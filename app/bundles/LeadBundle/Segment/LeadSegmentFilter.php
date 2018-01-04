@@ -37,7 +37,7 @@ class LeadSegmentFilter
     private $type;
 
     /**
-     * @var string|array|null
+     * @var string|array|bool|float|null
      */
     private $filter;
 
@@ -62,9 +62,13 @@ class LeadSegmentFilter
         $this->field    = isset($filter['field']) ? $filter['field'] : null;
         $this->object   = isset($filter['object']) ? $filter['object'] : self::LEAD_OBJECT;
         $this->type     = isset($filter['type']) ? $filter['type'] : null;
-        $this->filter   = isset($filter['filter']) ? $filter['filter'] : null;
         $this->display  = isset($filter['display']) ? $filter['display'] : null;
-        $this->operator = isset($filter['operator']) ? $filter['operator'] : null;
+
+        $operatorValue = isset($filter['operator']) ? $filter['operator'] : null;
+        $this->setOperator($operatorValue);
+
+        $filterValue = isset($filter['filter']) ? $filter['filter'] : null;
+        $this->setFilter($filterValue);
     }
 
     /**
@@ -148,10 +152,12 @@ class LeadSegmentFilter
     }
 
     /**
-     * @param string|array|null $filter
+     * @param string|array|bool|float|null $filter
      */
     public function setFilter($filter)
     {
+        $filter = $this->sanitizeFilter($filter);
+
         $this->filter = $filter;
     }
 
@@ -169,5 +175,29 @@ class LeadSegmentFilter
     public function setFunc($func)
     {
         $this->func = $func;
+    }
+
+    /**
+     * @param string|array|bool|float|null $filter
+     *
+     * @return string|array|bool|float|null
+     */
+    private function sanitizeFilter($filter)
+    {
+        if ($filter === null || is_array($filter) || !$this->getType()) {
+            return $filter;
+        }
+
+        switch ($this->getType()) {
+            case 'number':
+                $filter = (float) $filter;
+                break;
+
+            case 'boolean':
+                $filter = (bool) $filter;
+                break;
+        }
+
+        return $filter;
     }
 }

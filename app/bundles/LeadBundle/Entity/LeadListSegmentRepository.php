@@ -991,18 +991,6 @@ class LeadListSegmentRepository
             }
 
             if (!$ignoreAutoFilter) {
-                if (!is_array($leadSegmentFilter->getFilter())) {
-                    switch ($leadSegmentFilter->getType()) {
-                        case 'number':
-                            $leadSegmentFilter->setFilter((float) $leadSegmentFilter->getFilter());
-                            break;
-
-                        case 'boolean':
-                            $leadSegmentFilter->setFilter((bool) $leadSegmentFilter->getFilter());
-                            break;
-                    }
-                }
-
                 $parameters[$parameter] = $leadSegmentFilter->getFilter();
             }
 
