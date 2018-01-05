@@ -539,8 +539,8 @@ JS;
         $lead   = $this->trackingHelper->getLead();
 
         if ($id = $this->trackingHelper->displayInitCode('google_analytics')) {
-            $gaUserId     = ($lead && $lead->getId()) ? 'ga(\'set\', \'userId\', '.$lead->getId().');' : '';
-            $gaAnonymizeIp= $this->trackingHelper->getAnonymizeIp() ? 'ga(\'set\', \'anonymizeIp\', true);' : '';
+            $gaUserId      = ($lead && $lead->getId()) ? 'ga(\'set\', \'userId\', '.$lead->getId().');' : '';
+            $gaAnonymizeIp = $this->trackingHelper->getAnonymizeIp() ? 'ga(\'set\', \'anonymizeIp\', true);' : '';
 
             $js .= <<<JS
             dataLayer = window.dataLayer ? window.dataLayer : [];
