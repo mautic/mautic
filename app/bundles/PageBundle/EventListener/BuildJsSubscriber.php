@@ -537,8 +537,11 @@ JS;
         $js = '';
 
         $lead   = $this->trackingHelper->getLead();
-        $leadId = ($lead && $lead->getId()) ? $lead->getId() : '';
+
         if ($id = $this->trackingHelper->displayInitCode('google_analytics')) {
+            $gaUserId     = ($lead && $lead->getId()) ? 'ga(\'set\', \'userId\', '.$lead->getId().');' : '';
+            $gaAnonymizeIp= $this->trackingHelper->getAnonymizeIp() ? 'ga(\'set\', \'anonymizeIp\', true);' : '';
+
             $js .= <<<JS
             dataLayer = window.dataLayer ? window.dataLayer : [];
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -547,7 +550,8 @@ JS;
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
   ga('create', '{$id}', 'auto');
   ga('send', 'pageview');
-  ga('set', 'userId', {$leadId});
+  {$gaUserId}
+  {$gaAnonymizeIp}
 JS;
         }
 

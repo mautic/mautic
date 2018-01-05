@@ -333,6 +333,7 @@ return [
         'google_analytics_id'                   => null,
         'google_analytics_trackingpage_enabled' => false,
         'google_analytics_landingpage_enabled'  => false,
+        'google_analytics_anonymize_ip'         => false,
         'facebook_pixel_id'                     => null,
         'facebook_pixel_trackingpage_enabled'   => false,
         'facebook_pixel_landingpage_enabled'    => false,
