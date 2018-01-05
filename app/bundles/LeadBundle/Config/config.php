@@ -758,11 +758,19 @@ return [
                     'mautic.lead.model.lead_segment_service',
                 ],
             ],
+            'mautic.lead.repository.lead_segment_query_builder' => [
+                'class'     => \Mautic\LeadBundle\Services\LeadSegmentQueryBuilder::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.random_parameter_name',
+                ],
+            ],
             'mautic.lead.model.lead_segment_service' => [
                 'class'     => \Mautic\LeadBundle\Segment\LeadSegmentService::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_factory',
                     'mautic.lead.repository.lead_list_segment_repository',
+                    'mautic.lead.repository.lead_segment_query_builder'
                 ],
             ],
             'mautic.lead.model.lead_segment_filter_factory' => [

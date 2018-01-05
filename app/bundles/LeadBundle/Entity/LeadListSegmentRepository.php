@@ -83,6 +83,10 @@ class LeadListSegmentRepository
 
         $expr = $this->generateSegmentExpression($leadSegmentFilters, $q, $id);
 
+        echo 'SQL parameters:';
+        dump($q->getParameters());
+
+
         // Leads that do not have any record in the lead_lists_leads table for this lead list
         // For non null fields - it's apparently better to use left join over not exists due to not using nullable
         // fields - https://explainextended.com/2009/09/18/not-in-vs-not-exists-vs-left-join-is-null-mysql/
@@ -145,6 +149,7 @@ class LeadListSegmentRepository
 
     private function generateSegmentExpression(LeadSegmentFilters $leadSegmentFilters, QueryBuilder $q, $listId = null)
     {
+        var_dump(debug_backtrace()[1]['function']);
         $expr = $this->getListFilterExpr($leadSegmentFilters, $q, $listId);
 
         if ($leadSegmentFilters->isHasCompanyFilter()) {
@@ -163,6 +168,7 @@ class LeadListSegmentRepository
      */
     private function getListFilterExpr(LeadSegmentFilters $leadSegmentFilters, QueryBuilder $q, $listId)
     {
+        var_dump(debug_backtrace()[1]['function']);
         $parameters = [];
 
         $schema = $this->entityManager->getConnection()->getSchemaManager();
@@ -180,6 +186,10 @@ class LeadListSegmentRepository
             $field      = false;
 
             $filterField = $leadSegmentFilter->getField();
+
+            if($filterField=='lead_email_read_date') {
+
+            }
 
             if ($leadSegmentFilter->isLeadType()) {
                 $column = isset($leadTableSchema[$filterField]) ? $leadTableSchema[$filterField] : false;
@@ -206,6 +216,10 @@ class LeadListSegmentRepository
 
             // Generate a unique alias
             $alias = $this->generateRandomParameterName();
+
+//            var_dump($func.":".$leadSegmentFilter->getField());
+//            var_dump($exprParameter);
+
 
             switch ($leadSegmentFilter->getField()) {
                 case 'hit_url':
@@ -347,10 +361,17 @@ class LeadListSegmentRepository
                         $table  = 'email_stats';
                     }
 
+
+                    if($filterField=='lead_email_read_date') {
+                        var_dump($func);
+                    }
+
                     $subqb = $this->entityManager->getConnection()
                         ->createQueryBuilder()
                         ->select('id')
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
+
+
 
                     switch ($func) {
                         case 'eq':
@@ -398,7 +419,12 @@ class LeadListSegmentRepository
                             }
                             break;
                         default:
-                            $parameters[$parameter] = $leadSegmentFilter->getFilter();
+                            $parameter2              = $this->generateRandomParameterName();
+
+                            if($filterField=='lead_email_read_date') {
+                                var_dump($exprParameter);
+                            }
+                            $parameters[$parameter2] = $leadSegmentFilter->getFilter();
 
                             $subqb->where(
                                 $q->expr()
@@ -406,7 +432,7 @@ class LeadListSegmentRepository
                                         $q->expr()
                                             ->$func(
                                                 $alias.'.'.$column,
-                                                $exprParameter
+                                                $parameter2
                                             ),
                                         $q->expr()
                                             ->eq($alias.'.lead_id', 'l.id')
@@ -974,7 +1000,9 @@ class LeadListSegmentRepository
                             );
                             break;
                         default:
+                            $ignoreAutoFilter = true;
                             $groupExpr->add($q->expr()->$func($field, $exprParameter));
+                            $parameters[$exprParameter] = $leadSegmentFilter->getFilter();
                     }
             }
 
@@ -1018,6 +1046,8 @@ class LeadListSegmentRepository
             }
             $q->setParameter($k, $v, $paramType);
         }
+
+        var_dump($parameters);
 
         return $expr;
     }

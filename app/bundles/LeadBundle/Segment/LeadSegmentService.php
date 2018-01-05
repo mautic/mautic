@@ -11,8 +11,10 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListSegmentRepository;
+use Mautic\LeadBundle\Services\LeadSegmentQueryBuilder;
 
 class LeadSegmentService
 {
@@ -26,15 +28,34 @@ class LeadSegmentService
      */
     private $leadSegmentFilterFactory;
 
-    public function __construct(LeadSegmentFilterFactory $leadSegmentFilterFactory, LeadListSegmentRepository $leadListSegmentRepository)
+    /**
+     * @var LeadSegmentQueryBuilder
+     */
+    private $queryBuilder;
+
+    public function __construct(
+        LeadSegmentFilterFactory $leadSegmentFilterFactory,
+        LeadListSegmentRepository $leadListSegmentRepository,
+        LeadSegmentQueryBuilder $queryBuilder)
     {
         $this->leadListSegmentRepository = $leadListSegmentRepository;
         $this->leadSegmentFilterFactory  = $leadSegmentFilterFactory;
+        $this->queryBuilder              = $queryBuilder;
     }
 
     public function getNewLeadsByListCount(LeadList $entity, array $batchLimiters)
     {
         $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($entity);
+
+        /** @var QueryBuilder $qb */
+        $qb = $this->queryBuilder->getLeadsQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
+        var_dump($sql = $qb->getSQL());
+        $parameters = $qb->getParameters();
+        foreach($parameters as $parameter=>$value) {
+            $sql = str_replace(':' . $parameter, $value, $sql);
+        }
+        var_dump($sql);
+//        die();
 
         return $this->leadListSegmentRepository->getNewLeadsByListCount($entity->getId(), $segmentFilters, $batchLimiters);
     }

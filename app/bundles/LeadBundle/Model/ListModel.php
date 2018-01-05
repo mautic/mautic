@@ -30,6 +30,7 @@ use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\LeadSegmentService;
+use Mautic\LeadBundle\Services\LeadSegmentQueryBuilder;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
