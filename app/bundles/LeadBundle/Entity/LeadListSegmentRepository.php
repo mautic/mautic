@@ -65,7 +65,7 @@ class LeadListSegmentRepository
         }
 
         $q->select($select)
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+          ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         $batchExpr = $q->expr()->andX();
         // Only leads that existed at the time of count
@@ -121,7 +121,7 @@ class LeadListSegmentRepository
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
-                ->setMaxResults($limit);
+              ->setMaxResults($limit);
         }
 
         // remove any possible group by
@@ -248,9 +248,9 @@ class LeadListSegmentRepository
                     }
 
                     $subqb = $this->entityManager->getConnection()
-                        ->createQueryBuilder()
-                        ->select('id')
-                        ->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
+                                                 ->createQueryBuilder()
+                                                 ->select('id')
+                                                 ->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
 
                     switch ($func) {
                         case 'eq':
@@ -310,9 +310,9 @@ class LeadListSegmentRepository
 
                     $column = $leadSegmentFilter->getField();
                     $subqb  = $this->entityManager->getConnection()
-                        ->createQueryBuilder()
-                        ->select('id')
-                        ->from(MAUTIC_TABLE_PREFIX.'lead_devices', $alias);
+                                                  ->createQueryBuilder()
+                                                  ->select('id')
+                                                  ->from(MAUTIC_TABLE_PREFIX.'lead_devices', $alias);
                     switch ($func) {
                         case 'eq':
                         case 'neq':
@@ -367,9 +367,9 @@ class LeadListSegmentRepository
                     }
 
                     $subqb = $this->entityManager->getConnection()
-                        ->createQueryBuilder()
-                        ->select('id')
-                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
+                                                 ->createQueryBuilder()
+                                                 ->select('id')
+                                                 ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
 
 
@@ -380,12 +380,12 @@ class LeadListSegmentRepository
 
                             $subqb->where(
                                 $q->expr()
-                                    ->andX(
-                                        $q->expr()
-                                            ->eq($alias.'.'.$column, $exprParameter),
-                                        $q->expr()
-                                            ->eq($alias.'.lead_id', 'l.id')
-                                    )
+                                  ->andX(
+                                      $q->expr()
+                                        ->eq($alias.'.'.$column, $exprParameter),
+                                      $q->expr()
+                                        ->eq($alias.'.lead_id', 'l.id')
+                                  )
                             );
                             break;
                         case 'between':
@@ -401,20 +401,20 @@ class LeadListSegmentRepository
                             if ($func === 'between') {
                                 $subqb->where(
                                     $q->expr()
-                                        ->andX(
-                                            $q->expr()->gte($alias.'.'.$field, $exprParameter),
-                                            $q->expr()->lt($alias.'.'.$field, $exprParameter2),
-                                            $q->expr()->eq($alias.'.lead_id', 'l.id')
-                                        )
+                                      ->andX(
+                                          $q->expr()->gte($alias.'.'.$field, $exprParameter),
+                                          $q->expr()->lt($alias.'.'.$field, $exprParameter2),
+                                          $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                      )
                                 );
                             } else {
                                 $subqb->where(
                                     $q->expr()
-                                        ->andX(
-                                            $q->expr()->lt($alias.'.'.$field, $exprParameter),
-                                            $q->expr()->gte($alias.'.'.$field, $exprParameter2),
-                                            $q->expr()->eq($alias.'.lead_id', 'l.id')
-                                        )
+                                      ->andX(
+                                          $q->expr()->lt($alias.'.'.$field, $exprParameter),
+                                          $q->expr()->gte($alias.'.'.$field, $exprParameter2),
+                                          $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                      )
                                 );
                             }
                             break;
@@ -428,15 +428,15 @@ class LeadListSegmentRepository
 
                             $subqb->where(
                                 $q->expr()
-                                    ->andX(
-                                        $q->expr()
-                                            ->$func(
-                                                $alias.'.'.$column,
-                                                $parameter2
-                                            ),
-                                        $q->expr()
-                                            ->eq($alias.'.lead_id', 'l.id')
-                                    )
+                                  ->andX(
+                                      $q->expr()
+                                        ->$func(
+                                            $alias.'.'.$column,
+                                            $parameter2
+                                        ),
+                                      $q->expr()
+                                        ->eq($alias.'.lead_id', 'l.id')
+                                  )
                             );
                             break;
                     }
@@ -457,29 +457,29 @@ class LeadListSegmentRepository
                     }
 
                     $subqb = $this->entityManager->getConnection()
-                        ->createQueryBuilder()
-                        ->select($select)
-                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
+                                                 ->createQueryBuilder()
+                                                 ->select($select)
+                                                 ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
                     if ($leadSegmentFilter->getFilter() == 1) {
                         $subqb->where(
                             $q->expr()
-                                ->andX(
-                                    $q->expr()
-                                        ->isNotNull($alias.'.'.$column),
-                                    $q->expr()
-                                        ->eq($alias.'.lead_id', 'l.id')
-                                )
+                              ->andX(
+                                  $q->expr()
+                                    ->isNotNull($alias.'.'.$column),
+                                  $q->expr()
+                                    ->eq($alias.'.lead_id', 'l.id')
+                              )
                         );
                     } else {
                         $subqb->where(
                             $q->expr()
-                                ->andX(
-                                    $q->expr()
-                                        ->isNull($alias.'.'.$column),
-                                    $q->expr()
-                                        ->eq($alias.'.lead_id', 'l.id')
-                                )
+                              ->andX(
+                                  $q->expr()
+                                    ->isNull($alias.'.'.$column),
+                                  $q->expr()
+                                    ->eq($alias.'.lead_id', 'l.id')
+                              )
                         );
                     }
 
@@ -490,38 +490,38 @@ class LeadListSegmentRepository
                     $table   = 'page_hits';
                     $select  = 'COUNT(id)';
                     $subqb   = $this->entityManager->getConnection()
-                        ->createQueryBuilder()
-                        ->select($select)
-                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
+                                                   ->createQueryBuilder()
+                                                   ->select($select)
+                                                   ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
                     $alias2 = $this->generateRandomParameterName();
                     $subqb2 = $this->entityManager->getConnection()
-                        ->createQueryBuilder()
-                        ->select($alias2.'.id')
-                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias2);
+                                                  ->createQueryBuilder()
+                                                  ->select($alias2.'.id')
+                                                  ->from(MAUTIC_TABLE_PREFIX.$table, $alias2);
 
                     $subqb2->where(
                         $q->expr()
-                            ->andX(
-                                $q->expr()->eq($alias2.'.lead_id', 'l.id'),
-                                $q->expr()->gt($alias2.'.date_hit', '('.$alias.'.date_hit - INTERVAL 30 MINUTE)'),
-                                $q->expr()->lt($alias2.'.date_hit', $alias.'.date_hit')
-                            )
+                          ->andX(
+                              $q->expr()->eq($alias2.'.lead_id', 'l.id'),
+                              $q->expr()->gt($alias2.'.date_hit', '('.$alias.'.date_hit - INTERVAL 30 MINUTE)'),
+                              $q->expr()->lt($alias2.'.date_hit', $alias.'.date_hit')
+                          )
                     );
 
                     $parameters[$parameter] = $leadSegmentFilter->getFilter();
 
                     $subqb->where(
                         $q->expr()
-                            ->andX(
-                                $q->expr()
-                                    ->eq($alias.'.lead_id', 'l.id'),
-                                $q->expr()
-                                    ->isNull($alias.'.email_id'),
-                                $q->expr()
-                                    ->isNull($alias.'.redirect_id'),
-                                sprintf('%s (%s)', 'NOT EXISTS', $subqb2->getSQL())
-                            )
+                          ->andX(
+                              $q->expr()
+                                ->eq($alias.'.lead_id', 'l.id'),
+                              $q->expr()
+                                ->isNull($alias.'.email_id'),
+                              $q->expr()
+                                ->isNull($alias.'.redirect_id'),
+                              sprintf('%s (%s)', 'NOT EXISTS', $subqb2->getSQL())
+                          )
                     );
 
                     $opr = '';
@@ -558,17 +558,17 @@ class LeadListSegmentRepository
                         $select = 'COALESCE(SUM(open_count),0)';
                     }
                     $subqb = $this->entityManager->getConnection()
-                        ->createQueryBuilder()
-                        ->select($select)
-                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
+                                                 ->createQueryBuilder()
+                                                 ->select($select)
+                                                 ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
                     $parameters[$parameter] = $leadSegmentFilter->getFilter();
                     $subqb->where(
                         $q->expr()
-                            ->andX(
-                                $q->expr()
-                                    ->eq($alias.'.lead_id', 'l.id')
-                            )
+                          ->andX(
+                              $q->expr()
+                                ->eq($alias.'.lead_id', 'l.id')
+                          )
                     );
 
                     $opr = '';
@@ -614,15 +614,15 @@ class LeadListSegmentRepository
 
                     $channelParameter = $this->generateRandomParameterName();
                     $subqb            = $this->entityManager->getConnection()->createQueryBuilder()
-                        ->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $alias)
-                        ->where(
-                            $q->expr()->andX(
-                                $q->expr()->eq($alias.'.reason', $exprParameter),
-                                $q->expr()->eq($alias.'.lead_id', 'l.id'),
-                                $q->expr()->eq($alias.'.channel', ":$channelParameter")
-                            )
-                        );
+                                                            ->select('null')
+                                                            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $alias)
+                                                            ->where(
+                                                                $q->expr()->andX(
+                                                                    $q->expr()->eq($alias.'.reason', $exprParameter),
+                                                                    $q->expr()->eq($alias.'.lead_id', 'l.id'),
+                                                                    $q->expr()->eq($alias.'.channel', ":$channelParameter")
+                                                                )
+                                                            );
 
                     $groupExpr->add(
                         sprintf('%s (%s)', $func, $subqb->getSQL())
@@ -650,8 +650,8 @@ class LeadListSegmentRepository
 
                     if ($filterListIds = (array) $leadSegmentFilter->getFilter()) {
                         $listQb = $this->entityManager->getConnection()->createQueryBuilder()
-                            ->select('l.id, l.filters')
-                            ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'l');
+                                                      ->select('l.id, l.filters')
+                                                      ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'l');
                         $listQb->where(
                             $listQb->expr()->in('l.id', $filterListIds)
                         );
@@ -698,19 +698,19 @@ class LeadListSegmentRepository
                                     $membershipAlias,
                                     "$membershipAlias.lead_id = $alias.id AND $membershipAlias.leadlist_id = $id"
                                 )
-                                    ->where(
-                                        $subQb->expr()->orX(
-                                            $filterExpr,
-                                            $subQb->expr()->eq("$membershipAlias.manually_added", ":$trueParameter") //include manually added
-                                        )
-                                    )
-                                    ->andWhere(
-                                        $subQb->expr()->eq("$alias.id", 'l.id'),
-                                        $subQb->expr()->orX(
-                                            $subQb->expr()->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
-                                            $subQb->expr()->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
-                                        )
-                                    );
+                                      ->where(
+                                          $subQb->expr()->orX(
+                                              $filterExpr,
+                                              $subQb->expr()->eq("$membershipAlias.manually_added", ":$trueParameter") //include manually added
+                                          )
+                                      )
+                                      ->andWhere(
+                                          $subQb->expr()->eq("$alias.id", 'l.id'),
+                                          $subQb->expr()->orX(
+                                              $subQb->expr()->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
+                                              $subQb->expr()->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
+                                          )
+                                      );
                             }
 
                             $existsExpr->add(
@@ -793,9 +793,9 @@ class LeadListSegmentRepository
                     // if performance is desired.
 
                     $subQb = $this->entityManager->getConnection()
-                        ->createQueryBuilder()
-                        ->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX.'stages', $alias);
+                                                 ->createQueryBuilder()
+                                                 ->select('null')
+                                                 ->from(MAUTIC_TABLE_PREFIX.'stages', $alias);
 
                     switch ($func) {
                         case 'empty':
@@ -839,9 +839,9 @@ class LeadListSegmentRepository
                     $ignoreAutoFilter = true;
 
                     $subQb = $this->entityManager->getConnection()
-                        ->createQueryBuilder()
-                        ->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX.'integration_entity', $alias);
+                                                 ->createQueryBuilder()
+                                                 ->select('null')
+                                                 ->from(MAUTIC_TABLE_PREFIX.'integration_entity', $alias);
                     switch ($func) {
                         case 'eq':
                         case 'neq':
@@ -1142,8 +1142,8 @@ class LeadListSegmentRepository
         }
 
         $subQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.$table, $alias)
-            ->where($subExpr);
+              ->from(MAUTIC_TABLE_PREFIX.$table, $alias)
+              ->where($subExpr);
 
         return $subQb;
     }
@@ -1160,12 +1160,12 @@ class LeadListSegmentRepository
         $joinType = $leadSegmentFilters->isListFiltersInnerJoinCompany() ? 'join' : 'leftJoin';
         // Join company tables for query optimization
         $q->$joinType('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'l.id = cl.lead_id')
-            ->$joinType(
-                'cl',
-                MAUTIC_TABLE_PREFIX.'companies',
-                'comp',
-                'cl.company_id = comp.id'
-            );
+          ->$joinType(
+              'cl',
+              MAUTIC_TABLE_PREFIX.'companies',
+              'comp',
+              'cl.company_id = comp.id'
+          );
 
         // Return only unique contacts
         $q->groupBy('l.id');

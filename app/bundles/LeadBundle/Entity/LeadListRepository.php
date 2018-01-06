@@ -511,6 +511,7 @@ class LeadListRepository extends CommonRepository
                 dump($q->getSQL());
                 dump($q->getParameters());
 
+                die();
                 $results = $q->execute()->fetchAll();
 
                 foreach ($results as $r) {

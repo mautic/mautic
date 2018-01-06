@@ -200,45 +200,8 @@ class LeadSegmentQueryBuilder
         throw new \Exception(sprintf('Unknown value type \'%s\'.', $filter->getType()));
     }
 
-    private function getQueryPart(LeadSegmentFilter $filter, QueryBuilder $qb)
-    {
-        $parameters = [];
 
-        //@todo cache metadata
-        $schema    = $this->entityManager->getConnection()
-                                         ->getSchemaManager()
-        ;
-        $tableName = $this->entityManager->getClassMetadata('MauticLeadBundle:' . ucfirst($filter->getObject()))
-                                         ->getTableName()
-        ;
-
-
-        /** @var Column $dbColumn */
-        $dbColumn = isset($schema->listTableColumns($tableName)[$filter->getField()])
-            ? $schema->listTableColumns($tableName)[$filter->getField()]
-            : false;
-
-
-        if ($dbColumn) {
-            $dbField = $dbColumn->getFullQualifiedName(ucfirst($filter->getObject()));
-        }
-        else {
-            $translated = isset($this->translator[$filter->getField()])
-                ? $this->translator[$filter->getField()]
-                : false;
-
-            if (!$translated) {
-                var_dump('Unknown field: ' . $filter->getField());
-                var_dump($filter);
-                return $qb;
-                throw new \Exception('Unknown field: ' . $filter->getField());
-            }
-
-            var_dump($translated);
-            $dbColumn = $schema->listTableColumns($translated['foreign_table'])[$translated['field']];
-        }
-
-
+    private function addForeignTableQuery(QueryBuilder $qb, $translated) {
         $parameterHolder = $this->generateRandomParameterName();
 
         if (isset($translated) && $translated) {
@@ -287,9 +250,48 @@ class LeadSegmentQueryBuilder
             $qb->setParameter($parameterHolder, $filter->getFilter());
 
             $qb->groupBy(sprintf('%s.%s', $this->tableAliases[$translated['table']], $translated['table_field']));
-
-            var_dump($translated);
         }
+    }
+
+    private function getQueryPart(LeadSegmentFilter $filter, QueryBuilder $qb)
+    {
+        $parameters = [];
+
+        //@todo cache metadata
+        $schema    = $this->entityManager->getConnection()
+                                         ->getSchemaManager()
+        ;
+        $tableName = $this->entityManager->getClassMetadata('MauticLeadBundle:' . ucfirst($filter->getObject()))
+                                         ->getTableName()
+        ;
+
+
+        /** @var Column $dbColumn */
+        $dbColumn = isset($schema->listTableColumns($tableName)[$filter->getField()])
+            ? $schema->listTableColumns($tableName)[$filter->getField()]
+            : false;
+
+
+        if ($dbColumn) {
+            $dbField = $dbColumn->getFullQualifiedName(ucfirst($filter->getObject()));
+        }
+        else {
+            $translated = isset($this->translator[$filter->getField()])
+                ? $this->translator[$filter->getField()]
+                : false;
+
+            if (!$translated) {
+                var_dump('Unknown field: ' . $filter->getField());
+                var_dump($filter);
+                return $qb;
+                throw new \Exception('Unknown field: ' . $filter->getField());
+            }
+
+            $dbColumn = $schema->listTableColumns($translated['foreign_table'])[$translated['field']];
+        }
+
+
+
 
         return $qb;
 
