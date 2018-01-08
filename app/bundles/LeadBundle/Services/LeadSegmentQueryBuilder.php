@@ -33,37 +33,29 @@ class LeadSegmentQueryBuilder
 
     private $tableAliases = [];
 
-    private $translator = [];
+    /** @var LeadSegmentFilterDescriptor */
+    private $translator;
+
+    /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager */
+    private $schema;
 
     public function __construct(
         EntityManager $entityManager,
-        RandomParameterName $randomParameterName
+        RandomParameterName $randomParameterName,
+        LeadSegmentFilterDescriptor $translator
     )
     {
         $this->entityManager       = $entityManager;
         $this->randomParameterName = $randomParameterName;
+        $this->schema              = $this->entityManager->getConnection()
+                                                         ->getSchemaManager()
+        ;
+        $this->translator = $translator;
 
         //@todo Will be generate automatically, just as POC
         $this->tableAliases['leads']       = 'l';
         $this->tableAliases['email_stats'] = 'es';
-        $this->tableAliases['page_hits'] = 'ph';
-
-        $this->translator['lead_email_read_count'] = [
-            'foreign_table'       => 'email_stats',
-            'foreign_table_field' => 'lead_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'func'                => 'sum',
-            'field'               => 'open_count'
-        ];
-
-        $this->translator['lead_email_read_date'] = [
-            'foreign_table'       => 'page_hits',
-            'foreign_table_field' => 'lead_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'date_hit'
-        ];
+        $this->tableAliases['page_hits']   = 'ph';
     }
 
 //object(Mautic\LeadBundle\Segment\LeadSegmentFilter)[841]
@@ -167,42 +159,12 @@ class LeadSegmentQueryBuilder
         return $leads;
     }
 
-    private function getFilterOperator(LeadSegmentFilter $filter, $translated = false)
+    private function addForeignTableQuery(QueryBuilder $qb, LeadSegmentFilter $filter)
     {
-        switch ($filter->getOperator()) {
-            case 'gt':
-                return '>';
-            case 'eq':
-                return '=';
-            case 'gt':
-                return '>';
-            case 'gte':
-                return '>=';
-            case 'lt':
-                return '<';
-            case 'lte':
-                return '<=';
-        }
-        throw new \Exception(sprintf('Unknown operator \'%s\'.', $filter->getOperator()));
-    }
+        $translated = $filter->getQueryDescription($this->getTranslator());
 
-    private function getFilterValue(LeadSegmentFilter $filter, $parameterHolder, Column $dbColumn = null)
-    {
-        switch ($filter->getType()) {
-            case 'number':
-                return ":" . $parameterHolder;
-            case 'datetime':
-                return sprintf('":%s"', $parameterHolder);
-            default:
-                var_dump($dbColumn->getType());
-                die();
-        }
-        throw new \Exception(sprintf('Unknown value type \'%s\'.', $filter->getType()));
-    }
-
-
-    private function addForeignTableQuery(QueryBuilder $qb, $translated) {
         $parameterHolder = $this->generateRandomParameterName();
+        $dbColumn        = $this->schema->listTableColumns($translated['foreign_table'])[$translated['field']];
 
         if (isset($translated) && $translated) {
             if (isset($translated['func'])) {
@@ -223,12 +185,13 @@ class LeadSegmentQueryBuilder
                 $qb->andHaving(
                     isset($translated['func'])
                         ? sprintf('%s(%s.%s) %s %s', $translated['func'], $this->tableAliases[$translated['foreign_table']],
-                        $translated['field'], $this->getFilterOperator($filter), $this->getFilterValue($filter, $parameterHolder))
+                        $translated['field'], $filter->getSQLOperator(), $filter->getFilterConditionValue($parameterHolder))
                         : sprintf('%s.%s %s %s', $this->tableAliases[$translated['foreign_table']], $translated['field'],
                         $this->getFilterOperator($filter), $this->getFilterValue($filter, $parameterHolder, $dbColumn))
                 );
 
-            } else {
+            }
+            else {
                 //@todo rewrite with getFullQualifiedName
                 $qb->innerJoin(
                     $this->tableAliases[$translated['table']],
@@ -240,11 +203,10 @@ class LeadSegmentQueryBuilder
                         $this->tableAliases[$translated['foreign_table']],
                         $translated['foreign_table_field'],
                         sprintf('%s.%s %s %s', $this->tableAliases[$translated['foreign_table']], $translated['field'],
-                            $this->getFilterOperator($filter), $this->getFilterValue($filter, $parameterHolder, $dbColumn))
+                            $filter->getSQLOperator(), $filter->getFilterConditionValue($parameterHolder))
                     )
                 );
             }
-
 
 
             $qb->setParameter($parameterHolder, $filter->getFilter());
@@ -253,22 +215,124 @@ class LeadSegmentQueryBuilder
         }
     }
 
+    private function addLeadListQuery() {
+                $table                       = 'lead_lists_leads';
+                $column                      = 'leadlist_id';
+                $falseParameter              = $this->generateRandomParameterName();
+                $parameters[$falseParameter] = false;
+                $trueParameter               = $this->generateRandomParameterName();
+                $parameters[$trueParameter]  = true;
+                $func                        = in_array($func, ['eq', 'in']) ? 'EXISTS' : 'NOT EXISTS';
+                $ignoreAutoFilter            = true;
+
+                if ($filterListIds = (array)$leadSegmentFilter->getFilter()) {
+                    $listQb = $this->entityManager->getConnection()
+                                                  ->createQueryBuilder()
+                                                  ->select('l.id, l.filters')
+                                                  ->from(MAUTIC_TABLE_PREFIX . 'lead_lists', 'l')
+                    ;
+                    $listQb->where(
+                        $listQb->expr()
+                               ->in('l.id', $filterListIds)
+                    );
+                    $filterLists = $listQb->execute()
+                                          ->fetchAll()
+                    ;
+                    $not         = 'NOT EXISTS' === $func;
+
+                    // Each segment's filters must be appended as ORs so that each list is evaluated individually
+                    $existsExpr = $not ? $listQb->expr()
+                                                ->andX() : $listQb->expr()
+                                                                  ->orX()
+                    ;
+
+                    foreach ($filterLists as $list) {
+                        $alias = $this->generateRandomParameterName();
+                        $id    = (int)$list['id'];
+                        if ($id === (int)$listId) {
+                            // Ignore as somehow self is included in the list
+                            continue;
+                        }
+
+                        $listFilters = unserialize($list['filters']);
+                        if (empty($listFilters)) {
+                            // Use an EXISTS/NOT EXISTS on contact membership as this is a manual list
+                            $subQb = $this->createFilterExpressionSubQuery(
+                                $table,
+                                $alias,
+                                $column,
+                                $id,
+                                $parameters,
+                                [
+                                    $alias . '.manually_removed' => $falseParameter,
+                                ]
+                            );
+                        }
+                        else {
+                            // Build a EXISTS/NOT EXISTS using the filters for this list to include/exclude those not processed yet
+                            // but also leverage the current membership to take into account those manually added or removed from the segment
+
+                            // Build a "live" query based on current filters to catch those that have not been processed yet
+                            $subQb      = $this->createFilterExpressionSubQuery('leads', $alias, null, null, $parameters);
+                            $filterExpr = $this->generateSegmentExpression($leadSegmentFilters, $subQb, $id);
+
+                            // Left join membership to account for manually added and removed
+                            $membershipAlias = $this->generateRandomParameterName();
+                            $subQb->leftJoin(
+                                $alias,
+                                MAUTIC_TABLE_PREFIX . $table,
+                                $membershipAlias,
+                                "$membershipAlias.lead_id = $alias.id AND $membershipAlias.leadlist_id = $id"
+                            )
+                                  ->where(
+                                      $subQb->expr()
+                                            ->orX(
+                                                $filterExpr,
+                                                $subQb->expr()
+                                                      ->eq("$membershipAlias.manually_added", ":$trueParameter") //include manually added
+                                            )
+                                  )
+                                  ->andWhere(
+                                      $subQb->expr()
+                                            ->eq("$alias.id", 'l.id'),
+                                      $subQb->expr()
+                                            ->orX(
+                                                $subQb->expr()
+                                                      ->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
+                                                $subQb->expr()
+                                                      ->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
+                                            )
+                                  )
+                            ;
+                        }
+
+                        $existsExpr->add(
+                            sprintf('%s (%s)', $func, $subQb->getSQL())
+                        );
+                    }
+
+                    if ($existsExpr->count()) {
+                        $groupExpr->add($existsExpr);
+                    }
+                }
+
+                break;
+    }
+
+
     private function getQueryPart(LeadSegmentFilter $filter, QueryBuilder $qb)
     {
         $parameters = [];
 
         //@todo cache metadata
-        $schema    = $this->entityManager->getConnection()
-                                         ->getSchemaManager()
-        ;
         $tableName = $this->entityManager->getClassMetadata('MauticLeadBundle:' . ucfirst($filter->getObject()))
                                          ->getTableName()
         ;
 
 
         /** @var Column $dbColumn */
-        $dbColumn = isset($schema->listTableColumns($tableName)[$filter->getField()])
-            ? $schema->listTableColumns($tableName)[$filter->getField()]
+        $dbColumn = isset($this->schema->listTableColumns($tableName)[$filter->getField()])
+            ? $this->schema->listTableColumns($tableName)[$filter->getField()]
             : false;
 
 
@@ -276,9 +340,7 @@ class LeadSegmentQueryBuilder
             $dbField = $dbColumn->getFullQualifiedName(ucfirst($filter->getObject()));
         }
         else {
-            $translated = isset($this->translator[$filter->getField()])
-                ? $this->translator[$filter->getField()]
-                : false;
+            $translated = $filter->getQueryDescription();
 
             if (!$translated) {
                 var_dump('Unknown field: ' . $filter->getField());
@@ -287,10 +349,15 @@ class LeadSegmentQueryBuilder
                 throw new \Exception('Unknown field: ' . $filter->getField());
             }
 
-            $dbColumn = $schema->listTableColumns($translated['foreign_table'])[$translated['field']];
+            switch ($translated['type']) {
+                case 'foreign':
+                case 'foreign_aggr':
+                    $this->addForeignTableQuery($qb, $filter);
+                    break;
+                   }
+
+
         }
-
-
 
 
         return $qb;
@@ -1393,6 +1460,42 @@ class LeadSegmentQueryBuilder
         }
 
         return $expr;
+    }
+
+    /**
+     * @return LeadSegmentFilterDescriptor
+     */
+    public function getTranslator()
+    {
+        return $this->translator;
+    }
+
+    /**
+     * @param LeadSegmentFilterDescriptor $translator
+     * @return LeadSegmentQueryBuilder
+     */
+    public function setTranslator($translator)
+    {
+        $this->translator = $translator;
+        return $this;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
+     */
+    public function getSchema()
+    {
+        return $this->schema;
+    }
+
+    /**
+     * @param \Doctrine\DBAL\Schema\AbstractSchemaManager $schema
+     * @return LeadSegmentQueryBuilder
+     */
+    public function setSchema($schema)
+    {
+        $this->schema = $schema;
+        return $this;
     }
 
 
