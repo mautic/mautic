@@ -50,6 +50,8 @@ class LeadSegmentService
         /** @var QueryBuilder $qb */
         $qb = $this->queryBuilder->getLeadsQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
         dump($sql = $qb->getSQL());
+
+
         $parameters = $qb->getParameters();
         foreach($parameters as $parameter=>$value) {
             $sql = str_replace(':' . $parameter, $value, $sql);

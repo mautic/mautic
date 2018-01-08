@@ -766,8 +766,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Services\LeadSegmentQueryBuilder::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'mautic.lead.model.random_parameter_name',
-                    'mautic.lead.repository.lead_segment_filter_descriptor'
+                    'mautic.lead.model.random_parameter_name'
                 ],
             ],
             'mautic.lead.model.lead_segment_service' => [
@@ -783,6 +782,8 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_date',
                     'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                    'doctrine.orm.entity_manager'
                 ],
             ],
             'mautic.lead.model.relative_date' => [

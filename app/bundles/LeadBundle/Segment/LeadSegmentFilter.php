@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Column;
 use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 
 class LeadSegmentFilter
@@ -58,16 +60,21 @@ class LeadSegmentFilter
      */
     private $func;
 
-    /** @var LeadSegmentFilterDescriptor $translator */
-    private $translator;
-
     /**
      * @var array
      */
     private $queryDescription = null;
 
-    public function __construct(array $filter)
+    /** @var Column */
+    private $dbColumn;
+
+    private $schema;
+
+    public function __construct(array $filter, \ArrayIterator $dictionary = null, AbstractSchemaManager $schema = null)
     {
+        if (is_null($schema)) {
+            throw new \Exception('No schema');
+        }
         $this->glue    = isset($filter['glue']) ? $filter['glue'] : null;
         $this->field   = isset($filter['field']) ? $filter['field'] : null;
         $this->object  = isset($filter['object']) ? $filter['object'] : self::LEAD_OBJECT;
@@ -79,6 +86,10 @@ class LeadSegmentFilter
 
         $filterValue = isset($filter['filter']) ? $filter['filter'] : null;
         $this->setFilter($filterValue);
+        $this->schema = $schema;
+        if (!is_null($dictionary)) {
+            $this->translateQueryDescription($dictionary);
+        }
     }
 
     /**
@@ -101,7 +112,7 @@ class LeadSegmentFilter
             case 'lte':
                 return '<=';
         }
-        throw new \Exception(sprintf('Unknown operator \'%s\'.', $filter->getOperator()));
+        throw new \Exception(sprintf('Unknown operator \'%s\'.', $this->getOperator()));
     }
 
     public function getFilterConditionValue($argument = null) {
@@ -111,10 +122,16 @@ class LeadSegmentFilter
             case 'datetime':
                 return sprintf('":%s"', $argument);
             default:
-                var_dump($dbColumn->getType());
+                var_dump($this->getDBColumn()->getType());
                 die();
         }
         throw new \Exception(sprintf('Unknown value type \'%s\'.', $filter->getType()));
+    }
+
+
+    public function getDBColumn() {
+        $dbColumn = $this->schema->listTableColumns($this->queryDescription['foreign_table'])[$this->queryDescription['field']];
+        var_dump($dbColumn);
     }
 
     /**
@@ -267,12 +284,10 @@ class LeadSegmentFilter
     /**
      * @return array
      */
-    public function getQueryDescription($translator = null)
+    public function getQueryDescription($dictionary = null)
     {
-        $this->translator = is_null($translator) ? new LeadSegmentFilterDescriptor() : $translator;
-
         if (is_null($this->queryDescription)) {
-            $this->assembleQueryDescription();
+            $this->assembleQueryDescription($dictionary);
         }
         return $this->queryDescription;
     }
@@ -290,10 +305,13 @@ class LeadSegmentFilter
     /**
      * @return $this
      */
-    private function assembleQueryDescription() {
+    public function translateQueryDescription(\ArrayIterator $dictionary) {
+        if (is_null($this->schema)) {
+            throw new \Exception('You need to pass database schema manager along with dictionary');
+        }
 
-        $this->queryDescription = isset($this->translator[$this->getField()])
-            ? $this->translator[$this->getField()]
+        $this->queryDescription = isset($dictionary[$this->getField()])
+            ? $dictionary[$this->getField()]
             : false;
 
         return $this;
