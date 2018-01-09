@@ -176,27 +176,34 @@ abstract class AbstractMauticTestCase extends WebTestCase
     }
 
     /**
-     * @param       $name
-     * @param array $params
+     * @param              $name
+     * @param array        $params
+     * @param Command|null $command
+     *
+     * @return string
      *
      * @throws \Exception
      */
-    protected function runSymfonyCommand(Command $command, $name, array $params = [])
+    protected function runCommand($name, array $params = [], Command $command = null)
     {
         $params      = array_merge(['command' => $name], $params);
         $kernel      = $this->container->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
 
-        if ($command instanceof ContainerAwareCommand) {
-            $command->setContainer($this->container);
-        }
+        if ($command) {
+            if ($command instanceof ContainerAwareCommand) {
+                $command->setContainer($this->container);
+            }
 
-        // Register the command
-        $application->add($command);
+            // Register the command
+            $application->add($command);
+        }
 
         $input  = new ArrayInput($params);
         $output = new BufferedOutput();
         $application->run($input, $output);
+
+        return $output->fetch();
     }
 }
