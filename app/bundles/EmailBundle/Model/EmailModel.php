@@ -520,6 +520,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->em->flush($email);
         }
 
+        $this->em->persist($stat);
+        $this->em->flush();
+
         if (isset($emailOpenDevice) and is_object($emailOpenDevice)) {
             $emailOpenStat = new StatDevice();
             $emailOpenStat->setIpAddress($ipAddress);
@@ -530,9 +533,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->em->persist($emailOpenStat);
             $this->em->flush($emailOpenStat);
         }
-
-        $this->em->persist($stat);
-        $this->em->flush();
     }
 
     /**
