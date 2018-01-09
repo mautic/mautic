@@ -83,7 +83,7 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
     public function testCampaignExecution()
     {
         $command = new TriggerCampaignCommand();
-        $this->runCommand($command, 'mautic:campaigns:trigger', ['-i' => 1]);
+        $this->runSymfonyCommand($command, 'mautic:campaigns:trigger', ['-i' => 1]);
 
         // Let's analyze
         $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13]);
@@ -126,7 +126,7 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
 
         // Wait 15 seconds then execute the campaign again to send scheduled events
         sleep(15);
-        $this->runCommand($command, 'mautic:campaigns:trigger', ['-i' => 1]);
+        $this->runSymfonyCommand($command, 'mautic:campaigns:trigger', ['-i' => 1]);
 
         // Send email 1 should no longer be scheduled
         $byEvent = $this->getCampaignEventLogs([2]);
@@ -166,7 +166,7 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
         sleep(15);
 
         // Execute the command again to trigger inaction related events
-        $this->runCommand($command, 'mautic:campaigns:trigger', ['-i' => 1]);
+        $this->runSymfonyCommand($command, 'mautic:campaigns:trigger', ['-i' => 1]);
 
         // Now we should have 50 email open decisions
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 14]);

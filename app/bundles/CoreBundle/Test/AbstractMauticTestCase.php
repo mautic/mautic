@@ -181,7 +181,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      *
      * @throws \Exception
      */
-    protected function runCommand(Command $command, $name, array $params = [])
+    protected function runSymfonyCommand(Command $command, $name, array $params = [])
     {
         $params      = array_merge(['command' => $name], $params);
         $kernel      = $this->container->get('kernel');
