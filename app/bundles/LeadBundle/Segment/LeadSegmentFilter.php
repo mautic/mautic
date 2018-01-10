@@ -124,13 +124,17 @@ class LeadSegmentFilter
         switch ($this->getDBColumn()->getType()->getName()) {
             case 'number':
             case 'integer':
+            case 'float':
                 return ":" . $argument;
             case 'datetime':
+            case 'date':
                 return sprintf('":%s"', $argument);
+            case 'text':
             case 'string':
                 switch ($this->getFunc()) {
                     case 'eq':
                     case 'ne':
+                    case 'neq':
                         return sprintf("':%s'", $argument);
                     default:
                         throw new \Exception('Unknown operator ' . $this->getFunc());

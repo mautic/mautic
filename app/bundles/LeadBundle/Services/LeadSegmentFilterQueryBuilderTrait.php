@@ -170,11 +170,14 @@ trait LeadSegmentFilterQueryBuilderTrait {
         $result = $parts = $qb->getQueryPart('join');
 
 
+        dump(1);
         foreach ($parts['l'] as $key=>$part) {
+            dump($part);
             if ($part['joinAlias'] == $alias) {
                 $result['l'][$key]['joinCondition'] = $part['joinCondition'] . " and " . $expr;
             }
         }
+        dump(2);
 
         $qb->setQueryPart('join', $result);
         dump($qb->getQueryParts()); die();

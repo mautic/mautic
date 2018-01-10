@@ -85,6 +85,7 @@ class LeadSegmentQueryBuilder {
 
         $qb->select('*')->from('MauticLeadBundle:Lead', 'l');
 
+        $qb->execute();
         foreach ($leadSegmentFilters as $filter) {
             dump($filter);
             $qb = $this->getQueryPart($filter, $qb);
@@ -141,74 +142,6 @@ class LeadSegmentQueryBuilder {
 
         return $leads;
     }
-
-    /**
-     * @todo this is just copy of existing as template, not a real function
-     */
-    private function addLeadListQuery($filter) {
-        $table                       = 'lead_lists_leads';
-        $column                      = 'leadlist_id';
-        $falseParameter              = $this->generateRandomParameterName();
-        $parameters[$falseParameter] = false;
-        $trueParameter               = $this->generateRandomParameterName();
-        $parameters[$trueParameter]  = true;
-        $func                        = in_array($func, ['eq', 'in']) ? 'EXISTS' : 'NOT EXISTS';
-        $ignoreAutoFilter            = true;
-
-        if ($filterListIds = (array)$filter->getFilter()) {
-            $listQb = $this->entityManager->getConnection()->createQueryBuilder()->select('l.id, l.filters')
-                                          ->from(MAUTIC_TABLE_PREFIX . 'lead_lists', 'l');
-            $listQb->where($listQb->expr()->in('l.id', $filterListIds));
-            $filterLists = $listQb->execute()->fetchAll();
-            $not         = 'NOT EXISTS' === $func;
-
-            // Each segment's filters must be appended as ORs so that each list is evaluated individually
-            $existsExpr = $not ? $listQb->expr()->andX() : $listQb->expr()->orX();
-
-            foreach ($filterLists as $list) {
-                $alias = $this->generateRandomParameterName();
-                $id    = (int)$list['id'];
-                if ($id === (int)$listId) {
-                    // Ignore as somehow self is included in the list
-                    continue;
-                }
-
-                $listFilters = unserialize($list['filters']);
-                if (empty($listFilters)) {
-                    // Use an EXISTS/NOT EXISTS on contact membership as this is a manual list
-                    $subQb = $this->createFilterExpressionSubQuery($table, $alias, $column, $id, $parameters, [$alias . '.manually_removed' => $falseParameter,]);
-                }
-                else {
-                    // Build a EXISTS/NOT EXISTS using the filters for this list to include/exclude those not processed yet
-                    // but also leverage the current membership to take into account those manually added or removed from the segment
-
-                    // Build a "live" query based on current filters to catch those that have not been processed yet
-                    $subQb      = $this->createFilterExpressionSubQuery('leads', $alias, null, null, $parameters);
-                    $filterExpr = $this->generateSegmentExpression($leadSegmentFilters, $subQb, $id);
-
-                    // Left join membership to account for manually added and removed
-                    $membershipAlias = $this->generateRandomParameterName();
-                    $subQb->leftJoin($alias, MAUTIC_TABLE_PREFIX . $table, $membershipAlias, "$membershipAlias.lead_id = $alias.id AND $membershipAlias.leadlist_id = $id")
-                          ->where($subQb->expr()->orX($filterExpr, $subQb->expr()
-                                                                         ->eq("$membershipAlias.manually_added", ":$trueParameter") //include manually added
-                          ))->andWhere($subQb->expr()->eq("$alias.id", 'l.id'), $subQb->expr()->orX($subQb->expr()
-                                                                                                          ->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
-                                                                                                    $subQb->expr()
-                                                                                                          ->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
-                        ));
-                }
-
-                $existsExpr->add(sprintf('%s (%s)', $func, $subQb->getSQL()));
-            }
-
-            if ($existsExpr->count()) {
-                $groupExpr->add($existsExpr);
-            }
-        }
-
-        break;
-    }
-
 
     private function getQueryPart(LeadSegmentFilter $filter, QueryBuilder $qb) {
         var_dump('Asseting query type: ' . $filter->getFilter());
