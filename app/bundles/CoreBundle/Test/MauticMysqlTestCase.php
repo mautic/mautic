@@ -30,7 +30,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $connection = $this->container->get('doctrine.dbal.default_connection');
         $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file} 2>&1 | grep -v \"Using a password\" || true";
+        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file}";
 
         $lastLine = system($command, $status);
         if (0 !== $status) {
