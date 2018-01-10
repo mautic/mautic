@@ -110,7 +110,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         system($command, $status);
         if (1 !== $status) {
-            throw new \Exception('Failed to dump file');
+            throw new \Exception('Failed to dump SQL to '.$this->sqlDumpFile.' with status code '.$status);
         }
     }
 }
