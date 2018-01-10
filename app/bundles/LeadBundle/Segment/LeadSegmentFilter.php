@@ -11,12 +11,19 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
+use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 class LeadSegmentFilter
 {
+    use LeadSegmentFilterQueryBuilderTrait;
+
     const LEAD_OBJECT = 'lead';
     const COMPANY_OBJECT = 'company';
 
@@ -68,25 +75,23 @@ class LeadSegmentFilter
     /** @var Column */
     private $dbColumn;
 
-    private $schema;
+    /** @var EntityManager  */
+    private $em;
 
-    public function __construct(array $filter, \ArrayIterator $dictionary = null, AbstractSchemaManager $schema = null)
+    public function __construct(array $filter, \ArrayIterator $dictionary = null, EntityManager $em = null)
     {
-        if (is_null($schema)) {
-            throw new \Exception('No schema');
-        }
         $this->glue    = isset($filter['glue']) ? $filter['glue'] : null;
         $this->field   = isset($filter['field']) ? $filter['field'] : null;
         $this->object  = isset($filter['object']) ? $filter['object'] : self::LEAD_OBJECT;
         $this->type    = isset($filter['type']) ? $filter['type'] : null;
         $this->display = isset($filter['display']) ? $filter['display'] : null;
-
+        $this->func    = isset($filter['func']) ? $filter['func'] : null;
         $operatorValue = isset($filter['operator']) ? $filter['operator'] : null;
         $this->setOperator($operatorValue);
 
         $filterValue = isset($filter['filter']) ? $filter['filter'] : null;
         $this->setFilter($filterValue);
-        $this->schema = $schema;
+        $this->em = $em;
         if (!is_null($dictionary)) {
             $this->translateQueryDescription($dictionary);
         }
@@ -116,22 +121,106 @@ class LeadSegmentFilter
     }
 
     public function getFilterConditionValue($argument = null) {
-        switch ($this->getType()) {
+        switch ($this->getDBColumn()->getType()->getName()) {
             case 'number':
+            case 'integer':
                 return ":" . $argument;
             case 'datetime':
                 return sprintf('":%s"', $argument);
+            case 'string':
+                switch ($this->getFunc()) {
+                    case 'eq':
+                    case 'ne':
+                        return sprintf("':%s'", $argument);
+                    default:
+                        throw new \Exception('Unknown operator ' . $this->getFunc());
+                }
             default:
-                var_dump($this->getDBColumn()->getType());
+                var_dump($this->getDBColumn()->getType()->getName());
+                var_dump($this);
                 die();
         }
-        throw new \Exception(sprintf('Unknown value type \'%s\'.', $filter->getType()));
+        var_dump($filter);
+        throw new \Exception(sprintf('Unknown value type \'%s\'.', $filter->getName()));
     }
 
 
+    public function createQuery(QueryBuilder $queryBuilder, $alias = false) {
+        $glueFunc = $this->getGlue() . 'Where';
+
+        $parameterName = $this->generateRandomParameterName();
+
+        $queryBuilder = $queryBuilder->$glueFunc(
+            $this->createExpression($queryBuilder, $parameterName, $this->getFunc())
+        );
+
+        $queryBuilder->setParameter($parameterName, $this->getFilter());
+
+        return $queryBuilder;
+    }
+
+    public function createExpression(QueryBuilder $queryBuilder, $parameterName, $func = null) {
+        dump('creating expression'); dump($this);
+        $func = is_null($func) ? $this->getFunc() : $func;
+        $alias = $this->getTableAlias($this->getEntityName(), $queryBuilder);
+        if (!$alias) {
+            $expr = $queryBuilder->expr()->$func($this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
+            $queryBuilder = $this->createJoin($queryBuilder, $this->getEntityName(), $this->generateRandomParameterName(), $expr);
+        } else {
+            $expr = $queryBuilder->expr()->$func($alias . '.' . $this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
+            if ($alias != 'l') {
+                $queryBuilder = $this->AddJoinCondition($queryBuilder, $alias, $expr);
+
+            } else {
+                dump('lead restriction');
+                $queryBuilder = $queryBuilder->andWhere($expr);
+            }
+        }
+
+        dump($queryBuilder->getQueryParts()); //die();
+
+        return $queryBuilder;
+    }
+
+    public function getDBTable() {
+        //@todo cache metadata
+        try {
+            $tableName = $this->em->getClassMetadata($this->getEntityName())->getTableName();
+        } catch (MappingException $e) {
+            return $this->getObject();
+        }
+
+
+        return $tableName;
+    }
+
+    public function getEntityName() {
+        $converter = new CamelCaseToSnakeCaseNameConverter();
+        $entity = sprintf('MauticLeadBundle:%s',ucfirst($converter->denormalize($this->getObject())));
+        return $entity;
+    }
+
+    /**
+     * @return Column
+     * @throws \Exception
+     */
     public function getDBColumn() {
-        $dbColumn = $this->schema->listTableColumns($this->queryDescription['foreign_table'])[$this->queryDescription['field']];
-        var_dump($dbColumn);
+        if (is_null($this->dbColumn)) {
+            if($this->getQueryDescription()) {
+                $this->dbColumn = $this->schema->listTableColumns($this->getDBTable())[$this->queryDescription['field']];
+            } else {
+                $dbTableColumns = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->getDBTable());
+                if (!$dbTableColumns) {
+                    throw new \Exception('Unknown database table and no translation provided for type "' . $this->getType() .'"');
+                }
+                if (!isset($dbTableColumns[$this->getField()])) {
+                    throw new \Exception('Unknown database column and no translation provided for type "' . $this->getType() .'"');
+                }
+                $this->dbColumn = $dbTableColumns[$this->getField()];
+            }
+        }
+
+        return $this->dbColumn;
     }
 
     /**
@@ -287,7 +376,7 @@ class LeadSegmentFilter
     public function getQueryDescription($dictionary = null)
     {
         if (is_null($this->queryDescription)) {
-            $this->assembleQueryDescription($dictionary);
+            $this->translateQueryDescription($dictionary);
         }
         return $this->queryDescription;
     }
@@ -305,11 +394,7 @@ class LeadSegmentFilter
     /**
      * @return $this
      */
-    public function translateQueryDescription(\ArrayIterator $dictionary) {
-        if (is_null($this->schema)) {
-            throw new \Exception('You need to pass database schema manager along with dictionary');
-        }
-
+    public function translateQueryDescription(\ArrayIterator $dictionary = null) {
         $this->queryDescription = isset($dictionary[$this->getField()])
             ? $dictionary[$this->getField()]
             : false;

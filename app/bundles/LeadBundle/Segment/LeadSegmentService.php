@@ -49,6 +49,7 @@ class LeadSegmentService
 
         /** @var QueryBuilder $qb */
         $qb = $this->queryBuilder->getLeadsQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
+        $qb = $this->queryBuilder->addLeadListRestrictions($qb, $batchLimiters, $entity->getId(), $this->leadSegmentFilterFactory->dictionary);
         dump($sql = $qb->getSQL());
 
 

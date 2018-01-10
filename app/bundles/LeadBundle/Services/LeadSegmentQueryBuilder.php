@@ -24,6 +24,8 @@ use Mautic\LeadBundle\Segment\LeadSegmentFilters;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 
 class LeadSegmentQueryBuilder {
+    use LeadSegmentFilterQueryBuilderTrait;
+
     /** @var EntityManager */
     private $entityManager;
 
@@ -47,6 +49,36 @@ class LeadSegmentQueryBuilder {
     }
 
 
+    public function addLeadListRestrictions(QueryBuilder $queryBuilder, $whatever, $leadListId, $dictionary) {
+        $filter_list_id = new LeadSegmentFilter([
+                                            'glue'     => 'and',
+                                            'field'    => 'leadlist_id',
+                                            'object'   => 'lead_lists_leads',
+                                            'type'     => 'number',
+                                            'filter'   => intval($leadListId),
+                                            'operator' => "=",
+                                            'func'     => "eq"
+                                        ], $dictionary, $this->entityManager);
+
+        $filter_list_added = new LeadSegmentFilter([
+                                                    'glue'     => 'and',
+                                                    'field'    => 'date_added',
+                                                    'object'   => 'lead_lists_leads',
+                                                    'type'     => 'date',
+                                                    'filter'   => $whatever,
+                                                    'operator' => "=",
+                                                    'func'     => "lte"
+                                                ], $dictionary, $this->entityManager);
+
+        $queryBuilder = $this->addForeignTableQueryWhere($queryBuilder, [$filter_list_id, $filter_list_added]);
+        // SELECT count(l.id) as lead_count, max(l.id) as max_id FROM leads l
+        // LEFT JOIN lead_lists_leads ll ON (ll.leadlist_id = 28) AND (ll.lead_id = l.id) AND (ll.date_added <= '2018-01-09 14:48:54')
+        // WHERE (l.propertytype = :MglShQLG) AND (ll.lead_id IS NULL)
+        var_dump($whatever);
+    return $queryBuilder;
+        die();
+    }
+
     public function getLeadsQueryBuilder($id, LeadSegmentFilters $leadSegmentFilters) {
         /** @var QueryBuilder $qb */
         $qb = $this->entityManager->getConnection()->createQueryBuilder();
@@ -54,6 +86,7 @@ class LeadSegmentQueryBuilder {
         $qb->select('*')->from('MauticLeadBundle:Lead', 'l');
 
         foreach ($leadSegmentFilters as $filter) {
+            dump($filter);
             $qb = $this->getQueryPart($filter, $qb);
         }
 
@@ -109,35 +142,6 @@ class LeadSegmentQueryBuilder {
         return $leads;
     }
 
-    private function addForeignTableQuery(QueryBuilder $qb, LeadSegmentFilter $filter) {
-        $translated = $filter->getQueryDescription($this->getTranslator());
-
-        $parameterHolder = $this->generateRandomParameterName();
-        $dbColumn        = $this->schema->listTableColumns($translated['foreign_table'])[$translated['field']];
-
-        if (isset($translated) && $translated) {
-            if (isset($translated['func'])) {
-                //@todo rewrite with getFullQualifiedName
-                $qb->leftJoin($this->tableAliases[$translated['table']], $translated['foreign_table'], $this->tableAliases[$translated['foreign_table']], sprintf('%s.%s = %s.%s', $this->tableAliases[$translated['table']], $translated['table_field'], $this->tableAliases[$translated['foreign_table']], $translated['foreign_table_field']));
-
-                //@todo rewrite with getFullQualifiedName
-                $qb->andHaving(isset($translated['func']) ? sprintf('%s(%s.%s) %s %s', $translated['func'], $this->tableAliases[$translated['foreign_table']], $translated['field'], $filter->getSQLOperator(), $filter->getFilterConditionValue($parameterHolder)) : sprintf('%s.%s %s %s', $this->tableAliases[$translated['foreign_table']], $translated['field'], $this->getFilterOperator($filter), $this->getFilterValue($filter, $parameterHolder, $dbColumn)));
-
-            }
-            else {
-                //@todo rewrite with getFullQualifiedName
-                $qb->innerJoin($this->tableAliases[$translated['table']], $translated['foreign_table'], $this->tableAliases[$translated['foreign_table']], sprintf('%s.%s = %s.%s and %s', $this->tableAliases[$translated['table']], $translated['table_field'], $this->tableAliases[$translated['foreign_table']], $translated['foreign_table_field'], sprintf('%s.%s %s %s', $this->tableAliases[$translated['foreign_table']], $translated['field'], $filter->getSQLOperator(), $filter->getFilterConditionValue($parameterHolder))));
-            }
-
-
-            $qb->setParameter($parameterHolder, $filter->getFilter());
-
-            $qb->groupBy(sprintf('%s.%s', $this->tableAliases[$translated['table']], $translated['table_field']));
-        }
-    }
-
-
-
     /**
      * @todo this is just copy of existing as template, not a real function
      */
@@ -187,11 +191,11 @@ class LeadSegmentQueryBuilder {
                     $subQb->leftJoin($alias, MAUTIC_TABLE_PREFIX . $table, $membershipAlias, "$membershipAlias.lead_id = $alias.id AND $membershipAlias.leadlist_id = $id")
                           ->where($subQb->expr()->orX($filterExpr, $subQb->expr()
                                                                          ->eq("$membershipAlias.manually_added", ":$trueParameter") //include manually added
-                              ))->andWhere($subQb->expr()->eq("$alias.id", 'l.id'), $subQb->expr()->orX($subQb->expr()
-                                                                                                              ->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
-                                                                                                        $subQb->expr()
-                                                                                                              ->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
-                            ));
+                          ))->andWhere($subQb->expr()->eq("$alias.id", 'l.id'), $subQb->expr()->orX($subQb->expr()
+                                                                                                          ->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
+                                                                                                    $subQb->expr()
+                                                                                                          ->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
+                        ));
                 }
 
                 $existsExpr->add(sprintf('%s (%s)', $func, $subQb->getSQL()));
@@ -207,41 +211,36 @@ class LeadSegmentQueryBuilder {
 
 
     private function getQueryPart(LeadSegmentFilter $filter, QueryBuilder $qb) {
+        var_dump('Asseting query type: ' . $filter->getFilter());
         $parameters = [];
 
-        //@todo cache metadata
+        ///** @var Column $dbColumn */
+        //$dbColumn = isset($this->schema->listTableColumns($tableName)[$filter->getField()]) ? $this->schema->listTableColumns($tableName)[$filter->getField()] : false;
         $tableName = $this->entityManager->getClassMetadata('MauticLeadBundle:' . ucfirst($filter->getObject()))
                                          ->getTableName();
 
+        $dbField = $filter->getDBColumn()->getFullQualifiedName(ucfirst($filter->getObject()));
 
-        /** @var Column $dbColumn */
-        $dbColumn = isset($this->schema->listTableColumns($tableName)[$filter->getField()]) ? $this->schema->listTableColumns($tableName)[$filter->getField()] : false;
-
-
-        if ($dbColumn) {
-            $dbField = $dbColumn->getFullQualifiedName(ucfirst($filter->getObject()));
-        }
-        else {
-            $translated = $filter->getQueryDescription();
-
-            var_dump($filter);
-
-            if (!$translated) {
-                var_dump('Unknown field: ' . $filter->getField());
-                var_dump($filter);
-                return $qb;
-                throw new \Exception('Unknown field: ' . $filter->getField());
-            }
-
-            switch ($translated['type']) {
-                case 'foreign':
-                case 'foreign_aggr':
-                    $this->addForeignTableQuery($qb, $filter);
-                    break;
-            }
+        var_dump($qb->getQueryParts());
 
 
-        }
+        $qb = $filter->createQuery($qb);
+        //        if (!$dbField) {
+        //            $translated = $filter->getQueryDescription();
+        //
+        //            if (!$translated) {
+        //                $filter->createQuery($qb);
+        //                return $qb;
+        //                throw new \Exception('Unknown field: ' . $filter->getField());
+        //            }
+        //
+        //            switch ($translated['type']) {
+        //                case 'foreign':
+        //                case 'foreign_aggr':
+        //                    $this->addForeignTableQuery($qb, $filter);
+        //                    break;
+        //            }
+        //        }
 
 
         return $qb;
@@ -627,12 +626,12 @@ class LeadSegmentQueryBuilder {
                             $subQb->leftJoin($alias, MAUTIC_TABLE_PREFIX . $table, $membershipAlias, "$membershipAlias.lead_id = $alias.id AND $membershipAlias.leadlist_id = $id")
                                   ->where($subQb->expr()->orX($filterExpr, $subQb->expr()
                                                                                  ->eq("$membershipAlias.manually_added", ":$trueParameter") //include manually added
-                                      ))->andWhere($subQb->expr()->eq("$alias.id", 'l.id'), $subQb->expr()
-                                                                                                  ->orX($subQb->expr()
-                                                                                                              ->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
-                                                                                                        $subQb->expr()
-                                                                                                              ->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
-                                                                                                  ));
+                                  ))->andWhere($subQb->expr()->eq("$alias.id", 'l.id'), $subQb->expr()
+                                                                                              ->orX($subQb->expr()
+                                                                                                          ->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
+                                                                                                    $subQb->expr()
+                                                                                                          ->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
+                                                                                              ));
                         }
 
                         $existsExpr->add(sprintf('%s (%s)', $func, $subQb->getSQL()));

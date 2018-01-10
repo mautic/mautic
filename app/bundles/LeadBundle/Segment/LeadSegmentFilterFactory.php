@@ -15,8 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 
-class LeadSegmentFilterFactory
-{
+class LeadSegmentFilterFactory {
     /**
      * @var LeadSegmentFilterDate
      */
@@ -27,23 +26,17 @@ class LeadSegmentFilterFactory
      */
     private $leadSegmentFilterOperator;
 
-    /** @var LeadSegmentFilterDescriptor  */
-    private $dictionary;
+    /** @var LeadSegmentFilterDescriptor */
+    public $dictionary;
 
     /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager */
-    private $schema;
+    private $entityManager;
 
-    public function __construct(
-        LeadSegmentFilterDate $leadSegmentFilterDate,
-        LeadSegmentFilterOperator $leadSegmentFilterOperator,
-        LeadSegmentFilterDescriptor $dictionary,
-        EntityManager $entityManager
-)
-    {
+    public function __construct(LeadSegmentFilterDate $leadSegmentFilterDate, LeadSegmentFilterOperator $leadSegmentFilterOperator, LeadSegmentFilterDescriptor $dictionary, EntityManager $entityManager) {
         $this->leadSegmentFilterDate     = $leadSegmentFilterDate;
         $this->leadSegmentFilterOperator = $leadSegmentFilterOperator;
         $this->dictionary                = $dictionary;
-        $this->schema                    = $entityManager->getConnection()->getSchemaManager();
+        $this->entityManager             = $entityManager;
     }
 
     /**
@@ -51,13 +44,12 @@ class LeadSegmentFilterFactory
      *
      * @return LeadSegmentFilters
      */
-    public function getLeadListFilters(LeadList $leadList)
-    {
+    public function getLeadListFilters(LeadList $leadList) {
         $leadSegmentFilters = new LeadSegmentFilters();
 
         $filters = $leadList->getFilters();
         foreach ($filters as $filter) {
-            $leadSegmentFilter = new LeadSegmentFilter($filter, $this->dictionary, $this->schema);
+            $leadSegmentFilter = new LeadSegmentFilter($filter, $this->dictionary, $this->entityManager);
             $this->leadSegmentFilterOperator->fixOperator($leadSegmentFilter);
             $this->leadSegmentFilterDate->fixDateOptions($leadSegmentFilter);
             $leadSegmentFilters->addLeadSegmentFilter($leadSegmentFilter);

@@ -660,6 +660,7 @@ class LeadListRepository extends CommonRepository
      */
     public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $isNot = false, $leadId = null, $object = 'lead', $listId = null)
     {
+        dump($filters);
         if (!count($filters)) {
             return $q->expr()->andX();
         }
