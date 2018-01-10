@@ -15,7 +15,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CampaignBundle\Command\TriggerCampaignCommand;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class TriggerCampaignCommandTest extends MauticMysqlTestCase
+class TriggerCampaignCommandDisabled extends MauticMysqlTestCase
 {
     /**
      * @var array
