@@ -85,7 +85,6 @@ class LeadSegmentQueryBuilder {
 
         $qb->select('*')->from('MauticLeadBundle:Lead', 'l');
 
-        $qb->execute();
         foreach ($leadSegmentFilters as $filter) {
             dump($filter);
             $qb = $this->getQueryPart($filter, $qb);
@@ -145,17 +144,6 @@ class LeadSegmentQueryBuilder {
 
     private function getQueryPart(LeadSegmentFilter $filter, QueryBuilder $qb) {
         var_dump('Asseting query type: ' . $filter->getFilter());
-        $parameters = [];
-
-        ///** @var Column $dbColumn */
-        //$dbColumn = isset($this->schema->listTableColumns($tableName)[$filter->getField()]) ? $this->schema->listTableColumns($tableName)[$filter->getField()] : false;
-        $tableName = $this->entityManager->getClassMetadata('MauticLeadBundle:' . ucfirst($filter->getObject()))
-                                         ->getTableName();
-
-        $dbField = $filter->getDBColumn()->getFullQualifiedName(ucfirst($filter->getObject()));
-
-        var_dump($qb->getQueryParts());
-
 
         $qb = $filter->createQuery($qb);
         //        if (!$dbField) {

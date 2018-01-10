@@ -210,11 +210,13 @@ class LeadSegmentFilter
      */
     public function getDBColumn() {
         if (is_null($this->dbColumn)) {
-            if($this->getQueryDescription()) {
-                $this->dbColumn = $this->schema->listTableColumns($this->getDBTable())[$this->queryDescription['field']];
+            if($descr = $this->getQueryDescription()) {
+                $this->dbColumn = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->queryDescription['foreign_table'])[$this->queryDescription['field']];
             } else {
+                var_dump($this->getDBTable());
                 $dbTableColumns = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->getDBTable());
                 if (!$dbTableColumns) {
+                    var_dump($this);
                     throw new \Exception('Unknown database table and no translation provided for type "' . $this->getType() .'"');
                 }
                 if (!isset($dbTableColumns[$this->getField()])) {
