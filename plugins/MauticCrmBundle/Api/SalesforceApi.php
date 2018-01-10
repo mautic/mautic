@@ -3,6 +3,8 @@
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
+use MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper\RequestUrl;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 
@@ -15,7 +17,9 @@ class SalesforceApi extends CrmApi
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
-    protected $apiRequestCounter = 0;
+    protected $apiRequestCounter   = 0;
+    protected $requestCounter      = 1;
+    protected $maxLockRetries      = 3;
 
     public function __construct(CrmAbstractIntegration $integration)
     {
@@ -30,7 +34,7 @@ class SalesforceApi extends CrmApi
      * @param        $operation
      * @param array  $elementData
      * @param string $method
-     * @param bool   $retry
+     * @param bool   $isRetry
      * @param null   $object
      * @param null   $queryUrl
      *
@@ -38,59 +42,41 @@ class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function request($operation, $elementData = [], $method = 'GET', $retry = false, $object = null, $queryUrl = null)
+    public function request($operation, $elementData = [], $method = 'GET', $isRetry = false, $object = null, $queryUrl = null)
     {
         if (!$object) {
             $object = $this->object;
         }
 
-        $requestUrl = (!$queryUrl) ? sprintf($this->integration->getApiUrl().'/%s/%s', $object, $operation) : sprintf($queryUrl.'/%s', $operation);
+        $requestUrl = RequestUrl::get($this->integration->getApiUrl(), $queryUrl, $operation, $object);
+
         $settings   = $this->requestSettings;
         if ($method == 'PATCH') {
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
 
-        if (isset($queryUrl)) {
-            // Query commands can have long wait time while SF builds response as the offset increases
-            $settings['request_timeout'] = 300;
-        }
+        // Query commands can have long wait time while SF builds response as the offset increases
+        $settings['request_timeout'] = 300;
 
         // Wrap in a isAuthorized to refresh token if applicable
         $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $settings);
         ++$this->apiRequestCounter;
 
-        if (!empty($response['errors'])) {
-            throw new ApiErrorException(implode(', ', $response['errors']));
-        } elseif (is_array($response)) {
-            $errors = [];
-            foreach ($response as $r) {
-                if (is_array($r) && !empty($r['errorCode']) && !empty($r['message'])) {
-                    // Check for expired session then retry if we can refresh
-                    if ($r['errorCode'] == 'INVALID_SESSION_ID' && !$retry) {
-                        $refreshError = $this->integration->authCallback(['use_refresh_token' => true]);
-
-                        if (empty($refreshError)) {
-                            return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
-                        } else {
-                            $errors[] = $refreshError;
-                        }
-                    }
-                    $errors[] = $r['message'];
-                }
-            }
-
-            if (!empty($errors)) {
-                throw new ApiErrorException(implode(', ', $errors));
-            }
+        try {
+            $this->analyzeResponse($response, $isRetry);
+        } catch (RetryRequestException $exception) {
+            return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
         }
 
         return $response;
     }
 
     /**
-     * @param null|string $object
+     * @param null $object
      *
-     * @return mixed
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function getLeadFields($object = null)
     {
@@ -105,6 +91,8 @@ class SalesforceApi extends CrmApi
      * @param array $data
      *
      * @return array
+     *
+     * @throws ApiErrorException
      */
     public function getPerson(array $data)
     {
@@ -147,6 +135,8 @@ class SalesforceApi extends CrmApi
      * @param array $data
      *
      * @return array
+     *
+     * @throws ApiErrorException
      */
     public function getCompany(array $data)
     {
@@ -186,11 +176,11 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * Creates Salesforce lead.
-     *
      * @param array $data
      *
-     * @return mixed
+     * @return array|mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function createLead(array $data)
     {
@@ -208,6 +198,8 @@ class SalesforceApi extends CrmApi
      * @param       $sfObject
      *
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function createObject(array $data, $sfObject)
     {
@@ -227,7 +219,9 @@ class SalesforceApi extends CrmApi
      * @param       $sfObject
      * @param       $sfObjectId
      *
-     * @return array
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function updateObject(array $data, $sfObject, $sfObjectId)
     {
@@ -244,6 +238,8 @@ class SalesforceApi extends CrmApi
      * @param array $data
      *
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function syncMauticToSalesforce(array $data)
     {
@@ -256,9 +252,11 @@ class SalesforceApi extends CrmApi
      * @param array $activity
      * @param       $object
      *
-     * @return array|mixed|string
+     * @return array
+     *
+     * @throws ApiErrorException
      */
-    public function createLeadActivity(array $activity, $object, $filters = [])
+    public function createLeadActivity(array $activity, $object)
     {
         $config              = $this->integration->getIntegrationSettings()->getFeatureSettings();
         $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
@@ -316,28 +314,34 @@ class SalesforceApi extends CrmApi
     /**
      * Get Salesforce leads.
      *
-     * @param array  $query
+     * @param mixed  $query  String for a SOQL query or array to build query
      * @param string $object
      *
-     * @return mixed
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function getLeads($query, $object)
     {
+        $queryUrl = $this->integration->getQueryUrl();
+
+        if (!is_array($query)) {
+            return $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
+        }
+
+        if (!empty($query['nextUrl'])) {
+            $queryType = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
+
+            return $this->request('query'.$queryType, [], 'GET', false, null, $queryUrl);
+        }
+
         $organizationCreatedDate = $this->getOrganizationCreatedDate();
-        $queryUrl                = $this->integration->getQueryUrl();
-        $ignoreConvertedLeads    = '';
-        if (isset($query['start'])) {
+        $fields                  = $this->integration->getFieldsForQuery($object);
+        if (!empty($fields) && isset($query['start'])) {
             if (strtotime($query['start']) < strtotime($organizationCreatedDate)) {
                 $query['start'] = date('c', strtotime($organizationCreatedDate.' +1 hour'));
             }
-        }
 
-        $fields = $this->integration->getFieldsForQuery($object);
-
-        if (!empty($query['nextUrl'])) {
-            $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
-            $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
-        } elseif (!empty($fields) and isset($query['start'])) {
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
 
@@ -345,21 +349,25 @@ class SalesforceApi extends CrmApi
             if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
                 $fields = 'Owner.Name, Owner.Email, '.$fields;
             }
-            if ($object == 'Lead') {
-                $ignoreConvertedLeads = ' and ConvertedContactId = NULL';
-            }
 
-            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'].$ignoreConvertedLeads;
-            $result        = $this->request('queryAll', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
-        } else {
-            $result = $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
+            $ignoreConvertedLeads = ($object == 'Lead') ? ' and ConvertedContactId = NULL' : '';
+
+            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end']
+                .$ignoreConvertedLeads;
+
+            return $this->request('queryAll', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
         }
 
-        return $result;
+        return [
+            'totalSize' => 0,
+            'records'   => [],
+        ];
     }
 
     /**
-     * @return mixed
+     * @return bool|mixed
+     *
+     * @throws ApiErrorException
      */
     public function getOrganizationCreatedDate()
     {
@@ -377,6 +385,8 @@ class SalesforceApi extends CrmApi
 
     /**
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function getCampaigns()
     {
@@ -389,24 +399,46 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $campaignId
+     * @param      $campaignId
+     * @param null $modifiedSince
+     * @param null $queryUrl
      *
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
-    public function getCampaignMembers($campaignId)
+    public function getCampaignMembers($campaignId, $modifiedSince = null, $queryUrl = null)
     {
-        $campaignMembersQuery = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
-        $result               = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $this->integration->getQueryUrl());
+        $defaultSettings = $this->requestSettings;
 
-        return $result;
+        // Control batch size to prevent URL too long errors when fetching contact details via SOQL and to control Doctrine RAM usage for
+        // Mautic IntegrationEntity objects
+        $this->requestSettings['headers']['Sforce-Query-Options'] = 'batchSize=200';
+
+        if (null === $queryUrl) {
+            $queryUrl = $this->integration->getQueryUrl().'/query';
+        }
+
+        $query = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
+        if ($modifiedSince) {
+            $query .= ' and LastModifiedDate >= '.$modifiedSince;
+        }
+
+        $results = $this->request(null, ['q' => $query], 'GET', false, null, $queryUrl);
+
+        $this->requestSettings = $defaultSettings;
+
+        return $results;
     }
 
     /**
      * @param       $campaignId
      * @param       $object
-     * @param array $personIds
+     * @param array $people
      *
      * @return array
+     *
+     * @throws ApiErrorException
      */
     public function checkCampaignMembership($campaignId, $object, array $people)
     {
@@ -431,6 +463,8 @@ class SalesforceApi extends CrmApi
      * @param $campaignId
      *
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function getCampaignMemberStatus($campaignId)
     {
@@ -451,5 +485,93 @@ class SalesforceApi extends CrmApi
         $this->apiRequestCounter = 0;
 
         return $count;
+    }
+
+    /**
+     * @param mixed $response
+     * @param bool  $isRetry
+     *
+     * @throws ApiErrorException
+     * @throws RetryRequestException
+     */
+    private function analyzeResponse($response, $isRetry)
+    {
+        if (is_array($response)) {
+            if (!empty($response['errors'])) {
+                throw new ApiErrorException(implode(', ', $response['errors']));
+            }
+
+            foreach ($response as $lineItem) {
+                if (is_array($lineItem) && !empty($lineItem['errorCode']) && $error = $this->processError($lineItem, $isRetry)) {
+                    $errors[] = $error;
+                }
+            }
+
+            if (!empty($errors)) {
+                throw new ApiErrorException(implode(', ', $errors));
+            }
+        }
+    }
+
+    /**
+     * @param array $error
+     * @param       $isRetry
+     *
+     * @return string|false
+     *
+     * @throws ApiErrorException
+     * @throws RetryRequestException
+     */
+    private function processError(array $error, $isRetry)
+    {
+        switch ($error['errorCode']) {
+            case 'INVALID_SESSION_ID':
+                $this->revalidateSession($isRetry);
+                break;
+            case 'UNABLE_TO_LOCK_ROW':
+                $this->checkIfLockedRequestShouldBeRetried();
+                break;
+        }
+
+        if (!empty($error['message'])) {
+            return $error['message'];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $isRetry
+     *
+     * @throws ApiErrorException
+     * @throws RetryRequestException
+     */
+    private function revalidateSession($isRetry)
+    {
+        if ($refreshError = $this->integration->authCallback(['use_refresh_token' => true])) {
+            throw new ApiErrorException($refreshError);
+        }
+
+        if (!$isRetry) {
+            throw new RetryRequestException();
+        }
+    }
+
+    /**
+     * @throws RetryRequestException
+     */
+    private function checkIfLockedRequestShouldBeRetried()
+    {
+        // The record is locked so let's wait a a few seconds and retry
+        if ($this->requestCounter < $this->maxLockRetries) {
+            sleep($this->requestCounter * 3);
+            ++$this->requestCounter;
+
+            throw new RetryRequestException();
+        }
+
+        $this->requestCounter = 1;
+
+        return false;
     }
 }
