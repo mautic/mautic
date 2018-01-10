@@ -15,7 +15,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CampaignBundle\Command\TriggerCampaignCommand;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class TriggerCampaignCommandDisabled extends MauticMysqlTestCase
+class TriggerCampaignCommandTest extends MauticMysqlTestCase
 {
     /**
      * @var array
@@ -65,7 +65,7 @@ class TriggerCampaignCommandDisabled extends MauticMysqlTestCase
         $sql = str_replace('{CONDITION_TIMESTAMP}', $event->format('Y-m-d H:i:s'), $sql);
 
         // Update the schema
-        $tmpFile = tempnam(sys_get_temp_dir(), 'campaign_schema');
+        $tmpFile = $this->container->getParameter('kernel.cache_dir').'/campaign_schema.sql';
         file_put_contents($tmpFile, $sql);
         $this->applySqlFromFile($tmpFile);
     }
