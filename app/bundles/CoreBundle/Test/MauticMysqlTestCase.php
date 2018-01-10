@@ -30,11 +30,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $connection = $this->container->get('doctrine.dbal.default_connection');
         $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file} 2>&1 | grep -v \"Using a password\"";
+        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file} 2>&1 | grep -v \"Using a password\" || true";
 
-        system($command, $status);
-        if (1 !== $status) {
-            throw new \Exception('SQL failed to install for '.$file);
+        $lastLine = system($command, $status);
+        if (0 !== $status) {
+            throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
         }
     }
 
@@ -108,9 +108,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
         $command    = "mysqldump --add-drop-table --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} > {$this->sqlDumpFile}";
 
-        system($command, $status);
-        if (1 !== $status) {
-            throw new \Exception('Failed to dump SQL to '.$this->sqlDumpFile.' with status code '.$status);
+        $lastLine = system($command, $status);
+        if (0 !== $status) {
+            throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
         }
     }
 }
