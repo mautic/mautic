@@ -17,19 +17,11 @@ interface FilterDecoratorInterface
 {
     public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate);
 
-    // $field, respektive preklad z queryDescription - $field
-
-    public function getTable();
-
-    // leads nebo company - na zaklade podminky isLeadType() nebo z prekladu foreign_table
+    public function getTable(LeadSegmentFilterCrate $leadSegmentFilterCrate);
 
     public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate);
 
-    public function getParameterHolder($argument);
+    public function getParameterHolder(LeadSegmentFilterCrate $leadSegmentFilterCrate, $argument);
 
-    // vrati ":$argument", pripadne pro like "%:$argument%", date between vrati pole: [$startWith, $endWith]
-
-    public function getParameterValue();
-
-    // aktualne $filter
+    public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate);
 }

@@ -208,17 +208,17 @@ class LeadSegmentFilter
 
     public function getTable()
     {
-        throw new \Exception('Not implemented');
+        return $this->filterDecorator->getTable($this->leadSegmentFilterCrate);
     }
 
-    public function getParameterHolder()
+    public function getParameterHolder($argument)
     {
-        throw new \Exception('Not implemented');
+        return $this->filterDecorator->getParameterHolder($this->leadSegmentFilterCrate, $argument);
     }
 
     public function getParameterValue()
     {
-        throw new \Exception('Not implemented');
+        return $this->filterDecorator->getParameterValue($this->leadSegmentFilterCrate);
     }
 
     /**
@@ -227,14 +227,14 @@ class LeadSegmentFilter
     public function toArray()
     {
         return [
-            'glue'     => $this->getGlue(),
-            'field'    => $this->getField(),
-            'object'   => $this->getObject(),
-            'type'     => $this->getType(),
-            'filter'   => $this->getFilter(),
-            'display'  => $this->getDisplay(),
-            'operator' => $this->getOperator(),
-            'func'     => $this->getFunc(),
+            'glue'     => $this->leadSegmentFilterCrate->getGlue(),
+            'field'    => $this->leadSegmentFilterCrate->getField(),
+            'object'   => $this->leadSegmentFilterCrate->getObject(),
+            'type'     => $this->leadSegmentFilterCrate->getType(),
+            'filter'   => $this->leadSegmentFilterCrate->getFilter(),
+            'display'  => $this->leadSegmentFilterCrate->getDisplay(),
+            'operator' => $this->leadSegmentFilterCrate->getOperator(),
+            'func'     => $this->leadSegmentFilterCrate->getFunc(),
         ];
     }
 

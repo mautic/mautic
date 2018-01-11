@@ -66,6 +66,9 @@ class LeadSegmentFilterFactory
             dump($leadSegmentFilter);
             dump($leadSegmentFilter->getOperator());
             dump($leadSegmentFilter->getField());
+            dump($leadSegmentFilter->getTable());
+            dump($leadSegmentFilter->getParameterHolder('xxx'));
+            dump($leadSegmentFilter->getParameterValue());
             continue;
 
             //@todo replaced in query builder
