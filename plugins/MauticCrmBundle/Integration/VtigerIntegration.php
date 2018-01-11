@@ -173,7 +173,7 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
-        if ($fields = parent::getAvailableLeadFields()) {
+        if ($fields = parent::getAvailableLeadFields($settings)) {
             return $fields;
         }
 
