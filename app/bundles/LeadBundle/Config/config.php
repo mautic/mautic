@@ -766,7 +766,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Services\LeadSegmentQueryBuilder::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'mautic.lead.model.random_parameter_name'
+                    'mautic.lead.model.random_parameter_name',
                 ],
             ],
             'mautic.lead.model.lead_segment_service' => [
@@ -774,16 +774,16 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_factory',
                     'mautic.lead.repository.lead_list_segment_repository',
-                    'mautic.lead.repository.lead_segment_query_builder'
+                    'mautic.lead.repository.lead_segment_query_builder',
                 ],
             ],
             'mautic.lead.model.lead_segment_filter_factory' => [
                 'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterFactory::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_date',
-                    'mautic.lead.model.lead_segment_filter_operator',
                     'mautic.lead.repository.lead_segment_filter_descriptor',
-                    'doctrine.orm.entity_manager'
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.lead_segment_decorator_base',
                 ],
             ],
             'mautic.lead.model.relative_date' => [
@@ -804,6 +804,12 @@ return [
                     'translator',
                     'event_dispatcher',
                     'mautic.lead.segment.operator_options',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_base' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
                 ],
             ],
             'mautic.lead.model.random_parameter_name' => [

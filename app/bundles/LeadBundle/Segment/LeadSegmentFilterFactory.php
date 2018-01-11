@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Segment;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
+use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\QueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 
@@ -25,22 +26,30 @@ class LeadSegmentFilterFactory
     private $leadSegmentFilterDate;
 
     /**
-     * @var LeadSegmentFilterOperator
+     * @var LeadSegmentFilterDescriptor
      */
-    private $leadSegmentFilterOperator;
-
-    /** @var LeadSegmentFilterDescriptor */
     public $dictionary;
 
-    /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager */
+    /**
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
+     */
     private $entityManager;
 
-    public function __construct(LeadSegmentFilterDate $leadSegmentFilterDate, LeadSegmentFilterOperator $leadSegmentFilterOperator, LeadSegmentFilterDescriptor $dictionary, EntityManager $entityManager)
-    {
-        $this->leadSegmentFilterDate     = $leadSegmentFilterDate;
-        $this->leadSegmentFilterOperator = $leadSegmentFilterOperator;
-        $this->dictionary                = $dictionary;
-        $this->entityManager             = $entityManager;
+    /**
+     * @var BaseDecorator
+     */
+    private $baseDecorator;
+
+    public function __construct(
+        LeadSegmentFilterDate $leadSegmentFilterDate,
+        LeadSegmentFilterDescriptor $dictionary,
+        EntityManager $entityManager,
+        BaseDecorator $baseDecorator
+    ) {
+        $this->leadSegmentFilterDate = $leadSegmentFilterDate;
+        $this->dictionary            = $dictionary;
+        $this->entityManager         = $entityManager;
+        $this->baseDecorator         = $baseDecorator;
     }
 
     /**
@@ -54,20 +63,25 @@ class LeadSegmentFilterFactory
 
         $filters = $leadList->getFilters();
         foreach ($filters as $filter) {
-            $leadSegmentFilter = new LeadSegmentFilter($filter, $this->dictionary, $this->entityManager);
+            // LeadSegmentFilterCrate is for accessing $filter as an object
+            $leadSegmentFilterCrate = new LeadSegmentFilterCrate($filter);
 
+            $decorator = $this->getDecoratorForFilter($leadSegmentFilterCrate);
+
+            $leadSegmentFilter = new LeadSegmentFilter($leadSegmentFilterCrate, $decorator, $this->dictionary, $this->entityManager);
+            //$this->leadSegmentFilterDate->fixDateOptions($leadSegmentFilter);
             $leadSegmentFilter->setQueryDescription(
                 isset($this->dictionary[$leadSegmentFilter->getField()]) ? $this->dictionary[$leadSegmentFilter->getField()] : false
             );
             $leadSegmentFilter->setQueryBuilder($this->getQueryBuilderForFilter($leadSegmentFilter));
-            $leadSegmentFilter->setDecorator($this->getDecoratorForFilter($leadSegmentFilter));
+            //dump($leadSegmentFilter);
+            //dump($leadSegmentFilter->getOperator());
+            //continue;
 
             //@todo replaced in query builder
-            $this->leadSegmentFilterOperator->fixOperator($leadSegmentFilter);
-            $this->leadSegmentFilterDate->fixDateOptions($leadSegmentFilter);
             $leadSegmentFilters->addLeadSegmentFilter($leadSegmentFilter);
         }
-
+        //die();
         return $leadSegmentFilters;
     }
 
@@ -82,12 +96,12 @@ class LeadSegmentFilterFactory
     }
 
     /**
-     * @param LeadSegmentFilter $filter
+     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
      *
-     * @return BaseDecorator
+     * @return FilterDecoratorInterface
      */
-    protected function getDecoratorForFilter(LeadSegmentFilter $filter)
+    protected function getDecoratorForFilter(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return new BaseDecorator();
+        return $this->baseDecorator;
     }
 }
