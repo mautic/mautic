@@ -192,6 +192,23 @@ class LeadFieldRepository extends CommonRepository
                 )
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
+            } elseif ($operatorExpr === 'in' || $operatorExpr === 'notIn') {
+                $expr = $q->expr()->andX(
+                    $q->expr()->eq('l.id', ':lead')
+                );
+                $value = trim($value, "'");
+
+                if (substr($operatorExpr, 0, 3) === 'not') {
+                    $operator = 'NOT REGEXP';
+                } else {
+                    $operator = 'REGEXP';
+                }
+
+                $expr->add(
+                    'l.'.$field." $operator '\\\\|?$value\\\\|?'"
+                );
+                $q->where($expr)
+                    ->setParameter('lead', (int) $lead);
             } else {
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead')
