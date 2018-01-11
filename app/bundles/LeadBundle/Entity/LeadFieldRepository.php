@@ -196,17 +196,17 @@ class LeadFieldRepository extends CommonRepository
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead')
                 );
-                $value = trim($value, "'");
 
+                $value = trim($value, "'");
                 if (substr($operatorExpr, 0, 3) === 'not') {
                     $operator = 'NOT REGEXP';
                 } else {
                     $operator = 'REGEXP';
                 }
-
                 $expr->add(
                     'l.'.$field." $operator '\\\\|?$value\\\\|?'"
                 );
+
                 $q->where($expr)
                     ->setParameter('lead', (int) $lead);
             } else {
