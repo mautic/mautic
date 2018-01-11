@@ -24,9 +24,12 @@ use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
@@ -102,6 +105,11 @@ class PageModel extends FormModel
     protected $queueService;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * PageModel constructor.
      *
      * @param CookieHelper   $cookieHelper
@@ -111,6 +119,7 @@ class PageModel extends FormModel
      * @param RedirectModel  $pageRedirectModel
      * @param TrackableModel $pageTrackableModel
      * @param QueueService   $queueService
+     * @param CompanyModel   $companyModel
      */
     public function __construct(
         CookieHelper $cookieHelper,
@@ -119,7 +128,8 @@ class PageModel extends FormModel
         FieldModel $leadFieldModel,
         RedirectModel $pageRedirectModel,
         TrackableModel $pageTrackableModel,
-        QueueService $queueService
+        QueueService $queueService,
+        CompanyModel $companyModel
     ) {
         $this->cookieHelper       = $cookieHelper;
         $this->ipLookupHelper     = $ipLookupHelper;
@@ -129,6 +139,7 @@ class PageModel extends FormModel
         $this->pageTrackableModel = $pageTrackableModel;
         $this->dateTimeHelper     = new DateTimeHelper();
         $this->queueService       = $queueService;
+        $this->companyModel       = $companyModel;
     }
 
     /**
@@ -463,6 +474,20 @@ class PageModel extends FormModel
         // Get lead if required
         if (null == $lead) {
             $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
+            // company
+            list($company, $leadAdded, $companyEntity) =  IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
+            if ($leadAdded) {
+                $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+            } else {
+                $this->companyModel->setFieldValues($companyEntity, $query);
+                $this->companyModel->saveEntity($companyEntity);
+            }
+
+            if (!empty($company) and $companyEntity instanceof Company) {
+                // Save after the lead in for new leads created through the API and maybe other places
+                $this->companyModel->addLeadToCompany($companyEntity, $lead);
+                $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
+            }
         }
 
         if (!$lead || !$lead->getId()) {
