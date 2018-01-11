@@ -15,8 +15,8 @@ use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
-use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\QueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -24,48 +24,15 @@ class LeadSegmentFilter
 {
     use LeadSegmentFilterQueryBuilderTrait;
 
-    const LEAD_OBJECT    = 'lead';
-    const COMPANY_OBJECT = 'company';
+    /**
+     * @var LeadSegmentFilterCrate
+     */
+    private $leadSegmentFilterCrate;
 
     /**
-     * @var string|null
+     * @var FilterDecoratorInterface
      */
-    private $glue;
-
-    /**
-     * @var string|null
-     */
-    private $field;
-
-    /**
-     * @var string|null
-     */
-    private $object;
-
-    /**
-     * @var string|null
-     */
-    private $type;
-
-    /**
-     * @var string|array|bool|float|null
-     */
-    private $filter;
-
-    /**
-     * @var string|null
-     */
-    private $display;
-
-    /**
-     * @var string|null
-     */
-    private $operator;
-
-    /**
-     * @var string
-     */
-    private $func;
+    private $filterDecorator;
 
     /**
      * @var BaseFilterQueryBuilder
@@ -76,7 +43,6 @@ class LeadSegmentFilter
      * @var BaseDecorator
      */
     private $decorator;
-
     /**
      * @var array
      */
@@ -88,20 +54,15 @@ class LeadSegmentFilter
     /** @var EntityManager */
     private $em;
 
-    public function __construct(array $filter, \ArrayIterator $dictionary = null, EntityManager $em = null)
-    {
-        $this->glue    = isset($filter['glue']) ? $filter['glue'] : null;
-        $this->field   = isset($filter['field']) ? $filter['field'] : null;
-        $this->object  = isset($filter['object']) ? $filter['object'] : self::LEAD_OBJECT;
-        $this->type    = isset($filter['type']) ? $filter['type'] : null;
-        $this->display = isset($filter['display']) ? $filter['display'] : null;
-        $this->func    = isset($filter['func']) ? $filter['func'] : null;
-        $operatorValue = isset($filter['operator']) ? $filter['operator'] : null;
-        $this->setOperator($operatorValue);
-
-        $filterValue = isset($filter['filter']) ? $filter['filter'] : null;
-        $this->setFilter($filterValue);
-        $this->em = $em;
+    public function __construct(
+        LeadSegmentFilterCrate $leadSegmentFilterCrate,
+        FilterDecoratorInterface $filterDecorator,
+        \ArrayIterator $dictionary = null,
+        EntityManager $em = null
+    ) {
+        $this->leadSegmentFilterCrate = $leadSegmentFilterCrate;
+        $this->filterDecorator        = $filterDecorator;
+        $this->em                     = $em;
         if (!is_null($dictionary)) {
             $this->translateQueryDescription($dictionary);
         }
@@ -253,7 +214,7 @@ class LeadSegmentFilter
      */
     public function getGlue()
     {
-        return $this->glue;
+        return $this->leadSegmentFilterCrate->getGlue();
     }
 
     /**
@@ -261,7 +222,7 @@ class LeadSegmentFilter
      */
     public function getField()
     {
-        return $this->field;
+        return $this->leadSegmentFilterCrate->getField();
     }
 
     /**
@@ -269,7 +230,7 @@ class LeadSegmentFilter
      */
     public function getObject()
     {
-        return $this->object;
+        return $this->leadSegmentFilterCrate->getObject();
     }
 
     /**
@@ -277,7 +238,7 @@ class LeadSegmentFilter
      */
     public function isLeadType()
     {
-        return $this->object === self::LEAD_OBJECT;
+        return $this->leadSegmentFilterCrate->isLeadType();
     }
 
     /**
@@ -285,7 +246,7 @@ class LeadSegmentFilter
      */
     public function isCompanyType()
     {
-        return $this->object === self::COMPANY_OBJECT;
+        return $this->leadSegmentFilterCrate->isCompanyType();
     }
 
     /**
@@ -293,7 +254,7 @@ class LeadSegmentFilter
      */
     public function getType()
     {
-        return $this->type;
+        return $this->leadSegmentFilterCrate->getType();
     }
 
     /**
@@ -301,7 +262,7 @@ class LeadSegmentFilter
      */
     public function getFilter()
     {
-        return $this->filter;
+        return $this->leadSegmentFilterCrate->getFilter();
     }
 
     /**
@@ -309,7 +270,7 @@ class LeadSegmentFilter
      */
     public function getDisplay()
     {
-        return $this->display;
+        return $this->leadSegmentFilterCrate->getDisplay();
     }
 
     /**
@@ -317,25 +278,7 @@ class LeadSegmentFilter
      */
     public function getOperator()
     {
-        return $this->operator;
-    }
-
-    /**
-     * @param string|null $operator
-     */
-    public function setOperator($operator)
-    {
-        $this->operator = $operator;
-    }
-
-    /**
-     * @param string|array|bool|float|null $filter
-     */
-    public function setFilter($filter)
-    {
-        $filter = $this->sanitizeFilter($filter);
-
-        $this->filter = $filter;
+        return $this->filterDecorator->getOperator($this->leadSegmentFilterCrate);
     }
 
     /**
@@ -343,15 +286,7 @@ class LeadSegmentFilter
      */
     public function getFunc()
     {
-        return $this->func;
-    }
-
-    /**
-     * @param string $func
-     */
-    public function setFunc($func)
-    {
-        $this->func = $func;
+        return $this->leadSegmentFilterCrate->getFunc();
     }
 
     /**
@@ -369,30 +304,6 @@ class LeadSegmentFilter
             'operator' => $this->getOperator(),
             'func'     => $this->getFunc(),
         ];
-    }
-
-    /**
-     * @param string|array|bool|float|null $filter
-     *
-     * @return string|array|bool|float|null
-     */
-    private function sanitizeFilter($filter)
-    {
-        if ($filter === null || is_array($filter) || !$this->getType()) {
-            return $filter;
-        }
-
-        switch ($this->getType()) {
-            case 'number':
-                $filter = (float) $filter;
-                break;
-
-            case 'boolean':
-                $filter = (bool) $filter;
-                break;
-        }
-
-        return $filter;
     }
 
     /**
@@ -447,26 +358,6 @@ class LeadSegmentFilter
     public function setQueryBuilder($queryBuilder)
     {
         $this->queryBuilder = $queryBuilder;
-
-        return $this;
-    }
-
-    /**
-     * @return BaseDecorator
-     */
-    public function getDecorator()
-    {
-        return $this->decorator;
-    }
-
-    /**
-     * @param BaseDecorator $decorator
-     *
-     * @return LeadSegmentFilter
-     */
-    public function setDecorator($decorator)
-    {
-        $this->decorator = $decorator;
 
         return $this;
     }

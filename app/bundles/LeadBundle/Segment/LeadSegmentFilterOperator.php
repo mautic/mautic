@@ -43,7 +43,12 @@ class LeadSegmentFilterOperator
         $this->operatorOptions = $operatorOptions;
     }
 
-    public function fixOperator(LeadSegmentFilter $leadSegmentFilter)
+    /**
+     * @param string $operator
+     *
+     * @return string
+     */
+    public function fixOperator($operator)
     {
         $options = $this->operatorOptions->getFilterExpressionFunctionsNonStatic();
 
@@ -52,9 +57,8 @@ class LeadSegmentFilterOperator
         $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE, $event);
         $options = $event->getOperators();
 
-        $operatorDetails = $options[$leadSegmentFilter->getOperator()];
-        $func            = $operatorDetails['expr'];
+        $operatorDetails = $options[$operator];
 
-        $leadSegmentFilter->setFunc($func);
+        return $operatorDetails['expr'];
     }
 }
