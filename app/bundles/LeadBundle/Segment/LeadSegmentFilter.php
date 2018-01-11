@@ -16,7 +16,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
-use Mautic\LeadBundle\Segment\QueryBuilder\BaseFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -39,55 +39,17 @@ class LeadSegmentFilter
      */
     private $queryBuilder;
 
-    /**
-     * @var BaseDecorator
-     */
-    private $decorator;
-    /**
-     * @var array
-     */
-    private $queryDescription = null;
-
     /** @var Column */
     private $dbColumn;
-
-    public function getField()
-    {
-        throw new \Exception('Not implemented');
-    }
-
-    public function getTable()
-    {
-        throw new \Exception('Not implemented');
-    }
-
-    public function getOperator()
-    {
-        throw new \Exception('Not implemented');
-    }
-
-    public function getParameterHolder()
-    {
-        throw new \Exception('Not implemented');
-    }
-
-    public function getParameterValue()
-    {
-        throw new \Exception('Not implemented');
-    }
 
     public function __construct(
         LeadSegmentFilterCrate $leadSegmentFilterCrate,
         FilterDecoratorInterface $filterDecorator,
-        \ArrayIterator $dictionary = null,
         EntityManager $em = null
     ) {
         $this->leadSegmentFilterCrate = $leadSegmentFilterCrate;
         $this->filterDecorator        = $filterDecorator;
         $this->em                     = $em;
-        if (!is_null($dictionary)) {
-            $this->translateQueryDescription($dictionary);
-        }
     }
 
     /**
@@ -239,6 +201,26 @@ class LeadSegmentFilter
         return $this->filterDecorator->getOperator($this->leadSegmentFilterCrate);
     }
 
+    public function getField()
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function getTable()
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function getParameterHolder()
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function getParameterValue()
+    {
+        throw new \Exception('Not implemented');
+    }
+
     /**
      * @return array
      */
@@ -254,42 +236,6 @@ class LeadSegmentFilter
             'operator' => $this->getOperator(),
             'func'     => $this->getFunc(),
         ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getQueryDescription($dictionary = null)
-    {
-        if (is_null($this->queryDescription)) {
-            $this->translateQueryDescription($dictionary);
-        }
-
-        return $this->queryDescription;
-    }
-
-    /**
-     * @param array $queryDescription
-     *
-     * @return LeadSegmentFilter
-     */
-    public function setQueryDescription($queryDescription)
-    {
-        $this->queryDescription = $queryDescription;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function translateQueryDescription(\ArrayIterator $dictionary = null)
-    {
-        $this->queryDescription = isset($dictionary[$this->getField()])
-            ? $dictionary[$this->getField()]
-            : false;
-
-        return $this;
     }
 
     /**

@@ -781,7 +781,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterFactory::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_date',
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead_segment_decorator_base',
                 ],
@@ -810,6 +809,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
                 ],
             ],
             'mautic.lead.model.random_parameter_name' => [

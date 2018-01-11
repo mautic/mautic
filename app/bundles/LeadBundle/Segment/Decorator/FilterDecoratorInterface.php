@@ -25,8 +25,6 @@ interface FilterDecoratorInterface
 
     public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate);
 
-    // To, co vrati LeadSegmentFilterOperator
-
     public function getParameterHolder($argument);
 
     // vrati ":$argument", pripadne pro like "%:$argument%", date between vrati pole: [$startWith, $endWith]

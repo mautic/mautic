@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
-use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 
 class LeadSegmentFilterFactory
 {
@@ -24,11 +23,6 @@ class LeadSegmentFilterFactory
      * @var LeadSegmentFilterDate
      */
     private $leadSegmentFilterDate;
-
-    /**
-     * @var LeadSegmentFilterDescriptor
-     */
-    public $dictionary;
 
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
@@ -42,12 +36,10 @@ class LeadSegmentFilterFactory
 
     public function __construct(
         LeadSegmentFilterDate $leadSegmentFilterDate,
-        LeadSegmentFilterDescriptor $dictionary,
         EntityManager $entityManager,
         BaseDecorator $baseDecorator
     ) {
         $this->leadSegmentFilterDate = $leadSegmentFilterDate;
-        $this->dictionary            = $dictionary;
         $this->entityManager         = $entityManager;
         $this->baseDecorator         = $baseDecorator;
     }
@@ -68,20 +60,18 @@ class LeadSegmentFilterFactory
 
             $decorator = $this->getDecoratorForFilter($leadSegmentFilterCrate);
 
-            $leadSegmentFilter = new LeadSegmentFilter($leadSegmentFilterCrate, $decorator, $this->dictionary, $this->entityManager);
+            $leadSegmentFilter = new LeadSegmentFilter($leadSegmentFilterCrate, $decorator, $this->entityManager);
             //$this->leadSegmentFilterDate->fixDateOptions($leadSegmentFilter);
-            $leadSegmentFilter->setQueryDescription(
-                isset($this->dictionary[$leadSegmentFilter->getField()]) ? $this->dictionary[$leadSegmentFilter->getField()] : false
-            );
             $leadSegmentFilter->setQueryBuilder($this->getQueryBuilderForFilter($leadSegmentFilter));
-            //dump($leadSegmentFilter);
-            //dump($leadSegmentFilter->getOperator());
-            //continue;
+            dump($leadSegmentFilter);
+            dump($leadSegmentFilter->getOperator());
+            continue;
 
             //@todo replaced in query builder
             $leadSegmentFilters->addLeadSegmentFilter($leadSegmentFilter);
         }
-        //die();
+        die();
+
         return $leadSegmentFilters;
     }
 

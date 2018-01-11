@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterOperator;
+use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 
 class BaseDecorator implements FilterDecoratorInterface
 {
@@ -21,9 +22,17 @@ class BaseDecorator implements FilterDecoratorInterface
      */
     private $leadSegmentFilterOperator;
 
-    public function __construct(LeadSegmentFilterOperator $leadSegmentFilterOperator)
-    {
-        $this->leadSegmentFilterOperator = $leadSegmentFilterOperator;
+    /**
+     * @var LeadSegmentFilterDescriptor
+     */
+    private $leadSegmentFilterDescriptor;
+
+    public function __construct(
+        LeadSegmentFilterOperator $leadSegmentFilterOperator,
+        LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor
+    ) {
+        $this->leadSegmentFilterOperator   = $leadSegmentFilterOperator;
+        $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
     }
 
     public function getField()
