@@ -16,7 +16,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
-use Mautic\LeadBundle\Segment\QueryBuilder\BaseFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -76,6 +76,7 @@ class LeadSegmentFilter
      * @var BaseDecorator
      */
     private $decorator;
+
     /**
      * @var array
      */
@@ -106,6 +107,13 @@ class LeadSegmentFilter
         }
     }
 
+    /**
+     * @param null $argument
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
     public function getFilterConditionValue($argument = null)
     {
         switch ($this->getDBColumn()->getType()->getName()) {

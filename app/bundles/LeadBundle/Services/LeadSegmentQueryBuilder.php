@@ -11,19 +11,17 @@
 
 namespace Mautic\LeadBundle\Services;
 
-use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Schema\Column;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\Expr\Join;
-use function GuzzleHttp\default_ca_bundle;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\LeadSegmentFilters;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 
-class LeadSegmentQueryBuilder {
+class LeadSegmentQueryBuilder
+{
     use LeadSegmentFilterQueryBuilderTrait;
 
     /** @var EntityManager */
@@ -37,27 +35,23 @@ class LeadSegmentQueryBuilder {
     /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager */
     private $schema;
 
-    public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName) {
+    public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName)
+    {
         $this->entityManager       = $entityManager;
         $this->randomParameterName = $randomParameterName;
         $this->schema              = $this->entityManager->getConnection()->getSchemaManager();
-
-        //@todo Will be generate automatically, just as POC
-        $this->tableAliases['leads']       = 'l';
-        $this->tableAliases['email_stats'] = 'es';
-        $this->tableAliases['page_hits']   = 'ph';
     }
 
-
-    public function addLeadListRestrictions(QueryBuilder $queryBuilder, $whatever, $leadListId, $dictionary) {
+    public function addLeadListRestrictions(QueryBuilder $queryBuilder, $whatever, $leadListId, $dictionary)
+    {
         $filter_list_id = new LeadSegmentFilter([
                                             'glue'     => 'and',
                                             'field'    => 'leadlist_id',
                                             'object'   => 'lead_lists_leads',
                                             'type'     => 'number',
                                             'filter'   => intval($leadListId),
-                                            'operator' => "=",
-                                            'func'     => "eq"
+                                            'operator' => '=',
+                                            'func'     => 'eq',
                                         ], $dictionary, $this->entityManager);
 
         $filter_list_added = new LeadSegmentFilter([
@@ -66,8 +60,8 @@ class LeadSegmentQueryBuilder {
                                                     'object'   => 'lead_lists_leads',
                                                     'type'     => 'date',
                                                     'filter'   => $whatever,
-                                                    'operator' => "=",
-                                                    'func'     => "lte"
+                                                    'operator' => '=',
+                                                    'func'     => 'lte',
                                                 ], $dictionary, $this->entityManager);
 
         $queryBuilder = $this->addForeignTableQueryWhere($queryBuilder, [$filter_list_id, $filter_list_added]);
@@ -75,27 +69,27 @@ class LeadSegmentQueryBuilder {
         // LEFT JOIN lead_lists_leads ll ON (ll.leadlist_id = 28) AND (ll.lead_id = l.id) AND (ll.date_added <= '2018-01-09 14:48:54')
         // WHERE (l.propertytype = :MglShQLG) AND (ll.lead_id IS NULL)
         var_dump($whatever);
+
         return $queryBuilder;
         die();
     }
 
-    public function getLeadsQueryBuilder($id, LeadSegmentFilters $leadSegmentFilters) {
+    public function getLeadsQueryBuilder($id, LeadSegmentFilters $leadSegmentFilters)
+    {
         /** @var QueryBuilder $qb */
-        $qb = $this->entityManager->getConnection()->createQueryBuilder();
+        $qb = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($this->entityManager->getConnection());
 
-        $qb->select('*')->from('MauticLeadBundle:Lead', 'l');
+        $qb->select('*')->from('leads', 'l');
 
-        var_dump(count($leadSegmentFilters));
+        /** @var LeadSegmentFilter $filter */
         foreach ($leadSegmentFilters as $filter) {
-            var_dump($filter->getField());
-            $qb = $this->getQueryPart($filter, $qb);
+            var_dump('parsing filter: '.$filter->__toString());
+            $qb = $filter->getQueryBuilder();
         }
-
 
         return $qb;
         echo 'SQL parameters:';
         dump($q->getParameters());
-
 
         // Leads that do not have any record in the lead_lists_leads table for this lead list
         // For non null fields - it's apparently better to use left join over not exists due to not using nullable
@@ -107,7 +101,7 @@ class LeadSegmentQueryBuilder {
             $listOnExpr->add($q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime'])));
         }
 
-        $q->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', $listOnExpr);
+        $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', $listOnExpr);
 
         $expr->add($q->expr()->isNull('ll.lead_id'));
 
@@ -134,7 +128,7 @@ class LeadSegmentQueryBuilder {
 
         $leads = [];
         foreach ($results as $r) {
-            $leads = ['count' => $r['lead_count'], 'maxId' => $r['max_id'],];
+            $leads = ['count' => $r['lead_count'], 'maxId' => $r['max_id']];
             if ($withMinId) {
                 $leads['minId'] = $r['min_id'];
             }
@@ -143,7 +137,8 @@ class LeadSegmentQueryBuilder {
         return $leads;
     }
 
-    private function getQueryPart(LeadSegmentFilter $filter, QueryBuilder $qb) {
+    private function getQueryPart(LeadSegmentFilter $filter, QueryBuilder $qb)
+    {
         $qb = $filter->createQuery($qb);
 
         return $qb;
@@ -172,14 +167,13 @@ class LeadSegmentQueryBuilder {
         //            var_dump($func . ":" . $leadSegmentFilter->getField());
         //            var_dump($exprParameter);
 
-
         switch ($leadSegmentFilter->getField()) {
             case 'hit_url':
             case 'referer':
             case 'source':
             case 'source_id':
             case 'url_title':
-                $operand = in_array($func, ['eq', 'like', 'regexp', 'notRegexp', 'startsWith', 'endsWith', 'contains',]) ? 'EXISTS' : 'NOT EXISTS';
+                $operand = in_array($func, ['eq', 'like', 'regexp', 'notRegexp', 'startsWith', 'endsWith', 'contains']) ? 'EXISTS' : 'NOT EXISTS';
 
                 $ignoreAutoFilter = true;
                 $column           = $leadSegmentFilter->getField();
@@ -189,22 +183,22 @@ class LeadSegmentQueryBuilder {
                 }
 
                 $subqb = $this->entityManager->getConnection()->createQueryBuilder()->select('id')
-                                             ->from(MAUTIC_TABLE_PREFIX . 'page_hits', $alias);
+                                             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
 
                 switch ($func) {
                     case 'eq':
                     case 'neq':
                         $parameters[$parameter] = $leadSegmentFilter->getFilter();
                         $subqb->where($q->expr()->andX($q->expr()
-                                                         ->eq($alias . '.' . $column, $exprParameter), $q->expr()
-                                                                                                         ->eq($alias . '.lead_id', 'l.id')));
+                                                         ->eq($alias.'.'.$column, $exprParameter), $q->expr()
+                                                                                                         ->eq($alias.'.lead_id', 'l.id')));
                         break;
                     case 'regexp':
                     case 'notRegexp':
                         $parameters[$parameter] = $this->prepareRegex($leadSegmentFilter->getFilter());
                         $not                    = ($func === 'notRegexp') ? ' NOT' : '';
                         $subqb->where($q->expr()->andX($q->expr()
-                                                         ->eq($alias . '.lead_id', 'l.id'), $alias . '.' . $column . $not . ' REGEXP ' . $exprParameter));
+                                                         ->eq($alias.'.lead_id', 'l.id'), $alias.'.'.$column.$not.' REGEXP '.$exprParameter));
                         break;
                     case 'like':
                     case 'notLike':
@@ -215,19 +209,19 @@ class LeadSegmentQueryBuilder {
                             case 'like':
                             case 'notLike':
                             case 'contains':
-                                $parameters[$parameter] = '%' . $leadSegmentFilter->getFilter() . '%';
+                                $parameters[$parameter] = '%'.$leadSegmentFilter->getFilter().'%';
                                 break;
                             case 'startsWith':
-                                $parameters[$parameter] = $leadSegmentFilter->getFilter() . '%';
+                                $parameters[$parameter] = $leadSegmentFilter->getFilter().'%';
                                 break;
                             case 'endsWith':
-                                $parameters[$parameter] = '%' . $leadSegmentFilter->getFilter();
+                                $parameters[$parameter] = '%'.$leadSegmentFilter->getFilter();
                                 break;
                         }
 
                         $subqb->where($q->expr()->andX($q->expr()
-                                                         ->like($alias . '.' . $column, $exprParameter), $q->expr()
-                                                                                                           ->eq($alias . '.lead_id', 'l.id')));
+                                                         ->like($alias.'.'.$column, $exprParameter), $q->expr()
+                                                                                                           ->eq($alias.'.lead_id', 'l.id')));
                         break;
                 }
 
@@ -239,28 +233,28 @@ class LeadSegmentQueryBuilder {
 
                 $column = $leadSegmentFilter->getField();
                 $subqb  = $this->entityManager->getConnection()->createQueryBuilder()->select('id')
-                                              ->from(MAUTIC_TABLE_PREFIX . 'lead_devices', $alias);
+                                              ->from(MAUTIC_TABLE_PREFIX.'lead_devices', $alias);
                 switch ($func) {
                     case 'eq':
                     case 'neq':
                         $parameters[$parameter] = $leadSegmentFilter->getFilter();
                         $subqb->where($q->expr()->andX($q->expr()
-                                                         ->eq($alias . '.' . $column, $exprParameter), $q->expr()
-                                                                                                         ->eq($alias . '.lead_id', 'l.id')));
+                                                         ->eq($alias.'.'.$column, $exprParameter), $q->expr()
+                                                                                                         ->eq($alias.'.lead_id', 'l.id')));
                         break;
                     case 'like':
                     case '!like':
-                        $parameters[$parameter] = '%' . $leadSegmentFilter->getFilter() . '%';
+                        $parameters[$parameter] = '%'.$leadSegmentFilter->getFilter().'%';
                         $subqb->where($q->expr()->andX($q->expr()
-                                                         ->like($alias . '.' . $column, $exprParameter), $q->expr()
-                                                                                                           ->eq($alias . '.lead_id', 'l.id')));
+                                                         ->like($alias.'.'.$column, $exprParameter), $q->expr()
+                                                                                                           ->eq($alias.'.lead_id', 'l.id')));
                         break;
                     case 'regexp':
                     case 'notRegexp':
                         $parameters[$parameter] = $this->prepareRegex($leadSegmentFilter->getFilter());
                         $not                    = ($func === 'notRegexp') ? ' NOT' : '';
                         $subqb->where($q->expr()->andX($q->expr()
-                                                         ->eq($alias . '.lead_id', 'l.id'), $alias . '.' . $column . $not . ' REGEXP ' . $exprParameter));
+                                                         ->eq($alias.'.lead_id', 'l.id'), $alias.'.'.$column.$not.' REGEXP '.$exprParameter));
                         break;
                 }
 
@@ -278,14 +272,12 @@ class LeadSegmentQueryBuilder {
                     $table  = 'email_stats';
                 }
 
-
                 if ($filterField == 'lead_email_read_date') {
                     var_dump($func);
                 }
 
                 $subqb = $this->entityManager->getConnection()->createQueryBuilder()->select('id')
-                                             ->from(MAUTIC_TABLE_PREFIX . $table, $alias);
-
+                                             ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
                 switch ($func) {
                     case 'eq':
@@ -293,8 +285,8 @@ class LeadSegmentQueryBuilder {
                         $parameters[$parameter] = $leadSegmentFilter->getFilter();
 
                         $subqb->where($q->expr()->andX($q->expr()
-                                                         ->eq($alias . '.' . $column, $exprParameter), $q->expr()
-                                                                                                         ->eq($alias . '.lead_id', 'l.id')));
+                                                         ->eq($alias.'.'.$column, $exprParameter), $q->expr()
+                                                                                                         ->eq($alias.'.lead_id', 'l.id')));
                         break;
                     case 'between':
                     case 'notBetween':
@@ -308,15 +300,14 @@ class LeadSegmentQueryBuilder {
 
                         if ($func === 'between') {
                             $subqb->where($q->expr()->andX($q->expr()
-                                                             ->gte($alias . '.' . $field, $exprParameter), $q->expr()
-                                                                                                             ->lt($alias . '.' . $field, $exprParameter2), $q->expr()
-                                                                                                                                                             ->eq($alias . '.lead_id', 'l.id')));
-                        }
-                        else {
+                                                             ->gte($alias.'.'.$field, $exprParameter), $q->expr()
+                                                                                                             ->lt($alias.'.'.$field, $exprParameter2), $q->expr()
+                                                                                                                                                             ->eq($alias.'.lead_id', 'l.id')));
+                        } else {
                             $subqb->where($q->expr()->andX($q->expr()
-                                                             ->lt($alias . '.' . $field, $exprParameter), $q->expr()
-                                                                                                            ->gte($alias . '.' . $field, $exprParameter2), $q->expr()
-                                                                                                                                                             ->eq($alias . '.lead_id', 'l.id')));
+                                                             ->lt($alias.'.'.$field, $exprParameter), $q->expr()
+                                                                                                            ->gte($alias.'.'.$field, $exprParameter2), $q->expr()
+                                                                                                                                                             ->eq($alias.'.lead_id', 'l.id')));
                         }
                         break;
                     default:
@@ -328,8 +319,8 @@ class LeadSegmentQueryBuilder {
                         $parameters[$parameter2] = $leadSegmentFilter->getFilter();
 
                         $subqb->where($q->expr()->andX($q->expr()
-                                                         ->$func($alias . '.' . $column, $parameter2), $q->expr()
-                                                                                                         ->eq($alias . '.lead_id', 'l.id')));
+                                                         ->$func($alias.'.'.$column, $parameter2), $q->expr()
+                                                                                                         ->eq($alias.'.lead_id', 'l.id')));
                         break;
                 }
                 $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
@@ -349,15 +340,14 @@ class LeadSegmentQueryBuilder {
                 }
 
                 $subqb = $this->entityManager->getConnection()->createQueryBuilder()->select($select)
-                                             ->from(MAUTIC_TABLE_PREFIX . $table, $alias);
+                                             ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
                 if ($leadSegmentFilter->getFilter() == 1) {
-                    $subqb->where($q->expr()->andX($q->expr()->isNotNull($alias . '.' . $column), $q->expr()
-                                                                                                    ->eq($alias . '.lead_id', 'l.id')));
-                }
-                else {
-                    $subqb->where($q->expr()->andX($q->expr()->isNull($alias . '.' . $column), $q->expr()
-                                                                                                 ->eq($alias . '.lead_id', 'l.id')));
+                    $subqb->where($q->expr()->andX($q->expr()->isNotNull($alias.'.'.$column), $q->expr()
+                                                                                                    ->eq($alias.'.lead_id', 'l.id')));
+                } else {
+                    $subqb->where($q->expr()->andX($q->expr()->isNull($alias.'.'.$column), $q->expr()
+                                                                                                 ->eq($alias.'.lead_id', 'l.id')));
                 }
 
                 $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
@@ -367,21 +357,21 @@ class LeadSegmentQueryBuilder {
                 $table   = 'page_hits';
                 $select  = 'COUNT(id)';
                 $subqb   = $this->entityManager->getConnection()->createQueryBuilder()->select($select)
-                                               ->from(MAUTIC_TABLE_PREFIX . $table, $alias);
+                                               ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
                 $alias2 = $this->generateRandomParameterName();
-                $subqb2 = $this->entityManager->getConnection()->createQueryBuilder()->select($alias2 . '.id')
-                                              ->from(MAUTIC_TABLE_PREFIX . $table, $alias2);
+                $subqb2 = $this->entityManager->getConnection()->createQueryBuilder()->select($alias2.'.id')
+                                              ->from(MAUTIC_TABLE_PREFIX.$table, $alias2);
 
-                $subqb2->where($q->expr()->andX($q->expr()->eq($alias2 . '.lead_id', 'l.id'), $q->expr()
-                                                                                                ->gt($alias2 . '.date_hit', '(' . $alias . '.date_hit - INTERVAL 30 MINUTE)'), $q->expr()
-                                                                                                                                                                                 ->lt($alias2 . '.date_hit', $alias . '.date_hit')));
+                $subqb2->where($q->expr()->andX($q->expr()->eq($alias2.'.lead_id', 'l.id'), $q->expr()
+                                                                                                ->gt($alias2.'.date_hit', '('.$alias.'.date_hit - INTERVAL 30 MINUTE)'), $q->expr()
+                                                                                                                                                                                 ->lt($alias2.'.date_hit', $alias.'.date_hit')));
 
                 $parameters[$parameter] = $leadSegmentFilter->getFilter();
 
-                $subqb->where($q->expr()->andX($q->expr()->eq($alias . '.lead_id', 'l.id'), $q->expr()
-                                                                                              ->isNull($alias . '.email_id'), $q->expr()
-                                                                                                                                ->isNull($alias . '.redirect_id'), sprintf('%s (%s)', 'NOT EXISTS', $subqb2->getSQL())));
+                $subqb->where($q->expr()->andX($q->expr()->eq($alias.'.lead_id', 'l.id'), $q->expr()
+                                                                                              ->isNull($alias.'.email_id'), $q->expr()
+                                                                                                                                ->isNull($alias.'.redirect_id'), sprintf('%s (%s)', 'NOT EXISTS', $subqb2->getSQL())));
 
                 $opr = '';
                 switch ($func) {
@@ -403,7 +393,7 @@ class LeadSegmentQueryBuilder {
                 }
                 if ($opr) {
                     $parameters[$parameter] = $leadSegmentFilter->getFilter();
-                    $subqb->having($select . $opr . $leadSegmentFilter->getFilter());
+                    $subqb->having($select.$opr.$leadSegmentFilter->getFilter());
                 }
                 $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
                 break;
@@ -417,10 +407,10 @@ class LeadSegmentQueryBuilder {
                     $select = 'COALESCE(SUM(open_count),0)';
                 }
                 $subqb = $this->entityManager->getConnection()->createQueryBuilder()->select($select)
-                                             ->from(MAUTIC_TABLE_PREFIX . $table, $alias);
+                                             ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
                 $parameters[$parameter] = $leadSegmentFilter->getFilter();
-                $subqb->where($q->expr()->andX($q->expr()->eq($alias . '.lead_id', 'l.id')));
+                $subqb->where($q->expr()->andX($q->expr()->eq($alias.'.lead_id', 'l.id')));
 
                 $opr = '';
                 switch ($func) {
@@ -443,7 +433,7 @@ class LeadSegmentQueryBuilder {
 
                 if ($opr) {
                     $parameters[$parameter] = $leadSegmentFilter->getFilter();
-                    $subqb->having($select . $opr . $leadSegmentFilter->getFilter());
+                    $subqb->having($select.$opr.$leadSegmentFilter->getFilter());
                 }
 
                 $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
@@ -465,11 +455,11 @@ class LeadSegmentQueryBuilder {
 
                 $channelParameter = $this->generateRandomParameterName();
                 $subqb            = $this->entityManager->getConnection()->createQueryBuilder()->select('null')
-                                                        ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', $alias)
+                                                        ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $alias)
                                                         ->where($q->expr()->andX($q->expr()
-                                                                                   ->eq($alias . '.reason', $exprParameter), $q->expr()
-                                                                                                                               ->eq($alias . '.lead_id', 'l.id'), $q->expr()
-                                                                                                                                                                    ->eq($alias . '.channel', ":$channelParameter")));
+                                                                                   ->eq($alias.'.reason', $exprParameter), $q->expr()
+                                                                                                                               ->eq($alias.'.lead_id', 'l.id'), $q->expr()
+                                                                                                                                                                    ->eq($alias.'.channel', ":$channelParameter")));
 
                 $groupExpr->add(sprintf('%s (%s)', $func, $subqb->getSQL()));
 
@@ -493,9 +483,9 @@ class LeadSegmentQueryBuilder {
                 $func                        = in_array($func, ['eq', 'in']) ? 'EXISTS' : 'NOT EXISTS';
                 $ignoreAutoFilter            = true;
 
-                if ($filterListIds = (array)$leadSegmentFilter->getFilter()) {
+                if ($filterListIds = (array) $leadSegmentFilter->getFilter()) {
                     $listQb = $this->entityManager->getConnection()->createQueryBuilder()->select('l.id, l.filters')
-                                                  ->from(MAUTIC_TABLE_PREFIX . 'lead_lists', 'l');
+                                                  ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'l');
                     $listQb->where($listQb->expr()->in('l.id', $filterListIds));
                     $filterLists = $listQb->execute()->fetchAll();
                     $not         = 'NOT EXISTS' === $func;
@@ -505,8 +495,8 @@ class LeadSegmentQueryBuilder {
 
                     foreach ($filterLists as $list) {
                         $alias = $this->generateRandomParameterName();
-                        $id    = (int)$list['id'];
-                        if ($id === (int)$listId) {
+                        $id    = (int) $list['id'];
+                        if ($id === (int) $listId) {
                             // Ignore as somehow self is included in the list
                             continue;
                         }
@@ -514,9 +504,8 @@ class LeadSegmentQueryBuilder {
                         $listFilters = unserialize($list['filters']);
                         if (empty($listFilters)) {
                             // Use an EXISTS/NOT EXISTS on contact membership as this is a manual list
-                            $subQb = $this->createFilterExpressionSubQuery($table, $alias, $column, $id, $parameters, [$alias . '.manually_removed' => $falseParameter,]);
-                        }
-                        else {
+                            $subQb = $this->createFilterExpressionSubQuery($table, $alias, $column, $id, $parameters, [$alias.'.manually_removed' => $falseParameter]);
+                        } else {
                             // Build a EXISTS/NOT EXISTS using the filters for this list to include/exclude those not processed yet
                             // but also leverage the current membership to take into account those manually added or removed from the segment
 
@@ -526,7 +515,7 @@ class LeadSegmentQueryBuilder {
 
                             // Left join membership to account for manually added and removed
                             $membershipAlias = $this->generateRandomParameterName();
-                            $subQb->leftJoin($alias, MAUTIC_TABLE_PREFIX . $table, $membershipAlias, "$membershipAlias.lead_id = $alias.id AND $membershipAlias.leadlist_id = $id")
+                            $subQb->leftJoin($alias, MAUTIC_TABLE_PREFIX.$table, $membershipAlias, "$membershipAlias.lead_id = $alias.id AND $membershipAlias.leadlist_id = $id")
                                   ->where($subQb->expr()->orX($filterExpr, $subQb->expr()
                                                                                  ->eq("$membershipAlias.manually_added", ":$trueParameter") //include manually added
                                   ))->andWhere($subQb->expr()->eq("$alias.id", 'l.id'), $subQb->expr()
@@ -574,7 +563,7 @@ class LeadSegmentQueryBuilder {
                         $column = 'email_id';
 
                         $trueParameter                        = $this->generateRandomParameterName();
-                        $subQueryFilters[$alias . '.is_read'] = $trueParameter;
+                        $subQueryFilters[$alias.'.is_read'] = $trueParameter;
                         $parameters[$trueParameter]           = true;
                         break;
                     case 'lead_email_sent':
@@ -606,7 +595,7 @@ class LeadSegmentQueryBuilder {
                 // if performance is desired.
 
                 $subQb = $this->entityManager->getConnection()->createQueryBuilder()->select('null')
-                                             ->from(MAUTIC_TABLE_PREFIX . 'stages', $alias);
+                                             ->from(MAUTIC_TABLE_PREFIX.'stages', $alias);
 
                 switch ($func) {
                     case 'empty':
@@ -618,15 +607,15 @@ class LeadSegmentQueryBuilder {
                     case 'eq':
                         $parameters[$parameter] = $leadSegmentFilter->getFilter();
 
-                        $subQb->where($q->expr()->andX($q->expr()->eq($alias . '.id', 'l.stage_id'), $q->expr()
-                                                                                                       ->eq($alias . '.id', ":$parameter")));
+                        $subQb->where($q->expr()->andX($q->expr()->eq($alias.'.id', 'l.stage_id'), $q->expr()
+                                                                                                       ->eq($alias.'.id', ":$parameter")));
                         $groupExpr->add(sprintf('EXISTS (%s)', $subQb->getSQL()));
                         break;
                     case 'neq':
                         $parameters[$parameter] = $leadSegmentFilter->getFilter();
 
-                        $subQb->where($q->expr()->andX($q->expr()->eq($alias . '.id', 'l.stage_id'), $q->expr()
-                                                                                                       ->eq($alias . '.id', ":$parameter")));
+                        $subQb->where($q->expr()->andX($q->expr()->eq($alias.'.id', 'l.stage_id'), $q->expr()
+                                                                                                       ->eq($alias.'.id', ":$parameter")));
                         $groupExpr->add(sprintf('NOT EXISTS (%s)', $subQb->getSQL()));
                         break;
                 }
@@ -638,14 +627,13 @@ class LeadSegmentQueryBuilder {
                 $ignoreAutoFilter = true;
 
                 $subQb = $this->entityManager->getConnection()->createQueryBuilder()->select('null')
-                                             ->from(MAUTIC_TABLE_PREFIX . 'integration_entity', $alias);
+                                             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', $alias);
                 switch ($func) {
                     case 'eq':
                     case 'neq':
                         if (strpos($leadSegmentFilter->getFilter(), '::') !== false) {
                             list($integrationName, $campaignId) = explode('::', $leadSegmentFilter->getFilter());
-                        }
-                        else {
+                        } else {
                             // Assuming this is a Salesforce integration for BC with pre 2.11.0
                             $integrationName = 'Salesforce';
                             $campaignId      = $leadSegmentFilter->getFilter();
@@ -654,11 +642,11 @@ class LeadSegmentQueryBuilder {
                         $parameters[$parameter]  = $campaignId;
                         $parameters[$parameter2] = $integrationName;
                         $subQb->where($q->expr()->andX($q->expr()
-                                                         ->eq($alias . '.integration', ":$parameter2"), $q->expr()
-                                                                                                          ->eq($alias . '.integration_entity', "'CampaignMember'"), $q->expr()
-                                                                                                                                                                      ->eq($alias . '.integration_entity_id', ":$parameter"), $q->expr()
-                                                                                                                                                                                                                                ->eq($alias . '.internal_entity', "'lead'"), $q->expr()
-                                                                                                                                                                                                                                                                               ->eq($alias . '.internal_entity_id', 'l.id')));
+                                                         ->eq($alias.'.integration', ":$parameter2"), $q->expr()
+                                                                                                          ->eq($alias.'.integration_entity', "'CampaignMember'"), $q->expr()
+                                                                                                                                                                      ->eq($alias.'.integration_entity_id', ":$parameter"), $q->expr()
+                                                                                                                                                                                                                                ->eq($alias.'.internal_entity', "'lead'"), $q->expr()
+                                                                                                                                                                                                                                                                               ->eq($alias.'.internal_entity_id', 'l.id')));
                         break;
                 }
 
@@ -684,8 +672,7 @@ class LeadSegmentQueryBuilder {
                         if ($func === 'between') {
                             $groupExpr->add($q->expr()->andX($q->expr()->gte($field, $exprParameter), $q->expr()
                                                                                                         ->lt($field, $exprParameter2)));
-                        }
-                        else {
+                        } else {
                             $groupExpr->add($q->expr()->andX($q->expr()->lt($field, $exprParameter), $q->expr()
                                                                                                        ->gte($field, $exprParameter2)));
                         }
@@ -717,15 +704,13 @@ class LeadSegmentQueryBuilder {
 
                                 if (substr($func, 0, 3) === 'not') {
                                     $operator = 'NOT REGEXP';
-                                }
-                                else {
+                                } else {
                                     $operator = 'REGEXP';
                                 }
 
-                                $groupExpr->add($field . " $operator '\\\\|?$filter\\\\|?'");
+                                $groupExpr->add($field." $operator '\\\\|?$filter\\\\|?'");
                             }
-                        }
-                        else {
+                        } else {
                             $groupExpr->add($this->generateFilterExpression($q, $field, $func, $leadSegmentFilter->getFilter(), null));
                         }
                         $ignoreAutoFilter = true;
@@ -745,19 +730,19 @@ class LeadSegmentQueryBuilder {
                         switch ($func) {
                             case 'like':
                             case 'notLike':
-                                $parameters[$parameter] = (strpos($leadSegmentFilter->getFilter(), '%') === false) ? '%' . $leadSegmentFilter->getFilter() . '%' : $leadSegmentFilter->getFilter();
+                                $parameters[$parameter] = (strpos($leadSegmentFilter->getFilter(), '%') === false) ? '%'.$leadSegmentFilter->getFilter().'%' : $leadSegmentFilter->getFilter();
                                 break;
                             case 'startsWith':
                                 $func                   = 'like';
-                                $parameters[$parameter] = $leadSegmentFilter->getFilter() . '%';
+                                $parameters[$parameter] = $leadSegmentFilter->getFilter().'%';
                                 break;
                             case 'endsWith':
                                 $func                   = 'like';
-                                $parameters[$parameter] = '%' . $leadSegmentFilter->getFilter();
+                                $parameters[$parameter] = '%'.$leadSegmentFilter->getFilter();
                                 break;
                             case 'contains':
                                 $func                   = 'like';
-                                $parameters[$parameter] = '%' . $leadSegmentFilter->getFilter() . '%';
+                                $parameters[$parameter] = '%'.$leadSegmentFilter->getFilter().'%';
                                 break;
                         }
 
@@ -769,7 +754,7 @@ class LeadSegmentQueryBuilder {
                         $parameters[$parameter] = $this->prepareRegex($leadSegmentFilter->getFilter());
                         $not                    = ($func === 'notRegexp') ? ' NOT' : '';
                         $groupExpr->add(// Escape single quotes while accounting for those that may already be escaped
-                            $field . $not . ' REGEXP ' . $exprParameter);
+                            $field.$not.' REGEXP '.$exprParameter);
                         break;
                     default:
                         $ignoreAutoFilter = true;
@@ -790,7 +775,6 @@ class LeadSegmentQueryBuilder {
             }
         }
 
-
         // Get the last of the filters
         if ($groupExpr->count()) {
             $groups[] = $groupExpr;
@@ -798,16 +782,14 @@ class LeadSegmentQueryBuilder {
         if (count($groups) === 1) {
             // Only one andX expression
             $expr = $groups[0];
-        }
-        elseif (count($groups) > 1) {
+        } elseif (count($groups) > 1) {
             // Sets of expressions grouped by OR
             $orX = $q->expr()->orX();
             $orX->addMultiple($groups);
 
             // Wrap in a andX for other functions to append
             $expr = $q->expr()->andX($orX);
-        }
-        else {
+        } else {
             $expr = $groupExpr;
         }
 
@@ -831,7 +813,8 @@ class LeadSegmentQueryBuilder {
      *
      * @return string
      */
-    private function generateRandomParameterName() {
+    private function generateRandomParameterName()
+    {
         return $this->randomParameterName->generateRandomParameterName();
     }
 
@@ -840,11 +823,12 @@ class LeadSegmentQueryBuilder {
      * @param                                         $column
      * @param                                         $operator
      * @param                                         $parameter
-     * @param                                         $includeIsNull    true/false or null to auto determine based on operator
+     * @param                                         $includeIsNull true/false or null to auto determine based on operator
      *
      * @return mixed
      */
-    public function generateFilterExpression($q, $column, $operator, $parameter, $includeIsNull) {
+    public function generateFilterExpression($q, $column, $operator, $parameter, $includeIsNull)
+    {
         // in/notIn for dbal will use a raw array
         if (!is_array($parameter) && strpos($parameter, ':') !== 0) {
             $parameter = ":$parameter";
@@ -857,8 +841,7 @@ class LeadSegmentQueryBuilder {
 
         if ($includeIsNull) {
             $expr = $q->expr()->orX($q->expr()->$operator($column, $parameter), $q->expr()->isNull($column));
-        }
-        else {
+        } else {
             $expr = $q->expr()->$operator($column, $parameter);
         }
 
@@ -876,12 +859,13 @@ class LeadSegmentQueryBuilder {
      *
      * @return QueryBuilder
      */
-    protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, array $subQueryFilters = []) {
+    protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, array $subQueryFilters = [])
+    {
         $subQb   = $this->entityManager->getConnection()->createQueryBuilder();
         $subExpr = $subQb->expr()->andX();
 
         if ('leads' !== $table) {
-            $subExpr->add($subQb->expr()->eq($alias . '.lead_id', 'l.id'));
+            $subExpr->add($subQb->expr()->eq($alias.'.lead_id', 'l.id'));
         }
 
         foreach ($subQueryFilters as $subColumn => $subParameter) {
@@ -895,15 +879,14 @@ class LeadSegmentQueryBuilder {
                 $subFunc = 'in';
                 $subExpr->add($subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":$subFilterParamter"));
                 $parameters[$subFilterParamter] = ['value' => $value, 'type' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY];
-            }
-            else {
+            } else {
                 $parameters[$subFilterParamter] = $value;
             }
 
             $subExpr->add($subQb->expr()->$subFunc(sprintf('%s.%s', $alias, $column), ":$subFilterParamter"));
         }
 
-        $subQb->select('null')->from(MAUTIC_TABLE_PREFIX . $table, $alias)->where($subExpr);
+        $subQb->select('null')->from(MAUTIC_TABLE_PREFIX.$table, $alias)->where($subExpr);
 
         return $subQb;
     }
@@ -915,18 +898,19 @@ class LeadSegmentQueryBuilder {
      * @param QueryBuilder       $q
      * @param LeadSegmentFilters $leadSegmentFilters
      */
-    private function applyCompanyFieldFilters(QueryBuilder $q, LeadSegmentFilters $leadSegmentFilters) {
+    private function applyCompanyFieldFilters(QueryBuilder $q, LeadSegmentFilters $leadSegmentFilters)
+    {
         $joinType = $leadSegmentFilters->isListFiltersInnerJoinCompany() ? 'join' : 'leftJoin';
         // Join company tables for query optimization
-        $q->$joinType('l', MAUTIC_TABLE_PREFIX . 'companies_leads', 'cl', 'l.id = cl.lead_id')
-          ->$joinType('cl', MAUTIC_TABLE_PREFIX . 'companies', 'comp', 'cl.company_id = comp.id');
+        $q->$joinType('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'l.id = cl.lead_id')
+          ->$joinType('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'cl.company_id = comp.id');
 
         // Return only unique contacts
         $q->groupBy('l.id');
     }
 
-
-    private function generateSegmentExpression(LeadSegmentFilters $leadSegmentFilters, QueryBuilder $q, $listId = null) {
+    private function generateSegmentExpression(LeadSegmentFilters $leadSegmentFilters, QueryBuilder $q, $listId = null)
+    {
         var_dump(debug_backtrace()[1]['function']);
         $expr = $this->getListFilterExpr($leadSegmentFilters, $q, $listId);
 
@@ -940,7 +924,8 @@ class LeadSegmentQueryBuilder {
     /**
      * @return LeadSegmentFilterDescriptor
      */
-    public function getTranslator() {
+    public function getTranslator()
+    {
         return $this->translator;
     }
 
@@ -949,15 +934,18 @@ class LeadSegmentQueryBuilder {
      *
      * @return LeadSegmentQueryBuilder
      */
-    public function setTranslator($translator) {
+    public function setTranslator($translator)
+    {
         $this->translator = $translator;
+
         return $this;
     }
 
     /**
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
-    public function getSchema() {
+    public function getSchema()
+    {
         return $this->schema;
     }
 
@@ -966,10 +954,10 @@ class LeadSegmentQueryBuilder {
      *
      * @return LeadSegmentQueryBuilder
      */
-    public function setSchema($schema) {
+    public function setSchema($schema)
+    {
         $this->schema = $schema;
+
         return $this;
     }
-
-
 }
