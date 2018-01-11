@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 
 interface FilterDecoratorInterface
 {
-    public function getField();
+    public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate);
 
     // $field, respektive preklad z queryDescription - $field
 
