@@ -51,8 +51,30 @@ class LeadSegmentFilter
     /** @var Column */
     private $dbColumn;
 
-    /** @var EntityManager */
-    private $em;
+    public function getField()
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function getTable()
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function getOperator()
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function getParameterHolder()
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function getParameterValue()
+    {
+        throw new \Exception('Not implemented');
+    }
 
     public function __construct(
         LeadSegmentFilterCrate $leadSegmentFilterCrate,
@@ -212,81 +234,9 @@ class LeadSegmentFilter
     /**
      * @return string|null
      */
-    public function getGlue()
-    {
-        return $this->leadSegmentFilterCrate->getGlue();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getField()
-    {
-        return $this->leadSegmentFilterCrate->getField();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getObject()
-    {
-        return $this->leadSegmentFilterCrate->getObject();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isLeadType()
-    {
-        return $this->leadSegmentFilterCrate->isLeadType();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isCompanyType()
-    {
-        return $this->leadSegmentFilterCrate->isCompanyType();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getType()
-    {
-        return $this->leadSegmentFilterCrate->getType();
-    }
-
-    /**
-     * @return string|array|null
-     */
-    public function getFilter()
-    {
-        return $this->leadSegmentFilterCrate->getFilter();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDisplay()
-    {
-        return $this->leadSegmentFilterCrate->getDisplay();
-    }
-
-    /**
-     * @return string|null
-     */
     public function getOperator()
     {
         return $this->filterDecorator->getOperator($this->leadSegmentFilterCrate);
-    }
-
-    /**
-     * @return string
-     */
-    public function getFunc()
-    {
-        return $this->leadSegmentFilterCrate->getFunc();
     }
 
     /**
@@ -360,5 +310,13 @@ class LeadSegmentFilter
         $this->queryBuilder = $queryBuilder;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf('%s %s = %s', $this->getObject(), $this->getField(), $this->getField());
     }
 }
