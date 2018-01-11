@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\QueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -71,6 +72,10 @@ class LeadSegmentFilter
      */
     private $queryBuilder;
 
+    /**
+     * @var BaseDecorator
+     */
+    private $decorator;
     /**
      * @var array
      */
@@ -434,6 +439,26 @@ class LeadSegmentFilter
     public function setQueryBuilder($queryBuilder)
     {
         $this->queryBuilder = $queryBuilder;
+
+        return $this;
+    }
+
+    /**
+     * @return BaseDecorator
+     */
+    public function getDecorator()
+    {
+        return $this->decorator;
+    }
+
+    /**
+     * @param BaseDecorator $decorator
+     *
+     * @return LeadSegmentFilter
+     */
+    public function setDecorator($decorator)
+    {
+        $this->decorator = $decorator;
 
         return $this;
     }
