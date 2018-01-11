@@ -56,7 +56,9 @@ class LeadSegmentFilterFactory
         foreach ($filters as $filter) {
             $leadSegmentFilter = new LeadSegmentFilter($filter, $this->dictionary, $this->entityManager);
 
-            $leadSegmentFilter->setQueryDescription($this->dictionary[$filter] ? $this->dictionary[$filter] : false);
+            $leadSegmentFilter->setQueryDescription(
+                isset($this->dictionary[$leadSegmentFilter->getField()]) ? $this->dictionary[$leadSegmentFilter->getField()] : false
+            );
             $leadSegmentFilter->setQueryBuilder($this->getQueryBuilderForFilter($leadSegmentFilter));
             $leadSegmentFilter->setDecorator($this->getDecoratorForFilter($leadSegmentFilter));
 
