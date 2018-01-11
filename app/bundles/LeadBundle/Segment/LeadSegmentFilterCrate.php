@@ -65,9 +65,7 @@ class LeadSegmentFilterCrate
         $this->display  = isset($filter['display']) ? $filter['display'] : null;
         $this->func     = isset($filter['func']) ? $filter['func'] : null;
         $this->operator = isset($filter['operator']) ? $filter['operator'] : null;
-
-        $filterValue = isset($filter['filter']) ? $filter['filter'] : null;
-        $this->setFilter($filterValue);
+        $this->filter   = isset($filter['filter']) ? $filter['filter'] : null;
     }
 
     /**
@@ -143,44 +141,10 @@ class LeadSegmentFilterCrate
     }
 
     /**
-     * @param string|array|bool|float|null $filter
-     */
-    public function setFilter($filter)
-    {
-        $filter = $this->sanitizeFilter($filter);
-
-        $this->filter = $filter;
-    }
-
-    /**
      * @return string
      */
     public function getFunc()
     {
         return $this->func;
-    }
-
-    /**
-     * @param string|array|bool|float|null $filter
-     *
-     * @return string|array|bool|float|null
-     */
-    private function sanitizeFilter($filter)
-    {
-        if ($filter === null || is_array($filter) || !$this->getType()) {
-            return $filter;
-        }
-
-        switch ($this->getType()) {
-            case 'number':
-                $filter = (float) $filter;
-                break;
-
-            case 'boolean':
-                $filter = (bool) $filter;
-                break;
-        }
-
-        return $filter;
     }
 }

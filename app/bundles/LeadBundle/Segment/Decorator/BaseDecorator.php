@@ -93,6 +93,15 @@ class BaseDecorator implements FilterDecoratorInterface
 
     public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return $leadSegmentFilterCrate->getFilter();
+        $filter = $leadSegmentFilterCrate->getFilter();
+
+        switch ($leadSegmentFilterCrate->getType()) {
+            case 'number':
+                return (float) $filter;
+            case 'boolean':
+                return (bool) $filter;
+        }
+
+        return $filter;
     }
 }
