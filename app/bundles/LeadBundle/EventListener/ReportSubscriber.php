@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\ORM\Query\ResultSetMapping;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -308,52 +309,67 @@ class ReportSubscriber extends CommonSubscriber
                 if ($event->hasColumn(['cat.id', 'cat.title']) || $event->hasColumn(['cat.id', 'cat.title'])) {
                     $event->addCategoryLeftJoin($qb, 'c', 'cat');
                 }
-
-                $subQ = clone $qb;
-                $subQ->resetQueryParts();
-
                 $alias = str_replace('contact.attribution.', '', $context);
 
-                $expr = $subQ->expr()->andX(
-                    $subQ->expr()->eq("{$alias}e.event_type", $subQ->expr()->literal('decision')),
-                    $subQ->expr()->eq("{$alias}log.lead_id", 'log.lead_id')
-                );
+                if ('multi' != $alias) {
+                    $logIdQb = clone $qb;
+                    $logIdQb->resetQueryParts();
+                    $subLogIdQb       = clone $logIdQb;
+                    $subLogIdQbPrefix = 'subLogIdQb';
+                    $subLogIdQb->select("{$subLogIdQbPrefix}log.id, {$subLogIdQbPrefix}log.lead_id")
+                        ->from('campaign_lead_event_log', "{$subLogIdQbPrefix}log")
+                        ->innerJoin("{$subLogIdQbPrefix}log", 'campaign_events', "{$subLogIdQbPrefix}event", "{$subLogIdQbPrefix}log.event_id = {$subLogIdQbPrefix}event.id")
+                        ->innerJoin("{$subLogIdQbPrefix}event", 'campaigns', "{$subLogIdQbPrefix}campaign", "{$subLogIdQbPrefix}event.campaign_id = {$subLogIdQbPrefix}campaign.id")
+                        ->andWhere(
+                            $subLogIdQb->expr()->eq("{$subLogIdQbPrefix}event.event_type", $subLogIdQb->expr()->literal('decision'))
+                        );
 
-                $subsetFilters = ['log.campaign_id', 'c.name', 'channel', 'channel_action', 'e.name'];
-                if ($event->hasFilter($subsetFilters)) {
-                    // Must use the same filters for determining the min of a given subset
-                    $filters = $event->getReport()->getFilters();
-                    foreach ($filters as $filter) {
-                        if (in_array($filter['column'], $subsetFilters)) {
-                            $filterParam = $event->createParameterName();
-                            if (isset($filter['formula'])) {
-                                $x = "({$filter['formula']}) as {$alias}_{$filter['column']}";
-                            } else {
-                                $x = $alias.$filter['column'];
+                    $rsm         = new ResultSetMapping();
+                    $compareSign = $alias === 'first' ? '>' : '<';
+                    $logIdQuery  = $this->em->createNativeQuery("
+                        SELECT {$subLogIdQbPrefix}1.id
+                        FROM ({$subLogIdQb->getSQL()}) {$subLogIdQbPrefix}1
+                        LEFT JOIN ({$subLogIdQb->getSQL()}) {$subLogIdQbPrefix}2 ON ({$subLogIdQbPrefix}1.id {$compareSign} {$subLogIdQbPrefix}2.id AND {$subLogIdQbPrefix}1.lead_id = {$subLogIdQbPrefix}2.lead_id)
+                        WHERE {$subLogIdQbPrefix}2.id IS NULL
+                    ", $rsm);
+                    // Get the min/max row and group by lead for first touch or last touch events
+                    $qb->andWhere(
+                        $qb->expr()->eq('log.id', sprintf('(%s)', $logIdQuery->getSQL()))
+                    );
+                } else {
+                    $subQ = clone $qb;
+                    $subQ->resetQueryParts();
+
+                    $expr = $subQ->expr()->andX(
+                        $subQ->expr()->eq("{$alias}e.event_type", $subQ->expr()->literal('decision')),
+                        $subQ->expr()->eq("{$alias}log.lead_id", 'log.lead_id')
+                    );
+
+                    $subsetFilters = ['log.campaign_id', 'c.name', 'channel', 'channel_action', 'e.name'];
+                    if ($event->hasFilter($subsetFilters)) {
+                        // Must use the same filters for determining the min of a given subset
+                        $filters = $event->getReport()->getFilters();
+                        foreach ($filters as $filter) {
+                            if (in_array($filter['column'], $subsetFilters)) {
+                                $filterParam = $event->createParameterName();
+                                if (isset($filter['formula'])) {
+                                    $x = "({$filter['formula']}) as {$alias}_{$filter['column']}";
+                                } else {
+                                    $x = $alias.$filter['column'];
+                                }
+
+                                $expr->add(
+                                    $expr->{$filter['operator']}($x, ":$filterParam")
+                                );
+                                $qb->setParameter($filterParam, $filter['value']);
                             }
-
-                            $expr->add(
-                                $expr->{$filter['operator']}($x, ":$filterParam")
-                            );
-                            $qb->setParameter($filterParam, $filter['value']);
                         }
                     }
-                }
 
-                $subQ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', "{$alias}log")
-                    ->join("{$alias}log", MAUTIC_TABLE_PREFIX.'campaign_events', "{$alias}e", "{$alias}log.event_id = {$alias}e.id")
-                    ->join("{$alias}e", MAUTIC_TABLE_PREFIX.'campaigns', "{$alias}c", "{$alias}e.campaign_id = {$alias}c.id")
-                    ->where($expr);
-
-                if ('multi' != $alias) {
-                    // Get the min/max row and group by lead for first touch or last touch events
-                    $func = ('first' == $alias) ? 'min' : 'max';
-                    $subQ->select("$func({$alias}log.date_triggered)")
-                        ->setMaxResults(1);
-                    $qb->andWhere(
-                        $qb->expr()->eq('log.date_triggered', sprintf('(%s)', $subQ->getSQL()))
-                    )->groupBy('l.id');
-                } else {
+                    $subQ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', "{$alias}log")
+                        ->join("{$alias}log", MAUTIC_TABLE_PREFIX.'campaign_events', "{$alias}e", "{$alias}log.event_id = {$alias}e.id")
+                        ->join("{$alias}e", MAUTIC_TABLE_PREFIX.'campaigns', "{$alias}c", "{$alias}e.campaign_id = {$alias}c.id")
+                        ->where($expr);
                     // Get the total count of records for this lead that match the filters to divide the attribution by
                     $subQ->select('count(*)')
                         ->groupBy("{$alias}log.lead_id");
