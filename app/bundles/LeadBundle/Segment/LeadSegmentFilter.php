@@ -150,38 +150,54 @@ class LeadSegmentFilter
 
 
     public function createQuery(QueryBuilder $queryBuilder, $alias = false) {
+        dump('creating query:' . $this->getObject());
         $glueFunc = $this->getGlue() . 'Where';
 
         $parameterName = $this->generateRandomParameterName();
 
-        $queryBuilder = $queryBuilder->$glueFunc(
-            $this->createExpression($queryBuilder, $parameterName, $this->getFunc())
-        );
+        $queryBuilder = $this->createExpression($queryBuilder, $parameterName, $this->getFunc());
 
         $queryBuilder->setParameter($parameterName, $this->getFilter());
+
+
+        dump($queryBuilder->getSQL());
 
         return $queryBuilder;
     }
 
     public function createExpression(QueryBuilder $queryBuilder, $parameterName, $func = null) {
-        dump('creating expression'); dump($this);
+        dump('creating query:' . $this->getField());
         $func = is_null($func) ? $this->getFunc() : $func;
         $alias = $this->getTableAlias($this->getEntityName(), $queryBuilder);
+        $desc = $this->getQueryDescription();
         if (!$alias) {
-            $expr = $queryBuilder->expr()->$func($this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
-            $queryBuilder = $this->createJoin($queryBuilder, $this->getEntityName(), $this->generateRandomParameterName(), $expr);
-        } else {
-            $expr = $queryBuilder->expr()->$func($alias . '.' . $this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
-            if ($alias != 'l') {
-                $queryBuilder = $this->AddJoinCondition($queryBuilder, $alias, $expr);
-
+            if ($desc['func']) {
+                $queryBuilder = $this->createJoin($queryBuilder, $this->getEntityName(), $alias = $this->generateRandomParameterName());
+                $expr = $queryBuilder->expr()->$func($desc['func'] . "(" . $alias . "." . $this->getDBColumn()->getName() . ")", $this->getFilterConditionValue($parameterName));
+                $queryBuilder = $queryBuilder->andHaving($expr);
             } else {
-                dump('lead restriction');
+                if ($alias != 'l') {
+                    $queryBuilder = $this->createJoin($queryBuilder, $this->getEntityName(), $alias = $this->generateRandomParameterName());
+                    $expr = $queryBuilder->expr()->$func($alias . '.' . $this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
+                    $queryBuilder = $this->AddJoinCondition($queryBuilder, $alias, $expr);
+                } else {
+                    dump('lead restriction');
+                    $expr = $queryBuilder->expr()->$func($alias . '.' . $this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
+                    var_dump($expr);
+                    die();
+                    $queryBuilder = $queryBuilder->andWhere($expr);
+                }
+            }
+
+        } else {
+            if ($alias != 'l') {
+                $expr = $queryBuilder->expr()->$func($alias . '.' . $this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
+                $queryBuilder = $this->AddJoinCondition($queryBuilder, $alias, $expr);
+            } else {
+                $expr = $queryBuilder->expr()->$func($alias . '.' . $this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
                 $queryBuilder = $queryBuilder->andWhere($expr);
             }
         }
-
-        dump($queryBuilder->getQueryParts()); //die();
 
         return $queryBuilder;
     }
@@ -200,7 +216,13 @@ class LeadSegmentFilter
 
     public function getEntityName() {
         $converter = new CamelCaseToSnakeCaseNameConverter();
-        $entity = sprintf('MauticLeadBundle:%s',ucfirst($converter->denormalize($this->getObject())));
+        if ($this->getQueryDescription()) {
+            $table = $this->queryDescription['foreign_table'];
+        } else {
+            $table = $this->getObject();
+        }
+
+        $entity = sprintf('MauticLeadBundle:%s',ucfirst($converter->denormalize($table)));
         return $entity;
     }
 
@@ -213,7 +235,6 @@ class LeadSegmentFilter
             if($descr = $this->getQueryDescription()) {
                 $this->dbColumn = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->queryDescription['foreign_table'])[$this->queryDescription['field']];
             } else {
-                var_dump($this->getDBTable());
                 $dbTableColumns = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->getDBTable());
                 if (!$dbTableColumns) {
                     var_dump($this);

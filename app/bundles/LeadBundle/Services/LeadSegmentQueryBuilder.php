@@ -75,7 +75,7 @@ class LeadSegmentQueryBuilder {
         // LEFT JOIN lead_lists_leads ll ON (ll.leadlist_id = 28) AND (ll.lead_id = l.id) AND (ll.date_added <= '2018-01-09 14:48:54')
         // WHERE (l.propertytype = :MglShQLG) AND (ll.lead_id IS NULL)
         var_dump($whatever);
-    return $queryBuilder;
+        return $queryBuilder;
         die();
     }
 
@@ -85,8 +85,9 @@ class LeadSegmentQueryBuilder {
 
         $qb->select('*')->from('MauticLeadBundle:Lead', 'l');
 
+        var_dump(count($leadSegmentFilters));
         foreach ($leadSegmentFilters as $filter) {
-            dump($filter);
+            var_dump($filter->getField());
             $qb = $this->getQueryPart($filter, $qb);
         }
 
@@ -143,26 +144,7 @@ class LeadSegmentQueryBuilder {
     }
 
     private function getQueryPart(LeadSegmentFilter $filter, QueryBuilder $qb) {
-        var_dump('Asseting query type: ' . $filter->getFilter());
-
         $qb = $filter->createQuery($qb);
-        //        if (!$dbField) {
-        //            $translated = $filter->getQueryDescription();
-        //
-        //            if (!$translated) {
-        //                $filter->createQuery($qb);
-        //                return $qb;
-        //                throw new \Exception('Unknown field: ' . $filter->getField());
-        //            }
-        //
-        //            switch ($translated['type']) {
-        //                case 'foreign':
-        //                case 'foreign_aggr':
-        //                    $this->addForeignTableQuery($qb, $filter);
-        //                    break;
-        //            }
-        //        }
-
 
         return $qb;
 

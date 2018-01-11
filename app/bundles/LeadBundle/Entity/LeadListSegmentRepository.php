@@ -149,7 +149,6 @@ class LeadListSegmentRepository
 
     private function generateSegmentExpression(LeadSegmentFilters $leadSegmentFilters, QueryBuilder $q, $listId = null)
     {
-        var_dump(debug_backtrace()[1]['function']);
         $expr = $this->getListFilterExpr($leadSegmentFilters, $q, $listId);
 
         if ($leadSegmentFilters->isHasCompanyFilter()) {

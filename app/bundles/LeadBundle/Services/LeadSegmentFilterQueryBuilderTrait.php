@@ -21,7 +21,7 @@ trait LeadSegmentFilterQueryBuilderTrait {
         $tables = $this->getTableAliases($queryBuilder);
 
         if (!in_array($tableEntity, $tables)) {
-            var_dump(sprintf('table entity ' . $tableEntity . ' not found in "%s"', join(', ', array_keys($tables))));
+            //var_dump(sprintf('table entity ' . $tableEntity . ' not found in "%s"', join(', ', array_keys($tables))));
         }
 
         return isset($tables[$tableEntity]) ? $tables[$tableEntity] : false;
@@ -39,9 +39,7 @@ trait LeadSegmentFilterQueryBuilderTrait {
                 $tables[$joinPart['joinTable']] = $joinPart['joinAlias'];
             }
         }
-        var_dump($tables);
-        var_dump($queryParts['join']);
-
+        
         return $tables;
     }
 
@@ -76,7 +74,7 @@ trait LeadSegmentFilterQueryBuilderTrait {
         return $queryBuilder;
     }
 
-    protected function addForeignTableQuery(QueryBuilder $qb, LeadSegmentFilter $filter, $reuseTable = true) {
+    protected function addForeignTableQuery(QueryBuilder $qb, LeadSegmentFilter $filter) {
         $filter->createJoin($qb, $alias);
         if (isset($translated) && $translated) {
             if (isset($translated['func'])) {
@@ -170,17 +168,14 @@ trait LeadSegmentFilterQueryBuilderTrait {
         $result = $parts = $qb->getQueryPart('join');
 
 
-        dump(1);
         foreach ($parts['l'] as $key=>$part) {
-            dump($part);
             if ($part['joinAlias'] == $alias) {
                 $result['l'][$key]['joinCondition'] = $part['joinCondition'] . " and " . $expr;
             }
         }
-        dump(2);
 
         $qb->setQueryPart('join', $result);
-        dump($qb->getQueryParts()); die();
+
         return $qb;
     }
 
