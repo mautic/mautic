@@ -36,7 +36,7 @@ class LeadSegmentFilter
     /**
      * @var BaseFilterQueryBuilder
      */
-    private $queryBuilder;
+    private $filterQueryBuilder;
 
     /** @var Column */
     private $dbColumn;
@@ -228,19 +228,19 @@ class LeadSegmentFilter
     /**
      * @return BaseFilterQueryBuilder
      */
-    public function getQueryBuilder()
+    public function getFilterQueryBuilder()
     {
-        return $this->queryBuilder;
+        return $this->filterQueryBuilder;
     }
 
     /**
-     * @param BaseFilterQueryBuilder $queryBuilder
+     * @param BaseFilterQueryBuilder $filterQueryBuilder
      *
      * @return LeadSegmentFilter
      */
-    public function setQueryBuilder($queryBuilder)
+    public function setFilterQueryBuilder($filterQueryBuilder)
     {
-        $this->queryBuilder = $queryBuilder;
+        $this->filterQueryBuilder = $filterQueryBuilder;
 
         return $this;
     }
@@ -250,6 +250,6 @@ class LeadSegmentFilter
      */
     public function __toString()
     {
-        return sprintf('%s %s = %s', $this->getObject(), $this->getField(), $this->getField());
+        return sprintf('%s %s = %s', $this->getTable(), $this->getField(), $this->getParameterHolder());
     }
 }

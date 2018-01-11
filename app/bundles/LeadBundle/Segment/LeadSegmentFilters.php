@@ -36,13 +36,13 @@ class LeadSegmentFilters implements \Iterator, \Countable
     public function addLeadSegmentFilter(LeadSegmentFilter $leadSegmentFilter)
     {
         $this->leadSegmentFilters[] = $leadSegmentFilter;
-        if ($leadSegmentFilter->isCompanyType()) {
-            $this->hasCompanyFilter = true;
-            // Must tell getLeadsByList how to best handle the relationship with the companies table
-            if (!in_array($leadSegmentFilter->getFunc(), ['empty', 'neq', 'notIn', 'notLike'], true)) {
-                $this->listFiltersInnerJoinCompany = true;
-            }
-        }
+//        if ($leadSegmentFilter->isCompanyType()) {
+//            $this->hasCompanyFilter = true;
+//            // Must tell getLeadsByList how to best handle the relationship with the companies table
+//            if (!in_array($leadSegmentFilter->getFunc(), ['empty', 'neq', 'notIn', 'notLike'], true)) {
+//                $this->listFiltersInnerJoinCompany = true;
+//            }
+//        }
     }
 
     /**

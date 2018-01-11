@@ -76,18 +76,18 @@ class LeadSegmentQueryBuilder
 
     public function getLeadsQueryBuilder($id, LeadSegmentFilters $leadSegmentFilters)
     {
-        /** @var QueryBuilder $qb */
-        $qb = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($this->entityManager->getConnection());
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($this->entityManager->getConnection());
 
-        $qb->select('*')->from('leads', 'l');
+        $queryBuilder->select('*')->from('leads', 'l');
 
         /** @var LeadSegmentFilter $filter */
         foreach ($leadSegmentFilters as $filter) {
             var_dump('parsing filter: '.$filter->__toString());
-            $qb = $filter->getQueryBuilder();
+            $queryBuilder = $filter->getFilterQueryBuilder()->applyQuery($queryBuilder);
         }
 
-        return $qb;
+        return $queryBuilder;
         echo 'SQL parameters:';
         dump($q->getParameters());
 
@@ -563,7 +563,7 @@ class LeadSegmentQueryBuilder
                         $column = 'email_id';
 
                         $trueParameter                        = $this->generateRandomParameterName();
-                        $subQueryFilters[$alias.'.is_read'] = $trueParameter;
+                        $subQueryFilters[$alias.'.is_read']   = $trueParameter;
                         $parameters[$trueParameter]           = true;
                         break;
                     case 'lead_email_sent':

@@ -62,16 +62,11 @@ class LeadSegmentFilterFactory
 
             $leadSegmentFilter = new LeadSegmentFilter($leadSegmentFilterCrate, $decorator, $this->entityManager);
             //$this->leadSegmentFilterDate->fixDateOptions($leadSegmentFilter);
-            $leadSegmentFilter->setQueryBuilder($this->getQueryBuilderForFilter($leadSegmentFilter));
-            dump($leadSegmentFilter);
-            dump($leadSegmentFilter->getOperator());
-            dump($leadSegmentFilter->getField());
-            continue;
+            $leadSegmentFilter->setFilterQueryBuilder($this->getQueryBuilderForFilter($leadSegmentFilter));
 
             //@todo replaced in query builder
             $leadSegmentFilters->addLeadSegmentFilter($leadSegmentFilter);
         }
-        die();
 
         return $leadSegmentFilters;
     }
