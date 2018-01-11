@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\ORM\EntityManager;
@@ -59,7 +58,7 @@ class LeadSegmentFilter
      *
      * @throws \Exception
      */
-    public function getFilterConditionValue($argument = null)
+    public function XXgetFilterConditionValue($argument = null)
     {
         switch ($this->getDBColumn()->getType()->getName()) {
             case 'number':
@@ -88,7 +87,7 @@ class LeadSegmentFilter
         throw new \Exception(sprintf('Unknown value type \'%s\'.', $filter->getName()));
     }
 
-    public function createQuery(QueryBuilder $queryBuilder, $alias = false)
+    public function XXcreateQuery(QueryBuilder $queryBuilder, $alias = false)
     {
         dump('creating query:'.$this->getObject());
         $glueFunc = $this->getGlue().'Where';
@@ -104,7 +103,7 @@ class LeadSegmentFilter
         return $queryBuilder;
     }
 
-    public function createExpression(QueryBuilder $queryBuilder, $parameterName, $func = null)
+    public function XXcreateExpression(QueryBuilder $queryBuilder, $parameterName, $func = null)
     {
         dump('creating query:'.$this->getField());
         $func  = is_null($func) ? $this->getFunc() : $func;
@@ -141,19 +140,7 @@ class LeadSegmentFilter
         return $queryBuilder;
     }
 
-    public function getDBTable()
-    {
-        //@todo cache metadata
-        try {
-            $tableName = $this->em->getClassMetadata($this->getEntityName())->getTableName();
-        } catch (MappingException $e) {
-            return $this->getObject();
-        }
-
-        return $tableName;
-    }
-
-    public function getEntityName()
+    public function getEntity()
     {
         $converter = new CamelCaseToSnakeCaseNameConverter();
         if ($this->getQueryDescription()) {
@@ -172,7 +159,7 @@ class LeadSegmentFilter
      *
      * @throws \Exception
      */
-    public function getDBColumn()
+    public function XXgetDBColumn()
     {
         if (is_null($this->dbColumn)) {
             if ($descr = $this->getQueryDescription()) {
