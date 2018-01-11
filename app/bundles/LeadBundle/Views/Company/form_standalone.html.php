@@ -66,7 +66,7 @@ echo $view['form']->start($form);
             <div class="tab-content">
                 <?php echo $view->render(
                     'MauticLeadBundle:Company:form_fields.html.php',
-                    ['form' => $form, 'groups' => $groups, 'fields' => $fields]
+                    ['form' => $form, 'groups' => $groups, 'companyfiles' => !empty($companyfiles) ? $companyfiles : false, 'fields' => $fields]
                 ); ?>
             </div>
         </div>

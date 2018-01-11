@@ -132,6 +132,10 @@ return [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
                 'controller' => 'MauticLeadBundle:List:contacts',
             ],
+            'mautic_company_file_delete' => [
+                'path'       => '/companies/file/delete/{objectId}',
+                'controller' => 'MauticLeadBundle:Company:deleteFile',
+            ],
         ],
         'api' => [
             'mautic_api_contactsstandard' => [
@@ -806,10 +810,14 @@ return [
                     'mautic.lead.repository.dnc',
                 ],
             ],
+            'mautic.lead.model.company_files' => [
+                'class'     => \Mautic\LeadBundle\Model\CompanyFilesModel::class,
+            ],
         ],
     ],
     'parameters' => [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
+        'company_file_dir'                    => '%kernel.root_dir%/../media/companies',
     ],
 ];

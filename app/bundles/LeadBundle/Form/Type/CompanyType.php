@@ -97,6 +97,21 @@ class CompanyType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'companyFiles',
+            'file',
+            [
+                'label'      => 'mautic.lead.company.field.companyfiles',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                ],
+                'multiple'   => true,
+                'required'   => false,
+                'mapped'     => false,
+            ]
+        );
+
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',

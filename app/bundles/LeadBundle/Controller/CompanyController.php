@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyFiles;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -173,6 +174,12 @@ class CompanyController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
+                    $companyFiles = false;
+                    if ($this->request->files->get('company')) {
+                        $companyFiles = $this->request->files->get('company')['companyFiles'];
+                        //remove the company files from request
+                        $this->request->files->remove('company');
+                    }
                     //form is valid so process the data
                     //get custom field values
                     $data = $this->request->request->get('company');
@@ -183,6 +190,10 @@ class CompanyController extends FormController
                     $model->setFieldValues($entity, $data, true);
                     //form is valid so process the data
                     $model->saveEntity($entity);
+
+                    if ($companyFiles) {
+                        $this->uploadCompanyFiles($companyFiles, $entity);
+                    }
 
                     $this->addFlash(
                         'mautic.core.notice.created',
@@ -348,6 +359,13 @@ class CompanyController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
+                    $companyFiles = false;
+                    if ($this->request->files->get('company')) {
+                        $companyFiles = $this->request->files->get('company')['companyFiles'];
+                        //remove the company files from request
+                        $this->request->files->remove('company');
+                    }
+
                     $data = $this->request->request->get('company');
                     //pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
@@ -370,6 +388,10 @@ class CompanyController extends FormController
 
                     $model->setFieldValues($entity, $data, true);
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                    if ($companyFiles) {
+                        $this->uploadCompanyFiles($companyFiles, $entity);
+                    }
 
                     $this->addFlash(
                         'mautic.core.notice.updated',
@@ -439,16 +461,18 @@ class CompanyController extends FormController
         $fields = $model->organizeFieldsByGroup($fields);
         $groups = array_keys($fields);
         sort($groups);
-        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
+        $template     = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
+        $companyfiles = $this->getModel('lead.company_files')->getRepository()->getCompanyFiles($entity->getId());
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
-                    'fields' => $fields,
-                    'groups' => $groups,
+                    'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'entity'       => $entity,
+                    'form'         => $form->createView(),
+                    'fields'       => $fields,
+                    'groups'       => $groups,
+                    'companyfiles' => $companyfiles,
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
@@ -769,6 +793,74 @@ class CompanyController extends FormController
                     'target' => ($tmpl == 'update') ? '.company-merge-options' : null,
                 ],
             ]
+        );
+    }
+
+    /**
+     * Upload company files.
+     *
+     * @param type $files
+     * @param type $company
+     */
+    private function uploadCompanyFiles($files, $company)
+    {
+        foreach ($files as $file) {
+            $companyFiles = $this->getModel('lead.company_files')->getEntity();
+            $companyFiles->setUploadDir($this->get('mautic.helper.core_parameters')->getParameter('company_file_dir'))
+                         ->setCompany($company)
+                         ->setFile($file)
+                         ->upload();
+            $this->getModel('lead.company_files')->saveEntity($companyFiles);
+        }
+    }
+
+    /**
+     * Deletes the file.
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function deleteFileAction($objectId)
+    {
+        $page           = $this->get('session')->get('mautic.company.page', 1);
+        $returnUrl      = $this->generateUrl('mautic_company_index', ['page' => $page]);
+        $flashes        = [];
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_company_index',
+                'mauticContent' => 'company',
+            ],
+        ];
+
+        if ($this->request->getMethod() == 'POST') {
+            $model  = $this->getModel('lead.company_files');
+            $entity = $model->getEntity($objectId);
+            $entity->removeCompanyFile();
+            $model->deleteEntity($entity);
+
+            $flashes[] = [
+                'type'    => 'notice',
+                'msg'     => 'mautic.core.notice.deleted',
+                'msgVars' => [
+                    '%name%' => $entity->getTitle(),
+                    '%id%'   => $objectId,
+                ],
+            ];
+
+            return $this->editAction($entity->getCompany()->getId());
+        }
+
+        return $this->postActionRedirect(
+            array_merge(
+                $postActionVars,
+                [
+                    'flashes' => $flashes,
+                ]
+            )
         );
     }
 }

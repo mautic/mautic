@@ -31,7 +31,7 @@
     <div class="tab-content pa-md">
         <?php echo $view->render(
             'MauticLeadBundle:Company:form_fields.html.php',
-            ['form' => $form, 'groups' => $groups, 'fields' => $fields, 'embedded' => true]
+            ['form' => $form, 'groups' => $groups, 'fields' => $fields, 'companyfiles' => $companyfiles, 'embedded' => true]
         ); ?>
     </div>
     </div>
