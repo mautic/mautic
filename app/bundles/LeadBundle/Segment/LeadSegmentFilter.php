@@ -208,6 +208,11 @@ class LeadSegmentFilter
         return $this->filterDecorator->getParameterValue($this->leadSegmentFilterCrate);
     }
 
+    public function getGlue()
+    {
+        return $this->leadSegmentFilterCrate->getGlue();
+    }
+
     /**
      * @return array
      */
