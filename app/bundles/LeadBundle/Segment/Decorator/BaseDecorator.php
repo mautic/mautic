@@ -46,8 +46,19 @@ class BaseDecorator implements FilterDecoratorInterface
         return $this->leadSegmentFilterDescriptor[$originalField]['field'];
     }
 
-    public function getTable()
+    public function getTable(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
+        $originalField = $leadSegmentFilterCrate->getField();
+
+        if (empty($this->leadSegmentFilterDescriptor[$originalField])) {
+            if ($leadSegmentFilterCrate->isLeadType()) {
+                return 'leads';
+            }
+
+            return 'companies';
+        }
+
+        return $this->leadSegmentFilterDescriptor[$originalField]['foreign_table'];
     }
 
     public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)
@@ -55,11 +66,33 @@ class BaseDecorator implements FilterDecoratorInterface
         return $this->leadSegmentFilterOperator->fixOperator($leadSegmentFilterCrate->getOperator());
     }
 
-    public function getParameterHolder($argument)
+    public function getParameterHolder(LeadSegmentFilterCrate $leadSegmentFilterCrate, $argument)
     {
+        if (is_array($argument)) {
+            $result = [];
+            foreach ($argument as $arg) {
+                $result[] = $this->getParameterHolder($leadSegmentFilterCrate, $arg);
+            }
+
+            return $result;
+        }
+
+        switch ($this->getOperator($leadSegmentFilterCrate)) {
+            case 'like':
+            case 'notLike':
+            case 'contains':
+                return '%:'.$argument.'%';
+            case 'startsWith':
+                return ':'.$argument.'%';
+            case 'endsWith':
+                return '%:'.$argument;
+        }
+
+        return ':'.$argument;
     }
 
-    public function getParameterValue()
+    public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
+        return $leadSegmentFilterCrate->getFilter();
     }
 }

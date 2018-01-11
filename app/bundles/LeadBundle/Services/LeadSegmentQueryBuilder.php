@@ -84,7 +84,7 @@ class LeadSegmentQueryBuilder
         /** @var LeadSegmentFilter $filter */
         foreach ($leadSegmentFilters as $filter) {
             var_dump('parsing filter: '.$filter->__toString());
-            $queryBuilder = $filter->getFilterQueryBuilder()->applyQuery($queryBuilder);
+            $queryBuilder = $filter->applyQuery($queryBuilder);
         }
 
         return $queryBuilder;

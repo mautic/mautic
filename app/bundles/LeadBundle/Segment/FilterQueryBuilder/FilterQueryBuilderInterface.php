@@ -10,9 +10,16 @@
 
 namespace Mautic\LeadBundle\Segment\FilterQueryBuilder;
 
+use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 interface FilterQueryBuilderInterface
 {
-    public function applyQuery(QueryBuilder $queryBuilder);
+    /**
+     * @param QueryBuilder      $queryBuilder
+     * @param LeadSegmentFilter $filter
+     *
+     * @return QueryBuilder
+     */
+    public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter);
 }

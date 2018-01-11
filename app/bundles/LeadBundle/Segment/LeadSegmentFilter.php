@@ -11,11 +11,11 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -195,17 +195,17 @@ class LeadSegmentFilter
 
     public function getTable()
     {
-        throw new \Exception('Not implemented');
+        return $this->filterDecorator->getTable($this->leadSegmentFilterCrate);
     }
 
-    public function getParameterHolder()
+    public function getParameterHolder($argument)
     {
-        throw new \Exception('Not implemented');
+        return $this->filterDecorator->getParameterHolder($this->leadSegmentFilterCrate, $argument);
     }
 
     public function getParameterValue()
     {
-        throw new \Exception('Not implemented');
+        return $this->filterDecorator->getParameterValue($this->leadSegmentFilterCrate);
     }
 
     /**
@@ -214,14 +214,14 @@ class LeadSegmentFilter
     public function toArray()
     {
         return [
-            'glue'     => $this->getGlue(),
-            'field'    => $this->getField(),
-            'object'   => $this->getObject(),
-            'type'     => $this->getType(),
-            'filter'   => $this->getFilter(),
-            'display'  => $this->getDisplay(),
-            'operator' => $this->getOperator(),
-            'func'     => $this->getFunc(),
+            'glue'     => $this->leadSegmentFilterCrate->getGlue(),
+            'field'    => $this->leadSegmentFilterCrate->getField(),
+            'object'   => $this->leadSegmentFilterCrate->getObject(),
+            'type'     => $this->leadSegmentFilterCrate->getType(),
+            'filter'   => $this->leadSegmentFilterCrate->getFilter(),
+            'display'  => $this->leadSegmentFilterCrate->getDisplay(),
+            'operator' => $this->leadSegmentFilterCrate->getOperator(),
+            'func'     => $this->leadSegmentFilterCrate->getFunc(),
         ];
     }
 
@@ -250,6 +250,16 @@ class LeadSegmentFilter
      */
     public function __toString()
     {
-        return sprintf('%s %s = %s', $this->getTable(), $this->getField(), $this->getParameterHolder());
+        return sprintf('%s %s', $this->getTable(), $this->getField());
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return QueryBuilder
+     */
+    public function applyQuery(QueryBuilder $queryBuilder)
+    {
+        return $this->filterQueryBuilder->applyQuery($queryBuilder, $this);
     }
 }
