@@ -190,7 +190,7 @@ class LeadSegmentFilter
 
     public function getField()
     {
-        throw new \Exception('Not implemented');
+        return $this->filterDecorator->getField($this->leadSegmentFilterCrate);
     }
 
     public function getTable()

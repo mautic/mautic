@@ -35,8 +35,15 @@ class BaseDecorator implements FilterDecoratorInterface
         $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
     }
 
-    public function getField()
+    public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
+        $originalField = $leadSegmentFilterCrate->getField();
+
+        if (empty($this->leadSegmentFilterDescriptor[$originalField])) {
+            return $originalField;
+        }
+
+        return $this->leadSegmentFilterDescriptor[$originalField]['field'];
     }
 
     public function getTable()

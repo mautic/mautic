@@ -65,6 +65,7 @@ class LeadSegmentFilterFactory
             $leadSegmentFilter->setQueryBuilder($this->getQueryBuilderForFilter($leadSegmentFilter));
             dump($leadSegmentFilter);
             dump($leadSegmentFilter->getOperator());
+            dump($leadSegmentFilter->getField());
             continue;
 
             //@todo replaced in query builder
