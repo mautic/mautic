@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Swiftmailer\SendGrid;
 
 use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadLoginException;
 use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadRequestException;
+use Monolog\Logger;
 
 class SendGridApiFacade
 {
@@ -31,14 +32,21 @@ class SendGridApiFacade
      */
     private $sendGridApiResponse;
 
+    /**
+     * @var Logger
+     */
+    private $logger;
+
     public function __construct(
         SendGridWrapper $sendGridWrapper,
         SendGridApiMessage $sendGridApiMessage,
-        SendGridApiResponse $sendGridApiResponse
+        SendGridApiResponse $sendGridApiResponse,
+        Logger $logger
     ) {
         $this->sendGridWrapper     = $sendGridWrapper;
         $this->sendGridApiMessage  = $sendGridApiMessage;
         $this->sendGridApiResponse = $sendGridApiResponse;
+        $this->logger              = $logger;
     }
 
     /**
@@ -49,7 +57,8 @@ class SendGridApiFacade
     public function send(\Swift_Mime_Message $message)
     {
         $mail = $this->sendGridApiMessage->getMessage($message);
-
+        $this->logger->debug('SendGridApi - Swift_Mime_Message:', [$message]);
+        $this->logger->debug('SendGridApi - Mail:', [$mail]);
         $response = $this->sendGridWrapper->send($mail);
 
         try {

@@ -382,6 +382,7 @@ return [
                     'mautic.transport.sendgrid_api.sendgrid_wrapper',
                     'mautic.transport.sendgrid_api.message',
                     'mautic.transport.sendgrid_api.response',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.transport.sendgrid_api.mail.base' => [
