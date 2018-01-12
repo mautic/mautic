@@ -13,12 +13,15 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\File;
 
 /**
  * Class CompanyType.
@@ -44,17 +47,23 @@ class CompanyType extends AbstractType
     protected $translator;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * CompanyType constructor.
      *
      * @param EntityManager   $entityManager
      * @param CorePermissions $security
      */
-    public function __construct(EntityManager $entityManager, CorePermissions $security, RouterInterface $router, TranslatorInterface $translator)
+    public function __construct(EntityManager $entityManager, CorePermissions $security, RouterInterface $router, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
-        $this->em         = $entityManager;
-        $this->security   = $security;
-        $this->router     = $router;
-        $this->translator = $translator;
+        $this->em                   = $entityManager;
+        $this->security             = $security;
+        $this->router               = $router;
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -106,9 +115,17 @@ class CompanyType extends AbstractType
                 'attr'       => [
                     'class'    => 'form-control',
                 ],
-                'multiple'   => true,
-                'required'   => false,
-                'mapped'     => false,
+                'multiple'    => true,
+                'required'    => false,
+                'mapped'      => false,
+                'constraints' => [
+                    new All([
+                        new File([
+                            'maxSize'        => $this->coreParametersHelper->getParameter('mautic.max_size').'M',
+                            'maxSizeMessage' => $this->translator->trans('mautic.lead.company.file.maxsizemsg', ['%size%' => $this->coreParametersHelper->getParameter('mautic.max_size')]),
+                        ]),
+                    ]),
+                ],
             ]
         );
 

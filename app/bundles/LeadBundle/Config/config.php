@@ -641,7 +641,13 @@ return [
             ],
             'mautic.company.type.form' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyType',
-                'arguments' => ['doctrine.orm.entity_manager', 'mautic.security', 'router', 'translator'],
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.security',
+                    'router',
+                    'translator',
+                    'mautic.helper.core_parameters',
+                ],
                 'alias'     => 'company',
             ],
             'mautic.company.campaign.action.type.form' => [
