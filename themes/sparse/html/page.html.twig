@@ -1,0 +1,175 @@
+{% extends ":"~template~":base.html.twig" %}
+{% block content %}
+<header data-section-wrapper="1" id="top">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_white.svg')}}">
+      </div>
+    </div>
+  </div>
+</header>
+<section data-section-wrapper="1" class="hero">
+  <div data-section="1">
+    <div class="background">
+      <div data-slot-container="1">
+        <div data-slot="text">
+        <img class="background-image" src="{{getAssetUrl('themes/'~template~'/assets/photo_hero-background.jpg')}}">
+        </div>
+      </div>
+    </div>
+    <div class="container" data-slot-container="1">
+      <div class="main">
+        <div class="c6 hero-details-container">
+          <div class="hero-details" data-slot-container="1">
+            <div class="logo">
+              <div data-slot="text">
+                <img src="{{getAssetUrl('themes/'~template~'/assets/logo_white.svg')}}">
+              </div>
+            </div>
+            <div class="hero-details-inner" data-slot-container="1">
+              <div data-slot="text">
+                <h1>H1 Header Lorem<br>Ipsum Dolor Sit</h1>
+                <h2>H2 Subheader Lorem</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="c6 form-container">
+          <div class="form-wrapper">
+            <div class="form white">
+              <div data-slot="text">
+                <h2>H2 Call-To-Action</h2>
+                <div>
+                  {form=1}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="details">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div class="c6">
+        <div data-slot="text">
+          <h2>H2 Details</h2>
+          <h3>H3 Subheader</h3>
+          <p>
+            <strong>What:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus aliquam lacinia. Proin vel libero nisl. Pellentesque vel felis at massa faucibus lacinia.<br>
+            <strong>When:</strong> March 1st, 2018 @ 8pm EST<br>
+            <strong>Where:</strong> Liberty Hotel, Boston - Aliquam erat volutpat. Etiam vitae malesuada orci.<br>
+            <strong>Attire:</strong> Corporate casual
+          </p>
+        </div>
+      </div>
+      <div class="c6 image">
+        <div data-slot="text">
+          <img src="{{getAssetUrl('themes/'~template~'/assets/placeholder_coffee_big.jpg')}}">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="speakers">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div class="c6 image">
+        <div data-slot="text">
+          <img src="{{getAssetUrl('themes/'~template~'/assets/photo_woman.jpg')}}">
+        </div>
+      </div>
+      <div class="c6">
+        <div data-slot="text">
+          <h2>H2 Speaker</h2>
+          <h3>H3 Subheader</h3>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus aliquam lacinia. Proin vel libero nisl. Pellentesque vel felis at massa faucibus lacinia.<br>
+            Suspendisse non enim blandit, dictum velit vel, blandit tellus. Donec sed dolor nunc. In et magna ante. Quisque ut justo quis neque finibus consequat et sit amet lacus.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="about">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <h2>H2 About Company</h2>
+        <h3>H3 Subheader</h3>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus aliquam lacinia. Proin vel libero nisl. Pellentesque vel felis at massa faucibus lacinia. Donec sollicitudin laoreet gravida. Ut ex sem, imperdiet volutpat blandit eu, dictum sit amet nunc. Sed sollicitudin est quis lorem pretium, non molestie magna faucibus. Aliquam erat volutpat. Etiam vitae malesuada.<br>
+          Suspendisse non enim blandit, dictum velit vel, blandit tellus. Donec sed dolor nunc. In et magna ante. Quisque ut justo quis neque finibus consequat et sit amet lacus. Nulla eget lectus ut magna venenatis iaculis. Nulla a sapien congue, congue ligula at, tempor orci. Donec et nunc a massa rhoncus sollicitudin a non dolor. 
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="testimonials">
+  <div data-slot="text">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <h2>H2 Testimonials</h2>
+        <h3>H3 Subheader</h3>
+      </div>
+      <div class="testimonials-container">
+        <div class="testimonial">
+          <div data-slot="text">
+            <div class="c12 testimonial-quote">
+              <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
+            </div>
+            <div class="testimonial-details">
+              <div class="c5">
+                  <div class="speaker-image">
+                      <img src="{{getAssetUrl('themes/'~template~'/assets/photo_mars.jpg')}}">
+                  </div>
+              </div>
+              <div class="c7 details">
+                <h3>H3 Name</h3>
+                <p>Details about speaker</p>
+                <p>More details about speaker</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div data-slot="text">
+            <div class="c12 testimonial-quote">
+              <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
+            </div>
+            <div class="testimonial-details">
+              <div class="c5">
+                  <div class="speaker-image">
+                      <img src="{{getAssetUrl('themes/'~template~'/assets/photo_li.jpg')}}">
+                  </div>
+              </div>
+              <div class="c7 details">
+                <h3>H3 Name</h3>
+                <p>Details about speaker</p>
+                <p>More details about speaker</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<footer data-section-wrapper="1" id="bottom">
+  <div data-section="1">
+    <div class="container">
+      <div data-slot-container="1">
+        <div data-slot="text">
+          <p>© 2018 All Rights Reserved. Mautic, Inc.</p>
+          <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_black.svg')}}">
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+{% endblock %}
