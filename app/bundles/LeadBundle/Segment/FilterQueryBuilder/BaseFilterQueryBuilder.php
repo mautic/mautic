@@ -20,6 +20,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
     {
         $filterOperator = $filter->getOperator();
         $filterGlue     = $filter->getGlue();
+        $filterAggr     = $filter->getAggregateFunction();
 
         $filterParameters = $filter->getParameterValue();
 
@@ -40,8 +41,49 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
         $tableAlias = $this->getTableAlias($filter->getTable(), $queryBuilder);
 
+        // for aggregate function we need to create new alias and not reuse the old one
+        if ($filterAggr) {
+            $tableAlias = false;
+        }
+
         if (!$tableAlias) {
-            throw new \Exception('This QB is not intended for foreign queries, add entity "'.$filter->getTable().'"" first.');
+            $tableAlias = $this->generateRandomParameterName();
+
+            switch ($filterOperator) {
+                case 'notLike':
+                case 'notIn':
+
+                case 'empty':
+                case 'startsWith':
+                case 'gt':
+                case 'eq':
+                case 'neq':
+                case 'gte':
+                case 'like':
+                case 'lt':
+                case 'lte':
+                case 'in':
+                    if ($filterAggr) {
+                        $queryBuilder = $queryBuilder->leftJoin(
+                            $this->getTableAlias('leads', $queryBuilder),
+                            $filter->getTable(),
+                            $tableAlias,
+                            sprintf('%s.id = %s.lead_id', $this->getTableAlias('leads', $queryBuilder), $tableAlias)
+                        );
+                    } else {
+                        $queryBuilder = $queryBuilder->innerJoin(
+                            $this->getTableAlias('leads', $queryBuilder),
+                            $filter->getTable(),
+                            $tableAlias,
+                            sprintf('%s.id = %s.lead_id', $this->getTableAlias('leads', $queryBuilder), $tableAlias)
+                        );
+                    }
+                    break;
+                default:
+                    throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
+            }
+
+            var_dump('This QB is not intended for foreign queries, add entity "'.$filter->getTable().'"" first.');
         }
 
         switch ($filterOperator) {
@@ -52,6 +94,8 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 );
                 $queryBuilder->setParameter($emptyParameter, '');
                 break;
+            case 'startsWith':
+                $filterOperator = 'like';
             case 'gt':
             case 'eq':
             case 'neq':
@@ -62,22 +106,32 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             case 'lte':
             case 'notIn':
             case 'in':
-            case 'startsWith':
-                $expression = $queryBuilder->expr()->$filterOperator(
-                    $tableAlias.'.'.$filter->getField(),
-                    $filterParametersHolder
-                );
+                if ($filterAggr) {
+                    $expression = $queryBuilder->expr()->$filterOperator(
+                        sprintf('%s(%s)', $filterAggr, $tableAlias.'.'.$filter->getField()),
+                        $filterParametersHolder
+                    );
+                } else {
+                    $expression = $queryBuilder->expr()->$filterOperator(
+                        $tableAlias.'.'.$filter->getField(),
+                        $filterParametersHolder
+                    );
+                }
                 break;
             default:
+                var_dump($filter->toArray());
                 throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
         }
 
         if ($this->isJoinTable($filter->getTable(), $queryBuilder)) {
-            $queryBuilder->addJoinCondition($tableAlias, $expression);
+            if ($filterAggr) {
+                $queryBuilder->andHaving($expression);
+            } else {
+                $queryBuilder->addJoinCondition($tableAlias, $expression);
+            }
         } else {
             $queryBuilder->$filterGlueFunc($expression);
         }
-        //$queryBuilder->$filterGlueFunc()
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 

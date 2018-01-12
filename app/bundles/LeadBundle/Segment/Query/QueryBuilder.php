@@ -1394,7 +1394,7 @@ class QueryBuilder
      */
     public function addJoinCondition($alias, $expr)
     {
-        $parts = $this->getQueryPart('join');
+        $result = $parts = $this->getQueryPart('join');
 
         foreach ($parts['l'] as $key=>$part) {
             if ($part['joinAlias'] == $alias) {

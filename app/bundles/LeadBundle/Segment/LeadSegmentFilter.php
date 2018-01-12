@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Segment;
 
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -29,7 +30,7 @@ class LeadSegmentFilter
     private $leadSegmentFilterCrate;
 
     /**
-     * @var FilterDecoratorInterface
+     * @var FilterDecoratorInterface|BaseDecorator
      */
     private $filterDecorator;
 
@@ -112,16 +113,19 @@ class LeadSegmentFilter
         if (!$alias) {
             if ($desc['func']) {
                 $queryBuilder = $this->createJoin($queryBuilder, $this->getEntityName(), $alias = $this->generateRandomParameterName());
-                $expr         = $queryBuilder->expr()->$func($desc['func'].'('.$alias.'.'.$this->getDBColumn()->getName().')', $this->getFilterConditionValue($parameterName));
+                $expr         = $queryBuilder->expr()->$func($desc['func'].'('.$alias.'.'.$this->getDBColumn()
+                                                                                                       ->getName().')', $this->getFilterConditionValue($parameterName));
                 $queryBuilder = $queryBuilder->andHaving($expr);
             } else {
                 if ($alias != 'l') {
                     $queryBuilder = $this->createJoin($queryBuilder, $this->getEntityName(), $alias = $this->generateRandomParameterName());
-                    $expr         = $queryBuilder->expr()->$func($alias.'.'.$this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
+                    $expr         = $queryBuilder->expr()->$func($alias.'.'.$this->getDBColumn()
+                                                                                     ->getName(), $this->getFilterConditionValue($parameterName));
                     $queryBuilder = $this->AddJoinCondition($queryBuilder, $alias, $expr);
                 } else {
                     dump('lead restriction');
-                    $expr = $queryBuilder->expr()->$func($alias.'.'.$this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
+                    $expr = $queryBuilder->expr()->$func($alias.'.'.$this->getDBColumn()
+                                                                             ->getName(), $this->getFilterConditionValue($parameterName));
                     var_dump($expr);
                     die();
                     $queryBuilder = $queryBuilder->andWhere($expr);
@@ -129,10 +133,12 @@ class LeadSegmentFilter
             }
         } else {
             if ($alias != 'l') {
-                $expr         = $queryBuilder->expr()->$func($alias.'.'.$this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
+                $expr         = $queryBuilder->expr()->$func($alias.'.'.$this->getDBColumn()
+                                                                                 ->getName(), $this->getFilterConditionValue($parameterName));
                 $queryBuilder = $this->AddJoinCondition($queryBuilder, $alias, $expr);
             } else {
-                $expr         = $queryBuilder->expr()->$func($alias.'.'.$this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
+                $expr         = $queryBuilder->expr()->$func($alias.'.'.$this->getDBColumn()
+                                                                                 ->getName(), $this->getFilterConditionValue($parameterName));
                 $queryBuilder = $queryBuilder->andWhere($expr);
             }
         }
@@ -163,7 +169,8 @@ class LeadSegmentFilter
     {
         if (is_null($this->dbColumn)) {
             if ($descr = $this->getQueryDescription()) {
-                $this->dbColumn = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->queryDescription['foreign_table'])[$this->queryDescription['field']];
+                $this->dbColumn = $this->em->getConnection()->getSchemaManager()
+                                           ->listTableColumns($this->queryDescription['foreign_table'])[$this->queryDescription['field']];
             } else {
                 $dbTableColumns = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->getDBTable());
                 if (!$dbTableColumns) {
@@ -213,6 +220,11 @@ class LeadSegmentFilter
         return $this->leadSegmentFilterCrate->getGlue();
     }
 
+    public function getAggregateFunction()
+    {
+        return $this->filterDecorator->getAggregateFunc($this->leadSegmentFilterCrate);
+    }
+
     /**
      * @return array
      */
@@ -227,6 +239,7 @@ class LeadSegmentFilter
             'display'  => $this->leadSegmentFilterCrate->getDisplay(),
             'operator' => $this->leadSegmentFilterCrate->getOperator(),
             'func'     => $this->leadSegmentFilterCrate->getFunc(),
+            'aggr'     => $this->getAggregateFunction(),
         ];
     }
 

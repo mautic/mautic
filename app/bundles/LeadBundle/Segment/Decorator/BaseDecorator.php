@@ -104,4 +104,12 @@ class BaseDecorator implements FilterDecoratorInterface
 
         return $filter;
     }
+
+    public function getAggregateFunc(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        $originalField = $leadSegmentFilterCrate->getField();
+
+        return isset($this->leadSegmentFilterDescriptor[$originalField]['func']) ?
+            $this->leadSegmentFilterDescriptor[$originalField]['func'] : false;
+    }
 }
