@@ -716,6 +716,24 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            //  Segment Filter Query builders
+
+            'mautic.lead.query.builder.basic' => [
+                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder::class,
+                'arguments' => [],
+            ],
+            'mautic.lead.query.builder.foreign.value' => [
+                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignValueFilterQueryBuilder::class,
+                'arguments' => [],
+            ],
+            'mautic.lead.query.builder.foreign.func' => [
+                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignFuncFilterQueryBuilder::class,
+                'arguments' => [],
+            ],
+            'mautic.lead.query.builder.dnc' => [
+                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\DncFilterQueryBuilder::class,
+                'arguments' => [],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [

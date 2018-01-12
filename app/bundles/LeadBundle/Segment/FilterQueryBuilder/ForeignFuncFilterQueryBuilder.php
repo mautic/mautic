@@ -8,6 +8,6 @@
 
 namespace Mautic\LeadBundle\Segment\FilterQueryBuilder;
 
-class ForeignFilterQueryBuilder extends BaseFilterQueryBuilder
+class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 {
 }

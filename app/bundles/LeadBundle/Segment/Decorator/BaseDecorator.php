@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterOperator;
 use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
@@ -66,6 +67,17 @@ class BaseDecorator implements FilterDecoratorInterface
         return $this->leadSegmentFilterOperator->fixOperator($leadSegmentFilterCrate->getOperator());
     }
 
+    public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        $originalField = $leadSegmentFilterCrate->getField();
+
+        if (!isset($this->leadSegmentFilterDescriptor[$originalField]['type'])) {
+            return BaseFilterQueryBuilder::getServiceId();
+        }
+
+        return $this->leadSegmentFilterDescriptor[$originalField]['type'];
+    }
+
     public function getParameterHolder(LeadSegmentFilterCrate $leadSegmentFilterCrate, $argument)
     {
         if (is_array($argument)) {
@@ -99,7 +111,7 @@ class BaseDecorator implements FilterDecoratorInterface
             case 'startsWith':
                 return $filter.'%';
             case 'endsWith':
-                return '%'.filter;
+                return '%'.$filter;
         }
 
         return $filter;

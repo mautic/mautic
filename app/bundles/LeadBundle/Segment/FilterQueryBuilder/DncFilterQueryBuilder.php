@@ -12,13 +12,12 @@ use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
 
-class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
+class DncFilterQueryBuilder implements FilterQueryBuilderInterface
 {
     use LeadSegmentFilterQueryBuilderTrait;
 
     public static function getServiceId()
     {
-        return 'mautic.lead.query.builder.basic';
     }
 
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)

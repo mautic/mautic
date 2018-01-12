@@ -22,4 +22,6 @@ interface FilterQueryBuilderInterface
      * @return QueryBuilder
      */
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter);
+
+    public static function getServiceId();
 }

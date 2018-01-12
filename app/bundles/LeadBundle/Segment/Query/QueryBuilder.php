@@ -32,7 +32,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  * underlying database vendor. Limit queries and joins are NOT applied to UPDATE and DELETE statements
  * even if some vendors such as MySQL support it.
  *
- * @see   www.doctrine-project.org
+ * @see    www.doctrine-project.org
  * @since  2.1
  *
  * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
@@ -1200,8 +1200,8 @@ class QueryBuilder
     private function getSQLForInsert()
     {
         return 'INSERT INTO '.$this->sqlParts['from']['table'].
-        ' ('.implode(', ', array_keys($this->sqlParts['values'])).')'.
-        ' VALUES('.implode(', ', $this->sqlParts['values']).')';
+            ' ('.implode(', ', array_keys($this->sqlParts['values'])).')'.
+            ' VALUES('.implode(', ', $this->sqlParts['values']).')';
     }
 
     /**
@@ -1265,7 +1265,7 @@ class QueryBuilder
      *
      * @license New BSD License
      *
-     * @see http://www.zetacomponents.org
+     * @see     http://www.zetacomponents.org
      *
      * @param mixed  $value
      * @param mixed  $type
@@ -1396,9 +1396,9 @@ class QueryBuilder
     {
         $result = $parts = $this->getQueryPart('join');
 
-        foreach ($parts['l'] as $key=>$part) {
+        foreach ($parts['l'] as $key => $part) {
             if ($part['joinAlias'] == $alias) {
-                $result['l'][$key]['joinCondition'] = $part['joinCondition'].' and '.$expr;
+                $result['l'][$key]['joinCondition'] = $part['joinCondition'].' '.$expr.'';
             }
         }
 
@@ -1416,7 +1416,7 @@ class QueryBuilder
     public function replaceJoinCondition($alias, $expr)
     {
         $parts = $this->getQueryPart('join');
-        foreach ($parts['l'] as $key=>$part) {
+        foreach ($parts['l'] as $key => $part) {
             if ($part['joinAlias'] == $alias) {
                 $parts['l'][$key]['joinCondition'] = $expr;
             }
@@ -1441,9 +1441,86 @@ class QueryBuilder
 
         foreach ($parameters as $parameter) {
             $parameterValue = array_shift($filterParameters);
-            $return         = $this->setParameter($parameter, $parameterValue);
+            $this->setParameter($parameter, $parameterValue);
         }
 
-        return $return;
+        return $this;
+    }
+
+    public function getTableAlias($table, $joinType = null)
+    {
+        if (is_null($joinType)) {
+            $tables = $this->getTableAliases();
+
+            return isset($tables[$table]) ? $tables[$table] : false;
+        }
+
+        $tableJoins = $this->getTableJoins($table);
+
+        if (!$tableJoins) {
+            return false;
+        }
+
+        $result = [];
+
+        foreach ($tableJoins as $tableJoin) {
+            if ($tableJoin['joinType'] == $joinType) {
+                $result[] = $tableJoin['joinAlias'];
+            }
+        }
+
+        return !count($result) ? false : count($result) == 1 ? array_shift($result) : $result;
+    }
+
+    public function getTableJoins($tableName)
+    {
+        foreach ($this->getQueryParts()['join'] as $join) {
+            foreach ($join as $joinPart) {
+                if ($tableName == $joinPart['joinAlias']) {
+                    return $joinPart;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function getTableAliases()
+    {
+        $queryParts = $this->getQueryParts();
+        $tables     = array_reduce($queryParts['from'], function ($result, $item) {
+            $result[$item['table']] = $item['alias'];
+
+            return $result;
+        }, []);
+
+        foreach ($queryParts['join'] as $join) {
+            foreach ($join as $joinPart) {
+                $tables[$joinPart['joinTable']] = $joinPart['joinAlias'];
+            }
+        }
+
+        return $tables;
+    }
+
+    /**
+     * @param              $table
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return bool
+     */
+    public function isJoinTable($table)
+    {
+        $queryParts = $this->getQueryParts();
+
+        foreach ($queryParts['join'] as $join) {
+            foreach ($join as $joinPart) {
+                if ($joinPart['joinTable'] == $table) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

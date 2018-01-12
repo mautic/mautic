@@ -16,60 +16,6 @@ trait LeadSegmentFilterQueryBuilderTrait
     protected $parameterAliases = [];
 
     /**
-     * @todo move to query builder
-     *
-     * @param              $table
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
-     */
-    public function getTableAlias($table, QueryBuilder $queryBuilder)
-    {
-        $tables = $this->getTableAliases($queryBuilder);
-
-        return isset($tables[$table]) ? $tables[$table] : false;
-    }
-
-    public function getTableAliases(QueryBuilder $queryBuilder)
-    {
-        $queryParts = $queryBuilder->getQueryParts();
-        $tables     = array_reduce($queryParts['from'], function ($result, $item) {
-            $result[$item['table']] = $item['alias'];
-
-            return $result;
-        }, []);
-
-        foreach ($queryParts['join'] as $join) {
-            foreach ($join as $joinPart) {
-                $tables[$joinPart['joinTable']] = $joinPart['joinAlias'];
-            }
-        }
-
-        return $tables;
-    }
-
-    /**
-     * @param              $table
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
-     */
-    public function isJoinTable($table, QueryBuilder $queryBuilder)
-    {
-        $queryParts = $queryBuilder->getQueryParts();
-
-        foreach ($queryParts['join'] as $join) {
-            foreach ($join as $joinPart) {
-                if ($joinPart['joinTable'] == $table) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Generate a unique parameter name.
      *
      * @return string

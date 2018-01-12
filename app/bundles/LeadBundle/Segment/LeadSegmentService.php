@@ -49,16 +49,10 @@ class LeadSegmentService
 
         /** @var QueryBuilder $qb */
         $qb = $this->queryBuilder->getLeadsQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
-        //$qb = $this->queryBuilder->addLeadListRestrictions($qb, $batchLimiters, $entity->getId(), $this->leadSegmentFilterFactory->dictionary);
-        dump($sql = $qb->getSQL());
 
-        $parameters = $qb->getParameters();
-        foreach ($parameters as $parameter=>$value) {
-            $sql = str_replace(':'.$parameter, $value, $sql);
-        }
-        var_dump($sql);
-//        die();
-        return null;
+        dump($qb->getQueryParts());
+        dump($qb->getParameters());
+        dump($qb->execute());
 
         return $this->leadListSegmentRepository->getNewLeadsByListCount($entity->getId(), $segmentFilters, $batchLimiters);
     }

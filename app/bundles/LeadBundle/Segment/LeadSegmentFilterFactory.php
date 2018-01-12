@@ -78,6 +78,9 @@ class LeadSegmentFilterFactory
      */
     protected function getQueryBuilderForFilter(LeadSegmentFilter $filter)
     {
+        dump($filter->getQueryType());
+        die();
+
         return new BaseFilterQueryBuilder();
     }
 
