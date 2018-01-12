@@ -1366,4 +1366,84 @@ class QueryBuilder
             }
         }
     }
+
+    /**
+     * @param $alias
+     *
+     * @return bool
+     */
+    public function getJoinCondition($alias)
+    {
+        $parts = $this->getQueryParts();
+        foreach ($parts['join']['l'] as $joinedTable) {
+            if ($joinedTable['joinAlias'] == $alias) {
+                return $joinedTable['joinCondition'];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @todo I need to rewrite it, it's no longer necessary like this, we have direct access to query parts
+     *
+     * @param $alias
+     * @param $expr
+     *
+     * @return $this
+     */
+    public function addJoinCondition($alias, $expr)
+    {
+        $parts = $this->getQueryPart('join');
+
+        foreach ($parts['l'] as $key=>$part) {
+            if ($part['joinAlias'] == $alias) {
+                $result['l'][$key]['joinCondition'] = $part['joinCondition'].' and '.$expr;
+            }
+        }
+
+        $this->setQueryPart('join', $result);
+
+        return $this;
+    }
+
+    /**
+     * @param $alias
+     * @param $expr
+     *
+     * @return $this
+     */
+    public function replaceJoinCondition($alias, $expr)
+    {
+        $parts = $this->getQueryPart('join');
+        foreach ($parts['l'] as $key=>$part) {
+            if ($part['joinAlias'] == $alias) {
+                $parts['l'][$key]['joinCondition'] = $expr;
+            }
+        }
+
+        $this->setQueryPart('join', $parts);
+
+        return $this;
+    }
+
+    /**
+     * @param $parameters
+     * @param $filterParameters
+     *
+     * @return QueryBuilder
+     */
+    public function setParametersPairs($parameters, $filterParameters)
+    {
+        if (!is_array($parameters)) {
+            return $this->setParameter($parameters, $filterParameters);
+        }
+
+        foreach ($parameters as $parameter) {
+            $parameterValue = array_shift($filterParameters);
+            $return         = $this->setParameter($parameter, $parameterValue);
+        }
+
+        return $return;
+    }
 }

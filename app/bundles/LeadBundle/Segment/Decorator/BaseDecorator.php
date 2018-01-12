@@ -77,17 +77,6 @@ class BaseDecorator implements FilterDecoratorInterface
             return $result;
         }
 
-        switch ($this->getOperator($leadSegmentFilterCrate)) {
-            case 'like':
-            case 'notLike':
-            case 'contains':
-                return '%:'.$argument.'%';
-            case 'startsWith':
-                return ':'.$argument.'%';
-            case 'endsWith':
-                return '%:'.$argument;
-        }
-
         return ':'.$argument;
     }
 
@@ -100,6 +89,17 @@ class BaseDecorator implements FilterDecoratorInterface
                 return (float) $filter;
             case 'boolean':
                 return (bool) $filter;
+        }
+
+        switch ($this->getOperator($leadSegmentFilterCrate)) {
+            case 'like':
+            case 'notLike':
+            case 'contains':
+                return '%'.$filter.'%';
+            case 'startsWith':
+                return $filter.'%';
+            case 'endsWith':
+                return '%'.filter;
         }
 
         return $filter;

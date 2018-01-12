@@ -3,44 +3,70 @@
  * Created by PhpStorm.
  * User: jan
  * Date: 1/9/18
- * Time: 1:54 PM
+ * Time: 1:54 PM.
  */
 
 namespace Mautic\LeadBundle\Services;
 
-
-use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Schema\Column;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-trait LeadSegmentFilterQueryBuilderTrait {
+trait LeadSegmentFilterQueryBuilderTrait
+{
     protected $parameterAliases = [];
 
-    public function getTableAlias($tableEntity, QueryBuilder $queryBuilder) {
-
+    /**
+     * @todo move to query builder
+     *
+     * @param              $table
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return bool
+     */
+    public function getTableAlias($table, QueryBuilder $queryBuilder)
+    {
         $tables = $this->getTableAliases($queryBuilder);
 
-        if (!in_array($tableEntity, $tables)) {
-            //var_dump(sprintf('table entity ' . $tableEntity . ' not found in "%s"', join(', ', array_keys($tables))));
-        }
-
-        return isset($tables[$tableEntity]) ? $tables[$tableEntity] : false;
+        return isset($tables[$table]) ? $tables[$table] : false;
     }
 
-    public function getTableAliases(QueryBuilder $queryBuilder) {
+    public function getTableAliases(QueryBuilder $queryBuilder)
+    {
         $queryParts = $queryBuilder->getQueryParts();
-        $tables = array_reduce($queryParts['from'], function ($result, $item) {
+        $tables     = array_reduce($queryParts['from'], function ($result, $item) {
             $result[$item['table']] = $item['alias'];
+
             return $result;
-        }, array());
+        }, []);
 
         foreach ($queryParts['join'] as $join) {
-            foreach($join as $joinPart) {
+            foreach ($join as $joinPart) {
                 $tables[$joinPart['joinTable']] = $joinPart['joinAlias'];
             }
         }
-        
+
         return $tables;
+    }
+
+    /**
+     * @param              $table
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return bool
+     */
+    public function isJoinTable($table, QueryBuilder $queryBuilder)
+    {
+        $queryParts = $queryBuilder->getQueryParts();
+
+        foreach ($queryParts['join'] as $join) {
+            foreach ($join as $joinPart) {
+                if ($joinPart['joinTable'] == $table) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -54,7 +80,7 @@ trait LeadSegmentFilterQueryBuilderTrait {
 
         $paramName = substr(str_shuffle($alpha_numeric), 0, 8);
 
-        if (!in_array($paramName, $this->parameterAliases )) {
+        if (!in_array($paramName, $this->parameterAliases)) {
             $this->parameterAliases[] = $paramName;
 
             return $paramName;
@@ -64,9 +90,10 @@ trait LeadSegmentFilterQueryBuilderTrait {
     }
 
     // should be used by filter
-    protected function createJoin(QueryBuilder $queryBuilder, $target, $alias, $joinOn = '', $from = 'MauticLeadBundle:Lead') {
+    protected function createJoin(QueryBuilder $queryBuilder, $target, $alias, $joinOn = '', $from = 'MauticLeadBundle:Lead')
+    {
         $queryBuilder = $queryBuilder->leftJoin($this->getTableAlias($from, $queryBuilder), $target, $alias, sprintf(
-            '%s.id = %s.lead_id' . ( $joinOn ? " and $joinOn" : ""),
+            '%s.id = %s.lead_id'.($joinOn ? " and $joinOn" : ''),
             $this->getTableAlias($from, $queryBuilder),
             $alias
         ));
@@ -74,7 +101,8 @@ trait LeadSegmentFilterQueryBuilderTrait {
         return $queryBuilder;
     }
 
-    protected function addForeignTableQuery(QueryBuilder $qb, LeadSegmentFilter $filter) {
+    protected function addForeignTableQuery(QueryBuilder $qb, LeadSegmentFilter $filter)
+    {
         $filter->createJoin($qb, $alias);
         if (isset($translated) && $translated) {
             if (isset($translated['func'])) {
@@ -83,48 +111,44 @@ trait LeadSegmentFilterQueryBuilderTrait {
 
                 //@todo rewrite with getFullQualifiedName
                 $qb->andHaving(isset($translated['func']) ? sprintf('%s(%s.%s) %s %s', $translated['func'], $this->tableAliases[$translated['foreign_table']], $translated['field'], $filter->getSQLOperator(), $filter->getFilterConditionValue($parameterHolder)) : sprintf('%s.%s %s %s', $this->tableAliases[$translated['foreign_table']], $translated['field'], $this->getFilterOperator($filter), $this->getFilterValue($filter, $parameterHolder, $dbColumn)));
-
-            }
-            else {
+            } else {
                 //@todo rewrite with getFullQualifiedName
                 $qb->innerJoin($this->tableAliases[$translated['table']], $translated['foreign_table'], $this->tableAliases[$translated['foreign_table']], sprintf('%s.%s = %s.%s and %s', $this->tableAliases[$translated['table']], $translated['table_field'], $this->tableAliases[$translated['foreign_table']], $translated['foreign_table_field'], sprintf('%s.%s %s %s', $this->tableAliases[$translated['foreign_table']], $translated['field'], $filter->getSQLOperator(), $filter->getFilterConditionValue($parameterHolder))));
             }
-
 
             $qb->setParameter($parameterHolder, $filter->getFilter());
 
             $qb->groupBy(sprintf('%s.%s', $this->tableAliases[$translated['table']], $translated['table_field']));
         } else {
             //  Default behaviour, translation not necessary
-
         }
     }
 
     /**
      * @param QueryBuilder $qb
      * @param              $filter
-     * @param null         $alias use alias to extend current query
+     * @param null         $alias  use alias to extend current query
      *
      * @throws \Exception
      */
-    private function addForeignTableQueryWhere(QueryBuilder $qb, $filter, $alias = null) {
+    private function addForeignTableQueryWhere(QueryBuilder $qb, $filter, $alias = null)
+    {
         dump($filter);
         if (is_array($filter)) {
             $alias = is_null($alias) ? $this->generateRandomParameterName() : $alias;
             foreach ($filter as $singleFilter) {
                 $qb = $this->addForeignTableQueryWhere($qb, $singleFilter, $alias);
             }
+
             return $qb;
         }
 
         $parameterHolder = $this->generateRandomParameterName();
-        $qb = $filter->createExpression($qb, $parameterHolder);
+        $qb              = $filter->createExpression($qb, $parameterHolder);
 
         return $qb;
         dump($expr);
         die();
-
-
 
         //$qb = $qb->andWhere($expr);
         $qb->setParameter($parameterHolder, $filter->getFilter());
@@ -153,42 +177,4 @@ trait LeadSegmentFilterQueryBuilderTrait {
 //            $qb->groupBy(sprintf('%s.%s', $this->tableAliases[$translated['table']], $translated['table_field']));
 //        }
     }
-
-    protected function getJoinCondition(QueryBuilder $qb, $alias) {
-        $parts = $qb->getQueryParts();
-        foreach ($parts['join']['l'] as $joinedTable) {
-            if ($joinedTable['joinAlias']==$alias) {
-                return $joinedTable['joinCondition'];
-            }
-        }
-        throw new \Exception(sprintf('Join alias "%s" doesn\'t exist',$alias));
-    }
-
-    protected function addJoinCondition(QueryBuilder $qb, $alias, $expr) {
-        $result = $parts = $qb->getQueryPart('join');
-
-
-        foreach ($parts['l'] as $key=>$part) {
-            if ($part['joinAlias'] == $alias) {
-                $result['l'][$key]['joinCondition'] = $part['joinCondition'] . " and " . $expr;
-            }
-        }
-
-        $qb->setQueryPart('join', $result);
-
-        return $qb;
-    }
-
-    protected function replaceJoinCondition(QueryBuilder $qb, $alias, $expr) {
-        $parts = $qb->getQueryPart('join');
-        foreach ($parts['l'] as $key=>$part) {
-            if ($part['joinAlias']==$alias) {
-                $parts['l'][$key]['joinCondition'] = $expr;
-            }
-        }
-
-        $qb->setQueryPart('join', $parts);
-        return $qb;
-    }
-
 }
