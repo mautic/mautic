@@ -101,7 +101,6 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 break;
             case 'startsWith':
             case 'endsWith':
-                $filterOperator = 'like';
             case 'gt':
             case 'eq':
             case 'neq':

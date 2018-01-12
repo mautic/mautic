@@ -64,7 +64,17 @@ class BaseDecorator implements FilterDecoratorInterface
 
     public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return $this->leadSegmentFilterOperator->fixOperator($leadSegmentFilterCrate->getOperator());
+        $operator = $this->leadSegmentFilterOperator->fixOperator($leadSegmentFilterCrate->getOperator());
+
+        switch ($operator) {
+            case 'startsWith':
+            case 'endsWith':
+            case 'contains':
+                return 'like';
+                break;
+        }
+
+        return $operator;
     }
 
     public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)
