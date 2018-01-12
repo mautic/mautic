@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
+use Symfony\Component\DependencyInjection\Container;
 
 class LeadSegmentFilterFactory
 {
@@ -34,14 +35,21 @@ class LeadSegmentFilterFactory
      */
     private $baseDecorator;
 
+    /**
+     * @var Container
+     */
+    private $container;
+
     public function __construct(
         LeadSegmentFilterDate $leadSegmentFilterDate,
         EntityManager $entityManager,
-        BaseDecorator $baseDecorator
+        BaseDecorator $baseDecorator,
+        Container $container
     ) {
         $this->leadSegmentFilterDate = $leadSegmentFilterDate;
         $this->entityManager         = $entityManager;
         $this->baseDecorator         = $baseDecorator;
+        $this->container             = $container;
     }
 
     /**
@@ -78,10 +86,9 @@ class LeadSegmentFilterFactory
      */
     protected function getQueryBuilderForFilter(LeadSegmentFilter $filter)
     {
-        dump($filter->getQueryType());
-        die();
+        $qbServiceId = $filter->getQueryType();
 
-        return new BaseFilterQueryBuilder();
+        return $this->container->get($qbServiceId);
     }
 
     /**

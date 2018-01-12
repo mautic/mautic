@@ -801,6 +801,7 @@ return [
                     'mautic.lead.model.lead_segment_filter_date',
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead_segment_decorator_base',
+                    '@service_container',
                 ],
             ],
             'mautic.lead.model.relative_date' => [
