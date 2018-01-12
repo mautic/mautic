@@ -94,8 +94,6 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 );
                 $queryBuilder->setParameter($emptyParameter, '');
                 break;
-            case 'startsWith':
-                $filterOperator = 'like';
             case 'gt':
             case 'eq':
             case 'neq':
