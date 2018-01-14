@@ -1131,19 +1131,21 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function sendEmail(Email $email, $leads, $options = [])
     {
-        $listId              = (isset($options['listId'])) ? $options['listId'] : null;
-        $ignoreDNC           = (isset($options['ignoreDNC'])) ? $options['ignoreDNC'] : false;
-        $tokens              = (isset($options['tokens'])) ? $options['tokens'] : [];
-        $assetAttachments    = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
-        $customHeaders       = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
-        $emailType           = (isset($options['email_type'])) ? $options['email_type'] : '';
-        $isMarketing         = (in_array($emailType, ['marketing']) || !empty($listId));
-        $emailAttempts       = (isset($options['email_attempts'])) ? $options['email_attempts'] : 3;
-        $emailPriority       = (isset($options['email_priority'])) ? $options['email_priority'] : MessageQueue::PRIORITY_NORMAL;
-        $messageQueue        = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : null;
-        $returnErrorMessages = (isset($options['return_errors'])) ? $options['return_errors'] : false;
-        $channel             = (isset($options['channel'])) ? $options['channel'] : null;
-        $dncAsError          = (isset($options['dnc_as_error'])) ? $options['dnc_as_error'] : false;
+        $listId               = (isset($options['listId'])) ? $options['listId'] : null;
+        $ignoreDNC            = (isset($options['ignoreDNC'])) ? $options['ignoreDNC'] : false;
+        $tokens               = (isset($options['tokens'])) ? $options['tokens'] : [];
+        $assetAttachments     = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
+        $customHeaders        = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
+        $emailType            = (isset($options['email_type'])) ? $options['email_type'] : '';
+        $isMarketing          = (in_array($emailType, ['marketing']) || !empty($listId));
+        $emailAttempts        = (isset($options['email_attempts'])) ? $options['email_attempts'] : 3;
+        $emailPriority        = (isset($options['email_priority'])) ? $options['email_priority'] : MessageQueue::PRIORITY_NORMAL;
+        $messageQueue         = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : null;
+        $returnErrorMessages  = (isset($options['return_errors'])) ? $options['return_errors'] : false;
+        $channel              = (isset($options['channel'])) ? $options['channel'] : null;
+        $dncAsError           = (isset($options['dnc_as_error'])) ? $options['dnc_as_error'] : false;
+        $immediately          = (isset($options['immediately'])) ? $options['immediately'] : false;
+
         $errors              = [];
 
         if (empty($channel)) {
@@ -1152,6 +1154,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         if (!$email->getId()) {
             return false;
+        }
+
+        if ($immediately) {
+            $this->sendModel->setSampleMailer();
         }
 
         $singleEmail = false;

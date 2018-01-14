@@ -13,7 +13,10 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -26,11 +29,17 @@ class EmailSendType extends AbstractType
     protected $factory;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory, CoreParametersHelper $coreParametersHelper)
     {
-        $this->factory = $factory;
+        $this->factory              = $factory;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -185,6 +194,29 @@ class EmailSendType extends AbstractType
                     ]
                 );
             }
+        }
+
+        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
+            $default = (isset($options['data']['immediately'])) ? $options['data']['immediately'] : false;
+            $builder->add(
+                'immediately',
+                YesNoButtonGroupType::class,
+                [
+                    'label' => 'mautic.form.action.sendemail.immediately',
+                    'data'  => $default,
+                    'attr'  => [
+                        'tooltip'    => 'mautic.form.action.sendemail.immediately.desc',
+                    ],
+                ]
+            );
+        } else {
+            $builder->add(
+                'immediately',
+                HiddenType::class,
+                [
+                    'data'  => false,
+                ]
+            );
         }
     }
 

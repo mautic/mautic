@@ -63,9 +63,10 @@ class FormSubmitHelper
             } elseif (isset($currentLead)) {
                 if (isset($leadFields['email'])) {
                     $options = [
-                        'source'    => ['form', $form->getId()],
-                        'tokens'    => $tokens,
-                        'ignoreDNC' => true,
+                        'source'      => ['form', $form->getId()],
+                        'tokens'      => $tokens,
+                        'ignoreDNC'   => true,
+                        'immediately' => ($factory->getParameter('mailer_spool_type') == 'file' && !empty($properties['immediately'])) ? true : false,
                     ];
                     $emailModel->sendEmail($email, $currentLead, $options);
                 }

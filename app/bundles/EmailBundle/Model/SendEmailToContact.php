@@ -292,6 +292,11 @@ class SendEmailToContact
         $this->mailer->reset();
     }
 
+    public function setSampleMailer()
+    {
+        $this->mailer = $this->mailer->getSampleMailer();
+    }
+
     /**
      * @return array
      */

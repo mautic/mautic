@@ -274,7 +274,10 @@ return [
             ],
             'mautic.form.type.emailsend_list' => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\EmailSendType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.helper.core_parameters',
+                ],
                 'alias'     => 'emailsend_list',
             ],
             'mautic.form.type.formsubmit_sendemail_admin' => [

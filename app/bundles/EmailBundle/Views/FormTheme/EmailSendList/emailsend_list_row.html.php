@@ -11,9 +11,14 @@
 ?>
 
 <div class="row">
-    <div class="col-xs-<?php echo isset($form['email_type']) ? 7 : 12; ?>">
+    <div class="col-xs-<?php echo isset($form['email_type']) || isset($form['immediately']) ? 7 : 12; ?>">
         <?php echo $view['form']->row($form['email']); ?>
     </div>
+    <?php if (isset($form['immediately'])): ?>
+        <div class="col-xs-5">
+            <?php echo $view['form']->row($form['immediately']); ?>
+        </div>
+    <?php endif; ?>
     <?php if (isset($form['email_type'])): ?>
         <div class="col-xs-5">
             <?php echo $view['form']->row($form['email_type']); ?>
