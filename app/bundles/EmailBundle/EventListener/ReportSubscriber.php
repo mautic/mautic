@@ -189,7 +189,6 @@ class ReportSubscriber extends CommonSubscriber
         $data = [
             'display_name' => 'mautic.email.emails',
             'columns'      => $columns,
-            'filters'      => $companyColumns,
         ];
         $event->addTable(self::CONTEXT_EMAILS, $data);
         $context = self::CONTEXT_EMAILS;
