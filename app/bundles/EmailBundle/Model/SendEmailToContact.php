@@ -29,6 +29,11 @@ class SendEmailToContact
     private $mailer;
 
     /**
+     * @var MailHelper
+     */
+    private $temporaryMailer = null;
+
+    /**
      * @var StatRepository
      */
     private $statRepo;
@@ -116,8 +121,12 @@ class SendEmailToContact
      * @param DoNotContact        $dncModel
      * @param TranslatorInterface $translator
      */
-    public function __construct(MailHelper $mailer, StatRepository $statRepository, DoNotContact $dncModel, TranslatorInterface $translator)
-    {
+    public function __construct(
+        MailHelper $mailer,
+        StatRepository $statRepository,
+        DoNotContact $dncModel,
+        TranslatorInterface $translator
+    ) {
         $this->mailer     = $mailer;
         $this->statRepo   = $statRepository;
         $this->dncModel   = $dncModel;
@@ -180,8 +189,13 @@ class SendEmailToContact
      *
      * @return $this
      */
-    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], array $slots = [])
-    {
+    public function setEmail(
+        Email $email,
+        array $channel = [],
+        array $customHeaders = [],
+        array $assetAttachments = [],
+        array $slots = []
+    ) {
         // Flush anything that's pending from a previous email
         $this->flush();
 
@@ -289,11 +303,18 @@ class SendEmailToContact
         $this->statRepo->clear();
         $this->dncModel->clearEntities();
 
+        if ($this->temporaryMailer != null) {
+            $this->mailer = clone $this->temporaryMailer;
+        }
+
         $this->mailer->reset();
     }
 
     public function setSampleMailer()
     {
+        if ($this->temporaryMailer == null) {
+            $this->temporaryMailer = clone $this->mailer;
+        }
         $this->mailer = $this->mailer->getSampleMailer();
     }
 
