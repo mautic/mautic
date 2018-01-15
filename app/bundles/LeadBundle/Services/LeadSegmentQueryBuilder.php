@@ -68,7 +68,6 @@ class LeadSegmentQueryBuilder
         // SELECT count(l.id) as lead_count, max(l.id) as max_id FROM leads l
         // LEFT JOIN lead_lists_leads ll ON (ll.leadlist_id = 28) AND (ll.lead_id = l.id) AND (ll.date_added <= '2018-01-09 14:48:54')
         // WHERE (l.propertytype = :MglShQLG) AND (ll.lead_id IS NULL)
-        var_dump($whatever);
 
         return $queryBuilder;
         die();
@@ -801,8 +800,6 @@ class LeadSegmentQueryBuilder
             }
             $q->setParameter($k, $v, $paramType);
         }
-
-        var_dump($parameters);
 
         return $expr;
     }

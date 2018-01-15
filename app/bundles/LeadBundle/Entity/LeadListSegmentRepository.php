@@ -167,7 +167,6 @@ class LeadListSegmentRepository
      */
     private function getListFilterExpr(LeadSegmentFilters $leadSegmentFilters, QueryBuilder $q, $listId)
     {
-        var_dump(debug_backtrace()[1]['function']);
         $parameters = [];
 
         $schema = $this->entityManager->getConnection()->getSchemaManager();

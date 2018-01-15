@@ -141,10 +141,7 @@ class LeadSegmentFilterOld
                 }
             default:
                 var_dump($this->getDBColumn()->getType()->getName());
-                var_dump($this);
-                die();
         }
-        var_dump($filter);
         throw new \Exception(sprintf('Unknown value type \'%s\'.', $filter->getName()));
     }
 
@@ -181,9 +178,7 @@ class LeadSegmentFilterOld
                     $expr         = $queryBuilder->expr()->$func($alias.'.'.$this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
                     $queryBuilder = $this->AddJoinCondition($queryBuilder, $alias, $expr);
                 } else {
-                    dump('lead restriction');
                     $expr = $queryBuilder->expr()->$func($alias.'.'.$this->getDBColumn()->getName(), $this->getFilterConditionValue($parameterName));
-                    var_dump($expr);
                     die();
                     $queryBuilder = $queryBuilder->andWhere($expr);
                 }
@@ -240,7 +235,6 @@ class LeadSegmentFilterOld
             } else {
                 $dbTableColumns = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->getDBTable());
                 if (!$dbTableColumns) {
-                    var_dump($this);
                     throw new \Exception('Unknown database table and no translation provided for type "'.$this->getType().'"');
                 }
                 if (!isset($dbTableColumns[$this->getField()])) {
