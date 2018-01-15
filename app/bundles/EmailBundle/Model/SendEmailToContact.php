@@ -306,7 +306,6 @@ class SendEmailToContact
         if ($this->temporaryMailer != null) {
             $this->mailer = clone $this->temporaryMailer;
         }
-
         $this->mailer->reset();
     }
 
