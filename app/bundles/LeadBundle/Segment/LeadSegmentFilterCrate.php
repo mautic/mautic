@@ -58,7 +58,6 @@ class LeadSegmentFilterCrate
 
     public function __construct(array $filter)
     {
-        var_dump($filter);
         $this->glue     = isset($filter['glue']) ? $filter['glue'] : null;
         $this->field    = isset($filter['field']) ? $filter['field'] : null;
         $this->object   = isset($filter['object']) ? $filter['object'] : self::LEAD_OBJECT;

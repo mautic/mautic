@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\LeadSegmentFilterOld;
 use Mautic\LeadBundle\Segment\LeadSegmentFilters;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -85,7 +86,6 @@ class LeadListSegmentRepository
 
         echo 'SQL parameters:';
         dump($q->getParameters());
-
 
         // Leads that do not have any record in the lead_lists_leads table for this lead list
         // For non null fields - it's apparently better to use left join over not exists due to not using nullable
@@ -179,15 +179,15 @@ class LeadListSegmentRepository
         $groupExpr = $q->expr()->andX();
 
         foreach ($leadSegmentFilters as $k => $leadSegmentFilter) {
-            $object = $leadSegmentFilter->getObject();
+            $leadSegmentFilter = new LeadSegmentFilterOld((array) $leadSegmentFilter->leadSegmentFilterCrate);
+            //$object = $leadSegmentFilter->getObject();
 
             $column     = false;
             $field      = false;
 
             $filterField = $leadSegmentFilter->getField();
 
-            if($filterField=='lead_email_read_date') {
-
+            if ($filterField == 'lead_email_read_date') {
             }
 
             if ($leadSegmentFilter->isLeadType()) {
@@ -213,12 +213,13 @@ class LeadListSegmentRepository
 
             $func = $leadSegmentFilter->getFunc();
 
+            dump($func);
+            dump($leadSegmentFilter->getField());
             // Generate a unique alias
             $alias = $this->generateRandomParameterName();
 
 //            var_dump($func.":".$leadSegmentFilter->getField());
 //            var_dump($exprParameter);
-
 
             switch ($leadSegmentFilter->getField()) {
                 case 'hit_url':
@@ -360,8 +361,7 @@ class LeadListSegmentRepository
                         $table  = 'email_stats';
                     }
 
-
-                    if($filterField=='lead_email_read_date') {
+                    if ($filterField == 'lead_email_read_date') {
                         var_dump($func);
                     }
 
@@ -369,8 +369,6 @@ class LeadListSegmentRepository
                                                  ->createQueryBuilder()
                                                  ->select('id')
                                                  ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
-
-
 
                     switch ($func) {
                         case 'eq':
@@ -420,7 +418,7 @@ class LeadListSegmentRepository
                         default:
                             $parameter2              = $this->generateRandomParameterName();
 
-                            if($filterField=='lead_email_read_date') {
+                            if ($filterField == 'lead_email_read_date') {
                                 var_dump($exprParameter);
                             }
                             $parameters[$parameter2] = $leadSegmentFilter->getFilter();

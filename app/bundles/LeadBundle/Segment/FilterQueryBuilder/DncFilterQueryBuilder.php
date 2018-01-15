@@ -18,127 +18,93 @@ class DncFilterQueryBuilder implements FilterQueryBuilderInterface
 
     public static function getServiceId()
     {
+        return 'mautic.lead.query.builder.special.dnc';
+    }
+
+    public function aaa()
+    {
+        switch (false) {
+            case
+            'dnc_bounced':
+            case 'dnc_unsubscribed':
+            case 'dnc_bounced_sms':
+            case 'dnc_unsubscribed_sms':
+                // Special handling of do not contact
+
+                $func = (($func === 'eq' && $leadSegmentFilter->getFilter()) || ($func === 'neq' && !$leadSegmentFilter->getFilter())) ? 'EXISTS' : 'NOT EXISTS';
+
+                $parts   = explode('_', $leadSegmentFilter->getField());
+                $channel = 'email';
+
+                if (count($parts) === 3) {
+                    $channel = $parts[2];
+                }
+
+                $channelParameter = $this->generateRandomParameterName();
+                $subqb            = $this->entityManager->getConnection()->createQueryBuilder()
+                                                        ->select('null')
+                                                        ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $alias)
+                                                        ->where(
+                                                            $q->expr()->andX(
+                                                                $q->expr()->eq($alias.'.reason', $exprParameter),
+                                                                $q->expr()->eq($alias.'.lead_id', 'l.id'),
+                                                                $q->expr()
+                                                                  ->eq($alias.'.channel', ":$channelParameter")
+                                                            )
+                                                        );
+
+                $groupExpr->add(
+                    sprintf('%s (%s)', $func, $subqb->getSQL())
+                );
+
+                // Filter will always be true and differentiated via EXISTS/NOT EXISTS
+                $leadSegmentFilter->setFilter(true);
+
+                $ignoreAutoFilter = true;
+
+                $parameters[$parameter]        = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+                $parameters[$channelParameter] = $channel;
+
+                break;
+        }
     }
 
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
-        $filterOperator = $filter->getOperator();
-        $filterGlue     = $filter->getGlue();
-        $filterAggr     = $filter->getAggregateFunction();
+        dump('dnc apply query:');
+        var_dump($filter);
+        die();
+        $parts   = explode('_', $filter->getField());
+        $channel = 'email';
 
-        $filterParameters = $filter->getParameterValue();
-
-        if (is_array($filterParameters)) {
-            $parameters = [];
-            foreach ($filterParameters as $filterParameter) {
-                $parameters[] = $this->generateRandomParameterName();
-            }
-        } else {
-            $parameters = $this->generateRandomParameterName();
+        if (count($parts) === 3) {
+            $channel = $parts[2];
         }
 
-        $filterParametersHolder = $filter->getParameterHolder($parameters);
+        $channelParameter = $this->generateRandomParameterName();
+        $subqb            = $this->entityManager->getConnection()->createQueryBuilder()
+                                                ->select('null')
+                                                ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $alias)
+                                                ->where(
+                                                    $q->expr()->andX(
+                                                        $q->expr()->eq($alias.'.reason', $exprParameter),
+                                                        $q->expr()->eq($alias.'.lead_id', 'l.id'),
+                                                        $q->expr()
+                                                          ->eq($alias.'.channel', ":$channelParameter")
+                                                    )
+                                                );
 
-        dump(sprintf('START filter query for %s, operator: %s, %s', $filter->__toString(), $filter->getOperator(), print_r($filterAggr, true)));
+        $groupExpr->add(
+            sprintf('%s (%s)', $func, $subqb->getSQL())
+        );
 
-        $filterGlueFunc = $filterGlue.'Where';
+        // Filter will always be true and differentiated via EXISTS/NOT EXISTS
+        $leadSegmentFilter->setFilter(true);
 
-        $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
+        $ignoreAutoFilter = true;
 
-        // for aggregate function we need to create new alias and not reuse the old one
-        if ($filterAggr) {
-            $tableAlias = false;
-        }
-
-        if (!$tableAlias) {
-            $tableAlias = $this->generateRandomParameterName();
-
-            switch ($filterOperator) {
-                case 'notLike':
-                case 'notIn':
-
-                case 'empty':
-                case 'startsWith':
-                case 'gt':
-                case 'eq':
-                case 'neq':
-                case 'gte':
-                case 'like':
-                case 'lt':
-                case 'lte':
-                case 'in':
-                    //@todo this logic needs to
-                    if ($filterAggr) {
-                        $queryBuilder = $queryBuilder->leftJoin(
-                            $queryBuilder->getTableAlias('leads'),
-                            $filter->getTable(),
-                            $tableAlias,
-                            sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias('leads'), $tableAlias)
-                        );
-                    } else {
-                        $queryBuilder = $queryBuilder->innerJoin(
-                            $queryBuilder->getTableAlias('leads'),
-                            $filter->getTable(),
-                            $tableAlias,
-                            sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias('leads'), $tableAlias)
-                        );
-                    }
-                    break;
-                default:
-                    //throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
-                    dump('Dunno how to handle operator "'.$filterOperator.'"');
-            }
-        }
-
-        switch ($filterOperator) {
-            case 'empty':
-                $expression = $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
-                    $queryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), ':'.$emptyParameter = $this->generateRandomParameterName())
-                );
-                $queryBuilder->setParameter($emptyParameter, '');
-                break;
-            case 'startsWith':
-            case 'endsWith':
-                $filterOperator = 'like';
-            case 'gt':
-            case 'eq':
-            case 'neq':
-            case 'gte':
-            case 'like':
-            case 'notLike':
-            case 'lt':
-            case 'lte':
-            case 'notIn':
-            case 'in':
-                if ($filterAggr) {
-                    $expression = $queryBuilder->expr()->$filterOperator(
-                        sprintf('%s(%s)', $filterAggr, $tableAlias.'.'.$filter->getField()),
-                        $filterParametersHolder
-                    );
-                } else {
-                    $expression = $queryBuilder->expr()->$filterOperator(
-                        $tableAlias.'.'.$filter->getField(),
-                        $filterParametersHolder
-                    );
-                }
-                break;
-            default:
-                dump(' * IGNORED * - Dunno how to handle operator "'.$filterOperator.'"');
-                //throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
-                $expression = '1=1';
-        }
-
-        if ($queryBuilder->isJoinTable($filter->getTable())) {
-            if ($filterAggr) {
-                $queryBuilder->andHaving($expression);
-            } else {
-                dump($filter->getGlue());
-                $queryBuilder->addJoinCondition($tableAlias, 'and ('.$expression.')');
-            }
-        } else {
-            $queryBuilder->$filterGlueFunc($expression);
-        }
+        $parameters[$parameter]        = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+        $parameters[$channelParameter] = $channel;
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 

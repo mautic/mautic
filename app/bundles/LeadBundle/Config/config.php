@@ -730,7 +730,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignFuncFilterQueryBuilder::class,
                 'arguments' => [],
             ],
-            'mautic.lead.query.builder.dnc' => [
+            'mautic.lead.query.builder.special.dnc' => [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\DncFilterQueryBuilder::class,
                 'arguments' => [],
             ],

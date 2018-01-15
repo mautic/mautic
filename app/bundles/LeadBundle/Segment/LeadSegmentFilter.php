@@ -27,7 +27,7 @@ class LeadSegmentFilter
     /**
      * @var LeadSegmentFilterCrate
      */
-    private $leadSegmentFilterCrate;
+    public $leadSegmentFilterCrate;
 
     /**
      * @var FilterDecoratorInterface|BaseDecorator
