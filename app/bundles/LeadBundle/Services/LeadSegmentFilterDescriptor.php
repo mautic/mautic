@@ -42,11 +42,10 @@ class LeadSegmentFilterDescriptor extends \ArrayIterator
 
         $this->translations['dnc_bounced'] = [
             'type'                => DncFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'page_hits',
-            'foreign_table_field' => 'lead_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'date_hit',
+        ];
+
+        $this->translations['dnc_bounced_sms'] = [
+            'type'                => DncFilterQueryBuilder::getServiceId(),
         ];
 
         parent::__construct($this->translations);

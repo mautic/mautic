@@ -112,6 +112,21 @@ class LeadSegmentFilter
         return $this->filterDecorator->getAggregateFunc($this->leadSegmentFilterCrate);
     }
 
+    public function getCrate($field = null)
+    {
+        $fields = (array) $this->toArray();
+
+        if (is_null($field)) {
+            return $fields;
+        }
+
+        if (isset($fields[$field])) {
+            return $fields[$field];
+        }
+
+        throw new \Exception('Unknown crate field "'.$field."'");
+    }
+
     /**
      * @return array
      */

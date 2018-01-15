@@ -8,6 +8,7 @@
 
 namespace Mautic\LeadBundle\Segment\FilterQueryBuilder;
 
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
@@ -21,92 +22,39 @@ class DncFilterQueryBuilder implements FilterQueryBuilderInterface
         return 'mautic.lead.query.builder.special.dnc';
     }
 
-    public function aaa()
-    {
-        switch (false) {
-            case
-            'dnc_bounced':
-            case 'dnc_unsubscribed':
-            case 'dnc_bounced_sms':
-            case 'dnc_unsubscribed_sms':
-                // Special handling of do not contact
-
-                $func = (($func === 'eq' && $leadSegmentFilter->getFilter()) || ($func === 'neq' && !$leadSegmentFilter->getFilter())) ? 'EXISTS' : 'NOT EXISTS';
-
-                $parts   = explode('_', $leadSegmentFilter->getField());
-                $channel = 'email';
-
-                if (count($parts) === 3) {
-                    $channel = $parts[2];
-                }
-
-                $channelParameter = $this->generateRandomParameterName();
-                $subqb            = $this->entityManager->getConnection()->createQueryBuilder()
-                                                        ->select('null')
-                                                        ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $alias)
-                                                        ->where(
-                                                            $q->expr()->andX(
-                                                                $q->expr()->eq($alias.'.reason', $exprParameter),
-                                                                $q->expr()->eq($alias.'.lead_id', 'l.id'),
-                                                                $q->expr()
-                                                                  ->eq($alias.'.channel', ":$channelParameter")
-                                                            )
-                                                        );
-
-                $groupExpr->add(
-                    sprintf('%s (%s)', $func, $subqb->getSQL())
-                );
-
-                // Filter will always be true and differentiated via EXISTS/NOT EXISTS
-                $leadSegmentFilter->setFilter(true);
-
-                $ignoreAutoFilter = true;
-
-                $parameters[$parameter]        = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
-                $parameters[$channelParameter] = $channel;
-
-                break;
-        }
-    }
-
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
-        dump('dnc apply query:');
-        var_dump($filter);
-        die();
-        $parts   = explode('_', $filter->getField());
+        $parts   = explode('_', $filter->getCrate('field'));
         $channel = 'email';
 
         if (count($parts) === 3) {
             $channel = $parts[2];
         }
 
-        $channelParameter = $this->generateRandomParameterName();
-        $subqb            = $this->entityManager->getConnection()->createQueryBuilder()
-                                                ->select('null')
-                                                ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $alias)
-                                                ->where(
-                                                    $q->expr()->andX(
-                                                        $q->expr()->eq($alias.'.reason', $exprParameter),
-                                                        $q->expr()->eq($alias.'.lead_id', 'l.id'),
-                                                        $q->expr()
-                                                          ->eq($alias.'.channel', ":$channelParameter")
-                                                    )
-                                                );
+        $tableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'left');
 
-        $groupExpr->add(
-            sprintf('%s (%s)', $func, $subqb->getSQL())
+        if (!$tableAlias) {
+            $tableAlias = $this->generateRandomParameterName();
+            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_donotcontact', $tableAlias, MAUTIC_TABLE_PREFIX.'lead_donotcontact = l.id');
+        }
+
+        $exprParameter    = $this->generateRandomParameterName();
+        $channelParameter = $this->generateRandomParameterName();
+
+        $expression = $queryBuilder->expr()->andX(
+            $queryBuilder->expr()->eq($tableAlias.'.reason', ":$exprParameter"),
+            $queryBuilder->expr()
+              ->eq($tableAlias.'.channel', ":$channelParameter")
         );
 
-        // Filter will always be true and differentiated via EXISTS/NOT EXISTS
-        $leadSegmentFilter->setFilter(true);
+        $queryBuilder->addJoinCondition($tableAlias, $expression);
 
-        $ignoreAutoFilter = true;
+        $queryType = $filter->getOperator() === 'eq' ? 'isNull' : 'isNotNull';
 
-        $parameters[$parameter]        = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
-        $parameters[$channelParameter] = $channel;
+        $queryBuilder->andWhere($queryBuilder->expr()->$queryType($tableAlias.'.id'));
 
-        $queryBuilder->setParametersPairs($parameters, $filterParameters);
+        $queryBuilder->setParameter($exprParameter, ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED);
+        $queryBuilder->setParameter($channelParameter, $channel);
 
         return $queryBuilder;
     }

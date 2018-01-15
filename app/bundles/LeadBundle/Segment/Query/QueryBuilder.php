@@ -1398,7 +1398,7 @@ class QueryBuilder
 
         foreach ($parts['l'] as $key => $part) {
             if ($part['joinAlias'] == $alias) {
-                $result['l'][$key]['joinCondition'] = $part['joinCondition'].' '.$expr.'';
+                $result['l'][$key]['joinCondition'] = $part['joinCondition'].' and '.$expr.'';
             }
         }
 

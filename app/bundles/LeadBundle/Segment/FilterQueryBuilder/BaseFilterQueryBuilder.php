@@ -134,7 +134,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 $queryBuilder->andHaving($expression);
             } else {
                 dump($filter->getGlue());
-                $queryBuilder->addJoinCondition($tableAlias, 'and ('.$expression.')');
+                $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
             }
         } else {
             $queryBuilder->$filterGlueFunc($expression);
