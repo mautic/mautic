@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * LeadFieldRepository.
@@ -193,8 +194,8 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             } elseif ($operatorExpr === 'in' || $operatorExpr === 'notIn') {
-                $expr = $q->expr()->andX(
-                    $q->expr()->eq('l.id', ':lead')
+                $value = $q->expr()->literal(
+                    InputHelper::clean($value)
                 );
 
                 $value = trim($value, "'");
@@ -203,6 +204,11 @@ class LeadFieldRepository extends CommonRepository
                 } else {
                     $operator = 'REGEXP';
                 }
+
+                $expr = $q->expr()->andX(
+                    $q->expr()->eq('l.id', ':lead')
+                );
+
                 $expr->add(
                     'l.'.$field." $operator '\\\\|?$value\\\\|?'"
                 );
