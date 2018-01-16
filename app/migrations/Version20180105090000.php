@@ -35,6 +35,5 @@ class Version20180105090000 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $this->addSql("ALTER TABLE {$this->prefix}pages CHANGE redirect_url redirect_url VARCHAR(2048) DEFAULT NULL;");
-
     }
 }
