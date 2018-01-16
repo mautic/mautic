@@ -734,6 +734,10 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\DncFilterQueryBuilder::class,
                 'arguments' => [],
             ],
+            'mautic.lead.query.builder.special.sessions' => [
+                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\SessionsFilterQueryBuilder::class,
+                'arguments' => [],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [

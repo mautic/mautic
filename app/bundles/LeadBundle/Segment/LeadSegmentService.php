@@ -66,7 +66,6 @@ class LeadSegmentService
         $qb = $this->queryBuilder->getLeadsQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
 
         $qb = $this->addNewLeadsRestrictions($qb, $entity->getId(), $batchLimiters);
-//        $qb->andWhere('l.sssss=1');
         dump($qb->getQueryParts());
         $sql = $qb->getSQL();
 
@@ -75,7 +74,7 @@ class LeadSegmentService
         }
 
         echo '<hr/>';
-        echo $sql;
+        dump($sql);
         try {
             $start = microtime(true);
 

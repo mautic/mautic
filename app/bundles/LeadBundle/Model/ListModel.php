@@ -810,7 +810,7 @@ class ListModel extends FormModel
         $versionEnd = microtime(true) - $versionStart;
         dump('Total query assembly took:'.$versionEnd.'ms');
 
-        dump($newLeadsCount);
+        dump(array_shift($newLeadsCount));
         exit;
         // Ensure the same list is used each batch
         $batchLimiters['maxId'] = (int) $newLeadsCount[$id]['maxId'];

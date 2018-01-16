@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Segment\FilterQueryBuilder\DncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\LeadListFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\FilterQueryBuilder\SessionsFilterQueryBuilder;
 
 class LeadSegmentFilterDescriptor extends \ArrayIterator
 {
@@ -100,6 +101,61 @@ class LeadSegmentFilterDescriptor extends \ArrayIterator
             'type'                => BaseFilterQueryBuilder::getServiceId(),
             'foreign_table'       => 'leads',
             'field'               => 'stage_id',
+        ];
+
+        $this->translations['notification'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'push_ids',
+            'field'               => 'id',
+        ];
+
+        $this->translations['page_id'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'page_hits',
+            'foreign_field'       => 'page_id',
+        ];
+
+        $this->translations['email_id'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'page_hits',
+            'foreign_field'       => 'email_id',
+        ];
+
+        $this->translations['redirect_id'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'page_hits',
+            'foreign_field'       => 'redirect_id',
+        ];
+
+        $this->translations['source'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'page_hits',
+            'foreign_field'       => 'source',
+        ];
+
+        $this->translations['hit_url'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'page_hits',
+            'field'               => 'url',
+        ];
+
+        $this->translations['referer'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'page_hits',
+        ];
+
+        $this->translations['source_id'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'page_hits',
+        ];
+
+        $this->translations['url_title'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'page_hits',
+        ];
+
+        $this->translations['sessions'] = [
+            'type'                => SessionsFilterQueryBuilder::getServiceId(),
         ];
 
         parent::__construct($this->translations);
