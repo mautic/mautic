@@ -24,7 +24,6 @@ $showGraphTab = count($form['graphs']->vars['choices']);
 ?>
 
 <?php echo $view['form']->start($form); ?>
-<?php echo $view['form']->errors($form, true); ?>
     <div class="box-layout">
         <div class="col-md-9 bg-white height-auto">
             <div class="row">

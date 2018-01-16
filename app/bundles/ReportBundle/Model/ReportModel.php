@@ -149,16 +149,20 @@ class ReportModel extends FormModel
             throw new MethodNotAllowedHttpException(['Report']);
         }
 
-        $params              = (!empty($action)) ? ['action' => $action] : [];
-        $params['read_only'] = false;
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        $options = array_merge($options, [
+            'read_only'  => false,
+            'table_list' => $this->getTableData()
+        ]);
 
         // Fire the REPORT_ON_BUILD event off to get the table/column data
 
-        $params['table_list'] = $this->getTableData();
-
         $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
-        return $reportGenerator->getForm($entity, $params);
+        return $reportGenerator->getForm($entity, $options);
     }
 
     /**
