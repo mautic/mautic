@@ -155,7 +155,7 @@ class ReportModel extends FormModel
 
         $options = array_merge($options, [
             'read_only'  => false,
-            'table_list' => $this->getTableData()
+            'table_list' => $this->getTableData(),
         ]);
 
         // Fire the REPORT_ON_BUILD event off to get the table/column data
