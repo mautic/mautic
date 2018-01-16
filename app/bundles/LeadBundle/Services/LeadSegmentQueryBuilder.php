@@ -87,7 +87,7 @@ class LeadSegmentQueryBuilder
         // remove any possible group by
         $q->resetQueryPart('groupBy');
 
-        dump($q->getSQL());
+        var_dump($q->getSQL());
         echo 'SQL parameters:';
         dump($q->getParameters());
 

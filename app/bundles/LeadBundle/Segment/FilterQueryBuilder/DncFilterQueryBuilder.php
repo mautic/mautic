@@ -35,7 +35,7 @@ class DncFilterQueryBuilder implements FilterQueryBuilderInterface
 
         if (!$tableAlias) {
             $tableAlias = $this->generateRandomParameterName();
-            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_donotcontact', $tableAlias, MAUTIC_TABLE_PREFIX.'lead_donotcontact = l.id');
+            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_donotcontact', $tableAlias, MAUTIC_TABLE_PREFIX.'lead_donotcontact.lead_id = l.id');
         }
 
         $exprParameter    = $this->generateRandomParameterName();

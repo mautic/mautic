@@ -37,21 +37,22 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
 
-        $expression = $queryBuilder->expr()->$filterOperator(
-            $tableAlias.'.'.$filter->getField(),
-            $filterParametersHolder
-        );
-
         if (!$tableAlias) {
+            $tableAlias = $this->generateRandomParameterName();
+
             $queryBuilder = $queryBuilder->innerJoin(
                 $queryBuilder->getTableAlias('leads'),
                 $filter->getTable(),
                 $tableAlias,
-                $expression
+                $tableAlias.'.lead_id = l.id'
             );
-        } else {
-            $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
         }
+
+        $expression = $queryBuilder->expr()->$filterOperator(
+            $tableAlias.'.'.$filter->getField(),
+            $filterParametersHolder
+        );
+        $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 

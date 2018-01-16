@@ -40,7 +40,7 @@ class BaseDecorator implements FilterDecoratorInterface
     {
         $originalField = $leadSegmentFilterCrate->getField();
 
-        if (empty($this->leadSegmentFilterDescriptor[$originalField])) {
+        if (empty($this->leadSegmentFilterDescriptor[$originalField]['field'])) {
             return $originalField;
         }
 
@@ -51,7 +51,7 @@ class BaseDecorator implements FilterDecoratorInterface
     {
         $originalField = $leadSegmentFilterCrate->getField();
 
-        if (empty($this->leadSegmentFilterDescriptor[$originalField])) {
+        if (empty($this->leadSegmentFilterDescriptor[$originalField]['foreign_table'])) {
             if ($leadSegmentFilterCrate->isLeadType()) {
                 return 'leads';
             }

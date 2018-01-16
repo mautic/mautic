@@ -44,7 +44,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         try {
             $filter->getColumn();
         } catch (\Exception $e) {
-            dump(' * IGNORED * - Unhandled field '.sprintf(' %s, operator: %s, %s', $filter->__toString(), $filter->getOperator(), print_r($filterAggr, true)));
+            dump(' * ERROR * - Unhandled field '.sprintf(' %s, operator: %s, %s', $filter->__toString(), $filter->getOperator(), print_r($filterAggr, true)));
         }
 
         $filterGlueFunc = $filterGlue.'Where';
@@ -147,64 +147,5 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 
         return $queryBuilder;
-    }
-
-    public function aaa()
-    {
-        switch (true) {
-            case 'tags':
-            case 'globalcategory':
-            case 'lead_email_received':
-            case 'lead_email_sent':
-            case 'device_type':
-            case 'device_brand':
-            case 'device_os':
-                // Special handling of lead lists and tags
-                $func = in_array($func, ['eq', 'in'], true) ? 'EXISTS' : 'NOT EXISTS';
-
-                $ignoreAutoFilter = true;
-
-                // Collect these and apply after building the query because we'll want to apply the lead first for each of the subqueries
-                $subQueryFilters = [];
-                switch ($leadSegmentFilter->getField()) {
-                    case 'tags':
-                        $table  = 'lead_tags_xref';
-                        $column = 'tag_id';
-                        break;
-                    case 'globalcategory':
-                        $table  = 'lead_categories';
-                        $column = 'category_id';
-                        break;
-                    case 'lead_email_received':
-                        $table  = 'email_stats';
-                        $column = 'email_id';
-
-                        $trueParameter                        = $this->generateRandomParameterName();
-                        $subQueryFilters[$alias.'.is_read']   = $trueParameter;
-                        $parameters[$trueParameter]           = true;
-                        break;
-                    case 'lead_email_sent':
-                        $table  = 'email_stats';
-                        $column = 'email_id';
-                        break;
-                    case 'device_type':
-                        $table  = 'lead_devices';
-                        $column = 'device';
-                        break;
-                    case 'device_brand':
-                        $table  = 'lead_devices';
-                        $column = 'device_brand';
-                        break;
-                    case 'device_os':
-                        $table  = 'lead_devices';
-                        $column = 'device_os_name';
-                        break;
-                }
-
-                $subQb = $this->createFilterExpressionSubQuery($table, $alias, $column, $leadSegmentFilter->getFilter(), $parameters, $subQueryFilters);
-
-                $groupExpr->add(sprintf('%s (%s)', $func, $subQb->getSQL()));
-                break;
-        }
     }
 }

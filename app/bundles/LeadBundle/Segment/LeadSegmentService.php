@@ -55,9 +55,19 @@ class LeadSegmentService
 
         $qb = $this->addNewLeadsRestrictions($qb, $entity->getId(), $batchLimiters);
 
+        dump($qb->getQueryParts());
         dump($qb->getSQL());
+
         dump($qb->getParameters());
-        dump($qb->getFirstResult());
+
+        try {
+            $results = $qb->execute()->fetchAll();
+            foreach ($results as $result) {
+                var_dump($result);
+            }
+        } catch (\Exception $e) {
+            dump('Query exception: '.$e->getMessage());
+        }
 
         return $this->leadListSegmentRepository->getNewLeadsByListCount($entity->getId(), $segmentFilters, $batchLimiters);
     }
