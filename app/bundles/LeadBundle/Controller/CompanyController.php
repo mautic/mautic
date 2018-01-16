@@ -799,8 +799,8 @@ class CompanyController extends FormController
     /**
      * Upload company files.
      *
-     * @param type $files
-     * @param type $company
+     * @param array   $files
+     * @param Company $company
      */
     private function uploadCompanyFiles($files, $company)
     {

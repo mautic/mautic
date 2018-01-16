@@ -115,7 +115,7 @@ class CompanyFiles
     }
 
     /**
-     * @return Title
+     * @return string Title
      */
     public function getTitle()
     {
@@ -131,7 +131,7 @@ class CompanyFiles
     }
 
     /**
-     * @return Path
+     * @return string Path
      */
     public function getPath()
     {
@@ -167,7 +167,7 @@ class CompanyFiles
     }
 
     /**
-     * @return originalFileName
+     * @return string originalFileName
      */
     public function getOriginalFileName()
     {
@@ -183,7 +183,7 @@ class CompanyFiles
     }
 
     /**
-     * @return mime
+     * @return string mime
      */
     public function getMime()
     {
@@ -199,7 +199,7 @@ class CompanyFiles
     }
 
     /**
-     * @return size
+     * @return int size
      */
     public function getSize()
     {
@@ -255,7 +255,7 @@ class CompanyFiles
     }
 
     /**
-     * @return file
+     * @return UploadedFile file
      */
     public function getFile()
     {
