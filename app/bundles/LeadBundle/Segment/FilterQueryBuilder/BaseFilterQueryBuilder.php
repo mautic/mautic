@@ -27,6 +27,15 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         $filterGlue     = $filter->getGlue();
         $filterAggr     = $filter->getAggregateFunction();
 
+        // @debug we do not need this, it's just to verify we reference an existing database column
+        try {
+            $filter->getColumn();
+        } catch (\Exception $e) {
+            dump(' * ERROR * - Unhandled field '.sprintf(' %s, operator: %s, %s', $filter->__toString(), $filter->getOperator(), print_r($filterAggr, true)));
+
+            return $queryBuilder;
+        }
+
         $filterParameters = $filter->getParameterValue();
 
         if (is_array($filterParameters)) {
@@ -40,13 +49,6 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
 
-        // @debug we do not need this, it's just to verify we reference an existing database column
-        try {
-            $filter->getColumn();
-        } catch (\Exception $e) {
-            dump(' * ERROR * - Unhandled field '.sprintf(' %s, operator: %s, %s', $filter->__toString(), $filter->getOperator(), print_r($filterAggr, true)));
-        }
-
         $filterGlueFunc = $filterGlue.'Where';
 
         $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
@@ -56,13 +58,16 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             $tableAlias = false;
         }
 
+//        dump($filter->getTable()); if ($filter->getTable()=='companies') {
+//            dump('companies');
+//    }
+
         if (!$tableAlias) {
             $tableAlias = $this->generateRandomParameterName();
 
             switch ($filterOperator) {
                 case 'notLike':
                 case 'notIn':
-
                 case 'empty':
                 case 'startsWith':
                 case 'gt':
@@ -75,19 +80,25 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 case 'in':
                     //@todo this logic needs to
                     if ($filterAggr) {
-                        $queryBuilder = $queryBuilder->leftJoin(
+                        $queryBuilder->leftJoin(
                             $queryBuilder->getTableAlias('leads'),
                             $filter->getTable(),
                             $tableAlias,
                             sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias('leads'), $tableAlias)
                         );
                     } else {
-                        $queryBuilder = $queryBuilder->innerJoin(
-                            $queryBuilder->getTableAlias('leads'),
-                            $filter->getTable(),
-                            $tableAlias,
-                            sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias('leads'), $tableAlias)
-                        );
+                        if ($filter->getTable() == 'companies') {
+                            $relTable = $this->generateRandomParameterName();
+                            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = l.id');
+                            $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
+                        } else {
+                            $queryBuilder->leftJoin(
+                                $queryBuilder->getTableAlias('leads'),
+                                $filter->getTable(),
+                                $tableAlias,
+                                sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias('leads'), $tableAlias)
+                            );
+                        }
                     }
                     break;
                 default:

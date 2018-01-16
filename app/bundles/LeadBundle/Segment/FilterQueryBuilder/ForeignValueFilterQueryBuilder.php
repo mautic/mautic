@@ -40,7 +40,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         if (!$tableAlias) {
             $tableAlias = $this->generateRandomParameterName();
 
-            $queryBuilder = $queryBuilder->innerJoin(
+            $queryBuilder = $queryBuilder->leftJoin(
                 $queryBuilder->getTableAlias('leads'),
                 $filter->getTable(),
                 $tableAlias,

@@ -1396,9 +1396,11 @@ class QueryBuilder
     {
         $result = $parts = $this->getQueryPart('join');
 
-        foreach ($parts['l'] as $key => $part) {
-            if ($part['joinAlias'] == $alias) {
-                $result['l'][$key]['joinCondition'] = $part['joinCondition'].' and '.$expr.'';
+        foreach ($parts as $tbl=>$joins) {
+            foreach ($joins as $key=>$join) {
+                if ($join['joinAlias'] == $alias) {
+                    $result[$tbl][$key]['joinCondition'] = $join['joinCondition'].' and '.$expr;
+                }
             }
         }
 

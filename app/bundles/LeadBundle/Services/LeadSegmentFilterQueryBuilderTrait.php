@@ -38,7 +38,6 @@ trait LeadSegmentFilterQueryBuilderTrait
     public function addNewLeadsRestrictions(QueryBuilder $queryBuilder, $leadListId, $whatever)
     {
         $queryBuilder->select('max(l.id) maxId, count(l.id) as leadCount');
-        $queryBuilder->addGroupBy('l.id');
 
         $parts     = $queryBuilder->getQueryParts();
         $setHaving =  (count($parts['groupBy']) || !is_null($parts['having']));

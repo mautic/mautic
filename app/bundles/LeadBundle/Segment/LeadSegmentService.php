@@ -46,6 +46,15 @@ class LeadSegmentService
         $this->queryBuilder              = $queryBuilder;
     }
 
+    public function getDqlWithParams(Doctrine_Query $query)
+    {
+        $vals = $query->getFlattenedParams();
+        $sql  = $query->getDql();
+        $sql  = str_replace('?', '%s', $sql);
+
+        return vsprintf($sql, $vals);
+    }
+
     public function getNewLeadsByListCount(LeadList $entity, array $batchLimiters)
     {
         $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($entity);
@@ -55,19 +64,27 @@ class LeadSegmentService
 
         $qb = $this->addNewLeadsRestrictions($qb, $entity->getId(), $batchLimiters);
 
+//        $qb->andWhere('l.sssss=1');
         dump($qb->getQueryParts());
-        dump($qb->getSQL());
+        $sql = $qb->getSQL();
 
-        dump($qb->getParameters());
+        foreach ($qb->getParameters() as $k=>$v) {
+            $sql = str_replace(":$k", "'$v'", $sql);
+        }
 
+        echo '<hr/>';
+        echo $sql;
         try {
-            $results = $qb->execute()->fetchAll();
+            $stmt    = $qb->execute();
+            $results = $stmt->fetchAll();
+            dump($results);
             foreach ($results as $result) {
-                var_dump($result);
+                dump($result);
             }
         } catch (\Exception $e) {
             dump('Query exception: '.$e->getMessage());
         }
+        echo '<hr/>';
 
         return $this->leadListSegmentRepository->getNewLeadsByListCount($entity->getId(), $segmentFilters, $batchLimiters);
     }

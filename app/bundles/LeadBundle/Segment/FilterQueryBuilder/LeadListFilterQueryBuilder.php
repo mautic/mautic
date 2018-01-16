@@ -13,17 +13,19 @@ use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
 
-class DncFilterQueryBuilder implements FilterQueryBuilderInterface
+class LeadListFilterQueryBuilder implements FilterQueryBuilderInterface
 {
     use LeadSegmentFilterQueryBuilderTrait;
 
     public static function getServiceId()
     {
-        return 'mautic.lead.query.builder.special.dnc';
+        return 'mautic.lead.query.builder.special.leadlist';
     }
 
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
+        dump('lead list');
+        die();
         $parts   = explode('_', $filter->getCrate('field'));
         $channel = 'email';
 
@@ -35,7 +37,7 @@ class DncFilterQueryBuilder implements FilterQueryBuilderInterface
 
         if (!$tableAlias) {
             $tableAlias = $this->generateRandomParameterName();
-            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_donotcontact', $tableAlias, $tableAlias.'.lead_id = l.id');
+            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_donotcontact', $tableAlias, MAUTIC_TABLE_PREFIX.'lead_donotcontact.lead_id = l.id');
         }
 
         $exprParameter    = $this->generateRandomParameterName();
