@@ -8,11 +8,11 @@
 
 namespace Mautic\LeadBundle\Services;
 
-use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 trait LeadSegmentFilterQueryBuilderTrait
 {
+    // @todo make static to asure single instance
     protected $parameterAliases = [];
 
     /**
@@ -35,92 +35,33 @@ trait LeadSegmentFilterQueryBuilderTrait
         return $this->generateRandomParameterName();
     }
 
-    // should be used by filter
-    protected function createJoin(QueryBuilder $queryBuilder, $target, $alias, $joinOn = '', $from = 'MauticLeadBundle:Lead')
+    public function addNewLeadsRestrictions(QueryBuilder $queryBuilder, $leadListId, $whatever)
     {
-        $queryBuilder = $queryBuilder->leftJoin($this->getTableAlias($from, $queryBuilder), $target, $alias, sprintf(
-            '%s.id = %s.lead_id'.($joinOn ? " and $joinOn" : ''),
-            $this->getTableAlias($from, $queryBuilder),
-            $alias
-        ));
+        $queryBuilder->select('max(l.id) maxId, count(l.id) as leadCount');
+        $queryBuilder->addGroupBy('l.id');
+
+        $parts     = $queryBuilder->getQueryParts();
+        $setHaving =  (count($parts['groupBy']) || !is_null($parts['having']));
+
+        $tableAlias = $this->generateRandomParameterName();
+        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias, $tableAlias.'.lead_id = l.id');
+        $queryBuilder->addSelect($tableAlias.'.lead_id');
+
+        $expression = $queryBuilder->expr()->andX(
+            $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $leadListId),
+            $queryBuilder->expr()->lte($tableAlias.'.date_added', "'".$whatever['dateTime']."'")
+        );
+
+        $restrictionExpression = $queryBuilder->expr()->isNull($tableAlias.'.lead_id');
+
+        $queryBuilder->addJoinCondition($tableAlias, $expression);
+
+        if ($setHaving) {
+            $queryBuilder->andHaving($restrictionExpression);
+        } else {
+            $queryBuilder->andWhere($restrictionExpression);
+        }
 
         return $queryBuilder;
-    }
-
-    protected function addForeignTableQuery(QueryBuilder $qb, LeadSegmentFilter $filter)
-    {
-        $filter->createJoin($qb, $alias);
-        if (isset($translated) && $translated) {
-            if (isset($translated['func'])) {
-                //@todo rewrite with getFullQualifiedName
-                $qb->leftJoin($this->tableAliases[$translated['table']], $translated['foreign_table'], $this->tableAliases[$translated['foreign_table']], sprintf('%s.%s = %s.%s', $this->tableAliases[$translated['table']], $translated['table_field'], $this->tableAliases[$translated['foreign_table']], $translated['foreign_table_field']));
-
-                //@todo rewrite with getFullQualifiedName
-                $qb->andHaving(isset($translated['func']) ? sprintf('%s(%s.%s) %s %s', $translated['func'], $this->tableAliases[$translated['foreign_table']], $translated['field'], $filter->getSQLOperator(), $filter->getFilterConditionValue($parameterHolder)) : sprintf('%s.%s %s %s', $this->tableAliases[$translated['foreign_table']], $translated['field'], $this->getFilterOperator($filter), $this->getFilterValue($filter, $parameterHolder, $dbColumn)));
-            } else {
-                //@todo rewrite with getFullQualifiedName
-                $qb->innerJoin($this->tableAliases[$translated['table']], $translated['foreign_table'], $this->tableAliases[$translated['foreign_table']], sprintf('%s.%s = %s.%s and %s', $this->tableAliases[$translated['table']], $translated['table_field'], $this->tableAliases[$translated['foreign_table']], $translated['foreign_table_field'], sprintf('%s.%s %s %s', $this->tableAliases[$translated['foreign_table']], $translated['field'], $filter->getSQLOperator(), $filter->getFilterConditionValue($parameterHolder))));
-            }
-
-            $qb->setParameter($parameterHolder, $filter->getFilter());
-
-            $qb->groupBy(sprintf('%s.%s', $this->tableAliases[$translated['table']], $translated['table_field']));
-        } else {
-            //  Default behaviour, translation not necessary
-        }
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param              $filter
-     * @param null         $alias  use alias to extend current query
-     *
-     * @throws \Exception
-     */
-    private function addForeignTableQueryWhere(QueryBuilder $qb, $filter, $alias = null)
-    {
-        dump($filter);
-        if (is_array($filter)) {
-            $alias = is_null($alias) ? $this->generateRandomParameterName() : $alias;
-            foreach ($filter as $singleFilter) {
-                $qb = $this->addForeignTableQueryWhere($qb, $singleFilter, $alias);
-            }
-
-            return $qb;
-        }
-
-        $parameterHolder = $this->generateRandomParameterName();
-        $qb              = $filter->createExpression($qb, $parameterHolder);
-
-        return $qb;
-        dump($expr);
-        die();
-
-        //$qb = $qb->andWhere($expr);
-        $qb->setParameter($parameterHolder, $filter->getFilter());
-
-        //var_dump($qb->getSQL()); die();
-
-//        die();
-//
-//        if (isset($translated) && $translated) {
-//            if (isset($translated['func'])) {
-//                //@todo rewrite with getFullQualifiedName
-//                $qb->leftJoin($this->getTableAlias($filter->get), $translated['foreign_table'], $this->tableAliases[$translated['foreign_table']], sprintf('%s.%s = %s.%s', $this->tableAliases[$translated['table']], $translated['table_field'], $this->tableAliases[$translated['foreign_table']], $translated['foreign_table_field']));
-//
-//                //@todo rewrite with getFullQualifiedName
-//                $qb->andHaving(isset($translated['func']) ? sprintf('%s(%s.%s) %s %s', $translated['func'], $this->tableAliases[$translated['foreign_table']], $translated['field'], $filter->getSQLOperator(), $filter->getFilterConditionValue($parameterHolder)) : sprintf('%s.%s %s %s', $this->tableAliases[$translated['foreign_table']], $translated['field'], $this->getFilterOperator($filter), $this->getFilterValue($filter, $parameterHolder, $dbColumn)));
-//
-//            }
-//            else {
-//                //@todo rewrite with getFullQualifiedName
-//                $qb->innerJoin($this->tableAliases[$translated['table']], $translated['foreign_table'], $this->tableAliases[$translated['foreign_table']], sprintf('%s.%s = %s.%s and %s', $this->tableAliases[$translated['table']], $translated['table_field'], $this->tableAliases[$translated['foreign_table']], $translated['foreign_table_field'], sprintf('%s.%s %s %s', $this->tableAliases[$translated['foreign_table']], $translated['field'], $filter->getSQLOperator(), $filter->getFilterConditionValue($parameterHolder))));
-//            }
-//
-//
-//            $qb->setParameter($parameterHolder, $filter->getFilter());
-//
-//            $qb->groupBy(sprintf('%s.%s', $this->tableAliases[$translated['table']], $translated['table_field']));
-//        }
     }
 }

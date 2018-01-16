@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Doctrine\DBAL\Schema\Column;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
@@ -39,8 +38,10 @@ class LeadSegmentFilter
      */
     private $filterQueryBuilder;
 
-    /** @var Column */
-    private $dbColumn;
+    /**
+     * @var EntityManager
+     */
+    private $em;
 
     public function __construct(
         LeadSegmentFilterCrate $leadSegmentFilterCrate,
@@ -50,6 +51,16 @@ class LeadSegmentFilter
         $this->leadSegmentFilterCrate = $leadSegmentFilterCrate;
         $this->filterDecorator        = $filterDecorator;
         $this->em                     = $em;
+    }
+
+    public function getColumn()
+    {
+        $columns = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->getTable());
+        if (!isset($columns[$this->getField()])) {
+            throw new \Exception(sprintf('Database schema does not contain field %s.%s', $this->getTable(), $this->getField()));
+        }
+
+        return $columns[$this->getField()];
     }
 
     public function getEntity()

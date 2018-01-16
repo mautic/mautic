@@ -14,10 +14,13 @@ namespace Mautic\LeadBundle\Segment;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListSegmentRepository;
+use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
 use Mautic\LeadBundle\Services\LeadSegmentQueryBuilder;
 
 class LeadSegmentService
 {
+    use LeadSegmentFilterQueryBuilderTrait;
+
     /**
      * @var LeadListSegmentRepository
      */
@@ -50,9 +53,11 @@ class LeadSegmentService
         /** @var QueryBuilder $qb */
         $qb = $this->queryBuilder->getLeadsQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
 
-        dump($qb->getQueryParts());
+        $qb = $this->addNewLeadsRestrictions($qb, $entity->getId(), $batchLimiters);
+
+        dump($qb->getSQL());
         dump($qb->getParameters());
-        dump($qb->execute());
+        dump($qb->getFirstResult());
 
         return $this->leadListSegmentRepository->getNewLeadsByListCount($entity->getId(), $segmentFilters, $batchLimiters);
     }

@@ -8,6 +8,53 @@
 
 namespace Mautic\LeadBundle\Segment\FilterQueryBuilder;
 
+use Mautic\LeadBundle\Segment\LeadSegmentFilter;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+
 class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
+    public static function getServiceId()
+    {
+        return 'mautic.lead.query.builder.foreign.value';
+    }
+
+    public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
+    {
+        $filterOperator = $filter->getOperator();
+
+        $filterParameters = $filter->getParameterValue();
+
+        if (is_array($filterParameters)) {
+            $parameters = [];
+            foreach ($filterParameters as $filterParameter) {
+                $parameters[] = $this->generateRandomParameterName();
+            }
+        } else {
+            $parameters = $this->generateRandomParameterName();
+        }
+
+        $filterParametersHolder = $filter->getParameterHolder($parameters);
+
+        $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
+
+        $expression = $queryBuilder->expr()->$filterOperator(
+            $tableAlias.'.'.$filter->getField(),
+            $filterParametersHolder
+        );
+
+        if (!$tableAlias) {
+            $queryBuilder = $queryBuilder->innerJoin(
+                $queryBuilder->getTableAlias('leads'),
+                $filter->getTable(),
+                $tableAlias,
+                $expression
+            );
+        } else {
+            $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
+        }
+
+        $queryBuilder->setParametersPairs($parameters, $filterParameters);
+
+        return $queryBuilder;
+    }
 }

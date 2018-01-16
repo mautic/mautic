@@ -42,37 +42,6 @@ class LeadSegmentQueryBuilder
         $this->schema              = $this->entityManager->getConnection()->getSchemaManager();
     }
 
-    public function addLeadListRestrictions(QueryBuilder $queryBuilder, $whatever, $leadListId, $dictionary)
-    {
-        $filter_list_id = new LeadSegmentFilter([
-                                            'glue'     => 'and',
-                                            'field'    => 'leadlist_id',
-                                            'object'   => 'lead_lists_leads',
-                                            'type'     => 'number',
-                                            'filter'   => intval($leadListId),
-                                            'operator' => '=',
-                                            'func'     => 'eq',
-                                        ], $dictionary, $this->entityManager);
-
-        $filter_list_added = new LeadSegmentFilter([
-                                                    'glue'     => 'and',
-                                                    'field'    => 'date_added',
-                                                    'object'   => 'lead_lists_leads',
-                                                    'type'     => 'date',
-                                                    'filter'   => $whatever,
-                                                    'operator' => '=',
-                                                    'func'     => 'lte',
-                                                ], $dictionary, $this->entityManager);
-
-        $queryBuilder = $this->addForeignTableQueryWhere($queryBuilder, [$filter_list_id, $filter_list_added]);
-        // SELECT count(l.id) as lead_count, max(l.id) as max_id FROM leads l
-        // LEFT JOIN lead_lists_leads ll ON (ll.leadlist_id = 28) AND (ll.lead_id = l.id) AND (ll.date_added <= '2018-01-09 14:48:54')
-        // WHERE (l.propertytype = :MglShQLG) AND (ll.lead_id IS NULL)
-
-        return $queryBuilder;
-        die();
-    }
-
     public function getLeadsQueryBuilder($id, LeadSegmentFilters $leadSegmentFilters)
     {
         /** @var QueryBuilder $queryBuilder */

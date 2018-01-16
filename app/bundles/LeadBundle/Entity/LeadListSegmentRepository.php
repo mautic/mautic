@@ -84,9 +84,6 @@ class LeadListSegmentRepository
 
         $expr = $this->generateSegmentExpression($leadSegmentFilters, $q, $id);
 
-        echo 'SQL parameters:';
-        dump($q->getParameters());
-
         // Leads that do not have any record in the lead_lists_leads table for this lead list
         // For non null fields - it's apparently better to use left join over not exists due to not using nullable
         // fields - https://explainextended.com/2009/09/18/not-in-vs-not-exists-vs-left-join-is-null-mysql/

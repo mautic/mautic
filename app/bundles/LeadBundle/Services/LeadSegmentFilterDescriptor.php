@@ -48,6 +48,48 @@ class LeadSegmentFilterDescriptor extends \ArrayIterator
             'type'                => DncFilterQueryBuilder::getServiceId(),
         ];
 
+        $this->translations['globalcategory'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'lead_categories',
+            'field'               => 'category_id',
+        ];
+
+        $this->translations['tags'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'lead_tags_xref',
+            'field'               => 'tag_id',
+        ];
+
+        $this->translations['lead_email_sent'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'email_stats',
+            'field'               => 'email_id',
+        ];
+
+        $this->translations['device_type'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'lead_devices',
+            'field'               => 'device',
+        ];
+
+        $this->translations['device_brand'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'lead_devices',
+            'field'               => 'device_brand',
+        ];
+
+        $this->translations['device_os'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'lead_devices',
+            'field'               => 'device_os_name',
+        ];
+
+        $this->translations['device_model'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'lead_devices',
+            'field'               => 'device_model',
+        ];
+
         parent::__construct($this->translations);
     }
 }
