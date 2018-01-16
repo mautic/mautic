@@ -389,8 +389,6 @@ class LeadListRepository extends CommonRepository
 
                 if ($newOnly || !$nonMembersOnly) { // !$nonMembersOnly is mainly used for tests as we just want a live count
                     $expr = $this->generateSegmentExpression($filters, $parameters, $q, null, $id);
-                    dump($expr);
-                    dump($expr->count());
                     if (!$this->hasCompanyFilter && !$expr->count()) {
                         // Treat this as if it has no filters since all the filters are now invalid (fields were deleted)
                         $return[$id] = [];
@@ -511,7 +509,6 @@ class LeadListRepository extends CommonRepository
                 dump($q->getSQL());
                 dump($q->getParameters());
 
-                die();
                 $results = $q->execute()->fetchAll();
 
                 foreach ($results as $r) {

@@ -30,7 +30,6 @@ use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\LeadSegmentService;
-use Mautic\LeadBundle\Services\LeadSegmentQueryBuilder;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -791,6 +790,7 @@ class ListModel extends FormModel
 
         // Get a count of leads to add
         $newLeadsCount = $this->leadSegment->getNewLeadsByListCount($entity, $batchLimiters);
+        echo "<hr/>Petr's version result:";
         dump($newLeadsCount);
         // Get a count of leads to add
         $newLeadsCount = $this->getLeadsByList(
@@ -802,6 +802,7 @@ class ListModel extends FormModel
                 'batchLimiters' => $batchLimiters,
             ]
         );
+        echo '<hr/>Original result:';
         dump($newLeadsCount);
         exit;
         // Ensure the same list is used each batch

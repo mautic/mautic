@@ -1033,8 +1033,6 @@ class LeadListSegmentRepository
             $q->setParameter($k, $v, $paramType);
         }
 
-        var_dump($parameters);
-
         return $expr;
     }
 
