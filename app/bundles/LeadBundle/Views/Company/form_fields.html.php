@@ -127,28 +127,27 @@ foreach ($groups as $key => $group):
                             <?php endforeach; ?>
                         </div>
                     </div>                   
-                     <hr class="mnr-md mnl-md">
-                     <div class="form-group mb-0">
-                         <div class="row mb-xs">
-                             <div class="col-sm-<?php echo $fullSize; ?>">
-                                 <?php echo $view['form']->row($form['companyFiles']); ?>
-                             </div>
-                         </div>
-                     </div>
-                     <?php
-                     if (!empty($companyfiles)): ?>
-                     <div class="form-group mb-0">
-                         <div class="row mb-xs">
-                             <div class="col-sm-<?php echo $fullSize; ?>">
-                                <?php   foreach ($companyfiles as $file): ?>
-                                <a class="label label-primary" target="_new" href="/media/companies/<?php echo $file['path']; ?>"><?php echo $file['title']; ?></a>
-                                <a class="mr-5" href="<?php echo $view['router']->path(
-                                'mautic_company_file_delete',
-                                array_merge(['objectAction' => 'delete', 'objectId' => $file['id']], ['companyId' => 1])); ?>" data-toggle="confirmation" data-message="<?php echo $view['translator']->trans('mautic.company.form.confirmfiledelete'); ?>" data-confirm-text="<?php echo $view['translator']->trans('mautic.core.form.delete'); ?>" data-confirm-callback="executeAction" data-cancel-text="Cancel" data-cancel-callback="dismissConfirmation"><i class="fa fa-fw fa-close text-danger"></i></a>
-                                <?php endforeach; ?>
-                             </div>
-                         </div>
-                     </div>
+                    <hr class="mnr-md mnl-md">
+                    <div class="form-group mb-0">
+                        <div class="row mb-xs">
+                            <div class="col-sm-<?php echo $fullSize; ?>">
+                                <?php echo $view['form']->row($form['companyFiles']); ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php if (!empty($companyfiles)): ?>
+                        <?php foreach ($companyfiles as $file): ?>
+                            <div class="form-group mb-0">
+                                <div class="row mb-xs">
+                                    <div class="col-sm-<?php echo $fullSize; ?>">
+                                        <a class="label label-primary" target="_new" href="/media/companies/<?php echo $file['path']; ?>"><?php echo $file['title']; ?></a>
+                                        <a class="mr-5" href="<?php echo $view['router']->path(
+                                        'mautic_company_file_delete',
+                                        array_merge(['objectAction' => 'delete', 'objectId' => $file['id']], ['companyId' => 1])); ?>" data-toggle="confirmation" data-message="<?php echo $view['translator']->trans('mautic.company.form.confirmfiledelete'); ?>" data-confirm-text="<?php echo $view['translator']->trans('mautic.core.form.delete'); ?>" data-confirm-callback="executeAction" data-cancel-text="Cancel" data-cancel-callback="dismissConfirmation"><i class="fa fa-fw fa-close text-danger"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     <?php endif; ?>
                     <?php if (!empty($embedded)): ?>
                         <hr class="mnr-md mnl-md">
