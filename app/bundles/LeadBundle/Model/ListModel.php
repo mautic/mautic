@@ -776,6 +776,7 @@ class ListModel extends FormModel
         $id       = $entity->getId();
         $list     = ['id' => $id, 'filters' => $entity->getFilters()];
         $dtHelper = new DateTimeHelper();
+        $dtHelper = new DateTimeHelper('2017-10-01 00:00:00');
 
         $batchLimiters = [
             'dateTime' => $dtHelper->toUtcString(),
@@ -790,8 +791,12 @@ class ListModel extends FormModel
 
         // Get a count of leads to add
         $newLeadsCount = $this->leadSegment->getNewLeadsByListCount($entity, $batchLimiters);
-        echo "<hr/>Petr's version result:";
+
         dump($newLeadsCount);
+        echo '<hr/>Original result:';
+
+        $versionStart = microtime(true);
+
         // Get a count of leads to add
         $newLeadsCount = $this->getLeadsByList(
             $list,
@@ -802,7 +807,9 @@ class ListModel extends FormModel
                 'batchLimiters' => $batchLimiters,
             ]
         );
-        echo '<hr/>Original result:';
+        $versionEnd = microtime(true) - $versionStart;
+        dump('Total query assembly took:'.$versionEnd.'ms');
+
         dump($newLeadsCount);
         exit;
         // Ensure the same list is used each batch

@@ -124,7 +124,12 @@ class LeadListSegmentRepository
         // remove any possible group by
         $q->resetQueryPart('groupBy');
 
+        dump($q->getSQL());
+
+        $start   = microtime(true);
         $results = $q->execute()->fetchAll();
+        $end     = microtime(true) - $start;
+        dump('Query took '.$end.'ms');
 
         $leads = [];
         foreach ($results as $r) {

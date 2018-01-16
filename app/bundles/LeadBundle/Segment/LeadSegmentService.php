@@ -59,11 +59,13 @@ class LeadSegmentService
     {
         $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($entity);
 
+        echo '<hr/>New version result:';
+        $versionStart = microtime(true);
+
         /** @var QueryBuilder $qb */
         $qb = $this->queryBuilder->getLeadsQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
 
         $qb = $this->addNewLeadsRestrictions($qb, $entity->getId(), $batchLimiters);
-
 //        $qb->andWhere('l.sssss=1');
         dump($qb->getQueryParts());
         $sql = $qb->getSQL();
@@ -75,8 +77,17 @@ class LeadSegmentService
         echo '<hr/>';
         echo $sql;
         try {
+            $start = microtime(true);
+
             $stmt    = $qb->execute();
             $results = $stmt->fetchAll();
+
+            $end = microtime(true) - $start;
+            dump('Query took '.$end.'ms');
+
+            $versionEnd = microtime(true) - $versionStart;
+            dump('Total query assembly took:'.$versionEnd.'ms');
+
             dump($results);
             foreach ($results as $result) {
                 dump($result);
@@ -86,6 +97,13 @@ class LeadSegmentService
         }
         echo '<hr/>';
 
-        return $this->leadListSegmentRepository->getNewLeadsByListCount($entity->getId(), $segmentFilters, $batchLimiters);
+        echo "<hr/>Petr's version result:";
+        $versionStart = microtime(true);
+
+        $result     = $this->leadListSegmentRepository->getNewLeadsByListCount($entity->getId(), $segmentFilters, $batchLimiters);
+        $versionEnd = microtime(true) - $versionStart;
+        dump('Total query assembly took:'.$versionEnd.'ms');
+
+        return $result;
     }
 }

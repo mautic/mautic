@@ -509,7 +509,10 @@ class LeadListRepository extends CommonRepository
                 dump($q->getSQL());
                 dump($q->getParameters());
 
+                $start   = microtime(true);
                 $results = $q->execute()->fetchAll();
+                $end     = microtime(true) - $start;
+                dump('Query took '.$end.'ms');
 
                 foreach ($results as $r) {
                     if ($countOnly) {
