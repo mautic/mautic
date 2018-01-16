@@ -738,6 +738,10 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\SessionsFilterQueryBuilder::class,
                 'arguments' => [],
             ],
+            'mautic.lead.query.builder.special.leadlist' => [
+                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\LeadListFilterQueryBuilder::class,
+                'arguments' => [],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
