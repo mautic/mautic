@@ -481,8 +481,8 @@ class ReportController extends FormController
                     if ($report->isScheduled() && empty($report->getToAddress())) {
                         $context->buildViolation('mautic.report.schedule.to_address_required')->addViolation();
                     }
-                })
-            ]
+                }),
+            ],
         ]);
 
         ///Check for a submitted form and process it
