@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Services;
 
+use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\DncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignValueFilterQueryBuilder;
@@ -93,6 +94,12 @@ class LeadSegmentFilterDescriptor extends \ArrayIterator
             'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table'       => 'lead_devices',
             'field'               => 'device_model',
+        ];
+
+        $this->translations['stage'] = [
+            'type'                => BaseFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'leads',
+            'field'               => 'stage_id',
         ];
 
         parent::__construct($this->translations);

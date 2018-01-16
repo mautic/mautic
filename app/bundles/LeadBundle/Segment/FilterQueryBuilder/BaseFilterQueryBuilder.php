@@ -115,6 +115,13 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 );
                 $queryBuilder->setParameter($emptyParameter, '');
                 break;
+            case 'notEmpty':
+                $expression = $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()),
+                    $queryBuilder->expr()->neq($tableAlias.'.'.$filter->getField(), ':'.$emptyParameter = $this->generateRandomParameterName())
+                );
+                $queryBuilder->setParameter($emptyParameter, '');
+                break;
             case 'startsWith':
             case 'endsWith':
             case 'gt':

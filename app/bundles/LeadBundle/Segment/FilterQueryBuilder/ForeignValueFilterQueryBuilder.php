@@ -48,13 +48,27 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
             );
         }
 
-        $expression = $queryBuilder->expr()->$filterOperator(
-            $tableAlias.'.'.$filter->getField(),
-            $filterParametersHolder
-        );
-        $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
-
-        $queryBuilder->setParametersPairs($parameters, $filterParameters);
+        switch ($filterOperator) {
+            case 'empty':
+                $queryBuilder->addSelect($tableAlias.'.lead_id');
+                $expression = $queryBuilder->expr()->isNull(
+                    $tableAlias.'.lead_id');
+                $queryBuilder->andWhere($expression);
+                break;
+            case 'notEmpty':
+                $queryBuilder->addSelect($tableAlias.'.lead_id');
+                $expression = $queryBuilder->expr()->isNull(
+                    $tableAlias.'.lead_id');
+                $queryBuilder->andWhere($expression);
+                break;
+            default:
+                $expression = $queryBuilder->expr()->$filterOperator(
+                    $tableAlias.'.'.$filter->getField(),
+                    $filterParametersHolder
+                );
+                $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
+                $queryBuilder->setParametersPairs($parameters, $filterParameters);
+        }
 
         return $queryBuilder;
     }
