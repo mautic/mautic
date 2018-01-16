@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterOperator;
@@ -18,6 +19,8 @@ use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 
 class BaseDecorator implements FilterDecoratorInterface
 {
+    use RegexTrait;
+
     /**
      * @var LeadSegmentFilterOperator
      */
@@ -116,12 +119,16 @@ class BaseDecorator implements FilterDecoratorInterface
         switch ($this->getOperator($leadSegmentFilterCrate)) {
             case 'like':
             case 'notLike':
+                return strpos($filter, '%') === false ? '%'.$filter.'%' : $filter;
             case 'contains':
                 return '%'.$filter.'%';
             case 'startsWith':
                 return $filter.'%';
             case 'endsWith':
                 return '%'.$filter;
+            case 'regexp':
+            case 'notRegexp':
+                return $this->prepareRegex($filter);
         }
 
         return $filter;

@@ -124,10 +124,6 @@ class LeadListSegmentRepository
         // remove any possible group by
         $q->resetQueryPart('groupBy');
 
-        dump($q->getSQL());
-        echo 'SQL parameters:';
-        dump($q->getParameters());
-
         $results = $q->execute()->fetchAll();
 
         $leads = [];
@@ -208,9 +204,6 @@ class LeadListSegmentRepository
             $ignoreAutoFilter = false;
 
             $func = $leadSegmentFilter->getFunc();
-
-            dump($func);
-            dump($leadSegmentFilter->getField());
             // Generate a unique alias
             $alias = $this->generateRandomParameterName();
 
