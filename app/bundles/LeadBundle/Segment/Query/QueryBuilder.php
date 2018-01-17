@@ -21,6 +21,7 @@ namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
 /**
  * QueryBuilder class is responsible to dynamically create SQL queries.
@@ -60,6 +61,11 @@ class QueryBuilder
      * @var \Doctrine\DBAL\Connection
      */
     private $connection;
+
+    /**
+     * @var ExpressionBuilder
+     */
+    private $_expr;
 
     /**
      * @var array the array of SQL parts collected
@@ -156,11 +162,17 @@ class QueryBuilder
      * For more complex expression construction, consider storing the expression
      * builder object in a local variable.
      *
-     * @return \Doctrine\DBAL\Query\Expression\ExpressionBuilder
+     * @return ExpressionBuilder
      */
     public function expr()
     {
-        return $this->connection->getExpressionBuilder();
+        if (!is_null($this->_expr)) {
+            return $this->_expr;
+        }
+
+        $this->_expr = new ExpressionBuilder($this->connection);
+
+        return $this->_expr;
     }
 
     /**

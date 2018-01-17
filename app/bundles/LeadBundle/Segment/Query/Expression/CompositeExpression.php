@@ -17,7 +17,7 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace Doctrine\DBAL\Query\Expression;
+namespace Mautic\LeadBundle\Segment\Query\Expression;
 
 /**
  * Composite expression is responsible to build a group of similar expression.

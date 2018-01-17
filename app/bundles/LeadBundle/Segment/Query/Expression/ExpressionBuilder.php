@@ -17,7 +17,7 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace Doctrine\DBAL\Query\Expression;
+namespace Mautic\LeadBundle\Segment\Query\Expression;
 
 use Doctrine\DBAL\Connection;
 
@@ -32,12 +32,13 @@ use Doctrine\DBAL\Connection;
  */
 class ExpressionBuilder
 {
-    const EQ  = '=';
-    const NEQ = '<>';
-    const LT  = '<';
-    const LTE = '<=';
-    const GT  = '>';
-    const GTE = '>=';
+    const EQ     = '=';
+    const NEQ    = '<>';
+    const LT     = '<';
+    const LTE    = '<=';
+    const GT     = '>';
+    const GTE    = '>=';
+    const REGEXP = 'REGEXP';
 
     /**
      * The DBAL Connection.
@@ -106,6 +107,46 @@ class ExpressionBuilder
     public function comparison($x, $operator, $y)
     {
         return $x.' '.$operator.' '.$y;
+    }
+
+    /**
+     * Creates an equality comparison expression with the given arguments.
+     *
+     * First argument is considered the left expression and the second is the right expression.
+     * When converted to string, it will generated a <left expr> = <right expr>. Example:
+     *
+     *     [php]
+     *     // u.id = ?
+     *     $expr->eq('u.id', '?');
+     *
+     * @param mixed $x the left expression
+     * @param mixed $y the right expression
+     *
+     * @return string
+     */
+    public function regexp($x, $y)
+    {
+        return $this->comparison($x, self::REGEXP, $y);
+    }
+
+    /**
+     * Creates an equality comparison expression with the given arguments.
+     *
+     * First argument is considered the left expression and the second is the right expression.
+     * When converted to string, it will generated a <left expr> = <right expr>. Example:
+     *
+     *     [php]
+     *     // u.id = ?
+     *     $expr->eq('u.id', '?');
+     *
+     * @param mixed $x the left expression
+     * @param mixed $y the right expression
+     *
+     * @return string
+     */
+    public function notRegexp($x, $y)
+    {
+        return $this->comparison($x, self::REGEXP, $y);
     }
 
     /**
