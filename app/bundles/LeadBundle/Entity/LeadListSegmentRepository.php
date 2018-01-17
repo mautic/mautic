@@ -129,7 +129,7 @@ class LeadListSegmentRepository
         $start   = microtime(true);
         $results = $q->execute()->fetchAll();
         $end     = microtime(true) - $start;
-        dump('Query took '.$end.'ms');
+        dump('Query took '.(1000 * $end).'ms');
 
         $leads = [];
         foreach ($results as $r) {

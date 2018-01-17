@@ -808,7 +808,7 @@ class ListModel extends FormModel
             ]
         );
         $versionEnd = microtime(true) - $versionStart;
-        dump('Total query assembly took:'.$versionEnd.'ms');
+        dump('Total query assembly took:'.(1000 * $versionEnd).'ms');
 
         dump(array_shift($newLeadsCount));
         exit;

@@ -63,12 +63,12 @@ class LeadSegmentService
         $versionStart = microtime(true);
 
         /** @var QueryBuilder $qb */
-        $qb = $this->queryBuilder->getLeadsQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
+        $qb = $this->queryBuilder->getLeadsSegmentQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
+        $qb = $this->queryBuilder->addNewLeadsRestrictions($qb, $entity->getId(), $batchLimiters);
+        $qb = $this->queryBuilder->wrapInCount($qb);
 
-        $qb = $this->addNewLeadsRestrictions($qb, $entity->getId(), $batchLimiters);
-        dump($qb->getQueryParts());
+        //  Debug output
         $sql = $qb->getSQL();
-
         foreach ($qb->getParameters() as $k=>$v) {
             $sql = str_replace(":$k", "'$v'", $sql);
         }
@@ -82,26 +82,19 @@ class LeadSegmentService
             $results = $stmt->fetchAll();
 
             $end = microtime(true) - $start;
-            dump('Query took '.$end.'ms');
+            dump('Query took '.(1000 * $end).'ms');
+
+            $start = microtime(true);
+
+            $result = $qb->execute()->fetch();
 
             $versionEnd = microtime(true) - $versionStart;
-            dump('Total query assembly took:'.$versionEnd.'ms');
+            dump('Total query assembly took:'.(1000 * $versionEnd).'ms');
 
-            dump($results);
-            foreach ($results as $result) {
-                dump($result);
-            }
+            dump($result);
         } catch (\Exception $e) {
             dump('Query exception: '.$e->getMessage());
         }
-        echo '<hr/>';
-
-        echo "<hr/>Petr's version result:";
-        $versionStart = microtime(true);
-
-        $result     = $this->leadListSegmentRepository->getNewLeadsByListCount($entity->getId(), $segmentFilters, $batchLimiters);
-        $versionEnd = microtime(true) - $versionStart;
-        dump('Total query assembly took:'.$versionEnd.'ms');
 
         return $result;
     }

@@ -1396,8 +1396,8 @@ class QueryBuilder
     {
         $result = $parts = $this->getQueryPart('join');
 
-        foreach ($parts as $tbl=>$joins) {
-            foreach ($joins as $key=>$join) {
+        foreach ($parts as $tbl => $joins) {
+            foreach ($joins as $key => $join) {
                 if ($join['joinAlias'] == $alias) {
                     $result[$tbl][$key]['joinCondition'] = $join['joinCondition'].' and '.$expr;
                 }
@@ -1449,6 +1449,12 @@ class QueryBuilder
         return $this;
     }
 
+    /**
+     * @param string $table
+     * @param null   $joinType allowed values: inner, left, right
+     *
+     * @return array|bool|string
+     */
     public function getTableAlias($table, $joinType = null)
     {
         if (is_null($joinType)) {
@@ -1474,6 +1480,11 @@ class QueryBuilder
         return !count($result) ? false : count($result) == 1 ? array_shift($result) : $result;
     }
 
+    /**
+     * @param $tableName
+     *
+     * @return bool
+     */
     public function getTableJoins($tableName)
     {
         foreach ($this->getQueryParts()['join'] as $join) {
@@ -1487,6 +1498,11 @@ class QueryBuilder
         return false;
     }
 
+    /**
+     * Return aliases of all currently registered tables.
+     *
+     * @return array
+     */
     public function getTableAliases()
     {
         $queryParts = $this->getQueryParts();
