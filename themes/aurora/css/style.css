@@ -300,6 +300,7 @@ footer {
 
 footer .container {
   padding: 2rem 0;
+  background: transparent;
 }
 
 section {
@@ -1322,7 +1323,7 @@ body .facetwp-btn {
 .testimonials .testimonial-quote {
   background: #ffffff;
   color: #3f3f45;
-  padding: 0 0 1.5rem 0;
+  padding: 0 0 2rem 0;
   margin: 0 0 3rem 0;
   border-bottom: 1px solid #d5d5d5;
 }
