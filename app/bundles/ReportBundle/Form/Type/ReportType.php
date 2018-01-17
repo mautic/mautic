@@ -31,6 +31,8 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Class ReportType.
@@ -438,6 +440,16 @@ class ReportType extends AbstractType
             [
                 'data_class' => Report::class,
                 'table_list' => [],
+                'constraints' => [
+                    new Callback(function ($validateMe, ExecutionContextInterface $context) {
+                        /** @var Report $report */
+                        $report = $context->getValue();
+
+                        if ($report->isScheduled() && empty($report->getToAddress())) {
+                            $context->buildViolation('mautic.report.schedule.to_address_required')->addViolation();
+                        }
+                    }),
+                ]
             ]
         );
     }
