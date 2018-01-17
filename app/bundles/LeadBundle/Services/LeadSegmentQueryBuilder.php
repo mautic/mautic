@@ -63,7 +63,7 @@ class LeadSegmentQueryBuilder
 
     public function addNewLeadsRestrictions(QueryBuilder $queryBuilder, $leadListId, $whatever)
     {
-        $queryBuilder->select('max(l.id) maxId, count(distinct l.id) as leadCount');
+        $queryBuilder->select('l.id');
 
         $parts     = $queryBuilder->getQueryParts();
         $setHaving =  (count($parts['groupBy']) || !is_null($parts['having']));

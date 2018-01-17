@@ -759,6 +759,44 @@ class ListModel extends FormModel
         return $lists;
     }
 
+    public function getVersionNew(LeadList $entity)
+    {
+        $id       = $entity->getId();
+        $list     = ['id' => $id, 'filters' => $entity->getFilters()];
+        $dtHelper = new DateTimeHelper('2017-10-01 00:00:00');
+
+        $batchLimiters = [
+            'dateTime' => $dtHelper->toUtcString(),
+        ];
+
+        return $this->leadSegment->getNewLeadsByListCount($entity, $batchLimiters);
+    }
+
+    public function getVersionOld(LeadList $entity)
+    {
+        $id       = $entity->getId();
+        $list     = ['id' => $id, 'filters' => $entity->getFilters()];
+        $dtHelper = new DateTimeHelper('2017-10-01 00:00:00');
+
+        $batchLimiters = [
+            'dateTime' => $dtHelper->toUtcString(),
+        ];
+
+        $newLeadsCount = $this->getLeadsByList(
+            $list,
+            true,
+            [
+                'countOnly'     => true,
+                'newOnly'       => true,
+                'batchLimiters' => $batchLimiters,
+            ]
+        );
+
+        $return = array_shift($newLeadsCount);
+
+        return $return;
+    }
+
     /**
      * Rebuild lead lists.
      *

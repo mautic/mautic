@@ -24,6 +24,9 @@ class LeadListFilterQueryBuilder implements FilterQueryBuilderInterface
 
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
+        dump('This is definitely an @todo!!!!');
+
+        return $queryBuilder;
         dump('lead list');
         die();
         $parts   = explode('_', $filter->getCrate('field'));

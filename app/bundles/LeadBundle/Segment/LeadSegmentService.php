@@ -62,6 +62,9 @@ class LeadSegmentService
         echo '<hr/>New version result:';
         $versionStart = microtime(true);
 
+        if (!count($segmentFilters)) {
+            return [0];
+        }
         /** @var QueryBuilder $qb */
         $qb = $this->queryBuilder->getLeadsSegmentQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
         $qb = $this->queryBuilder->addNewLeadsRestrictions($qb, $entity->getId(), $batchLimiters);

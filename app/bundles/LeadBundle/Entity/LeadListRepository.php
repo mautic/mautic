@@ -506,6 +506,7 @@ class LeadListRepository extends CommonRepository
                     // remove any possible group by
                     $q->resetQueryPart('groupBy');
                 }
+
                 dump($q->getSQL());
 
                 $start   = microtime(true);
