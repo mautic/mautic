@@ -76,7 +76,7 @@ class Version20160420000000 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $mainTableSql = <<<SQL
-CREATE TABLE `{$this->prefix}sms_messages` (
+CREATE TABLE IF NOT EXISTS `{$this->prefix}sms_messages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `category_id` int(11) DEFAULT NULL,
   `is_published` tinyint(1) NOT NULL,
@@ -106,7 +106,7 @@ SQL;
         $this->addSql($mainTableSql);
 
         $statsSql = <<<SQL
-CREATE TABLE `{$this->prefix}sms_message_stats` (
+CREATE TABLE IF NOT EXISTS `{$this->prefix}sms_message_stats` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sms_id` int(11) DEFAULT NULL,
   `lead_id` int(11) DEFAULT NULL,
@@ -134,7 +134,7 @@ SQL;
         $this->addSql($statsSql);
 
         $listXrefSql = <<<SQL
-CREATE TABLE `{$this->prefix}sms_message_list_xref` (
+CREATE TABLE IF NOT EXISTS `{$this->prefix}sms_message_list_xref` (
   `sms_id` int(11) NOT NULL,
   `leadlist_id` int(11) NOT NULL,
   PRIMARY KEY (`sms_id`,`leadlist_id`),

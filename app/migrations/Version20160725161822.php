@@ -35,7 +35,7 @@ class Version20160725161822 extends AbstractMauticMigration
         $ipFK    = $this->generatePropertyName('video_hits', 'fk', ['ip_id']);
 
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}video_hits (
+CREATE TABLE IF NOT EXISTS {$this->prefix}video_hits (
 	id INT AUTO_INCREMENT NOT NULL,
 	lead_id INT DEFAULT NULL,
 	ip_id INT NOT NULL,
