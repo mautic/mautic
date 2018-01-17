@@ -17,8 +17,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Symfony\Component\HttpFoundation;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Class ReportController.
@@ -472,18 +470,7 @@ class ReportController extends FormController
         $page    = $session->get('mautic.report.page', 1);
 
         $action = $this->generateUrl('mautic_report_action', ['objectAction' => 'new']);
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, [
-            'constraints' => [
-                new Callback(function ($validateMe, ExecutionContextInterface $context) {
-                    /** @var Report $report */
-                    $report = $context->getValue();
-
-                    if ($report->isScheduled() && empty($report->getToAddress())) {
-                        $context->buildViolation('mautic.report.schedule.to_address_required')->addViolation();
-                    }
-                }),
-            ],
-        ]);
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
