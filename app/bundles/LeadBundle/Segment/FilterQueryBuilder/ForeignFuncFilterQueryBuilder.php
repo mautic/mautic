@@ -58,17 +58,12 @@ class ForeignFuncFilterQueryBuilder implements FilterQueryBuilderInterface
             $tableAlias = false;
         }
 
-        //        dump($filter->getTable()); if ($filter->getTable()=='companies') {
-        //            dump('companies');
-        //    }
-
         if (!$tableAlias) {
             $tableAlias = $this->generateRandomParameterName();
 
             switch ($filterOperator) {
                 case 'notLike':
                 case 'notIn':
-                case 'empty':
                 case 'startsWith':
                 case 'gt':
                 case 'eq':

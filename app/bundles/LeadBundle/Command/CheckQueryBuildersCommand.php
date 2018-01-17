@@ -79,12 +79,12 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         $output->writeln('<info>old:</info>');
         $timer1    = microtime(true);
         $processed = $listModel->getVersionOld($l);
-        $timer1    = round((microtime(true) - $timer1) * 1000);
+        $timer1    = round((microtime(true) - $timer1) * 1000, 3);
 
         $output->writeln('<info>new:</info>');
         $timer2     = microtime(true);
         $processed2 = $listModel->getVersionNew($l);
-        $timer2     = round((microtime(true) - $timer2) * 1000);
+        $timer2     = round((microtime(true) - $timer2) * 1000, 3);
 
         $output->writeln('');
 

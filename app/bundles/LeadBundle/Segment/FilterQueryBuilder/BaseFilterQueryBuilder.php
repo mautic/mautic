@@ -78,6 +78,8 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 case 'lt':
                 case 'lte':
                 case 'in':
+                case 'regexp':
+                case 'notRegexp':
                     //@todo this logic needs to
                     if ($filterAggr) {
                         $queryBuilder->leftJoin(
@@ -127,6 +129,8 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             case 'lte':
             case 'notIn':
             case 'in':
+            case 'regexp':
+            case 'notRegexp':
                 if ($filterAggr) {
                     $expression = $queryBuilder->expr()->$filterOperator(
                         sprintf('%s(%s)', $filterAggr, $tableAlias.'.'.$filter->getField()),
