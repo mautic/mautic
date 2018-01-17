@@ -1,0 +1,174 @@
+{% extends ":"~template~":base.html.twig" %}
+{% block content %}
+<header data-section-wrapper="1" id="top">
+  <div data-section="1">
+    <div data-slot-container="1">
+      <div data-slot="text">
+        <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_white.svg')}}">
+      </div>
+    </div>
+  </div>
+</header>
+<section data-section-wrapper="1" class="hero">
+  <div data-section="1">
+    <div class="background">
+      <div data-slot-container="1">
+        <div data-slot="text">
+          <img class="background-image" src="{{getAssetUrl('themes/'~template~'/assets/photo_hero-background.jpg')}}">
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="c6 s3 form-container" data-slot-container="1">
+        <div data-slot="text">
+          <h1 class="txtCenter">H1 Header</h1>
+        </div>
+        <div class="form white">
+          <div data-slot="text">
+            <h2>H2 CTA</h2>
+            <img src="{{getAssetUrl('themes/'~template~'/assets/img_form-demo.jpg')}}">
+            <!-- PLACE FORM HERE -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="customers">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <h3>H3 Customers</h3>
+      </div>
+      <div class="logos">
+        <div class="logo-container" data-slot="text">
+          <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-i.svg')}}">
+        </div>
+        <div class="logo-container" data-slot="text">
+          <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-ii.svg')}}">
+        </div>
+        <div class="logo-container" data-slot="text">
+          <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-iii.svg')}}">
+        </div>
+        <div class="logo-container" data-slot="text">
+          <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-iv.svg')}}">
+        </div>
+        <div class="logo-container" data-slot="text">
+          <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-v.svg')}}">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="details">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <h2>H2 Details</h2>
+      </div>
+      <div class="details-wrapper" data-slot="text">
+        <p class="c3 detail"><strong>What:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus aliquam.</p>
+        <p class="c3 detail"><strong>When:</strong> March 1st, 2018 @ 8pm EST - Proin vel libero nisl. Pellentesque vel felis.</p>
+        <p class="c3 detail"><strong>Where:</strong> Liberty Hotel, Boston - Aliquam erat volutpat. Etiam vitae malesuada orci.</p>
+        <p class="c3 detail"><strong>Wear:</strong> Corporate casual - dressing in shorts and a t-shirt or a sundress and sandals is too casual.</p>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="speakers">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <h2>H2 Speakers</h2>
+      </div>
+      <div class="speakers-container">
+        <div class="speaker" data-slot="text">
+          <div class="speaker-image">
+            <img src="{{getAssetUrl('themes/'~template~'/assets/photo_sza.jpg')}}">
+          </div>
+          <div class="speaker-details">
+            <h3>H3 Name</h3>
+            <p>Details about speaker</p>
+            <p>More details about speaker</p>
+          </div>
+        </div>
+        <div class="speaker" data-slot="text">
+          <div class="speaker-image">
+            <img src="{{getAssetUrl('themes/'~template~'/assets/photo_eno.jpg')}}">
+          </div>
+          <div class="speaker-details">
+            <h3>H3 Name</h3>
+            <p>Details about speaker</p>
+            <p>More details about speaker</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="background-wrapper">
+  <section data-section-wrapper="1" class="about">
+    <div data-section="1">
+      <div class="container" data-slot-container="1">
+        <div data-slot="text">
+          <h2>H2 About Company</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section data-section-wrapper="1" class="testimonials">
+    <div data-slot="text">
+      <div class="container">
+        <div class="testimonials-container" data-slot-container="1">
+          <div class="testimonial" data-slot="text">
+            <div class="c12 testimonial-quote">
+              <h2>H2 Testimonial</h2>
+              <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
+            </div>
+            <div class="testimonial-details">
+              <div class="speaker-image">
+                  <img src="{{getAssetUrl('themes/'~template~'/assets/photo_mars.jpg')}}">
+              </div>
+              <div class="c7 speaker-details">
+                <h3>H3 Name</h3>
+                <p>Details about speaker</p>
+                <p>More details about speaker</p>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial" data-slot="text">
+            <div class="c12 testimonial-quote">
+              <h2>H2 Testimonial</h2>
+              <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
+            </div>
+            <div class="testimonial-details">
+              <div class="speaker-image">
+                  <img src="{{getAssetUrl('themes/'~template~'/assets/photo_li.jpg')}}">
+              </div>
+              <div class="c7 speaker-details">
+                <h3>H3 Name</h3>
+                <p>Details about speaker</p>
+                <p>More details about speaker</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<footer data-section-wrapper="1" id="bottom">
+  <div data-section="1">
+    <div class="container">
+      <div data-slot-container="1">
+        <div data-slot="text">
+          <p>© 2018 All Rights Reserved. Mautic, Inc.</p>
+          <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_black.svg')}}">
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+{% endblock %}
