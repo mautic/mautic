@@ -28,7 +28,7 @@ class FocusController extends FormController
             'mautic_focus',
             'mautic.focus',
             'MauticFocusBundle:Focus',
-            null,
+            '#mautic_focus_index',
             'focus'
         );
     }
