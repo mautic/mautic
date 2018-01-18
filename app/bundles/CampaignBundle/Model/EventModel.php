@@ -932,7 +932,7 @@ class EventModel extends CommonFormModel
                         false,
                         null,
                         true,
-                        $log['id'],
+                        false,
                         $evaluatedEventCount,
                         $executedEventCount,
                         $totalEventCount
