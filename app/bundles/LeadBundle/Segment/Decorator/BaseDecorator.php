@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterOperator;
-use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 
 class BaseDecorator implements FilterDecoratorInterface
 {
@@ -24,45 +23,26 @@ class BaseDecorator implements FilterDecoratorInterface
     /**
      * @var LeadSegmentFilterOperator
      */
-    private $leadSegmentFilterOperator;
-
-    /**
-     * @var LeadSegmentFilterDescriptor
-     */
-    private $leadSegmentFilterDescriptor;
+    protected $leadSegmentFilterOperator;
 
     public function __construct(
-        LeadSegmentFilterOperator $leadSegmentFilterOperator,
-        LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor
+        LeadSegmentFilterOperator $leadSegmentFilterOperator
     ) {
         $this->leadSegmentFilterOperator   = $leadSegmentFilterOperator;
-        $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
     }
 
     public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        $originalField = $leadSegmentFilterCrate->getField();
-
-        if (empty($this->leadSegmentFilterDescriptor[$originalField]['field'])) {
-            return $originalField;
-        }
-
-        return $this->leadSegmentFilterDescriptor[$originalField]['field'];
+        return $leadSegmentFilterCrate->getField();
     }
 
     public function getTable(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        $originalField = $leadSegmentFilterCrate->getField();
-
-        if (empty($this->leadSegmentFilterDescriptor[$originalField]['foreign_table'])) {
-            if ($leadSegmentFilterCrate->isLeadType()) {
-                return 'leads';
-            }
-
-            return 'companies';
+        if ($leadSegmentFilterCrate->isLeadType()) {
+            return 'leads';
         }
 
-        return $this->leadSegmentFilterDescriptor[$originalField]['foreign_table'];
+        return 'companies';
     }
 
     public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)
@@ -82,13 +62,7 @@ class BaseDecorator implements FilterDecoratorInterface
 
     public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        $originalField = $leadSegmentFilterCrate->getField();
-
-        if (!isset($this->leadSegmentFilterDescriptor[$originalField]['type'])) {
-            return BaseFilterQueryBuilder::getServiceId();
-        }
-
-        return $this->leadSegmentFilterDescriptor[$originalField]['type'];
+        return BaseFilterQueryBuilder::getServiceId();
     }
 
     public function getParameterHolder(LeadSegmentFilterCrate $leadSegmentFilterCrate, $argument)
@@ -136,9 +110,6 @@ class BaseDecorator implements FilterDecoratorInterface
 
     public function getAggregateFunc(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        $originalField = $leadSegmentFilterCrate->getField();
-
-        return isset($this->leadSegmentFilterDescriptor[$originalField]['func']) ?
-            $this->leadSegmentFilterDescriptor[$originalField]['func'] : false;
+        return false;
     }
 }

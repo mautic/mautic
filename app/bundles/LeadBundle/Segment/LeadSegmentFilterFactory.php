@@ -14,8 +14,10 @@ namespace Mautic\LeadBundle\Segment;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
+use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
+use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 use Symfony\Component\DependencyInjection\Container;
 
 class LeadSegmentFilterFactory
@@ -31,25 +33,39 @@ class LeadSegmentFilterFactory
     private $entityManager;
 
     /**
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * @var LeadSegmentFilterDescriptor
+     */
+    private $leadSegmentFilterDescriptor;
+
+    /**
      * @var BaseDecorator
      */
     private $baseDecorator;
 
     /**
-     * @var Container
+     * @var CustomMappedDecorator
      */
-    private $container;
+    private $customMappedDecorator;
 
     public function __construct(
         LeadSegmentFilterDate $leadSegmentFilterDate,
         EntityManager $entityManager,
+        Container $container,
+        LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor,
         BaseDecorator $baseDecorator,
-        Container $container
+        CustomMappedDecorator $customMappedDecorator
     ) {
-        $this->leadSegmentFilterDate = $leadSegmentFilterDate;
-        $this->entityManager         = $entityManager;
-        $this->baseDecorator         = $baseDecorator;
-        $this->container             = $container;
+        $this->leadSegmentFilterDate       = $leadSegmentFilterDate;
+        $this->entityManager               = $entityManager;
+        $this->container                   = $container;
+        $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
+        $this->baseDecorator               = $baseDecorator;
+        $this->customMappedDecorator       = $customMappedDecorator;
     }
 
     /**
@@ -98,6 +114,12 @@ class LeadSegmentFilterFactory
      */
     protected function getDecoratorForFilter(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return $this->baseDecorator;
+        $originalField = $leadSegmentFilterCrate->getField();
+
+        if (empty($this->leadSegmentFilterDescriptor[$originalField])) {
+            return $this->baseDecorator;
+        }
+
+        return $this->customMappedDecorator;
     }
 }

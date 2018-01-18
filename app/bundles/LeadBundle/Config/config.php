@@ -808,8 +808,10 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_date',
                     'doctrine.orm.entity_manager',
-                    'mautic.lead.model.lead_segment_decorator_base',
                     '@service_container',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                    'mautic.lead.model.lead_segment_decorator_base',
+                    'mautic.lead.model.lead_segment_decorator_custom_mapped',
                 ],
             ],
             'mautic.lead.model.relative_date' => [
@@ -834,6 +836,13 @@ return [
             ],
             'mautic.lead.model.lead_segment_decorator_base' => [
                 'class'     => \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_custom_mapped' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_operator',
                     'mautic.lead.repository.lead_segment_filter_descriptor',
