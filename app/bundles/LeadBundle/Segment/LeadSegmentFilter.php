@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -29,7 +28,7 @@ class LeadSegmentFilter
     public $leadSegmentFilterCrate;
 
     /**
-     * @var FilterDecoratorInterface|BaseDecorator
+     * @var FilterDecoratorInterface
      */
     private $filterDecorator;
 

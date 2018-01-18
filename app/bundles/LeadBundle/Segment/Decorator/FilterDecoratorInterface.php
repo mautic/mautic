@@ -24,4 +24,8 @@ interface FilterDecoratorInterface
     public function getParameterHolder(LeadSegmentFilterCrate $leadSegmentFilterCrate, $argument);
 
     public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+
+    public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+
+    public function getAggregateFunc(LeadSegmentFilterCrate $leadSegmentFilterCrate);
 }
