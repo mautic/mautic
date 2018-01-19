@@ -678,7 +678,7 @@ class ReportSubscriber extends CommonSubscriber
         $data = [
             'display_name' => 'mautic.lead.report.points.table',
             'columns'      => array_merge($columns, $pointColumns, $event->getIpColumn()),
-            'filters'      => $filters,
+            'filters'      => array_merge($filters, $pointColumns),
         ];
         $event->addTable(self::CONTEXT_LEAD_POINT_LOG, $data, self::GROUP_CONTACTS);
 
@@ -733,7 +733,7 @@ class ReportSubscriber extends CommonSubscriber
         $data = [
             'display_name' => 'mautic.lead.report.frequency.messages',
             'columns'      => array_merge($columns, $frequencyColumns),
-            'filters'      => $filters,
+            'filters'      => array_merge($filters, $frequencyColumns),
         ];
         $event->addTable(self::CONTEXT_CONTACT_FREQUENCYRULES, $data, self::GROUP_CONTACTS);
     }
