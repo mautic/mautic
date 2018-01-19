@@ -19,7 +19,7 @@ class Version20170829081048 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->hasTable(MAUTIC_TABLE_PREFIX.'email_stat_replies ')) {
+        if ($schema->hasTable(MAUTIC_TABLE_PREFIX.'email_stat_replies')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
