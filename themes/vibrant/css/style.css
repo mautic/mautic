@@ -110,7 +110,7 @@ div[data-section-focus] {
   z-index: 2;
 }
 
-div[data-slot] {
+div[data-slot], div[data-slot-container] {
   float: left;
   width: 100%;
 }
@@ -181,7 +181,7 @@ div[data-slot] {
   position: relative;
   letter-spacing: .02rem;
   cursor: pointer;
-  margin: 0 .5rem;
+  margin: 0 .5rem 0 0;
   overflow: hidden;
   border: 1px solid #ffffff;
   -webkit-box-shadow: -2px 2px 2px 0 rgba(0,0,0,.2);
@@ -307,6 +307,8 @@ section {
   width: 100%;
   padding: 0;
   overflow: hidden;
+  z-index: 1;
+  position: relative;
 }
 .container {
   width: 100%;
@@ -321,6 +323,12 @@ section {
 
 .fixed-form {
   z-index: 3 !important;
+  position: fixed;
+}
+
+.fixed-form div[data-section], .fixed-form div[data-section-wrapper]{
+  width: 100%;
+  height: 100%;
 }
 
 @media (max-width: 73rem) {
@@ -332,7 +340,7 @@ section {
 /* Hero Style */
 
 .hero {
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   background: #2c3e50;
   color: #ffffff;
@@ -343,14 +351,15 @@ section {
 }
 
 .hero .background {
-  position: absolute;
+  position: relative;
   width: 100%;
-  height: 100%;
+  height: 0;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  min-height: 10rem;
+  overflow: visible;
+  z-index: 0;
 }
 
 .hero .background div[data-slot-container], .hero .background div[data-slot] {
@@ -383,6 +392,9 @@ section {
 
 .hero .container {
   padding: 6.5rem 0 0 0;
+  background: transparent;
+  z-index: 2;
+  position: relative;
 }
 
 .hero-details {
@@ -972,7 +984,24 @@ body .facetwp-btn {
 }
 
 /* Customer section */
+
+.overflow-hide {
+  float: left;
+  width: 100%;
+  overflow: hidden;
+}
+
 .customers {
+  background: #2c3e50;
+  z-index: inherit;
+}
+.customers h3 {
+  color: #ffffff;
+}
+.customers .container {
+  padding: 0;
+}
+.customers-container {
   float: left;
   width: 100%;
   color: #212121;
@@ -985,15 +1014,12 @@ body .facetwp-btn {
   border-top-right-radius: 0.25rem;
 }
 @media (max-width:73rem) { 
-  .customers {
+  .customers-container {
     border-radius: 0.25rem;
   }
 }
-.customers .container {
-  padding: 3.5rem 0;
-}
 
-.customers .logo-container {
+.customers .logo-container, .customers .logos div[data-slot] {
     display: inline-block;
     padding: 0 1.5rem 1.5rem 0;
     line-height: 3rem;
@@ -1008,17 +1034,14 @@ body .facetwp-btn {
     -webkit-box-pack: center;
     -webkit-justify-content: left;
     justify-content: left;
+    width: auto;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 33%;
 }
 
-.customers .logo-container {
-  width: auto;
-  flex: 1;
-  flex-grow: 0;
-  flex-shrink: 0;
-  flex-basis: 33%;
-}
 @media (max-width:73rem) { 
-  .customers .logo-container {
+  .customers .logo-container, .customers .logos div[data-slot] {
     flex-basis: auto;
     flex-grow: 1;
   }
@@ -1159,6 +1182,11 @@ section.details .detail {
 .about {
   background: #2c3e50;
   color: #ffffff;
+}
+
+.about div[data-slot-container] {
+  float: left;
+  width: 100%;
 }
 
 /* Testimonials section */

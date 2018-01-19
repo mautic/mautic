@@ -50,18 +50,18 @@ img{max-width:100%;height:auto;display:block;}
 .w320{max-width:31rem}
 .w640{max-width:640px}
 .w960{max-width:73rem}
-.c1{width:8.33%}
-.c2{width:16.66%}
-.c3{width:25%}
-.c4{width:33.33%}
-.c5{width:41.66%}
-.c6{width:50%}
-.c7{width:58.33%}
-.c8{width:66.66%}
-.c9{width:75%}
-.c10{width:83.33%}
-.c11{width:91.66%}
-.c12{width:100%}
+.c1, .c1[data-slot]{width:8.33%}
+.c2, .c2[data-slot]{width:16.66%}
+.c3, .c3[data-slot]{width:25%}
+.c4, .c4[data-slot]{width:33.33%}
+.c5, .c5[data-slot]{width:41.66%}
+.c6, .c6[data-slot]{width:50%}
+.c7, .c7[data-slot]{width:58.33%}
+.c8, .c8[data-slot]{width:66.66%}
+.c9, .c9[data-slot]{width:75%}
+.c10, .c10[data-slot]{width:83.33%}
+.c11, .c11[data-slot]{width:91.66%}
+.c12, .c12[data-slot]{width:100%}
 .c1,.c2,.c3,.c4,.c5,.c6,.c7,.c8,.c9,.c10,.c11,.c12{min-height:1px;float:left;position:relative}
 .s1{margin-left:8.33%}
 .s2{margin-left:16.66%}
@@ -91,7 +91,7 @@ img{max-width:100%;height:auto;display:block;}
 @media handheld, only screen and (max-width: 48rem), only screen and (max-device-width: 48rem) and (orientation:portrait){
 body{font-size:90%}
 .container{margin-bottom:0!important; padding: 2rem 1.5rem !important;}
-.c1,.c2,.c3,.c4,.c5,.c6,.c7,.c8,.c9,.c10,.c11,.c12{width:100%;margin-right:0;margin-left:0;margin-bottom:1rem}
+.c1 , .c1[data-slot],.c2, .c2[data-slot],.c3, .c3[data-slot],.c4, .c4[data-slot],.c5, .c5[data-slot],.c6, .c6[data-slot],.c7, .c7[data-slot],.c8, .c8[data-slot],.c9, .c9[data-slot],.c10, .c10[data-slot],.c11, .c11[data-slot],.c12, .c12[data-slot]{width:100%;margin-right:0;margin-left:0;margin-bottom:1rem}
 }
 
 /* Additional helpers */
@@ -183,7 +183,7 @@ div[data-slot] {
   position: relative;
   letter-spacing: .02rem;
   cursor: pointer;
-  margin: 0 .5rem;
+  margin: 0 .5rem 0 0;
   overflow: hidden;
   border: 1px solid #ffffff;
   -webkit-box-shadow: -2px 2px 2px 0 rgba(0,0,0,.2);
@@ -259,26 +259,26 @@ br {
 header {
   position: fixed;
   text-align: left;
-  z-index: 2;
+  z-index: 3;
   background: rgba(0,0,0,0.33);
   top: 0;
   left: 0;
   right: 0;
   width: 100%;
-  height: 3.5rem;
+  height: 4rem;
   padding: 0.75rem 0;
   -webkit-transition: all 0.2s cubic-bezier(.19, 1, .22, 1);
   transition: all 0.2s cubic-bezier(.19, 1, .22, 1);
   opacity: 0;
 }
 header .logo {
-  height: 2rem;
+  width: 8rem;
   display: inline-block;
   -webkit-transition: all 0.2s cubic-bezier(.19, 1, .22, 1);
   transition: all 0.2s cubic-bezier(.19, 1, .22, 1);
 }
 header .container {
-  padding: 0;
+  padding: 0.25rem 3.25rem;
 }
 @media (max-width:73rem) {
   header .container {
@@ -311,6 +311,11 @@ footer {
   text-align: center;
 }
 
+footer div[data-slot-container] {
+  float: left;
+  width: 100%;
+}
+
 footer .container {
   padding: 2rem 0;
 }
@@ -325,9 +330,9 @@ section {
 }
 .container {
   width: 100%;
-  max-width: 73rem;
+  max-width: 77rem;
   margin: 0 auto;
-  padding: 6rem 0;
+  padding: 6rem 2rem;
 }
 
 .container h3 {
@@ -346,25 +351,24 @@ section {
 }
 
 .hero .background {
-  position: absolute;
+  position: relative;
   width: 100%;
-  height: 100%;
+  height: 0;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  min-height: 10rem;
+  z-index: 0;
 }
 
 .hero .background div[data-slot-container], .hero .background div[data-slot] {
   position: absolute;
   width: 100%;
-  height: 100%;
+  height: 0;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  min-height: 10rem;
 }
 
 .hero .background-image {
@@ -376,15 +380,15 @@ section {
 
 @media (max-width: 73rem) {
   .hero .background-image {
-    height: 120%;
     max-width: inherit;
     width: auto;
-    margin: calc(-20% - 3rem);
+    transform: none !important;
   }
 }
 
 .hero .container {
-  padding: 4.5rem 0 0 0;
+  padding: 4.5rem 2rem 0 2rem;
+  z-index: 2;
 }
 
 .hero .main {
@@ -487,6 +491,8 @@ section {
 
 .form-container {
   background: rgba(255,255,255,0.9);
+  position: relative;
+  z-index: 1;
 }
 
 .form h1,
@@ -1082,6 +1088,11 @@ body .facetwp-btn {
   float: right;
 }
 
+.details div[data-slot-container] {
+  float: left;
+  width: 100%;
+}
+
 @media (max-width: 48rem) {
   .details .image {
     display: none;
@@ -1101,6 +1112,16 @@ body .facetwp-btn {
   -webkit-justify-content: center;
   justify-content: center;
   align-items: stretch;
+  width: 100%;
+}
+
+.speakers div[data-slot] {
+  float: left;
+  width: 50%;
+}
+
+.speakers div[data-slot-container] {
+  float: left;
   width: 100%;
 }
 
@@ -1201,8 +1222,14 @@ body .facetwp-btn {
 }
 
 .about .container {
-  background: #ffffff;
+  background: #ffffff;.
   padding: 3rem 2.5rem;
+  max-width: 73rem;
+}
+
+.about div[data-slot-container] {
+  float: left;
+  width: 100%;
 }
 
 @media (max-width:48rem) {
@@ -1270,7 +1297,7 @@ body .facetwp-btn {
 }
 
 .testimonials .speaker-image {
-  padding-left: 0;
+  padding: 0 2rem 0 0;
 }
 
 @media (max-width:48rem) {
@@ -1296,6 +1323,7 @@ body .facetwp-btn {
   background: #000000;
   color: #ffffff;
   padding: 2rem;
+  margin: 0 0 2rem 0;
 }
 
 .testimonial-quote:before {

@@ -1,7 +1,7 @@
 {% extends ":"~template~":base.html.twig" %}
 {% block content %}
 <header data-section-wrapper="1" id="top">
-  <div data-section="1">
+  <div class="container" data-section="1">
     <div data-slot-container="1">
       <div data-slot="text">
         <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_white.svg')}}">
@@ -19,12 +19,12 @@
       </div>
     </div>
     <div class="container">
-      <div class="c6 s3 form-container" data-slot-container="1">
-        <div data-slot="text">
-          <h1 class="txtCenter">H1 Header</h1>
-        </div>
-        <div class="form white">
+      <div class="c6 s3 form-container">
+        <div data-slot-container="1">
           <div data-slot="text">
+            <h1 class="txtCenter">H1 Header</h1>
+          </div>
+          <div class="form white" data-slot="text">
             <h2>H2 CTA</h2>
             <img src="{{getAssetUrl('themes/'~template~'/assets/img_form-demo.jpg')}}">
             <!-- PLACE FORM HERE -->
@@ -35,12 +35,14 @@
   </div>
 </section>
 <section data-section-wrapper="1" class="customers">
-  <div data-section="1">
-    <div class="container" data-slot-container="1">
+  <div class="container" data-section="1">
+    <div data-slot-container="1">
       <div data-slot="text">
         <h3>H3 Customers</h3>
       </div>
-      <div class="logos">
+    </div>
+    <div class="logos-container">
+      <div class="logos" data-slot-container="1">
         <div class="logo-container" data-slot="text">
           <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-i.svg')}}">
         </div>
@@ -61,8 +63,8 @@
   </div>
 </section>
 <section data-section-wrapper="1" class="details">
-  <div data-section="1">
-    <div class="container" data-slot-container="1">
+  <div class="container" data-section="1">
+    <div data-slot-container="1">
       <div data-slot="text">
         <h2>H2 Details</h2>
       </div>
@@ -77,8 +79,8 @@
   </div>
 </section>
 <section data-section-wrapper="1" class="speakers">
-  <div data-section="1">
-    <div class="container" data-slot-container="1">
+  <div class="container" data-section="1">
+    <div data-slot-container="1">
       <div data-slot="text">
         <h2>H2 Speakers</h2>
       </div>
@@ -109,8 +111,8 @@
 </section>
 <div class="background-wrapper">
   <section data-section-wrapper="1" class="about">
-    <div data-section="1">
-      <div class="container" data-slot-container="1">
+    <div class="container" data-section="1">
+      <div data-slot-container="1">
         <div data-slot="text">
           <h2>H2 About Company</h2>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.</p>
@@ -119,39 +121,40 @@
     </div>
   </section>
   <section data-section-wrapper="1" class="testimonials">
-    <div data-slot="text">
-      <div class="container">
-        <div class="testimonials-container" data-slot-container="1">
-          <div class="testimonial" data-slot="text">
-            <div class="c12 testimonial-quote">
-              <h2>H2 Testimonial</h2>
-              <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
+    <div class="container" data-section="1">
+      <div data-slot-container="1">
+        <div data-slot="separator"><hr></div>
+      </div>
+      <div class="testimonials-container" data-slot-container="1">
+        <div class="testimonial" data-slot="text">
+          <div class="c12 testimonial-quote">
+            <h2>H2 Testimonial</h2>
+            <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
+          </div>
+          <div class="testimonial-details">
+            <div class="speaker-image">
+                <img src="{{getAssetUrl('themes/'~template~'/assets/photo_mars.jpg')}}">
             </div>
-            <div class="testimonial-details">
-              <div class="speaker-image">
-                  <img src="{{getAssetUrl('themes/'~template~'/assets/photo_mars.jpg')}}">
-              </div>
-              <div class="c7 speaker-details">
-                <h3>H3 Name</h3>
-                <p>Details about speaker</p>
-                <p>More details about speaker</p>
-              </div>
+            <div class="c7 speaker-details">
+              <h3>H3 Name</h3>
+              <p>Details about speaker</p>
+              <p>More details about speaker</p>
             </div>
           </div>
-          <div class="testimonial" data-slot="text">
-            <div class="c12 testimonial-quote">
-              <h2>H2 Testimonial</h2>
-              <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
+        </div>
+        <div class="testimonial" data-slot="text">
+          <div class="c12 testimonial-quote">
+            <h2>H2 Testimonial</h2>
+            <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
+          </div>
+          <div class="testimonial-details">
+            <div class="speaker-image">
+                <img src="{{getAssetUrl('themes/'~template~'/assets/photo_li.jpg')}}">
             </div>
-            <div class="testimonial-details">
-              <div class="speaker-image">
-                  <img src="{{getAssetUrl('themes/'~template~'/assets/photo_li.jpg')}}">
-              </div>
-              <div class="c7 speaker-details">
-                <h3>H3 Name</h3>
-                <p>Details about speaker</p>
-                <p>More details about speaker</p>
-              </div>
+            <div class="c7 speaker-details">
+              <h3>H3 Name</h3>
+              <p>Details about speaker</p>
+              <p>More details about speaker</p>
             </div>
           </div>
         </div>
@@ -160,13 +163,11 @@
   </section>
 </div>
 <footer data-section-wrapper="1" id="bottom">
-  <div data-section="1">
-    <div class="container">
-      <div data-slot-container="1">
-        <div data-slot="text">
-          <p>© 2018 All Rights Reserved. Mautic, Inc.</p>
-          <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_black.svg')}}">
-        </div>
+  <div class="container" data-section="1">
+    <div data-slot-container="1">
+      <div data-slot="text">
+        <p>© 2018 All Rights Reserved. Mautic, Inc.</p>
+        <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_black.svg')}}">
       </div>
     </div>
   </div>

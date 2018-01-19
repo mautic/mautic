@@ -106,7 +106,7 @@ div[data-section-wrapper], div[data-section], div[data-slot-container], div[data
   z-index: 1;
 }
 
-div[data-slot] {
+div[data-slot], div[data-slot-container] {
   float: left;
   width: 100%;
 }
@@ -127,7 +127,7 @@ div[data-section-focus] {
   position: relative;
   letter-spacing: .02rem;
   cursor: pointer;
-  margin: 0 .5rem;
+  margin: 0 .5rem 0 0;
   overflow: hidden;
   border: 1px solid #ffffff;
   -webkit-box-shadow: -2px 2px 2px 0 rgba(0,0,0,.2);
@@ -329,6 +329,11 @@ section {
   margin: 0 0 1.5rem 0;
 }
 
+.hide-overflow {
+  overflow: hidden;
+  width: 100%;
+}
+
 .hero {
   overflow: visible;
   position: relative;
@@ -364,15 +369,15 @@ section {
 }
 
 .hero .background {
-  position: absolute;
+  position: relative;
   width: 100%;
-  height: 100vh;
+  height: 0;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  min-height: 10rem;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 0;
 }
 
 .hero .background div[data-slot-container], .hero .background div[data-slot] {
@@ -956,10 +961,16 @@ body .facetwp-btn {
   color: #ffffff;
 }
 
+.form-section div[data-slot-container] {
+  float: left;
+  width: 100%;
+}
+
 .form-section h2 {
   color: #ffffff;
   text-align: center;
 }
+
 .form-section .container {
   padding: 0;
   background: transparent;
@@ -986,6 +997,11 @@ body .facetwp-btn {
 .customers-section .container {
   text-align: center;
   padding: 2rem 0 0 0;
+}
+
+.customers-section div[data-slot-container] {
+  float: left;
+  width: 100%;
 }
 
 .customers {
@@ -1038,7 +1054,7 @@ body .facetwp-btn {
   padding: 1rem 1rem 1rem 0;
   background: #f5f5f5;
 }
-.customers .logo-container {
+.customers .logo-container, .customers div[data-slot] {
   flex: 1;
   text-align: center;
   display: flex;
@@ -1116,17 +1132,23 @@ body .facetwp-btn {
   width: auto;
 }
 
+@media (max-width: 73rem) {
+  .speakers-container div[data-slot] {
+    width: 100%;
+  }
+}
+
 .speakers {
   color: #ffffff;
   margin-top: -1px;
 }
 
 .speakers .container {
+  background-color: #2d3c63;
   background-image: url('../assets/background_aurora_tall.jpg');
 }
 
 .speaker {
-  color: #ffffff;
   margin: 0 0.5rem;
   flex: 1;
   display: -webkit-box;
@@ -1364,6 +1386,11 @@ body .facetwp-btn {
 .about {
   color: #ffffff;
   margin-top: -1px;
+}
+
+.about .container {
+  background-color: #2d3c63;
+  background-image: url('../assets/background_aurora_tall.jpg');
 }
 
 .about .container {

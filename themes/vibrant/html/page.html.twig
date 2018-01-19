@@ -1,14 +1,15 @@
 {% extends ":"~template~":base.html.twig" %}
 {% block content %}
 <header data-section-wrapper="1" id="top">
-  <div data-section="1">
-    <div class="container" data-slot-container="1">
+  <div class="container" data-section="1">
+    <div data-slot-container="1">
       <div data-slot="text">
         <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_white.svg')}}">
       </div>
     </div>
   </div>
 </header>
+<div class="overflow-hide">
 <section data-section-wrapper="1" class="hero">
   <div data-section="1">
     <div class="background">
@@ -18,50 +19,60 @@
         </div>
       </div>
     </div>
-    <div class="container" data-slot-container="1">
+    <div class="container">
       <div class="c6">
-        <div data-slot="text">
-          <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_bulb.png')}}">
-          <h1>H1 Header</h1>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.</p>
-        </div>
-        <div data-slot="text">
-          <h3>H3 Customers</h3>
-          <div class="customers">
-            <div class="logos">
-              <div class="logo-container">
-                <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-i.svg')}}">
-              </div>
-              <div class="logo-container" data-slot="text">
-                <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-ii.svg')}}">
-              </div>
-              <div class="logo-container" data-slot="text">
-                <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-iii.svg')}}">
-              </div>
-              <div class="logo-container" data-slot="text">
-                <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-iv.svg')}}">
-              </div>
-              <div class="logo-container" data-slot="text">
-                <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-v.svg')}}">
-              </div>
-            </div>
+        <div data-slot-container="1">
+          <div data-slot="text">
+            <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_bulb.png')}}">
+            <h1>H1 Header</h1>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
-<div data-section-wrapper="1" class="fixed-form">
-  <div data-section="1">
-    <div data-slot-container="1">
-      <div data-slot="text">
-          <div class="form white">
-            <div class="form-inner">
+<section data-section-wrapper="1" class="customers">
+  <div class="container" data-section="1">
+    <div class="c6">
+      <div data-slot-container="1">
+        <div data-slot="text">
+          <h3>H3 Customers</h3>
+        </div>
+      </div>
+      <div class="customers-container">
+        <div class="logos" data-slot-container="1">
+          <div class="logo-container" data-slot="text">
+            <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-i.svg')}}">
+          </div>
+          <div class="logo-container" data-slot="text">
+            <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-ii.svg')}}">
+          </div>
+          <div class="logo-container" data-slot="text">
+            <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-iii.svg')}}">
+          </div>
+          <div class="logo-container" data-slot="text">
+            <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-iv.svg')}}">
+          </div>
+          <div class="logo-container" data-slot="text">
+            <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-v.svg')}}">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+<div class="fixed-form">
+  <div class="form white">
+    <div data-section-wrapper="1">
+      <div data-section="1">
+        <div class="form-inner">
+          <div data-slot-container="1">
+            <div data-slot="text">
               <h2>H2 Call-To-Action</h2>
-              <div>
-                <img src="{{getAssetUrl('themes/'~template~'/assets/img_form-demo.jpg')}}" style="margin: 0 auto;">
-                <!-- PLACE FORM HERE -->
-              </div>
+              <img src="{{getAssetUrl('themes/'~template~'/assets/img_form-demo.jpg')}}" style="margin: 0 auto;">
+              <!-- PLACE FORM HERE -->
             </div>
           </div>
         </div>
@@ -70,9 +81,9 @@
   </div>
 </div>
 <section data-section-wrapper="1" class="details">
-  <div data-section="1">
-    <div class="container" data-slot-container="1">
-      <div class="c6">
+  <div class="container" data-section="1">
+    <div class="c6">
+      <div data-slot-container="1">
         <div data-slot="text">
           <h2>H2 Details</h2>
             <p class="c6 detail"><strong>Detail:</strong> Lorem Ipsum</p>
@@ -85,32 +96,33 @@
   </div>
 </section>
 <section data-section-wrapper="1" class="speakers">
-  <div data-section="1">
-    <div class="container" data-slot-container="1">
-      <div class="c6">
+  <div class="container" data-section="1">
+    <div class="c6" data-slot-container="1">
+      <div data-slot="text">
+        <h2>H2 Speakers</h2>
+      </div>
+      <div class="speakers-container" data-slot-container="1">
         <div data-slot="text">
-          <h2>H2 Speakers</h2>
-        </div>
-          <div class="speakers-container">
-            <div class="speaker" data-slot="text">
-              <div class="speaker-image">
-                <img src="{{getAssetUrl('themes/'~template~'/assets/photo_sza.jpg')}}">
-              </div>
-              <div class="speaker-details">
-                <h3>H3 Name</h3>
-                <p>Details about speaker</p>
-                <p>More details about speaker</p>
-              </div>
+          <div class="speaker">
+            <div class="speaker-image">
+              <img src="{{getAssetUrl('themes/'~template~'/assets/photo_sza.jpg')}}">
             </div>
-            <div class="speaker" data-slot="text">
-              <div class="speaker-image">
-                <img src="{{getAssetUrl('themes/'~template~'/assets/photo_eno.jpg')}}">
-              </div>
-              <div class="speaker-details">
-                <h3>H3 Name</h3>
-                <p>Details about speaker</p>
-                <p>More details about speaker</p>
-              </div>
+            <div class="speaker-details">
+              <h3>H3 Name</h3>
+              <p>Details about speaker</p>
+              <p>More details about speaker</p>
+            </div>
+          </div>
+        </div>
+        <div data-slot="text">
+          <div class="speaker">
+            <div class="speaker-image">
+              <img src="{{getAssetUrl('themes/'~template~'/assets/photo_eno.jpg')}}">
+            </div>
+            <div class="speaker-details">
+              <h3>H3 Name</h3>
+              <p>Details about speaker</p>
+              <p>More details about speaker</p>
             </div>
           </div>
         </div>
@@ -119,54 +131,54 @@
   </div>
 </section>
 <section data-section-wrapper="1" class="about">
-  <div data-section="1">
-    <div class="container">
-      <div class="c6">
-        <div data-slot-container="1">
-          <div data-slot="text">
-            <h2 class="green">H2 About Company</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.</p>
-          </div>
+  <div class="container" data-section="1">
+    <div class="c6">
+      <div data-slot-container="1">
+        <div data-slot="text">
+          <h2 class="green">H2 About Company</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 <section data-section-wrapper="1" class="testimonials">
-  <div class="container" data-slot-container="1">
+  <div class="container" data-section="1">
     <div class="c6">
       <div class="testimonials-container">
-        <div class="testimonial" data-slot="text">
-          <div class="c12 testimonial-quote">
-            <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
-          </div>
-          <div class="testimonial-details">
-            <div class="c5">
-                <div class="speaker-image">
-                    <img src="{{getAssetUrl('themes/'~template~'/assets/photo_mars.jpg')}}">
-                </div>
+        <div data-slot-container="1">
+          <div class="testimonial" data-slot="text">
+            <div class="c12 testimonial-quote">
+              <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
             </div>
-            <div class="c7 details">
-              <h3>H3 Name</h3>
-              <p>Details about speaker</p>
-              <p>More details about speaker</p>
+            <div class="testimonial-details">
+              <div class="c5">
+                  <div class="speaker-image">
+                      <img src="{{getAssetUrl('themes/'~template~'/assets/photo_mars.jpg')}}">
+                  </div>
+              </div>
+              <div class="c7 details">
+                <h3>H3 Name</h3>
+                <p>Details about speaker</p>
+                <p>More details about speaker</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="testimonial" data-slot="text">
-          <div class="c12 testimonial-quote">
-            <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
-          </div>
-          <div class="testimonial-details">
-            <div class="c5">
-                <div class="speaker-image">
-                    <img src="{{getAssetUrl('themes/'~template~'/assets/photo_li.jpg')}}">
-                </div>
+          <div class="testimonial" data-slot="text">
+            <div class="c12 testimonial-quote">
+              <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
             </div>
-            <div class="c7 details">
-              <h3>H3 Name</h3>
-              <p>Details about speaker</p>
-              <p>More details about speaker</p>
+            <div class="testimonial-details">
+              <div class="c5">
+                  <div class="speaker-image">
+                      <img src="{{getAssetUrl('themes/'~template~'/assets/photo_li.jpg')}}">
+                  </div>
+              </div>
+              <div class="c7 details">
+                <h3>H3 Name</h3>
+                <p>Details about speaker</p>
+                <p>More details about speaker</p>
+              </div>
             </div>
           </div>
         </div>
@@ -175,18 +187,16 @@
   </div>
 </section>
 <footer data-section-wrapper="1" id="bottom">
-  <div data-section="1">
-    <div class="container" data-slot-container="1">
-      <div class="c6">
-        <div class="c6 logo-container">
-          <div data-slot="text">
-            <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_white.svg')}}">
-          </div>
+  <div class="container" data-section="1">
+    <div class="c6" data-slot-container="1">
+      <div class="c6 logo-container">
+        <div data-slot="text">
+          <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_white.svg')}}">
         </div>
-        <div class="c6">
-          <div data-slot="text">
-            <p class="copyright">&copy; Mautic 2017</p>
-          </div>
+      </div>
+      <div class="c6">
+        <div data-slot="text">
+          <p class="copyright">&copy; Mautic 2017</p>
         </div>
       </div>
     </div>
