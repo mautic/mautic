@@ -1100,7 +1100,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 if (!is_null($lead->getOwner())) {
                     $sugarOwnerId = $this->getApiHelper()->getIdBySugarEmail(['emails' => [$lead->getOwner()->getEmail()]]);
-                    $mappedData[$object]['assigned_user_id'] = array_values($sugarOwnerId)[0];
+                    if (!empty($sugarOwnerId)){
+                        $mappedData[$object]['assigned_user_id'] = array_values($sugarOwnerId)[0];
+                    }
                 }
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
                 if (isset($createdLeadData['id'])) {
