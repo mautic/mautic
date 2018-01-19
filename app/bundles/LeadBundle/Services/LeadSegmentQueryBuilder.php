@@ -55,7 +55,8 @@ class LeadSegmentQueryBuilder
         // Add count functions to the query
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
         $qb->addSelect('l.id as leadIdPrimary');
-        $queryBuilder->select('count(leadIdPrimary) count, max(leadIdPrimary) maxId')->from('('.$qb->getSQL().')', 'sss');
+        $queryBuilder->select('count(leadIdPrimary) count, max(leadIdPrimary) maxId')
+                     ->from('('.$qb->getSQL().')', 'sss');
         $queryBuilder->setParameters($qb->getParameters());
 
         return $queryBuilder;
@@ -66,7 +67,7 @@ class LeadSegmentQueryBuilder
         $queryBuilder->select('l.id');
 
         $parts     = $queryBuilder->getQueryParts();
-        $setHaving =  (count($parts['groupBy']) || !is_null($parts['having']));
+        $setHaving = (count($parts['groupBy']) || !is_null($parts['having']));
 
         $tableAlias = $this->generateRandomParameterName();
         $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias, $tableAlias.'.lead_id = l.id');
@@ -86,6 +87,36 @@ class LeadSegmentQueryBuilder
         } else {
             $queryBuilder->andWhere($restrictionExpression);
         }
+
+        return $queryBuilder;
+    }
+
+    public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
+    {
+        $tableAlias = $this->generateRandomParameterName();
+        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias,
+                                'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId));
+        $queryBuilder->addJoinCondition($tableAlias,
+                                        $queryBuilder->expr()->andX(
+                                            $queryBuilder->expr()->orX(
+                                                $queryBuilder->expr()->isNull($tableAlias.'.manually_removed'),
+                                                $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 0)
+                                            ),
+                                            $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1)
+                                        )
+        );
+        $queryBuilder->orWhere($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'));
+
+        return $queryBuilder;
+    }
+
+    public function addManuallyUnsubsribedQuery(QueryBuilder $queryBuilder, $leadListId)
+    {
+        $tableAlias = $this->generateRandomParameterName();
+        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias,
+                                'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId));
+        $queryBuilder->addJoinCondition($tableAlias, $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 1));
+        $queryBuilder->andWhere($queryBuilder->expr()->isNull($tableAlias.'.lead_id'));
 
         return $queryBuilder;
     }

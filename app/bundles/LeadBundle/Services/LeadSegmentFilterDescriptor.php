@@ -34,6 +34,16 @@ class LeadSegmentFilterDescriptor extends \ArrayIterator
             'field'               => 'open_count',
         ];
 
+        $this->translations['hit_url_count'] = [
+            'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'page_hits',
+            'foreign_table_field' => 'lead_id',
+            'table'               => 'leads',
+            'table_field'         => 'id',
+            'func'                => 'count',
+            'field'               => 'id',
+        ];
+
         $this->translations['lead_email_read_date'] = [
             'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table'       => 'page_hits',
@@ -48,6 +58,14 @@ class LeadSegmentFilterDescriptor extends \ArrayIterator
         ];
 
         $this->translations['dnc_bounced_sms'] = [
+            'type'                => DncFilterQueryBuilder::getServiceId(),
+        ];
+
+        $this->translations['dnc_unsubscribed'] = [
+            'type'                => DncFilterQueryBuilder::getServiceId(),
+        ];
+
+        $this->translations['dnc_unsubscribed_sms'] = [
             'type'                => DncFilterQueryBuilder::getServiceId(),
         ];
 

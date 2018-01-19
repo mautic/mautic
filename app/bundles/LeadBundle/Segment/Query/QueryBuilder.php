@@ -38,6 +38,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
  *
  * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Jan Kozak <galvani78@gmail.com>
  */
 class QueryBuilder
 {

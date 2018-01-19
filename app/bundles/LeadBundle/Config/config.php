@@ -740,7 +740,7 @@ return [
             ],
             'mautic.lead.query.builder.special.leadlist' => [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\LeadListFilterQueryBuilder::class,
-                'arguments' => [],
+                'arguments' => ['mautic.lead.repository.lead_segment_query_builder', 'doctrine.orm.entity_manager', 'mautic.lead.model.lead_segment_filter_factory'],
             ],
         ],
         'helpers' => [

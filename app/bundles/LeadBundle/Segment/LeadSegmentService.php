@@ -66,8 +66,10 @@ class LeadSegmentService
             return [0];
         }
         /** @var QueryBuilder $qb */
-        $qb = $this->queryBuilder->getLeadsSegmentQueryBuilder($entity->getId(), $segmentFilters, $batchLimiters);
+        $qb = $this->queryBuilder->getLeadsSegmentQueryBuilder($entity->getId(), $segmentFilters);
         $qb = $this->queryBuilder->addNewLeadsRestrictions($qb, $entity->getId(), $batchLimiters);
+        $qb = $this->queryBuilder->addManuallySubscribedQuery($qb, $entity->getId());
+        $qb = $this->queryBuilder->addManuallyUnsubsribedQuery($qb, $entity->getId());
         $qb = $this->queryBuilder->wrapInCount($qb);
 
         //  Debug output

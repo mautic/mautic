@@ -180,7 +180,11 @@ class LeadSegmentFilter
      */
     public function __toString()
     {
-        return sprintf('%s %s', $this->getTable(), $this->getField());
+        if (!is_array($this->getParameterValue())) {
+            return sprintf('table:%s field:%s holder:%s value:%s', $this->getTable(), $this->getField(), $this->getParameterHolder('holder'), $this->getParameterValue());
+        }
+
+        return sprintf('table:%s field:%s holder:%s value:%s', $this->getTable(), $this->getField(), print_r($this->getParameterHolder($this->getParameterValue()), true), print_r($this->getParameterValue(), true));
     }
 
     /**
