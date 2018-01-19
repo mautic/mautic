@@ -1357,7 +1357,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         array $lead = null,
         array $tokens = [],
         array $assetAttachments = [],
-        $saveStat = true,
+        $saveStat = false,
         array $to = [],
         array $cc = [],
         array $bcc = []
