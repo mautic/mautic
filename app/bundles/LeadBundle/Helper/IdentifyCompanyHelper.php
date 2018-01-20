@@ -78,6 +78,9 @@ class IdentifyCompanyHelper
         elseif (isset($parameters['companyname'])) {
             $companyName = filter_var($parameters['companyname']);
         }
+        else {
+            // Do nothing here. Just adding this for proper syntax.
+        }
         
         if (isset($parameters['email']) || isset($parameters['companyemail'])) {
             $companyDomain = isset($parameters['email']) ? self::domainExists($parameters['email']) : self::domainExists($parameters['companyemail']);
