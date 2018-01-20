@@ -31,7 +31,7 @@ class IdentifyCompanyHelper
         list($company, $companyEntities) = self::findCompany($parameters, $companyModel);
         if (!empty($company)) {
             $leadAdded = false;
-            if (count($companyEntities)) {
+            if (!empty($companyEntities)) {
                 foreach ($companyEntities as $entity) {
                     $companyEntity   = $entity;
                     $companyLeadRepo = $companyModel->getCompanyLeadRepository();
