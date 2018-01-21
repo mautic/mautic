@@ -717,30 +717,33 @@ return [
                 ],
             ],
             //  Segment Filter Query builders
-
             'mautic.lead.query.builder.basic' => [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder::class,
-                'arguments' => [],
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.foreign.value' => [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignValueFilterQueryBuilder::class,
-                'arguments' => [],
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.foreign.func' => [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignFuncFilterQueryBuilder::class,
-                'arguments' => [],
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.special.dnc' => [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\DncFilterQueryBuilder::class,
-                'arguments' => [],
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.special.sessions' => [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\SessionsFilterQueryBuilder::class,
-                'arguments' => [],
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.special.leadlist' => [
                 'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\LeadListFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.repository.lead_segment_query_builder', 'doctrine.orm.entity_manager', 'mautic.lead.model.lead_segment_filter_factory'],
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'mautic.lead.repository.lead_segment_query_builder',
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.lead_segment_filter_factory', ],
             ],
         ],
         'helpers' => [

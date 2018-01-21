@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -13,6 +13,9 @@ namespace Mautic\LeadBundle\Segment\FilterQueryBuilder;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
+/**
+ * Interface FilterQueryBuilderInterface.
+ */
 interface FilterQueryBuilderInterface
 {
     /**
@@ -23,5 +26,8 @@ interface FilterQueryBuilderInterface
      */
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter);
 
+    /**
+     * @return string returns the service id in the DIC container
+     */
     public static function getServiceId();
 }

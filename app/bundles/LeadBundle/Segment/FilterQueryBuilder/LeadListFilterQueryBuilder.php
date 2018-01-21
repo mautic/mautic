@@ -1,65 +1,121 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jan
- * Date: 1/11/18
- * Time: 11:24 AM.
+/*
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Segment\FilterQueryBuilder;
 
-use Mautic\LeadBundle\Entity\DoNotContact;
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
+use Mautic\LeadBundle\Segment\LeadSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
+use Mautic\LeadBundle\Segment\RandomParameterName;
+use Mautic\LeadBundle\Services\LeadSegmentQueryBuilder;
 
-class LeadListFilterQueryBuilder implements FilterQueryBuilderInterface
+/**
+ * Class LeadListFilterQueryBuilder.
+ */
+class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    use LeadSegmentFilterQueryBuilderTrait;
+    /**
+     * @var LeadSegmentQueryBuilder
+     */
+    private $leadSegmentQueryBuilder;
 
+    /**
+     * @var LeadSegmentFilterFactory
+     */
+    private $leadSegmentFilterFactory;
+
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
+     * LeadListFilterQueryBuilder constructor.
+     *
+     * @param RandomParameterName      $randomParameterNameService
+     * @param LeadSegmentQueryBuilder  $leadSegmentQueryBuilder
+     * @param EntityManager            $entityManager
+     * @param LeadSegmentFilterFactory $leadSegmentFilterFactory
+     */
+    public function __construct(
+        RandomParameterName $randomParameterNameService,
+        LeadSegmentQueryBuilder $leadSegmentQueryBuilder,
+        EntityManager $entityManager,
+        LeadSegmentFilterFactory $leadSegmentFilterFactory
+    ) {
+        parent::__construct($randomParameterNameService);
+
+        $this->leadSegmentQueryBuilder  = $leadSegmentQueryBuilder;
+        $this->leadSegmentFilterFactory = $leadSegmentFilterFactory;
+        $this->entityManager            = $entityManager;
+    }
+
+    /**
+     * @return string
+     */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.special.leadlist';
     }
 
+    /**
+     * @param QueryBuilder      $queryBuilder
+     * @param LeadSegmentFilter $filter
+     *
+     * @return QueryBuilder
+     */
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
-        dump('This is definitely an @todo!!!!');
+        $segmentIds = $filter->getParameterValue();
 
-        return $queryBuilder;
-        dump('lead list');
-        die();
-        $parts   = explode('_', $filter->getCrate('field'));
-        $channel = 'email';
-
-        if (count($parts) === 3) {
-            $channel = $parts[2];
+        if (!is_array($segmentIds)) {
+            $segmentIds = [intval($segmentIds)];
         }
 
-        $tableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'left');
+        $leftIds = [];
+        $innerIds = [];
 
-        if (!$tableAlias) {
-            $tableAlias = $this->generateRandomParameterName();
-            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_donotcontact', $tableAlias, MAUTIC_TABLE_PREFIX.'lead_donotcontact.lead_id = l.id');
+        foreach ($segmentIds as $segmentId) {
+            $ids[]     = $segmentId;
+            $exclusion = ($filter->getOperator() == 'exists');
+            if ($exclusion) {
+                $leftIds[] = $segmentId;
+            } else {
+                if (!isset($innerAlias)) {
+                    $innerAlias = $this->generateRandomParameterName();
+                }
+                $innerIds[] = $segmentId;
+            }
         }
 
-        $exprParameter    = $this->generateRandomParameterName();
-        $channelParameter = $this->generateRandomParameterName();
+        if (count($leftIds)) {
+            $leftAlias = $this->generateRandomParameterName();
+            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $leftAlias,
+                                    $queryBuilder->expr()->andX(
+                                        $queryBuilder->expr()->in('l.id', $leftIds),
+                                        $queryBuilder->expr()->eq('l.id', $leftAlias.'.lead_id'))
+            );
+            $queryBuilder->andWhere($queryBuilder->expr()->isNull($leftAlias.'.lead_id'));
+        }
 
-        $expression = $queryBuilder->expr()->andX(
-            $queryBuilder->expr()->eq($tableAlias.'.reason', ":$exprParameter"),
-            $queryBuilder->expr()
-              ->eq($tableAlias.'.channel', ":$channelParameter")
-        );
+        if (count($innerIds)) {
+            $leftAlias = $this->generateRandomParameterName();
+            $queryBuilder->innerJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $leftAlias,
+                                    $queryBuilder->expr()->andX(
+                                        $queryBuilder->expr()->in('l.id', $innerIds),
+                                        $queryBuilder->expr()->eq('l.id', $leftAlias.'.lead_id'))
+            );
+        }
 
-        $queryBuilder->addJoinCondition($tableAlias, $expression);
-
-        $queryType = $filter->getOperator() === 'eq' ? 'isNull' : 'isNotNull';
-
-        $queryBuilder->andWhere($queryBuilder->expr()->$queryType($tableAlias.'.id'));
-
-        $queryBuilder->setParameter($exprParameter, ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED);
-        $queryBuilder->setParameter($channelParameter, $channel);
+        $queryBuilder->innerJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $innerAlias, 'l.id = '.$innerAlias.'.lead_id');
 
         return $queryBuilder;
     }

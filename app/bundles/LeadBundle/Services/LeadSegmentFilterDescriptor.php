@@ -46,10 +46,13 @@ class LeadSegmentFilterDescriptor extends \ArrayIterator
 
         $this->translations['lead_email_read_date'] = [
             'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'email_stats',
+            'field'               => 'date_read',
+        ];
+
+        $this->translations['hit_url_date'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table'       => 'page_hits',
-            'foreign_table_field' => 'lead_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
             'field'               => 'date_hit',
         ];
 

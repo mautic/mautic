@@ -36,6 +36,13 @@ class LeadSegmentService
      */
     private $queryBuilder;
 
+    /**
+     * LeadSegmentService constructor.
+     *
+     * @param LeadSegmentFilterFactory  $leadSegmentFilterFactory
+     * @param LeadListSegmentRepository $leadListSegmentRepository
+     * @param LeadSegmentQueryBuilder   $queryBuilder
+     */
     public function __construct(
         LeadSegmentFilterFactory $leadSegmentFilterFactory,
         LeadListSegmentRepository $leadListSegmentRepository,
@@ -46,6 +53,11 @@ class LeadSegmentService
         $this->queryBuilder              = $queryBuilder;
     }
 
+    /**
+     * @param Doctrine_Query $query
+     *
+     * @return string
+     */
     public function getDqlWithParams(Doctrine_Query $query)
     {
         $vals = $query->getFlattenedParams();

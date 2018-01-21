@@ -1,9 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jan
- * Date: 1/11/18
- * Time: 11:24 AM.
+/*
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Segment\FilterQueryBuilder;
@@ -11,17 +13,23 @@ namespace Mautic\LeadBundle\Segment\FilterQueryBuilder;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
 
-class DncFilterQueryBuilder implements FilterQueryBuilderInterface
+/**
+ * Class DncFilterQueryBuilder.
+ */
+class DncFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    use LeadSegmentFilterQueryBuilderTrait;
-
+    /**
+     * {@inheritdoc}
+     */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.special.dnc';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
         $parts   = explode('_', $filter->getCrate('field'));

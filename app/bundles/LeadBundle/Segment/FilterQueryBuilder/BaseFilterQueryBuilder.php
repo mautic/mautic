@@ -1,40 +1,56 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jan
- * Date: 1/11/18
- * Time: 11:24 AM.
+/*
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Segment\FilterQueryBuilder;
 
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
+use Mautic\LeadBundle\Segment\RandomParameterName;
 
+/**
+ * Class BaseFilterQueryBuilder.
+ */
 class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 {
-    use LeadSegmentFilterQueryBuilderTrait;
+    /** @var RandomParameterName */
+    private $parameterNameGenerator;
 
+    /**
+     * BaseFilterQueryBuilder constructor.
+     *
+     * @param RandomParameterName $randomParameterNameService
+     */
+    public function __construct(RandomParameterName $randomParameterNameService)
+    {
+        $this->parameterNameGenerator = $randomParameterNameService;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.basic';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
         $filterOperator = $filter->getOperator();
         $filterGlue     = $filter->getGlue();
         $filterAggr     = $filter->getAggregateFunction();
 
-        // @debug we do not need this, it's just to verify we reference an existing database column
-        try {
-            $filter->getColumn();
-        } catch (\Exception $e) {
-            dump(' * ERROR * - Unhandled field '.sprintf(' %s, operator: %s, %s', $filter->__toString(), $filter->getOperator(), print_r($filterAggr, true)));
-
-            return $queryBuilder;
-        }
+        //  Verify the column exists in database, this might be removed after tested
+        $filter->getColumn();
 
         $filterParameters = $filter->getParameterValue();
 
@@ -57,10 +73,6 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         if ($filterAggr) {
             $tableAlias = false;
         }
-
-//        dump($filter->getTable()); if ($filter->getTable()=='companies') {
-//            dump('companies');
-//    }
 
         if (!$tableAlias) {
             $tableAlias = $this->generateRandomParameterName();
@@ -104,8 +116,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                     }
                     break;
                 default:
-                    //throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
-                    dump('Dunno how to handle operator "'.$filterOperator.'"');
+                    throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
             }
         }
 
@@ -144,9 +155,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 }
                 break;
             default:
-                dump(' * IGNORED * - Dunno how to handle operator "'.$filterOperator.'"');
-                //throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
-                $expression = '1=1';
+                throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
         }
 
         if ($queryBuilder->isJoinTable($filter->getTable())) {
@@ -162,5 +171,25 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 
         return $queryBuilder;
+    }
+
+    /**
+     * @param RandomParameterName $parameterNameGenerator
+     *
+     * @return BaseFilterQueryBuilder
+     */
+    public function setParameterNameGenerator($parameterNameGenerator)
+    {
+        $this->parameterNameGenerator = $parameterNameGenerator;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function generateRandomParameterName()
+    {
+        return $this->parameterNameGenerator->generateRandomParameterName();
     }
 }

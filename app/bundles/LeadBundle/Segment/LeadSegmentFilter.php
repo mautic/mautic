@@ -52,6 +52,11 @@ class LeadSegmentFilter
         $this->em                     = $em;
     }
 
+    /**
+     * @return \Doctrine\DBAL\Schema\Column
+     *
+     * @throws \Exception
+     */
     public function getColumn()
     {
         $columns = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->getTable());
@@ -62,6 +67,11 @@ class LeadSegmentFilter
         return $columns[$this->getField()];
     }
 
+    /**
+     * @return string
+     *
+     * @deprecated This function might be not used at all
+     */
     public function getEntity()
     {
         $converter = new CamelCaseToSnakeCaseNameConverter();
@@ -92,36 +102,65 @@ class LeadSegmentFilter
         return $this->filterDecorator->getOperator($this->leadSegmentFilterCrate);
     }
 
+    /**
+     * @return mixed
+     */
     public function getField()
     {
         return $this->filterDecorator->getField($this->leadSegmentFilterCrate);
     }
 
+    /**
+     * @return mixed
+     */
     public function getTable()
     {
         return $this->filterDecorator->getTable($this->leadSegmentFilterCrate);
     }
 
+    /**
+     * @param $argument
+     *
+     * @return mixed
+     */
     public function getParameterHolder($argument)
     {
         return $this->filterDecorator->getParameterHolder($this->leadSegmentFilterCrate, $argument);
     }
 
+    /**
+     * @return mixed
+     */
     public function getParameterValue()
     {
         return $this->filterDecorator->getParameterValue($this->leadSegmentFilterCrate);
     }
 
+    /**
+     * @return null|string
+     */
     public function getGlue()
     {
         return $this->leadSegmentFilterCrate->getGlue();
     }
 
+    /**
+     * @return mixed
+     */
     public function getAggregateFunction()
     {
         return $this->filterDecorator->getAggregateFunc($this->leadSegmentFilterCrate);
     }
 
+    /**
+     * @todo check whether necessary and replace or remove
+     *
+     * @param null $field
+     *
+     * @return array|mixed
+     *
+     * @throws \Exception
+     */
     public function getCrate($field = null)
     {
         $fields = (array) $this->toArray();

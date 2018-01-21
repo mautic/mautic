@@ -16,20 +16,12 @@ trait LeadSegmentFilterQueryBuilderTrait
     /**
      * Generate a unique parameter name.
      *
+     * @todo make use of the service, this is VERY unreliable
+     *
      * @return string
      */
     protected function generateRandomParameterName()
     {
-        $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-
-        $paramName = substr(str_shuffle($alpha_numeric), 0, 8);
-
-        if (!in_array($paramName, $this->parameterAliases)) {
-            $this->parameterAliases[] = $paramName;
-
-            return $paramName;
-        }
-
-        return $this->generateRandomParameterName();
+        throw new \Exception('This function is obsole, remove references to it.');
     }
 }
