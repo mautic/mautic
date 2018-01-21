@@ -791,7 +791,15 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 if ($SUGAR_VERSION == '6') {
                     foreach ($record['name_value_list'] as $item) {
                         if ($object !== 'Activity') {
-                            $dataObject[$item['name'].$newName] = $item['value'];
+                            
+                            if ( $this->checkIfSugarCrmMultiSelectString( $item['value'] ) ) {
+                                $convertedMultiSelectString = $this->convertSuiteCrmToMauticMultiSelect( $item['value'] );
+                                $dataObject[$item['name'].$newName] = $convertedMultiSelectString;
+                            }
+                            else {
+                                $dataObject[$item['name'].$newName] = $item['value'];
+                            }
+                            
 
                             if ($item['name'] == 'date_entered') {
                                 $itemDateEntered = new \DateTime($item['value']);
@@ -1445,7 +1453,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    $body[] = ['name' => $sugarField, 'value' => $lead[$mauticField]];
+                    // Check to see if Mautic Field contains Multi Select Values
+                    if ( strpos($lead[$mauticField], '|') !== false) {
+                        // Transform Mautic Multi Select into SugarCRM/SuiteCRM Multi Select format
+                        $sugarCrmMultiSelectString = $this->convertMauticToSuiteCrmMultiSelect($lead[$mauticField]);
+                        $body[] = ['name' => $sugarField, 'value' => $sugarCrmMultiSelectString];
+                    }
+                    else {
+                        $body[] = ['name' => $sugarField, 'value' => $lead[$mauticField]];
+                    }
+                    
                 } elseif ($required) {
                     $value  = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
                     $body[] = ['name' => $sugarField, 'value' => $value];
@@ -1644,4 +1661,64 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return $fieldMappings;
     }
+    
+    /**
+     * Converts Mautic Multi-Select String into the format used to store Multi-Select values used 
+     * by SuiteCRM / SugarCRM 6.x. Mautic Multi Select format - 'choice1|choice2|choice_3'.
+     * SugarCRM/SuiteCRM Multi-Select format - '^choice1^,^choice2^,^choice_3^'.
+     * 
+     * @param  string
+     * @return string
+     */
+    public function convertMauticToSuiteCrmMultiSelect( $mauticMultiSelectStringToConvert ) {
+        //$mauticMultiSelectStringToConvert = 'test|enhancedapi|dataservices';
+        $multiSelectArrayValues = explode('|', $mauticMultiSelectStringToConvert);
+        $convertedSugarCrmMultiSelectString = '';
+        foreach($multiSelectArrayValues as $item){
+            $convertedSugarCrmMultiSelectString = $convertedSugarCrmMultiSelectString. '^' . $item . '^' . ',';
+        }
+        $convertedSugarCrmMultiSelectString = substr($convertedSugarCrmMultiSelectString, 0, -1);
+        return $convertedSugarCrmMultiSelectString;
+    }
+
+    /**
+     * Checks if a string contains SuiteCRM / SugarCRM 6.x Multi-Select values.
+     * Example SugarCRM/SuiteCRM Multi-Select String: '^choice1^,^choice2^,^choice_3^'
+     * 
+     * @param  string
+     * @return boolean
+     */
+    public function checkIfSugarCrmMultiSelectString( $stringToCheck ) {
+        // Regular Express to check SugarCRM/SuiteCRM Multi-Select format below
+        // example format: '^choice1^,^choice2^,^choice_3^'
+        $regex = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';      
+        if ( preg_match($regex, $stringToCheck) ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    
+    /**
+     * Converts a SuiteCRM / SugarCRM 6.x Multi-Select String into the format used to 
+     * store Multi-Select values used by Mautic. Mautic Multi Select format - 'choice1|choice2|choice_3'
+     * SugarCRM/SuiteCRM Multi-Select format - '^choice1^,^choice2^,^choice_3^'.
+     * 
+     * @param  string
+     * @return string
+     */
+    public function convertSuiteCrmToMauticMultiSelect( $suiteCrmMultiSelectStringToConvert ) {
+        // Mautic Multi Select format - 'choice1|choice2|choice_3'
+        $regexString = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
+        preg_match_all($regexString, $suiteCrmMultiSelectStringToConvert, $matches, PREG_SET_ORDER, 0);
+        $convertedString = '';
+        foreach($matches as $row => $innerArray){
+           $convertedString = $convertedString . $innerArray[2] . "|";
+        }
+        $convertedString = substr($convertedString, 0, -1);
+        return $convertedString;
+    }
+    
+    
 }
