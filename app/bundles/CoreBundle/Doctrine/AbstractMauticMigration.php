@@ -193,6 +193,22 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     }
 
     /**
+     * Generate index and foreign constraint.
+     *
+     * @param       $table
+     * @param array $columnNames
+     *
+     * @return array [idx, fk]
+     */
+    protected function generateKeys($table, array $columnNames)
+    {
+        return [
+            $this->generatePropertyName($table, 'idx', $columnNames),
+            $this->generatePropertyName($table, 'fk', $columnNames),
+        ];
+    }
+
+    /**
      * Use this when you're doing a migration that
      * purposely does not have any SQL statements,
      * such as when moving data using the query builder.

@@ -143,13 +143,17 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                                 <?php
                                 foreach ($group->choices as $subGroup => $fields):
                                     foreach ($fields->choices as $field) :
-                                        $attr  = (!empty($field->attr)) ? $field->attr : [];
+                                        $attr       = (!empty($field->attr)) ? $field->attr : [];
+                                        $attrString = '';
+                                        foreach ($attr as $k => $v) {
+                                            $attrString .= $k.'="'.preg_replace('/"/', '&quot;', $v).'" ';
+                                        }
                                         $label = $field->label;
                                         $value = $field->value;
                                         ?>
                                         <option value="<?php echo $value?>" class="segment-filter <?php echo $icon; ?>" <?php if ($data === $value) {
                                             echo 'Selected';
-                                        } ?> ><?php echo $label; ?></option>
+                                        } ?> <?php echo $attrString; ?> ><?php echo $label; ?></option>
                                     <?php endforeach; ?>
                                 <?php endforeach; ?>
                             </optgroup>
