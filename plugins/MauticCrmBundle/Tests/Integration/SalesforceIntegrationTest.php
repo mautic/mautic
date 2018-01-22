@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticCrmBundle\Tests;
+namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -124,6 +124,11 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
      */
     protected $leadsCreatedCounter = 0;
 
+    public function setUp()
+    {
+        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+    }
+
     /**
      * Reset.
      */
@@ -181,10 +186,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         // Validate that there were 4 found entries (two duplciate leads)
         $sfEntities = $this->getReturnedSfEntities();
         $this->assertEquals(4, count($sfEntities));
-    }
-
-    public function testThatMultipleMauticContactsAreNotDuplicatedInSF()
-    {
     }
 
     public function testThatLeadsAreOnlyCreatedIfEnabled()
@@ -313,10 +314,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($lastSync instanceof \DateTime);
     }
 
-    public function testThatMissingRequiredDataIsPulledFromSfAndHydrated()
-    {
-    }
-
     public function testLeadsAreNotCreatedInSfIfFoundToAlreadyExistAsContacts()
     {
         $this->sfObjects     = ['Lead', 'Contact'];
@@ -369,14 +366,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $sf->pushLeads();
     }
 
-    public function testIntegrationEntityRecordIsCreatedForFoundSfContacts()
-    {
-    }
-
-    public function testNonMatchingMauticContactsAreCreated()
-    {
-    }
-
     public function testExceptionIsThrownIfSfReturnsErrorOnEmailLookup()
     {
         $this->sfObjects     = ['Lead'];
@@ -389,22 +378,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(ApiErrorException::class);
 
         $sf->pushLeads();
-    }
-
-    public function testIntegrationPushFindsDuplicate()
-    {
-    }
-
-    public function testIntegrationPushCreatesNew()
-    {
-    }
-
-    public function testApostropheInEmailDoesNotCauseDuplicates()
-    {
-    }
-
-    public function testExistingEntityRecordsDoesNotCreate()
-    {
     }
 
     public function testGetCampaigns()
@@ -440,7 +413,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $sf->getCampaignMembers(1, []);
+        $sf->getCampaignMembers(1);
     }
 
     public function testGetCampaignMemberStatus()
@@ -776,8 +749,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockFactory()
     {
-        defined('IN_MAUTIC_CONSOLE') or define('IN_MAUTIC_CONSOLE', 1);
-
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -1119,9 +1090,15 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                                 if (isset($args[1]['q']) && strpos($args[0], 'from CampaignMember') !== false) {
                                     return [];
                                 } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Campaign') !== false) {
-                                    return 'fetched campaigns';
+                                    return [
+                                        'totalSize' => 0,
+                                        'records'   => [],
+                                    ];
                                 } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Account') !== false) {
-                                    return 'fetched accounts';
+                                    return [
+                                        'totalSize' => 0,
+                                        'records'   => [],
+                                    ];
                                 } elseif (isset($args[1]['q']) && $args[1]['q'] === 'SELECT CreatedDate from Organization') {
                                     return [
                                         'records' => [
