@@ -78,6 +78,8 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             $tableAlias = $this->generateRandomParameterName();
 
             switch ($filterOperator) {
+                case 'between':
+                case 'notBetween':
                 case 'notLike':
                 case 'notIn':
                 case 'empty':
@@ -141,6 +143,8 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             case 'notIn':
             case 'in':
             case 'regexp':
+            case 'between':
+            case 'notBetween':
             case 'notRegexp':
                 if ($filterAggr) {
                     $expression = $queryBuilder->expr()->$filterOperator(

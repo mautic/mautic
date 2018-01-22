@@ -131,6 +131,13 @@ class ExpressionBuilder
     /**
      * Creates a not between comparison expression.
      *
+     * First argument is considered the left expression and the second is the right expression.
+     * When converted to string, it will generated a <left expr> = <right expr>. Example:
+     *
+     *     [php]
+     *     // u.id = ?
+     *     $expr->eq('u.id', '?');
+     *
      * @param $x
      * @param $arr
      *
