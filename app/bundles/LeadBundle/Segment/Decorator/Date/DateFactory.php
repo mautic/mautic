@@ -57,7 +57,7 @@ class DateFactory
             case 'year_this':
                 return new DateYearThis();
             default:
-                return new DateDefault($originalValue);
+                return new DateDefault($originalValue, $requiresBetween);
         }
     }
 }

@@ -19,18 +19,25 @@ class DateDefault implements DateOptionsInterface
     private $originalValue;
 
     /**
-     * @param string $originalValue
+     * @var string
      */
-    public function __construct($originalValue)
+    private $requiresBetween;
+
+    /**
+     * @param string $originalValue
+     * @param string $requiresBetween
+     */
+    public function __construct($originalValue, $requiresBetween)
     {
-        $this->originalValue = $originalValue;
+        $this->originalValue   = $originalValue;
+        $this->requiresBetween = $requiresBetween;
     }
 
     /**
-     * @return string
+     * @return string|array
      */
     public function getDateValue()
     {
-        return $this->originalValue;
+        return $this->requiresBetween ? [$this->originalValue, $this->originalValue] : $this->originalValue;
     }
 }
