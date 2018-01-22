@@ -56,7 +56,7 @@ class DateFactory
             case 'year_this':
                 return new DateYearThis();
             default:
-                return new DateDefault();
+                return new DateDefault($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
         }
     }
 }

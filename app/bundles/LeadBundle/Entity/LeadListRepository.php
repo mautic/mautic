@@ -511,7 +511,8 @@ class LeadListRepository extends CommonRepository
                 //dump($q->getSQL());
                 $sql = $q->getSQL();
                 foreach ($q->getParameters() as $k=>$v) {
-                    $sql = str_replace(":$k", "'$v'", $sql);
+                    $value = is_array($v) ? implode(', ', $v) : $v;
+                    $sql   = str_replace(":$k", "'$value'", $sql);
                 }
 
                 echo '<hr/>';
