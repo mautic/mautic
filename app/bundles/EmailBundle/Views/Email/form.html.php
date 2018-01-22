@@ -276,7 +276,9 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
     'slots'         => $slots,
     'sections'      => $sections,
     'objectId'      => $email->getSessionId(),
-]); ?>
+    'previewUrl'    => $previewUrl,
+]);
+?>
 
 <?php
 $type = $email->getEmailType();

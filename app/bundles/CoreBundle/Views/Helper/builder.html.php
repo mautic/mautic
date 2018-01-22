@@ -18,7 +18,9 @@
     </div>
     <div class="builder-panel">
         <div class="builder-panel-top">
-            <?php echo $view->render('MauticCoreBundle:Helper:builder_buttons.html.php', ['onclick' => "Mautic.closeBuilder('$type');"]); ?>
+            <?php echo $view->render('MauticCoreBundle:Helper:builder_buttons.html.php', [
+                'onclick'       => "Mautic.closeBuilder('$type');",
+            ]); ?>
 
             <div class="code-mode-toolbar <?php echo $isCodeMode ? '' : 'hide'; ?>">
                 <button class="btn btn-default btn-nospin" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.core.media.manager.desc'); ?>">
@@ -36,6 +38,25 @@
             <i class="text-muted"><?php echo $view['translator']->trans('mautic.core.code.mode.token.dropdown.hint'); ?></i>
         </div>
         <div class="builder-toolbar <?php echo $isCodeMode ? 'hide' : ''; ?>">
+            <div class="panel panel-default" id="preview">
+                <div class="panel-heading">
+                    <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.email.urlvariant'); ?></h4>
+                </div>
+                <div class="panel-body">
+                    <div id="public-preview-container" class="col-md-12">
+                        <div class="input-group">
+                            <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                                   readonly
+                                   value="<?php echo $previewUrl; ?>"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
+                                    <i class="fa fa-external-link"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.core.slot.types'); ?></h4>
