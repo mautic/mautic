@@ -128,4 +128,5 @@ $isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
     'slots'         => $slots,
     'sections'      => $sections,
     'objectId'      => $activePage->getSessionId(),
+    'previewUrl'    => $previewUrl,
 ]); ?>
