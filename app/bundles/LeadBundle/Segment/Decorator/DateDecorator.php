@@ -61,16 +61,13 @@ class DateDecorator extends BaseDecorator
 
     public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        if ($this->isAnniversary($leadSegmentFilterCrate)) {
-            return '%'.date('-m-d');
-        }
-
+        $originalValue   = $leadSegmentFilterCrate->getFilter();
         $isTimestamp     = $this->isTimestamp($leadSegmentFilterCrate);
         $timeframe       = $this->getTimeFrame($leadSegmentFilterCrate);
         $requiresBetween = $this->requiresBetween($leadSegmentFilterCrate);
         $includeMidnigh  = $this->shouldIncludeMidnight($leadSegmentFilterCrate);
 
-        $date = $this->dateFactory->getDate($timeframe, $requiresBetween, $includeMidnigh, $isTimestamp);
+        $date = $this->dateFactory->getDate($originalValue, $timeframe, $requiresBetween, $includeMidnigh, $isTimestamp);
 
         return $date->getDateValue();
     }

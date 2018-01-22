@@ -11,6 +11,21 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-class DateWeekThis
+class DateWeekThis extends DateOptionAbstract implements DateOptionsInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function modifyBaseDate()
+    {
+        $this->dateTimeHelper->setDateTime('midnight monday this week', null);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getModifierForBetweenRange()
+    {
+        return '+1 week';
+    }
 }

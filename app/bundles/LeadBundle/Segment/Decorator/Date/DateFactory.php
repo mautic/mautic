@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class DateFactory
 {
     /**
+     * @param string $originalValue
      * @param string $timeframe
      * @param bool   $requiresBetween
      * @param bool   $includeMidnigh
@@ -23,7 +24,7 @@ class DateFactory
      *
      * @return DateOptionsInterface
      */
-    public function getDate($timeframe, $requiresBetween, $includeMidnigh, $isTimestamp)
+    public function getDate($originalValue, $timeframe, $requiresBetween, $includeMidnigh, $isTimestamp)
     {
         $dtHelper = new DateTimeHelper('midnight today', null, 'local');
 
@@ -38,11 +39,11 @@ class DateFactory
             case 'yesterday':
                 return new DateDayYesterday($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'week_last':
-                return new DateWeekLast();
+                return new DateWeekLast($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'week_next':
-                return new DateWeekNext();
+                return new DateWeekNext($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'week_this':
-                return new DateWeekThis();
+                return new DateWeekThis($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'month_last':
                 return new DateMonthLast();
             case 'month_next':
@@ -56,7 +57,7 @@ class DateFactory
             case 'year_this':
                 return new DateYearThis();
             default:
-                return new DateDefault($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
+                return new DateDefault($originalValue);
         }
     }
 }
