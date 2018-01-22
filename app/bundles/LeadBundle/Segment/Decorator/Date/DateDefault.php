@@ -11,6 +11,20 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-class DateDefault
+class DateDefault extends DateOptionAbstract implements DateOptionsInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function modifyBaseDate()
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getModifierForBetweenRange()
+    {
+        return '+0 day';
+    }
 }
