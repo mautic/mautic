@@ -317,9 +317,9 @@ class ReportSubscriber extends CommonSubscriber
                     $subLogIdQb       = clone $logIdQb;
                     $subLogIdQbPrefix = 'subLogIdQb';
                     $subLogIdQb->select("{$subLogIdQbPrefix}log.id, {$subLogIdQbPrefix}log.lead_id")
-                        ->from('campaign_lead_event_log', "{$subLogIdQbPrefix}log")
-                        ->innerJoin("{$subLogIdQbPrefix}log", 'campaign_events', "{$subLogIdQbPrefix}event", "{$subLogIdQbPrefix}log.event_id = {$subLogIdQbPrefix}event.id")
-                        ->innerJoin("{$subLogIdQbPrefix}event", 'campaigns', "{$subLogIdQbPrefix}campaign", "{$subLogIdQbPrefix}event.campaign_id = {$subLogIdQbPrefix}campaign.id")
+                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', "{$subLogIdQbPrefix}log")
+                        ->innerJoin("{$subLogIdQbPrefix}log", MAUTIC_TABLE_PREFIX.'campaign_events', "{$subLogIdQbPrefix}event", "{$subLogIdQbPrefix}log.event_id = {$subLogIdQbPrefix}event.id")
+                        ->innerJoin("{$subLogIdQbPrefix}event", MAUTIC_TABLE_PREFIX.'campaigns', "{$subLogIdQbPrefix}campaign", "{$subLogIdQbPrefix}event.campaign_id = {$subLogIdQbPrefix}campaign.id")
                         ->andWhere(
                             $subLogIdQb->expr()->eq("{$subLogIdQbPrefix}event.event_type", $subLogIdQb->expr()->literal('decision'))
                         );
