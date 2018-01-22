@@ -122,7 +122,7 @@ class ExpressionBuilder
     public function between($x, $arr)
     {
         if (!is_array($arr) || count($arr) != 2) {
-            throw new \Exception('Between expression expects send argument to be an array with exactly two elements');
+            throw new \Exception('Between expression expects second argument to be an array with exactly two elements');
         }
 
         return $x.' BETWEEN '.$this->comparison($arr[0], 'AND', $arr[1]);
@@ -148,7 +148,7 @@ class ExpressionBuilder
     public function notBetween($x, $arr)
     {
         if (!is_array($arr) || count($arr) != 2) {
-            throw new \Exception('Not between expression expects send argument to be an array with exactly two elements');
+            throw new \Exception('Not between expression expects second argument to be an array with exactly two elements');
         }
 
         return 'NOT '.$this->between($x, $arr);
