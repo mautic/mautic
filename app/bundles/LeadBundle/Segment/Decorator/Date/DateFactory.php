@@ -1,0 +1,62 @@
+<?php
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\LeadBundle\Segment\Decorator\Date;
+
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+
+class DateFactory
+{
+    /**
+     * @param string $timeframe
+     * @param bool   $requiresBetween
+     * @param bool   $includeMidnigh
+     * @param bool   $isTimestamp
+     *
+     * @return DateOptionsInterface
+     */
+    public function getDate($timeframe, $requiresBetween, $includeMidnigh, $isTimestamp)
+    {
+        $dtHelper = new DateTimeHelper('midnight today', null, 'local');
+
+        switch ($timeframe) {
+            case 'birthday':
+            case 'anniversary':
+                return new DateAnniversary();
+            case 'today':
+                return new DateDayToday($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
+            case 'tomorrow':
+                return new DateDayTomorrow($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
+            case 'yesterday':
+                return new DateDayYesterday($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
+            case 'week_last':
+                return new DateWeekLast();
+            case 'week_next':
+                return new DateWeekNext();
+            case 'week_this':
+                return new DateWeekThis();
+            case 'month_last':
+                return new DateMonthLast();
+            case 'month_next':
+                return new DateMonthNext();
+            case 'month_this':
+                return new DateMonthThis();
+            case 'year_last':
+                return new DateYearLast();
+            case 'year_next':
+                return new DateYearNext();
+            case 'year_this':
+                return new DateYearThis();
+            default:
+                return new DateDefault();
+        }
+    }
+}

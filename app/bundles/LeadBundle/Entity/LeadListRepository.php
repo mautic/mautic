@@ -507,7 +507,15 @@ class LeadListRepository extends CommonRepository
                     $q->resetQueryPart('groupBy');
                 }
 
-                dump($q->getSQL());
+                //  Debug output
+                //dump($q->getSQL());
+                $sql = $q->getSQL();
+                foreach ($q->getParameters() as $k=>$v) {
+                    $sql = str_replace(":$k", "'$v'", $sql);
+                }
+
+                echo '<hr/>';
+                dump($sql);
 
                 $start   = microtime(true);
                 $results = $q->execute()->fetchAll();
