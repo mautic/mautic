@@ -38,7 +38,7 @@ class PipedriveController extends CommonController
 
     public function webhookAction(Request $request)
     {
-      $integrationHelper    = $this->get('mautic.helper.integration');
+        $integrationHelper    = $this->get('mautic.helper.integration');
         $pipedriveIntegration = $integrationHelper->getIntegrationObject(self::INTEGRATION_NAME);
 
         if (!$pipedriveIntegration || !$pipedriveIntegration->getIntegrationSettings()->getIsPublished()) {
