@@ -39,11 +39,11 @@ class DateFactory
             case 'yesterday':
                 return new DateDayYesterday($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'week_last':
-                return new DateWeekLast();
+                return new DateWeekLast($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'week_next':
-                return new DateWeekNext();
+                return new DateWeekNext($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'week_this':
-                return new DateWeekThis();
+                return new DateWeekThis($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'month_last':
                 return new DateMonthLast();
             case 'month_next':
