@@ -669,13 +669,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             foreach ($keys as $key) {
-                if ('Id' === $key) {
-                    // Don't map Id for push
-                    continue;
-                }
-
                 if (strpos($key, '__'.$obj)) {
-                    $newKey                    = str_replace('__'.$obj, '', $key);
+                    $newKey = str_replace('__'.$obj, '', $key);
+                    if ('Id' === $newKey) {
+                        // Don't map Id for push
+                        continue;
+                    }
+
                     $leadFields[$obj][$newKey] = $fields[$key];
                 }
             }
