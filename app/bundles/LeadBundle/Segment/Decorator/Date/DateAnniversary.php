@@ -11,6 +11,13 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-class DateAnniversary
+class DateAnniversary implements DateOptionsInterface
 {
+    /**
+     * @return string
+     */
+    public function getDateValue()
+    {
+        return '%'.date('-m-d');
+    }
 }

@@ -61,10 +61,6 @@ class DateDecorator extends BaseDecorator
 
     public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        if ($this->isAnniversary($leadSegmentFilterCrate)) {
-            return '%'.date('-m-d');
-        }
-
         $originalValue   = $leadSegmentFilterCrate->getFilter();
         $isTimestamp     = $this->isTimestamp($leadSegmentFilterCrate);
         $timeframe       = $this->getTimeFrame($leadSegmentFilterCrate);
