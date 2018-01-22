@@ -69,7 +69,7 @@ class ExpressionBuilder
      * @param mixed $x Optional clause. Defaults = null, but requires
      *                 at least one defined when converting to string.
      *
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression
      */
     public function andX($x = null)
     {
@@ -88,7 +88,7 @@ class ExpressionBuilder
      * @param mixed $x Optional clause. Defaults = null, but requires
      *                 at least one defined when converting to string.
      *
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression
      */
     public function orX($x = null)
     {
