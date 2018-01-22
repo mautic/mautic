@@ -15,12 +15,9 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListSegmentRepository;
 use Mautic\LeadBundle\Segment\Query\LeadSegmentQueryBuilder;
-use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
 
 class LeadSegmentService
 {
-    use LeadSegmentFilterQueryBuilderTrait;
-
     /**
      * @var LeadListSegmentRepository
      */
@@ -53,25 +50,10 @@ class LeadSegmentService
         $this->queryBuilder              = $queryBuilder;
     }
 
-    /**
-     * @param Doctrine_Query $query
-     *
-     * @return string
-     */
-    public function getDqlWithParams(Doctrine_Query $query)
-    {
-        $vals = $query->getFlattenedParams();
-        $sql  = $query->getDql();
-        $sql  = str_replace('?', '%s', $sql);
-
-        return vsprintf($sql, $vals);
-    }
-
     public function getNewLeadsByListCount(LeadList $entity, array $batchLimiters)
     {
         $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($entity);
 
-        echo '<hr/>New version result:';
         $versionStart = microtime(true);
 
         if (!count($segmentFilters)) {
@@ -83,6 +65,8 @@ class LeadSegmentService
         $qb = $this->queryBuilder->addManuallySubscribedQuery($qb, $entity->getId());
         $qb = $this->queryBuilder->addManuallyUnsubsribedQuery($qb, $entity->getId());
         $qb = $this->queryBuilder->wrapInCount($qb);
+
+        $debug = $qb->getDebugOutput();
 
         //  Debug output
         $sql = $qb->getSQL();

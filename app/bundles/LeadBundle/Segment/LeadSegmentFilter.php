@@ -14,13 +14,9 @@ namespace Mautic\LeadBundle\Segment;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 class LeadSegmentFilter
 {
-    use LeadSegmentFilterQueryBuilderTrait;
-
     /**
      * @var LeadSegmentFilterCrate
      */
@@ -64,25 +60,6 @@ class LeadSegmentFilter
         }
 
         return $columns[$this->getField()];
-    }
-
-    /**
-     * @return string
-     *
-     * @deprecated This function might be not used at all
-     */
-    public function getEntity()
-    {
-        $converter = new CamelCaseToSnakeCaseNameConverter();
-        if ($this->getQueryDescription()) {
-            $table = $this->queryDescription['foreign_table'];
-        } else {
-            $table = $this->getObject();
-        }
-
-        $entity = sprintf('MauticLeadBundle:%s', ucfirst($converter->denormalize($table)));
-
-        return $entity;
     }
 
     /**

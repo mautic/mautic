@@ -34,6 +34,9 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
  * even if some vendors such as MySQL support it.
  *
  * @see    www.doctrine-project.org
+ *
+ * @todo rework this to extend the original Query Builder instead of writing new one
+ *
  * @since  2.1
  *
  * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
@@ -1553,5 +1556,22 @@ class QueryBuilder
         }
 
         return false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDebugOutput()
+    {
+        $params = $this->getParameters();
+        $sql    = $this->getSQL();
+        foreach ($params as $key=>$val) {
+            if (!is_int($val) and !is_float($val)) {
+                $val = "'$val'";
+            }
+            $sql = str_replace(":{$key}", $val, $sql);
+        }
+
+        return $sql;
     }
 }
