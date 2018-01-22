@@ -110,6 +110,44 @@ class ExpressionBuilder
     }
 
     /**
+     * Creates a between comparison expression.
+     *
+     * @param $x
+     * @param $arr
+     *
+     * @throws \Exception
+     *
+     * @return string
+     */
+    public function between($x, $arr)
+    {
+        if (!is_array($arr) || count($arr) != 2) {
+            throw new \Exception('Between expression expects send argument to be an array with exactly two elements');
+        }
+
+        return $x.' BETWEEN '.$this->comparison($arr[0], 'AND', $arr[1]);
+    }
+
+    /**
+     * Creates a not between comparison expression.
+     *
+     * @param $x
+     * @param $arr
+     *
+     * @throws \Exception
+     *
+     * @return string
+     */
+    public function notBetween($x, $arr)
+    {
+        if (!is_array($arr) || count($arr) != 2) {
+            throw new \Exception('Not between expression expects send argument to be an array with exactly two elements');
+        }
+
+        return 'NOT '.$this->between($x, $arr);
+    }
+
+    /**
      * Creates an equality comparison expression with the given arguments.
      *
      * First argument is considered the left expression and the second is the right expression.
