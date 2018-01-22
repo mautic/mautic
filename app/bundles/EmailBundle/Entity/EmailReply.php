@@ -49,6 +49,7 @@ class EmailReply
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('email_stat_replies')
+            ->setCustomRepositoryClass(EmailReplyRepository::class)
             ->addIndex(['stat_id', 'message_id'], 'email_replies')
             ->addIndex(['date_replied'], 'date_email_replied');
 
