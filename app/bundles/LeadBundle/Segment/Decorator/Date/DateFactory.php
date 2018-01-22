@@ -45,11 +45,11 @@ class DateFactory
             case 'week_this':
                 return new DateWeekThis($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'month_last':
-                return new DateMonthLast();
+                return new DateMonthLast($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'month_next':
-                return new DateMonthNext();
+                return new DateMonthNext($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'month_this':
-                return new DateMonthThis();
+                return new DateMonthThis($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'year_last':
                 return new DateYearLast();
             case 'year_next':

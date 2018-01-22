@@ -11,6 +11,21 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-class DateMonthLast
+class DateMonthLast extends DateOptionAbstract implements DateOptionsInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function modifyBaseDate()
+    {
+        $this->dateTimeHelper->setDateTime('midnight first day of last month', null);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getModifierForBetweenRange()
+    {
+        return '+1 month';
+    }
 }
