@@ -14,8 +14,8 @@ namespace Mautic\LeadBundle\Segment;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListSegmentRepository;
+use Mautic\LeadBundle\Segment\Query\LeadSegmentQueryBuilder;
 use Mautic\LeadBundle\Services\LeadSegmentFilterQueryBuilderTrait;
-use Mautic\LeadBundle\Services\LeadSegmentQueryBuilder;
 
 class LeadSegmentService
 {

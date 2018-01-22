@@ -792,7 +792,7 @@ return [
                 'arguments' => [],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [
-                'class'     => \Mautic\LeadBundle\Services\LeadSegmentQueryBuilder::class,
+                'class'     => Mautic\LeadBundle\Segment\Query\LeadSegmentQueryBuilder::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.random_parameter_name',

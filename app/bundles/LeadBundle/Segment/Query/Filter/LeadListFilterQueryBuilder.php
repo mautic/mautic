@@ -13,9 +13,9 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterFactory;
+use Mautic\LeadBundle\Segment\Query\LeadSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
-use Mautic\LeadBundle\Services\LeadSegmentQueryBuilder;
 
 /**
  * Class LeadListFilterQueryBuilder.
@@ -80,7 +80,7 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
             $segmentIds = [intval($segmentIds)];
         }
 
-        $leftIds = [];
+        $leftIds  = [];
         $innerIds = [];
 
         foreach ($segmentIds as $segmentId) {
