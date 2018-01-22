@@ -107,7 +107,7 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $field = new Field;
+        $field = new Field();
         $field->setType('email');
         $field->setAlias('email');
         $field->setLabel('Email');
@@ -141,7 +141,7 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $field = new Field;
+        $field = new Field();
         $field->setType('email');
         $field->setAlias('email');
         $field->setLabel('Email');
