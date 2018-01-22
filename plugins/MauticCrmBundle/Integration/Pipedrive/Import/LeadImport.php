@@ -23,7 +23,7 @@ class LeadImport extends AbstractImport
             throw new \Exception('Lead already have integration', Response::HTTP_CONFLICT);
         }
 
-        $data         = $this->convertPipedriveData($data);
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
         $lead = new Lead();
@@ -64,7 +64,7 @@ class LeadImport extends AbstractImport
         }
 
         $lead         = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
-        $data         = $this->convertPipedriveData($data);
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
         foreach ($dataToUpdate as $field => $value) {
