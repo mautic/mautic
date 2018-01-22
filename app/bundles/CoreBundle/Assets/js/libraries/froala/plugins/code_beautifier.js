@@ -117,7 +117,6 @@
     })(acorn);
 
     function run (html_source, options) {
-      console.log('beautifier running');
       function ltrim(s) {
         return s.replace(/^\s+/g, '');
       }
