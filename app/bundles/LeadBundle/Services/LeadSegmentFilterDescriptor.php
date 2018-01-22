@@ -11,12 +11,12 @@
 
 namespace Mautic\LeadBundle\Services;
 
-use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\FilterQueryBuilder\DncFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignFuncFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignValueFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\FilterQueryBuilder\LeadListFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\FilterQueryBuilder\SessionsFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\DncFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\LeadListFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
 
 class LeadSegmentFilterDescriptor extends \ArrayIterator
 {

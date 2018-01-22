@@ -12,9 +12,9 @@
 namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Mautic\LeadBundle\Entity\RegexTrait;
-use Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterOperator;
+use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 
 class BaseDecorator implements FilterDecoratorInterface
 {

@@ -718,27 +718,27 @@ return [
             ],
             //  Segment Filter Query builders
             'mautic.lead.query.builder.basic' => [
-                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\BaseFilterQueryBuilder::class,
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.foreign.value' => [
-                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignValueFilterQueryBuilder::class,
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.foreign.func' => [
-                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\ForeignFuncFilterQueryBuilder::class,
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.special.dnc' => [
-                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\DncFilterQueryBuilder::class,
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\DncFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.special.sessions' => [
-                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\SessionsFilterQueryBuilder::class,
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.special.leadlist' => [
-                'class'     => \Mautic\LeadBundle\Segment\FilterQueryBuilder\LeadListFilterQueryBuilder::class,
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\LeadListFilterQueryBuilder::class,
                 'arguments' => [
                     'mautic.lead.model.random_parameter_name',
                     'mautic.lead.repository.lead_segment_query_builder',

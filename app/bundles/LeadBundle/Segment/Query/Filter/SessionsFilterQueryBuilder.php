@@ -8,20 +8,20 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Segment\FilterQueryBuilder;
+namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class ForeignValueFilterQueryBuilder.
+ * Class SessionsFilterQueryBuilder.
  */
-class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
+class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     /** {@inheritdoc} */
     public static function getServiceId()
     {
-        return 'mautic.lead.query.builder.foreign.value';
+        return 'mautic.lead.query.builder.special.sessions';
     }
 
     /** {@inheritdoc} */
@@ -55,27 +55,14 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
             );
         }
 
-        switch ($filterOperator) {
-            case 'empty':
-                $queryBuilder->addSelect($tableAlias.'.lead_id');
-                $expression = $queryBuilder->expr()->isNull(
-                    $tableAlias.'.lead_id');
-                $queryBuilder->andWhere($expression);
-                break;
-            case 'notEmpty':
-                $queryBuilder->addSelect($tableAlias.'.lead_id');
-                $expression = $queryBuilder->expr()->isNull(
-                    $tableAlias.'.lead_id');
-                $queryBuilder->andWhere($expression);
-                break;
-            default:
-                $expression = $queryBuilder->expr()->$filterOperator(
-                    $tableAlias.'.'.$filter->getField(),
-                    $filterParametersHolder
-                );
-                $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
-                $queryBuilder->setParametersPairs($parameters, $filterParameters);
-        }
+        $expression = $queryBuilder->expr()->$filterOperator(
+            'count('.$tableAlias.'.id)',
+            $filterParametersHolder
+        );
+        $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
+        $queryBuilder->setParametersPairs($parameters, $filterParameters);
+
+        $queryBuilder->andHaving($expression);
 
         return $queryBuilder;
     }
