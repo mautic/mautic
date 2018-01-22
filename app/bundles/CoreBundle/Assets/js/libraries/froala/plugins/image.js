@@ -207,11 +207,6 @@
       for (var i = 0; i < images.length; i++) {
         var $img = $(images[i]);
 
-        if (!editor.opts.htmlUntouched && editor.opts.useClasses) {
-          if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0 || editor.opts.imageEditButtons.indexOf('imageDisplay') >= 0) {
-            _convertStyleToClasses($img);
-          }
-
           // Do not allow text near image.
           if (!editor.opts.imageTextNear) {
             $img.removeClass('fr-dii').addClass('fr-dib');

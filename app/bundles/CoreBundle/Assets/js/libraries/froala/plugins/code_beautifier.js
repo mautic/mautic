@@ -49,7 +49,6 @@
     /* jshint ignore:start */
     /* jscs:disable */
 
-
     var acorn = {};
     (function(exports) {
         /* jshint curly: false */
@@ -118,6 +117,7 @@
     })(acorn);
 
     function run (html_source, options) {
+      console.log('beautifier running');
       function ltrim(s) {
         return s.replace(/^\s+/g, '');
       }
@@ -728,7 +728,6 @@
           this.indent_level = 0;
           this.wrap_line_length = wrap_line_length;
           this.line_char_count = 0; //count to see if wrap_line_length was exceeded
-
           for (var i = 0; i < this.indent_size; i++) {
             this.indent_string += this.indent_character;
           }
