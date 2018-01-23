@@ -9,9 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Segment\Decorator\Date;
+namespace Mautic\LeadBundle\Segment\Decorator\Date\Week;
 
-class DateWeekNext extends DateOptionAbstract implements DateOptionsInterface
+class DateWeekNext extends DateWeekAbstract
 {
     /**
      * {@inheritdoc}
@@ -19,13 +19,5 @@ class DateWeekNext extends DateOptionAbstract implements DateOptionsInterface
     protected function modifyBaseDate()
     {
         $this->dateTimeHelper->setDateTime('midnight monday next week', null);
-    }
-
-    /**
-     * @return string
-     */
-    protected function getModifierForBetweenRange()
-    {
-        return '+1 week';
     }
 }

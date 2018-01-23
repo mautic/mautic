@@ -9,9 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Segment\Decorator\Date;
+namespace Mautic\LeadBundle\Segment\Decorator\Date\Day;
 
-class DateDayTomorrow extends DateOptionAbstract implements DateOptionsInterface
+class DateDayTomorrow extends DateDayAbstract
 {
     /**
      * {@inheritdoc}
@@ -19,13 +19,5 @@ class DateDayTomorrow extends DateOptionAbstract implements DateOptionsInterface
     protected function modifyBaseDate()
     {
         $this->dateTimeHelper->modify('+1 day');
-    }
-
-    /**
-     * @return string
-     */
-    protected function getModifierForBetweenRange()
-    {
-        return '+1 day';
     }
 }

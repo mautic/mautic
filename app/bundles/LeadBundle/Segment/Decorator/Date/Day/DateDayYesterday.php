@@ -9,15 +9,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Segment\Decorator\Date;
+namespace Mautic\LeadBundle\Segment\Decorator\Date\Day;
 
-class DateAnniversary implements DateOptionsInterface
+class DateDayYesterday extends DateDayAbstract
 {
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getDateValue()
+    protected function modifyBaseDate()
     {
-        return '%'.date('-m-d');
+        $this->dateTimeHelper->modify('-1 day');
     }
 }
