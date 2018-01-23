@@ -32,7 +32,7 @@ abstract class DateWeekAbstract extends DateOptionAbstract
         $dateFormat = $this->isTimestamp ? 'Y-m-d H:i:s' : 'Y-m-d';
         $startWith  = $this->dateTimeHelper->toUtcString($dateFormat);
 
-        $modifier = $this->getModifierForBetweenRange();
+        $modifier = $this->getModifierForBetweenRange().' -1 second';
         $this->dateTimeHelper->modify($modifier);
         $endWith = $this->dateTimeHelper->toUtcString($dateFormat);
 
