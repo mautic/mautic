@@ -41,6 +41,7 @@ abstract class AbstractPipedrive
     /**
      * @param array $data
      * @param array $objectFields
+     *
      * @return array
      */
     protected function convertPipedriveData(array $data = [], array $objectFields = [])
