@@ -53,7 +53,7 @@ abstract class AbstractPipedrive
             foreach ($objectFields as $field) {
                 if ($field['field_type'] == 'set' && in_array($field['key'], array_keys($data))) {
                     $pipedriveContactFieldOptions = array_flip(explode(',', $data[$field['key']]));
-                    $pipedriveAllFieldOptions = array_combine(array_values(array_column($field['options'], 'id')),
+                    $pipedriveAllFieldOptions     = array_combine(array_values(array_column($field['options'], 'id')),
                         array_column($field['options'], 'label'));
                     foreach ($pipedriveAllFieldOptions as $key => $option) {
                         if (!isset($pipedriveContactFieldOptions[$key])) {
