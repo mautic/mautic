@@ -12,6 +12,20 @@
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday;
+use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayTomorrow;
+use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday;
+use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthLast;
+use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthNext;
+use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthThis;
+use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
+use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault;
+use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast;
+use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekNext;
+use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekThis;
+use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearLast;
+use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearNext;
+use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearThis;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
@@ -45,13 +59,10 @@ class DateOptionFactory
             case 'anniversary':
                 return new DateAnniversary($this->dateDecorator);
             case 'today':
-                //LIKE 2018-01-23%
                 return new DateDayToday($this->dateDecorator, $dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'tomorrow':
-                //LIKE 2018-01-24%
                 return new DateDayTomorrow($this->dateDecorator, $dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'yesterday':
-                //LIKE 2018-01-22%
                 return new DateDayYesterday($this->dateDecorator, $dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'week_last':
                 return new DateWeekLast($this->dateDecorator, $dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
@@ -60,22 +71,16 @@ class DateOptionFactory
             case 'week_this':
                 return new DateWeekThis($this->dateDecorator, $dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'month_last':
-                //LIKE 2017-12-%
                 return new DateMonthLast($this->dateDecorator, $dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'month_next':
-                //LIKE 2018-02-%
                 return new DateMonthNext($this->dateDecorator, $dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'month_this':
-                //LIKE 2018-01-%
                 return new DateMonthThis($this->dateDecorator, $dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
             case 'year_last':
-                //LIKE 2017-%
                 return new DateYearLast();
-                //LIKE 2019-%
             case 'year_next':
                 return new DateYearNext();
             case 'year_this':
-                //LIKE 2018-%
                 return new DateYearThis();
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);

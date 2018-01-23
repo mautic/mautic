@@ -9,23 +9,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Segment\Decorator\Date;
+namespace Mautic\LeadBundle\Segment\Decorator\Date\Week;
 
-class DateDayYesterday extends DateOptionAbstract
+class DateWeekThis extends DateWeekAbstract
 {
     /**
      * {@inheritdoc}
      */
     protected function modifyBaseDate()
     {
-        $this->dateTimeHelper->modify('-1 day');
-    }
-
-    /**
-     * @return string
-     */
-    protected function getModifierForBetweenRange()
-    {
-        return '+1 day';
+        $this->dateTimeHelper->setDateTime('midnight monday this week', null);
     }
 }

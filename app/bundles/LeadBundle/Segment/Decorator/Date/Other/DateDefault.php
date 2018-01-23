@@ -9,22 +9,32 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Segment\Decorator\Date;
+namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 
-class DateAnniversary implements FilterDecoratorInterface
+class DateDefault implements FilterDecoratorInterface
 {
     /**
      * @var DateDecorator
      */
     private $dateDecorator;
 
-    public function __construct(DateDecorator $dateDecorator)
+    /**
+     * @var string
+     */
+    private $originalValue;
+
+    /**
+     * @param DateDecorator $dateDecorator
+     * @param string        $originalValue
+     */
+    public function __construct(DateDecorator $dateDecorator, $originalValue)
     {
-        $this->dateDecorator = $dateDecorator;
+        $this->dateDecorator   = $dateDecorator;
+        $this->originalValue   = $originalValue;
     }
 
     public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)
@@ -39,7 +49,7 @@ class DateAnniversary implements FilterDecoratorInterface
 
     public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return 'like';
+        return $this->dateDecorator->getOperator($leadSegmentFilterCrate);
     }
 
     public function getParameterHolder(LeadSegmentFilterCrate $leadSegmentFilterCrate, $argument)
@@ -49,7 +59,7 @@ class DateAnniversary implements FilterDecoratorInterface
 
     public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return '%'.date('-m-d');
+        return $this->originalValue;
     }
 
     public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)

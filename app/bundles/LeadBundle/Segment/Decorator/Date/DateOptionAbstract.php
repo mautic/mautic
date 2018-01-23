@@ -41,7 +41,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
     /**
      * @var bool
      */
-    private $isTimestamp;
+    protected $isTimestamp;
 
     /**
      * @param DateDecorator  $dateDecorator
@@ -73,6 +73,23 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
      */
     abstract protected function getModifierForBetweenRange();
 
+    /**
+     * This function returns a value if between range is needed. Could return string for like operator or array for between operator
+     * Eg. //LIKE 2018-01-23% for today, //LIKE 2017-12-% for last month, //LIKE 2017-% for last year, array for this week.
+     *
+     * @return string|array
+     */
+    abstract protected function getValueForBetweenRange();
+
+    /**
+     * This function returns an operator if between range is needed. Could return like or between.
+     *
+     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
+     *
+     * @return string
+     */
+    abstract protected function getOperatorForBetweenRange(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+
     public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
         return $this->dateDecorator->getField($leadSegmentFilterCrate);
@@ -86,7 +103,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
     public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
         if ($this->requiresBetween) {
-            return $leadSegmentFilterCrate->getOperator() === '!=' ? 'notBetween' : 'between';
+            return $this->getOperatorForBetweenRange($leadSegmentFilterCrate);
         }
 
         return $this->dateDecorator->getOperator($leadSegmentFilterCrate);
@@ -105,12 +122,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
         $dateFormat = $this->isTimestamp ? 'Y-m-d H:i:s' : 'Y-m-d';
 
         if ($this->requiresBetween) {
-            $startWith = $this->dateTimeHelper->toUtcString($dateFormat);
-
-            $this->dateTimeHelper->modify($modifier);
-            $endWith = $this->dateTimeHelper->toUtcString($dateFormat);
-
-            return [$startWith, $endWith];
+            return $this->getValueForBetweenRange();
         }
 
         if ($this->includeMidnigh) {

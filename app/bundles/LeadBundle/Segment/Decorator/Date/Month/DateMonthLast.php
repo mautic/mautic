@@ -9,9 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Segment\Decorator\Date;
+namespace Mautic\LeadBundle\Segment\Decorator\Date\Month;
 
-class DateMonthLast extends DateOptionAbstract
+class DateMonthLast extends DateMonthAbstract
 {
     /**
      * {@inheritdoc}
@@ -19,13 +19,5 @@ class DateMonthLast extends DateOptionAbstract
     protected function modifyBaseDate()
     {
         $this->dateTimeHelper->setDateTime('midnight first day of last month', null);
-    }
-
-    /**
-     * @return string
-     */
-    protected function getModifierForBetweenRange()
-    {
-        return '+1 month';
     }
 }
