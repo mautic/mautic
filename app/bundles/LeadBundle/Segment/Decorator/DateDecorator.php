@@ -11,10 +11,8 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
-use Mautic\LeadBundle\Segment\Decorator\Date\DateFactory;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterOperator;
-use Mautic\LeadBundle\Segment\RelativeDate;
 use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 
 class DateDecorator extends BaseDecorator
@@ -24,87 +22,31 @@ class DateDecorator extends BaseDecorator
      */
     private $leadSegmentFilterDescriptor;
 
-    /**
-     * @var RelativeDate
-     */
-    private $relativeDate;
-
-    /**
-     * @var DateFactory
-     */
-    private $dateFactory;
-
     public function __construct(
         LeadSegmentFilterOperator $leadSegmentFilterOperator,
-        LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor,
-        RelativeDate $relativeDate,
-        DateFactory $dateFactory
+        LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor
     ) {
         parent::__construct($leadSegmentFilterOperator);
         $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
-        $this->relativeDate                = $relativeDate;
-        $this->dateFactory                 = $dateFactory;
     }
 
-    public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)
-    {
-        if ($this->isAnniversary($leadSegmentFilterCrate)) {
-            return 'like';
+    /*
+        public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+        {
+            if ($this->isAnniversary($leadSegmentFilterCrate)) {
+                return 'like';
+            }
+    
+            if ($this->requiresBetween($leadSegmentFilterCrate)) {
+                return $leadSegmentFilterCrate->getOperator() === '!=' ? 'notBetween' : 'between';
+            }
+    
+            return parent::getOperator($leadSegmentFilterCrate);
         }
-
-        if ($this->requiresBetween($leadSegmentFilterCrate)) {
-            return $leadSegmentFilterCrate->getOperator() === '!=' ? 'notBetween' : 'between';
-        }
-
-        return parent::getOperator($leadSegmentFilterCrate);
-    }
-
+    */
     public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        $originalValue   = $leadSegmentFilterCrate->getFilter();
-        $isTimestamp     = $this->isTimestamp($leadSegmentFilterCrate);
-        $timeframe       = $this->getTimeFrame($leadSegmentFilterCrate);
-        $requiresBetween = $this->requiresBetween($leadSegmentFilterCrate);
-        $includeMidnigh  = $this->shouldIncludeMidnight($leadSegmentFilterCrate);
-
-        $date = $this->dateFactory->getDate($originalValue, $timeframe, $requiresBetween, $includeMidnigh, $isTimestamp);
-
-        return $date->getDateValue();
-    }
-
-    private function isAnniversary(LeadSegmentFilterCrate $leadSegmentFilterCrate)
-    {
-        $timeframe = $this->getTimeFrame($leadSegmentFilterCrate);
-
-        return $timeframe === 'anniversary' || $timeframe === 'birthday';
-    }
-
-    private function requiresBetween(LeadSegmentFilterCrate $leadSegmentFilterCrate)
-    {
-        return in_array($leadSegmentFilterCrate->getOperator(), ['=', '!='], true);
-    }
-
-    private function shouldIncludeMidnight(LeadSegmentFilterCrate $leadSegmentFilterCrate)
-    {
-        return in_array($this->getOperator($leadSegmentFilterCrate), ['gt', 'lte'], true);
-    }
-
-    private function isTimestamp(LeadSegmentFilterCrate $leadSegmentFilterCrate)
-    {
-        return $leadSegmentFilterCrate->getType() === 'datetime';
-    }
-
-    /**
-     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
-     *
-     * @return string
-     */
-    private function getTimeFrame(LeadSegmentFilterCrate $leadSegmentFilterCrate)
-    {
-        $relativeDateStrings = $this->relativeDate->getRelativeDateStrings();
-        $key                 = array_search($leadSegmentFilterCrate->getFilter(), $relativeDateStrings, true);
-
-        return str_replace('mautic.lead.list.', '', $key);
+        throw new \Exception();
     }
 
     public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)

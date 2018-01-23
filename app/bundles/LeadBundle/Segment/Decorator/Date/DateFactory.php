@@ -11,53 +11,71 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\RelativeDate;
 
 class DateFactory
 {
     /**
-     * @param string $originalValue
-     * @param string $timeframe
-     * @param bool   $requiresBetween
-     * @param bool   $includeMidnigh
-     * @param bool   $isTimestamp
-     *
-     * @return DateOptionsInterface
+     * @var DateOptionFactory
      */
-    public function getDate($originalValue, $timeframe, $requiresBetween, $includeMidnigh, $isTimestamp)
-    {
-        $dtHelper = new DateTimeHelper('midnight today', null, 'local');
+    private $dateOptionFactory;
 
-        switch ($timeframe) {
-            case 'birthday':
-            case 'anniversary':
-                return new DateAnniversary();
-            case 'today':
-                return new DateDayToday($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
-            case 'tomorrow':
-                return new DateDayTomorrow($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
-            case 'yesterday':
-                return new DateDayYesterday($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
-            case 'week_last':
-                return new DateWeekLast($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
-            case 'week_next':
-                return new DateWeekNext($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
-            case 'week_this':
-                return new DateWeekThis($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
-            case 'month_last':
-                return new DateMonthLast($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
-            case 'month_next':
-                return new DateMonthNext($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
-            case 'month_this':
-                return new DateMonthThis($dtHelper, $requiresBetween, $includeMidnigh, $isTimestamp);
-            case 'year_last':
-                return new DateYearLast();
-            case 'year_next':
-                return new DateYearNext();
-            case 'year_this':
-                return new DateYearThis();
-            default:
-                return new DateDefault($originalValue, $requiresBetween);
-        }
+    /**
+     * @var RelativeDate
+     */
+    private $relativeDate;
+
+    public function __construct(
+        DateOptionFactory $dateOptionFactory,
+        RelativeDate $relativeDate
+    ) {
+        $this->dateOptionFactory = $dateOptionFactory;
+        $this->relativeDate      = $relativeDate;
+    }
+
+    /**
+     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
+     *
+     * @return FilterDecoratorInterface
+     */
+    public function getDateOption(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        $originalValue   = $leadSegmentFilterCrate->getFilter();
+        $isTimestamp     = $this->isTimestamp($leadSegmentFilterCrate);
+        $timeframe       = $this->getTimeFrame($leadSegmentFilterCrate);
+        $requiresBetween = $this->requiresBetween($leadSegmentFilterCrate);
+        $includeMidnigh  = $this->shouldIncludeMidnight($leadSegmentFilterCrate);
+
+        return $this->dateOptionFactory->getDate($originalValue, $timeframe, $requiresBetween, $includeMidnigh, $isTimestamp);
+    }
+
+    private function requiresBetween(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return in_array($leadSegmentFilterCrate->getOperator(), ['=', '!='], true);
+    }
+
+    private function shouldIncludeMidnight(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return in_array($leadSegmentFilterCrate->getOperator(), ['gt', 'lte'], true);
+    }
+
+    private function isTimestamp(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return $leadSegmentFilterCrate->getType() === 'datetime';
+    }
+
+    /**
+     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
+     *
+     * @return string
+     */
+    private function getTimeFrame(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        $relativeDateStrings = $this->relativeDate->getRelativeDateStrings();
+        $key                 = array_search($leadSegmentFilterCrate->getFilter(), $relativeDateStrings, true);
+
+        return str_replace('mautic.lead.list.', '', $key);
     }
 }

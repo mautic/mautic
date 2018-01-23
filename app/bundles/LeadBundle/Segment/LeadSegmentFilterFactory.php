@@ -15,18 +15,13 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
-use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
+use Mautic\LeadBundle\Segment\Decorator\Date\DateFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 use Symfony\Component\DependencyInjection\Container;
 
 class LeadSegmentFilterFactory
 {
-    /**
-     * @var LeadSegmentFilterDate
-     */
-    private $leadSegmentFilterDate;
-
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
@@ -53,26 +48,24 @@ class LeadSegmentFilterFactory
     private $customMappedDecorator;
 
     /**
-     * @var DateDecorator
+     * @var DateFactory
      */
-    private $dateDecorator;
+    private $dateFactory;
 
     public function __construct(
-        LeadSegmentFilterDate $leadSegmentFilterDate,
         EntityManager $entityManager,
         Container $container,
         LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor,
         BaseDecorator $baseDecorator,
         CustomMappedDecorator $customMappedDecorator,
-        DateDecorator $dateDecorator
+        DateFactory $dateFactory
     ) {
-        $this->leadSegmentFilterDate       = $leadSegmentFilterDate;
         $this->entityManager               = $entityManager;
         $this->container                   = $container;
         $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
         $this->baseDecorator               = $baseDecorator;
         $this->customMappedDecorator       = $customMappedDecorator;
-        $this->dateDecorator               = $dateDecorator;
+        $this->dateFactory                 = $dateFactory;
     }
 
     /**
@@ -123,7 +116,7 @@ class LeadSegmentFilterFactory
     {
         $type = $leadSegmentFilterCrate->getType();
         if ($type === 'datetime' || $type === 'date') {
-            return $this->dateDecorator;
+            return $this->dateFactory->getDateOption($leadSegmentFilterCrate);
         }
 
         $originalField = $leadSegmentFilterCrate->getField();

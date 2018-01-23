@@ -11,26 +11,30 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-class DateDefault implements DateOptionsInterface
+use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
+use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
+
+class DateDefault implements DateOptionsInterface, FilterDecoratorInterface
 {
+    /**
+     * @var DateDecorator
+     */
+    private $dateDecorator;
+
     /**
      * @var string
      */
     private $originalValue;
 
     /**
-     * @var string
+     * @param DateDecorator $dateDecorator
+     * @param string        $originalValue
      */
-    private $requiresBetween;
-
-    /**
-     * @param string $originalValue
-     * @param string $requiresBetween
-     */
-    public function __construct($originalValue, $requiresBetween)
+    public function __construct(DateDecorator $dateDecorator, $originalValue)
     {
+        $this->dateDecorator   = $dateDecorator;
         $this->originalValue   = $originalValue;
-        $this->requiresBetween = $requiresBetween;
     }
 
     /**
@@ -38,6 +42,41 @@ class DateDefault implements DateOptionsInterface
      */
     public function getDateValue()
     {
-        return $this->requiresBetween ? [$this->originalValue, $this->originalValue] : $this->originalValue;
+        return $this->originalValue;
+    }
+
+    public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return $this->dateDecorator->getField($leadSegmentFilterCrate);
+    }
+
+    public function getTable(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return $this->dateDecorator->getTable($leadSegmentFilterCrate);
+    }
+
+    public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return $this->dateDecorator->getOperator($leadSegmentFilterCrate);
+    }
+
+    public function getParameterHolder(LeadSegmentFilterCrate $leadSegmentFilterCrate, $argument)
+    {
+        return $this->dateDecorator->getParameterHolder($leadSegmentFilterCrate, $argument);
+    }
+
+    public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return $this->getDateValue();
+    }
+
+    public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return $this->dateDecorator->getQueryType($leadSegmentFilterCrate);
+    }
+
+    public function getAggregateFunc(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return $this->dateDecorator->getAggregateFunc($leadSegmentFilterCrate);
     }
 }
