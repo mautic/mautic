@@ -29,34 +29,20 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
     protected $dateTimeHelper;
 
     /**
-     * @var bool
+     * @var DateOptionParameters
      */
-    private $requiresBetween;
+    protected $dateOptionParameters;
 
     /**
-     * @var bool
+     * @param DateDecorator        $dateDecorator
+     * @param DateTimeHelper       $dateTimeHelper
+     * @param DateOptionParameters $dateOptionParameters
      */
-    private $includeMidnigh;
-
-    /**
-     * @var bool
-     */
-    protected $isTimestamp;
-
-    /**
-     * @param DateDecorator  $dateDecorator
-     * @param DateTimeHelper $dateTimeHelper
-     * @param bool           $requiresBetween
-     * @param bool           $includeMidnigh
-     * @param bool           $isTimestamp
-     */
-    public function __construct(DateDecorator $dateDecorator, DateTimeHelper $dateTimeHelper, $requiresBetween, $includeMidnigh, $isTimestamp)
+    public function __construct(DateDecorator $dateDecorator, DateTimeHelper $dateTimeHelper, DateOptionParameters $dateOptionParameters)
     {
-        $this->dateDecorator   = $dateDecorator;
-        $this->dateTimeHelper  = $dateTimeHelper;
-        $this->requiresBetween = $requiresBetween;
-        $this->includeMidnigh  = $includeMidnigh;
-        $this->isTimestamp     = $isTimestamp;
+        $this->dateDecorator        = $dateDecorator;
+        $this->dateTimeHelper       = $dateTimeHelper;
+        $this->dateOptionParameters = $dateOptionParameters;
     }
 
     /**
@@ -102,7 +88,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
 
     public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        if ($this->requiresBetween) {
+        if ($this->dateOptionParameters->isBetweenRequired()) {
             return $this->getOperatorForBetweenRange($leadSegmentFilterCrate);
         }
 
@@ -119,13 +105,13 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
         $this->modifyBaseDate();
 
         $modifier   = $this->getModifierForBetweenRange();
-        $dateFormat = $this->isTimestamp ? 'Y-m-d H:i:s' : 'Y-m-d';
+        $dateFormat = $this->dateOptionParameters->hasTimePart() ? 'Y-m-d H:i:s' : 'Y-m-d';
 
-        if ($this->requiresBetween) {
+        if ($this->dateOptionParameters->isBetweenRequired()) {
             return $this->getValueForBetweenRange();
         }
 
-        if ($this->includeMidnigh) {
+        if ($this->dateOptionParameters->shouldIncludeMidnigh()) {
             $modifier .= ' -1 second';
             $this->dateTimeHelper->modify($modifier);
         }

@@ -147,4 +147,14 @@ class LeadSegmentFilterCrate
     {
         return $this->func;
     }
+
+    public function isDateType()
+    {
+        return $this->getType() === 'date' || $this->hasTimeParts();
+    }
+
+    public function hasTimeParts()
+    {
+        return $this->getType() === 'datetime';
+    }
 }
