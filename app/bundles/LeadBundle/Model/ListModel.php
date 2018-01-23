@@ -799,6 +799,239 @@ class ListModel extends FormModel
 
     public function updateLeadList(LeadList $leadList)
     {
+        defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
+
+        $id       = $entity->getId();
+        $list     = ['id' => $id, 'filters' => $entity->getFilters()];
+        $dtHelper = new DateTimeHelper();
+        $dtHelper = new DateTimeHelper('2017-10-01 00:00:00');
+
+        $batchLimiters = [
+            'dateTime' => $dtHelper->toUtcString(),
+        ];
+
+        $localDateTime = $dtHelper->getLocalDateTime();
+
+        $this->dispatcher->dispatch(
+            LeadEvents::LIST_PRE_PROCESS_LIST,
+            new ListPreProcessListEvent($list, false)
+        );
+
+        // Get a count of leads to add
+        $newLeadsCount = $this->leadSegment->getNewLeadsByListCount($entity, $batchLimiters);
+
+        dump($newLeadsCount);
+        echo '<hr/>Original result:';
+
+        $versionStart = microtime(true);
+
+        // Get a count of leads to add
+        $newLeadsCount = $this->getLeadsByList(
+            $list,
+            true,
+            [
+                'countOnly'     => true,
+                'newOnly'       => true,
+                'batchLimiters' => $batchLimiters,
+            ]
+        );
+        $versionEnd = microtime(true) - $versionStart;
+        dump('Total query assembly took:'.(1000 * $versionEnd).'ms');
+
+        dump(array_shift($newLeadsCount));
+        exit;
+        // Ensure the same list is used each batch
+        $batchLimiters['maxId'] = (int) $newLeadsCount[$id]['maxId'];
+
+        // Number of total leads to process
+        $leadCount = (int) $newLeadsCount[$id]['count'];
+
+        if ($output) {
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', ['%leads%' => $leadCount, '%batch%' => $limit]));
+        }
+
+        // Handle by batches
+        $start = $lastRoundPercentage = $leadsProcessed = 0;
+
+        // Try to save some memory
+        gc_enable();
+
+        if ($leadCount) {
+            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+
+            if ($output) {
+                $progress = ProgressBarHelper::init($output, $maxCount);
+                $progress->start();
+            }
+
+            // Add leads
+            while ($start < $leadCount) {
+                // Keep CPU down for large lists; sleep per $limit batch
+                $this->batchSleep();
+
+                $newLeadList = $this->getLeadsByList(
+                    $list,
+                    true,
+                    [
+                        'newOnly' => true,
+                        // No start set because of newOnly thus always at 0
+                        'limit'         => $limit,
+                        'batchLimiters' => $batchLimiters,
+                    ]
+                );
+
+                if (empty($newLeadList[$id])) {
+                    // Somehow ran out of leads so break out
+                    break;
+                }
+
+                $processedLeads = [];
+                foreach ($newLeadList[$id] as $l) {
+                    $this->addLead($l, $entity, false, true, -1, $localDateTime);
+                    $processedLeads[] = $l;
+                    unset($l);
+
+                    ++$leadsProcessed;
+                    if ($output && $leadsProcessed < $maxCount) {
+                        $progress->setProgress($leadsProcessed);
+                    }
+
+                    if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                        break;
+                    }
+                }
+
+                $start += $limit;
+
+                // Dispatch batch event
+                if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                    $this->dispatcher->dispatch(
+                        LeadEvents::LEAD_LIST_BATCH_CHANGE,
+                        new ListChangeEvent($processedLeads, $entity, true)
+                    );
+                }
+
+                unset($newLeadList);
+
+                // Free some memory
+                gc_collect_cycles();
+
+                if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                    if ($output) {
+                        $progress->finish();
+                        $output->writeln('');
+                    }
+
+                    return $leadsProcessed;
+                }
+            }
+
+            if ($output) {
+                $progress->finish();
+                $output->writeln('');
+            }
+        }
+
+        // Unset max ID to prevent capping at newly added max ID
+        unset($batchLimiters['maxId']);
+
+        // Get a count of leads to be removed
+        $removeLeadCount = $this->getLeadsByList(
+            $list,
+            true,
+            [
+                'countOnly'      => true,
+                'nonMembersOnly' => true,
+                'batchLimiters'  => $batchLimiters,
+            ]
+        );
+
+        // Ensure the same list is used each batch
+        $batchLimiters['maxId'] = (int) $removeLeadCount[$id]['maxId'];
+
+        // Restart batching
+        $start     = $lastRoundPercentage     = 0;
+        $leadCount = $removeLeadCount[$id]['count'];
+
+        if ($output) {
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', ['%leads%' => $leadCount, '%batch%' => $limit]));
+        }
+
+        if ($leadCount) {
+            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+
+            if ($output) {
+                $progress = ProgressBarHelper::init($output, $maxCount);
+                $progress->start();
+            }
+
+            // Remove leads
+            while ($start < $leadCount) {
+                // Keep CPU down for large lists; sleep per $limit batch
+                $this->batchSleep();
+
+                $removeLeadList = $this->getLeadsByList(
+                    $list,
+                    true,
+                    [
+                        // No start because the items are deleted so always 0
+                        'limit'          => $limit,
+                        'nonMembersOnly' => true,
+                        'batchLimiters'  => $batchLimiters,
+                    ]
+                );
+
+                if (empty($removeLeadList[$id])) {
+                    // Somehow ran out of leads so break out
+                    break;
+                }
+
+                $processedLeads = [];
+                foreach ($removeLeadList[$id] as $l) {
+                    $this->removeLead($l, $entity, false, true, true);
+                    $processedLeads[] = $l;
+                    ++$leadsProcessed;
+                    if ($output && $leadsProcessed < $maxCount) {
+                        $progress->setProgress($leadsProcessed);
+                    }
+
+                    if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                        break;
+                    }
+                }
+
+                // Dispatch batch event
+                if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                    $this->dispatcher->dispatch(
+                        LeadEvents::LEAD_LIST_BATCH_CHANGE,
+                        new ListChangeEvent($processedLeads, $entity, false)
+                    );
+                }
+
+                $start += $limit;
+
+                unset($removeLeadList);
+
+                // Free some memory
+                gc_collect_cycles();
+
+                if ($maxLeads && $leadsProcessed >= $maxLeads) {
+                    if ($output) {
+                        $progress->finish();
+                        $output->writeln('');
+                    }
+
+                    return $leadsProcessed;
+                }
+            }
+
+            if ($output) {
+                $progress->finish();
+                $output->writeln('');
+            }
+        }
+
+        return $leadsProcessed;
     }
 
     public function rebuildListLeads()
