@@ -32,13 +32,14 @@ use Doctrine\DBAL\Connection;
  */
 class ExpressionBuilder
 {
-    const EQ     = '=';
-    const NEQ    = '<>';
-    const LT     = '<';
-    const LTE    = '<=';
-    const GT     = '>';
-    const GTE    = '>=';
-    const REGEXP = 'REGEXP';
+    const EQ      = '=';
+    const NEQ     = '<>';
+    const LT      = '<';
+    const LTE     = '<=';
+    const GT      = '>';
+    const GTE     = '>=';
+    const REGEXP  = 'REGEXP';
+    const BETWEEN = 'BETWEEN';
 
     /**
      * The DBAL Connection.
@@ -125,7 +126,7 @@ class ExpressionBuilder
             throw new \Exception('Between expression expects second argument to be an array with exactly two elements');
         }
 
-        return $x.' BETWEEN '.$this->comparison($arr[0], 'AND', $arr[1]);
+        return $x.' '.self::BETWEEN.' '.$this->comparison($arr[0], 'AND', $arr[1]);
     }
 
     /**
