@@ -38,7 +38,7 @@ class Version20170628191405 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}plugin_crm_pipedrive_owners (
+CREATE TABLE IF NOT EXISTS {$this->prefix}plugin_crm_pipedrive_owners (
   id INT AUTO_INCREMENT NOT NULL,
   email VARCHAR(255) NOT NULL,
   owner_id INT DEFAULT NULL,

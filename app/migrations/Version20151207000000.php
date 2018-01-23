@@ -39,7 +39,7 @@ class Version20151207000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql('CREATE TABLE '.$this->prefix.'email_copies (id VARCHAR(32) NOT NULL, date_created DATETIME NOT NULL, body LONGTEXT DEFAULT NULL, subject LONGTEXT DEFAULT NULL, PRIMARY KEY(id))  DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE IF NOT EXISTS '.$this->prefix.'email_copies (id VARCHAR(32) NOT NULL, date_created DATETIME NOT NULL, body LONGTEXT DEFAULT NULL, subject LONGTEXT DEFAULT NULL, PRIMARY KEY(id))  DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB');
         $this->addSql('ALTER TABLE '.$this->prefix.'email_stats ADD copy_id VARCHAR(32) DEFAULT NULL');
         $this->addSql('ALTER TABLE '.$this->prefix.'email_stats ADD CONSTRAINT '.$this->generatePropertyName('email_stats', 'fk', ['copy_id']).' FOREIGN KEY (copy_id) REFERENCES '.$this->prefix.'email_copies (id) ON DELETE SET NULL');
         $this->addSql('CREATE INDEX '.$this->generatePropertyName('email_stats', 'idx', ['copy_id']).' ON '.$this->prefix.'email_stats (copy_id)');
