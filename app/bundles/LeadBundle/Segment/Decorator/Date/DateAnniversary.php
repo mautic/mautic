@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 
-class DateAnniversary implements DateOptionsInterface, FilterDecoratorInterface
+class DateAnniversary implements FilterDecoratorInterface
 {
     /**
      * @var DateDecorator
@@ -25,14 +25,6 @@ class DateAnniversary implements DateOptionsInterface, FilterDecoratorInterface
     public function __construct(DateDecorator $dateDecorator)
     {
         $this->dateDecorator = $dateDecorator;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDateValue()
-    {
-        return '%'.date('-m-d');
     }
 
     public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)
@@ -57,7 +49,7 @@ class DateAnniversary implements DateOptionsInterface, FilterDecoratorInterface
 
     public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return $this->getDateValue();
+        return '%'.date('-m-d');
     }
 
     public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)

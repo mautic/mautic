@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-class DateDayYesterday extends DateOptionAbstract implements DateOptionsInterface
+class DateDayYesterday extends DateOptionAbstract
 {
     /**
      * {@inheritdoc}

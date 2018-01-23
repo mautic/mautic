@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-class DateMonthThis extends DateOptionAbstract implements DateOptionsInterface
+class DateMonthThis extends DateOptionAbstract
 {
     /**
      * {@inheritdoc}

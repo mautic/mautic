@@ -20,7 +20,7 @@ class CustomMappedDecorator extends BaseDecorator
     /**
      * @var LeadSegmentFilterDescriptor
      */
-    private $leadSegmentFilterDescriptor;
+    protected $leadSegmentFilterDescriptor;
 
     public function __construct(
         LeadSegmentFilterOperator $leadSegmentFilterOperator,

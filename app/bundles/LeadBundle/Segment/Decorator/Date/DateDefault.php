@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 
-class DateDefault implements DateOptionsInterface, FilterDecoratorInterface
+class DateDefault implements FilterDecoratorInterface
 {
     /**
      * @var DateDecorator
@@ -35,14 +35,6 @@ class DateDefault implements DateOptionsInterface, FilterDecoratorInterface
     {
         $this->dateDecorator   = $dateDecorator;
         $this->originalValue   = $originalValue;
-    }
-
-    /**
-     * @return string|array
-     */
-    public function getDateValue()
-    {
-        return $this->originalValue;
     }
 
     public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)
@@ -67,7 +59,7 @@ class DateDefault implements DateOptionsInterface, FilterDecoratorInterface
 
     public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return $this->getDateValue();
+        return $this->originalValue;
     }
 
     public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)

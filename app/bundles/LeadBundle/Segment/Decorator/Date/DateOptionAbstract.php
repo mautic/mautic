@@ -60,33 +60,6 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
     }
 
     /**
-     * @return array|string
-     */
-    public function getDateValue()
-    {
-        $this->modifyBaseDate();
-
-        $modifier   = $this->getModifierForBetweenRange();
-        $dateFormat = $this->isTimestamp ? 'Y-m-d H:i:s' : 'Y-m-d';
-
-        if ($this->requiresBetween) {
-            $startWith = $this->dateTimeHelper->toUtcString($dateFormat);
-
-            $this->dateTimeHelper->modify($modifier);
-            $endWith = $this->dateTimeHelper->toUtcString($dateFormat);
-
-            return [$startWith, $endWith];
-        }
-
-        if ($this->includeMidnigh) {
-            $modifier .= ' -1 second';
-            $this->dateTimeHelper->modify($modifier);
-        }
-
-        return $this->dateTimeHelper->toUtcString($dateFormat);
-    }
-
-    /**
      * This function is responsible for setting date. $this->dateTimeHelper holds date with midnight today.
      * Eg. +1 day for "tomorrow", -1 for yesterday etc.
      */
@@ -126,7 +99,26 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
 
     public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return $this->getDateValue();
+        $this->modifyBaseDate();
+
+        $modifier   = $this->getModifierForBetweenRange();
+        $dateFormat = $this->isTimestamp ? 'Y-m-d H:i:s' : 'Y-m-d';
+
+        if ($this->requiresBetween) {
+            $startWith = $this->dateTimeHelper->toUtcString($dateFormat);
+
+            $this->dateTimeHelper->modify($modifier);
+            $endWith = $this->dateTimeHelper->toUtcString($dateFormat);
+
+            return [$startWith, $endWith];
+        }
+
+        if ($this->includeMidnigh) {
+            $modifier .= ' -1 second';
+            $this->dateTimeHelper->modify($modifier);
+        }
+
+        return $this->dateTimeHelper->toUtcString($dateFormat);
     }
 
     public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)
