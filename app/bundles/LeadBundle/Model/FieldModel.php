@@ -722,7 +722,7 @@ class FieldModel extends FormModel
      * @param bool|true  $byGroup
      * @param bool|true  $alphabetical
      * @param array      $filters
-     * @param bool|false $addPrefix    - add prefix to label
+     * @param bool|false $addPrefix    - add prefix to label and alias by object
      *
      * @return array
      */
