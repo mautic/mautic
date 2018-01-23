@@ -467,6 +467,7 @@ class CampaignSubscriber extends CommonSubscriber
      * @param Lead                   $lead
      * @param CampaignExecutionEvent $event
      * @param \DateTime              $triggerDate
+     * @param string                 $columnAlias
      *
      * @return bool
      */

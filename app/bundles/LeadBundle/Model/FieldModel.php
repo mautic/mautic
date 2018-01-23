@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
@@ -718,13 +719,14 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param bool|true $byGroup
-     * @param bool|true $alphabetical
-     * @param array     $filters
+     * @param bool|true  $byGroup
+     * @param bool|true  $alphabetical
+     * @param array      $filters
+     * @param bool|false $addPrefix    - add prefix to label
      *
      * @return array
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'])
+    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'], $addPrefix = false)
     {
         $forceFilters = [];
         foreach ($filters as $col => $val) {
@@ -745,7 +747,15 @@ class FieldModel extends FormModel
 
         $leadFields = [];
 
+        /** @var LeadField $f * */
         foreach ($fields as $f) {
+            if (!empty($addPrefix)) {
+                // set prefix to label, prevent duplicate for example Company Company E-mail
+                $label = $this->translator->trans('mautic.lead.'.$filters['object']);
+                $f->setLabel($label.' '.str_replace($label.' ', '', $f->getLabel()));
+                $f->setAlias($filters['object'].'.'.$f->getAlias());
+            }
+
             if ($byGroup) {
                 $fieldName                              = $this->translator->trans('mautic.lead.field.group.'.$f->getGroup());
                 $leadFields[$fieldName][$f->getAlias()] = $f->getLabel();
