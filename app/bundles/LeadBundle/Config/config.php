@@ -814,7 +814,7 @@ return [
                     'mautic.lead.repository.lead_segment_filter_descriptor',
                     'mautic.lead.model.lead_segment_decorator_base',
                     'mautic.lead.model.lead_segment_decorator_custom_mapped',
-                    'mautic.lead.model.lead_segment.decorator.date.dateFactory',
+                    'mautic.lead.model.lead_segment.decorator.date.optionFactory',
                 ],
             ],
             'mautic.lead.model.relative_date' => [
@@ -858,17 +858,11 @@ return [
                     'mautic.lead.repository.lead_segment_filter_descriptor',
                 ],
             ],
-            'mautic.lead.model.lead_segment.decorator.date.dateFactory' => [
-                'class'     => \Mautic\LeadBundle\Segment\Decorator\Date\DateFactory::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment.decorator.date.optionFactory',
-                    'mautic.lead.model.relative_date',
-                ],
-            ],
             'mautic.lead.model.lead_segment.decorator.date.optionFactory' => [
                 'class'     => \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_decorator_date',
+                    'mautic.lead.model.relative_date',
                 ],
             ],
             'mautic.lead.model.random_parameter_name' => [

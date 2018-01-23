@@ -15,7 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
-use Mautic\LeadBundle\Segment\Decorator\Date\DateFactory;
+use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
 use Symfony\Component\DependencyInjection\Container;
@@ -48,9 +48,9 @@ class LeadSegmentFilterFactory
     private $customMappedDecorator;
 
     /**
-     * @var DateFactory
+     * @var DateOptionFactory
      */
-    private $dateFactory;
+    private $dateOptionFactory;
 
     public function __construct(
         EntityManager $entityManager,
@@ -58,14 +58,14 @@ class LeadSegmentFilterFactory
         LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor,
         BaseDecorator $baseDecorator,
         CustomMappedDecorator $customMappedDecorator,
-        DateFactory $dateFactory
+        DateOptionFactory $dateOptionFactory
     ) {
         $this->entityManager               = $entityManager;
         $this->container                   = $container;
         $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
         $this->baseDecorator               = $baseDecorator;
         $this->customMappedDecorator       = $customMappedDecorator;
-        $this->dateFactory                 = $dateFactory;
+        $this->dateOptionFactory           = $dateOptionFactory;
     }
 
     /**
@@ -116,7 +116,7 @@ class LeadSegmentFilterFactory
     {
         $type = $leadSegmentFilterCrate->getType();
         if ($type === 'datetime' || $type === 'date') {
-            return $this->dateFactory->getDateOption($leadSegmentFilterCrate);
+            return $this->dateOptionFactory->getDateOption($leadSegmentFilterCrate);
         }
 
         $originalField = $leadSegmentFilterCrate->getField();

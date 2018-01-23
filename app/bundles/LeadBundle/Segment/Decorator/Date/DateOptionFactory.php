@@ -28,6 +28,8 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearNext;
 use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearThis;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\RelativeDate;
 
 class DateOptionFactory
 {
@@ -36,22 +38,32 @@ class DateOptionFactory
      */
     private $dateDecorator;
 
-    public function __construct(DateDecorator $dateDecorator)
-    {
+    /**
+     * @var RelativeDate
+     */
+    private $relativeDate;
+
+    public function __construct(
+        DateDecorator $dateDecorator,
+        RelativeDate $relativeDate
+    ) {
         $this->dateDecorator = $dateDecorator;
+        $this->relativeDate  = $relativeDate;
     }
 
     /**
-     * @param string $originalValue
-     * @param string $timeframe
-     * @param bool   $requiresBetween
-     * @param bool   $includeMidnigh
-     * @param bool   $isTimestamp
+     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
      *
      * @return FilterDecoratorInterface
      */
-    public function getDate($originalValue, $timeframe, $requiresBetween, $includeMidnigh, $isTimestamp)
+    public function getDateOption(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
+        $originalValue   = $leadSegmentFilterCrate->getFilter();
+        $isTimestamp     = $this->isTimestamp($leadSegmentFilterCrate);
+        $timeframe       = $this->getTimeFrame($leadSegmentFilterCrate);
+        $requiresBetween = $this->requiresBetween($leadSegmentFilterCrate);
+        $includeMidnigh  = $this->shouldIncludeMidnight($leadSegmentFilterCrate);
+
         $dtHelper = new DateTimeHelper('midnight today', null, 'local');
 
         switch ($timeframe) {
@@ -85,5 +97,33 @@ class DateOptionFactory
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);
         }
+    }
+
+    private function requiresBetween(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return in_array($leadSegmentFilterCrate->getOperator(), ['=', '!='], true);
+    }
+
+    private function shouldIncludeMidnight(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return in_array($leadSegmentFilterCrate->getOperator(), ['gt', 'lte'], true);
+    }
+
+    private function isTimestamp(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return $leadSegmentFilterCrate->getType() === 'datetime';
+    }
+
+    /**
+     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
+     *
+     * @return string
+     */
+    private function getTimeFrame(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        $relativeDateStrings = $this->relativeDate->getRelativeDateStrings();
+        $key                 = array_search($leadSegmentFilterCrate->getFilter(), $relativeDateStrings, true);
+
+        return str_replace('mautic.lead.list.', '', $key);
     }
 }
