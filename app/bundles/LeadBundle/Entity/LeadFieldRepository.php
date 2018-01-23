@@ -132,6 +132,24 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
+     * Return column alias and join tables.
+     *
+     * @param string                                                       $field
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     */
+    public function getColumnAliasByField($field, $q)
+    {
+        $columnAlias = 'l.';
+        // Join company tables If we're trying search by company fields
+        if (strpos($field, 'company.') !== false) {
+            $this->addCompanyLeftJoin($q);
+            $columnAlias = '';
+        }
+
+        return $columnAlias;
+    }
+
+    /**
      * Compare a form result value with defined value for defined lead.
      *
      * @param int    $lead         ID
@@ -170,13 +188,7 @@ class LeadFieldRepository extends CommonRepository
                 return false;
             }
         } else {
-            $columnAlias = 'l.';
-            // Join company tables If we're trying search by company fields
-            if (strpos($field, 'company.') !== false) {
-                $this->addCompanyLeftJoin($q);
-                $columnAlias = '';
-            }
-
+            $columnAlias = $this->getColumnAliasByField($field, $q);
             // Standard field
             if ($operatorExpr === 'empty' || $operatorExpr === 'notEmpty') {
                 $q->where(
@@ -267,12 +279,7 @@ class LeadFieldRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $columnAlias = 'l.';
-        // Join company tables If we're trying search by company fields
-        if (strpos($field, 'company.') !== false) {
-            $this->addCompanyLeftJoin($q);
-            $columnAlias = '';
-        }
+        $columnAlias = $this->getColumnAliasByField($field, $q);
 
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
