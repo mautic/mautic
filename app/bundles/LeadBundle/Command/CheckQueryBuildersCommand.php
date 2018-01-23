@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,7 +23,6 @@ class CheckQueryBuildersCommand extends ModeratedCommand
     {
         $this
             ->setName('mautic:segments:check-builders')
-            ->setAliases(['mautic:segments:check-query-builders'])
             ->setDescription('Compare output of query builders for given segments')
             ->addOption('--segment-id', '-i', InputOption::VALUE_OPTIONAL, 'Set the ID of segment to process')
             ;
@@ -67,7 +67,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         return 0;
     }
 
-    private function runSegment($output, $verbose, $l, $listModel)
+    private function runSegment($output, $verbose, $l, ListModel $listModel)
     {
         $output->writeln('<info>Running segment '.$l->getId().'...</info>');
         $output->writeln('');

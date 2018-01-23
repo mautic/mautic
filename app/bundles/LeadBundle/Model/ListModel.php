@@ -797,6 +797,15 @@ class ListModel extends FormModel
         return $return;
     }
 
+    public function updateLeadList(LeadList $leadList)
+    {
+    }
+
+    public function rebuildListLeads()
+    {
+        throw new  \Exception('Deprecated function, use updateLeadList instead');
+    }
+
     /**
      * Rebuild lead lists.
      *
@@ -805,9 +814,11 @@ class ListModel extends FormModel
      * @param bool            $maxLeads
      * @param OutputInterface $output
      *
+     * @throws \Exception
+     *
      * @return int
      */
-    public function rebuildListLeads(LeadList $entity, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
+    public function rebuildListLeadsOld(LeadList $entity, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
