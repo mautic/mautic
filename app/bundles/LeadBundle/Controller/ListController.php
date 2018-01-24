@@ -563,8 +563,8 @@ class ListController extends FormController
 
         $list = $listModel->getEntity($objectId);
         //dump($list);
-        $processed = $listModel->rebuildListLeads($list, 2, 2);
-        dump($processed);
+        $processed = $listModel->updateLeadList($list);
+        var_dump($processed);
         exit;
 
         /** @var \Mautic\LeadBundle\Model\ListModel $model */

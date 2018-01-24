@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Segment;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryException;
 
 class LeadSegmentFilter
 {
@@ -50,13 +51,13 @@ class LeadSegmentFilter
     /**
      * @return \Doctrine\DBAL\Schema\Column
      *
-     * @throws \Exception
+     * @throws QueryException
      */
     public function getColumn()
     {
         $columns = $this->em->getConnection()->getSchemaManager()->listTableColumns($this->getTable());
         if (!isset($columns[$this->getField()])) {
-            throw new \Exception(sprintf('Database schema does not contain field %s.%s', $this->getTable(), $this->getField()));
+            throw new QueryException(sprintf('Database schema does not contain field %s.%s', $this->getTable(), $this->getField()));
         }
 
         return $columns[$this->getField()];

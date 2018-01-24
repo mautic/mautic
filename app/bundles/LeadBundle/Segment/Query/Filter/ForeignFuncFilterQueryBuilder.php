@@ -35,7 +35,12 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterGlue     = $filter->getGlue();
         $filterAggr     = $filter->getAggregateFunction();
 
-        $filter->getColumn();
+        try {
+            $filter->getColumn();
+        } catch (QueryException $e) {
+            // We do ignore not found fields as they may be just removed custom field
+            return $queryBuilder;
+        }
 
         $filterParameters = $filter->getParameterValue();
 

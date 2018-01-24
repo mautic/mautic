@@ -312,8 +312,12 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * This function is weird, you should not use it, use LeadSegmentService instead.
+     *
      * @param       $lists
      * @param array $args
+     *
+     * @deprecated
      *
      * @return array
      */
@@ -507,21 +511,7 @@ class LeadListRepository extends CommonRepository
                     $q->resetQueryPart('groupBy');
                 }
 
-                //  Debug output
-                //dump($q->getSQL());
-                $sql = $q->getSQL();
-                foreach ($q->getParameters() as $k=>$v) {
-                    $value = is_array($v) ? implode(', ', $v) : $v;
-                    $sql   = str_replace(":$k", "'$value'", $sql);
-                }
-
-                echo '<hr/>';
-                dump($sql);
-
-                $start   = microtime(true);
                 $results = $q->execute()->fetchAll();
-                $end     = microtime(true) - $start;
-                dump('Query took '.(1000 * $end).'ms');
 
                 foreach ($results as $r) {
                     if ($countOnly) {

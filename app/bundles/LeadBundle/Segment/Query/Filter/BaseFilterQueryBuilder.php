@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 
 /**
@@ -49,8 +50,12 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         $filterGlue     = $filter->getGlue();
         $filterAggr     = $filter->getAggregateFunction();
 
-        //  Verify the column exists in database, this might be removed after tested
-        $filter->getColumn();
+        try {
+            $filter->getColumn();
+        } catch (QueryException $e) {
+            // We do ignore not found fields as they may be just removed custom field
+            return $queryBuilder;
+        }
 
         $filterParameters = $filter->getParameterValue();
 

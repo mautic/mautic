@@ -50,7 +50,7 @@ class ListModel extends FormModel
     /**
      * @var LeadSegmentService
      */
-    private $leadSegment;
+    private $leadSegmentService;
 
     /**
      * ListModel constructor.
@@ -60,7 +60,7 @@ class ListModel extends FormModel
     public function __construct(CoreParametersHelper $coreParametersHelper, LeadSegmentService $leadSegment)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->leadSegment          = $leadSegment;
+        $this->leadSegmentService   = $leadSegment;
     }
 
     /**
@@ -759,6 +759,13 @@ class ListModel extends FormModel
         return $lists;
     }
 
+    /**
+     * @param LeadList $entity
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
     public function getVersionNew(LeadList $entity)
     {
         $id       = $entity->getId();
@@ -769,9 +776,14 @@ class ListModel extends FormModel
             'dateTime' => $dtHelper->toUtcString(),
         ];
 
-        return $this->leadSegment->getNewLeadsByListCount($entity, $batchLimiters);
+        return $this->leadSegmentService->getNewLeadListLeadsCount($entity, $batchLimiters);
     }
 
+    /**
+     * @param LeadList $entity
+     *
+     * @return mixed
+     */
     public function getVersionOld(LeadList $entity)
     {
         $id       = $entity->getId();
@@ -797,54 +809,41 @@ class ListModel extends FormModel
         return $return;
     }
 
-    public function updateLeadList(LeadList $leadList)
+    /**
+     * @param LeadList             $leadList
+     * @param int                  $limit
+     * @param bool                 $maxLeads
+     * @param OutputInterface|null $output
+     *
+     * @return int
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
+     */
+    public function updateLeadList(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null)
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
-        $id       = $entity->getId();
-        $list     = ['id' => $id, 'filters' => $entity->getFilters()];
         $dtHelper = new DateTimeHelper();
+
+        $batchLimiters = ['dateTime' => $dtHelper->toUtcString()];
+        $list          = ['id' => $leadList->getId(), 'filters' => $leadList->getFilters()];
+
+        //@todo remove this debug line
         $dtHelper = new DateTimeHelper('2017-10-01 00:00:00');
 
-        $batchLimiters = [
-            'dateTime' => $dtHelper->toUtcString(),
-        ];
-
-        $localDateTime = $dtHelper->getLocalDateTime();
-
         $this->dispatcher->dispatch(
-            LeadEvents::LIST_PRE_PROCESS_LIST,
-            new ListPreProcessListEvent($list, false)
+            LeadEvents::LIST_PRE_PROCESS_LIST, new ListPreProcessListEvent($list, false)
         );
 
         // Get a count of leads to add
-        $newLeadsCount = $this->leadSegment->getNewLeadsByListCount($entity, $batchLimiters);
+        $newLeadsCount = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
 
-        dump($newLeadsCount);
-        echo '<hr/>Original result:';
-
-        $versionStart = microtime(true);
-
-        // Get a count of leads to add
-        $newLeadsCount = $this->getLeadsByList(
-            $list,
-            true,
-            [
-                'countOnly'     => true,
-                'newOnly'       => true,
-                'batchLimiters' => $batchLimiters,
-            ]
-        );
-        $versionEnd = microtime(true) - $versionStart;
-        dump('Total query assembly took:'.(1000 * $versionEnd).'ms');
-
-        dump(array_shift($newLeadsCount));
-        exit;
         // Ensure the same list is used each batch
-        $batchLimiters['maxId'] = (int) $newLeadsCount[$id]['maxId'];
+        $batchLimiters['maxId'] = (int) $newLeadsCount[$leadList->getId()]['maxId'];
 
         // Number of total leads to process
-        $leadCount = (int) $newLeadsCount[$id]['count'];
+        $leadCount = (int) $newLeadsCount[$leadList->getId()]['count'];
 
         if ($output) {
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', ['%leads%' => $leadCount, '%batch%' => $limit]));
@@ -869,25 +868,19 @@ class ListModel extends FormModel
                 // Keep CPU down for large lists; sleep per $limit batch
                 $this->batchSleep();
 
-                $newLeadList = $this->getLeadsByList(
-                    $list,
-                    true,
-                    [
-                        'newOnly' => true,
-                        // No start set because of newOnly thus always at 0
-                        'limit'         => $limit,
-                        'batchLimiters' => $batchLimiters,
-                    ]
-                );
+                $newLeadList = $this->leadSegmentService->getNewLeadListLeads($leadList, $batchLimiters, $limit);
+                dump('Got list:');
+                dump($newLeadList);
+                die();
 
-                if (empty($newLeadList[$id])) {
+                if (empty($newLeadList[$leadList->getId()])) {
                     // Somehow ran out of leads so break out
                     break;
                 }
 
                 $processedLeads = [];
-                foreach ($newLeadList[$id] as $l) {
-                    $this->addLead($l, $entity, false, true, -1, $localDateTime);
+                foreach ($newLeadList[$leadList->getId()] as $l) {
+                    $this->addLead($l, $leadList, false, true, -1, $dtHelper->getLocalDateTime());
                     $processedLeads[] = $l;
                     unset($l);
 
@@ -907,7 +900,7 @@ class ListModel extends FormModel
                 if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
                         LeadEvents::LEAD_LIST_BATCH_CHANGE,
-                        new ListChangeEvent($processedLeads, $entity, true)
+                        new ListChangeEvent($processedLeads, $leadList, true)
                     );
                 }
 
@@ -932,6 +925,9 @@ class ListModel extends FormModel
             }
         }
 
+        dump('added leads');
+        die();
+
         // Unset max ID to prevent capping at newly added max ID
         unset($batchLimiters['maxId']);
 
@@ -947,7 +943,7 @@ class ListModel extends FormModel
         );
 
         // Ensure the same list is used each batch
-        $batchLimiters['maxId'] = (int) $removeLeadCount[$id]['maxId'];
+        $batchLimiters['maxId'] = (int) $removeLeadCount[$leadList->getId()]['maxId'];
 
         // Restart batching
         $start     = $lastRoundPercentage     = 0;
@@ -1042,7 +1038,7 @@ class ListModel extends FormModel
     /**
      * Rebuild lead lists.
      *
-     * @param LeadList        $entity
+     * @param LeadList        $leadList
      * @param int             $limit
      * @param bool            $maxLeads
      * @param OutputInterface $output
@@ -1051,12 +1047,12 @@ class ListModel extends FormModel
      *
      * @return int
      */
-    public function rebuildListLeadsOld(LeadList $entity, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
+    public function rebuildListLeadsOld(LeadList $leadList, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
-        $id       = $entity->getId();
-        $list     = ['id' => $id, 'filters' => $entity->getFilters()];
+        $id       = $leadList->getId();
+        $list     = ['id' => $id, 'filters' => $leadList->getFilters()];
         $dtHelper = new DateTimeHelper();
         $dtHelper = new DateTimeHelper('2017-10-01 00:00:00');
 
@@ -1068,11 +1064,11 @@ class ListModel extends FormModel
 
         $this->dispatcher->dispatch(
             LeadEvents::LIST_PRE_PROCESS_LIST,
-            new ListPreProcessListEvent($list, false)
+            $list, false
         );
 
         // Get a count of leads to add
-        $newLeadsCount = $this->leadSegment->getNewLeadsByListCount($entity, $batchLimiters);
+        $newLeadsCount = $this->leadSegmentService->getNewLeadsByListCount($leadList, $batchLimiters);
 
         dump($newLeadsCount);
         echo '<hr/>Original result:';
@@ -1141,7 +1137,7 @@ class ListModel extends FormModel
 
                 $processedLeads = [];
                 foreach ($newLeadList[$id] as $l) {
-                    $this->addLead($l, $entity, false, true, -1, $localDateTime);
+                    $this->addLead($l, $leadList, false, true, -1, $localDateTime);
                     $processedLeads[] = $l;
                     unset($l);
 
@@ -1161,7 +1157,7 @@ class ListModel extends FormModel
                 if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
                         LeadEvents::LEAD_LIST_BATCH_CHANGE,
-                        new ListChangeEvent($processedLeads, $entity, true)
+                        new ListChangeEvent($processedLeads, $leadList, true)
                     );
                 }
 
@@ -1242,7 +1238,7 @@ class ListModel extends FormModel
 
                 $processedLeads = [];
                 foreach ($removeLeadList[$id] as $l) {
-                    $this->removeLead($l, $entity, false, true, true);
+                    $this->removeLead($l, $leadList, false, true, true);
                     $processedLeads[] = $l;
                     ++$leadsProcessed;
                     if ($output && $leadsProcessed < $maxCount) {
@@ -1258,7 +1254,7 @@ class ListModel extends FormModel
                 if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
                         LeadEvents::LEAD_LIST_BATCH_CHANGE,
-                        new ListChangeEvent($processedLeads, $entity, false)
+                        new ListChangeEvent($processedLeads, $leadList, false)
                     );
                 }
 

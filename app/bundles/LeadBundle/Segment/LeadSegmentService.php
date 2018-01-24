@@ -11,10 +11,11 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListSegmentRepository;
 use Mautic\LeadBundle\Segment\Query\LeadSegmentQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Symfony\Bridge\Monolog\Logger;
 
 class LeadSegmentService
 {
@@ -31,7 +32,17 @@ class LeadSegmentService
     /**
      * @var LeadSegmentQueryBuilder
      */
-    private $queryBuilder;
+    private $leadSegmentQueryBuilder;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * @var QueryBuilder
+     */
+    private $preparedQB;
 
     /**
      * LeadSegmentService constructor.
@@ -39,62 +50,164 @@ class LeadSegmentService
      * @param LeadSegmentFilterFactory  $leadSegmentFilterFactory
      * @param LeadListSegmentRepository $leadListSegmentRepository
      * @param LeadSegmentQueryBuilder   $queryBuilder
+     * @param Logger                    $logger
      */
     public function __construct(
         LeadSegmentFilterFactory $leadSegmentFilterFactory,
         LeadListSegmentRepository $leadListSegmentRepository,
-        LeadSegmentQueryBuilder $queryBuilder)
-    {
+        LeadSegmentQueryBuilder $queryBuilder,
+        Logger $logger
+    ) {
         $this->leadListSegmentRepository = $leadListSegmentRepository;
         $this->leadSegmentFilterFactory  = $leadSegmentFilterFactory;
-        $this->queryBuilder              = $queryBuilder;
+        $this->leadSegmentQueryBuilder   = $queryBuilder;
+        $this->logger                    = $logger;
     }
 
-    public function getNewLeadsByListCount(LeadList $entity, array $batchLimiters)
+    /**
+     * @param LeadList $leadList
+     * @param          $segmentFilters
+     * @param          $batchLimiters
+     *
+     * @return Query\QueryBuilder|QueryBuilder
+     */
+    private function getNewLeadListLeadsQuery(LeadList $leadList, $segmentFilters, $batchLimiters)
     {
-        $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($entity);
+        if (!is_null($this->preparedQB)) {
+            return $this->preparedQB;
+        }
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $this->leadSegmentQueryBuilder->getLeadsSegmentQueryBuilder($leadList->getId(), $segmentFilters);
+        $queryBuilder = $this->leadSegmentQueryBuilder->addNewLeadsRestrictions($queryBuilder, $leadList->getId(), $batchLimiters);
+        $queryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $leadList->getId());
+        $queryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubsribedQuery($queryBuilder, $leadList->getId());
 
-        $versionStart = microtime(true);
+        return $queryBuilder;
+    }
+
+    /**
+     * @param LeadList $leadList
+     * @param array    $batchLimiters
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function getNewLeadListLeadsCount(LeadList $leadList, array $batchLimiters)
+    {
+        $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($leadList);
 
         if (!count($segmentFilters)) {
-            return [0];
-        }
-        /** @var QueryBuilder $qb */
-        $qb = $this->queryBuilder->getLeadsSegmentQueryBuilder($entity->getId(), $segmentFilters);
-        $qb = $this->queryBuilder->addNewLeadsRestrictions($qb, $entity->getId(), $batchLimiters);
-        $qb = $this->queryBuilder->addManuallySubscribedQuery($qb, $entity->getId());
-        $qb = $this->queryBuilder->addManuallyUnsubsribedQuery($qb, $entity->getId());
-        $qb = $this->queryBuilder->wrapInCount($qb);
+            $this->logger->debug('Segment QB: Segment has no filters', ['segmentId' => $leadList->getId()]);
 
-        $debug = $qb->getDebugOutput();
-
-        //  Debug output
-        $sql = $qb->getSQL();
-        foreach ($qb->getParameters() as $k=>$v) {
-            $sql = str_replace(":$k", "'$v'", $sql);
+            return [$leadList->getId() => [
+                'count' => '0',
+                'maxId' => '0',
+            ],
+            ];
         }
 
-        echo '<hr/>';
-        dump($sql);
+        $qb = $this->getNewLeadListLeadsQuery($leadList, $segmentFilters, $batchLimiters);
+        $qb = $this->leadSegmentQueryBuilder->wrapInCount($qb);
+
+        $this->logger->debug('Segment QB: Create SQL: '.$qb->getDebugOutput(), ['segmentId' => $leadList->getId()]);
+
+        $result = $this->timedFetch($qb, $leadList->getId());
+
+        return [$leadList->getId() => $result];
+    }
+
+    /**
+     * @param LeadList $leadList
+     * @param array    $batchLimiters
+     * @param int      $limit
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function getNewLeadListLeads(LeadList $leadList, array $batchLimiters, $limit = 1000)
+    {
+        $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($leadList);
+
+        $qb = $this->getNewLeadListLeadsQuery($leadList, $segmentFilters, $batchLimiters);
+        $qb->select('l.*');
+
+        $this->logger->debug('Segment QB: Create Leads SQL: '.$qb->getDebugOutput(), ['segmentId' => $leadList->getId()]);
+
+        $qb->setMaxResults($limit);
+
+        if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
+            $qb->andWhere(
+                $qb->expr()->comparison('l.id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
+            );
+        } elseif (!empty($batchLimiters['maxId'])) {
+            $qb->andWhere(
+                $qb->expr()->lte('l.id', $batchLimiters['maxId'])
+            );
+        }
+
+        if (!empty($batchLimiters['dateTime'])) {
+            // Only leads in the list at the time of count
+            $qb->andWhere(
+                $qb->expr()->lte('l.date_added', $qb->expr()->literal($batchLimiters['dateTime']))
+            );
+        }
+
+        $result = $this->timedFetchAll($qb, $leadList->getId());
+
+        return [$leadList->getId() => $result];
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param int          $segmentId
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    private function timedFetch(QueryBuilder $qb, $segmentId)
+    {
         try {
-            $start = microtime(true);
-
-            $stmt    = $qb->execute();
-            $results = $stmt->fetchAll();
+            $start  = microtime(true);
+            $result = $qb->execute()->fetch(\PDO::FETCH_ASSOC);
 
             $end = microtime(true) - $start;
-            dump('Query took '.(1000 * $end).'ms');
 
-            $start = microtime(true);
-
-            $result = $qb->execute()->fetch();
-
-            $versionEnd = microtime(true) - $versionStart;
-            dump('Total query assembly took:'.(1000 * $versionEnd).'ms');
-
-            dump($result);
+            $this->logger->debug('Segment QB: Query took: '.round($end * 100, 2).'ms. Result: '.$qb->getDebugOutput(), ['segmentId' => $segmentId]);
         } catch (\Exception $e) {
-            dump('Query exception: '.$e->getMessage());
+            $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
+                'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),
+            ]);
+            throw $e;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param int          $segmentId
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    private function timedFetchAll(QueryBuilder $qb, $segmentId)
+    {
+        try {
+            $start  = microtime(true);
+            $result = $qb->execute()->fetchAll(\PDO::FETCH_ASSOC);
+
+            $end = microtime(true) - $start;
+
+            $this->logger->debug('Segment QB: Query took: '.round($end * 100, 2).'ms. Result: '.$qb->getDebugOutput(), ['segmentId' => $segmentId]);
+        } catch (\Exception $e) {
+            $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
+                'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),
+            ]);
+            throw $e;
         }
 
         return $result;

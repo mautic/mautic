@@ -69,32 +69,25 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
     private function runSegment($output, $verbose, $l, ListModel $listModel)
     {
-        $output->writeln('<info>Running segment '.$l->getId().'...</info>');
-        $output->writeln('');
+        $output->write('<info>Running segment '.$l->getId().'...</info>');
 
-        if (!$verbose) {
-            ob_start();
-        }
-
-        $output->writeln('<info>old:</info>');
         $timer1    = microtime(true);
         $processed = $listModel->getVersionOld($l);
         $timer1    = round((microtime(true) - $timer1) * 1000, 3);
 
-        $output->writeln('<info>new:</info>');
         $timer2     = microtime(true);
         $processed2 = $listModel->getVersionNew($l);
         $timer2     = round((microtime(true) - $timer2) * 1000, 3);
 
-        $output->writeln('');
+        $processed2 = array_shift($processed2);
 
-        if ($processed['count'] != $processed2['count'] or $processed['maxId'] != $processed2['maxId']) {
+        if ((intval($processed['count']) != intval($processed2['count'])) or (intval($processed['maxId']) != intval($processed2['maxId']))) {
             $output->write('<error>');
         } else {
             $output->write('<info>');
         }
 
-        $output->writeln(
+        $output->write(
             sprintf('old: c: %d, m: %d, time: %dms  <--> new: c: %d, m: %s, time: %dms',
                     $processed['count'],
                     $processed['maxId'],
@@ -105,17 +98,10 @@ class CheckQueryBuildersCommand extends ModeratedCommand
             )
         );
 
-        if ($processed['count'] != $processed2['count'] or $processed['maxId'] != $processed2['maxId']) {
-            $output->write('</error>');
+        if ((intval($processed['count']) != intval($processed2['count'])) or (intval($processed['maxId']) != intval($processed2['maxId']))) {
+            $output->writeln('</error>');
         } else {
-            $output->write('</info>');
-        }
-
-        $output->writeln('');
-        $output->writeln('-------------------------------------------------------------------------');
-
-        if (!$verbose) {
-            ob_clean();
+            $output->writeln('</info>');
         }
     }
 }

@@ -20,6 +20,7 @@
 namespace Mautic\LeadBundle\Segment\Query\Expression;
 
 use Doctrine\DBAL\Connection;
+use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 
 /**
  * ExpressionBuilder class is responsible to dynamically create SQL query parts.
@@ -116,14 +117,14 @@ class ExpressionBuilder
      * @param $x
      * @param $arr
      *
-     * @throws \Exception
+     * @throws SegmentQueryException
      *
      * @return string
      */
     public function between($x, $arr)
     {
         if (!is_array($arr) || count($arr) != 2) {
-            throw new \Exception('Between expression expects second argument to be an array with exactly two elements');
+            throw new SegmentQueryException('Between expression expects second argument to be an array with exactly two elements');
         }
 
         return $x.' '.self::BETWEEN.' '.$this->comparison($arr[0], 'AND', $arr[1]);
@@ -142,14 +143,14 @@ class ExpressionBuilder
      * @param $x
      * @param $arr
      *
-     * @throws \Exception
+     * @throws SegmentQueryException
      *
      * @return string
      */
     public function notBetween($x, $arr)
     {
         if (!is_array($arr) || count($arr) != 2) {
-            throw new \Exception('Not between expression expects second argument to be an array with exactly two elements');
+            throw new SegmentQueryException('Not between expression expects second argument to be an array with exactly two elements');
         }
 
         return 'NOT '.$this->between($x, $arr);

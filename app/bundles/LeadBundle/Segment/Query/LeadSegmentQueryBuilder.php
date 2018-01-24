@@ -34,6 +34,12 @@ class LeadSegmentQueryBuilder
         $this->schema              = $this->entityManager->getConnection()->getSchemaManager();
     }
 
+    /**
+     * @param                    $id
+     * @param LeadSegmentFilters $leadSegmentFilters
+     *
+     * @return QueryBuilder
+     */
     public function getLeadsSegmentQueryBuilder($id, LeadSegmentFilters $leadSegmentFilters)
     {
         /** @var QueryBuilder $queryBuilder */
