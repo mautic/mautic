@@ -824,12 +824,6 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.lead.model.lead_segment_filter_date' => [
-                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterDate::class,
-                'arguments' => [
-                    'mautic.lead.model.relative_date',
-                ],
-            ],
             'mautic.lead.model.lead_segment_filter_operator' => [
                 'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterOperator::class,
                 'arguments' => [
