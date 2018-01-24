@@ -946,7 +946,7 @@ Mautic.initSlotListeners = function() {
             });
             cloneLink.click(function(e) {   
                 var cloneBtn = mQuery(this);
-                var clonedElem = cloneBtn.closest('[data-slot-container]');
+                var clonedElem = cloneBtn.closest('[data-slot]');
                 clonedElem.clone().insertAfter(clonedElem);
                 Mautic.initSlotListeners();
                 Mautic.initSections();
