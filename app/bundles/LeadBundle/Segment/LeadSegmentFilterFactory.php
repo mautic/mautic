@@ -114,8 +114,7 @@ class LeadSegmentFilterFactory
      */
     protected function getDecoratorForFilter(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        $type = $leadSegmentFilterCrate->getType();
-        if ($type === 'datetime' || $type === 'date') {
+        if ($leadSegmentFilterCrate->isDateType()) {
             return $this->dateOptionFactory->getDateOption($leadSegmentFilterCrate);
         }
 

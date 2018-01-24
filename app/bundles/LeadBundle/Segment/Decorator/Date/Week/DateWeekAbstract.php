@@ -29,7 +29,7 @@ abstract class DateWeekAbstract extends DateOptionAbstract
      */
     protected function getValueForBetweenRange()
     {
-        $dateFormat = $this->isTimestamp ? 'Y-m-d H:i:s' : 'Y-m-d';
+        $dateFormat = $this->dateOptionParameters->hasTimePart() ? 'Y-m-d H:i:s' : 'Y-m-d';
         $startWith  = $this->dateTimeHelper->toUtcString($dateFormat);
 
         $modifier = $this->getModifierForBetweenRange().' -1 second';
