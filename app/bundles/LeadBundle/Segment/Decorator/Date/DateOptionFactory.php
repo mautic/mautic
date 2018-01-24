@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthNext;
 use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthThis;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault;
+use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekNext;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekThis;
@@ -64,7 +65,8 @@ class DateOptionFactory
 
         $dtHelper = new DateTimeHelper('midnight today', null, 'local');
 
-        switch ($dateOptionParameters->getTimeframe()) {
+        $timeframe = $dateOptionParameters->getTimeframe();
+        switch ($timeframe) {
             case 'birthday':
             case 'anniversary':
                 return new DateAnniversary($this->dateDecorator);
@@ -92,6 +94,8 @@ class DateOptionFactory
                 return new DateYearNext($this->dateDecorator, $dtHelper, $dateOptionParameters);
             case 'year_this':
                 return new DateYearThis($this->dateDecorator, $dtHelper, $dateOptionParameters);
+            case $timeframe && (false !== strpos($timeframe[0], '-') || false !== strpos($timeframe[0], '+')):
+                return new DateRelativeInterval($this->dateDecorator, $originalValue);
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);
         }

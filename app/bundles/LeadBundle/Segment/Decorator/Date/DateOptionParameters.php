@@ -89,6 +89,11 @@ class DateOptionParameters
     {
         $key = array_search($leadSegmentFilterCrate->getFilter(), $relativeDateStrings, true);
 
+        if ($key === false) {
+            // Time frame does not match any option from $relativeDateStrings, so return original value
+            return $leadSegmentFilterCrate->getFilter();
+        }
+
         return str_replace('mautic.lead.list.', '', $key);
     }
 }
