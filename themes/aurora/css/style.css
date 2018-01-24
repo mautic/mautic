@@ -974,6 +974,7 @@ body .facetwp-btn {
 .form-section .container {
   padding: 0;
   background: transparent;
+  overflow: visible;
 }
 
 @media (max-width: 73rem) {
