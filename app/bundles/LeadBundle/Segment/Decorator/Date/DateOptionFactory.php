@@ -87,11 +87,11 @@ class DateOptionFactory
             case 'month_this':
                 return new DateMonthThis($this->dateDecorator, $dtHelper, $dateOptionParameters);
             case 'year_last':
-                return new DateYearLast();
+                return new DateYearLast($this->dateDecorator, $dtHelper, $dateOptionParameters);
             case 'year_next':
-                return new DateYearNext();
+                return new DateYearNext($this->dateDecorator, $dtHelper, $dateOptionParameters);
             case 'year_this':
-                return new DateYearThis();
+                return new DateYearThis($this->dateDecorator, $dtHelper, $dateOptionParameters);
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);
         }
