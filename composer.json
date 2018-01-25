@@ -67,7 +67,7 @@
         "doctrine/cache": "~1.5.4",
         "doctrine/migrations": "~1.2.2",
         "doctrine/orm": "~2.5.4",
-        "doctrine/doctrine-bundle": "~1.6",
+        "doctrine/doctrine-bundle": "1.6.*",
         "doctrine/doctrine-cache-bundle": "~1.3.0",
         "doctrine/doctrine-fixtures-bundle": "~2.3.0",
         "doctrine/doctrine-migrations-bundle": "~1.1.1",

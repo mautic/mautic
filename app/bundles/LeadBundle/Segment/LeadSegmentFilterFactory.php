@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
@@ -52,15 +51,20 @@ class LeadSegmentFilterFactory
      */
     private $dateOptionFactory;
 
+    /**
+     * @var TableSchemaColumnsCache
+     */
+    private $schemaCache;
+
     public function __construct(
-        EntityManager $entityManager,
+        TableSchemaColumnsCache $schemaCache,
         Container $container,
         LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor,
         BaseDecorator $baseDecorator,
         CustomMappedDecorator $customMappedDecorator,
         DateOptionFactory $dateOptionFactory
     ) {
-        $this->entityManager               = $entityManager;
+        $this->schemaCache                 = $schemaCache;
         $this->container                   = $container;
         $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
         $this->baseDecorator               = $baseDecorator;
@@ -84,7 +88,7 @@ class LeadSegmentFilterFactory
 
             $decorator = $this->getDecoratorForFilter($leadSegmentFilterCrate);
 
-            $leadSegmentFilter = new LeadSegmentFilter($leadSegmentFilterCrate, $decorator, $this->entityManager);
+            $leadSegmentFilter = new LeadSegmentFilter($leadSegmentFilterCrate, $decorator, $this->schemaCache);
             //$this->leadSegmentFilterDate->fixDateOptions($leadSegmentFilter);
             $leadSegmentFilter->setFilterQueryBuilder($this->getQueryBuilderForFilter($leadSegmentFilter));
 

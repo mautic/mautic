@@ -130,31 +130,93 @@ class LeadSegmentService
     {
         $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($leadList);
 
-        $qb = $this->getNewLeadListLeadsQuery($leadList, $segmentFilters, $batchLimiters);
-        $qb->select('l.*');
+        $queryBuilder = $this->getNewLeadListLeadsQuery($leadList, $segmentFilters, $batchLimiters);
+        $queryBuilder->select('l.*');
 
-        $this->logger->debug('Segment QB: Create Leads SQL: '.$qb->getDebugOutput(), ['segmentId' => $leadList->getId()]);
+        $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $leadList->getId()]);
 
-        $qb->setMaxResults($limit);
+        $queryBuilder->setMaxResults($limit);
 
         if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
-            $qb->andWhere(
-                $qb->expr()->comparison('l.id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->comparison('l.id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
             );
         } elseif (!empty($batchLimiters['maxId'])) {
-            $qb->andWhere(
-                $qb->expr()->lte('l.id', $batchLimiters['maxId'])
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->lte('l.id', $batchLimiters['maxId'])
             );
         }
 
         if (!empty($batchLimiters['dateTime'])) {
             // Only leads in the list at the time of count
-            $qb->andWhere(
-                $qb->expr()->lte('l.date_added', $qb->expr()->literal($batchLimiters['dateTime']))
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->lte('l.date_added', $queryBuilder->expr()->literal($batchLimiters['dateTime']))
             );
         }
 
-        $result = $this->timedFetchAll($qb, $leadList->getId());
+        $result = $this->timedFetchAll($queryBuilder, $leadList->getId());
+
+        return [$leadList->getId() => $result];
+    }
+
+    /**
+     * @param LeadList $leadList
+     *
+     * @return QueryBuilder
+     */
+    private function getOrphanedLeadListLeadsQueryBuilder(LeadList $leadList)
+    {
+        $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($leadList);
+
+        $queryBuilder = $this->leadSegmentQueryBuilder->getLeadsSegmentQueryBuilder($leadList->getId(), $segmentFilters);
+
+        $queryBuilder->select('l.id');
+        $queryBuilder->rightJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp', 'l.id = orp.lead_id and orp.leadlist_id = '.$leadList->getId());
+        $queryBuilder->andWhere($queryBuilder->expr()->andX(
+            $queryBuilder->expr()->isNull('l.id'),
+            $queryBuilder->expr()->eq('orp.leadlist_id', $leadList->getId())
+        ));
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param LeadList $leadList
+     * @param array    $batchLimiters
+     * @param int      $limit
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function getOrphanedLeadListLeadsCount(LeadList $leadList)
+    {
+        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($leadList);
+        $queryBuilder = $this->leadSegmentQueryBuilder->wrapInCount($queryBuilder);
+
+        $this->logger->debug('Segment QB: Orphan Leads Count SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $leadList->getId()]);
+
+        $result = $this->timedFetch($queryBuilder, $leadList->getId());
+
+        return [$leadList->getId() => $result];
+    }
+
+    /**
+     * @param LeadList $leadList
+     * @param array    $batchLimiters
+     * @param int      $limit
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function getOrphanedLeadListLeads(LeadList $leadList)
+    {
+        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($leadList);
+
+        $this->logger->debug('Segment QB: Orphan Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $leadList->getId()]);
+
+        $result = $this->timedFetchAll($queryBuilder, $leadList->getId());
 
         return [$leadList->getId() => $result];
     }
@@ -175,7 +237,7 @@ class LeadSegmentService
 
             $end = microtime(true) - $start;
 
-            $this->logger->debug('Segment QB: Query took: '.round($end * 100, 2).'ms. Result: '.$qb->getDebugOutput(), ['segmentId' => $segmentId]);
+            $this->logger->debug('Segment QB: Query took: '.round($end * 100, 2).'ms. Result count: '.count($result), ['segmentId' => $segmentId]);
         } catch (\Exception $e) {
             $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
                 'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),
@@ -202,7 +264,7 @@ class LeadSegmentService
 
             $end = microtime(true) - $start;
 
-            $this->logger->debug('Segment QB: Query took: '.round($end * 100, 2).'ms. Result: '.$qb->getDebugOutput(), ['segmentId' => $segmentId]);
+            $this->logger->debug('Segment QB: Query took: '.round($end * 100, 2).'ms. Result count: '.count($result), ['segmentId' => $segmentId]);
         } catch (\Exception $e) {
             $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
                 'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),

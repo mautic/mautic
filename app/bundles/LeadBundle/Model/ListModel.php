@@ -845,10 +845,13 @@ class ListModel extends FormModel
         // Number of total leads to process
         $leadCount = (int) $newLeadsCount[$leadList->getId()]['count'];
 
+        $this->logger->info('Segment QB - No new leads for segment found');
+
         if ($output) {
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', ['%leads%' => $leadCount, '%batch%' => $limit]));
         }
 
+        dump('To add: '.$leadCount);
         // Handle by batches
         $start = $lastRoundPercentage = $leadsProcessed = 0;
 
@@ -868,21 +871,19 @@ class ListModel extends FormModel
                 // Keep CPU down for large lists; sleep per $limit batch
                 $this->batchSleep();
 
+                $this->logger->debug(sprintf('Segment QB - Fetching new leads for segment [%d] %s', $leadList->getId(), $leadList->getName()));
                 $newLeadList = $this->leadSegmentService->getNewLeadListLeads($leadList, $batchLimiters, $limit);
-                dump('Got list:');
-                dump($newLeadList);
-                die();
 
                 if (empty($newLeadList[$leadList->getId()])) {
                     // Somehow ran out of leads so break out
                     break;
                 }
 
-                $processedLeads = [];
+                $this->logger->debug(sprintf('Segment QB - Adding %d new leads to segment [%d] %s', count($newLeadList), $leadList->getId(), $leadList->getName()));
                 foreach ($newLeadList[$leadList->getId()] as $l) {
+                    $this->logger->debug(sprintf('Segment QB - Adding lead #%s to segment [%d] %s', $l->getId()), $leadList->getId(), $leadList->getName());
+
                     $this->addLead($l, $leadList, false, true, -1, $dtHelper->getLocalDateTime());
-                    $processedLeads[] = $l;
-                    unset($l);
 
                     ++$leadsProcessed;
                     if ($output && $leadsProcessed < $maxCount) {
@@ -894,13 +895,15 @@ class ListModel extends FormModel
                     }
                 }
 
+                $this->logger->info(sprintf('Segment QB - Added %d new leads to segment [%d] %s', count($newLeadList), $leadList->getId(), $leadList->getName()));
+
                 $start += $limit;
 
                 // Dispatch batch event
-                if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                if (count($newLeadList[$leadList->getId()]) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
                         LeadEvents::LEAD_LIST_BATCH_CHANGE,
-                        new ListChangeEvent($processedLeads, $leadList, true)
+                        new ListChangeEvent($newLeadList[$leadList->getId()], $leadList, true)
                     );
                 }
 
@@ -925,29 +928,19 @@ class ListModel extends FormModel
             }
         }
 
-        dump('added leads');
-        die();
-
         // Unset max ID to prevent capping at newly added max ID
         unset($batchLimiters['maxId']);
 
-        // Get a count of leads to be removed
-        $removeLeadCount = $this->getLeadsByList(
-            $list,
-            true,
-            [
-                'countOnly'      => true,
-                'nonMembersOnly' => true,
-                'batchLimiters'  => $batchLimiters,
-            ]
-        );
+        $orphanLeadsCount = $this->leadSegmentService->getOrphanedLeadListLeadsCount($leadList);
 
         // Ensure the same list is used each batch
-        $batchLimiters['maxId'] = (int) $removeLeadCount[$leadList->getId()]['maxId'];
+        $batchLimiters['maxId'] = (int) $orphanLeadsCount[$leadList->getId()]['maxId'];
 
         // Restart batching
         $start     = $lastRoundPercentage     = 0;
-        $leadCount = $removeLeadCount[$id]['count'];
+        $leadCount = $orphanLeadsCount[$leadList->getId()]['count'];
+
+        dump('To remove: '.$leadCount);
 
         if ($output) {
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', ['%leads%' => $leadCount, '%batch%' => $limit]));
@@ -977,14 +970,14 @@ class ListModel extends FormModel
                     ]
                 );
 
-                if (empty($removeLeadList[$id])) {
+                if (empty($removeLeadList[$leadList->getId()])) {
                     // Somehow ran out of leads so break out
                     break;
                 }
 
                 $processedLeads = [];
-                foreach ($removeLeadList[$id] as $l) {
-                    $this->removeLead($l, $entity, false, true, true);
+                foreach ($removeLeadList[$leadList->getId()] as $l) {
+                    $this->removeLead($l, $leadList, false, true, true);
                     $processedLeads[] = $l;
                     ++$leadsProcessed;
                     if ($output && $leadsProcessed < $maxCount) {

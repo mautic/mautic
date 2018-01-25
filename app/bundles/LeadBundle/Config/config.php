@@ -810,12 +810,18 @@ return [
             'mautic.lead.model.lead_segment_filter_factory' => [
                 'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterFactory::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.lead_segment_schema_cache',
                     '@service_container',
                     'mautic.lead.repository.lead_segment_filter_descriptor',
                     'mautic.lead.model.lead_segment_decorator_base',
                     'mautic.lead.model.lead_segment_decorator_custom_mapped',
                     'mautic.lead.model.lead_segment.decorator.date.optionFactory',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_schema_cache' => [
+                'class'     => \Mautic\LeadBundle\Segment\TableSchemaColumnsCache::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.lead.model.relative_date' => [

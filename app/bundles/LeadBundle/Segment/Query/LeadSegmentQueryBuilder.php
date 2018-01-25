@@ -110,7 +110,7 @@ class LeadSegmentQueryBuilder
                                             $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1)
                                         )
         );
-        $queryBuilder->orWhere($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'));
+        $queryBuilder->andWhere($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'));
 
         return $queryBuilder;
     }
