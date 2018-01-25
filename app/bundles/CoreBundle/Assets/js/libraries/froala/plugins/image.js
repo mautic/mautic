@@ -208,9 +208,10 @@
         var $img = $(images[i]);
 
         if (!editor.opts.htmlUntouched && editor.opts.useClasses) {
-          if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0 || editor.opts.imageEditButtons.indexOf('imageDisplay') >= 0) {
-            _convertStyleToClasses($img);
-          }
+          /** Comment to prevent style stripping in code builder **/
+          //if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0 || editor.opts.imageEditButtons.indexOf('imageDisplay') >= 0) {
+          //  _convertStyleToClasses($img);
+          //}
 
           // Do not allow text near image.
           if (!editor.opts.imageTextNear) {
