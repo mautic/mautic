@@ -13,7 +13,7 @@
 <!-- filter form -->
 <form method="post" action="<?php echo $view['router']->path('mautic_contact_auditlog_action', ['leadId' => $lead->getId()]); ?>" class="panel" id="auditlog-filters">
     <div class="form-control-icon pa-xs">
-        <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" value="<?php echo $events['filters']['search']; ?>">
+        <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" value="<?php echo $view->escape($events['filters']['search']); ?>">
         <span class="the-icon fa fa-search text-muted mt-xs"></span>
     </div>
     <?php if (isset($events['types']) && is_array($events['types'])) : ?>
@@ -21,7 +21,7 @@
             <div class="col-sm-5">
                 <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="<?php echo $view['translator']->trans('mautic.lead.lead.filter.bundles.include.placeholder'); ?>">
                     <?php foreach ($events['types'] as $typeKey => $typeName) : ?>
-                        <option value="<?php echo $typeKey; ?>"<?php echo in_array($typeKey, $events['filters']['includeEvents']) ? ' selected' : ''; ?> >
+                        <option value="<?php echo $view->escape($typeKey); ?>"<?php echo in_array($typeKey, $events['filters']['includeEvents']) ? ' selected' : ''; ?> >
                             <?php echo $typeName; ?>
                         </option>
                     <?php endforeach; ?>
@@ -30,7 +30,7 @@
             <div class="col-sm-5">
                 <select name="excludeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="<?php echo $view['translator']->trans('mautic.lead.lead.filter.bundles.exclude.placeholder'); ?>">
                     <?php foreach ($events['types'] as $typeKey => $typeName) : ?>
-                        <option value="<?php echo $typeKey; ?>"<?php echo in_array($typeKey, $events['filters']['excludeEvents']) ? ' selected' : ''; ?> >
+                        <option value="<?php echo $view->escape($typeKey); ?>"<?php echo in_array($typeKey, $events['filters']['excludeEvents']) ? ' selected' : ''; ?> >
                             <?php echo $typeName; ?>
                         </option>
                     <?php endforeach; ?>
@@ -46,7 +46,7 @@
         </div>
     <?php endif; ?>
 
-    <input type="hidden" name="leadId" id="leadId" value="<?php echo $lead->getId(); ?>" />
+    <input type="hidden" name="leadId" id="leadId" value="<?php echo $view->escape($lead->getId()); ?>" />
 </form>
 
 <script>

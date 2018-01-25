@@ -122,6 +122,6 @@ $view['slots']->set(
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
-    <input name="entityId" id="entityId" type="hidden" value="<?php echo $notification->getId(); ?>" />
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $view->escape($notification->getId()); ?>" />
 </div>
 <!--/ end: box layout -->

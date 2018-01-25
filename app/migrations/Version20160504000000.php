@@ -45,7 +45,7 @@ class Version20160504000000 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql = <<<SQL
-CREATE TABLE `{$this->prefix}lead_utmtags` (
+CREATE TABLE IF NOT EXISTS `{$this->prefix}lead_utmtags` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date_added` datetime NOT NULL COMMENT '(DC2Type:datetime)',
   `lead_id` int(11) NOT NULL,

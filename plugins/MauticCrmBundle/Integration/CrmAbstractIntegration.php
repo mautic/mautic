@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\UserBundle\Entity\User;
+use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
 /**
  * Class CrmAbstractIntegration.
@@ -60,12 +61,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param Lead  $lead
-     * @param array $config
+     * @param Lead|array $lead
+     * @param array      $config
      *
      * @return array|bool
      */
-    public function pushLead($lead,  $config = [])
+    public function pushLead($lead, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -83,7 +84,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $LeadData = $this->getApiHelper()->createLead($mappedData, $lead);
+                $this->getApiHelper()->createLead($mappedData, $lead);
 
                 return true;
             }
@@ -97,7 +98,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param array $params
      */
-    public function getLeads($params, $query, &$executed, $result = [],  $object = 'Lead')
+    public function getLeads($params, $query, &$executed, $result = [], $object = 'Lead')
     {
         $executed = null;
 
@@ -174,7 +175,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Get the API helper.
      *
-     * @return object
+     * @return CrmApi
      */
     public function getApiHelper()
     {
@@ -319,6 +320,14 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $company = $existingCompany[2];
         }
 
+        $companyFieldTypes = $this->fieldModel->getFieldListWithProperties('company');
+
+        foreach ($matchedFields as $companyField => $value) {
+            if (isset($companyFieldTypes[$companyField]['type']) && $companyFieldTypes[$companyField]['type'] == 'text') {
+                $matchedFields[$companyField] = substr($value, 0, 255);
+            }
+        }
+
         if (!$company->isNew()) {
             $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
             $fieldsToUpdate = array_intersect_key($config['companyFields'], $fieldsToUpdate);
@@ -369,10 +378,14 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields();
         $uniqueLeadFieldData = [];
+        $leadFieldTypes      = $this->fieldModel->getFieldListWithProperties();
 
         foreach ($matchedFields as $leadField => $value) {
             if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
                 $uniqueLeadFieldData[$leadField] = $value;
+            }
+            if (isset($leadFieldTypes[$leadField]['type']) && $leadFieldTypes[$leadField]['type'] == 'text') {
+                $matchedFields[$leadField] = substr($value, 0, 255);
             }
         }
 
@@ -395,6 +408,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $leadFields = $this->cleanPriorityFields($config, $object);
         if (!$lead->isNewlyCreated()) {
+            $params = $this->commandParameters;
+
+            $this->getLeadDoNotContactByDate('email', $matchedFields, $object, $lead, $data, $params);
+
             // Use only prioirty fields if updating
             $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
             if (empty($fieldsToUpdateInMautic)) {

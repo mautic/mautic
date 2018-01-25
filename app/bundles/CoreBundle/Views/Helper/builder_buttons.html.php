@@ -12,7 +12,7 @@
 ?>
 
 <div class="row">
-    <div class="col-xs-6">
+    <div class="col-xs-12">
         <button type="button" class="btn btn-primary btn-apply-builder">
             <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
         </button>

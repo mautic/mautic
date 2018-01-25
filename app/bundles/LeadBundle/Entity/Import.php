@@ -58,7 +58,7 @@ class Import extends FormEntity
     const MANUAL = 6;
 
     /**
-     * When the import happens is scheduled for later processing.
+     * When the import is scheduled for later processing.
      */
     const DELAYED = 7;
 
@@ -351,7 +351,7 @@ class Import extends FormEntity
     /**
      * Removes the file if exists.
      * It won't throw any exception if the file is not readable.
-     * Not removing the CSV file is not consodered a big trouble.
+     * Not removing the CSV file is not considered a big trouble.
      * It will be removed on the next cache:clear.
      */
     public function removeFile()
@@ -385,7 +385,7 @@ class Import extends FormEntity
     }
 
     /**
-     * getName method is used by standart templates so there it is for this entity.
+     * getName method is used by standard templates so there it is for this entity.
      *
      * @return string
      */
@@ -503,7 +503,7 @@ class Import extends FormEntity
     }
 
     /**
-     * Counts how many rows has been processed so far.
+     * Counts how many rows have been processed so far.
      *
      * @return int
      */
@@ -630,7 +630,7 @@ class Import extends FormEntity
     }
 
     /**
-     * Modify the entity for the start of import.
+     * Modify the entity for the end of import.
      *
      * @return Import
      */
@@ -671,7 +671,7 @@ class Import extends FormEntity
     }
 
     /**
-     * Counts how log the import run so far.
+     * Counts how long the import has run so far.
      *
      * @return \DateInterval|null
      */
@@ -764,6 +764,24 @@ class Import extends FormEntity
     }
 
     /**
+     * @param $line
+     *
+     * @return Import
+     */
+    public function setLastLineImported($line)
+    {
+        $this->properties['line'] = (int) $line;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastLineImported()
+    {
+        return isset($this->properties['line']) ? $this->properties['line'] : 0;
+    }
+
+    /**
      * @return array
      */
     public function getMatchedFields()
@@ -772,7 +790,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @param string $properties
+     * @param array $properties
      *
      * @return Import
      */
@@ -880,7 +898,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function getProperties()
     {

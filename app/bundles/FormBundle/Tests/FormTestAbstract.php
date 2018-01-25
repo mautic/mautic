@@ -27,7 +27,6 @@ use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
-use Mautic\FormBundle\Model\SubmissionResultLoader;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -152,11 +151,6 @@ class FormTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $submissionResultLoader = $this
-            ->getMockBuilder(SubmissionResultLoader::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $formModel = new FormModel(
             $requestStack,
             $templatingHelperMock,
@@ -167,8 +161,7 @@ class FormTestAbstract extends WebTestCase
             $leadModel,
             $fieldHelper,
             $leadFieldModel,
-            $formUploaderMock,
-            $submissionResultLoader
+            $formUploaderMock
         );
 
         $formModel->setDispatcher($dispatcher);

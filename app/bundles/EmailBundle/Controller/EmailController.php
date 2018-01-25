@@ -1561,7 +1561,7 @@ class EmailController extends FormController
 
         //add builder toolbar
         $slotsHelper->start('builder'); ?>
-        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
+        <input type="hidden" id="builder_entity_id" value="<?php echo $view->escape($entity->getSessionId()); ?>"/>
         <?php
         $slotsHelper->stop();
     }

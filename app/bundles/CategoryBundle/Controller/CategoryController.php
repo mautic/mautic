@@ -255,7 +255,6 @@ class CategoryController extends FormController
                 ],
             ]);
         } elseif (!empty($valid)) {
-
             //return edit view to prevent duplicates
             return $this->editAction($bundle, $entity->getId(), true);
         } else {

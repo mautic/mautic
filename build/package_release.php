@@ -3,7 +3,7 @@
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @see        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -96,24 +96,6 @@ if (!isset($args['repackage'])) {
         'upgrade.php'             => true,
     ];
 
-    // Build an array of paths which we won't ever distro, this is used for the update packages
-    $doNotPackage = [
-        '.github/CONTRIBUTING.md',
-        '.github/ISSUE_TEMPLATE.md',
-        '.github/PULL_REQUEST_TEMPLATE.md',
-        '.gitignore',
-        '.travis.yml',
-        '.php_cs',
-        'app/phpunit.xml.dist',
-        'build',
-        'composer.json',
-        'composer.lock',
-        'Gruntfile.js',
-        'index_dev.php',
-        'package.json',
-        'upgrade.php',
-    ];
-
     // Create a flag to check if the vendors changed
     $vendorsChanged = false;
 
@@ -130,13 +112,6 @@ if (!isset($args['repackage'])) {
 
             if (!$vendorsChanged && $filename == 'composer.lock') {
                 $vendorsChanged = true;
-            }
-
-            $doNotPackageFile   = in_array($filename, $doNotPackage);
-            $doNotPackageFolder = in_array($baseFolderName, $doNotPackage);
-
-            if ($doNotPackageFile || $doNotPackageFolder) {
-                continue;
             }
 
             if (substr($file, 0, 1) == 'D') {
@@ -186,4 +161,6 @@ echo "Packaging Mautic Full Installation\n";
 system('zip -r ../packages/'.$appVersion.'.zip . -x@../excludefiles.txt > /dev/null');
 
 echo "Packaging Mautic Update Package\n";
-system('zip -r ../packages/'.$appVersion.'-update.zip -@ < modified_files.txt > /dev/null');
+system('zip -r ../packages/'.$appVersion.'-update.zip -x@../excludefiles.txt -@ < modified_files.txt > /dev/null');
+
+system('openssl sha1 ../packages/'.$appVersion.'.zip');

@@ -498,7 +498,7 @@ switch ($style) {
                     console.log('mautic_focus_<?php echo $focus['id']; ?> cookie set for ' + now);
 
                 Focus.cookies.removeItem('mautic_focus_<?php echo $focus['id']; ?>');
-                Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', now, Infinity);
+                Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', now, Infinity, '/');
 
                 <?php if ($style == 'bar'): ?>
                 var collapser = document.getElementsByClassName('mf-bar-collapser-<?php echo $focus['id']; ?>');

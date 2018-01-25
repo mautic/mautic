@@ -65,9 +65,7 @@ class EmailSubscriber extends CommonSubscriber
             EmailEvents::EMAIL_POST_SAVE   => ['onEmailPostSave', 0],
             EmailEvents::EMAIL_POST_DELETE => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED      => ['onEmailFailed', 0],
-            EmailEvents::EMAIL_ON_SEND     => ['onEmailSend', 0],
             EmailEvents::EMAIL_RESEND      => ['onEmailResend', 0],
-            EmailEvents::EMAIL_PARSE       => ['onEmailParse', 0],
             QueueEvents::EMAIL_HIT         => ['onEmailHit', 0],
         ];
     }
@@ -134,24 +132,6 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add an unsubscribe email to the List-Unsubscribe header if applicable.
-     *
-     * @param Events\EmailSendEvent $event
-     */
-    public function onEmailSend(Events\EmailSendEvent $event)
-    {
-        $helper = $event->getHelper();
-        if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
-            $headers          = $event->getTextHeaders();
-            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
-            $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
-            $updatedHeader    = ($existing) ? $unsubscribeEmail.', '.$existing : $unsubscribeEmail;
-
-            $event->addTextHeader('List-Unsubscribe', $updatedHeader);
-        }
-    }
-
-    /**
      * Process if an email is resent.
      *
      * @param Events\QueueEmailEvent $event
@@ -179,28 +159,6 @@ class EmailSubscriber extends CommonSubscriber
 
                 $this->em->persist($stat);
                 $this->em->flush();
-            }
-        }
-    }
-
-    /**
-     * @param Events\ParseEmailEvent $event
-     */
-    public function onEmailParse(Events\ParseEmailEvent $event)
-    {
-        // Listening for bounce_folder and unsubscribe_folder
-        $isBounce      = $event->isApplicable('EmailBundle', 'bounces');
-        $isUnsubscribe = $event->isApplicable('EmailBundle', 'unsubscribes');
-
-        if ($isBounce || $isUnsubscribe) {
-            // Process the messages
-
-            /** @var \Mautic\EmailBundle\Helper\MessageHelper $messageHelper */
-            $messageHelper = $this->factory->getHelper('message');
-
-            $messages = $event->getMessages();
-            foreach ($messages as $message) {
-                $messageHelper->analyzeMessage($message, $isBounce, $isUnsubscribe);
             }
         }
     }

@@ -444,6 +444,48 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => true,
             ],
+            [ // ID 24
+                'name'    => 'Segment membership based on only company fields',
+                'alias'   => 'segment-company-only-fields',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'company',
+                        'field'    => 'companycity',
+                        'operator' => '=',
+                        'filter'   => 'Houston',
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 25
+                'name'    => 'Segment membership with excluded segment without other filters',
+                'alias'   => 'segment-including-segment-with-company-only-fields',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'company',
+                        'field'    => 'companyindustry',
+                        'operator' => 'in',
+                        'filter'   => ['Software', 'Hardware'],
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => '!in',
+                        'filter'   => [21],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {
