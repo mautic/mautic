@@ -132,14 +132,15 @@ class IdentifyCompanyHelper
      */
     protected static function domainExists($email)
     {
+        if (!strstr($email, '@')){ //not a valid email adress
+            return false;
+        }
         list($user, $domain) = explode('@', $email);
         $arr                 = dns_get_record($domain, DNS_MX);
 
         if ($arr && $arr[0]['host'] === $domain) {
             return $domain;
         }
-
-        return false;
     }
 
     /**
