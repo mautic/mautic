@@ -4724,6 +4724,8 @@ th.col-id {
 }
 span.slot-caption {
   font-size: 12px;
+  line-height: 18px;
+  display: inline-block;
 }
 .imagecard-caption,
 figcaption {

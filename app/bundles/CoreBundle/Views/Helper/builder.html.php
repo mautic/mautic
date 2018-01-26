@@ -45,12 +45,14 @@
                     <div id="slot-type-container" class="col-md-12">
                         <?php foreach ($slots as $slotKey => $slot): ?>
                             <div class="slot-type-handle btn btn-default btn-lg btn-nospin" data-slot-type="<?php echo $slotKey; ?>">
-                                <i class="fa fa-<?php echo $slot['icon']; ?>" aria-hidden="true"></i>
-                                <br>
-                                <span class="slot-caption"><?php echo $slot['header']; ?></span>
-                                <script type="text/html">
-                                    <?php echo $view->render($slot['content'], isset($slot['params']) ? $slot['params'] : []); ?>
-                                </script>
+                                <div class="slot-body">
+                                    <i class="fa fa-<?php echo $slot['icon']; ?>" aria-hidden="true"></i>
+                                    <br>
+                                    <span class="slot-caption"><?php echo $slot['header']; ?></span>
+                                    <script type="text/html">
+                                        <?php echo $view->render($slot['content'], isset($slot['params']) ? $slot['params'] : []); ?>
+                                    </script>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                         <div class="clearfix"></div>
@@ -69,12 +71,14 @@
                     <div id="section-type-container" class="col-md-12">
                         <?php foreach ($sections as $sectionKey => $section): ?>
                             <div class="section-type-handle btn btn-default btn-lg btn-nospin" data-section-type="<?php echo $sectionKey; ?>">
-                                <i class="fa fa-<?php echo $section['icon']; ?>" aria-hidden="true"></i>
-                                <br>
-                                <span class="slot-caption"><?php echo $section['header']; ?></span>
-                                <script type="text/html">
-                                    <?php echo $view->render($section['content']); ?>
-                                </script>
+                                <div class="section-type-body">
+                                    <i class="fa fa-<?php echo $section['icon']; ?>" aria-hidden="true"></i>
+                                    <br>
+                                    <span class="slot-caption"><?php echo $section['header']; ?></span>
+                                    <script type="text/html">
+                                        <?php echo $view->render($section['content']); ?>
+                                    </script>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                         <div class="clearfix"></div>

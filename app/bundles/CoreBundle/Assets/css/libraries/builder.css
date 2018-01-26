@@ -5452,23 +5452,27 @@ div[data-slot].ui-sortable-helper {
   float: left;
   width: 111px;
   margin: 2px;
-  height: 75px;
+  height: 75px !important;
   padding-left: 5px;
   padding-right: 5px;
   text-align: center;
   word-wrap: break-word;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 .slot-type-handle.ui-draggable-dragging,
 .section-type-handle.ui-draggable-dragging {
   color: #5d6c7c;
   background-color: #f5f5f5;
   border-color: #d3d3d3;
-  padding: 10px 16px;
-  font-size: 16px;
-  line-height: 1.25;
-  border-radius: 4px;
-  margin: 2px;
-  text-align: center;
 }
 .theme-list .panel-body {
   height: 350px;
