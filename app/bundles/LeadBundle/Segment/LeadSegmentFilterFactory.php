@@ -13,6 +13,8 @@ namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
+use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 class LeadSegmentFilterFactory
@@ -58,9 +60,9 @@ class LeadSegmentFilterFactory
 
             $decorator = $this->decoratorFactory->getDecoratorForFilter($leadSegmentFilterCrate);
 
-            $leadSegmentFilter = new LeadSegmentFilter($leadSegmentFilterCrate, $decorator, $this->schemaCache);
+            $filterQueryBuilder = $this->getQueryBuilderForFilter($decorator, $leadSegmentFilterCrate);
 
-            $leadSegmentFilter->setFilterQueryBuilder($this->getQueryBuilderForFilter($leadSegmentFilter));
+            $leadSegmentFilter = new LeadSegmentFilter($leadSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder);
 
             //@todo replaced in query builder
             $leadSegmentFilters->addLeadSegmentFilter($leadSegmentFilter);
@@ -70,13 +72,14 @@ class LeadSegmentFilterFactory
     }
 
     /**
-     * @param LeadSegmentFilter $filter
+     * @param FilterDecoratorInterface $decorator
+     * @param LeadSegmentFilterCrate   $leadSegmentFilterCrate
      *
-     * @return BaseFilterQueryBuilder
+     * @return FilterQueryBuilderInterface
      */
-    protected function getQueryBuilderForFilter(LeadSegmentFilter $filter)
+    private function getQueryBuilderForFilter(FilterDecoratorInterface $decorator, LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        $qbServiceId = $filter->getQueryType();
+        $qbServiceId = $decorator->getQueryType($leadSegmentFilterCrate);
 
         return $this->container->get($qbServiceId);
     }
