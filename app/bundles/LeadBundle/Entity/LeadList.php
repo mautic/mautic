@@ -289,4 +289,15 @@ class LeadList extends FormEntity
     {
         return $this->leads;
     }
+
+    /**
+     * Clone entity with empty contact list
+     */
+    public function __clone()
+    {
+        parent::__clone();
+
+        $this->id = null;
+        $this->leads = new ArrayCollection();
+    }
 }
