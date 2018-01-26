@@ -27,6 +27,7 @@
             </div>
             <div class="pt-0 pb-xs pl-0 pr-0">
                 <div class="scroll-content slimscroll" style="height:250px;" id="notifications">
+                    hello
                     <?php echo $view->render('MauticCoreBundle:Notification:notification_messages.html.php', [
                         'notifications' => $notifications,
                         'updateMessage' => $updateMessage,
