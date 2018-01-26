@@ -220,7 +220,7 @@ class ListController extends FormController
     }
 
     /**
-     * Clone segment action
+     * Generate's clone form and processes post data.
      *
      * @param int   $objectId
      * @param bool  $ignorePost
@@ -259,7 +259,7 @@ class ListController extends FormController
     }
 
     /**
-     * Edit segment action
+     * Generate's edit form and processes post data.
      *
      * @param int   $objectId
      * @param bool  $ignorePost
