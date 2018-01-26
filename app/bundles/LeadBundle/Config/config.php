@@ -812,10 +812,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead_segment_schema_cache',
                     '@service_container',
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
-                    'mautic.lead.model.lead_segment_decorator_base',
-                    'mautic.lead.model.lead_segment_decorator_custom_mapped',
-                    'mautic.lead.model.lead_segment.decorator.date.optionFactory',
+                    'mautic.lead.model.lead_segment_decorator_factory',
                 ],
             ],
             'mautic.lead.model.lead_segment_schema_cache' => [
@@ -836,6 +833,15 @@ return [
                     'translator',
                     'event_dispatcher',
                     'mautic.lead.segment.operator_options',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_factory' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\DecoratorFactory::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                    'mautic.lead.model.lead_segment_decorator_base',
+                    'mautic.lead.model.lead_segment_decorator_custom_mapped',
+                    'mautic.lead.model.lead_segment.decorator.date.optionFactory',
                 ],
             ],
             'mautic.lead.model.lead_segment_decorator_base' => [

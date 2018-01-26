@@ -12,19 +12,15 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
-use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
-use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
-use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
-use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
+use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Symfony\Component\DependencyInjection\Container;
 
 class LeadSegmentFilterFactory
 {
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @var TableSchemaColumnsCache
      */
-    private $entityManager;
+    private $schemaCache;
 
     /**
      * @var Container
@@ -32,44 +28,18 @@ class LeadSegmentFilterFactory
     private $container;
 
     /**
-     * @var LeadSegmentFilterDescriptor
+     * @var DecoratorFactory
      */
-    private $leadSegmentFilterDescriptor;
-
-    /**
-     * @var BaseDecorator
-     */
-    private $baseDecorator;
-
-    /**
-     * @var CustomMappedDecorator
-     */
-    private $customMappedDecorator;
-
-    /**
-     * @var DateOptionFactory
-     */
-    private $dateOptionFactory;
-
-    /**
-     * @var TableSchemaColumnsCache
-     */
-    private $schemaCache;
+    private $decoratorFactory;
 
     public function __construct(
         TableSchemaColumnsCache $schemaCache,
         Container $container,
-        LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor,
-        BaseDecorator $baseDecorator,
-        CustomMappedDecorator $customMappedDecorator,
-        DateOptionFactory $dateOptionFactory
+        DecoratorFactory $decoratorFactory
     ) {
-        $this->schemaCache                 = $schemaCache;
-        $this->container                   = $container;
-        $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
-        $this->baseDecorator               = $baseDecorator;
-        $this->customMappedDecorator       = $customMappedDecorator;
-        $this->dateOptionFactory           = $dateOptionFactory;
+        $this->schemaCache      = $schemaCache;
+        $this->container        = $container;
+        $this->decoratorFactory = $decoratorFactory;
     }
 
     /**
@@ -86,10 +56,10 @@ class LeadSegmentFilterFactory
             // LeadSegmentFilterCrate is for accessing $filter as an object
             $leadSegmentFilterCrate = new LeadSegmentFilterCrate($filter);
 
-            $decorator = $this->getDecoratorForFilter($leadSegmentFilterCrate);
+            $decorator = $this->decoratorFactory->getDecoratorForFilter($leadSegmentFilterCrate);
 
             $leadSegmentFilter = new LeadSegmentFilter($leadSegmentFilterCrate, $decorator, $this->schemaCache);
-            //$this->leadSegmentFilterDate->fixDateOptions($leadSegmentFilter);
+
             $leadSegmentFilter->setFilterQueryBuilder($this->getQueryBuilderForFilter($leadSegmentFilter));
 
             //@todo replaced in query builder
@@ -109,25 +79,5 @@ class LeadSegmentFilterFactory
         $qbServiceId = $filter->getQueryType();
 
         return $this->container->get($qbServiceId);
-    }
-
-    /**
-     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
-     *
-     * @return FilterDecoratorInterface
-     */
-    protected function getDecoratorForFilter(LeadSegmentFilterCrate $leadSegmentFilterCrate)
-    {
-        if ($leadSegmentFilterCrate->isDateType()) {
-            return $this->dateOptionFactory->getDateOption($leadSegmentFilterCrate);
-        }
-
-        $originalField = $leadSegmentFilterCrate->getField();
-
-        if (empty($this->leadSegmentFilterDescriptor[$originalField])) {
-            return $this->baseDecorator;
-        }
-
-        return $this->customMappedDecorator;
     }
 }
