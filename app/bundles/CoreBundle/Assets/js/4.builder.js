@@ -916,6 +916,7 @@ Mautic.initSlots = function(slotContainers) {
 
             return ui;
         },
+        scroll: false,
         items: '[data-slot]',
         handle: '[data-slot-toolbar]',
         placeholder: 'slot-placeholder',
@@ -964,6 +965,7 @@ Mautic.initSlots = function(slotContainers) {
         connectToSortable: '[data-slot-container]',
         revert: 'invalid',
         iframeOffset: iframe.offset(),
+        scroll: false,
         helper: function(e, ui) {
             // fix for Uncaught TypeError: Cannot read property 'document' of null
             // Fix body overflow that messes sortable up
@@ -986,9 +988,6 @@ Mautic.initSlots = function(slotContainers) {
             mQuery('.builder-panel', Mautic.parentDocument).css({overflowY: 'visible'});
             // check if it is initialized first to prevent error
             if (slotContainers.data('sortable')) slotContainers.sortable('option', 'scroll', false);
-        },
-        drag: function(event, ui) {
-            console.log(ui.helper);
         },
         stop: function(event, ui) {
             // Restore original overflow
