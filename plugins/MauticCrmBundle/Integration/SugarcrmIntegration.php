@@ -1656,7 +1656,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return $fieldMappings;
     }
-    
+
     /**
      * Converts Mautic Multi-Select String into the format used to store Multi-Select values used by SuiteCRM / SugarCRM 6.x.
      *
@@ -1673,7 +1673,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $convertedSugarCrmMultiSelectString = $convertedSugarCrmMultiSelectString.'^'.$item.'^'.',';
         }
         $convertedSugarCrmMultiSelectString = substr($convertedSugarCrmMultiSelectString, 0, -1);
-        
+
         return $convertedSugarCrmMultiSelectString;
     }
 
@@ -1695,7 +1695,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             return false;
         }
     }
-    
+
     /**
      * Converts a SuiteCRM / SugarCRM 6.x Multi-Select String into the format used to store Multi-Select values used by Mautic.
      *
@@ -1713,9 +1713,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $convertedString     = $convertedString.$innerArray[2].'|';
         }
         $convertedString        = substr($convertedString, 0, -1);
-        
+
         return $convertedString;
     }
-    
-    
 }
