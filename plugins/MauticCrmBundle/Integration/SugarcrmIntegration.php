@@ -791,15 +791,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 if ($SUGAR_VERSION == '6') {
                     foreach ($record['name_value_list'] as $item) {
                         if ($object !== 'Activity') {
-                            
                             if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {
                                 $convertedMultiSelectString         = $this->convertSuiteCrmToMauticMultiSelect($item['value']);
                                 $dataObject[$item['name'].$newName] = $convertedMultiSelectString;
                             } else {
                                 $dataObject[$item['name'].$newName] = $item['value'];
                             }
-                            
-
                             if ($item['name'] == 'date_entered') {
                                 $itemDateEntered = new \DateTime($item['value']);
                             }
@@ -1676,6 +1673,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $convertedSugarCrmMultiSelectString = $convertedSugarCrmMultiSelectString.'^'.$item.'^'.',';
         }
         $convertedSugarCrmMultiSelectString = substr($convertedSugarCrmMultiSelectString, 0, -1);
+        
         return $convertedSugarCrmMultiSelectString;
     }
 
@@ -1715,6 +1713,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $convertedString     = $convertedString.$innerArray[2].'|';
         }
         $convertedString        = substr($convertedString, 0, -1);
+        
         return $convertedString;
     }
     
