@@ -39,7 +39,7 @@ class Version20160523000000 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql = <<<SQL
-CREATE TABLE `{$this->prefix}stages` (
+CREATE TABLE IF NOT EXISTS `{$this->prefix}stages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `category_id` int(11) DEFAULT NULL,
   `checked_out` datetime DEFAULT NULL,
@@ -50,9 +50,9 @@ CREATE TABLE `{$this->prefix}stages` (
   `description` longtext,
   `date_added` datetime NULL COMMENT '(DC2Type:datetime)',
   `date_modified` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
-  `is_published` tinyint(1) NOT NULL,  
+  `is_published` tinyint(1) NOT NULL,
   `modified_by` int(11) DEFAULT NULL,
-  `modified_by_user` varchar(255) DEFAULT NULL,  
+  `modified_by_user` varchar(255) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   `publish_up` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
   `publish_down` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
@@ -64,7 +64,7 @@ SQL;
         $this->addSql($sql);
 
         $sql = <<<SQL
-CREATE TABLE `{$this->prefix}lead_stages_change_log` (
+CREATE TABLE IF NOT EXISTS `{$this->prefix}lead_stages_change_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `lead_id` int(11) NOT NULL,
   `event_name` varchar(255) NOT NULL,
@@ -79,7 +79,7 @@ SQL;
         $this->addSql('ALTER TABLE '.$this->prefix.'lead_stages_change_log ADD CONSTRAINT '.$this->generatePropertyName('lead_stages_change_log', 'fk', ['lead_id']).' FOREIGN KEY (lead_id) REFERENCES '.$this->prefix.'leads (id) ON DELETE CASCADE');
 
         $sql = <<<SQL
-CREATE TABLE `{$this->prefix}stage_lead_action_log` (
+CREATE TABLE IF NOT EXISTS `{$this->prefix}stage_lead_action_log` (
   `stage_id` int(11) NOT NULL,
   `lead_id` int(11) NOT NULL,
   `ip_id` int(11) DEFAULT NULL,

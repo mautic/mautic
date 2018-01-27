@@ -1,10 +1,10 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved
+
+/*
+ * @package     Mautic
+ * @copyright   2018 Mautic Contributors. All rights reserved.
  * @author      Mautic
- *
- * @see         http://mautic.org
- *
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,10 +14,7 @@ use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-/**
- * Auto-generated Migration: Please modify to your needs!
- */
-class Version20161222183556 extends AbstractMauticMigration
+class Version20180117141613 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
@@ -27,7 +24,10 @@ class Version20161222183556 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->hasTable($this->prefix.'saml_id_entry')) {
+        $table = $schema->getTable(MAUTIC_TABLE_PREFIX.'tweets');
+        if ($table->hasColumn('text')
+            && $table->getColumn('text')->getLength() === 280
+        ) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -37,14 +37,6 @@ class Version20161222183556 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $sql = <<<SQL
-CREATE TABLE IF NOT EXISTS {$this->prefix}saml_id_entry (
-  id VARCHAR(255) NOT NULL,
-  entity_id VARCHAR(255) NOT NULL,
-  expiryTimestamp INT NOT NULL,
-  PRIMARY KEY(id, entity_id)
-) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
-SQL;
-        $this->addSql($sql);
+        $this->addSql("ALTER TABLE {$this->prefix}tweets CHANGE text text VARCHAR(280) NOT NULL");
     }
 }
