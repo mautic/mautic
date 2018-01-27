@@ -1661,15 +1661,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
     
     /**
-     * Converts Mautic Multi-Select String into the format used to store Multi-Select values used by SuiteCRM / SugarCRM 6.x. 
-     * Mautic Multi Select format - 'choice1|choice2|choice_3'. 
-     * SugarCRM/SuiteCRM Multi-Select format - '^choice1^,^choice2^,^choice_3^'.
+     * Converts Mautic Multi-Select String into the format used to store Multi-Select values used by SuiteCRM / SugarCRM 6.x.
      *
      * @param  string
      *
      * @return string
      */
-    public function convertMauticToSuiteCrmMultiSelect($mauticMultiSelectStringToConvert) 
+    public function convertMauticToSuiteCrmMultiSelect($mauticMultiSelectStringToConvert)
     {
         //$mauticMultiSelectStringToConvert = 'test|enhancedapi|dataservices';
         $multiSelectArrayValues             = explode('|', $mauticMultiSelectStringToConvert);
@@ -1682,18 +1680,17 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Checks if a string contains SuiteCRM / SugarCRM 6.x Multi-Select values. 
-     * Example SugarCRM/SuiteCRM Multi-Select String: '^choice1^,^choice2^,^choice_3^'. 
+     * Checks if a string contains SuiteCRM / SugarCRM 6.x Multi-Select values.
      *
      * @param  string
      *
      * @return bool
      */
-    public function checkIfSugarCrmMultiSelectString($stringToCheck) 
+    public function checkIfSugarCrmMultiSelectString($stringToCheck)
     {
         // Regular Express to check SugarCRM/SuiteCRM Multi-Select format below
         // example format: '^choice1^,^choice2^,^choice_3^'
-        $regex = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';      
+        $regex = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
         if (preg_match($regex, $stringToCheck)) {
             return true;
         } else {
@@ -1702,15 +1699,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
     
     /**
-     * Converts a SuiteCRM / SugarCRM 6.x Multi-Select String into the format used to store Multi-Select values used by Mautic. 
-     * Mautic Multi Select format - 'choice1|choice2|choice_3'. 
-     * SugarCRM/SuiteCRM Multi-Select format - '^choice1^,^choice2^,^choice_3^'.
+     * Converts a SuiteCRM / SugarCRM 6.x Multi-Select String into the format used to store Multi-Select values used by Mautic.
      *
      * @param  string
      *
      * @return string
      */
-    public function convertSuiteCrmToMauticMultiSelect( $suiteCrmMultiSelectStringToConvert ) 
+    public function convertSuiteCrmToMauticMultiSelect($suiteCrmMultiSelectStringToConvert)
     {
         // Mautic Multi Select format - 'choice1|choice2|choice_3'
         $regexString            = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
