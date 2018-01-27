@@ -1463,7 +1463,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     } else {
                         $body[]                    = ['name' => $sugarField, 'value' => $lead[$mauticField]];
                     }
-                    
                 } elseif ($required) {
                     $value  = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
                     $body[] = ['name' => $sugarField, 'value' => $value];
