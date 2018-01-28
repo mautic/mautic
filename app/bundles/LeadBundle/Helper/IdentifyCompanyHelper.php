@@ -136,6 +136,8 @@ class IdentifyCompanyHelper
         if ($arr && $arr[0]['host'] === $domain) {
             return $domain;
         }
+
+        return false;
     }
 
     /**
