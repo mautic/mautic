@@ -132,7 +132,7 @@ class IdentifyCompanyHelper
      */
     protected static function domainExists($email)
     {
-        if (!strstr($email, '@')){ //not a valid email adress
+        if (!strstr($email, '@')) { //not a valid email adress
             return false;
         }
         list($user, $domain) = explode('@', $email);
