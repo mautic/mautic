@@ -975,10 +975,11 @@ Mautic.initSlots = function(slotContainers) {
                 overflowX: 'hidden',
                 overflowY: 'hidden'
             });
+            var styles = mQuery(this).getStyleObject();
+            var cloned = mQuery(this).clone();
 
-            return mQuery(this).clone()
-                .css('height', mQuery(this).height())
-                .css('width', mQuery(this).width());
+            cloned.css(styles);
+            return cloned;
         },
         zIndex: 8000,
         cursorAt: {top: 15, left: 15},
@@ -998,7 +999,6 @@ Mautic.initSlots = function(slotContainers) {
             // check if it is initialized first to prevent error
             if (slotContainers.data('sortable')) slotContainers.sortable('option', 'scroll', true);
             // this fixes an issue where after reopening the builder and trying to drag a slot, it leaves a clone behind
-            console.log(parent.mQuery('.ui-draggable-dragging').css("height"));
             parent.mQuery('.ui-draggable-dragging').remove();
         }
     }).disableSelection();
