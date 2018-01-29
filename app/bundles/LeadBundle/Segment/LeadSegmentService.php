@@ -79,7 +79,7 @@ class LeadSegmentService
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->leadSegmentQueryBuilder->getLeadsSegmentQueryBuilder($leadList->getId(), $segmentFilters);
         $queryBuilder = $this->leadSegmentQueryBuilder->addNewLeadsRestrictions($queryBuilder, $leadList->getId(), $batchLimiters);
-        $queryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $leadList->getId());
+        //$queryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $leadList->getId());
         $queryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubsribedQuery($queryBuilder, $leadList->getId());
 
         return $queryBuilder;
@@ -170,12 +170,13 @@ class LeadSegmentService
 
         $queryBuilder = $this->leadSegmentQueryBuilder->getLeadsSegmentQueryBuilder($leadList->getId(), $segmentFilters);
 
-        $queryBuilder->select('l.id');
         $queryBuilder->rightJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp', 'l.id = orp.lead_id and orp.leadlist_id = '.$leadList->getId());
         $queryBuilder->andWhere($queryBuilder->expr()->andX(
             $queryBuilder->expr()->isNull('l.id'),
             $queryBuilder->expr()->eq('orp.leadlist_id', $leadList->getId())
         ));
+
+        $queryBuilder->select($queryBuilder->guessPrimaryLeadIdColumn().' as id');
 
         return $queryBuilder;
     }

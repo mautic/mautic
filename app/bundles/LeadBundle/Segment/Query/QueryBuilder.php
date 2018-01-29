@@ -1515,6 +1515,29 @@ class QueryBuilder
     }
 
     /**
+     * Functions returns either the 'lead.id' or the primary key from right joined table.
+     *
+     * @return string
+     */
+    public function guessPrimaryLeadIdColumn()
+    {
+        $parts     = $this->getQueryParts();
+        $leadTable = $parts['from'][0]['alias'];
+        $joins     = $parts['join'][$leadTable];
+
+        foreach ($joins as $join) {
+            if ($join['joinType'] == 'right') {
+                $matches = null;
+                if (preg_match('/'.$leadTable.'\.id \= ([^\ ]+)/i', $join['joinCondition'], $matches)) {
+                    return $matches[1];
+                }
+            }
+        }
+
+        return $leadTable.'.id';
+    }
+
+    /**
      * Return aliases of all currently registered tables.
      *
      * @return array

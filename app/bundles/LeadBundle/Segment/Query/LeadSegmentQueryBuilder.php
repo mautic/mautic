@@ -59,7 +59,10 @@ class LeadSegmentQueryBuilder
     {
         // Add count functions to the query
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
-        $qb->addSelect('l.id as leadIdPrimary');
+        //  If there is any right join in the query we need to select its it
+        $primary = $qb->guessPrimaryLeadIdColumn();
+
+        $qb->addSelect($primary.' as leadIdPrimary');
         $queryBuilder->select('count(leadIdPrimary) count, max(leadIdPrimary) maxId')
                      ->from('('.$qb->getSQL().')', 'sss');
         $queryBuilder->setParameters($qb->getParameters());

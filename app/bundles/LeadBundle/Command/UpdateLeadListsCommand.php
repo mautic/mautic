@@ -77,7 +77,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                 $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $l->getId()]).'</info>');
 
-                $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
+                $processed = $listModel->updateLeadList($l, $batch, $max, $output);
                 $output->writeln(
                     '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
                 );
