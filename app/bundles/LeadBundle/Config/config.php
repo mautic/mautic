@@ -346,6 +346,7 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.lead.event.dispatcher',
                 ],
                 'methodCalls' => [
                     'setModelFactory' => ['mautic.model.factory'],
@@ -707,6 +708,12 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\Lead::class,
+                ],
+            ],
+            'mautic.lead.event.dispatcher' => [
+                'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
                 ],
             ],
         ],

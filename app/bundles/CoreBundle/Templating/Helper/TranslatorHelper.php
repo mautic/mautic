@@ -11,10 +11,13 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper as BaseHelper;
 
 /**
  * Extended TranslatorHelper.
+ *
+ * @property Translator $translator
  */
 class TranslatorHelper extends BaseHelper
 {

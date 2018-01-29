@@ -520,6 +520,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->em->flush($email);
         }
 
+        $this->em->persist($stat);
+        $this->em->flush();
+
         if (isset($emailOpenDevice) and is_object($emailOpenDevice)) {
             $emailOpenStat = new StatDevice();
             $emailOpenStat->setIpAddress($ipAddress);
@@ -530,9 +533,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->em->persist($emailOpenStat);
             $this->em->flush($emailOpenStat);
         }
-
-        $this->em->persist($stat);
-        $this->em->flush();
     }
 
     /**
@@ -1357,7 +1357,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         array $lead = null,
         array $tokens = [],
         array $assetAttachments = [],
-        $saveStat = true,
+        $saveStat = false,
         array $to = [],
         array $cc = [],
         array $bcc = []
@@ -1576,6 +1576,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Processes the callback response from a mailer for bounces and unsubscribes.
      *
+     * @deprecated 2.13.0 to be removed in 3.0; use TransportWebhook::processCallback() instead
+     *
      * @param array $response
      *
      * @return array|void
@@ -1735,24 +1737,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if ($flag == 'all' || $flag == 'clicked') {
-            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', [])
-                ->join('t', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 't.redirect_id = cut.redirect_id')
-                ->andWhere('cut.channel = :channel')
-                ->setParameter('channel', 'email');
+            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', []);
+            $q->andWhere('t.source = :source');
+            $q->setParameter('source', 'email');
 
             if (isset($filter['email_id'])) {
                 if (is_array($filter['email_id'])) {
-                    $q->andWhere($q->expr()->in('cut.channel_id', $filter['email_id']));
+                    $q->andWhere('t.source_id IN (:email_ids)');
+                    $q->setParameter('email_ids', $filter['email_id'], \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
                 } else {
-                    $q->andWhere('cut.channel_id = :channel_id');
-                    $q->setParameter('channel_id', $filter['email_id']);
+                    $q->andWhere('t.source_id = :email_id');
+                    $q->setParameter('email_id', $filter['email_id']);
                 }
             }
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
-
             $data = $query->loadAndBuildTimeData($q);
 
             $chart->setDataset($this->translator->trans('mautic.email.clicked'), $data);

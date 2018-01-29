@@ -357,4 +357,22 @@ class ImportModelTest extends StandardImportTestHelper
 
         $import->end();
     }
+
+    public function testMacLineEndings()
+    {
+        $oldCsv = self::$csvPath;
+
+        // Generate a new CSV
+        self::generateSmallCSV();
+
+        $csv = file_get_contents(self::$csvPath);
+        $csv = str_replace("\n", "\r", $csv);
+        file_put_contents(self::$csvPath, $csv);
+
+        $this->testProcess();
+
+        @unlink(self::$csvPath);
+
+        self::$csvPath = $oldCsv;
+    }
 }

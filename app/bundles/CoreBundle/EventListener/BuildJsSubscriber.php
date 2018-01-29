@@ -289,6 +289,11 @@ MauticJS.firstDeliveryMade      = false;
 MauticJS.onFirstEventDelivery = function(f) {
     MauticJS.postEventDeliveryQueue.push(f);
 };
+MauticJS.preEventDeliveryQueue = [];
+MauticJS.beforeFirstDeliveryMade = false;
+MauticJS.beforeFirstEventDelivery = function(f) {
+    MauticJS.preEventDeliveryQueue.push(f);
+};
 document.addEventListener('mauticPageEventDelivered', function(e) {
     var detail   = e.detail;
     var isImage = detail.image;

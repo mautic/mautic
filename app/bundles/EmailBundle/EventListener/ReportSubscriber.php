@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -188,7 +189,6 @@ class ReportSubscriber extends CommonSubscriber
         $data = [
             'display_name' => 'mautic.email.emails',
             'columns'      => $columns,
-            'filters'      => $companyColumns,
         ];
         $event->addTable(self::CONTEXT_EMAILS, $data);
         $context = self::CONTEXT_EMAILS;
@@ -305,7 +305,7 @@ class ReportSubscriber extends CommonSubscriber
         // channel_url_trackables subquery
         $qbcut        = $this->db->createQueryBuilder();
         $clickColumns = ['hits', 'unique_hits', 'hits_ratio', 'unique_ratio', 'is_hit'];
-        $dncColumns   = ['unsubscribed', 'unsubscribed_ratio'];
+        $dncColumns   = ['unsubscribed', 'unsubscribed_ratio', 'bounced', 'bounced_ratio'];
 
         switch ($context) {
             case self::CONTEXT_EMAILS:
@@ -375,12 +375,7 @@ class ReportSubscriber extends CommonSubscriber
                 }
 
                 if ($event->hasColumn($dncColumns) || $event->hasFilter($dncColumns)) {
-                    $qb->leftJoin(
-                        'e',
-                        MAUTIC_TABLE_PREFIX.'lead_donotcontact',
-                        'dnc',
-                        'e.id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
-                    );
+                    $this->addDNCTable($qb);
                 }
 
                 $event->addCampaignByChannelJoin($qb, 'e', 'email');
@@ -541,6 +536,7 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.table.most.emails.unsubscribed':
+                    $this->addDNCTable($queryBuilder);
                     $queryBuilder->select(
                         'e.id, e.subject as title, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed'
                     )
@@ -549,6 +545,7 @@ class ReportSubscriber extends CommonSubscriber
                         )
                         ->groupBy('e.id, e.subject')
                         ->orderBy('unsubscribed', 'DESC');
+
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
@@ -561,6 +558,7 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.table.most.emails.bounced':
+                    $this->addDNCTable($queryBuilder);
                     $queryBuilder->select(
                         'e.id, e.subject as title, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
                     )
@@ -597,5 +595,20 @@ class ReportSubscriber extends CommonSubscriber
             }
             unset($queryBuilder);
         }
+    }
+
+    /**
+     * Add the Do Not Contact table to the query builder.
+     *
+     * @param QueryBuilder $qb
+     */
+    private function addDNCTable(QueryBuilder $qb)
+    {
+        $qb->leftJoin(
+                'e',
+                MAUTIC_TABLE_PREFIX.'lead_donotcontact',
+                'dnc',
+                'e.id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
+            );
     }
 }
