@@ -58,7 +58,7 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
     private $password;
 
     /**
-     * @var integer
+     * @var int
      */
     private $concurrency;
 
