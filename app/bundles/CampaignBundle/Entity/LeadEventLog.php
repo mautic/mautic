@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 /**
  * Class LeadEventLog.
  */
-class LeadEventLog
+class LeadEventLog implements ChannelInterface
 {
     /**
      * @var

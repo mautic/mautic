@@ -21,11 +21,18 @@ use Mautic\LeadBundle\Entity\Lead as Contact;
 /**
  * Class Event.
  */
-class Event
+class Event implements ChannelInterface
 {
     const TYPE_DECISION  = 'decision';
     const TYPE_ACTION    = 'action';
     const TYPE_CONDITION = 'condition';
+
+    const PATH_INACTION = 'no';
+    const PATH_ACTION   = 'yes';
+
+    const TRIGGER_MODE_DATE      = 'date';
+    const TRIGGER_MODE_INTERVAL  = 'interval';
+    const TRIGGER_MODE_IMMEDIATE = 'immediate';
 
     /**
      * @var int

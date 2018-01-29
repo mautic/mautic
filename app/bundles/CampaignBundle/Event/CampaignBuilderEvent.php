@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CampaignBuilderEvent.
@@ -50,9 +51,11 @@ class CampaignBuilderEvent extends Event
     private $sortCache = [];
 
     /**
-     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
+     * CampaignBuilderEvent constructor.
+     *
+     * @param TranslatorInterface $translator
      */
-    public function __construct($translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
@@ -226,7 +229,7 @@ class CampaignBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            ['label', ['eventName', 'callback']],
+            ['label', ['batchEventName', 'eventName', 'callback']],
             $action,
             ['callback']
         );

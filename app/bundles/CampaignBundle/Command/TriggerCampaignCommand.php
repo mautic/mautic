@@ -79,6 +79,8 @@ class TriggerCampaignCommand extends ModeratedCommand
         $batch            = $input->getOption('batch-limit');
         $max              = $input->getOption('max-events');
 
+        $kickoff = $container->get('mautic.campaign.executioner.kickoff');
+
         if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
         }
@@ -146,13 +148,16 @@ class TriggerCampaignCommand extends ModeratedCommand
                     if (!$negativeOnly && !$scheduleOnly) {
                         //trigger starting action events for newly added contacts
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
-                        $processed = $model->triggerStartingEvents($c, $totalProcessed, $batch, $max, $output);
-                        $output->writeln(
+                        //$processed = $model->triggerStartingEvents($c, $totalProcessed, $batch, $max, $output);
+
+                        $kickoff->executeForCampaign($c, $batch, $max, $output);
+                        /*$output->writeln(
                             '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'
                             ."\n"
-                        );
+                        );*/
                     }
 
+                    /*
                     if ($max && $totalProcessed >= $max) {
                         continue;
                     }
@@ -180,6 +185,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                             ."\n"
                         );
                     }
+                    */
                 }
 
                 $em->detach($c);
@@ -189,6 +195,7 @@ class TriggerCampaignCommand extends ModeratedCommand
             unset($campaigns);
         }
 
+        $this->output->writeln('done');
         $this->completeRun();
 
         return 0;

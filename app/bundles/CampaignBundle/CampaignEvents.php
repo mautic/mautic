@@ -98,33 +98,61 @@ final class CampaignEvents
     const LEAD_CAMPAIGN_BATCH_CHANGE = 'mautic.lead_campaign_batch_change';
 
     /**
+     * The mautic.campaign_on_event_executed event is dispatched when a campaign event is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\ExecutedEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_EXECUTED = 'mautic.campaign_on_event_executed';
+
+    /**
+     * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled or scheduling is modified.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\ScheduledEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_SCHEDULED = 'matuic.campaign_on_event_scheduled';
+
+    /**
+     * The mautic.campaign_on_event_failed event is dispatched when an event fails for whatever reason.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\FailedEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_FAILED = 'matuic.campaign_on_event_failed';
+
+    /**
+     * The mautic.campaign_on_event_decision event is dispatched when a campaign event is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\DecisionEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_DECISION = 'mautic.campaign_on_event_decision';
+
+    /**
+     * @deprecated 2.13.0; to be removed in 3.0. Listen to ON_EVENT_EXECUTED and ON_EVENT_FAILED
+     *
      * The mautic.campaign_on_event_execution event is dispatched when a campaign event is executed.
      *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent instance.
+     * The event listener receives a Mautic\CampaignBundle\Event\CampaignExecutionEvent instance.
      *
      * @var string
      */
     const ON_EVENT_EXECUTION = 'mautic.campaign_on_event_execution';
 
     /**
+     * @deprecated 2.13.0; to be removed in 3.0; Listen to ON_EVENT_DECISION instead
+     *
      * The mautic.campaign_on_event_decision_trigger event is dispatched after a lead decision triggers a set of actions or if the decision is set
      * as a root level event.
      *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignDecisionEvent instance.
+     * The event listener receives a Mautic\CampaignBundle\Event\CampaignDecisionEvent instance.
      *
      * @var string
      */
     const ON_EVENT_DECISION_TRIGGER = 'mautic.campaign_on_event_decision_trigger';
-
-    /**
-     * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled or scheduling is modified.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignScheduledEvent instance.
-     *
-     * @var string
-     */
-    const ON_EVENT_SCHEDULED = 'mautic.campaign_on_event_scheduled';
 }

@@ -160,9 +160,14 @@ class Campaign extends FormEntity
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint(
+            'name',
+            new Assert\NotBlank(
+                [
+                    'message' => 'mautic.core.name.required',
+                ]
+            )
+        );
     }
 
     /**
@@ -325,11 +330,21 @@ class Campaign extends FormEntity
     /**
      * Get events.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\ArrayCollection
      */
     public function getEvents()
     {
         return $this->events;
+    }
+
+    /**
+     * @return ArrayCollection|\Doctrine\Common\Collections\Collection
+     */
+    public function getRootEvents()
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->isNull('parent'));
+
+        return $this->getEvents()->matching($criteria);
     }
 
     /**

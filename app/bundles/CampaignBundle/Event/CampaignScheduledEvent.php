@@ -16,6 +16,8 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class CampaignScheduledEvent.
+ *
+ * @deprecated 2.13.0; to be removed in 3.0
  */
 class CampaignScheduledEvent extends Event
 {
