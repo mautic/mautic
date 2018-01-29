@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 
@@ -28,7 +29,7 @@ class LeadSegmentFilter
     private $filterDecorator;
 
     /**
-     * @var BaseFilterQueryBuilder
+     * @var FilterQueryBuilderInterface
      */
     private $filterQueryBuilder;
 
@@ -40,11 +41,13 @@ class LeadSegmentFilter
     public function __construct(
         LeadSegmentFilterCrate $leadSegmentFilterCrate,
         FilterDecoratorInterface $filterDecorator,
-        TableSchemaColumnsCache $cache
+        TableSchemaColumnsCache $cache,
+        FilterQueryBuilderInterface $filterQueryBuilder
     ) {
         $this->leadSegmentFilterCrate = $leadSegmentFilterCrate;
         $this->filterDecorator        = $filterDecorator;
         $this->schemaCache            = $cache;
+        $this->filterQueryBuilder     = $filterQueryBuilder;
     }
 
     /**
@@ -171,23 +174,11 @@ class LeadSegmentFilter
     }
 
     /**
-     * @return BaseFilterQueryBuilder
+     * @return FilterQueryBuilderInterface
      */
     public function getFilterQueryBuilder()
     {
         return $this->filterQueryBuilder;
-    }
-
-    /**
-     * @param BaseFilterQueryBuilder $filterQueryBuilder
-     *
-     * @return LeadSegmentFilter
-     */
-    public function setFilterQueryBuilder($filterQueryBuilder)
-    {
-        $this->filterQueryBuilder = $filterQueryBuilder;
-
-        return $this;
     }
 
     /**
