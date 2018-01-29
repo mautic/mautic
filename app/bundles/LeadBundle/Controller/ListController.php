@@ -17,10 +17,10 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ListController extends FormController
 {
@@ -222,8 +222,8 @@ class ListController extends FormController
     /**
      * Generate's clone form and processes post data.
      *
-     * @param int   $objectId
-     * @param bool  $ignorePost
+     * @param int  $objectId
+     * @param bool $ignorePost
      *
      * @return Response
      */
@@ -233,16 +233,15 @@ class ListController extends FormController
 
         try {
             $segment = $this->getSegment($objectId);
+
             return $this->createSegmentModifyResponse(
                 clone $segment,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
                 $ignorePost
             );
-
         } catch (AccessDeniedException $exception) {
             return $this->accessDenied();
-
         } catch (EntityNotFoundException $exception) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -261,8 +260,8 @@ class ListController extends FormController
     /**
      * Generate's edit form and processes post data.
      *
-     * @param int   $objectId
-     * @param bool  $ignorePost
+     * @param int  $objectId
+     * @param bool $ignorePost
      *
      * @return Response
      */
@@ -272,16 +271,15 @@ class ListController extends FormController
 
         try {
             $segment = $this->getSegment($objectId);
+
             return $this->createSegmentModifyResponse(
                 $segment,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
             );
-
         } catch (AccessDeniedException $exception) {
             return $this->accessDenied();
-
         } catch (EntityNotFoundException $exception) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -298,12 +296,12 @@ class ListController extends FormController
     }
 
     /**
-     * Create modifying response for segments - edit/clone
+     * Create modifying response for segments - edit/clone.
      *
-     * @param LeadList  $segment
-     * @param array     $postActionVars
-     * @param string    $action
-     * @param bool      $ignorePost
+     * @param LeadList $segment
+     * @param array    $postActionVars
+     * @param string   $action
+     * @param bool     $ignorePost
      *
      * @return Response
      */
@@ -335,7 +333,6 @@ class ListController extends FormController
                         ]),
                     ]);
                 }
-
             } else {
                 //unlock the entity
                 $segmentModel->unlockEntity($segment);
@@ -344,7 +341,6 @@ class ListController extends FormController
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
             }
-
         } else {
             //lock the entity
             $segmentModel->lockEntity($segment);
@@ -365,9 +361,9 @@ class ListController extends FormController
     }
 
     /**
-     * Return segment if exists and user has access
+     * Return segment if exists and user has access.
      *
-     * @param integer $segmentId
+     * @param int $segmentId
      *
      * @return LeadList
      *
@@ -394,7 +390,7 @@ class ListController extends FormController
     }
 
     /**
-     * Get variables for POST action
+     * Get variables for POST action.
      *
      * @return array
      */
