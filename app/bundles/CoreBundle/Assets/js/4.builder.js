@@ -979,6 +979,9 @@ Mautic.initSlots = function(slotContainers) {
             var cloned = mQuery(this).clone();
 
             cloned.css(styles);
+            cloned.css('box-shadow','none');
+            cloned.css('-moz-box-shadow','none');
+            cloned.css('-webkit-box-shadow','none');
             return cloned;
         },
         zIndex: 8000,
