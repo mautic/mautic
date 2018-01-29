@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -1065,6 +1066,34 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return [];
+    }
+
+    /**
+     * @param array $ids
+     *
+     * @return ArrayCollection
+     */
+    public function getContactCollection(array $ids)
+    {
+        $contacts = $this->getEntities(
+            [
+                'filter'             => [
+                    'force' => [
+                        [
+                            'column' => 'l.id',
+                            'expr'   => 'in',
+                            'value'  => $ids,
+                        ],
+                    ],
+                ],
+                'orderBy'            => 'l.id',
+                'orderByDir'         => 'asc',
+                'withPrimaryCompany' => true,
+                'withChannelRules'   => true,
+            ]
+        );
+
+        return new ArrayCollection($contacts);
     }
 
     /**

@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -540,23 +541,42 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param $contacts
-     * @param $emailId
+     * @param      $contacts
+     * @param      $emailId
+     * @param bool $organizeByContact
      *
-     * @return mixed
+     * @return array|mixed|string
      */
-    public function checkContactsSentEmail($contacts, $emailId)
+    public function checkContactsSentEmail($contacts, $emailId, $organizeByContact = false)
     {
+        if (is_array($contacts)) {
+            $contacts = implode(',', $contacts);
+        }
+
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
         $query->select('id, lead_id')
-        ->where('s.email_id = :email')
-        ->andWhere('s.lead_id in (:contacts)')
+            ->where('s.email_id = :email')
+            ->andWhere('s.lead_id in (:contacts)')
             ->andWhere('is_failed = 0')
-        ->setParameter(':email', $emailId)
-        ->setParameter(':contacts', $contacts);
+            ->setParameter(':email', $emailId)
+            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->groupBy('lead_id');
 
         $results = $query->execute()->fetch();
+
+        if ($organizeByContact) {
+            $contacts = [];
+            foreach ($results as $result) {
+                if (!isset($contacts[$result['lead_id']])) {
+                    $contacts[$result['lead_id']] = [];
+                }
+
+                $contacts[$result['lead_id']][] = $result['id'];
+            }
+
+            return $contacts;
+        }
 
         return $results;
     }
