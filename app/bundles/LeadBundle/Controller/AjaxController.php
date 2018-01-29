@@ -758,6 +758,11 @@ class AjaxController extends CommonAjaxController
     protected function updateLeadFieldValuesAction(Request $request)
     {
         $alias     = InputHelper::clean($request->request->get('alias'));
+        // If fields alias has prefix
+        list($alias, $alias2) = explode('.', $alias);
+        if (isset($alias2)) {
+            $alias = $alias2;
+        }
         $operator  = InputHelper::clean($request->request->get('operator'));
         $changed   = InputHelper::clean($request->request->get('changed'));
         $dataArray = ['success' => 0, 'options' => null, 'optionsAttr' => [], 'operators' => null, 'disabled' => false];
