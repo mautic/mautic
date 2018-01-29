@@ -1870,6 +1870,10 @@ abstract class AbstractIntegration
 
                     continue;
                 }
+                if ('id' === $leadFields[$integrationKey]) {
+                    $matched[$integrationKey] = $lead->getId();
+                    continue;
+                }
                 $mauticKey = $leadFields[$integrationKey];
                 if (isset($fields[$mauticKey]) && $fields[$mauticKey]['value'] !== '' && $fields[$mauticKey]['value'] !== null) {
                     $matched[$matchIntegrationKey] = $this->cleanPushData(
