@@ -802,7 +802,7 @@ class CompanyController extends FormController
      * @param array   $files
      * @param Company $company
      */
-    private function uploadCompanyFiles($files, $company)
+    private function uploadCompanyFiles(array $files, Company $company)
     {
         foreach ($files as $file) {
             $companyFiles = $this->getModel('lead.company_files')->getEntity();
