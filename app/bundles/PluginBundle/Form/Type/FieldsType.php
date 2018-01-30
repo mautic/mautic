@@ -65,6 +65,6 @@ class FieldsType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $this->buildFieldView($view,  $options, 'lead');
+        $this->buildFieldView($view, $options, 'lead');
     }
 }

@@ -112,7 +112,6 @@ class WebhookType extends AbstractType
             [
                 'attr'  => ['class' => 'btn btn-success', 'onclick' => 'Mautic.sendHookTest(this)'],
                 'label' => 'mautic.webhook.send.test.payload',
-
             ]
         );
 

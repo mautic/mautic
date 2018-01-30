@@ -105,7 +105,7 @@ foreach ($responsiveViewports as $viewport):
                 <select autocomplete="false" class="form-control not-chosen pagination-limit<?php echo $class; ?>" onchange="Mautic.limitTableData('<?php echo $sessionVar; ?>',this.value,'<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);">
                     <?php foreach ($limitOptions as $value => $label): ?>
                         <?php $selected = ($limit === $value) ? ' selected="selected"' : ''; ?>
-                        <option<?php echo $selected; ?> value="<?php echo $value; ?>">
+                        <option<?php echo $selected; ?> value="<?php echo $view->escape($value); ?>">
                             <?php echo $view['translator']->trans('mautic.core.pagination.'.$label); ?>
                         </option>
                     <?php endforeach; ?>

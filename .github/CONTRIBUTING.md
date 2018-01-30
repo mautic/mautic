@@ -1,3 +1,7 @@
+## Reporting Security Vulnerabilities
+
+If you think that you have found a security vulnerability, please email security@mautic.com with as much detail as possible. The core team will review the vulnerability and if found applicable, will create the patch in a private repository. The vulnerability will be disclosed once the patch has been included into a release. 
+
 ## Contributing Code
 
 Development is open and available to any member of the Mautic community. All fixes and improvements are done through pull requests to the code. This code is open source and publicly available. 
@@ -45,7 +49,8 @@ Votes are cast by all members of the core team. Votes can be changed at any time
 ### Merging Policy
 
 The voting process on any particular pull request must allow for enough time for review by the community and the core team. This involves a minimum of 2 days for minor modifications and minimum of 5 days for significant code changes. Minor changes involve typographical errors, documentation, code standards, minor CSS, javascript, and HTML modifications. Minor modifications do not require a voting process. All other submissions require a vote after the minimum code review period and must be approved by two or more core members (with no core members voting against).
-Core Membership Application
+
+### Core Membership Application
 
 Core team members are based on a form of meritocracy. We actively seek to empower our active community members and those demonstrating increased involvement will be given everything needed for their continued success.
 

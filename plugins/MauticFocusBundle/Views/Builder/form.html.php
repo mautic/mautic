@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-use \Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 $formName = '_'.strtolower(
         InputHelper::alphanum(
@@ -114,7 +114,7 @@ if (empty($preview)):
 
 <?php
 $formExtra = <<<EXTRA
-<input type="hidden" name="mauticform[focusId]" id="mauticform<?php echo $formName ?>_focus_id" value="$focusId"/>
+<input type="hidden" name="mauticform[focusId]" id="mauticform{$formName}_focus_id" value="$focusId"/>
 EXTRA;
 
 echo $view->render('MauticFormBundle:Builder:form.html.php', [

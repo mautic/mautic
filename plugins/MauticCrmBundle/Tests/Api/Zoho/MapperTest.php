@@ -45,7 +45,6 @@ class MapperTest extends \PHPUnit_Framework_TestCase
                         'required' => false,
                     ],
             ],
-
     ];
 
     /**
@@ -95,8 +94,8 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Test that xml is generated according to the mapping
      *
-     * @covers  \Mapper::map()
-     * @covers  \Mapper::getXml()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getXml()
      */
     public function testXmlIsGeneratedBasedOnMapping()
     {
@@ -134,8 +133,8 @@ XML;
     /**
      * @testdox Test that contacts do not inherit previous contact information
      *
-     * @covers  \Mapper::map()
-     * @covers  \Mapper::getXml()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getXml()
      */
     public function testContactDoesNotInheritPrevioudContactData()
     {
@@ -176,8 +175,8 @@ XML;
     /**
      * @testdox Test that xml is generated according to the mapping
      *
-     * @covers  \Mapper::map()
-     * @covers  \Mapper::getXml()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getXml()
      */
     public function testXmlIsGeneratedBasedOnMappingWithId()
     {

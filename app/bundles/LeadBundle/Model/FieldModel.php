@@ -328,7 +328,47 @@ class FieldModel extends FormModel
      */
     public function getEntities(array $args = [])
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities($args);
+        return $this->em->getRepository(LeadField::class)->getEntities($args);
+    }
+
+    /**
+     * @return array
+     */
+    public function getLeadFields()
+    {
+        $leadFields = $this->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'like',
+                        'value'  => 'lead',
+                    ],
+                ],
+            ],
+        ]);
+
+        return $leadFields;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCompanyFields()
+    {
+        $companyFields = $this->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'like',
+                        'value'  => 'company',
+                    ],
+                ],
+            ],
+        ]);
+
+        return $companyFields;
     }
 
     /**

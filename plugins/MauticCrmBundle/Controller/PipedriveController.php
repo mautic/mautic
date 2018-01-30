@@ -12,6 +12,9 @@
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\CompanyImport;
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\LeadImport;
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\OwnerImport;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,6 +39,11 @@ class PipedriveController extends CommonController
     const USER_ADD_EVENT    = 'added.user';
     const USER_UPDATE_EVENT = 'updated.user';
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     public function webhookAction(Request $request)
     {
         $integrationHelper    = $this->get('mautic.helper.integration');
@@ -92,7 +100,6 @@ class PipedriveController extends CommonController
                     $response = [
                         'status' => 'unsupported event',
                     ];
-
             }
         } catch (\Exception $e) {
             return new JsonResponse([
@@ -104,30 +111,54 @@ class PipedriveController extends CommonController
         return new JsonResponse($response, Response::HTTP_OK);
     }
 
+    /**
+     * @param $integration
+     *
+     * @return LeadImport
+     */
     private function getLeadImport($integration)
     {
+        /** @var LeadImport $leadImport */
         $leadImport = $this->get('mautic_integration.pipedrive.import.lead');
         $leadImport->setIntegration($integration);
 
         return $leadImport;
     }
 
+    /**
+     * @param $integration
+     *
+     * @return CompanyImport
+     */
     private function getCompanyImport($integration)
     {
+        /** @var CompanyImport $companyImport */
         $companyImport = $this->get('mautic_integration.pipedrive.import.company');
         $companyImport->setIntegration($integration);
 
         return $companyImport;
     }
 
+    /**
+     * @param $integration
+     *
+     * @return OwnerImport
+     */
     private function getOwnerImport($integration)
     {
+        /** @var OwnerImport $ownerImport */
         $ownerImport = $this->get('mautic_integration.pipedrive.import.owner');
         $ownerImport->setIntegration($integration);
 
         return $ownerImport;
     }
 
+    /**
+     * @param Request              $request
+     * @param PipedriveIntegration $pipedriveIntegration
+     *
+     * @return bool
+     */
     private function validCredential(Request $request, PipedriveIntegration $pipedriveIntegration)
     {
         $headers = $request->headers->all();

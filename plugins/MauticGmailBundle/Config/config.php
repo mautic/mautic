@@ -19,7 +19,6 @@ return [
             'mautic.integration.gmail' => [
                 'class'     => \MauticPlugin\MauticGmailBundle\Integration\GmailIntegration::class,
                 'arguments' => [
-
                 ],
             ],
         ],
