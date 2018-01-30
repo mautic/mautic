@@ -20,11 +20,6 @@ use Symfony\Bridge\Monolog\Logger;
 class LeadSegmentService
 {
     /**
-     * @var LeadListSegmentRepository
-     */
-    private $leadListSegmentRepository;
-
-    /**
      * @var LeadSegmentFilterFactory
      */
     private $leadSegmentFilterFactory;
@@ -54,11 +49,9 @@ class LeadSegmentService
      */
     public function __construct(
         LeadSegmentFilterFactory $leadSegmentFilterFactory,
-        LeadListSegmentRepository $leadListSegmentRepository,
         LeadSegmentQueryBuilder $queryBuilder,
         Logger $logger
     ) {
-        $this->leadListSegmentRepository = $leadListSegmentRepository;
         $this->leadSegmentFilterFactory  = $leadSegmentFilterFactory;
         $this->leadSegmentQueryBuilder   = $queryBuilder;
         $this->logger                    = $logger;
@@ -76,7 +69,7 @@ class LeadSegmentService
         if (!is_null($this->preparedQB)) {
             return $this->preparedQB;
         }
-        /** @var QueryBuilder $queryBuilder */
+
         $queryBuilder = $this->leadSegmentQueryBuilder->getLeadsSegmentQueryBuilder($leadList->getId(), $segmentFilters);
         $queryBuilder = $this->leadSegmentQueryBuilder->addNewLeadsRestrictions($queryBuilder, $leadList->getId(), $batchLimiters);
         //$queryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $leadList->getId());

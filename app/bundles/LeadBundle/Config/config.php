@@ -802,7 +802,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\LeadSegmentService::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_factory',
-                    'mautic.lead.repository.lead_list_segment_repository',
                     'mautic.lead.repository.lead_segment_query_builder',
                     'monolog.logger.mautic',
                 ],
