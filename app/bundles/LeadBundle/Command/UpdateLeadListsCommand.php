@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\LeadBundle\Segment\Query\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,7 +58,12 @@ class UpdateLeadListsCommand extends ModeratedCommand
             $list = $listModel->getEntity($id);
             if ($list !== null) {
                 $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $id]).'</info>');
-                $processed = $listModel->updateLeadList($list, $batch, $max, $output);
+                try {
+                    $processed = $listModel->updateLeadList($list, $batch, $max, $output);
+                } catch (QueryException $e) {
+                    $this->getContainer()->get('mautic.logger')->error('Query Builder Exception: '.$e->getMessage());
+                }
+
                 $output->writeln(
                     '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
                 );

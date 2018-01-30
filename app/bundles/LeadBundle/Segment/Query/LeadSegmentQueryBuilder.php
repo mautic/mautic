@@ -3,6 +3,7 @@
 /*
  * @copyright   2014-2018 Mautic Contributors. All rights reserved
  * @author      Mautic
+ * @author      Jan Kozak <galvani78@gmail.com>
  *
  * @link        http://mautic.org
  *
@@ -16,6 +17,11 @@ use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\LeadSegmentFilters;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 
+/**
+ * Class LeadSegmentQueryBuilder is responsible for building queries for segments.
+ *
+ * @todo add exceptions
+ */
 class LeadSegmentQueryBuilder
 {
     /** @var EntityManager */
@@ -27,6 +33,12 @@ class LeadSegmentQueryBuilder
     /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager */
     private $schema;
 
+    /**
+     * LeadSegmentQueryBuilder constructor.
+     *
+     * @param EntityManager       $entityManager
+     * @param RandomParameterName $randomParameterName
+     */
     public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName)
     {
         $this->entityManager       = $entityManager;
@@ -55,6 +67,11 @@ class LeadSegmentQueryBuilder
         return $queryBuilder;
     }
 
+    /**
+     * @param QueryBuilder $qb
+     *
+     * @return QueryBuilder
+     */
     public function wrapInCount(QueryBuilder $qb)
     {
         // Add count functions to the query
@@ -62,7 +79,19 @@ class LeadSegmentQueryBuilder
         //  If there is any right join in the query we need to select its it
         $primary = $qb->guessPrimaryLeadIdColumn();
 
-        $qb->addSelect('DISTINCT '.$primary.' as leadIdPrimary');
+        $currentSelects = [];
+        foreach ($qb->getQueryParts()['select'] as $select) {
+            if ($select != $primary) {
+                $currentSelects[] = $select;
+            }
+        }
+
+        $qb->select('DISTINCT '.$primary.' as leadIdPrimary');
+
+        foreach ($currentSelects as $select) {
+            $qb->addSelect($select);
+        }
+
         $queryBuilder->select('count(leadIdPrimary) count, max(leadIdPrimary) maxId')
                      ->from('('.$qb->getSQL().')', 'sss');
         $queryBuilder->setParameters($qb->getParameters());
@@ -70,6 +99,15 @@ class LeadSegmentQueryBuilder
         return $queryBuilder;
     }
 
+    /**
+     * Restrict the query to NEW members of segment.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param              $leadListId
+     * @param              $whatever     @todo document this field
+     *
+     * @return QueryBuilder
+     */
     public function addNewLeadsRestrictions(QueryBuilder $queryBuilder, $leadListId, $whatever)
     {
         $queryBuilder->select('l.id');
@@ -99,6 +137,12 @@ class LeadSegmentQueryBuilder
         return $queryBuilder;
     }
 
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param              $leadListId
+     *
+     * @return QueryBuilder
+     */
     public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
     {
         $tableAlias = $this->generateRandomParameterName();
@@ -118,6 +162,12 @@ class LeadSegmentQueryBuilder
         return $queryBuilder;
     }
 
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param              $leadListId
+     *
+     * @return QueryBuilder
+     */
     public function addManuallyUnsubsribedQuery(QueryBuilder $queryBuilder, $leadListId)
     {
         $tableAlias = $this->generateRandomParameterName();
