@@ -240,14 +240,24 @@ div[data-slot].ui-sortable-helper {
 }
 
 .theme-list {
+    .panel {
+        position: relative;
+    }
     .panel-body {
         height: 350px;
     }
-    .select-theme-link {
-        margin-top: 5px;
+    .panel-button-container {
+        position: absolute;
+        z-index: 2;
+        background: #ffffff;
+        padding: 15px 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
-    .select-theme-selected {
-        margin-top:5px;
+    .panel-thumbnail {
+        position: relative;
+        z-index: 1;
     }
 }
 

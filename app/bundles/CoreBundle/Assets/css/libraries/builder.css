@@ -5470,14 +5470,24 @@ div[data-slot].ui-sortable-helper {
   margin: 2px;
   text-align: center;
 }
+.theme-list .panel {
+  position: relative;
+}
 .theme-list .panel-body {
   height: 350px;
 }
-.theme-list .select-theme-link {
-  margin-top: 5px;
+.theme-list .panel-button-container {
+  position: absolute;
+  z-index: 2;
+  background: #ffffff;
+  padding: 15px 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
-.theme-list .select-theme-selected {
-  margin-top: 5px;
+.theme-list .panel-thumbnail {
+  position: relative;
+  z-index: 1;
 }
 [data-slot="dynamicContent"] {
   z-index: 50;

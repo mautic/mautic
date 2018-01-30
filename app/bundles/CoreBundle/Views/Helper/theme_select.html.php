@@ -52,7 +52,7 @@ $isCodeMode = ($active == $codeMode);
                 <div class="panel-body text-center">
                     <h3><?php echo $themeInfo['name']; ?></h3>
                     <?php if ($hasThumbnail) : ?>
-                        <a href="#" data-toggle="modal" data-target="#theme-<?php echo $themeKey; ?>">
+                        <a class="panel-thumbnail" href="#" data-toggle="modal" data-target="#theme-<?php echo $themeKey; ?>">
                             <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 250px"></div>
                         </a>
                     <?php else : ?>
@@ -60,12 +60,14 @@ $isCodeMode = ($active == $codeMode);
                             <i class="fa fa-file-image-o fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4;"></i>
                         </div>
                     <?php endif; ?>
-                    <a href="#" type="button" data-theme="<?php echo $themeKey; ?>" class="select-theme-link btn btn-default <?php echo $isSelected ? 'hide' : '' ?>" onclick="mQuery('#dynamic-content-tab').addClass('hidden')">
-                        Select
-                    </a>
-                    <button type="button" class="select-theme-selected btn btn-default <?php echo $isSelected ? '' : 'hide' ?>" disabled="disabled">
-                        Selected
-                    </button>
+                    <div class="panel-button-container">
+                        <a href="#" type="button" data-theme="<?php echo $themeKey; ?>" class="select-theme-link btn btn-default <?php echo $isSelected ? 'hide' : '' ?>" onclick="mQuery('#dynamic-content-tab').addClass('hidden')">
+                            Select
+                        </a>
+                        <button type="button" class="select-theme-selected btn btn-default <?php echo $isSelected ? '' : 'hide' ?>" disabled="disabled">
+                            Selected
+                        </button>
+                    </div>
                 </div>
             </div>
             <?php if ($hasThumbnail) : ?>
