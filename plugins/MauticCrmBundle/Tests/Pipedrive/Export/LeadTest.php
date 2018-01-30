@@ -23,12 +23,15 @@ class LeadTest extends PipedriveTest
     public function testAddPersonViaPointTrigger()
     {
         $iterations = 5;
-        $this->loginUser();
 
-        $this->installPipedriveIntegration(true, $this->features, [
-            'url'   => 'Api/Post',
-            'token' => 'token',
-        ]);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => 'Api/Post',
+                'token' => 'token',
+            ]
+        );
 
         $trigger = new Trigger();
         $trigger->setName('Add Lead To Integration');
@@ -45,13 +48,18 @@ class LeadTest extends PipedriveTest
         $this->em->flush();
 
         for ($i = 0; $i < $iterations; ++$i) {
-            $this->client->request('POST', '/s/contacts/new?qf=1&mauticUserLastActive=1&mauticLastNotificationId=', [
-                'lead' => [
-                    'firstname' => 'Test'.$i,
-                    'lastname'  => 'User'.$i,
-                    'email'     => 'test'.$i.'@test.pl',
-                ],
-            ]);
+            $this->client->request(
+                'POST',
+                '/s/contacts/new?qf=1&mauticUserLastActive=1&mauticLastNotificationId=',
+                [
+                    'lead' => [
+                        'firstname' => 'Test'.$i,
+                        'lastname'  => 'User'.$i,
+                        'email'     => 'test'.$i.'@test.pl',
+                        '_token'    => $this->getCsrfToken('lead'),
+                    ],
+                ]
+            );
         }
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
@@ -69,25 +77,33 @@ class LeadTest extends PipedriveTest
     public function testUpdatePerson()
     {
         $integrationId = 99;
-        $this->loginUser();
 
-        $this->installPipedriveIntegration(true, $this->features, [
-            'url'   => 'Api/Put',
-            'token' => 'token',
-        ]);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => 'Api/Put',
+                'token' => 'token',
+            ]
+        );
 
         $lead = $this->createLead();
         $this->createLeadIntegrationEntity($integrationId, $lead->getId());
 
-        $this->client->request('POST', '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=', [
-            'lead' => [
-                'firstname' => 'Test',
-                'lastname'  => 'User',
-                'email'     => 'test@test.pl',
-                'points'    => 0,
-                'phone'     => 123456789,
-            ],
-        ]);
+        $this->client->request(
+            'POST',
+            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            [
+                'lead' => [
+                    'firstname' => 'Test',
+                    'lastname'  => 'User',
+                    'email'     => 'test@test.pl',
+                    'points'    => 0,
+                    'phone'     => 123456789,
+                    '_token'    => $this->getCsrfToken('lead'),
+                ],
+            ]
+        );
 
         $requests = $GLOBALS['requests'];
         $request  = $requests['PUT/Api/Put/persons/'.$integrationId][0];
@@ -104,12 +120,15 @@ class LeadTest extends PipedriveTest
         $integrationId         = 99;
         $integrationCompanyId  = 66;
         $integrationCompany2Id = 77;
-        $this->loginUser();
 
-        $this->installPipedriveIntegration(true, $this->features, [
-            'url'   => 'Api/Put',
-            'token' => 'token',
-        ]);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => 'Api/Put',
+                'token' => 'token',
+            ]
+        );
 
         $company  = $this->createCompany();
         $company2 = $this->createCompany('Main Company', 'Main Company Address1');
@@ -119,15 +138,20 @@ class LeadTest extends PipedriveTest
         $this->createCompanyIntegrationEntity($integrationCompanyId, $company->getId());
         $this->createCompanyIntegrationEntity($integrationCompany2Id, $company2->getId());
 
-        $this->client->request('POST', '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=', [
-            'lead' => [
-                'firstname' => 'Test',
-                'lastname'  => 'User',
-                'email'     => 'test@test.pl',
-                'points'    => 0,
-                'phone'     => 123456789,
-            ],
-        ]);
+        $this->client->request(
+            'POST',
+            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            [
+                'lead' => [
+                    'firstname' => 'Test',
+                    'lastname'  => 'User',
+                    'email'     => 'test@test.pl',
+                    'points'    => 0,
+                    'phone'     => 123456789,
+                    '_token'    => $this->getCsrfToken('lead'),
+                ],
+            ]
+        );
 
         $requests = $GLOBALS['requests'];
         $request  = $requests['PUT/Api/Put/persons/'.$integrationId][0];
@@ -144,28 +168,36 @@ class LeadTest extends PipedriveTest
     {
         $integrationId    = 99;
         $pipedriveOwnerId = 55;
-        $this->loginUser();
 
-        $this->installPipedriveIntegration(true, $this->features, [
-            'url'   => 'Api/Put',
-            'token' => 'token',
-        ]);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => 'Api/Put',
+                'token' => 'token',
+            ]
+        );
 
         $owner = $this->createUser(true, 'user@email.com', 'new_user');
         $lead  = $this->createLead();
         $this->createLeadIntegrationEntity($integrationId, $lead->getId());
         $this->addPipedriveOwner($pipedriveOwnerId, $owner->getEmail());
 
-        $this->client->request('POST', '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=', [
-            'lead' => [
-                'firstname' => 'Test',
-                'lastname'  => 'User',
-                'email'     => 'test@test.pl',
-                'points'    => 0,
-                'phone'     => 123456789,
-                'owner'     => $owner->getId(),
-            ],
-        ]);
+        $this->client->request(
+            'POST',
+            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            [
+                'lead' => [
+                    'firstname' => 'Test',
+                    'lastname'  => 'User',
+                    'email'     => 'test@test.pl',
+                    'points'    => 0,
+                    'phone'     => 123456789,
+                    'owner'     => $owner->getId(),
+                    '_token'    => $this->getCsrfToken('lead'),
+                ],
+            ]
+        );
 
         $requests = $GLOBALS['requests'];
         $request  = $requests['PUT/Api/Put/persons/'.$integrationId][0];
@@ -182,19 +214,26 @@ class LeadTest extends PipedriveTest
     {
         $integrationId    = 99;
         $pipedriveOwnerId = 55;
-        $this->loginUser();
 
-        $this->installPipedriveIntegration(true, $this->features, [
-            'url'   => 'Api/Delete',
-            'token' => 'token',
-        ]);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => 'Api/Delete',
+                'token' => 'token',
+            ]
+        );
 
         $owner = $this->createUser(true, 'user@email.com', 'new_user');
         $lead  = $this->createLead();
         $this->createLeadIntegrationEntity($integrationId, $lead->getId());
         $this->addPipedriveOwner($pipedriveOwnerId, $owner->getEmail());
 
-        $this->client->request('POST', '/s/contacts/delete/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=', []);
+        $this->client->request(
+            'POST',
+            '/s/contacts/delete/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            []
+        );
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $leads               = $this->em->getRepository(Lead::class)->findAll();

@@ -20,7 +20,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -268,7 +268,7 @@ class MailHelper
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
-        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport) {
+        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof TokenTransportInterface) {
             $this->tokenizationEnabled = true;
         }
 
@@ -775,28 +775,6 @@ class MailHelper
 
             unset($childBody, $bodyReplaced);
         }
-    }
-
-    /**
-     * Extract plain text from message.
-     *
-     * @param \Swift_Message $message
-     *
-     * @return string
-     */
-    public static function getPlainTextFromMessage(\Swift_Message $message)
-    {
-        $children = (array) $message->getChildren();
-
-        /** @var \Swift_Mime_MimeEntity $child */
-        foreach ($children as $child) {
-            $childType = $child->getContentType();
-            if ($childType == 'text/plain' && $child instanceof \Swift_MimePart) {
-                return $child->getBody();
-            }
-        }
-
-        return '';
     }
 
     /**

@@ -21,6 +21,8 @@ $header = ($report->getId()) ?
 
 $view['slots']->set('headerTitle', $header);
 $showGraphTab = count($form['graphs']->vars['choices']);
+
+$scheduleTabErrorClass = ($view['form']->containsErrors($form['toAddress'])) ? 'class="text-danger"' : '';
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -46,7 +48,7 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                                 ); ?></a>
                         </li>
                         <li>
-                            <a href="#schedule-container" role="tab"
+                            <a href="#schedule-container" role="tab" <?php echo $scheduleTabErrorClass; ?>
                                data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.schedule'); ?></a>
                         </li>
                     </ul>

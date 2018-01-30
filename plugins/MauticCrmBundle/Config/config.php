@@ -110,32 +110,34 @@ return [
                 ],
             ],
             'mautic_integration.pipedrive.import.owner' => [
-                'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\OwnerImport',
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\OwnerImport::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic_integration.pipedrive.import.company' => [
-                'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\CompanyImport',
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\CompanyImport::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic.lead.model.company',
                 ],
             ],
             'mautic_integration.pipedrive.import.lead' => [
-                'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\LeadImport',
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\LeadImport::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
                 ],
             ],
             'mautic_integration.pipedrive.export.company' => [
-                'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\CompanyExport',
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\CompanyExport::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic_integration.pipedrive.export.lead' => [
-                'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport',
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],

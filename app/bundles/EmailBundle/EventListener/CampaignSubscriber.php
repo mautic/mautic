@@ -22,9 +22,11 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
+use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Entity\Hit;
 
 /**
  * Class CampaignSubscriber.
@@ -222,14 +224,13 @@ class CampaignSubscriber extends CommonSubscriber
         if (!empty($eventParent) && $eventParent['type'] === 'email.send') {
             // click decision
             if ($event->checkContext('email.click')) {
+                /** @var Hit $hit */
                 $hit = $eventDetails;
                 if ($eventDetails->getEmail()->getId() == (int) $eventParent['properties']['email']) {
                     if (!empty($eventConfig['urls']['list'])) {
-                        $limitToUrl = $eventConfig['urls']['list'];
-                        foreach ($limitToUrl as $url) {
-                            if (preg_match('/'.$url.'/i', $hit->getUrl())) {
-                                return $event->setResult(true);
-                            }
+                        $limitToUrls = (array) $eventConfig['urls']['list'];
+                        if (UrlMatcher::hasMatch($limitToUrls, $hit->getUrl())) {
+                            return $event->setResult(true);
                         }
                     } else {
                         return $event->setResult(true);

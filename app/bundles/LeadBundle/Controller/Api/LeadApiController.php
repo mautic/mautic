@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -44,7 +45,7 @@ class LeadApiController extends CommonApiController
         $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
-        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
+        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'stageList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
 
         parent::initialize($event);
     }
@@ -61,6 +62,63 @@ class LeadApiController extends CommonApiController
         }
 
         return parent::newEntityAction();
+    }
+
+    /**
+     * @return array|\Symfony\Component\HttpFoundation\Response
+     */
+    public function newEntitiesAction()
+    {
+        $entity = $this->model->getEntity();
+
+        if (!$this->checkEntityAccess($entity, 'create')) {
+            return $this->accessDenied();
+        }
+
+        $parameters = $this->request->request->all();
+
+        $valid = $this->validateBatchPayload($parameters);
+        if ($valid instanceof Response) {
+            return $valid;
+        }
+
+        $this->inBatchMode = true;
+        $entities          = [];
+        $errors            = [];
+        $statusCodes       = [];
+        foreach ($parameters as $key => $params) {
+            $method     = 'POST';
+            $entity     = $this->getNewEntity($params);
+            $statusCode = Codes::HTTP_CREATED;
+
+            if ($existingLead = $this->getExistingLead($params)) {
+                $method     = 'PATCH';
+                $entity     = $existingLead;
+                $statusCode = Codes::HTTP_OK;
+            }
+
+            $this->processBatchForm($key, $entity, $params, $method, $errors, $entities);
+
+            if (isset($errors[$key])) {
+                $statusCodes[$key] = $errors[$key]['code'];
+            } else {
+                $statusCodes[$key] = $statusCode;
+            }
+        }
+
+        $payload = [
+            $this->entityNameMulti => $entities,
+            'statusCodes'          => $statusCodes,
+        ];
+
+        if (!empty($errors)) {
+            $payload['errors'] = $errors;
+        }
+
+        $view = $this->view($payload, Codes::HTTP_CREATED);
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
     }
 
     /**

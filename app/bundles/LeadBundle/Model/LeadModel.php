@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use DeviceDetector\DeviceDetector;
+use Doctrine\ORM\NonUniqueResultException;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -30,6 +31,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
@@ -507,6 +509,7 @@ class LeadModel extends FormModel
             $this->companyModel->addLeadToCompany($companyEntity, $entity);
             $this->setPrimaryCompany($companyEntity->getId(), $entity->getId());
         }
+
         $this->em->clear(CompanyChangeLog::class);
     }
 
@@ -1715,7 +1718,7 @@ class LeadModel extends FormModel
         foreach ($fields as $leadField => $importField) {
             // Prevent overwriting existing data with empty data
             if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
-                $fieldData[$leadField] = InputHelper::clean($data[$importField]);
+                $fieldData[$leadField] = InputHelper::_($data[$importField], 'string');
             }
         }
 
@@ -1844,11 +1847,13 @@ class LeadModel extends FormModel
         unset($fieldData['doNotEmail']);
 
         if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {
-            $newOwner = $this->userProvider->loadUserByUsername($data[$fields['ownerusername']], $data[$fields['ownerusername']]);
-            if ($newOwner) {
+            try {
+                $newOwner = $this->userProvider->loadUserByUsername($data[$fields['ownerusername']]);
                 $lead->setOwner($newOwner);
                 //reset default import owner if exists owner for contact
                 $owner = null;
+            } catch (NonUniqueResultException $exception) {
+                // user not found
             }
         }
         unset($fieldData['ownerusername']);
@@ -2699,6 +2704,7 @@ class LeadModel extends FormModel
 
         $companyLeads = $this->companyModel->getCompanyLeadRepository()->getEntitiesByLead($lead);
 
+        /** @var CompanyLead $companyLead */
         foreach ($companyLeads as $companyLead) {
             $company = $companyLead->getCompany();
 
@@ -2729,6 +2735,9 @@ class LeadModel extends FormModel
             $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray, false);
         }
+
+        // Clear CompanyLead entities from Doctrine memory
+        $this->em->clear(CompanyLead::class);
 
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
     }

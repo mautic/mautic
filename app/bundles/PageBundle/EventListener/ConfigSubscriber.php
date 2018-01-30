@@ -41,7 +41,13 @@ class ConfigSubscriber extends CommonSubscriber
             'bundle'     => 'PageBundle',
             'formAlias'  => 'pageconfig',
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
-            'parameters' => $event->getParametersFromConfig('MauticPageBundle'),
+            // parameters must be defined directly in case there are 2 config forms per bundle.
+            // $event->getParametersFromConfig('MauticPageBundle') would return all params for PageBundle
+            // and trackingconfig form would overwrote values in the pageconfig form. See #5559.
+            'parameters' => [
+                'cat_in_page_url'  => false,
+                'google_analytics' => false,
+            ],
         ]);
     }
 
@@ -51,7 +57,18 @@ class ConfigSubscriber extends CommonSubscriber
             'bundle'     => 'PageBundle',
             'formAlias'  => 'trackingconfig',
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
-            'parameters' => $event->getParametersFromConfig('MauticPageBundle'),
+            // parameters defined this way because of the reason as above.
+            'parameters' => [
+                'track_contact_by_ip'                   => false,
+                'track_by_tracking_url'                 => true,
+                'track_by_fingerprint'                  => false,
+                'facebook_pixel_id'                     => null,
+                'facebook_pixel_trackingpage_enabled'   => false,
+                'facebook_pixel_landingpage_enabled'    => false,
+                'google_analytics_id'                   => null,
+                'google_analytics_trackingpage_enabled' => false,
+                'google_analytics_landingpage_enabled'  => false,
+            ],
         ]);
     }
 

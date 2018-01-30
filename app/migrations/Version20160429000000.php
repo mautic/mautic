@@ -45,12 +45,12 @@ class Version20160429000000 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}channel_url_trackables (
-  redirect_id INT NOT NULL, 
-  channel_id INT NOT NULL, 
-  channel VARCHAR(255) NOT NULL, 
-  hits INT NOT NULL, 
-  unique_hits INT NOT NULL, 
+CREATE TABLE IF NOT EXISTS {$this->prefix}channel_url_trackables (
+  redirect_id INT NOT NULL,
+  channel_id INT NOT NULL,
+  channel VARCHAR(255) NOT NULL,
+  hits INT NOT NULL,
+  unique_hits INT NOT NULL,
   INDEX {$this->redirectIdx} (redirect_id),
   INDEX {$this->prefix}channel_url_trackable_search (channel, channel_id),
   PRIMARY KEY(redirect_id, channel_id)
