@@ -757,8 +757,9 @@ class LeadListRepository extends CommonRepository
                     $modifier        = false;
                     $requiresBetween = false;
                     if (in_array($func, ['eq', 'neq']) && $isTimestamp) {
+                        //we want to compare only 'Y-m-d', not also the hour, minute and second.
+                        $isTimestamp = false;
                         $requiresBetween = true;
-                        $isTimestamp = false; //we want to compare only 'Y-m-d', not also the hour, minute and second.
                         $modifier = '+ 1 day';
                     }
                     $timeframe       = str_replace('mautic.lead.list.', '', $key);
