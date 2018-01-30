@@ -131,7 +131,7 @@ class LeadSegmentService
         $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($leadList);
 
         $queryBuilder = $this->getNewLeadListLeadsQuery($leadList, $segmentFilters, $batchLimiters);
-        $queryBuilder->select('l.*');
+        $queryBuilder->select('DISTINCT l.id');
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $leadList->getId()]);
 

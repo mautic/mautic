@@ -62,7 +62,7 @@ class LeadSegmentQueryBuilder
         //  If there is any right join in the query we need to select its it
         $primary = $qb->guessPrimaryLeadIdColumn();
 
-        $qb->addSelect($primary.' as leadIdPrimary');
+        $qb->addSelect('DISTINCT '.$primary.' as leadIdPrimary');
         $queryBuilder->select('count(leadIdPrimary) count, max(leadIdPrimary) maxId')
                      ->from('('.$qb->getSQL().')', 'sss');
         $queryBuilder->setParameters($qb->getParameters());
