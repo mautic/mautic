@@ -134,6 +134,15 @@ final class CampaignEvents
     const ON_EVENT_SCHEDULED_BATCH = 'mautic.campaign_on_event_scheduled_batch';
 
     /**
+     * The mautic.campaign_on_event_scheduled_batch event is dispatched when a batch of events are scheduled at once.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\ScheduledBatchEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_SCHEDULED_BATCH = 'matuic.campaign_on_event_scheduled_batch';
+
+    /**
      * The mautic.campaign_on_event_failed event is dispatched when an event fails for whatever reason.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\FailedEvent instance.
