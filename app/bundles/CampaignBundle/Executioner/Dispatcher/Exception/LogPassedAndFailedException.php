@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CampaignBundle\Executioner\Dispatcher;
+namespace Mautic\CampaignBundle\Executioner\Dispatcher\Exception;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 

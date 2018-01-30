@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\ScheduledBatchEvent;
 use Mautic\CampaignBundle\Event\ScheduledEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -120,6 +121,12 @@ class EventScheduler
 
         // Persist any pending in the queue
         $this->eventLogger->persistQueued();
+
+        // Send out a batch event
+        $this->dispatchBatchScheduledEvent($config, $event, $this->eventLogger->getLogs());
+
+        // Update log entries and clear from memory
+        $this->eventLogger->persist();
     }
 
     /**
@@ -128,6 +135,7 @@ class EventScheduler
     public function reschedule(LeadEventLog $log, \DateTime $toBeExecutedOn)
     {
         $log->setTriggerDate($toBeExecutedOn);
+        $this->eventLogger->persistLog($log);
 
         $event  = $log->getEvent();
         $config = $this->collector->getEventConfig($event);
@@ -161,19 +169,26 @@ class EventScheduler
      *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTime $now = null)
+    public function getExecutionDateTime(Event $event, \DateTime $now = null, \DateTime $comparedToDateTime = null)
     {
         if (null === $now) {
             $now = new \DateTime();
+        }
+
+        if (null === $comparedToDateTime) {
+            $comparedToDateTime = clone $now;
+        } else {
+            // Prevent comparisons from modifying original object
+            $comparedToDateTime = clone $comparedToDateTime;
         }
 
         switch ($event->getTriggerMode()) {
             case Event::TRIGGER_MODE_IMMEDIATE:
                 return $now;
             case Event::TRIGGER_MODE_INTERVAL:
-                return $this->intervalScheduler->getExecutionDateTime($event, $now, $now);
+                return $this->intervalScheduler->getExecutionDateTime($event, $now, $comparedToDateTime);
             case Event::TRIGGER_MODE_DATE:
-                return $this->dateTimeScheduler->getExecutionDateTime($event, $now, $now);
+                return $this->dateTimeScheduler->getExecutionDateTime($event, $now, $comparedToDateTime);
         }
 
         throw new NotSchedulableException();
@@ -188,6 +203,18 @@ class EventScheduler
         $this->dispatcher->dispatch(
             CampaignEvents::ON_EVENT_SCHEDULED,
             new ScheduledEvent($config, $log)
+        );
+    }
+
+    /**
+     * @param AbstractEventAccessor $config
+     * @param ArrayCollection       $logs
+     */
+    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    {
+        $this->dispatcher->dispatch(
+            CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
+            new ScheduledBatchEvent($config, $event, $logs)
         );
     }
 }

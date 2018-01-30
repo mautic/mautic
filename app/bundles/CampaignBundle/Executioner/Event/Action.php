@@ -51,25 +51,42 @@ class Action implements EventInterface
      *
      * @return mixed|void
      *
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\LogPassedAndFailedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      */
-    public function execute(AbstractEventAccessor $config, Event $event, ArrayCollection $contacts)
+    public function executeForContacts(AbstractEventAccessor $config, Event $event, ArrayCollection $contacts)
     {
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
             $log = $this->getLogEntry($event, $contact);
             ChannelExtractor::setChannel($log, $event, $config);
 
-            $this->eventLogger->addToQueue($log, false);
+            $this->eventLogger->addToQueue($log);
         }
-        $this->eventLogger->persistQueued(false);
+        $this->eventLogger->persistQueued();
 
         // Execute to process the batch of contacts
         $this->dispatcher->executeEvent($config, $event, $this->eventLogger->getLogs());
 
         // Update log entries or persist failed entries
         $this->eventLogger->persist();
+    }
+
+    /**
+     * @param AbstractEventAccessor $config
+     * @param Event                 $event
+     * @param ArrayCollection       $logs
+     *
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     */
+    public function executeLogs(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    {
+        // Execute to process the batch of contacts
+        $this->dispatcher->executeEvent($config, $event, $logs);
+
+        // Update log entries or persist failed entries
+        $this->eventLogger->persistCollection($logs);
     }
 
     /**

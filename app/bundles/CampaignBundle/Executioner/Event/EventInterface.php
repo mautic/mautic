@@ -24,5 +24,5 @@ interface EventInterface
      *
      * @return mixed
      */
-    public function execute(AbstractEventAccessor $config, Event $event, ArrayCollection $contacts);
+    public function executeForContacts(AbstractEventAccessor $config, Event $event, ArrayCollection $contacts);
 }

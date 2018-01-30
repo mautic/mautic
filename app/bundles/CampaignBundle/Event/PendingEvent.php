@@ -17,23 +17,8 @@ use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-class PendingEvent extends \Symfony\Component\EventDispatcher\Event
+class PendingEvent extends AbstractLogCollectionEvent
 {
-    /**
-     * @var AbstractEventAccessor
-     */
-    private $config;
-
-    /**
-     * @var Event
-     */
-    private $event;
-
-    /**
-     * @var ArrayCollection
-     */
-    private $pending;
-
     /**
      * @var ArrayCollection
      */
@@ -55,36 +40,24 @@ class PendingEvent extends \Symfony\Component\EventDispatcher\Event
     private $channelId;
 
     /**
+     * @var \DateTime
+     */
+    private $now;
+
+    /**
      * PendingEvent constructor.
      *
      * @param AbstractEventAccessor $config
      * @param Event                 $event
-     * @param ArrayCollection       $pending
+     * @param ArrayCollection       $logs
      */
-    public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $pending)
+    public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
-        $this->config  = $config;
-        $this->event   = $event;
-        $this->pending = $pending;
-
         $this->failures   = new ArrayCollection();
         $this->successful = new ArrayCollection();
-    }
+        $this->now        = new \DateTime();
 
-    /**
-     * @return AbstractEventAccessor
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
-     * @return Event
-     */
-    public function getEvent()
-    {
-        return $this->event;
+        parent::__construct($config, $event, $logs);
     }
 
     /**
@@ -92,7 +65,7 @@ class PendingEvent extends \Symfony\Component\EventDispatcher\Event
      */
     public function getPending()
     {
-        return $this->pending;
+        return $this->logs;
     }
 
     /**
@@ -130,7 +103,7 @@ class PendingEvent extends \Symfony\Component\EventDispatcher\Event
      */
     public function failAll($reason)
     {
-        foreach ($this->pending as $log) {
+        foreach ($this->logs as $log) {
             $this->fail($log, $reason);
         }
     }
@@ -150,7 +123,21 @@ class PendingEvent extends \Symfony\Component\EventDispatcher\Event
             $log->setMetadata($metadata);
         }
         $this->logChannel($log);
+        $log->setIsScheduled(false)
+            ->setDateTriggered($this->now);
+
         $this->successful->add($log);
+    }
+
+    /**
+     * Pass all pending.
+     */
+    public function passAll()
+    {
+        /** @var LeadEventLog $log */
+        foreach ($this->logs as $log) {
+            $this->pass($log);
+        }
     }
 
     /**
@@ -177,16 +164,6 @@ class PendingEvent extends \Symfony\Component\EventDispatcher\Event
     {
         $this->channel   = $channel;
         $this->channelId = $channelId;
-    }
-
-    /**
-     * Check if an event is applicable.
-     *
-     * @param $eventType
-     */
-    public function checkContext($eventType)
-    {
-        return strtolower($eventType) === strtolower($this->event->getType());
     }
 
     /**

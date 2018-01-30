@@ -65,12 +65,12 @@ class EventLogger
     /**
      * @param LeadEventLog $log
      */
-    public function addToQueue(LeadEventLog $log, $clearPostPersist = true)
+    public function addToQueue(LeadEventLog $log)
     {
         $this->queued->add($log);
 
         if ($this->queued->count() >= 20) {
-            $this->persistQueued($clearPostPersist);
+            $this->persistQueued();
         }
     }
 
@@ -111,21 +111,16 @@ class EventLogger
     /**
      * Persist the queue, clear the entities from memory, and reset the queue.
      */
-    public function persistQueued($clearPostPersist = true)
+    public function persistQueued()
     {
-        if ($this->queued) {
+        if ($this->queued->count()) {
             $this->repo->saveEntities($this->queued->getValues());
-
-            if ($clearPostPersist) {
-                $this->repo->clear();
-            }
         }
 
-        if (!$clearPostPersist) {
-            // The logs are needed so don't clear
-            foreach ($this->queued as $log) {
-                $this->processed->add($log);
-            }
+        // Push them into the processed ArrayCollection to be used later.
+        /** @var LeadEventLog $log */
+        foreach ($this->queued as $log) {
+            $this->processed->set($log->getId(), $log);
         }
 
         $this->queued->clear();
@@ -140,11 +135,24 @@ class EventLogger
     }
 
     /**
+     * @param ArrayCollection $collection
+     */
+    public function persistCollection(ArrayCollection $collection)
+    {
+        if (!$collection->count()) {
+            return;
+        }
+
+        $this->repo->saveEntities($collection->getValues());
+        $this->repo->clear();
+    }
+
+    /**
      * Persist processed entities after they've been updated.
      */
     public function persist()
     {
-        if (!$this->processed) {
+        if (!$this->processed->count()) {
             return;
         }
 

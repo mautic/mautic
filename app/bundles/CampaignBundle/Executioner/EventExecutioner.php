@@ -74,24 +74,64 @@ class EventExecutioner
      * @param Event           $event
      * @param ArrayCollection $contacts
      *
-     * @throws Dispatcher\LogNotProcessedException
-     * @throws Dispatcher\LogPassedAndFailedException
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
      */
-    public function execute(Event $event, ArrayCollection $contacts)
+    public function executeForContacts(Event $event, ArrayCollection $contacts)
     {
         $this->logger->debug('CAMPAIGN: Executing event ID '.$event->getId());
+
+        if ($contacts->count()) {
+            $this->logger->debug('CAMPAIGN: No contacts to process for event ID '.$event->getId());
+
+            return;
+        }
 
         $config = $this->collector->getEventConfig($event);
 
         switch ($event->getEventType()) {
             case Event::TYPE_ACTION:
-                $this->actionExecutioner->execute($config, $event, $contacts);
+                $this->actionExecutioner->executeForContacts($config, $event, $contacts);
                 break;
             case Event::TYPE_CONDITION:
-                $this->conditionExecutioner->execute($config, $event, $contacts);
+                $this->conditionExecutioner->executeForContacts($config, $event, $contacts);
                 break;
             case Event::TYPE_DECISION:
-                $this->decisionExecutioner->execute($config, $event, $contacts);
+                $this->decisionExecutioner->executeForContacts($config, $event, $contacts);
+                break;
+            default:
+                throw new TypeNotFoundException("{$event->getEventType()} is not a valid event type");
+        }
+    }
+
+    /**
+     * @param Event           $event
+     * @param ArrayCollection $contacts
+     *
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     */
+    public function executeLogs(Event $event, ArrayCollection $logs)
+    {
+        $this->logger->debug('CAMPAIGN: Executing event ID '.$event->getId());
+
+        if (!$logs->count()) {
+            $this->logger->debug('CAMPAIGN: No logs to process for event ID '.$event->getId());
+
+            return;
+        }
+
+        $config = $this->collector->getEventConfig($event);
+
+        switch ($event->getEventType()) {
+            case Event::TYPE_ACTION:
+                $this->actionExecutioner->executeLogs($config, $event, $logs);
+                break;
+            case Event::TYPE_CONDITION:
+                $this->conditionExecutioner->executeLogs($config, $event, $logs);
+                break;
+            case Event::TYPE_DECISION:
+                $this->decisionExecutioner->executeLogs($config, $event, $logs);
                 break;
             default:
                 throw new TypeNotFoundException("{$event->getEventType()} is not a valid event type");

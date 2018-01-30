@@ -259,61 +259,6 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get a list of scheduled events.
-     *
-     * @param      $campaignId
-     * @param bool $count
-     * @param int  $limit
-     *
-     * @return array|bool
-     */
-    public function getScheduledEvents($campaignId, $count = false, $limit = 0)
-    {
-        $date = new \Datetime();
-
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from('MauticCampaignBundle:LeadEventLog', 'o');
-
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->eq('IDENTITY(o.campaign)', (int) $campaignId),
-                $q->expr()->eq('o.isScheduled', ':true'),
-                $q->expr()->lte('o.triggerDate', ':now')
-            )
-        )
-            ->setParameter('now', $date)
-            ->setParameter('true', true, 'boolean');
-
-        if ($count) {
-            $q->select('COUNT(o) as event_count');
-
-            $results = $results = $q->getQuery()->getArrayResult();
-            $count   = $results[0]['event_count'];
-
-            return $count;
-        }
-
-        $q->select('o, IDENTITY(o.lead) as lead_id, IDENTITY(o.event) AS event_id')
-            ->orderBy('o.triggerDate', 'DESC');
-
-        if ($limit) {
-            $q->setFirstResult(0)
-                ->setMaxResults($limit);
-        }
-
-        $results = $q->getQuery()->getArrayResult();
-
-        // Organize by lead
-        $logs = [];
-        foreach ($results as $e) {
-            $logs[$e['lead_id']][$e['event_id']] = array_merge($e[0], ['lead_id' => $e['lead_id'], 'event_id' => $e['event_id']]);
-        }
-        unset($results);
-
-        return $logs;
-    }
-
-    /**
      * @param $campaignId
      *
      * @return array
@@ -602,5 +547,62 @@ class EventRepository extends CommonRepository
     protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
+    }
+
+    /**
+     * @deprecated 2.13.0 to be removed in 3.0; use LeadEventLogRepository::getScheduled() instead
+     *
+     * Get a list of scheduled events.
+     *
+     * @param      $campaignId
+     * @param bool $count
+     * @param int  $limit
+     *
+     * @return array|bool
+     */
+    public function getScheduledEvents($campaignId, $count = false, $limit = 0)
+    {
+        $date = new \Datetime();
+
+        $q = $this->getEntityManager()->createQueryBuilder()
+            ->from('MauticCampaignBundle:LeadEventLog', 'o');
+
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->eq('IDENTITY(o.campaign)', (int) $campaignId),
+                $q->expr()->eq('o.isScheduled', ':true'),
+                $q->expr()->lte('o.triggerDate', ':now')
+            )
+        )
+            ->setParameter('now', $date)
+            ->setParameter('true', true, 'boolean');
+
+        if ($count) {
+            $q->select('COUNT(o) as event_count');
+
+            $results = $results = $q->getQuery()->getArrayResult();
+            $count   = $results[0]['event_count'];
+
+            return $count;
+        }
+
+        $q->select('o, IDENTITY(o.lead) as lead_id, IDENTITY(o.event) AS event_id')
+            ->orderBy('o.triggerDate', 'DESC');
+
+        if ($limit) {
+            $q->setFirstResult(0)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->getQuery()->getArrayResult();
+
+        // Organize by lead
+        $logs = [];
+        foreach ($results as $e) {
+            $logs[$e['lead_id']][$e['event_id']] = array_merge($e[0], ['lead_id' => $e['lead_id'], 'event_id' => $e['event_id']]);
+        }
+        unset($results);
+
+        return $logs;
     }
 }

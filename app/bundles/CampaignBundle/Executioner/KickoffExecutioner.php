@@ -41,7 +41,7 @@ class KickoffExecutioner
     /**
      * @var int
      */
-    private $eventLimit = 100;
+    private $batchLimit = 100;
 
     /**
      * @var int|null
@@ -118,24 +118,21 @@ class KickoffExecutioner
 
     /**
      * @param Campaign             $campaign
-     * @param int                  $eventLimit
-     * @param null                 $maxEventsToExecute
+     * @param int                  $batchLimit
      * @param OutputInterface|null $output
      *
-     * @throws NoContactsFound
-     * @throws NoEventsFound
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws NotSchedulableException
      */
-    public function executeForCampaign(Campaign $campaign, $eventLimit = 100, $maxEventsToExecute = null, OutputInterface $output = null)
+    public function executeForCampaign(Campaign $campaign, $batchLimit = 100, OutputInterface $output = null)
     {
-        $this->campaign           = $campaign;
-        $this->contactId          = null;
-        $this->eventLimit         = $eventLimit;
-        $this->maxEventsToExecute = $maxEventsToExecute;
-        $this->output             = ($output) ? $output : new NullOutput();
+        $this->campaign   = $campaign;
+        $this->contactId  = null;
+        $this->batchLimit = $batchLimit;
+        $this->output     = ($output) ? $output : new NullOutput();
 
-        $this->prepareForExecution();
-        $this->executeOrSchedule();
+        $this->execute();
     }
 
     /**
@@ -143,22 +140,40 @@ class KickoffExecutioner
      * @param                      $contactId
      * @param OutputInterface|null $output
      *
-     * @throws NoContactsFound
-     * @throws NoEventsFound
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws NotSchedulableException
      */
     public function executeForContact(Campaign $campaign, $contactId, OutputInterface $output = null)
     {
-        $this->campaign  = $campaign;
-        $this->contactId = $contactId;
-        $this->output    = ($output) ? $output : new NullOutput();
+        $this->campaign   = $campaign;
+        $this->contactId  = $contactId;
+        $this->output     = ($output) ? $output : new NullOutput();
+        $this->batchLimit = null;
 
-        // Process all events for this contact
-        $this->eventLimit         = null;
-        $this->maxEventsToExecute = null;
+        $this->execute();
+    }
 
-        $this->prepareForExecution();
-        $this->executeOrSchedule();
+    /**
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws NotSchedulableException
+     */
+    private function execute()
+    {
+        try {
+            $this->prepareForExecution();
+            $this->executeOrScheduleEvent();
+        } catch (NoContactsFound $exception) {
+            $this->logger->debug('CAMPAIGN: No more contacts to process');
+        } catch (NoEventsFound $exception) {
+            $this->logger->debug('CAMPAIGN: No events to process');
+        } finally {
+            if ($this->progressBar) {
+                $this->progressBar->finish();
+                $this->output->writeln("\n");
+            }
+        }
     }
 
     /**
@@ -168,69 +183,72 @@ class KickoffExecutioner
     {
         $this->logger->debug('CAMPAIGN: Triggering kickoff events');
 
-        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
-
         $this->batchCounter = 0;
-        $this->rootEvents   = $this->campaign->getRootEvents();
-        $totalRootEvents    = $this->rootEvents->count();
+
+        $this->rootEvents = $this->campaign->getRootEvents();
+        $totalRootEvents  = $this->rootEvents->count();
         $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
 
         $totalContacts      = $this->kickoffContacts->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->contactId);
         $totalKickoffEvents = $totalRootEvents * $totalContacts;
+
         $this->output->writeln(
             $this->translator->trans(
                 'mautic.campaign.trigger.event_count',
                 [
                     '%events%' => $totalKickoffEvents,
-                    '%batch%'  => $this->eventLimit,
+                    '%batch%'  => $this->batchLimit,
                 ]
             )
         );
 
-        if (!$totalKickoffEvents) {
-            $this->logger->debug('CAMPAIGN: No contacts/events to process');
+        $this->progressBar = ProgressBarHelper::init($this->output, $totalKickoffEvents);
+        $this->progressBar->start();
 
+        if (!$totalKickoffEvents) {
             throw new NoEventsFound();
         }
-
-        if (!$this->maxEventsToExecute) {
-            $this->maxEventsToExecute = $totalKickoffEvents;
-        }
-
-        $this->progressBar = ProgressBarHelper::init($this->output, $this->maxEventsToExecute);
-        $this->progressBar->start();
     }
 
     /**
-     * @throws Dispatcher\LogNotProcessedException
-     * @throws Dispatcher\LogPassedAndFailedException
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws NoContactsFound
      * @throws NotSchedulableException
      */
-    private function executeOrSchedule()
+    private function executeOrScheduleEvent()
     {
         // Use the same timestamp across all contacts processed
         $now = new \DateTime();
 
         // Loop over contacts until the entire campaign is executed
-        try {
-            while ($contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->eventLimit, $this->contactId)) {
-                /** @var Event $event */
-                foreach ($this->rootEvents as $event) {
-                    // Check if the event should be scheduled (let the scheduler's do the debug logging)
-                    $executionDate = $this->scheduler->getExecutionDateTime($event, $now);
-                    if ($executionDate > $now) {
-                        $this->scheduler->schedule($event, $executionDate, $contacts);
-                        continue;
-                    }
+        $contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->batchLimit, $this->contactId);
+        while ($contacts->count()) {
+            /** @var Event $event */
+            foreach ($this->rootEvents as $event) {
+                $this->progressBar->advance($contacts->count());
 
-                    // Execute the event for the batch of contacts
-                    $this->executioner->execute($event, $contacts);
+                // Check if the event should be scheduled (let the schedulers do the debug logging)
+                $executionDate = $this->scheduler->getExecutionDateTime($event, $now);
+                $this->logger->debug(
+                    'CAMPAIGN: Event ID# '.$event->getId().
+                    ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
+                    ' compared to '.$now->format('Y-m-d H:i:s')
+                );
+
+                if ($executionDate > $now) {
+                    $this->scheduler->schedule($event, $executionDate, $contacts);
+                    continue;
                 }
 
-                $this->kickoffContacts->clear();
+                // Execute the event for the batch of contacts
+                $this->executioner->executeForContacts($event, $contacts);
             }
-        } catch (NoContactsFound $exception) {
-            // We're done here
+
+            $this->kickoffContacts->clear();
+
+            // Get the next batch
+            $contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->batchLimit, $this->contactId);
         }
     }
 }

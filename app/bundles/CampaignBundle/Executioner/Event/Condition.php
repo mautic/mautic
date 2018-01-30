@@ -49,7 +49,11 @@ class Condition implements EventInterface
      *
      * @return mixed|void
      */
-    public function execute(AbstractEventAccessor $config, Event $event, ArrayCollection $contacts)
+    public function executeForContacts(AbstractEventAccessor $config, Event $event, ArrayCollection $contacts)
+    {
+    }
+
+    public function executeLogs(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
     }
 }

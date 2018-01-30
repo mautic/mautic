@@ -26,12 +26,12 @@ class ScheduledEvent extends CampaignScheduledEvent
     /**
      * @var AbstractEventAccessor
      */
-    private $config;
+    private $eventConfig;
 
     /**
      * @var ArrayCollection
      */
-    private $log;
+    private $eventLog;
 
     /**
      * PendingEvent constructor.
@@ -42,8 +42,8 @@ class ScheduledEvent extends CampaignScheduledEvent
      */
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
     {
-        $this->config = $config;
-        $this->log    = $log;
+        $this->eventConfig = $config;
+        $this->eventLog    = $log;
 
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
@@ -64,7 +64,7 @@ class ScheduledEvent extends CampaignScheduledEvent
      */
     public function getConfig()
     {
-        return $this->config;
+        return $this->eventConfig;
     }
 
     /**
@@ -72,6 +72,6 @@ class ScheduledEvent extends CampaignScheduledEvent
      */
     public function getLog()
     {
-        return $this->log;
+        return $this->eventLog;
     }
 }

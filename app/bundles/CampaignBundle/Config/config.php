@@ -264,6 +264,12 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
+            'mautic.campaign.contact_finder.scheduled'  => [
+                'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContacts::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead',
+                ],
+            ],
             'mautic.campaign.event_dispatcher'        => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher::class,
                 'arguments' => [
@@ -351,6 +357,17 @@ return [
                     'translator',
                     'mautic.campaign.executioner',
                     'mautic.campaign.scheduler',
+                ],
+            ],
+            'mautic.campaign.executioner.scheduled'     => [
+                'class'     => \Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead_event_log',
+                    'monolog.logger.mautic',
+                    'translator',
+                    'mautic.campaign.executioner',
+                    'mautic.campaign.scheduler',
+                    'mautic.campaign.contact_finder.scheduled',
                 ],
             ],
             // @deprecated 2.13.0 for BC support; to be removed in 3.0

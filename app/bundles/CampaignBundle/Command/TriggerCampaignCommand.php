@@ -14,6 +14,8 @@ namespace Mautic\CampaignBundle\Command;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignTriggerEvent;
+use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
+use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -79,7 +81,12 @@ class TriggerCampaignCommand extends ModeratedCommand
         $batch            = $input->getOption('batch-limit');
         $max              = $input->getOption('max-events');
 
+        /** @var KickoffExecutioner $kickoff */
         $kickoff = $container->get('mautic.campaign.executioner.kickoff');
+        /** @var ScheduledExecutioner $scheduled */
+        $scheduled = $container->get('mautic.campaign.executioner.scheduled');
+
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
@@ -148,9 +155,10 @@ class TriggerCampaignCommand extends ModeratedCommand
                     if (!$negativeOnly && !$scheduleOnly) {
                         //trigger starting action events for newly added contacts
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
-                        //$processed = $model->triggerStartingEvents($c, $totalProcessed, $batch, $max, $output);
+                        $kickoff->executeForCampaign($c, $batch, $output);
+                        $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
+                        $scheduled->executeForCampaign($c, $batch, $output);
 
-                        $kickoff->executeForCampaign($c, $batch, $max, $output);
                         /*$output->writeln(
                             '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'
                             ."\n"
@@ -195,7 +203,6 @@ class TriggerCampaignCommand extends ModeratedCommand
             unset($campaigns);
         }
 
-        $this->output->writeln('done');
         $this->completeRun();
 
         return 0;
