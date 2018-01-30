@@ -754,9 +754,15 @@ class LeadListRepository extends CommonRepository
                 $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func) {
                     $key             = array_search($string, $relativeDateStrings);
                     $dtHelper        = new DateTimeHelper('midnight today', null, 'local');
-                    $requiresBetween = in_array($func, ['eq', 'neq']) && $isTimestamp;
-                    $timeframe       = str_replace('mautic.lead.list.', '', $key);
                     $modifier        = false;
+                    $requiresBetween = false;
+                    if (in_array($func, ['eq', 'neq']) && $isTimestamp) {
+                        //we want to compare only 'Y-m-d', not also the hour, minute and second.
+                        $isTimestamp     = false;
+                        $requiresBetween = true;
+                        $modifier        = '+ 1 day';
+                    }
+                    $timeframe       = str_replace('mautic.lead.list.', '', $key);
                     $isRelative      = true;
 
                     switch ($timeframe) {
