@@ -46,7 +46,7 @@ class TableSchemaColumnsCache
     public function getColumns($tableName)
     {
         if (!isset($this->cache[$tableName])) {
-            $columns                 = $this->entityManager->getConnection()->getSchemaManager()->listTableColumns($tableName);
+            $columns                 = $this->entityManager->getConnection()->getSchemaManager()->listTableColumns(MAUTIC_TABLE_PREFIX.$tableName);
             $this->cache[$tableName] = $columns ?: [];
         }
 

@@ -51,13 +51,15 @@ class LeadSegmentQueryBuilder
      * @param LeadSegmentFilters $leadSegmentFilters
      *
      * @return QueryBuilder
+     *
+     * @todo Remove $id?
      */
     public function getLeadsSegmentQueryBuilder($id, LeadSegmentFilters $leadSegmentFilters)
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
 
-        $queryBuilder->select('*')->from('leads', 'l');
+        $queryBuilder->select('*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         /** @var LeadSegmentFilter $filter */
         foreach ($leadSegmentFilters as $filter) {
@@ -191,6 +193,8 @@ class LeadSegmentQueryBuilder
 
     /**
      * @return LeadSegmentFilterDescriptor
+     *
+     * @todo Remove this function
      */
     public function getTranslator()
     {
@@ -201,6 +205,8 @@ class LeadSegmentQueryBuilder
      * @param LeadSegmentFilterDescriptor $translator
      *
      * @return LeadSegmentQueryBuilder
+     *
+     * @todo Remove this function
      */
     public function setTranslator($translator)
     {
@@ -211,6 +217,8 @@ class LeadSegmentQueryBuilder
 
     /**
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
+     *
+     * @todo Remove this function
      */
     public function getSchema()
     {
@@ -221,6 +229,8 @@ class LeadSegmentQueryBuilder
      * @param \Doctrine\DBAL\Schema\AbstractSchemaManager $schema
      *
      * @return LeadSegmentQueryBuilder
+     *
+     * @todo Remove this function
      */
     public function setSchema($schema)
     {

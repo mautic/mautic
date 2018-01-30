@@ -49,7 +49,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
             $queryBuilder = $queryBuilder->innerJoin(
                 $queryBuilder->getTableAlias('leads'),
-                $filter->getTable(),
+                MAUTIC_TABLE_PREFIX.$filter->getTable(),
                 $tableAlias,
                 $tableAlias.'.lead_id = l.id'
             );

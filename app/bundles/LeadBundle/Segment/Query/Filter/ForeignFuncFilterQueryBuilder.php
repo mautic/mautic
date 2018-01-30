@@ -28,6 +28,8 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 
     /**
      * {@inheritdoc}
+     *
+     * @todo Missing use for a QueryException
      */
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
@@ -57,7 +59,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $filterGlueFunc = $filterGlue.'Where';
 
-        $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
+        $tableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.$filter->getTable());
 
         // for aggregate function we need to create new alias and not reuse the old one
         if ($filterAggr) {
@@ -83,7 +85,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                     if ($filterAggr) {
                         $queryBuilder->innerJoin(
                             $queryBuilder->getTableAlias('leads'),
-                            $filter->getTable(),
+                            MAUTIC_TABLE_PREFIX.$filter->getTable(),
                             $tableAlias,
                             sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias('leads'), $tableAlias)
                         );
@@ -91,11 +93,11 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                         if ($filter->getTable() == 'companies') {
                             $relTable = $this->generateRandomParameterName();
                             $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = l.id');
-                            $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
+                            $queryBuilder->leftJoin($relTable, MAUTIC_TABLE_PREFIX.$filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
                         } else {
                             $queryBuilder->leftJoin(
                                 $queryBuilder->getTableAlias('leads'),
-                                $filter->getTable(),
+                                MAUTIC_TABLE_PREFIX.$filter->getTable(),
                                 $tableAlias,
                                 sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias('leads'), $tableAlias)
                             );

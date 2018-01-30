@@ -49,7 +49,7 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 
             $queryBuilder = $queryBuilder->leftJoin(
                 $queryBuilder->getTableAlias('leads'),
-                $filter->getTable(),
+                MAUTIC_TABLE_PREFIX.$filter->getTable(),
                 $tableAlias,
                 $tableAlias.'.lead_id = l.id'
             );
