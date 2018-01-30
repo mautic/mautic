@@ -64,7 +64,6 @@ class LeadSegmentFilterFactory
 
             $leadSegmentFilter = new LeadSegmentFilter($leadSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder);
 
-            //@todo replaced in query builder
             $leadSegmentFilters->addLeadSegmentFilter($leadSegmentFilter);
         }
 

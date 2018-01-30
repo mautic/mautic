@@ -21,6 +21,7 @@ class DecoratorFactory
      * @var LeadSegmentFilterDescriptor
      */
     private $leadSegmentFilterDescriptor;
+
     /**
      * @var BaseDecorator
      */
