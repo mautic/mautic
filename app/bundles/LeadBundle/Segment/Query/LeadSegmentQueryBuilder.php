@@ -57,7 +57,7 @@ class LeadSegmentQueryBuilder
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
 
-        $queryBuilder->select('*')->from('leads', 'l');
+        $queryBuilder->select('*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         /** @var LeadSegmentFilter $filter */
         foreach ($leadSegmentFilters as $filter) {

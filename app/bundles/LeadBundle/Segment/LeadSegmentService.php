@@ -72,7 +72,6 @@ class LeadSegmentService
 
         $queryBuilder = $this->leadSegmentQueryBuilder->getLeadsSegmentQueryBuilder($leadList->getId(), $segmentFilters);
         $queryBuilder = $this->leadSegmentQueryBuilder->addNewLeadsRestrictions($queryBuilder, $leadList->getId(), $batchLimiters);
-        //$queryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $leadList->getId());
         $queryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubsribedQuery($queryBuilder, $leadList->getId());
 
         return $queryBuilder;
@@ -227,11 +226,12 @@ class LeadSegmentService
     {
         try {
             $start  = microtime(true);
+
             $result = $qb->execute()->fetch(\PDO::FETCH_ASSOC);
 
             $end = microtime(true) - $start;
 
-            $this->logger->debug('Segment QB: Query took: '.round($end * 100, 2).'ms. Result count: '.count($result), ['segmentId' => $segmentId]);
+            $this->logger->debug('Segment QB: Query took: '.number_format(round($end * 100, 2), 3, '.', 's ').'ms. Result count: '.count($result), ['segmentId' => $segmentId]);
         } catch (\Exception $e) {
             $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
                 'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),

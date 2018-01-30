@@ -39,10 +39,10 @@ class BaseDecorator implements FilterDecoratorInterface
     public function getTable(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
         if ($leadSegmentFilterCrate->isLeadType()) {
-            return 'leads';
+            return MAUTIC_TABLE_PREFIX.'leads';
         }
 
-        return 'companies';
+        return MAUTIC_TABLE_PREFIX.'companies';
     }
 
     public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)

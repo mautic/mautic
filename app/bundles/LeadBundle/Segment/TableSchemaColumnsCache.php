@@ -62,4 +62,12 @@ class TableSchemaColumnsCache
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getCurrentDatabaseName()
+    {
+        return $this->entityManager->getConnection()->getDatabase();
+    }
 }

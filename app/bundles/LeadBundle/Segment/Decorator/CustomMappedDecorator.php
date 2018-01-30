@@ -49,7 +49,7 @@ class CustomMappedDecorator extends BaseDecorator
             return parent::getTable($leadSegmentFilterCrate);
         }
 
-        return $this->leadSegmentFilterDescriptor[$originalField]['foreign_table'];
+        return MAUTIC_TABLE_PREFIX.$this->leadSegmentFilterDescriptor[$originalField]['foreign_table'];
     }
 
     public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)

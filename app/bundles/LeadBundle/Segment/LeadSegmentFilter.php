@@ -57,7 +57,12 @@ class LeadSegmentFilter
      */
     public function getColumn()
     {
-        $columns = $this->schemaCache->getColumns($this->getTable());
+        $currentDBName = $this->schemaCache->getCurrentDatabaseName();
+
+        $table = preg_replace("/^{$currentDBName}\./", '', $this->getTable());
+
+        $columns = $this->schemaCache->getColumns($table);
+
         if (!isset($columns[$this->getField()])) {
             throw new QueryException(sprintf('Database schema does not contain field %s.%s', $this->getTable(), $this->getField()));
         }

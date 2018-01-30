@@ -48,7 +48,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
             $tableAlias = $this->generateRandomParameterName();
 
             $queryBuilder = $queryBuilder->innerJoin(
-                $queryBuilder->getTableAlias('leads'),
+                $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
                 $filter->getTable(),
                 $tableAlias,
                 $tableAlias.'.lead_id = l.id'

@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryException;
 
 /**
  * Class ForeignFuncFilterQueryBuilder.
@@ -35,13 +36,6 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterGlue     = $filter->getGlue();
         $filterAggr     = $filter->getAggregateFunction();
 
-        try {
-            $filter->getColumn();
-        } catch (QueryException $e) {
-            // We do ignore not found fields as they may be just removed custom field
-            return $queryBuilder;
-        }
-
         $filterParameters = $filter->getParameterValue();
 
         if (is_array($filterParameters)) {
@@ -51,6 +45,13 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
             }
         } else {
             $parameters = $this->generateRandomParameterName();
+        }
+
+        try {
+            $filter->getColumn();
+        } catch (QueryException $e) {
+            // We do ignore not found fields as they may be just removed custom field, it's bad!
+            return $queryBuilder;
         }
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
@@ -82,10 +83,10 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                     //@todo this logic needs to
                     if ($filterAggr) {
                         $queryBuilder->innerJoin(
-                            $queryBuilder->getTableAlias('leads'),
+                            $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
                             $filter->getTable(),
                             $tableAlias,
-                            sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias('leads'), $tableAlias)
+                            sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
                         );
                     } else {
                         if ($filter->getTable() == 'companies') {
@@ -94,10 +95,10 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                             $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
                         } else {
                             $queryBuilder->leftJoin(
-                                $queryBuilder->getTableAlias('leads'),
+                                $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
                                 $filter->getTable(),
                                 $tableAlias,
-                                sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias('leads'), $tableAlias)
+                                sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
                             );
                         }
                     }

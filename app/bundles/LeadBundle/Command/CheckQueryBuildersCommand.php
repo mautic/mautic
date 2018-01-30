@@ -13,12 +13,16 @@ namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\LeadBundle\Model\ListModel;
+use Monolog\Logger;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CheckQueryBuildersCommand extends ModeratedCommand
 {
+    /** @var Logger */
+    private $logger;
+
     protected function configure()
     {
         $this
@@ -32,7 +36,8 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container  = $this->getContainer();
+        $container    = $this->getContainer();
+        $this->logger = $container->get('monolog.logger.mautic');
 
         /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
         $listModel = $container->get('mautic.lead.model.list');
@@ -40,10 +45,14 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         $id      = $input->getOption('segment-id');
         $verbose = $input->getOption('verbose');
 
-        $verbose = false;
-
         if ($id) {
             $list = $listModel->getEntity($id);
+
+            if (!$list) {
+                $output->writeln('<error>Segment with id "'.$id.'" not found');
+
+                return 1;
+            }
             $this->runSegment($output, $verbose, $list, $listModel);
         } else {
             $lists = $listModel->getEntities(
@@ -67,14 +76,26 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         return 0;
     }
 
+    private function format_period($inputSeconds)
+    {
+        $hours = (int) ($minutes = (int) ($seconds = (int) ($milliseconds = (int) ($inputSeconds * 1000)) / 1000) / 60) / 60;
+
+        return $hours.':'.($minutes % 60).':'.($seconds % 60).(($milliseconds === 0) ? '' : '.'.rtrim($milliseconds % 1000, '0'));
+    }
+
     private function runSegment($output, $verbose, $l, ListModel $listModel)
     {
-        $output->write('<info>Running segment '.$l->getId().'...</info>');
+        $output->write('<info>Running segment '.$l->getId().'...old...');
+
+        $this->logger->info(sprintf('Running OLD segment #%d', $l->getId()));
 
         $timer1    = microtime(true);
         $processed = $listModel->getVersionOld($l);
         $timer1    = round((microtime(true) - $timer1) * 1000, 3);
 
+        $this->logger->info(sprintf('Running NEW segment #%d', $l->getId()));
+
+        $output->write('new...');
         $timer2     = microtime(true);
         $processed2 = $listModel->getVersionNew($l);
         $timer2     = round((microtime(true) - $timer2) * 1000, 3);
@@ -91,10 +112,10 @@ class CheckQueryBuildersCommand extends ModeratedCommand
             sprintf('old: c: %d, m: %d, time: %dms  <--> new: c: %d, m: %s, time: %dms',
                     $processed['count'],
                     $processed['maxId'],
-                    $timer1,
+                    $this->format_period($timer1),
                     $processed2['count'],
                     $processed2['maxId'],
-                    $timer2
+                    $this->format_period($timer2)
             )
         );
 

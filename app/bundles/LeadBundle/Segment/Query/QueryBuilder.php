@@ -1493,7 +1493,11 @@ class QueryBuilder
             }
         }
 
-        return !count($result) ? false : count($result) == 1 ? array_shift($result) : $result;
+        if (!count($result)) {
+            throw new QueryException(sprintf('No alias found for %s, available tables: [%s]', $table, join(', ', $this->getTableAliases())));
+        }
+
+        return count($result) == 1 ? array_shift($result) : $result;
     }
 
     /**
