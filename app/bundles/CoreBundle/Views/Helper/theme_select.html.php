@@ -16,16 +16,18 @@ $isCodeMode = ($active == $codeMode);
     <div class="col-md-3 theme-list">
         <div class="panel panel-default <?php echo $isCodeMode ? 'theme-selected' : ''; ?>">
             <div class="panel-body text-center">
-                <h3><?php echo $view['translator']->trans('mautic.core.code.mode'); ?></h3>
+                <h3 class="panel-header"><?php echo $view['translator']->trans('mautic.core.code.mode'); ?></h3>
                 <div class="panel-body text-center" style="height: 250px">
                     <i class="fa fa-code fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4;"></i>
                 </div>
-                <a href="#" type="button" data-theme="<?php echo $codeMode; ?>" class="select-theme-link btn btn-default <?php echo $isCodeMode ? 'hide' : '' ?>" onclick="mQuery('#dynamic-content-tab').removeClass('hidden')">
-                    Select
-                </a>
-                <button type="button" class="select-theme-selected btn btn-default <?php echo $isCodeMode ? '' : 'hide' ?>" disabled="disabled">
-                    Selected
-                </button>
+                <div class="panel-button-container">
+                    <a href="#" type="button" data-theme="<?php echo $codeMode; ?>" class="select-theme-link btn btn-default <?php echo $isCodeMode ? 'hide' : '' ?>" onclick="mQuery('#dynamic-content-tab').removeClass('hidden')">
+                        Select
+                    </a>
+                    <button type="button" class="select-theme-selected btn btn-default <?php echo $isCodeMode ? '' : 'hide' ?>" disabled="disabled">
+                        Selected
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -50,10 +52,10 @@ $isCodeMode = ($active == $codeMode);
         <div class="col-md-3 theme-list">
             <div class="panel panel-default <?php echo $isSelected ? 'theme-selected' : ''; ?>">
                 <div class="panel-body text-center">
-                    <h3><?php echo $themeInfo['name']; ?></h3>
+                    <h3 class="panel-header"><?php echo $themeInfo['name']; ?></h3>
                     <?php if ($hasThumbnail) : ?>
                         <a class="panel-thumbnail" href="#" data-toggle="modal" data-target="#theme-<?php echo $themeKey; ?>">
-                            <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 250px"></div>
+                            <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center top; width: 100%; height: 250px"></div>
                         </a>
                     <?php else : ?>
                         <div class="panel-body text-center" style="height: 250px">
@@ -80,7 +82,7 @@ $isCodeMode = ($active == $codeMode);
                                 <h4 class="modal-title" id="<?php echo $themeKey; ?>"><?php echo $themeInfo['name']; ?></h4>
                             </div>
                             <div class="modal-body">
-                                <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
+                                <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center top; width: 100%; height: 600px"></div>
                             </div>
                         </div>
                     </div>

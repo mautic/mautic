@@ -5476,6 +5476,9 @@ div[data-slot].ui-sortable-helper {
 .theme-list .panel-body {
   height: 350px;
 }
+.theme-list .panel-header {
+  margin-bottom: 15px;
+}
 .theme-list .panel-button-container {
   position: absolute;
   z-index: 2;
