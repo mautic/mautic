@@ -78,9 +78,9 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
     private function format_period($inputSeconds)
     {
-        $hours = (int) ($minutes = (int) ($seconds = (int) ($milliseconds = (int) ($inputSeconds * 1000)) / 1000) / 60) / 60;
+        $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
 
-        return $hours.':'.($minutes % 60).':'.($seconds % 60).(($milliseconds === 0) ? '' : '.'.rtrim($milliseconds % 1000, '0'));
+        return $now->format('H:i:s.u');
     }
 
     private function runSegment($output, $verbose, $l, ListModel $listModel)
@@ -91,14 +91,14 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
         $timer1    = microtime(true);
         $processed = $listModel->getVersionOld($l);
-        $timer1    = round((microtime(true) - $timer1) * 1000, 3);
+        $timer1    = microtime(true) - $timer1;
 
         $this->logger->info(sprintf('Running NEW segment #%d', $l->getId()));
 
         $output->write('new...');
         $timer2     = microtime(true);
         $processed2 = $listModel->getVersionNew($l);
-        $timer2     = round((microtime(true) - $timer2) * 1000, 3);
+        $timer2     = microtime(true) - $timer2;
 
         $processed2 = array_shift($processed2);
 
@@ -109,7 +109,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         }
 
         $output->write(
-            sprintf('old: c: %d, m: %d, time: %dms  <--> new: c: %d, m: %s, time: %dms',
+            sprintf('old: c: %d, m: %d, time: %s(est)  <--> new: c: %d, m: %s, time: %s',
                     $processed['count'],
                     $processed['maxId'],
                     $this->format_period($timer1),

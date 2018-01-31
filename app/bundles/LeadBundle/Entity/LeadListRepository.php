@@ -25,6 +25,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -311,17 +312,21 @@ class LeadListRepository extends CommonRepository
         return ($returnArray) ? $return : $return[$listIds[0]];
     }
 
+    private function format_period($inputSeconds)
+    {
+        $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
+
+        return $now->format('H:i:s.u');
+    }
+
     /**
-     * This function is weird, you should not use it, use LeadSegmentService instead.
-     *
-     * @param       $lists
-     * @param array $args
-     *
-     * @deprecated
+     * @param        $lists
+     * @param array  $args
+     * @param Logger $logger
      *
      * @return array
      */
-    public function getLeadsByList($lists, $args = [])
+    public function getLeadsByList($lists, $args = [], Logger $logger)
     {
         // Return only IDs
         $idOnly = (!array_key_exists('idOnly', $args)) ? false : $args['idOnly']; //Always TRUE
@@ -511,7 +516,20 @@ class LeadListRepository extends CommonRepository
                     $q->resetQueryPart('groupBy');
                 }
 
+                $params  = $q->getParameters();
+                $sqlT    = $q->getSQL();
+                foreach ($params as $key=>$val) {
+                    if (!is_int($val) and !is_float($val)) {
+                        $val = "'$val'";
+                    }
+                    $sqlT = str_replace(":{$key}", $val, $sqlT);
+                }
+
+                $logger->debug(sprintf('Old version SQL: %s', $sqlT));
+                $timer   = microtime(true);
                 $results = $q->execute()->fetchAll();
+                $timer   = microtime(true) - $timer;
+                $logger->debug(sprintf('Old version SQL took: %s', $this->format_period($timer)));
 
                 foreach ($results as $r) {
                     if ($countOnly) {
