@@ -137,11 +137,13 @@ class LeadSegmentFilter
     }
 
     /**
-     * @todo check whether necessary and replace or remove
+     * @todo check where necessary and remove after debugging is done
      *
      * @param null $field
      *
      * @return array|mixed
+     *
+     * @deprecated
      *
      * @throws \Exception
      */
@@ -192,10 +194,21 @@ class LeadSegmentFilter
     public function __toString()
     {
         if (!is_array($this->getParameterValue())) {
-            return sprintf('table:%s field:%s holder:%s value:%s', $this->getTable(), $this->getField(), $this->getParameterHolder('holder'), $this->getParameterValue());
+            return sprintf('table:%s field:%s operator:%s holder:%s value:%s, crate:%s',
+                           $this->getTable(),
+                           $this->getField(),
+                           $this->getOperator(),
+                           $this->getParameterHolder('holder'),
+                           $this->getParameterValue(),
+                           print_r($this->getCrate(), true));
         }
 
-        return sprintf('table:%s field:%s holder:%s value:%s', $this->getTable(), $this->getField(), print_r($this->getParameterHolder($this->getParameterValue()), true), print_r($this->getParameterValue(), true));
+        return sprintf('table:%s field:%s holder:%s value:%s, crate: %s',
+                       $this->getTable(),
+                       $this->getField(),
+                       print_r($this->getParameterHolder($this->getParameterValue()), true),
+                       print_r($this->getParameterValue(), true),
+                       print_r($this->getCrate(), true));
     }
 
     /**
