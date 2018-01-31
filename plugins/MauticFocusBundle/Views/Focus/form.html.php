@@ -392,7 +392,13 @@ echo $view['form']->start($form);
 
                             <!-- form type properties -->
                             <div class="focus-hide visible-focus-type-form">
+                                <div class="col-sm-12" id="focusFormAlert" data-hide-on='{"focus_html_mode_0":"checked"}'>
+                                    <div class="alert alert-info">
+                                        <?php echo $view['translator']->trans('mautic.focus.form_token.instructions'); ?>
+                                    </div>
+                                </div>
                                 <?php echo $view['form']->row($form['form']); ?>
+                                <div style="margin-bottom: 50px;"></div>
                             </div>
 
                             <!-- link type properties -->

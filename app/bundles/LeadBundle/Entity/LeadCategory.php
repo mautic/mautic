@@ -78,6 +78,7 @@ class LeadCategory
             ->columnName('manually_added')
             ->build();
     }
+
     /**
      * @return mixed
      */

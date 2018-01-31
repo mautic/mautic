@@ -89,6 +89,7 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                     'customButtons' => $customButtons,
                     'langVar'       => 'lead.lead',
                     'routeBase'     => 'contact',
+                    'tooltip'       => $view['translator']->trans('mautic.lead.list.checkall.help'),
                 ]);
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [

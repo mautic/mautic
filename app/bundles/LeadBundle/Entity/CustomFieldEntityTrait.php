@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 
 trait CustomFieldEntityTrait
@@ -29,6 +30,14 @@ trait CustomFieldEntityTrait
      * @var array
      */
     protected $updatedFields = [];
+
+    /**
+     * A place events can use to pass data around on the object to prevent issues like creating a contact and having it processed to be sent back
+     * to the origin of creation in a webhook (like Pipedrive).
+     *
+     * @var array
+     */
+    protected $eventData = [];
 
     /**
      * @param $name
@@ -113,15 +122,22 @@ trait CustomFieldEntityTrait
     public function addUpdatedField($alias, $value, $oldValue = null)
     {
         $property = (defined('self::FIELD_ALIAS')) ? str_replace(self::FIELD_ALIAS, '', $alias) : $alias;
+        $field    = $this->getField($alias);
+        $setter   = 'set'.ucfirst($property);
 
-        $setter = 'set'.ucfirst($property);
         if (property_exists($this, $property) && method_exists($this, $setter)) {
             // Fixed custom field so use the setter but don't get caught in a loop such as a custom field called "notes"
+            // Set empty value as null
+            if ($value === '') {
+                $value = null;
+            }
             $this->$setter($value);
         }
 
         if (null == $oldValue) {
             $oldValue = $this->getFieldValue($alias);
+        } elseif ($field) {
+            $oldValue = CustomFieldHelper::fixValueType($field['type'], $oldValue);
         }
 
         if (is_string($value)) {
@@ -137,6 +153,10 @@ trait CustomFieldEntityTrait
         } elseif (is_array($value)) {
             // Flatten the array
             $value = implode('|', $value);
+        }
+
+        if ($field) {
+            $value = CustomFieldHelper::fixValueType($field['type'], $value);
         }
 
         if ($oldValue !== $value && !(('' === $oldValue && null === $value) || (null === $oldValue && '' === $value))) {
@@ -158,27 +178,44 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * Get company field value.
+     * Get field value.
      *
-     * @param      $field
-     * @param null $group
+     * @param string $field
+     * @param string $group
      *
-     * @return bool
+     * @return mixed
      */
     public function getFieldValue($field, $group = null)
     {
-        if (isset($this->updatedFields[$field])) {
+        if (array_key_exists($field, $this->updatedFields)) {
             return $this->updatedFields[$field];
         }
 
-        if (!empty($group) && isset($this->fields[$group][$field])) {
-            return $this->fields[$group][$field]['value'];
+        if ($field = $this->getField($field, $group)) {
+            return CustomFieldHelper::fixValueType($field['type'], $field['value']);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get field details.
+     *
+     * @param string $key
+     * @param string $group
+     *
+     * @return array|false
+     */
+    public function getField($key, $group = null)
+    {
+        if ($group && isset($this->fields[$group][$key])) {
+            return $this->fields[$group][$key];
         }
 
         foreach ($this->fields as $group => $groupFields) {
             foreach ($groupFields as $name => $details) {
-                if ($name == $field) {
-                    return $details['value'];
+                if ($name == $key) {
+                    return $details;
                 }
             }
         }
@@ -211,6 +248,27 @@ trait CustomFieldEntityTrait
 
             return $this->fields;
         }
+    }
+
+    /**
+     * @param $key
+     */
+    public function getEventData($key)
+    {
+        return (isset($this->eventData[$key])) ? $this->eventData[$key] : null;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     *
+     * @return $this
+     */
+    public function setEventData($key, $value)
+    {
+        $this->eventData[$key] = $value;
+
+        return $this;
     }
 
     /**

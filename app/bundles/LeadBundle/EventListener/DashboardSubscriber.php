@@ -187,8 +187,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.lead.leads'),
+                        'mautic.dashboard.label.title',
+                        'mautic.lead.leads',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $lists,
@@ -340,8 +340,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.user.account.permissions.editname'),
-                        $event->getTranslator()->trans('mautic.lead.leads'),
+                        'mautic.user.account.permissions.editname',
+                        'mautic.lead.leads',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $owners,
@@ -395,8 +395,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.user.account.permissions.editname'),
-                        $event->getTranslator()->trans('mautic.lead.leads'),
+                        'mautic.user.account.permissions.editname',
+                        'mautic.lead.leads',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $creators,
@@ -447,7 +447,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        'mautic.dashboard.label.title',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $leads,

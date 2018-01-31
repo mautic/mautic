@@ -8,6 +8,12 @@ use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\AbstractPipedrive;
 
 abstract class AbstractImport extends AbstractPipedrive
 {
+    /**
+     * @param $params
+     * @param $endpoint
+     *
+     * @return array
+     */
     public function getData($params, $endpoint)
     {
         $result = [
@@ -43,8 +49,16 @@ abstract class AbstractImport extends AbstractPipedrive
         return $result;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return bool
+     */
     abstract protected function create(array $data = []);
 
+    /**
+     * @param $id
+     */
     protected function getOwnerByIntegrationId($id)
     {
         $pipedriveOwner = $this->em->getRepository(PipedriveOwner::class)->findOneByOwnerId($id);

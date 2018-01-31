@@ -37,9 +37,24 @@ class LeadImportFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $specialFields = [
+            'dateAdded'      => 'mautic.lead.import.label.dateAdded',
+            'createdByUser'  => 'mautic.lead.import.label.createdByUser',
+            'dateModified'   => 'mautic.lead.import.label.dateModified',
+            'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
+            'lastActive'     => 'mautic.lead.import.label.lastActive',
+            'dateIdentified' => 'mautic.lead.import.label.dateIdentified',
+            'ip'             => 'mautic.lead.import.label.ip',
+            'points'         => 'mautic.lead.import.label.points',
+            'stage'          => 'mautic.lead.import.label.stage',
+            'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
+            'ownerusername'  => 'mautic.lead.import.label.ownerusername',
+        ];
+
         $importChoiceFields = [
-            'mautic.lead.contact' => $options['lead_fields'],
-            'mautic.lead.company' => $options['company_fields'],
+            'mautic.lead.contact'        => $options['lead_fields'],
+            'mautic.lead.company'        => $options['company_fields'],
+            'mautic.lead.special_fields' => $specialFields,
         ];
 
         if ($options['object'] !== 'lead') {
@@ -60,140 +75,6 @@ class LeadImportFieldType extends AbstractType
                 ]
             );
         }
-
-        $properties = $builder->create('properties', 'form', ['virtual' => true]);
-
-        $properties->add(
-            'dateAdded',
-            'choice',
-            [
-                'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.dateAdded',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'data'       => $this->getDefaultValue('dateAdded', $options['import_fields']),
-            ]
-        );
-
-        $properties->add(
-            'createdByUser',
-            'choice',
-            [
-                'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.createdByUser',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'data'       => $this->getDefaultValue('createdByUser', $options['import_fields']),
-            ]
-        );
-
-        $properties->add(
-            'dateModified',
-            'choice',
-            [
-                'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.dateModified',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'data'       => $this->getDefaultValue('dateModified', $options['import_fields']),
-            ]
-        );
-
-        $properties->add(
-            'modifiedByUser',
-            'choice',
-            [
-                'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.modifiedByUser',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'data'       => $this->getDefaultValue('modifiedByUser', $options['import_fields']),
-            ]
-        );
-
-        $properties->add(
-            'lastActive',
-            'choice',
-            [
-                'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.lastActive',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'data'       => $this->getDefaultValue('lastActive', $options['import_fields']),
-            ]
-        );
-
-        $properties->add(
-            'dateIdentified',
-            'choice',
-            [
-                'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.dateIdentified',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'data'       => $this->getDefaultValue('dateIdentified', $options['import_fields']),
-            ]
-        );
-
-        $properties->add(
-            'ip',
-            'choice',
-            [
-                'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.ip',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'data'       => $this->getDefaultValue('ip', $options['import_fields']),
-            ]
-        );
-
-        $properties->add(
-            'points',
-            'choice',
-            [
-                'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.points',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'data'       => $this->getDefaultValue('points', $options['import_fields']),
-            ]
-        );
-
-        $properties->add(
-            'stage',
-            'choice',
-            [
-                'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.stage',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'data'       => $this->getDefaultValue('stage', $options['import_fields']),
-            ]
-        );
-
-        $properties->add(
-            'doNotEmail',
-            'choice',
-            [
-                'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.doNotEmail',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'data'       => $this->getDefaultValue('doNotEmail', $options['import_fields']),
-            ]
-        );
-
-        $builder->add($properties);
 
         $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
             $this->factory->getEntityManager(),
@@ -255,21 +136,27 @@ class LeadImportFieldType extends AbstractType
         $buttons = ['cancel_icon' => 'fa fa-times'];
 
         if (empty($options['line_count_limit'])) {
-            $buttons = array_merge($buttons, [
-                'apply_text'  => 'mautic.lead.import.in.background',
-                'apply_class' => 'btn btn-success',
-                'apply_icon'  => 'fa fa-history',
-                'save_text'   => 'mautic.lead.import.start',
-                'save_class'  => 'btn btn-primary',
-                'save_icon'   => 'fa fa-upload',
-            ]);
+            $buttons = array_merge(
+                $buttons,
+                [
+                    'apply_text'  => 'mautic.lead.import.in.background',
+                    'apply_class' => 'btn btn-success',
+                    'apply_icon'  => 'fa fa-history',
+                    'save_text'   => 'mautic.lead.import.start',
+                    'save_class'  => 'btn btn-primary',
+                    'save_icon'   => 'fa fa-upload',
+                ]
+            );
         } else {
-            $buttons = array_merge($buttons, [
-                'apply_text' => false,
-                'save_text'  => 'mautic.lead.import',
-                'save_class' => 'btn btn-primary',
-                'save_icon'  => 'fa fa-upload',
-            ]);
+            $buttons = array_merge(
+                $buttons,
+                [
+                    'apply_text' => false,
+                    'save_text'  => 'mautic.lead.import',
+                    'save_class' => 'btn btn-primary',
+                    'save_icon'  => 'fa fa-upload',
+                ]
+            );
         }
 
         $builder->add('buttons', 'form_buttons', $buttons);

@@ -188,7 +188,6 @@ class InstallController extends CommonController
                             break;
                     }
                     break;
-
             }
         }
 

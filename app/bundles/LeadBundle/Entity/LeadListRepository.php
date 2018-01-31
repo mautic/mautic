@@ -588,24 +588,24 @@ class LeadListRepository extends CommonRepository
      * @param QueryBuilder|null $parameterQ
      * @param null              $listId
      * @param bool              $isNot
+     * @param string            $leadTablePrefix
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
-    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $isNot = false)
+    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $isNot = false, $leadTablePrefix = 'l')
     {
         if (null === $parameterQ) {
             $parameterQ = $q;
         }
 
-        $objectFilters          = $this->arrangeFilters($filters);
-        $this->hasCompanyFilter = isset($objectFilters['company']) && count($objectFilters['company']) > 0;
-
+        $objectFilters                     = $this->arrangeFilters($filters);
         $this->listFiltersInnerJoinCompany = false;
-        $expr                              = $this->getListFilterExpr($filters, $parameters, $q, $isNot, null, 'lead', $listId);
 
-        if ($this->hasCompanyFilter) {
-            $this->applyCompanyFieldFilters($q);
+        if ($this->hasCompanyFilter = isset($objectFilters['company']) && count($objectFilters['company']) > 0) {
+            $this->applyCompanyFieldFilters($q, $leadTablePrefix);
         }
+
+        $expr = $this->getListFilterExpr($filters, $parameters, $q, $isNot, null, 'lead', $listId);
 
         $paramType = null;
         foreach ($parameters as $k => $v) {
@@ -868,7 +868,7 @@ class LeadListRepository extends CommonRepository
                         case 'year_next':
                         case 'year_this':
                             $interval = substr($key, -4);
-                            $dtHelper->setDateTime('midnight first day of '.$interval.' year', null);
+                            $dtHelper->setDateTime('midnight first day of January '.$interval.' year', null);
 
                             // This year: 2015-01-01 00:00:00
                             if ($requiresBetween) {
@@ -948,6 +948,7 @@ class LeadListRepository extends CommonRepository
                 case 'hit_url':
                 case 'referer':
                 case 'source':
+                case 'source_id':
                 case 'url_title':
                     $operand = in_array(
                         $func,
@@ -1293,7 +1294,7 @@ class LeadListRepository extends CommonRepository
                     $select  = 'COUNT(id)';
                     if ($details['field'] == 'lead_email_read_count') {
                         $table  = 'email_stats';
-                        $select = 'SUM(open_count)';
+                        $select = 'COALESCE(SUM(open_count),0)';
                     }
                     $subqb = $this->getEntityManager()->getConnection()
                         ->createQueryBuilder()
@@ -1434,7 +1435,7 @@ class LeadListRepository extends CommonRepository
 
                                 // Build a "live" query based on current filters to catch those that have not been processed yet
                                 $subQb      = $this->createFilterExpressionSubQuery('leads', $alias, null, null, $parameters, $leadId);
-                                $filterExpr = $this->generateSegmentExpression($listFilters, $parameters, $subQb, null, $id);
+                                $filterExpr = $this->generateSegmentExpression($listFilters, $parameters, $subQb, null, $id, false, $alias);
 
                                 // Left join membership to account for manually added and removed
                                 $membershipAlias = $this->generateRandomParameterName();
@@ -1581,8 +1582,9 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 case 'integration_campaigns':
-                    $operand = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
-                    //get integration campaign members here
+                    $parameter2       = $this->generateRandomParameterName();
+                    $operand          = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
+                    $ignoreAutoFilter = true;
 
                     $subQb = $this->getEntityManager()->getConnection()
                         ->createQueryBuilder()
@@ -1591,13 +1593,23 @@ class LeadListRepository extends CommonRepository
                     switch ($func) {
                         case 'eq':
                         case 'neq':
-                            $parameters[$parameter] = $details['filter'];
+                            if (strpos($details['filter'], '::') !== false) {
+                                list($integrationName, $campaignId) = explode('::', $details['filter']);
+                            } else {
+                                // Assuming this is a Salesforce integration for BC with pre 2.11.0
+                                $integrationName = 'Salesforce';
+                                $campaignId      = $details['filter'];
+                            }
+
+                            $parameters[$parameter]  = $campaignId;
+                            $parameters[$parameter2] = $integrationName;
                             $subQb->where(
                                 $q->expr()->andX(
-                                    $q->expr()->eq($alias.'.internal_entity_id', 'l.id'),
+                                    $q->expr()->eq($alias.'.integration', ":$parameter2"),
+                                    $q->expr()->eq($alias.'.integration_entity', "'CampaignMember'"),
                                     $q->expr()->eq($alias.'.integration_entity_id', ":$parameter"),
                                     $q->expr()->eq($alias.'.internal_entity', "'lead'"),
-                                    $q->expr()->eq($alias.'.integration_entity', "'CampaignMember'")
+                                    $q->expr()->eq($alias.'.internal_entity_id', 'l.id')
                                 )
                             );
                             break;
@@ -1743,6 +1755,7 @@ class LeadListRepository extends CommonRepository
                             $groupExpr->add($q->expr()->$func($field, $exprParameter));
                     }
             }
+
             if (!$ignoreAutoFilter) {
                 if (!is_array($details['filter'])) {
                     switch ($details['type']) {
@@ -2034,13 +2047,14 @@ class LeadListRepository extends CommonRepository
      * If there is a negate comparison such as not equal, empty, isNotLike or isNotIn then contacts without companies should
      * be included but the way the relationship is handled needs to be different to optimize best for a posit vs negate.
      *
-     * @param $q
+     * @param QueryBuilder $q
+     * @param string       $leadTablePrefix
      */
-    private function applyCompanyFieldFilters($q)
+    private function applyCompanyFieldFilters(QueryBuilder $q, $leadTablePrefix = 'l')
     {
         $joinType = ($this->listFiltersInnerJoinCompany) ? 'join' : 'leftJoin';
         // Join company tables for query optimization
-        $q->$joinType('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'l.id = cl.lead_id')
+        $q->$joinType($leadTablePrefix, MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', "$leadTablePrefix.id = cl.lead_id")
             ->$joinType(
                 'cl',
                 MAUTIC_TABLE_PREFIX.'companies',
@@ -2049,6 +2063,6 @@ class LeadListRepository extends CommonRepository
             );
 
         // Return only unique contacts
-        $q->groupBy('l.id');
+        $q->groupBy("$leadTablePrefix.id");
     }
 }

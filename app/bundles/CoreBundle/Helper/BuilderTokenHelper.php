@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Factory\MauticFactory;
 
@@ -27,6 +28,8 @@ class BuilderTokenHelper
 
     /**
      * @var MauticFactory
+     *
+     * @deprecated 2.12 To be removed in 3.0 Inject dependencies in your constructor instead
      */
     private $factory;
 

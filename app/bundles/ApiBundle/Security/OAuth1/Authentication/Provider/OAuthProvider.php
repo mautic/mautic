@@ -68,6 +68,7 @@ class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification
 
         throw new AuthenticationException($translator->trans('mautic.api.oauth.auth.failed'));
     }
+
     /**
      * {@inheritdoc}
      */

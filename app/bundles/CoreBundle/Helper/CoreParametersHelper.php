@@ -48,10 +48,15 @@ class CoreParametersHelper
         }
 
         if ($this->parameterBag->has('mautic.'.$name)) {
-            // Decode %%
-            $value = str_replace('%%', '%', $this->parameterBag->get('mautic.'.$name));
+            $value = $this->parameterBag->get('mautic.'.$name);
 
-            return $value;
+            // Do not convert null values to strings
+            if (null === $value) {
+                return $value;
+            }
+
+            // Decode %%
+            return str_replace('%%', '%', $this->parameterBag->get('mautic.'.$name));
         }
 
         // Last ditch effort in case we're getting non-mautic params

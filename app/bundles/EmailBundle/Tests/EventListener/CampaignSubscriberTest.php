@@ -14,53 +14,55 @@ namespace Mautic\EmailBundle\Test\EventListener;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
-use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
+use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\UserBundle\Entity\User;
 
 class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    public function testTransformToUserIdsWithDifferentOwnerId()
-    {
-        $subscriber = $this->initSubscriber();
-        $users      = $subscriber->transformToUserIds([4, 6], 5);
-        $expected   = [
-            ['id' => 4],
-            ['id' => 6],
-            ['id' => 5],
-        ];
-
-        $this->assertEquals($expected, $users);
-    }
-
-    public function testTransformToUserIdsWithSameOwnerId()
-    {
-        $subscriber = $this->initSubscriber();
-        $users      = $subscriber->transformToUserIds([4, 6], 4);
-        $expected   = [
-            ['id' => 4],
-            ['id' => 6],
-        ];
-
-        $this->assertEquals($expected, $users);
-    }
+    /** @var array */
+    private $config = [
+        'useremail' => [
+            'email' => 33,
+        ],
+        'user_id'  => [6, 7],
+        'to_owner' => true,
+        'to'       => 'hello@there.com, bob@bobek.cz',
+        'bcc'      => 'hidden@translation.in',
+    ];
 
     public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType()
     {
-        $subscriber = $this->initSubscriber();
-        $args       = [
+        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockEventModel = $this->getMockBuilder(EventModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockMessageQueueModel = $this->getMockBuilder(MessageQueueModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser);
+
+        $args = [
             'lead'  => 64,
             'event' => [
                 'type'       => 'email.send',
-                'properties' => [
-                    'useremail' => [
-                        'email' => 33,
-                    ],
-                ],
+                'properties' => $this->config,
             ],
             'eventDetails'    => [],
             'systemTriggered' => true,
@@ -72,108 +74,10 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($event->getResult());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithEmailNotFound()
-    {
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEmailModel->expects($this->once())
-            ->method('getEntity')
-            ->will($this->returnValue(null));
-
-        $mockEventModel = $this->getMockBuilder(EventModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockMessageQueueModel = $this->getMockBuilder(MessageQueueModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel);
-        $args       = [
-            'lead'  => 64,
-            'event' => [
-                'type'       => 'email.send.to.user',
-                'properties' => [
-                    'useremail' => [
-                        'email' => 33,
-                    ],
-                ],
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
-        $event    = new CampaignExecutionEvent($args, false);
-        $expected = [
-            'failed' => 1,
-            'reason' => 'Email not found or published',
-        ];
-
-        $subscriber->onCampaignTriggerActionSendEmailToUser($event);
-
-        $this->assertEquals($expected, $event->getResult());
-    }
-
-    public function testOnCampaignTriggerActionSendEmailToUserWithEmailUnpublished()
-    {
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $email = new Email();
-        $email->setIsPublished(false);
-
-        $mockEmailModel->expects($this->once())
-            ->method('getEntity')
-            ->will($this->returnValue($email));
-
-        $mockEventModel = $this->getMockBuilder(EventModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockMessageQueueModel = $this->getMockBuilder(MessageQueueModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel);
-
-        $args = [
-            'lead'  => 64,
-            'event' => [
-                'type'       => 'email.send.to.user',
-                'properties' => [
-                    'useremail' => [
-                        'email' => 33,
-                    ],
-                ],
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
-        $event    = new CampaignExecutionEvent($args, false);
-        $expected = [
-            'failed' => 1,
-            'reason' => 'Email not found or published',
-        ];
-
-        $subscriber->onCampaignTriggerActionSendEmailToUser($event);
-
-        $this->assertEquals($expected, $event->getResult());
-    }
-
     public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
     {
+        $lead = new Lead();
+
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -181,42 +85,6 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $mockEmailModel = $this->getMockBuilder(EmailModel::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $email = new Email();
-        $email->setIsPublished(true);
-
-        $mockEmailSendEvent = $this->getMockBuilder(EmailSendEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEmailSendEvent->expects($this->once())
-            ->method('getTokens')
-            ->will($this->returnValue([]));
-
-        $mockEmailModel->expects($this->once())
-            ->method('getEntity')
-            ->will($this->returnValue($email));
-
-        $mockEmailModel
-            ->expects($this->once())
-            ->method('sendEmailToUser')
-            ->will($this->returnCallback(function ($email, $users, $leadCredentials, $tokens, $assetAttachments, $saveStat, $to, $cc, $bcc) {
-                $expectedUsers = [
-                    ['id' => 6],
-                    ['id' => 7],
-                    ['id' => 10], // owner ID
-                ];
-                \PHPUnit_Framework_Assert::assertTrue($email instanceof Email);
-                \PHPUnit_Framework_Assert::assertEquals($expectedUsers, $users);
-                \PHPUnit_Framework_Assert::assertFalse($saveStat);
-                \PHPUnit_Framework_Assert::assertEquals(['hello@there.com', 'bob@bobek.cz'], $to);
-                \PHPUnit_Framework_Assert::assertEquals([], $cc);
-                \PHPUnit_Framework_Assert::assertEquals(['hidden@translation.in'], $bcc);
-            }));
-
-        $mockEmailModel->expects($this->once())
-            ->method('dispatchEmailSendEvent')
-            ->will($this->returnValue($mockEmailSendEvent));
 
         $mockEventModel = $this->getMockBuilder(EventModel::class)
             ->disableOriginalConstructor()
@@ -226,51 +94,39 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel);
-
-        $mockUser = $this->getMockBuilder(User::class)
+        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockUser->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue(10));
-
-        $lead = new Lead();
-        $lead->setOwner($mockUser);
+        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser);
 
         $args = [
             'lead'  => $lead,
             'event' => [
                 'type'       => 'email.send.to.user',
-                'properties' => [
-                    'useremail' => [
-                        'email' => 33,
-                    ],
-                    'user_id'  => [6, 7],
-                    'to_owner' => true,
-                    'to'       => 'hello@there.com, bob@bobek.cz',
-                    'bcc'      => 'hidden@translation.in',
-                ],
+                'properties' => $this->config,
             ],
             'eventDetails' => [
             ],
             'systemTriggered' => true,
             'eventSettings'   => [],
         ];
-        $event    = new CampaignExecutionEvent($args, false);
-        $expected = [
-            'failed' => 1,
-            'reason' => 'Email not found or published',
-        ];
+
+        $mockSendEmailToUser->expects($this->once())
+            ->method('sendEmailToUsers')
+            ->with($this->config, $lead);
+
+        $event = new CampaignExecutionEvent($args, false);
 
         $subscriber->onCampaignTriggerActionSendEmailToUser($event);
 
         $this->assertTrue($event->getResult());
     }
 
-    protected function initSubscriber()
+    public function testOnCampaignTriggerActionSendEmailToUserWithError()
     {
+        $lead = new Lead();
+
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -287,6 +143,38 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        return new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel);
+        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser);
+
+        $args = [
+            'lead'  => $lead,
+            'event' => [
+                'type'       => 'email.send.to.user',
+                'properties' => $this->config,
+            ],
+            'eventDetails' => [
+            ],
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ];
+
+        $mockSendEmailToUser->expects($this->once())
+            ->method('sendEmailToUsers')
+            ->with($this->config, $lead)
+            ->will($this->throwException(new EmailCouldNotBeSentException('Something happenned')));
+
+        $event = new CampaignExecutionEvent($args, false);
+
+        $subscriber->onCampaignTriggerActionSendEmailToUser($event);
+
+        $expected = [
+            'failed' => 1,
+            'reason' => 'Something happenned',
+        ];
+
+        $this->assertSame($expected, $event->getResult());
     }
 }

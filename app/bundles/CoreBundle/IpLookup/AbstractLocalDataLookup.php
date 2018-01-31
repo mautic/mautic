@@ -134,7 +134,12 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     protected function getDataDir()
     {
         if (null !== $this->cacheDir) {
+            if (!file_exists($this->cacheDir)) {
+                mkdir($this->cacheDir);
+            }
+
             $dataDir = $this->cacheDir.'/../ip_data';
+
             if (!file_exists($dataDir)) {
                 mkdir($dataDir);
             }

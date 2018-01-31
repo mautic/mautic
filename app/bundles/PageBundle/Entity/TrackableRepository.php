@@ -29,11 +29,12 @@ class TrackableRepository extends CommonRepository
      */
     public function findByChannel($channel, $channelId)
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $tableAlias = $this->getTableAlias();
 
-        return $q->select('r.redirect_id, r.url, r.hits, r.unique_hits')
+        return $q->select('r.redirect_id, r.url, '.$tableAlias.'.hits, '.$tableAlias.'.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'r')
-            ->innerJoin('r', MAUTIC_TABLE_PREFIX.'channel_url_trackables', $this->getTableAlias(),
+            ->innerJoin('r', MAUTIC_TABLE_PREFIX.'channel_url_trackables', $tableAlias,
                 $q->expr()->andX(
                     $q->expr()->eq('r.id', 't.redirect_id'),
                     $q->expr()->eq('t.channel', ':channel'),
@@ -145,12 +146,12 @@ class TrackableRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null)
+    public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null, $combined = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('count(ph.id) as click_count')
             ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut')
-            ->leftJoin('cut', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.redirect_id = cut.redirect_id');
+            ->innerJoin('cut', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.redirect_id = cut.redirect_id AND ph.source = cut.channel AND ph.source_id = cut.channel_id');
 
         $q->where(
             'cut.channel = :channel'
@@ -166,20 +167,32 @@ class TrackableRepository extends CommonRepository
         }
 
         if ($listId) {
-            $q->leftJoin('ph', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = ph.lead_id');
+            if (!$combined) {
+                $q->innerJoin('ph', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = ph.lead_id');
 
-            if (true === $listId) {
-                $q->addSelect('cs.leadlist_id')
-                    ->groupBy('cs.leadlist_id');
-            } elseif (is_array($listId)) {
-                $q->andWhere(
-                    $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
-                )
-                    ->addSelect('cs.leadlist_id')
-                    ->groupBy('cs.leadlist_id');
+                if (true === $listId) {
+                    $q->addSelect('cs.leadlist_id')
+                        ->groupBy('cs.leadlist_id');
+                } elseif (is_array($listId)) {
+                    $q->andWhere(
+                        $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
+                    );
+
+                    $q->addSelect('cs.leadlist_id')
+                        ->groupBy('cs.leadlist_id');
+                } else {
+                    $q->andWhere('cs.leadlist_id = :list_id')
+                        ->setParameter('list_id', $listId);
+                }
             } else {
-                $q->andWhere('cs.leadlist_id = :list_id')
-                    ->setParameter('list_id', $listId);
+                $subQ = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $subQ->select('distinct(list.lead_id)')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list')
+                    ->andWhere(
+                        $q->expr()->in('list.leadlist_id', array_map('intval', $listId))
+                    );
+
+                $q->innerJoin('ph', sprintf('(%s)', $subQ->getSQL()), 'cs', 'cs.lead_id = ph.lead_id');
             }
         }
 
@@ -189,7 +202,7 @@ class TrackableRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        if (true === $listId || is_array($listId)) {
+        if ((true === $listId || is_array($listId)) && !$combined) {
             // Return array of results
             $byList = [];
             foreach ($results as $result) {

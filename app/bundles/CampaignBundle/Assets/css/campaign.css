@@ -2,17 +2,11 @@
     width: 75px;
 }
 
-.btn-close-campaign-builder {
+
+.campaign-builder .btns-builder {
     position: fixed;
     top: 15px;
     right: 30px;
-    z-index: 1040;
-}
-
-.campaign-builder .btn-apply-builder {
-    position: fixed;
-    top: 15px;
-    right: 142px;
     z-index: 1040;
 }
 
@@ -113,7 +107,7 @@
     border-radius: 3px;
 }
 
-.list-campaign-event:hover, .list-campaign-source:hover {
+.live .list-campaign-event:hover, .live .list-campaign-source:hover {
     border:1px solid #123456;
     /*
     box-shadow: 2px 2px 19px #444;
@@ -214,4 +208,72 @@
 
 .stat-boxes .pie-legend li {
     display: inline;
+}
+
+.preview .builder-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.preview .builder-active {
+    width: 100%;
+    height: auto;
+    position: relative;
+}
+
+.preview .list-campaign-event, .preview  .list-campaign-source {
+    width: auto;
+    height: 45px;
+    position: absolute;
+    padding: 10px 15px;
+    z-index: 1010;
+    background: #FFFFFF;
+    border-radius: 3px;
+}
+
+.preview .list-campaign-event {
+    height: 54px;
+}
+
+.preview .list-campaign-source {
+    height: 45px;
+}
+
+.preview .jtk-endpoint {
+    cursor: default;
+}
+
+.preview .jtk-endpoint svg {
+    display: none;
+}
+
+.preview .list-campaign-event .campaign-event-name {
+    line-height: 14px;
+    overflow: visible;
+}
+
+#preview-container {
+    width: 100%;
+    height: 500px;
+    overflow: auto;
+}
+
+.campaign-event-logic {
+    text-transform: uppercase;
+    font-size: 10px;
+    line-height: 10px;
+}
+
+.list-campaign-decision .campaign-event-logic {
+    color: #00b49d;
+}
+
+.list-campaign-condition .campaign-event-logic {
+    color: #ffb79f;
+}
+
+.list-campaign-action .campaign-event-logic {
+    color: #9babeb;
 }

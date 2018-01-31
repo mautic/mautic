@@ -51,25 +51,5 @@
             <?php endforeach; ?>
         </div>
     </div>
-    <div class="panel panel-info">
-        <div class="panel-heading">
-            <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.import.properties'); ?></div>
-        </div>
-        <div class="panel-body">
-            <?php $rowCount = 2; ?>
-            <?php foreach ($form->children['properties'] as $child): ?>
-                <?php if ($rowCount++ % 3 == 1): ?>
-                    <div class="row">
-                <?php endif; ?>
-                <div class="col-sm-4">
-                    <?php echo $view['form']->row($child); ?>
-                </div>
-                <?php if ($rowCount++ % 3 == 1): ?>
-                    </div>
-                <?php endif; ?>
-                <?php ++$rowCount; ?>
-            <?php endforeach; ?>
-        </div>
-    </div>
     <?php echo $view['form']->end($form); ?>
 </div>

@@ -174,4 +174,43 @@ final class EmailEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.email.on_campaign_trigger_decision';
+
+    /**
+     * The mautic.email.on_campaign_trigger_condition event is dispatched when the campaign condition triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.email.on_campaign_trigger_condition';
+
+    /**
+     * The mautic.email_on_reply event is dispatched when an reply came to an email.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailOpenEvent instance.
+     *
+     * @var string
+     */
+    const EMAIL_ON_REPLY = 'mautic.email_on_reply';
+
+    /**
+     * The mautic.email.on_email_validation event is dispatched when an email is validated through the validator.
+     *
+     * The event listener receives a Mautic\EmailBundle\Event\EmailValidationEvent
+     *
+     * @var string
+     */
+    const ON_EMAIL_VALIDATION = 'mautic.email.on_email_validation';
+
+    /**
+     * The mautic.email.on_sent_email_to_user event is dispatched when email is sent to user.
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Events\TriggerExecutedEvent
+     *
+     * @var string
+     */
+    const ON_SENT_EMAIL_TO_USER = 'mautic.email.on_sent_email_to_user';
 }

@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -86,14 +87,7 @@ class ApiSubscriber extends CommonSubscriber
         $isApiRequest = $this->isApiRequest($event);
 
         if ($isApiRequest && !$apiEnabled) {
-            throw new AccessDeniedHttpException(
-                $this->translator->trans(
-                    'mautic.core.url.error.401',
-                    [
-                        '%url%' => $request->getRequestUri(),
-                    ]
-                )
-            );
+            throw new AccessDeniedHttpException($this->translator->trans('mautic.api.error.api.disabled'));
         }
     }
 
@@ -123,8 +117,17 @@ class ApiSubscriber extends CommonSubscriber
 
                     switch ($error) {
                         case 'access_denied':
-                            $message = $this->translator->trans('mautic.api.auth.error.accessdenied');
-                            $type    = $error;
+                            if ($this->isBasicAuth($event->getRequest())) {
+                                if ($this->coreParametersHelper->getParameter('api_enable_basic_auth')) {
+                                    $message = $this->translator->trans('mautic.api.error.basic.auth.invalid.credentials');
+                                } else {
+                                    $message = $this->translator->trans('mautic.api.error.basic.auth.disabled');
+                                }
+                            } else {
+                                $message = $this->translator->trans('mautic.api.auth.error.accessdenied');
+                            }
+
+                            $type = $error;
                             break;
                         default:
                             if (isset($data['error_description'])) {
@@ -156,6 +159,15 @@ class ApiSubscriber extends CommonSubscriber
                     }
                 }
             }
+        }
+    }
+
+    public function isBasicAuth(Request $request)
+    {
+        try {
+            return strpos(strtolower($request->headers->get('Authorization')), 'basic') === 0;
+        } catch (\Exception $e) {
+            return false;
         }
     }
 

@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
 $wrap = true;
 $view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_TOOLBAR_ACTIONS, ButtonHelper::TYPE_GROUP);

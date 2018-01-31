@@ -17,12 +17,16 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
+use Mautic\EmailBundle\Event\EmailReplyEvent;
+use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
+use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Entity\Hit;
 
 /**
  * Class CampaignSubscriber.
@@ -50,23 +54,29 @@ class CampaignSubscriber extends CommonSubscriber
     protected $campaignEventModel;
 
     /**
-     * CampaignSubscriber constructor.
-     *
+     * @var SendEmailToUser
+     */
+    private $sendEmailToUser;
+
+    /**
      * @param LeadModel         $leadModel
      * @param EmailModel        $emailModel
      * @param EventModel        $eventModel
      * @param MessageQueueModel $messageQueueModel
+     * @param SendEmailToUser   $sendEmailToUser
      */
     public function __construct(
         LeadModel $leadModel,
         EmailModel $emailModel,
         EventModel $eventModel,
-        MessageQueueModel $messageQueueModel
+        MessageQueueModel $messageQueueModel,
+        SendEmailToUser $sendEmailToUser
     ) {
         $this->leadModel          = $leadModel;
         $this->emailModel         = $emailModel;
         $this->campaignEventModel = $eventModel;
         $this->messageQueueModel  = $messageQueueModel;
+        $this->sendEmailToUser    = $sendEmailToUser;
     }
 
     /**
@@ -82,6 +92,7 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionSendEmailToUser', 1],
             ],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
+            EmailEvents::EMAIL_ON_REPLY               => ['onEmailReply', 0],
         ];
     }
 
@@ -137,6 +148,22 @@ class CampaignSubscriber extends CommonSubscriber
             ]
         );
 
+        $event->addDecision(
+                'email.reply',
+                [
+                    'label'                  => 'mautic.email.campaign.event.reply',
+                    'description'            => 'mautic.email.campaign.event.reply_descr',
+                    'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                    'connectionRestrictions' => [
+                        'source' => [
+                            'action' => [
+                                'email.send',
+                            ],
+                        ],
+                    ],
+                ]
+            );
+
         $event->addAction(
             'email.send.to.user',
             [
@@ -167,28 +194,43 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
+     * Trigger campaign event for reply to an email.
+     *
+     * @param EmailReplyEvent $event
+     */
+    public function onEmailReply(EmailReplyEvent $event)
+    {
+        $email = $event->getEmail();
+        if ($email !== null) {
+            $this->campaignEventModel->triggerEvent('email.reply', $email, 'email', $email->getId());
+        }
+    }
+
+    /**
      * @param CampaignExecutionEvent $event
      */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
+        /** @var Email $eventDetails */
         $eventDetails = $event->getEventDetails();
         $eventParent  = $event->getEvent()['parent'];
         $eventConfig  = $event->getConfig();
+
         if ($eventDetails == null) {
             return $event->setResult(false);
         }
+
         //check to see if the parent event is a "send email" event and that it matches the current email opened or clicked
         if (!empty($eventParent) && $eventParent['type'] === 'email.send') {
             // click decision
             if ($event->checkContext('email.click')) {
+                /** @var Hit $hit */
                 $hit = $eventDetails;
                 if ($eventDetails->getEmail()->getId() == (int) $eventParent['properties']['email']) {
                     if (!empty($eventConfig['urls']['list'])) {
-                        $limitToUrl = $eventConfig['urls']['list'];
-                        foreach ($limitToUrl as $url) {
-                            if (preg_match('/'.$url.'/i', $hit->getUrl())) {
-                                return $event->setResult(true);
-                            }
+                        $limitToUrls = (array) $eventConfig['urls']['list'];
+                        if (UrlMatcher::hasMatch($limitToUrls, $hit->getUrl())) {
+                            return $event->setResult(true);
                         }
                     } else {
                         return $event->setResult(true);
@@ -198,6 +240,9 @@ class CampaignSubscriber extends CommonSubscriber
                 return $event->setResult(false);
             } elseif ($event->checkContext('email.open')) {
                 // open decision
+                return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
+            } elseif ($event->checkContext('email.reply')) {
+                // reply decision
                 return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
             }
         }
@@ -289,60 +334,16 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $config  = $event->getConfig();
-        $emailId = (int) $config['useremail']['email'];
-        $email   = $this->emailModel->getEntity($emailId);
+        $config = $event->getConfig();
+        $lead   = $event->getLead();
 
-        if (!$email || !$email->isPublished()) {
-            $event->setFailed('Email not found or published');
-
-            return;
+        try {
+            $this->sendEmailToUser->sendEmailToUsers($config, $lead);
+            $event->setResult(true);
+        } catch (EmailCouldNotBeSentException $e) {
+            $event->setFailed($e->getMessage());
         }
 
-        $transformer     = new ArrayStringTransformer();
-        $leadCredentials = $event->getLeadFields();
-        $toOwner         = empty($config['to_owner']) ? false : $config['to_owner'];
-        $ownerId         = empty($leadCredentials['owner_id']) ? null : $leadCredentials['owner_id'];
-        $userIds         = empty($config['user_id']) ? [] : $config['user_id'];
-        $to              = empty($config['to']) ? [] : $transformer->reverseTransform($config['to']);
-        $cc              = empty($config['cc']) ? [] : $transformer->reverseTransform($config['cc']);
-        $bcc             = empty($config['bcc']) ? [] : $transformer->reverseTransform($config['bcc']);
-        $users           = $this->transformToUserIds($userIds, $ownerId);
-        $idHash          = 'xxxxxxxxxxxxxx'; // bogus ID since it goes to users, not contacts
-        $tokens          = $this->emailModel->dispatchEmailSendEvent($email, $leadCredentials, $idHash)->getTokens();
-        $errors          = $this->emailModel->sendEmailToUser($email, $users, $leadCredentials, $tokens, [], false, $to, $cc, $bcc);
-
-        if ($errors) {
-            $event->setFailed(implode(', ', $errors));
-        }
-
-        return $event->setResult(empty($errors));
-    }
-
-    /**
-     * Transform user IDs and owner ID in format we get them from the campaign
-     * event form to the format the sendEmailToUser expects it.
-     * The owner ID will be added only if it's not already present in the user IDs array.
-     *
-     * @param array $userIds
-     * @param int   $ownerId
-     *
-     * @return array
-     */
-    public function transformToUserIds(array $userIds, $ownerId)
-    {
-        $users = [];
-
-        if ($userIds) {
-            foreach ($userIds as $userId) {
-                $users[] = ['id' => $userId];
-            }
-        }
-
-        if ($ownerId && !in_array($ownerId, $userIds)) {
-            $users[] = ['id' => $ownerId];
-        }
-
-        return $users;
+        return $event;
     }
 }
