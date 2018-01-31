@@ -268,6 +268,25 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * Return a list of global and non global lists.
+     *
+     * @return array
+     */
+    public function getGlobalAndNonGlobalLists()
+    {
+        $q = $this->getEntityManager()->createQueryBuilder()
+            ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+
+        $q->select('partial l.{id, name, alias}')
+            ->where($q->expr()->eq('l.isPublished', 'true'))
+            ->orderBy('l.name');
+
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
+    }
+
+    /**
      * Get a count of leads that belong to the list.
      *
      * @param $listIds

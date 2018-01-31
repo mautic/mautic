@@ -40,7 +40,12 @@ class LeadListType extends AbstractType
         $model = $this->model;
         $resolver->setDefaults([
             'choices' => function (Options $options) use ($model) {
-                $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
+                $globalParameter = $options['global_only'];
+                if ($globalParameter == true) {
+                    $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
+                } else {
+                    $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalAndNonGlobalLists();
+                }
 
                 $choices = [];
                 foreach ($lists as $l) {

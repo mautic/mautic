@@ -753,6 +753,18 @@ class ListModel extends FormModel
     }
 
     /**
+     * Get a list of global and non global lead lists.
+     *
+     * @return mixed
+     */
+    public function getGlobalAndNonGlobalLists()
+    {
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getGlobalAndNonGlobalLists();
+
+        return $lists;
+    }
+
+    /**
      * Rebuild lead lists.
      *
      * @param LeadList        $entity
