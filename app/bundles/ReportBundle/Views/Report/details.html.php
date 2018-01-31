@@ -176,4 +176,4 @@ if ($tmpl == 'index') {
 </div>
 <?php endif; ?>
 <!--/ end: box layout -->
-<input type="hidden" name="entityId" id="entityId" value="<?php echo $report->getId(); ?>"/>
+<input type="hidden" name="entityId" id="entityId" value="<?php echo $view->escape($report->getId()); ?>"/>

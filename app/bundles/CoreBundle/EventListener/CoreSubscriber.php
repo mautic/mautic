@@ -456,8 +456,8 @@ class CoreSubscriber extends CommonSubscriber
                 $defaults['objectId'] = 0;
             }
             if (!isset($requirements['objectId'])) {
-                // Only allow alphanumeric for objectId
-                $requirements['objectId'] = '[a-zA-Z0-9_]+';
+                // Only allow alphanumeric and _- for objectId
+                $requirements['objectId'] = '[a-zA-Z0-9_-]+';
             }
         }
         if ($type == 'api') {

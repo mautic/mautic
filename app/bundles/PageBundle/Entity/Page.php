@@ -200,7 +200,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder->createField('redirectUrl', 'string')
             ->columnName('redirect_url')
             ->nullable()
-            ->length(100)
+            ->length(2048)
             ->build();
 
         $builder->addCategory();

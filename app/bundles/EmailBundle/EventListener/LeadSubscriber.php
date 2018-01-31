@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\Entity\EmailReplyRepositoryInterface;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -21,6 +22,19 @@ use Mautic\LeadBundle\LeadEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
+    /** @var EmailReplyRepositoryInterface */
+    private $emailReplyRepository;
+
+    /**
+     * LeadSubscriber constructor.
+     *
+     * @param EmailReplyRepositoryInterface $emailReplyRepository
+     */
+    public function __construct(EmailReplyRepositoryInterface $emailReplyRepository)
+    {
+        $this->emailReplyRepository = $emailReplyRepository;
+    }
+
     /**
      * @return array
      */
@@ -42,6 +56,7 @@ class LeadSubscriber extends CommonSubscriber
         $this->addEmailEvents($event, 'read');
         $this->addEmailEvents($event, 'sent');
         $this->addEmailEvents($event, 'failed');
+        $this->addEmailReplies($event);
     }
 
     /**
@@ -124,6 +139,44 @@ class LeadSubscriber extends CommonSubscriber
                         'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => ($state == 'read') ? 'fa-envelope-o' : 'fa-envelope',
                         'contactId'       => $contactId,
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
+     * @param LeadTimelineEvent $event
+     */
+    protected function addEmailReplies(LeadTimelineEvent $event)
+    {
+        $eventTypeKey  = 'email.replied';
+        $eventTypeName = $this->translator->trans('mautic.email.replied');
+        $event->addSerializerGroup('emailList');
+        $event->addEventType($eventTypeKey, $eventTypeName);
+        $options          = $event->getQueryOptions();
+        $replies          = $this->emailReplyRepository->getByLeadIdForTimeline($event->getLeadId(), $options);
+        if (!$event->isEngagementCount()) {
+            foreach ($replies['results'] as $reply) {
+                $label = $this->translator->trans('mautic.email.timeline.event.email_reply');
+                if (!empty($reply['email_name'])) {
+                    $label .= ': '.$reply['email_name'];
+                } elseif (!empty($reply['storedSubject'])) {
+                    $label .= ': '.$reply['storedSubject'];
+                }
+
+                $contactId = $reply['lead_id'];
+                unset($reply['lead_id']);
+
+                $event->addEvent(
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$reply['id'],
+                        'eventLabel' => $label,
+                        'eventType'  => $eventTypeName,
+                        'timestamp'  => $reply['date_replied'],
+                        'icon'       => 'fa-envelope',
+                        'contactId'  => $contactId,
                     ]
                 );
             }

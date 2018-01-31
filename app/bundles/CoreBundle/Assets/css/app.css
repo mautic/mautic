@@ -4311,7 +4311,7 @@ lesshat-selector { -lh-property: 0 ;
   position: fixed;
   left: 0;
   top: 0;
-  right: 70%;
+  width: 70%;
   height: 100%;
 }
 .code-mode .builder-panel {
@@ -4399,6 +4399,7 @@ li.CodeMirror-hint-active {
   }
   .builder .builder-content {
     right: 0;
+    width: 100%;
   }
   .builder .builder-panel-top {
     position: relative;

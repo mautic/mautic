@@ -11,6 +11,7 @@
 
 namespace Mautic\PluginBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -35,7 +36,7 @@ class IntegrationEntityRepository extends CommonRepository
         $integration,
         $integrationEntity,
         $internalEntity,
-        $internalEntityId = null,
+        $internalEntityIds = null,
         $startDate = null,
         $endDate = null,
         $push = false,
@@ -62,28 +63,42 @@ class IntegrationEntityRepository extends CommonRepository
                 ->setParameter('startDate', $startDate);
         }
 
-        if ($internalEntityId) {
-            $q->andWhere('i.internal_entity_id = :internalEntityId')
-                ->setParameter('internalEntityId', $internalEntityId);
+        if ($internalEntityIds) {
+            if (is_array($internalEntityIds)) {
+                $q->andWhere('i.internal_entity_id in (:internalEntityIds)')
+                    ->setParameter('internalEntityIds', $internalEntityIds, Connection::PARAM_STR_ARRAY);
+            } else {
+                $q->andWhere('i.internal_entity_id = :internalEntityId')
+                    ->setParameter('internalEntityId', $internalEntityIds);
+            }
         }
 
         if ($startDate and !$push) {
             $q->andWhere('i.last_sync_date >= :startDate')
                 ->setParameter('startDate', $startDate);
         }
+
         if ($endDate and !$push) {
             $q->andWhere('i.last_sync_date <= :endDate')
                 ->setParameter('endDate', $endDate);
         }
 
+        if ($integrationEntityIds) {
+            if (is_array($integrationEntityIds)) {
+                $q->andWhere('i.integration_entity_id in (:integrationEntityIds)')
+                    ->setParameter('integrationEntityIds', $integrationEntityIds, Connection::PARAM_STR_ARRAY);
+            } else {
+                $q->andWhere('i.integration_entity_id = :integrationEntityId')
+                    ->setParameter('integrationEntityId', $integrationEntityIds);
+            }
+        }
+
         if ($start) {
             $q->setFirstResult((int) $start);
         }
+
         if ($limit) {
             $q->setMaxResults((int) $limit);
-        }
-        if ($integrationEntityIds) {
-            $q->andWhere('i.integration_entity_id in ('.$integrationEntityIds.')');
         }
 
         $results = $q->execute()->fetchAll();
