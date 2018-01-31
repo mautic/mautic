@@ -104,15 +104,18 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
             );
 
             // do not contact restriction, those who are do no to contact are not considered for exclusion
-            $dncAlias = $this->generateRandomParameterName();
+            $dncAlias         = $this->generateRandomParameterName();
+            $channelParameter = $this->generateRandomParameterName();
 
             $queryBuilder->leftJoin($leftAlias, MAUTIC_TABLE_PREFIX.'lead_donotcontact', $dncAlias, $dncAlias.'.lead_id = '.$leftAlias.'.lead_id');
 
             $expression = $queryBuilder->expr()->andX(
                 $queryBuilder->expr()->eq($dncAlias.'.reason', 1),
                 $queryBuilder->expr()
-                             ->eq($dncAlias.'.channel', 'email')    //@todo  I really need to verify that this is the value to use, where is the email coming from?
+                             ->eq($dncAlias.'.channel', ':'.$channelParameter)    //@todo  I really need to verify that this is the value to use, where is the email coming from?
             );
+
+            $queryBuilder->setParameter($channelParameter, 'email');
 
             $queryBuilder->addJoinCondition($dncAlias, $expression);
 
