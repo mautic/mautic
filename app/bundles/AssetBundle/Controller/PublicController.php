@@ -93,6 +93,10 @@ class PublicController extends CommonFormController
                 $response = new Response();
                 $response->headers->set('Content-Type', $entity->getFileMimeType());
 
+                if ($entity->getDisallow()) {
+                    $response->headers->set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+                }
+
                 $stream = $this->request->get('stream', 0);
                 if (!$stream) {
                     $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());

@@ -11,6 +11,7 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildRobotsTxtEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -20,6 +21,21 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
  */
 class RobotsTxtSubscriber extends CommonSubscriber
 {
+    /**
+     * @var AssetModel
+     */
+    protected $assetModel;
+
+    /**
+     * RobotsTxtSubscriber constructor.
+     *
+     * @param AssetModel $assetModel
+     */
+    public function __construct(AssetModel $assetModel)
+    {
+        $this->assetModel = $assetModel;
+    }
+
     /**
      * @return array
      */
@@ -36,6 +52,7 @@ class RobotsTxtSubscriber extends CommonSubscriber
     public function onRobotsTxtBuild(BuildRobotsTxtEvent $event)
     {
         $content = '';
+        $assets  = $this->assetModel->getAssetList(999, null, null, [], ['onlyDissalow' => 1]);
         $event->appendContent($content);
     }
 }
