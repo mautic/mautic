@@ -35,7 +35,6 @@ $view['slots']->set('mauticContent', 'asset');
 						<?php echo $view['form']->row($form['storageLocation']); ?>
 						<?php echo $view['form']->row($form['disallow']); ?>
 					</div>
-
 			        <div class="col-md-5 text-left mt-lg<?php if ($startOnLocal) {
     echo ' hide';
 } ?>" id="remote-button">
