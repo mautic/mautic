@@ -107,6 +107,15 @@ final class CoreEvents
     const BUILD_MAUTIC_JS = 'mautic.build_embeddable_js';
 
     /**
+     * The mautic.build_embeddable_robots_txt event is dispatched to allow plugins to extend the mautic robots.txt.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\BuildJsEvent instance.
+     *
+     * @var string
+     */
+    const BUILD_MAUTIC_ROBOTS_TXT = 'mautic.build_embeddable_robots_txt';
+
+    /**
      * The mautic.maintenance_cleanup_data event is dispatched to purge old data.
      *
      * The event listener receives a Mautic\CoreBundle\Event\MaintenanceEvent instance.
