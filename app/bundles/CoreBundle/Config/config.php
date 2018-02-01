@@ -49,10 +49,6 @@ return [
                 'path'       => '/mtc.js',
                 'controller' => 'MauticCoreBundle:Js:index',
             ],
-            'mautic_robots_txt' => [
-                'path'       => '/robots.txt',
-                'controller' => 'MauticCoreBundle:RobotsTxt:index',
-            ],
             'mautic_base_index' => [
                 'path'       => '/',
                 'controller' => 'MauticCoreBundle:Default:index',
