@@ -60,7 +60,7 @@ trait TimelineTrait
             $query->andWhere($query->expr()->gte($timestampColumn, ':dateFrom'))
                 ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'));
         } elseif (!empty($options['toDate'])) {
-            $query->andWhere($query->expr()->lte('fs.date_submitted', ':dateTo'))
+            $query->andWhere($query->expr()->lte($timestampColumn, ':dateTo'))
                 ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
         }
 
