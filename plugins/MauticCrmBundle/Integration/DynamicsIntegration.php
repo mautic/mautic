@@ -413,7 +413,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts')
     {
-        if ('Contact' === $object) {
+        if ('Contacts' === $object) {
             $object = 'contacts';
         }
         $executed    = 0;
@@ -426,7 +426,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $aFields          = $this->getAvailableLeadFields($config);
                 $mappedData       = [];
                 foreach (array_keys($fields) as $k) {
-                    if (isset($aFields[$object][$k])) {
+                    if (isset($aFields[$object][$k]['dv'])) {
                         $mappedData[] = $aFields[$object][$k]['dv'];
                     }
                 }
