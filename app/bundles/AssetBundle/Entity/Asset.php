@@ -158,11 +158,6 @@ class Asset extends FormEntity
     private $downloadUrl;
 
     /**
-     * @var bool
-     */
-    private $disallow;
-
-    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -225,8 +220,6 @@ class Asset extends FormEntity
         $builder->createField('size', 'integer')
             ->nullable()
             ->build();
-
-        $builder->createField('disallow', 'boolean')->build();
     }
 
     /**
@@ -259,7 +252,6 @@ class Asset extends FormEntity
                     'size',
                     'downloadUrl',
                     'storageLocation',
-                    'disallow',
                 ]
             )
             ->build();
@@ -1446,21 +1438,5 @@ class Asset extends FormEntity
     public function isRemote()
     {
         return $this->storageLocation === 'remote';
-    }
-
-    /**
-     * @return bool
-     */
-    public function getDisallow()
-    {
-        return $this->disallow;
-    }
-
-    /**
-     * @param mixed $disallow
-     */
-    public function setDisallow($disallow)
-    {
-        $this->disallow = $disallow;
     }
 }

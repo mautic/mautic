@@ -139,12 +139,6 @@ return [
                     'mautic.asset.model.asset',
                 ],
             ],
-            'mautic.asset.robots.txt.subscriber' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\RobotsTxtSubscriber',
-                'arguments' => [
-                    'mautic.asset.model.asset',
-                ],
-            ],
         ],
         'forms' => [
             'mautic.form.type.asset' => [
