@@ -127,16 +127,7 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     // Blur and focus the focussed inputs to fix the browser autocomplete bug on scroll
     builderPanel.on('scroll', function(e) {
-        // If Froala popup window open
-        if(mQuery.find('.fr-popup:visible').length){
-            if(!Mautic.isInViewport(builderPanel.find('.fr-view:visible'))) {
-                builderPanel.find('.fr-view:visible').blur();
-                builderPanel.find('input:focus').blur();
-            }
-        }else{
-            builderPanel.find('input:focus').blur();
-
-        }
+        builderPanel.find('input:focus').blur();
     });
 
     var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
@@ -150,16 +141,6 @@ Mautic.launchBuilder = function (formName, actionName) {
     themeHtml = themeHtml.replace('</head>', assets+'</head>');
 
     Mautic.initBuilderIframe(themeHtml, btnCloseBuilder, applyBtn);
-};
-
-Mautic.isInViewport = function(el) {
-    var elementTop = mQuery(el).offset().top;
-    var elementBottom = elementTop + mQuery(el).outerHeight();
-
-    var viewportTop = mQuery(window).scrollTop();
-    var viewportBottom = viewportTop + mQuery(window).height();
-
-    return elementBottom > viewportTop && elementTop < viewportBottom;
 };
 
 /**
@@ -554,7 +535,8 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
     // Remove the slot focus highlight
     htmlContent.find('[data-slot-focus], [data-section-focus]').remove();
 
-    var customHtml = Mautic.domToString(htmlContent);
+    // Reokace url("${URL}") with url('${URL}')
+    var customHtml = Mautic.domToString(htmlContent).replace(/url\(&quot;(.+)&quot;\)/, 'url(\'$1\')');
 
     // Convert dynamic slot definitions into tokens
     return Mautic.convertDynamicContentSlotsToTokens(customHtml);
@@ -743,6 +725,23 @@ Mautic.initSectionListeners = function() {
                 sectionForm.find('#builder_section_wrapper-background-color').val(Mautic.rgb2hex(sectionWrapper.css('backgroundColor')));
             }
 
+            // Prefill The Backgrounf Image
+            if (bgImage = section.css('background-image')) {
+              sectionForm.find('#builder_section_content-background-image').val(bgImage.replace(/url\((?:'|")(.+)(?:'|")\)/g, '$1'))
+            }
+
+            // Prefill The Background Size
+            if (bgSize= section.css('background-size')) {
+              bgSize = bgSize.split(' ')
+              sectionForm.find('#builder_section_content-background-size-width').val(bgSize[0] || 'auto')
+              sectionForm.find('#builder_section_content-background-size-height').val(bgSize[1]||'auto')
+            }
+
+            // Prefill The Background Repeat
+            if(bgRepeat = section.css('background-repeat')) {
+              sectionForm.find('#builder_section_content-background-repeat').val(bgRepeat);
+            }
+
             // Initialize the color picker
             sectionFormContainer.find('input[data-toggle="color"]').each(function() {
                 parent.Mautic.activateColorPicker(this);
@@ -751,10 +750,37 @@ Mautic.initSectionListeners = function() {
             // Handle color change events
             sectionForm.on('keyup paste change touchmove', function(e) {
                 var field = mQuery(e.target);
-                if (section.length && field.attr('id') === 'builder_section_content-background-color') {
-                    Mautic.sectionBackgroundChanged(section, field.val());
-                } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
-                    Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+                switch (field.attr('id')) {
+                    case 'builder_section_content-background-color':
+                        Mautic.sectionBackgroundChanged(section, field.val());
+                        break;
+                    case 'builder_section_wrapper-background-color':
+                        Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+                        break;
+                    case 'builder_section_content-background-image':
+                        if (field.val().match(/url\(.+\)/g)) {
+                            section.css('background-image', field.val());
+                            return
+                        }
+                        section.css('background-image', "url(" + field.val() + ")");
+                        break;
+                    case 'builder_section_content-background-repeat':
+                        section.css('background-repeat', field.val());
+                        break;
+                    case 'builder_section_content-background-size-height':
+                        Mautic.sectionBackgroundSize(
+                            section,
+                            window.parent.document.getElementById('builder_section_content-background-size-width').value,
+                            field.val()
+                        );
+                        break;
+                    case 'builder_section_content-background-size-width':
+                        Mautic.sectionBackgroundSize(
+                            section,
+                            field.val(),
+                            window.parent.document.getElementById('builder_section_content-background-size-height').value
+                        );
+                        break;
                 }
             });
 
@@ -881,6 +907,19 @@ Mautic.sectionBackgroundChanged = function(element, color) {
         }
     });
 };
+
+Mautic.sectionBackgroundSize = function (element, width, height) {
+
+  if (!width && !height) {
+    element.css('background-size', '');
+  }
+
+  if (!width) { width = 'auto'; }
+  if (!height) { height = 'auto'; }
+
+  element.css('background-size', [width, height].join(' '));
+}
+
 
 Mautic.rgb2hex = function(orig) {
     var rgb = orig.replace(/\s/g,'').match(/^rgba?\((\d+),(\d+),(\d+)/i);
