@@ -99,7 +99,7 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
             $leftAlias = $this->generateRandomParameterName();
             $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $leftAlias,
                                     $queryBuilder->expr()->andX(
-                                        $queryBuilder->expr()->in('l.id', $leftIds),
+                                        $queryBuilder->expr()->in($leftAlias.'.leadlist_id', $leftIds),
                                         $queryBuilder->expr()->eq('l.id', $leftAlias.'.lead_id'))
             );
 
