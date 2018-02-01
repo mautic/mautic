@@ -226,7 +226,9 @@ class Asset extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->createField('disallow', 'boolean')->build();
+        $builder->createField('disallow', 'boolean')
+            ->nullable()
+            ->build();
     }
 
     /**
