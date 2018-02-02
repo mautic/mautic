@@ -120,7 +120,6 @@ class ReportSubscriber extends CommonSubscriber
             [
                 'display_name' => 'mautic.message.queue',
                 'columns'      => $columns,
-                'filters'      => $companyColumns,
             ]
         );
     }

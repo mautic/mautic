@@ -40,7 +40,7 @@ class Version20160719000000 extends AbstractMauticMigration
     {
         $leadIdx = $this->generatePropertyName('lead_devices', 'idx', ['lead_id']);
         $sql     = <<<SQL
-CREATE TABLE {$this->prefix}lead_devices (
+CREATE TABLE IF NOT EXISTS {$this->prefix}lead_devices (
 `id` int (11) NOT NULL AUTO_INCREMENT,
 `lead_id` int (11) NOT NULL,
 `client_info` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)',
@@ -83,7 +83,7 @@ SQL;
         $statIdx   = $this->generatePropertyName('email_stats_devices', 'idx', ['stat_id']);
 
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}email_stats_devices (
+CREATE TABLE IF NOT EXISTS {$this->prefix}email_stats_devices (
 `id` int (11) NOT NULL AUTO_INCREMENT,
 `ip_id` int( 11) DEFAULT NULL,
 `device_id` int (11) DEFAULT NULL,

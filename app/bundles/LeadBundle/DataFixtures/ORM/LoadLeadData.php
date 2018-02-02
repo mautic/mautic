@@ -59,7 +59,11 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
             $this->setReference('ipAddress-'.$key, $ipAddress);
             unset($l['ip']);
             $lead->addIpAddress($ipAddress);
-            $lead->setOwner($this->getReference('sales-user'));
+
+            if ($this->hasReference('sales-user')) {
+                $lead->setOwner($this->getReference('sales-user'));
+            }
+
             foreach ($l as $col => $val) {
                 $lead->addUpdatedField($col, $val);
             }
@@ -71,11 +75,13 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
             // Assign to companies in a predictable way
             $lastCharacter = (int) substr($count, -1, 1);
             if ($lastCharacter <= 3) {
-                $companyLead = new CompanyLead();
-                $companyLead->setLead($lead);
-                $companyLead->setCompany($this->getReference('company-'.$lastCharacter));
-                $companyLead->setDateAdded($today);
-                $companyLeadRepo->saveEntity($companyLead);
+                if ($this->hasReference('company-'.$lastCharacter)) {
+                    $companyLead = new CompanyLead();
+                    $companyLead->setLead($lead);
+                    $companyLead->setCompany($this->getReference('company-'.$lastCharacter));
+                    $companyLead->setDateAdded($today);
+                    $companyLeadRepo->saveEntity($companyLead);
+                }
             }
         }
     }
