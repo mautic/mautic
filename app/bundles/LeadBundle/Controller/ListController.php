@@ -562,7 +562,7 @@ class ListController extends FormController
         $listModel = $this->get('mautic.lead.model.list');
 
         $list      = $listModel->getEntity($objectId);
-        //$processed = $listModel->updateLeadList($list);
+        $processed = $listModel->updateLeadList($list);
 
         /** @var \Mautic\LeadBundle\Model\ListModel $model */
         $model    = $this->getModel('lead.list');
