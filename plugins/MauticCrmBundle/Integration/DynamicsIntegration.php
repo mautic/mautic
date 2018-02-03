@@ -450,7 +450,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $aFields          = $this->getAvailableLeadFields($config);
                 $mappedData       = [];
                 foreach (array_keys($fields) as $k) {
-                    if (isset($aFields[$object][$k])) {
+                    if (isset($aFields[$object][$k]['dv'])) {
                         $mappedData[] = $aFields[$object][$k]['dv'];
                     }
                 }
@@ -807,7 +807,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $fieldsToUpdate['contacts'] = array_values(array_intersect(array_keys($availableFields['contacts']), $fieldsToUpdateInCrm));
         $fieldsToUpdate['leads']    = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['leads']));
         $fieldsToUpdate['contacts'] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['contacts']));
-
+        
         $progress      = false;
         $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, false, $params['start'], $params['end'], ['contacts', 'leads']));
         $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, false, $params['start'], $params['end']);
