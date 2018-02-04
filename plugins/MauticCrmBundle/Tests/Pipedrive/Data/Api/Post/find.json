@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "Test Tester",
+      "email": "test@test.com",
+      "phone": null,
+      "org_id": null,
+      "org_name": "",
+      "visible_to": "3"
+    }
+  ],
+  "additional_data": {
+    "search_method": "search_by_email",
+    "pagination": {
+      "start": 0,
+      "limit": 100,
+      "more_items_in_collection": false
+    }
+  }
+}
