@@ -3,8 +3,8 @@
   "data": [
     {
       "id": 1,
-      "name": "Test Tester",
-      "email": "test@test.com",
+      "name": "Test User",
+      "email": "test@pipedrivemail.com",
       "phone": null,
       "org_id": null,
       "org_name": "",
