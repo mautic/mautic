@@ -21,6 +21,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -94,6 +95,24 @@ class DynamicsIntegration extends CrmAbstractIntegration
             ]
         );
         if ($formArea === 'features') {
+           /* $builder->add(
+                'objects2',
+                'button_group',
+                [
+                    'choices' => [
+                        'leads'    => 'mautic.dynamics.object.lead',
+                        'contacts' => 'mautic.dynamics.object.contact',
+                        'company'  => 'mautic.dynamics.object.company',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => false,
+                    'label'       => 'mautic.dynamics.form.objects_to_pull_from',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );*/
+
             $builder->add(
                 'objects',
                 'choice',
@@ -807,7 +826,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $fieldsToUpdate['contacts'] = array_values(array_intersect(array_keys($availableFields['contacts']), $fieldsToUpdateInCrm));
         $fieldsToUpdate['leads']    = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['leads']));
         $fieldsToUpdate['contacts'] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['contacts']));
-        
+
         $progress      = false;
         $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, false, $params['start'], $params['end'], ['contacts', 'leads']));
         $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, false, $params['start'], $params['end']);
