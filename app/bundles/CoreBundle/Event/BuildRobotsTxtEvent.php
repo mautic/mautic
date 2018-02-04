@@ -47,6 +47,14 @@ class BuildRobotsTxtEvent extends Event
     }
 
     /**
+     * @param string $content
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
+
+    /**
      * Append Content.
      *
      * @param string $content
