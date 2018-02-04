@@ -95,23 +95,42 @@ class DynamicsIntegration extends CrmAbstractIntegration
             ]
         );
         if ($formArea === 'features') {
-           /* $builder->add(
+
+            $builder->add(
                 'objects2',
                 'button_group',
                 [
                     'choices' => [
                         'leads'    => 'mautic.dynamics.object.lead',
                         'contacts' => 'mautic.dynamics.object.contact',
-                        'company'  => 'mautic.dynamics.object.company',
                     ],
                     'expanded'    => true,
                     'multiple'    => false,
-                    'label'       => 'mautic.dynamics.form.objects_to_pull_from',
+                    'label'       => 'mautic.dynamics.form.objects_to_push_from',
                     'label_attr'  => ['class' => 'control-label'],
                     'empty_value' => false,
                     'required'    => false,
                 ]
-            );*/
+            );
+
+            $builder->add(
+                'objects3',
+                'button_group',
+                [
+                    'choices' => [
+                        'selected'    => 'mautic.dynamics.form.objects_to_push_merge.just.from',
+                        'both' => 'mautic.dynamics.form.objects_to_push_merge.both',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => false,
+                    'label'       => 'mautic.dynamics.form.objects_to_push_merge',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );
+
+
 
             $builder->add(
                 'objects',
