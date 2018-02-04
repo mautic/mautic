@@ -3,8 +3,14 @@
   "data": [
     {
       "id": 99,
-      "name": "Test User",
-      "email": "test@test.com",
+      "name": "New Test User",
+      "email": [
+        {
+          "label": "",
+          "value": "user@test.com",
+          "primary": true
+        }
+      ],
       "phone": null,
       "org_id": null,
       "org_name": "",
