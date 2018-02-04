@@ -165,12 +165,10 @@ class CompanyLeadRepository extends CommonRepository
      */
     public function updateLeadsPrimaryCompanyName(Company $company)
     {
-        $changes = $company->getChanges();
-
-        // Company name wasn't change?
-        if (empty($changes['fields']['companyname'])) {
+        if ($company->isNew() || empty($company->getChanges()['fields']['companyname'])) {
             return;
         }
+
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('cl.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
@@ -178,13 +176,14 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter(':companyId', $company->getId())
             ->andWhere('cl.is_primary = 1');
         $leadIds = $q->execute()->fetchColumn();
-
-        $this->getEntityManager()->getConnection()->createQueryBuilder()
+        if (!empty($leadIds) && is_array($leadIds)) {
+            $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')
             ->set('company', ':company')
             ->setParameter(':company', $company->getName())
             ->where(
                 $q->expr()->in('id', $leadIds)
             )->execute();
+        }
     }
 }
