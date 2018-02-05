@@ -15,6 +15,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 
@@ -162,5 +164,48 @@ class EventLogger
         $this->repo->saveEntities($this->processed->getValues());
         $this->processed->clear();
         $this->repo->clear();
+    }
+
+    /**
+     * @param ArrayCollection $logs
+     *
+     * @return ArrayCollection
+     */
+    public function extractContactsFromLogs(ArrayCollection $logs)
+    {
+        $contacts = new ArrayCollection();
+
+        /** @var LeadEventLog $log */
+        foreach ($logs as $log) {
+            $contact = $log->getLead();
+            $contacts->set($contact->getId(), $contact);
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * @param Event                 $event
+     * @param AbstractEventAccessor $config
+     * @param ArrayCollection       $contacts
+     *
+     * @return ArrayCollection
+     */
+    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts)
+    {
+        // Ensure each contact has a log entry to prevent them from being picked up again prematurely
+        foreach ($contacts as $contact) {
+            $log = $this->buildLogEntry($event, $contact);
+            $log->setIsScheduled(false);
+            $log->setDateTriggered(new \DateTime());
+
+            ChannelExtractor::setChannel($log, $event, $config);
+
+            $this->addToQueue($log);
+        }
+
+        $this->persistQueued();
+
+        return $this->getLogs();
     }
 }

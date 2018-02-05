@@ -246,6 +246,7 @@ class ScheduledExecutioner implements ExecutionerInterface
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
@@ -285,7 +286,7 @@ class ScheduledExecutioner implements ExecutionerInterface
         foreach ($logs as $key => $log) {
             if ($createdDate = $log->getDateTriggered()) {
                 // Date Triggered will be when the log entry was first created so use it to compare to ensure that the event's schedule
-                // hasn't been changed since this even was first scheduled
+                // hasn't been changed since this event was first scheduled
                 $executionDate = $this->scheduler->getExecutionDateTime($event, $now, $createdDate);
                 $this->logger->debug(
                     'CAMPAIGN: Log ID# '.$log->getId().

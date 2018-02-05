@@ -359,6 +359,7 @@ return [
                     'mautic.campaign.executioner.condition',
                     'mautic.campaign.executioner.decision',
                     'monolog.logger.mautic',
+                    'mautic.campaign.scheduler',
                 ],
             ],
             'mautic.campaign.executioner.kickoff'     => [
