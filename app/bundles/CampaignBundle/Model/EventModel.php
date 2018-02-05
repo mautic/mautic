@@ -928,7 +928,7 @@ class EventModel extends CommonFormModel
                     // Skip If was lead was removed from campaign
                     // Execute event
                     if (!in_array($leadId, $this->campaignModel->getRemovedLeads()) && $this->executeEvent(
-                        $event,
+                         $event,
                         $campaign,
                         $lead,
                         $eventSettings,

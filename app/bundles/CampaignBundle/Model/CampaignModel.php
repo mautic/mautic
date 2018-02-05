@@ -957,7 +957,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getRemovedLeads()
     {
-        return $this->removedLeads;
+        return  $this->removedLeads;
     }
 
     /**
