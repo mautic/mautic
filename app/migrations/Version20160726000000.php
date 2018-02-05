@@ -42,7 +42,7 @@ class Version20160726000000 extends AbstractMauticMigration
         $leadFk  = $this->generatePropertyName('lead_frequencyrules', 'fk', ['lead_id']);
 
         $sql = <<<SQL
-CREATE TABLE `{$this->prefix}lead_frequencyrules` (
+CREATE TABLE IF NOT EXISTS `{$this->prefix}lead_frequencyrules` (
   `id` INT AUTO_INCREMENT NOT NULL,
   `lead_id` INT NOT NULL,
   `date_added` datetime NOT NULL COMMENT '(DC2Type:datetime)',
@@ -51,7 +51,7 @@ CREATE TABLE `{$this->prefix}lead_frequencyrules` (
   `frequency_number` smallint(6) NOT NULL,
    PRIMARY KEY (id),
    INDEX $leadIdx (lead_id),
-   INDEX {$this->prefix}channel_frequency (channel) 
+   INDEX {$this->prefix}channel_frequency (channel)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 SQL;
         $this->addSql($sql);

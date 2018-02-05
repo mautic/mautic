@@ -15,9 +15,9 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Class Version20170113015255.
+ * Auto-generated Migration.
  */
-class Version20170113015255 extends AbstractMauticMigration
+class Version20180105090000 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
@@ -27,9 +27,6 @@ class Version20170113015255 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->hasTable(MAUTIC_TABLE_PREFIX.'cache_items')) {
-            throw new SkipMigrationException('Schema includes this migration');
-        }
     }
 
     /**
@@ -37,6 +34,6 @@ class Version20170113015255 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("CREATE TABLE IF NOT EXISTS {$this->prefix}cache_items (item_id VARBINARY(255) NOT NULL PRIMARY KEY, item_data MEDIUMBLOB NOT NULL, item_lifetime INTEGER UNSIGNED, item_time INTEGER UNSIGNED NOT NULL) COLLATE utf8_bin, ENGINE = InnoDB");
+        $this->addSql("ALTER TABLE {$this->prefix}pages CHANGE redirect_url redirect_url VARCHAR(2048) DEFAULT NULL;");
     }
 }
