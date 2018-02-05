@@ -69,6 +69,11 @@ class CampaignModel extends CommonFormModel
     protected static $events;
 
     /**
+     * @var array
+     */
+    private $removedLeads = [];
+
+    /**
      * CampaignModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -942,8 +947,17 @@ class CampaignModel extends CommonFormModel
                 $this->em->detach($lead);
             }
 
+            $this->removedLeads[] = $leadId;
             unset($campaignLead, $lead);
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getRemovedLeads()
+    {
+        return $this->removedLeads;
     }
 
     /**

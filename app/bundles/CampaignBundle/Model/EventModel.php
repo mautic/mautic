@@ -925,8 +925,9 @@ class EventModel extends CommonFormModel
                         'createdBy' => $campaign->getCreatedBy(),
                     ];
 
+                    // Skip If was lead was removed from campaign
                     // Execute event
-                    if ($this->executeEvent(
+                    if (!in_array($leadId, $this->campaignModel->getRemovedLeads()) && $this->executeEvent(
                         $event,
                         $campaign,
                         $lead,
@@ -934,7 +935,7 @@ class EventModel extends CommonFormModel
                         false,
                         null,
                         true,
-                        false,
+                        $log['id'],
                         $evaluatedEventCount,
                         $executedEventCount,
                         $totalEventCount
