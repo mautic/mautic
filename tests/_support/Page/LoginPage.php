@@ -1,8 +1,7 @@
 <?php
+namespace Page;
 
-namespace Page\Acceptance;
-
-class Login
+class LoginPage
 {
     // include url of current page
     public static $URL = '/s/login';
@@ -15,24 +14,23 @@ class Login
     public static $username = ".//*[@id='username']";
     public static $password = ".//*[@id='password']";
     public static $login    = ".//*[@id='main']/div/div[1]/div/div/div/form/button";
-
     /**
      * Basic route example for your current URL
      * You can append any additional parameter to URL
-     * and use it in tests like: Page\Edit::route('/123-post');.
+     * and use it in tests like: Page\Edit::route('/123-post');
      */
     public static function route($param)
     {
         return static::$URL.$param;
     }
-
     /**
-     * @var \AcceptanceTester;
+     * @var \ContactsTester;
      */
-    protected $acceptanceTester;
+    protected $contactsTester;
 
-    public function __construct(\AcceptanceTester $I)
+    public function __construct(\ContactsTester $I)
     {
-        $this->acceptanceTester = $I;
+        $this->contactsTester = $I;
     }
+
 }
