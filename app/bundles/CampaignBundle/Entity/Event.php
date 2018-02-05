@@ -604,13 +604,55 @@ class Event implements ChannelInterface
     }
 
     /**
-     * Get children.
-     *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection
      */
     public function getChildren()
     {
         return $this->children;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getPositiveChildren()
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_ACTION));
+
+        return $this->getChildren()->matching($criteria);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getNegativeChildren()
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_ACTION));
+
+        return $this->getChildren()->matching($criteria);
+    }
+
+    /**
+     * @param $type
+     *
+     * @return ArrayCollection
+     */
+    public function getChildrenByType($type)
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('type', $type));
+
+        return $this->getChildren()->matching($criteria);
+    }
+
+    /**
+     * @param $type
+     *
+     * @return ArrayCollection
+     */
+    public function getChildrenByEventType($type)
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
+
+        return $this->getChildren()->matching($criteria);
     }
 
     /**

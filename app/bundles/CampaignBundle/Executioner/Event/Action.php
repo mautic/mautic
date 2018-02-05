@@ -13,20 +13,14 @@ namespace Mautic\CampaignBundle\Executioner\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
-use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
-use Mautic\CampaignBundle\Helper\ChannelExtractor;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 
 class Action implements EventInterface
 {
     const TYPE = 'action';
-
-    /**
-     * @var EventLogger
-     */
-    private $eventLogger;
 
     /**
      * @var EventDispatcher
@@ -36,75 +30,37 @@ class Action implements EventInterface
     /**
      * Action constructor.
      *
-     * @param EventLogger $eventLogger
+     * @param EventDispatcher $dispatcher
      */
-    public function __construct(EventLogger $eventLogger, EventDispatcher $dispatcher)
+    public function __construct(EventDispatcher $dispatcher)
     {
-        $this->eventLogger = $eventLogger;
         $this->dispatcher  = $dispatcher;
     }
 
     /**
      * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $contacts
+     * @param ArrayCollection       $logs
      *
      * @return mixed|void
      *
+     * @throws CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      */
-    public function executeForContacts(AbstractEventAccessor $config, Event $event, ArrayCollection $contacts)
+    public function executeLogs(AbstractEventAccessor $config, ArrayCollection $logs)
     {
-        // Ensure each contact has a log entry to prevent them from being picked up again prematurely
-        foreach ($contacts as $contact) {
-            $log = $this->getLogEntry($event, $contact);
-            ChannelExtractor::setChannel($log, $event, $config);
-
-            $this->eventLogger->addToQueue($log);
+        /** @var LeadEventLog $firstLog */
+        if (!$firstLog = $logs->first()) {
+            return;
         }
-        $this->eventLogger->persistQueued();
+
+        $event = $firstLog->getEvent();
+
+        if (Event::TYPE_ACTION !== $event->getEventType()) {
+            throw new CannotProcessEventException('Cannot process event ID '.$event->getId().' as an action.');
+        }
 
         // Execute to process the batch of contacts
-        $this->dispatcher->executeEvent($config, $event, $this->eventLogger->getLogs());
-
-        // Update log entries or persist failed entries
-        $this->eventLogger->persist();
-    }
-
-    /**
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
-     *
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     */
-    public function executeLogs(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
-    {
-        // Execute to process the batch of contacts
-        $this->dispatcher->executeEvent($config, $event, $logs);
-
-        // Update log entries or persist failed entries
-        $this->eventLogger->persistCollection($logs);
-    }
-
-    /**
-     * @param Event $event
-     * @param Lead  $contact
-     *
-     * @return \Mautic\CampaignBundle\Entity\LeadEventLog
-     */
-    private function getLogEntry(Event $event, Lead $contact)
-    {
-        // Create the entry
-        $log = $this->eventLogger->buildLogEntry($event, $contact);
-
-        $log->setIsScheduled(false);
-        $log->setDateTriggered(new \DateTime());
-
-        $this->eventLogger->persistLog($log);
-
-        return $log;
+        $this->dispatcher->executeActionEvent($config, $event, $logs);
     }
 }

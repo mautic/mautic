@@ -14,10 +14,16 @@ namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\ConditionEvent;
+use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
@@ -76,7 +82,7 @@ class EventDispatcher
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    public function executeEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    public function executeActionEvent(ActionAccessor $config, Event $event, ArrayCollection $logs)
     {
         // this if statement can be removed when legacy dispatcher is removed
         if ($customEvent = $config->getBatchEventName()) {
@@ -97,7 +103,40 @@ class EventDispatcher
 
         // Execute BC eventName or callback. Or support case where the listener has been converted to batchEventName but still wants to execute
         // eventName for BC support for plugins that could be listening to it's own custom event.
-        $this->legacyDispatcher->dispatchCustomEvent($config, $event, $logs, ($customEvent));
+        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, ($customEvent));
+    }
+
+    /**
+     * @param DecisionAccessor $config
+     * @param LeadEventLog     $log
+     * @param                  $passthrough
+     *
+     * @return DecisionEvent
+     */
+    public function dispatchDecisionEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough)
+    {
+        $event = new DecisionEvent($config, $log, $passthrough);
+        $this->dispatcher->dispatch($config->getEventName(), $event);
+        $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DECISION_EVALUATION, $event);
+
+        $this->legacyDispatcher->dispatchDecisionEvent($event);
+
+        return $event;
+    }
+
+    /**
+     * @param ConditionAccessor $config
+     * @param LeadEventLog      $log
+     *
+     * @return ConditionEvent
+     */
+    public function dispatchConditionEvent(ConditionAccessor $config, LeadEventLog $log)
+    {
+        $event = new ConditionEvent($config, $log);
+        $this->dispatcher->dispatch($config->getEventName(), $event);
+        $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_CONDITION_EVALUATION, $event);
+
+        return $event;
     }
 
     /**

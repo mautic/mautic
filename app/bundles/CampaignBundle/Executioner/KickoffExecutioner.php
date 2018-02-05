@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContacts;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFound;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFound;
+use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
@@ -42,11 +43,6 @@ class KickoffExecutioner
      * @var int
      */
     private $batchLimit = 100;
-
-    /**
-     * @var int|null
-     */
-    private $maxEventsToExecute;
 
     /**
      * @var OutputInterface
@@ -94,6 +90,11 @@ class KickoffExecutioner
     private $rootEvents;
 
     /**
+     * @var Counter
+     */
+    private $counter;
+
+    /**
      * KickoffExecutioner constructor.
      *
      * @param LoggerInterface     $logger
@@ -121,6 +122,8 @@ class KickoffExecutioner
      * @param int                  $batchLimit
      * @param OutputInterface|null $output
      *
+     * @return Counter
+     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws NotSchedulableException
@@ -132,13 +135,15 @@ class KickoffExecutioner
         $this->batchLimit = $batchLimit;
         $this->output     = ($output) ? $output : new NullOutput();
 
-        $this->execute();
+        return $this->execute();
     }
 
     /**
      * @param Campaign             $campaign
      * @param                      $contactId
      * @param OutputInterface|null $output
+     *
+     * @return Counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
@@ -151,16 +156,20 @@ class KickoffExecutioner
         $this->output     = ($output) ? $output : new NullOutput();
         $this->batchLimit = null;
 
-        $this->execute();
+        return $this->execute();
     }
 
     /**
+     * @return Counter
+     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws NotSchedulableException
      */
     private function execute()
     {
+        $this->counter = new Counter();
+
         try {
             $this->prepareForExecution();
             $this->executeOrScheduleEvent();
@@ -174,6 +183,8 @@ class KickoffExecutioner
                 $this->output->writeln("\n");
             }
         }
+
+        return $this->counter;
     }
 
     /**
@@ -213,6 +224,7 @@ class KickoffExecutioner
     /**
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
      * @throws NoContactsFound
      * @throws NotSchedulableException
      */
@@ -220,6 +232,7 @@ class KickoffExecutioner
     {
         // Use the same timestamp across all contacts processed
         $now = new \DateTime();
+        $this->counter->advanceEventCount($this->rootEvents->count());
 
         // Loop over contacts until the entire campaign is executed
         $contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->batchLimit, $this->contactId);
@@ -227,6 +240,7 @@ class KickoffExecutioner
             /** @var Event $event */
             foreach ($this->rootEvents as $event) {
                 $this->progressBar->advance($contacts->count());
+                $this->counter->advanceEvaluated($contacts->count());
 
                 // Check if the event should be scheduled (let the schedulers do the debug logging)
                 $executionDate = $this->scheduler->getExecutionDateTime($event, $now);
@@ -242,7 +256,7 @@ class KickoffExecutioner
                 }
 
                 // Execute the event for the batch of contacts
-                $this->executioner->executeForContacts($event, $contacts);
+                $this->executioner->executeForContacts($event, $contacts, $this->counter);
             }
 
             $this->kickoffContacts->clear();

@@ -22,10 +22,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\CampaignScheduledEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CampaignBundle\Executioner\DecisionExecutioner;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
@@ -42,16 +41,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class EventModel extends CommonFormModel
 {
-    /**
-     * @var mixed
-     */
-    protected $batchSleepTime;
-
-    /**
-     * @var mixed
-     */
-    protected $batchCampaignSleepTime;
-
     /**
      * Used in triggerEvent so that responses from recursive events are saved.
      *
@@ -85,14 +74,9 @@ class EventModel extends CommonFormModel
     protected $notificationModel;
 
     /**
-     * @var mixed
+     * @var DecisionExecutioner
      */
-    protected $scheduleTimeForFailedEvents;
-
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
+    private $decisionExecutioner;
 
     /**
      * Track triggered events to check for conditions that may be attached.
@@ -104,32 +88,27 @@ class EventModel extends CommonFormModel
     /**
      * EventModel constructor.
      *
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param LeadModel            $leadModel
-     * @param CampaignModel        $campaignModel
-     * @param UserModel            $userModel
-     * @param NotificationModel    $notificationModel
-     * @param MauticFactory        $factory
+     * @param IpLookupHelper      $ipLookupHelper
+     * @param LeadModel           $leadModel
+     * @param CampaignModel       $campaignModel
+     * @param UserModel           $userModel
+     * @param NotificationModel   $notificationModel
+     * @param DecisionExecutioner $decisionExecutioner
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
-        CoreParametersHelper $coreParametersHelper,
         LeadModel $leadModel,
         CampaignModel $campaignModel,
         UserModel $userModel,
         NotificationModel $notificationModel,
-        MauticFactory $factory
+        DecisionExecutioner $decisionExecutioner
     ) {
         $this->ipLookupHelper              = $ipLookupHelper;
         $this->leadModel                   = $leadModel;
         $this->campaignModel               = $campaignModel;
         $this->userModel                   = $userModel;
         $this->notificationModel           = $notificationModel;
-        $this->batchSleepTime              = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
-        $this->batchCampaignSleepTime      = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
-        $this->scheduleTimeForFailedEvents = $coreParametersHelper->getParameter('campaign_time_wait_on_event_false');
-        $this->factory                     = $factory;
+        $this->decisionExecutioner         = $decisionExecutioner;
     }
 
     /**
@@ -236,7 +215,9 @@ class EventModel extends CommonFormModel
      */
     public function triggerEvent($type, $eventDetails = null, $channel = null, $channelId = null)
     {
-        static $leadCampaigns = [], $eventList = [], $availableEventSettings = [], $leadsEvents = [], $examinedEvents = [];
+        $this->decisionExecutioner->execute($type, $eventDetails, $channel, $channelId);
+
+        return;
 
         $this->logger->debug('CAMPAIGN: Campaign triggered for event type '.$type.'('.$channel.' / '.$channelId.')');
 
@@ -2221,16 +2202,6 @@ class EventModel extends CommonFormModel
      */
     protected function batchSleep()
     {
-        $eventSleepTime = $this->batchCampaignSleepTime ? $this->batchCampaignSleepTime : ($this->batchSleepTime ? $this->batchSleepTime : 1);
-
-        if (empty($eventSleepTime)) {
-            return;
-        }
-
-        if ($eventSleepTime < 1) {
-            usleep($eventSleepTime * 1000000);
-        } else {
-            sleep($eventSleepTime);
-        }
+        // No longer used
     }
 }

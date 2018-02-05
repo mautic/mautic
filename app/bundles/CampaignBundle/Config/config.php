@@ -222,12 +222,11 @@ return [
                 'class'     => 'Mautic\CampaignBundle\Model\EventModel',
                 'arguments' => [
                     'mautic.helper.ip_lookup',
-                    'mautic.helper.core_parameters',
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
                     'mautic.user.model.user',
                     'mautic.core.model.notification',
-                    'mautic.factory',
+                    'mautic.campaign.executioner.active_decision',
                 ],
             ],
             'mautic.campaign.model.event_log' => [
@@ -245,6 +244,20 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\CampaignBundle\Entity\Campaign::class,
+                ],
+            ],
+            'mautic.campaign.repository.lead' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\CampaignBundle\Entity\Lead::class,
+                ],
+            ],
+            'mautic.campaign.repository.event' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\CampaignBundle\Entity\Event::class,
                 ],
             ],
             'mautic.campaign.repository.lead_event_log' => [
@@ -321,14 +334,12 @@ return [
             'mautic.campaign.executioner.action' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Event\Action::class,
                 'arguments' => [
-                    'mautic.campaign.event_logger',
                     'mautic.campaign.event_dispatcher',
                 ],
             ],
             'mautic.campaign.executioner.condition' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Event\Condition::class,
                 'arguments' => [
-                    'mautic.campaign.event_logger',
                     'mautic.campaign.event_dispatcher',
                 ],
             ],
@@ -343,6 +354,7 @@ return [
                 'class'     => \Mautic\CampaignBundle\Executioner\EventExecutioner::class,
                 'arguments' => [
                     'mautic.campaign.event_collector',
+                    'mautic.campaign.event_logger',
                     'mautic.campaign.executioner.action',
                     'mautic.campaign.executioner.condition',
                     'mautic.campaign.executioner.decision',
@@ -370,6 +382,17 @@ return [
                     'mautic.campaign.contact_finder.scheduled',
                 ],
             ],
+            'mautic.campaign.executioner.active_decision'     => [
+                'class'     => \Mautic\CampaignBundle\Executioner\DecisionExecutioner::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                    'mautic.lead.model.lead',
+                    'mautic.campaign.repository.event',
+                    'mautic.campaign.executioner',
+                    'mautic.campaign.executioner.decision',
+                    'mautic.campaign.event_collector',
+                ],
+            ],
             // @deprecated 2.13.0 for BC support; to be removed in 3.0
             'mautic.campaign.legacy_event_dispatcher' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher::class,
@@ -377,6 +400,7 @@ return [
                     'event_dispatcher',
                     'mautic.campaign.scheduler',
                     'monolog.logger.mautic',
+                    'mautic.lead.model.lead',
                     'mautic.factory',
                 ],
             ],

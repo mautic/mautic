@@ -13,9 +13,15 @@ namespace Mautic\CampaignBundle\Executioner\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
+use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
+use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
+use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
+use Mautic\LeadBundle\Entity\Lead;
 
 class Decision implements EventInterface
 {
@@ -44,16 +50,72 @@ class Decision implements EventInterface
 
     /**
      * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $contacts
+     * @param ArrayCollection       $logs
      *
-     * @return mixed|void
+     * @return EvaluatedContacts|mixed
+     *
+     * @throws CannotProcessEventException
      */
-    public function executeForContacts(AbstractEventAccessor $config, Event $event, ArrayCollection $contacts)
+    public function executeLogs(AbstractEventAccessor $config, ArrayCollection $logs)
     {
+        $evaluatedContacts = new EvaluatedContacts();
+
+        /** @var LeadEventLog $log */
+        foreach ($logs as $log) {
+            if (Event::TYPE_DECISION !== $log->getEvent()->getEventType()) {
+                throw new CannotProcessEventException('Event ID '.$log->getEvent()->getId().' is not a decision');
+            }
+
+            try {
+                /* @var DecisionAccessor $config */
+                $this->execute($config, $log);
+                $evaluatedContacts->pass($log->getLead());
+            } catch (DecisionNotApplicableException $exception) {
+                $evaluatedContacts->fail($log->getLead());
+            }
+        }
+
+        return $evaluatedContacts;
     }
 
-    public function executeLogs(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    /**
+     * @param DecisionAccessor $config
+     * @param Event            $event
+     * @param Lead             $contact
+     * @param null             $passthrough
+     * @param null             $channel
+     * @param null             $channelId
+     *
+     * @throws CannotProcessEventException
+     * @throws DecisionNotApplicableException
+     */
+    public function evaluateForContact(DecisionAccessor $config, Event $event, Lead $contact, $passthrough = null, $channel = null, $channelId = null)
     {
+        if (Event::TYPE_DECISION !== $event->getEventType()) {
+            throw new CannotProcessEventException('Cannot process event ID '.$event->getId().' as a decision.');
+        }
+
+        $log = $this->eventLogger->buildLogEntry($event, $contact);
+        $log->setChannel($channel)
+            ->setChannelId($channelId);
+
+        $this->execute($config, $log, $passthrough);
+        $this->eventLogger->persistLog($log);
+    }
+
+    /**
+     * @param DecisionAccessor $config
+     * @param LeadEventLog     $log
+     * @param null             $passthrough
+     *
+     * @throws DecisionNotApplicableException
+     */
+    private function execute(DecisionAccessor $config, LeadEventLog $log, $passthrough = null)
+    {
+        $decisionEvent = $this->dispatcher->dispatchDecisionEvent($config, $log, $passthrough);
+
+        if (!$decisionEvent->wasDecisionApplicable()) {
+            throw new DecisionNotApplicableException('evaluation failed');
+        }
     }
 }

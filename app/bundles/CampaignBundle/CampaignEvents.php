@@ -134,13 +134,22 @@ final class CampaignEvents
     const ON_EVENT_FAILED = 'matuic.campaign_on_event_failed';
 
     /**
-     * The mautic.campaign_on_event_decision event is dispatched when a campaign event is executed.
+     * The mautic.campaign_on_event_decision_evaluation event is dispatched when a campaign decision is to be evaluated.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\DecisionEvent instance.
      *
      * @var string
      */
-    const ON_EVENT_DECISION = 'mautic.campaign_on_event_decision';
+    const ON_EVENT_DECISION_EVALUATION = 'mautic.campaign_on_event_decision_evaluation';
+
+    /**
+     * The mautic.campaign_on_event_decision_evaluation event is dispatched when a campaign decision is to be evaluated.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\DecisionEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_CONDITION_EVALUATION = 'mautic.campaign_on_event_decision_evaluation';
 
     /**
      * @deprecated 2.13.0; to be removed in 3.0. Listen to ON_EVENT_EXECUTED and ON_EVENT_FAILED
@@ -154,7 +163,7 @@ final class CampaignEvents
     const ON_EVENT_EXECUTION = 'mautic.campaign_on_event_execution';
 
     /**
-     * @deprecated 2.13.0; to be removed in 3.0; Listen to ON_EVENT_DECISION instead
+     * @deprecated 2.13.0; to be removed in 3.0; Listen to ON_EVENT_DECISION_EVALUATION instead
      *
      * The mautic.campaign_on_event_decision_trigger event is dispatched after a lead decision triggers a set of actions or if the decision is set
      * as a root level event.

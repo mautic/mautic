@@ -85,11 +85,10 @@ class EventLogger
     /**
      * @param Event $event
      * @param null  $lead
-     * @param bool  $systemTriggered
      *
      * @return LeadEventLog
      */
-    public function buildLogEntry(Event $event, $lead = null, $systemTriggered = false)
+    public function buildLogEntry(Event $event, $lead = null)
     {
         $log = new LeadEventLog();
 
@@ -103,7 +102,7 @@ class EventLogger
         $log->setLead($lead);
 
         $log->setDateTriggered(new \DateTime());
-        $log->setSystemTriggered($systemTriggered);
+        $log->setSystemTriggered(defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'));
 
         return $log;
     }
@@ -145,6 +144,10 @@ class EventLogger
 
         $this->repo->saveEntities($collection->getValues());
         $this->repo->clear();
+
+        // Clear queued and processed
+        $this->processed->clear();
+        $this->queued->clear();
     }
 
     /**
@@ -157,7 +160,7 @@ class EventLogger
         }
 
         $this->repo->saveEntities($this->processed->getValues());
-        $this->repo->clear();
         $this->processed->clear();
+        $this->repo->clear();
     }
 }

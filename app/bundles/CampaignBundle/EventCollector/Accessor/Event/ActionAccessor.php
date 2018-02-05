@@ -13,4 +13,23 @@ namespace Mautic\CampaignBundle\EventCollector\Accessor\Event;
 
 class ActionAccessor extends AbstractEventAccessor
 {
+    /**
+     * ActionAccessor constructor.
+     *
+     * @param array $config
+     */
+    public function __construct(array $config)
+    {
+        parent::__construct($config);
+
+        $this->systemProperties[] = 'batchEventName';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBatchEventName()
+    {
+        return $this->getProperty('batchEventName');
+    }
 }

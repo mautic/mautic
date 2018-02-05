@@ -11,12 +11,10 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Mautic\CoreBundle\Entity\CommonRepository;
-
 /**
  * EventRepository.
  */
-class EventRepository extends CommonRepository
+class EventRepository extends LegacyEventRepository
 {
     /**
      * Get a list of entities.
@@ -52,77 +50,55 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get array of published events based on type.
-     *
-     * @param       $type
-     * @param array $campaigns
-     * @param null  $leadId           If included, only events that have not been triggered by the lead yet will be included
-     * @param bool  $positivePathOnly If negative, all events including those with a negative path will be returned
+     * @param $contactId
      *
      * @return array
      */
-    public function getPublishedByType($type, array $campaigns = null, $leadId = null, $positivePathOnly = true)
+    public function getContactPendingEvents($contactId, $type)
     {
-        $q = $this->createQueryBuilder('e')
-            ->select('c, e, ec, ep, ecc')
-            ->join('e.campaign', 'c')
-            ->leftJoin('e.children', 'ec')
-            ->leftJoin('e.parent', 'ep')
-            ->leftJoin('ec.campaign', 'ecc')
-            ->orderBy('e.order');
-
-        //make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q, 'c');
-
-        $expr->add(
-            $q->expr()->eq('e.type', ':type')
-        );
-
-        $q->where($expr)
-            ->setParameter('type', $type);
-
-        if (!empty($campaigns)) {
-            $q->andWhere($q->expr()->in('c.id', ':campaigns'))
-                ->setParameter('campaigns', $campaigns);
-        }
-
-        if ($leadId != null) {
-            // Events that aren't fired yet
-            $dq = $this->getEntityManager()->createQueryBuilder();
-            $dq->select('ellev.id')
-                ->from('MauticCampaignBundle:LeadEventLog', 'ell')
-                ->leftJoin('ell.event', 'ellev')
-                ->leftJoin('ell.lead', 'el')
-                ->where('ellev.id = e.id')
-                ->andWhere(
-                    $dq->expr()->eq('el.id', ':leadId')
-                );
-
-            $q->andWhere('e.id NOT IN('.$dq->getDQL().')')
-                ->setParameter('leadId', $leadId);
-        }
-
-        if ($positivePathOnly) {
-            $q->andWhere(
-                $q->expr()->orX(
-                    $q->expr()->neq(
-                        'e.decisionPath',
-                        $q->expr()->literal('no')
-                    ),
-                    $q->expr()->isNull('e.decisionPath')
+        // Limit to events that aren't been executed or scheduled yet
+        $eventQb = $this->getEntityManager()->createQueryBuilder();
+        $eventQb->select('IDENTITY(log_event.event)')
+            ->from(LeadEventLog::class, 'log_event')
+            ->where(
+                $eventQb->expr()->andX(
+                    $eventQb->expr()->eq('IDENTITY(log_event.event)', 'IDENTITY(e.parent)'),
+                    $eventQb->expr()->eq('IDENTITY(log_event.lead)', 'IDENTITY(l.lead)'),
+                    $eventQb->expr()->eq('log_event.rotation', 'l.rotation')
                 )
             );
-        }
 
-        $results = $q->getQuery()->getArrayResult();
+        // Limit to events that have no parent or who's parent has already been executed
+        $parentQb = $this->getEntityManager()->createQueryBuilder();
+        $parentQb->select('parent_log_event.id')
+            ->from(LeadEventLog::class, 'parent_log_event')
+            ->where(
+                $parentQb->expr()->eq('IDENTITY(parent_log_event.event)', 'IDENTITY(e.parent)'),
+                $parentQb->expr()->eq('IDENTITY(parent_log_event.lead)', 'IDENTITY(l.lead)'),
+                $parentQb->expr()->eq('parent_log_event.rotation', 'l.rotation')
+            );
 
-        //group them by campaign
-        $events = [];
-        foreach ($results as $r) {
-            $events[$r['campaign']['id']][$r['id']] = $r;
-        }
+        $q = $this->createQueryBuilder('e', 'e.id');
+        $q->select('e,c')
+            ->innerJoin('e.campaign', 'c')
+            ->innerJoin('c.leads', 'l')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->eq('e.type', ':type'),
+                    $q->expr()->eq('IDENTITY(l.lead)', ':contactId'),
+                    $q->expr()->eq('l.manuallyRemoved', 0),
+                    $q->expr()->notIn('e.id', $eventQb->getDQL()),
+                    $q->expr()->orX(
+                        $q->expr()->isNull('e.parent'),
+                        $q->expr()->exists($parentQb->getDQL())
+                    )
+                )
+            )
+            ->setParameter('type', $type)
+            ->setParameter('contactId', (int) $contactId);
 
-        return $events;
+        return $q->getQuery()->getResult();
     }
 
     /**
@@ -159,103 +135,6 @@ class EventRepository extends CommonRepository
         }
 
         return $q->getQuery()->getArrayResult();
-    }
-
-    /**
-     * Get the top level events for a campaign.
-     *
-     * @param $id
-     * @param $includeDecisions
-     *
-     * @return array
-     */
-    public function getRootLevelEvents($id, $includeDecisions = false)
-    {
-        $q = $this->getEntityManager()->createQueryBuilder();
-
-        $q->select('e')
-            ->from('MauticCampaignBundle:Event', 'e', 'e.id')
-            ->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('IDENTITY(e.campaign)', (int) $id),
-                    $q->expr()->isNull('e.parent')
-                )
-            );
-
-        if (!$includeDecisions) {
-            $q->andWhere(
-                $q->expr()->neq('e.eventType', $q->expr()->literal('decision'))
-            );
-        }
-
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
-    }
-
-    /**
-     * Gets ids of leads who have already triggered the event.
-     *
-     * @param $events
-     * @param $leadId
-     *
-     * @return array
-     */
-    public function getEventLogLeads($events, $leadId = null)
-    {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $q->select('distinct(e.lead_id)')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
-            ->where(
-                $q->expr()->in('e.event_id', $events)
-            )
-            ->setParameter('false', false, 'boolean');
-
-        if ($leadId) {
-            $q->andWhere(
-                $q->expr()->eq('e.lead_id', (int) $leadId)
-            );
-        }
-
-        $results = $q->execute()->fetchAll();
-
-        $log = [];
-        foreach ($results as $r) {
-            $log[] = $r['lead_id'];
-        }
-
-        unset($results);
-
-        return $log;
-    }
-
-    /**
-     * Get an array of events that have been triggered by this lead.
-     *
-     * @param $leadId
-     *
-     * @return array
-     */
-    public function getLeadTriggeredEvents($leadId)
-    {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->select('e, c, l')
-            ->from('MauticCampaignBundle:Event', 'e')
-            ->join('e.campaign', 'c')
-            ->join('e.log', 'l');
-
-        //make sure the published up and down dates are good
-        $q->where($q->expr()->eq('IDENTITY(l.lead)', (int) $leadId));
-
-        $results = $q->getQuery()->getArrayResult();
-
-        $return = [];
-        foreach ($results as $r) {
-            $return[$r['id']] = $r;
-        }
-
-        return $return;
     }
 
     /**
@@ -318,24 +197,6 @@ class EventRepository extends CommonRepository
                 )
             );
         }
-
-        $events = $q->getQuery()->getArrayResult();
-
-        return $events;
-    }
-
-    /**
-     * @param $campaignId
-     *
-     * @return array
-     */
-    public function getCampaignActionAndConditionEvents($campaignId)
-    {
-        $q = $this->getEntityManager()->createQueryBuilder();
-        $q->select('e')
-            ->from('MauticCampaignBundle:Event', 'e', 'e.id')
-            ->where($q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId))
-            ->andWhere($q->expr()->in('e.eventType', ['action', 'condition']));
 
         $events = $q->getQuery()->getArrayResult();
 
@@ -435,7 +296,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Null event parents in preparation for deleting a campaign.
+     * Null event parents in preparation for deleI'lting a campaign.
      *
      * @param $campaignId
      */
@@ -547,62 +408,5 @@ class EventRepository extends CommonRepository
     protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
-    }
-
-    /**
-     * @deprecated 2.13.0 to be removed in 3.0; use LeadEventLogRepository::getScheduled() instead
-     *
-     * Get a list of scheduled events.
-     *
-     * @param      $campaignId
-     * @param bool $count
-     * @param int  $limit
-     *
-     * @return array|bool
-     */
-    public function getScheduledEvents($campaignId, $count = false, $limit = 0)
-    {
-        $date = new \Datetime();
-
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from('MauticCampaignBundle:LeadEventLog', 'o');
-
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->eq('IDENTITY(o.campaign)', (int) $campaignId),
-                $q->expr()->eq('o.isScheduled', ':true'),
-                $q->expr()->lte('o.triggerDate', ':now')
-            )
-        )
-            ->setParameter('now', $date)
-            ->setParameter('true', true, 'boolean');
-
-        if ($count) {
-            $q->select('COUNT(o) as event_count');
-
-            $results = $results = $q->getQuery()->getArrayResult();
-            $count   = $results[0]['event_count'];
-
-            return $count;
-        }
-
-        $q->select('o, IDENTITY(o.lead) as lead_id, IDENTITY(o.event) AS event_id')
-            ->orderBy('o.triggerDate', 'DESC');
-
-        if ($limit) {
-            $q->setFirstResult(0)
-                ->setMaxResults($limit);
-        }
-
-        $results = $q->getQuery()->getArrayResult();
-
-        // Organize by lead
-        $logs = [];
-        foreach ($results as $e) {
-            $logs[$e['lead_id']][$e['event_id']] = array_merge($e[0], ['lead_id' => $e['lead_id'], 'event_id' => $e['event_id']]);
-        }
-        unset($results);
-
-        return $logs;
     }
 }

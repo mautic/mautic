@@ -22,6 +22,9 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class CampaignExecutionEvent extends Event
 {
+    use EventArrayTrait;
+    use ContextTrait;
+
     /**
      * @var Lead
      */
@@ -31,11 +34,6 @@ class CampaignExecutionEvent extends Event
      * @var array
      */
     protected $event;
-
-    /**
-     * @var array
-     */
-    protected $config;
 
     /**
      * @var array
@@ -88,7 +86,6 @@ class CampaignExecutionEvent extends Event
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
-        $this->config          = $args['event']['properties'];
         $this->eventDetails    = $args['eventDetails'];
         $this->systemTriggered = $args['systemTriggered'];
         $this->eventSettings   = $args['eventSettings'];
@@ -130,7 +127,7 @@ class CampaignExecutionEvent extends Event
      */
     public function getEvent()
     {
-        return $this->event;
+        return ($this->event instanceof \Mautic\CampaignBundle\Entity\Event) ? $this->getEventArray($this->event) : $this->event;
     }
 
     /**
@@ -138,7 +135,7 @@ class CampaignExecutionEvent extends Event
      */
     public function getConfig()
     {
-        return $this->config;
+        return $this->getEvent()['properties'];
     }
 
     /**
@@ -233,16 +230,6 @@ class CampaignExecutionEvent extends Event
     public function wasLogUpdatedByListener()
     {
         return $this->logUpdatedByListener;
-    }
-
-    /**
-     * Check if an event is applicable.
-     *
-     * @param $eventType
-     */
-    public function checkContext($eventType)
-    {
-        return strtolower($eventType) == strtolower($this->event['type']);
     }
 
     /**

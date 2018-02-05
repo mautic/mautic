@@ -105,16 +105,6 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
         return $this->logs->get($this->logContactXref[$id]);
     }
 
-    /**
-     * Check if an event is applicable.
-     *
-     * @param $eventType
-     */
-    public function checkContext($eventType)
-    {
-        return strtolower($eventType) === strtolower($this->event->getType());
-    }
-
     private function extractContacts()
     {
         /** @var LeadEventLog $log */

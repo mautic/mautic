@@ -19,6 +19,8 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
 class PendingEvent extends AbstractLogCollectionEvent
 {
+    use ContextTrait;
+
     /**
      * @var ArrayCollection
      */

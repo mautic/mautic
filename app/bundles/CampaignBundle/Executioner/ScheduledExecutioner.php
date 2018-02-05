@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContacts;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFound;
+use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Psr\Log\LoggerInterface;
@@ -89,6 +90,11 @@ class ScheduledExecutioner implements ExecutionerInterface
     private $scheduledEvents;
 
     /**
+     * @var Counter
+     */
+    private $counter;
+
+    /**
      * ScheduledExecutioner constructor.
      *
      * @param LeadEventLogRepository $repository
@@ -119,7 +125,7 @@ class ScheduledExecutioner implements ExecutionerInterface
      * @param int                  $batchLimit
      * @param OutputInterface|null $output
      *
-     * @return mixed|void
+     * @return Counter|mixed
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
@@ -134,7 +140,7 @@ class ScheduledExecutioner implements ExecutionerInterface
 
         $this->logger->debug('CAMPAIGN: Triggering scheduled events');
 
-        $this->execute();
+        return $this->execute();
     }
 
     /**
@@ -142,7 +148,7 @@ class ScheduledExecutioner implements ExecutionerInterface
      * @param                      $contactId
      * @param OutputInterface|null $output
      *
-     * @return mixed|void
+     * @return Counter|mixed
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
@@ -156,10 +162,12 @@ class ScheduledExecutioner implements ExecutionerInterface
         $this->output     = ($output) ? $output : new NullOutput();
         $this->batchLimit = null;
 
-        $this->execute();
+        return $this->execute();
     }
 
     /**
+     * @return Counter
+     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Scheduler\Exception\NotSchedulableException
@@ -167,6 +175,8 @@ class ScheduledExecutioner implements ExecutionerInterface
      */
     private function execute()
     {
+        $this->counter = new Counter();
+
         try {
             $this->prepareForExecution();
             $this->executeOrRecheduleEvent();
@@ -178,6 +188,8 @@ class ScheduledExecutioner implements ExecutionerInterface
                 $this->output->writeln("\n");
             }
         }
+
+        return $this->counter;
     }
 
     /**
@@ -221,6 +233,8 @@ class ScheduledExecutioner implements ExecutionerInterface
         $now = new \DateTime();
 
         foreach ($this->scheduledEvents as $eventId) {
+            $this->counter->advanceEventCount();
+
             // Loop over contacts until the entire campaign is executed
             $this->executeScheduled($eventId, $now);
         }
@@ -243,10 +257,13 @@ class ScheduledExecutioner implements ExecutionerInterface
         while ($logs->count()) {
             $event = $logs->first()->getEvent();
             $this->progressBar->advance($logs->count());
+            $this->counter->advanceEvaluated($logs->count());
+
+            // Validate that the schedule is still appropriate
             $this->validateSchedule($logs, $event, $now);
 
             // Execute if there are any that did not get rescheduled
-            $this->executioner->executeLogs($event, $logs);
+            $this->executioner->executeLogs($event, $logs, $this->counter);
 
             // Get next batch
             $this->scheduledContacts->clear();

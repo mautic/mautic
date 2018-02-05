@@ -11,6 +11,133 @@
 
 namespace Mautic\CampaignBundle\Event;
 
-class DecisionEvent
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Symfony\Component\EventDispatcher\Event;
+
+class DecisionEvent extends CampaignExecutionEvent
 {
+    use ContextTrait;
+
+    /**
+     * @var AbstractEventAccessor
+     */
+    private $eventConfig;
+
+    /**
+     * @var LeadEventLog
+     */
+    private $eventLog;
+
+    /**
+     * @var mixed
+     */
+    private $passthrough;
+
+    /**
+     * @var bool
+     */
+    private $applicable = false;
+
+    /**
+     * DecisionEvent constructor.
+     *
+     * @param AbstractEventAccessor $config
+     * @param LeadEventLog          $log
+     * @param                       $passthrough
+     */
+    public function __construct(AbstractEventAccessor $config, LeadEventLog $log, $passthrough)
+    {
+        $this->eventConfig = $config;
+        $this->eventLog    = $log;
+        $this->passthrough = $passthrough;
+
+        // @deprecated support for pre 2.13.0; to be removed in 3.0
+        parent::__construct(
+            [
+                'eventSettings'   => $config->getConfig(),
+                'eventDetails'    => $passthrough,
+                'event'           => $log->getEvent(),
+                'lead'            => $log->getLead(),
+                'systemTriggered' => defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'),
+                'dateScheduled'   => $log->getTriggerDate(),
+            ],
+            null,
+            $log
+        );
+    }
+
+    /**
+     * @return AbstractEventAccessor
+     */
+    public function getEventConfig()
+    {
+        return $this->eventConfig;
+    }
+
+    /**
+     * @return LeadEventLog
+     */
+    public function getLog()
+    {
+        return $this->eventLog;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPassthrough()
+    {
+        return $this->passthrough;
+    }
+
+    /**
+     * Note that this decision is a match and the child events should be executed.
+     */
+    public function setAsApplicable()
+    {
+        $this->applicable = true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function wasDecisionApplicable()
+    {
+        return $this->applicable;
+    }
+
+    /**
+     * @param      $channel
+     * @param null $channelId
+     */
+    public function setChannel($channel, $channelId = null)
+    {
+        $this->log->setChannel($this->channel)
+            ->setChannelId($this->channelId);
+    }
+
+    /**
+     * @deprecated 2.13.0 to be removed in 3.0; BC support
+     *
+     * @return bool
+     */
+    public function getResult()
+    {
+        return $this->applicable;
+    }
+
+    /**
+     * @deprecated 2.13.0 to be removed in 3.0; BC support
+     *
+     * @param $result
+     *
+     * @return $this
+     */
+    public function setResult($result)
+    {
+        $this->applicable = $result;
+
+        return $this;
+    }
 }

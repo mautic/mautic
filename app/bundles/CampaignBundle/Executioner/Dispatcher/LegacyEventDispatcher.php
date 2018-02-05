@@ -16,13 +16,16 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\EventArrayTrait;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -51,6 +54,11 @@ class LegacyEventDispatcher
     private $logger;
 
     /**
+     * @var LeadModel
+     */
+    private $leadModel;
+
+    /**
      * @var MauticFactory
      */
     private $factory;
@@ -67,21 +75,24 @@ class LegacyEventDispatcher
         EventDispatcherInterface $dispatcher,
         EventScheduler $scheduler,
         LoggerInterface $logger,
+        LeadModel $leadModel,
         MauticFactory $factory
     ) {
         $this->dispatcher    = $dispatcher;
         $this->scheduler     = $scheduler;
         $this->logger        = $logger;
+        $this->leadModel     = $leadModel;
         $this->factory       = $factory;
     }
 
     /**
      * @param AbstractEventAccessor $config
-     * @param Event                 $event
      * @param ArrayCollection       $logs
-     * @param bool                  $wasBatchProcessed
+     * @param                       $wasBatchProcessed
+     *
+     * @throws \ReflectionException
      */
-    public function dispatchCustomEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $wasBatchProcessed)
+    public function dispatchCustomEvent(AbstractEventAccessor $config, ArrayCollection $logs, $wasBatchProcessed)
     {
         $settings = $config->getConfig();
 
@@ -89,19 +100,19 @@ class LegacyEventDispatcher
             return;
         }
 
-        $eventArray = $this->getEventArray($event);
-
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
+            $this->leadModel->setSystemCurrentLead($log->getLead());
+
             if (isset($settings['eventName'])) {
-                $result = $this->dispatchEventName($settings['eventName'], $settings, $eventArray, $log);
+                $result = $this->dispatchEventName($settings['eventName'], $settings, $log);
             } else {
                 if (!is_callable($settings['callback'])) {
                     // No use to keep trying for the other logs as it won't ever work
                     break;
                 }
 
-                $result = $this->dispatchCallback($settings, $eventArray, $log);
+                $result = $this->dispatchCallback($settings, $log);
             }
 
             if (!$wasBatchProcessed) {
@@ -114,12 +125,14 @@ class LegacyEventDispatcher
 
                     $this->dispatchFailedEvent($config, $log);
 
-                    return;
+                    continue;
                 }
 
                 $this->dispatchExecutedEvent($config, $log);
             }
         }
+
+        $this->leadModel->setSystemCurrentLead(null);
     }
 
     /**
@@ -141,26 +154,51 @@ class LegacyEventDispatcher
     }
 
     /**
+     * @param DecisionEvent $decisionEvent
+     */
+    public function dispatchDecisionEvent(DecisionEvent $decisionEvent)
+    {
+        if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_DECISION_TRIGGER)) {
+            $log   = $decisionEvent->getLog();
+            $event = $log->getEvent();
+
+            $legacyDecisionEvent = $this->dispatcher->dispatch(
+                CampaignEvents::ON_EVENT_DECISION_TRIGGER,
+                new CampaignDecisionEvent(
+                    $log->getLead(),
+                    $event->getType(),
+                    $decisionEvent->getEventConfig()->getConfig(),
+                    $this->getLegacyEventsArray($log),
+                    $this->getLegacyEventsConfigArray($event, $decisionEvent->getEventConfig()),
+                    0 === $event->getOrder(),
+                    [$log]
+                )
+            );
+
+            if ($legacyDecisionEvent->wasDecisionTriggered()) {
+                $decisionEvent->setAsApplicable();
+            }
+        }
+    }
+
+    /**
      * @param              $eventName
      * @param array        $settings
-     * @param array        $eventArray
      * @param LeadEventLog $log
      *
      * @return bool
      */
-    private function dispatchEventName($eventName, array $settings, array $eventArray, LeadEventLog $log)
+    private function dispatchEventName($eventName, array $settings, LeadEventLog $log)
     {
         @trigger_error('eventName is deprecated. Convert to using batchEventName.', E_USER_DEPRECATED);
 
-        // Create a campaign event with a default successful result
         $campaignEvent = new CampaignExecutionEvent(
             [
                 'eventSettings'   => $settings,
-                'eventDetails'    => null, // @todo fix when procesing decisions,
-                'event'           => $eventArray,
+                'eventDetails'    => null,
+                'event'           => $log->getEvent(),
                 'lead'            => $log->getLead(),
                 'systemTriggered' => $log->getSystemTriggered(),
-                'config'          => $eventArray['properties'],
             ],
             null,
             $log
@@ -185,11 +223,12 @@ class LegacyEventDispatcher
      *
      * @throws \ReflectionException
      */
-    private function dispatchCallback(array $settings, array $eventArray, LeadEventLog $log)
+    private function dispatchCallback(array $settings, LeadEventLog $log)
     {
         @trigger_error('callback is deprecated. Convert to using batchEventName.', E_USER_DEPRECATED);
 
-        $args = [
+        $eventArray = $this->getEventArray($log->getEvent());
+        $args       = [
             'eventSettings'   => $settings,
             'eventDetails'    => null, // @todo fix when procesing decisions,
             'event'           => $eventArray,

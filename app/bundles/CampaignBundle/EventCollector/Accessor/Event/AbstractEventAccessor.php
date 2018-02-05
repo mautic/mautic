@@ -24,7 +24,6 @@ abstract class AbstractEventAccessor
     protected $systemProperties = [
         'label',
         'description',
-        'batchEventName',
         'formType',
         'formTypeOptions',
         'formTheme',
@@ -65,14 +64,6 @@ abstract class AbstractEventAccessor
     public function getDescription()
     {
         return $this->getProperty('description');
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getBatchEventName()
-    {
-        return $this->getProperty('batchEventName');
     }
 
     /**

@@ -13,18 +13,17 @@ namespace Mautic\CampaignBundle\Executioner\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
-use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
+use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
+use Mautic\CampaignBundle\Executioner\Exception\ConditionFailedException;
+use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 
 class Condition implements EventInterface
 {
     const TYPE = 'condition';
-
-    /**
-     * @var EventLogger
-     */
-    private $eventLogger;
 
     /**
      * @var EventDispatcher
@@ -32,28 +31,59 @@ class Condition implements EventInterface
     private $dispatcher;
 
     /**
-     * Action constructor.
+     * Condition constructor.
      *
-     * @param EventLogger $eventLogger
+     * @param EventDispatcher $dispatcher
      */
-    public function __construct(EventLogger $eventLogger, EventDispatcher $dispatcher)
+    public function __construct(EventDispatcher $dispatcher)
     {
-        $this->eventLogger = $eventLogger;
         $this->dispatcher  = $dispatcher;
     }
 
     /**
      * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $contacts
+     * @param ArrayCollection       $logs
      *
-     * @return mixed|void
+     * @return EvaluatedContacts|mixed
+     *
+     * @throws CannotProcessEventException
      */
-    public function executeForContacts(AbstractEventAccessor $config, Event $event, ArrayCollection $contacts)
+    public function executeLogs(AbstractEventAccessor $config, ArrayCollection $logs)
     {
+        $evaluatedContacts = new EvaluatedContacts();
+
+        /** @var LeadEventLog $log */
+        foreach ($logs as $log) {
+            try {
+                /* @var ConditionAccessor $config */
+                $this->execute($config, $log);
+                $evaluatedContacts->pass($log->getLead());
+            } catch (ConditionFailedException $exception) {
+                $evaluatedContacts->fail($log->getLead());
+                $log->setNonActionPathTaken(true);
+            }
+        }
+
+        return $evaluatedContacts;
     }
 
-    public function executeLogs(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    /**
+     * @param ConditionAccessor $config
+     * @param LeadEventLog      $log
+     *
+     * @throws CannotProcessEventException
+     * @throws ConditionFailedException
+     */
+    private function execute(ConditionAccessor $config, LeadEventLog $log)
     {
+        if (Event::TYPE_CONDITION !== $log->getEvent()->getEventType()) {
+            throw new CannotProcessEventException('Cannot process event ID '.$log->getEvent()->getId().' as a condition.');
+        }
+
+        $conditionEvent = $this->dispatcher->dispatchConditionEvent($config, $log);
+
+        if (!$conditionEvent->wasConditionSatisfied()) {
+            throw new ConditionFailedException('evaluation failed');
+        }
     }
 }

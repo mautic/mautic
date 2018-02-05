@@ -14,7 +14,7 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-class ScheduledEvent extends CampaignScheduledEvent
+class ConditionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
@@ -29,10 +29,16 @@ class ScheduledEvent extends CampaignScheduledEvent
     private $eventLog;
 
     /**
-     * ScheduledEvent constructor.
+     * @var bool
+     */
+    private $passed = false;
+
+    /**
+     * DecisionEvent constructor.
      *
      * @param AbstractEventAccessor $config
      * @param LeadEventLog          $log
+     * @param                       $passthrough
      */
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
     {
@@ -46,9 +52,9 @@ class ScheduledEvent extends CampaignScheduledEvent
                 'eventDetails'    => null,
                 'event'           => $log->getEvent(),
                 'lead'            => $log->getLead(),
-                'systemTriggered' => true,
-                'dateScheduled'   => $log->getTriggerDate(),
+                'systemTriggered' => $log->getSystemTriggered(),
             ],
+            null,
             $log
         );
     }
@@ -67,5 +73,63 @@ class ScheduledEvent extends CampaignScheduledEvent
     public function getLog()
     {
         return $this->eventLog;
+    }
+
+    /**
+     * Pass this condition.
+     */
+    public function pass()
+    {
+        $this->passed = true;
+    }
+
+    /**
+     * Fail this condition.
+     */
+    public function fail()
+    {
+        $this->passed = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function wasConditionSatisfied()
+    {
+        return $this->passed;
+    }
+
+    /**
+     * @param      $channel
+     * @param null $channelId
+     */
+    public function setChannel($channel, $channelId = null)
+    {
+        $this->log->setChannel($this->channel)
+            ->setChannelId($this->channelId);
+    }
+
+    /**
+     * @deprecated 2.13.0 to be removed in 3.0; BC support
+     *
+     * @return bool
+     */
+    public function getResult()
+    {
+        return $this->passed;
+    }
+
+    /**
+     * @deprecated 2.13.0 to be removed in 3.0; BC support
+     *
+     * @param $result
+     *
+     * @return $this
+     */
+    public function setResult($result)
+    {
+        $this->passed = (bool) $result;
+
+        return $this;
     }
 }

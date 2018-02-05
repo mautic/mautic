@@ -609,14 +609,16 @@ class CampaignRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
                 ->where(
                     $sq->expr()->andX(
-                        $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
-                        $sq->expr()->eq('e.campaign_id', (int) $campaignId)
+                        $sq->expr()->eq('e.lead_id', 'cl.lead_id'),
+                        $sq->expr()->eq('e.campaign_id', ':campaignId'),
+                        $sq->expr()->eq('e.rotation', 'cl.rotation')
                     )
                 );
 
             $q->andWhere(
                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
-            );
+            )
+            ->setParameter('campaignId', (int) $campaignId);
         }
 
         if (!empty($limit)) {
