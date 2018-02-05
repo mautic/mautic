@@ -437,7 +437,7 @@ class EventModel extends CommonFormModel
         }
 
         if ($lead->getChanges()) {
-            $this->leadModel->saveEntity($lead);
+            $this->leadModel->saveEntity($lead, false);
         }
 
         if (count($logs)) {
