@@ -834,8 +834,10 @@ class CampaignModel extends CommonFormModel
             }
             unset($campaignLead, $lead);
         }
-
         unset($leadModel, $campaign, $leads);
+        if (isset($this->removedLeads[$leadId])) {
+            $this->removedLeads[$leadId];
+        }
     }
 
     /**
@@ -947,7 +949,7 @@ class CampaignModel extends CommonFormModel
                 $this->em->detach($lead);
             }
 
-            $this->removedLeads[] = $leadId;
+            $this->removedLeads[$leadId] = $leadId;
             unset($campaignLead, $lead);
         }
     }
