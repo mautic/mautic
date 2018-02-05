@@ -168,7 +168,6 @@ class CompanyLeadRepository extends CommonRepository
         if ($company->isNew() || empty($company->getChanges()['fields']['companyname'])) {
             return;
         }
-
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('cl.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
@@ -176,7 +175,7 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter(':companyId', $company->getId())
             ->andWhere('cl.is_primary = 1');
         $leadIds = $q->execute()->fetchColumn();
-        if (!empty($leadIds) && is_array($leadIds)) {
+        if (!empty($leadIds)) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')
             ->set('company', ':company')
