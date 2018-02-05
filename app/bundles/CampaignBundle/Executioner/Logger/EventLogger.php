@@ -137,33 +137,57 @@ class EventLogger
 
     /**
      * @param ArrayCollection $collection
+     *
+     * @return $this
      */
     public function persistCollection(ArrayCollection $collection)
     {
         if (!$collection->count()) {
-            return;
+            return $this;
         }
 
         $this->repo->saveEntities($collection->getValues());
-        $this->repo->clear();
 
-        // Clear queued and processed
-        $this->processed->clear();
-        $this->queued->clear();
+        return $this;
+    }
+
+    /**
+     * @param ArrayCollection $collection
+     *
+     * @return $this
+     */
+    public function clearCollection(ArrayCollection $collection)
+    {
+        $this->repo->detachEntities($collection->getValues());
+
+        return $this;
     }
 
     /**
      * Persist processed entities after they've been updated.
+     *
+     * @return $this
      */
     public function persist()
     {
         if (!$this->processed->count()) {
-            return;
+            return $this;
         }
 
         $this->repo->saveEntities($this->processed->getValues());
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clear()
+    {
         $this->processed->clear();
         $this->repo->clear();
+
+        return $this;
     }
 
     /**

@@ -24,6 +24,7 @@ use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableExceptio
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -93,6 +94,18 @@ class EventScheduler
     }
 
     /**
+     * @param Event     $event
+     * @param \DateTime $executionDate
+     * @param Lead      $contact
+     */
+    public function scheduleForContact(Event $event, \DateTime $executionDate, Lead $contact)
+    {
+        $contacts =  new ArrayCollection([$contact]);
+
+        $this->schedule($event, $executionDate, $contacts);
+    }
+
+    /**
      * @param Event           $event
      * @param ArrayCollection $contacts
      */
@@ -126,7 +139,8 @@ class EventScheduler
         $this->dispatchBatchScheduledEvent($config, $event, $this->eventLogger->getLogs());
 
         // Update log entries and clear from memory
-        $this->eventLogger->persist();
+        $this->eventLogger->persist()
+            ->clear();
     }
 
     /**

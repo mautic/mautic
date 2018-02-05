@@ -22,6 +22,7 @@ use Mautic\CampaignBundle\Executioner\Event\Decision;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
+use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
@@ -102,14 +103,18 @@ class EventExecutioner
      * @param Event $event
      * @param Lead  $contact
      *
+     * @return ArrayCollection
+     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeForContact(Event $event, Lead $contact)
+    public function executeForContact(Event $event, Lead $contact, Responses $responses = null)
     {
         $contacts = new ArrayCollection([$contact->getId() => $contact]);
 
-        $this->executeForContacts($event, $contacts);
+        $this->executeForContacts($event, $contacts, null, $responses);
     }
 
     /**
@@ -122,7 +127,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null)
+    public function executeForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null, Responses $responses = null)
     {
         if (!$contacts->count()) {
             $this->logger->debug('CAMPAIGN: No contacts to process for event ID '.$event->getId());
@@ -131,9 +136,18 @@ class EventExecutioner
         }
 
         $config = $this->collector->getEventConfig($event);
-        $logs   = $this->logger->generateLogsFromContacts($event, $config, $contacts);
+        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts);
 
         $this->executeLogs($event, $logs, $counter);
+
+        if ($responses) {
+            // Extract responses
+            $responses->setFromLogs($logs);
+        }
+
+        // Save updated log entries and clear from memory
+        $this->eventLogger->persistCollection($logs)
+            ->clear();
     }
 
     /**
@@ -292,7 +306,7 @@ class EventExecutioner
         $this->actionExecutioner->executeLogs($config, $logs);
 
         /** @var ArrayCollection $contacts */
-        $contacts = $this->logger->extractContactsFromLogs($logs);
+        $contacts = $this->eventLogger->extractContactsFromLogs($logs);
 
         // Update and clear any pending logs
         $this->eventLogger->persistCollection($logs);

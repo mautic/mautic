@@ -392,6 +392,7 @@ return [
                     'mautic.campaign.executioner',
                     'mautic.campaign.executioner.decision',
                     'mautic.campaign.event_collector',
+                    'mautic.campaign.scheduler',
                 ],
             ],
             // @deprecated 2.13.0 for BC support; to be removed in 3.0

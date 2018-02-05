@@ -11,7 +11,7 @@
 
 namespace Mautic\CampaignBundle\Executioner\Result;
 
-class Counter implements \ArrayAccess
+class Counter
 {
     /**
      * @var int
@@ -134,46 +134,5 @@ class Counter implements \ArrayAccess
     public function advanceTotalExecuted($step = 1)
     {
         $this->totalExecuted += $step;
-    }
-
-    /**
-     * BC support for pre 2.13.0 array based counts.
-     *
-     * @param mixed $offset
-     *
-     * @return bool
-     */
-    public function offsetExists($offset)
-    {
-        return isset($this->$$offset);
-    }
-
-    /**
-     * BC support for pre 2.13.0 array based counts.
-     *
-     * @param mixed $offset
-     *
-     * @return mixed|null
-     */
-    public function offsetGet($offset)
-    {
-        return (isset($this->$$offset)) ? $this->$$offset : null;
-    }
-
-    /**
-     * @param mixed $offset
-     * @param mixed $value
-     */
-    public function offsetSet($offset, $value)
-    {
-        // ignore
-    }
-
-    /**
-     * @param mixed $offset
-     */
-    public function offsetUnset($offset)
-    {
-        // ignore
     }
 }
