@@ -1,7 +1,0 @@
-actor: AcceptanceTester
-modules:
-    enabled:
-        - WebDriver:
-            url: http://mautic.loc
-            browser: chrome
-        - \Helper\Acceptance

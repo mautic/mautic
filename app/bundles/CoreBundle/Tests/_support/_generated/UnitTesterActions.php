@@ -1,5 +1,5 @@
 <?php
- //[STAMP] 1dee20186393cae516aea4afa0d0d065
+ //[STAMP] a4705bfb025d9523b00a0d293ba1e2f3
 
 namespace Mautic\CoreBundle\_generated;
 
