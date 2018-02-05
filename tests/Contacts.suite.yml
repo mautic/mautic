@@ -4,17 +4,16 @@ modules:
         - WebDriver:
              url: '%MAUTIC_URL%'
              browser: chrome
-             wait: 8
+             wait: 5
         - \Helper\Contacts
         - Db:
              dsn: 'mysql:host=%DB_HOST%;dbname=%DB_NAME%;port=%DB_PORT%'
              user: '%DB_USER%'
              password: '%DB_PASSWD%'
-             dump: tests/_data/Beta_Blank.sql
+             dump: tests/_data/Contacts.sql
              #restart: true
-             populate: true
-             cleanup: false
+#             populate: true
+#             cleanup: false
              #reconnect: true
         - Asserts:
         - Cli:
-
