@@ -1,5 +1,5 @@
 <?php
- //[STAMP] a6ad52da3240b4dea3611f54dd9c3513
+ //[STAMP] 2d9768e0e4c772e4a385624aa7a568a6
 
 namespace Mautic\CoreBundle\_generated;
 
@@ -298,6 +298,17 @@ trait FunctionalTesterActions
      * <?php
      * $I->haveHttpHeader('X-Requested-With', 'Codeception');
      * $I->amOnPage('test-headers.php');
+     * ?>
+     * ```
+     *
+     * To use special chars in Header Key use HTML Character Entities:
+     * Example:
+     * Header with underscore - 'Client_Id'
+     * should be represented as - 'Client&#x0005F;Id' or 'Client&#95;Id'
+     *
+     * ```php
+     * <?php
+     * $I->haveHttpHeader('Client&#95;Id', 'Codeception');
      * ?>
      * ```
      *
@@ -1001,7 +1012,7 @@ trait FunctionalTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Executes the given regular expression against the current URI and returns the first match.
+     * Executes the given regular expression against the current URI and returns the first capturing group.
      * If no parameters are provided, the full URI is returned.
      *
      * ``` php
@@ -1989,7 +2000,7 @@ trait FunctionalTesterActions
      *
      * @throws ModuleException if no page was opened
      *
-     * @return string Current page source code
+     * @return string current page source code
      *
      * @see \Codeception\Lib\InnerBrowser::grabPageSource()
      */
