@@ -385,6 +385,58 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
+     * @param $contactId
+     *
+     * @return array
+     */
+    public function getInactive($campaignId)
+    {
+        // Limit to events that hasn't been executed or scheduled yet
+        $eventQb = $this->getEntityManager()->createQueryBuilder();
+        $eventQb->select('IDENTITY(log_event.event)')
+            ->from(LeadEventLog::class, 'log_event')
+            ->where(
+                $eventQb->expr()->andX(
+                    $eventQb->expr()->eq('IDENTITY(log_event.event)', 'IDENTITY(e.parent)'),
+                    $eventQb->expr()->eq('IDENTITY(log_event.lead)', 'IDENTITY(l.lead)'),
+                    $eventQb->expr()->eq('log_event.rotation', 'l.rotation')
+                )
+            );
+
+        // Limit to events that has a decision parent
+        $parentQb = $this->getEntityManager()->createQueryBuilder();
+        $parentQb->select('parent_log_event.id')
+            ->from(LeadEventLog::class, 'parent_log_event')
+            ->where(
+                $parentQb->expr()->eq('IDENTITY(parent_log_event.event)', 'IDENTITY(e.parent)'),
+                $parentQb->expr()->eq('IDENTITY(parent_log_event.lead)', 'IDENTITY(l.lead)'),
+                $parentQb->expr()->eq('parent_log_event.rotation', 'l.rotation')
+            );
+
+        $q = $this->createQueryBuilder('l', 'l.id');
+        $q->select('e,c')
+            ->innerJoin('e.campaign', 'c')
+            ->innerJoin('c.leads', 'l')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->eq('e.type', ':type'),
+                    $q->expr()->eq('IDENTITY(l.lead)', ':contactId'),
+                    $q->expr()->eq('l.manuallyRemoved', 0),
+                    $q->expr()->notIn('e.id', $eventQb->getDQL()),
+                    $q->expr()->orX(
+                        $q->expr()->isNull('e.parent'),
+                        $q->expr()->exists($parentQb->getDQL())
+                    )
+                )
+            )
+            ->setParameter('type', $type)
+            ->setParameter('contactId', (int) $contactId);
+
+        return $q->getQuery()->getResult();
+    }
+
+    /**
      * Get a list of scheduled events.
      *
      * @param      $eventId
@@ -435,21 +487,28 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getScheduledCounts($campaignId)
+    public function getScheduledCounts($campaignId, $contactId = null)
     {
         $date = new \Datetime('now', new \DateTimeZone('UTC'));
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
+        $expr = $q->expr()->andX(
+            $q->expr()->eq('l.campaign_id', ':campaignId'),
+            $q->expr()->eq('l.is_scheduled', ':true'),
+            $q->expr()->lte('l.trigger_date', ':now')
+        );
+
+        if ($contactId) {
+            $expr->add(
+                $q->expr()->eq('l.lead_id', ':contactId')
+            );
+            $q->setParameter('contactId', (int) $contactId);
+        }
+
         $results = $q->select('COUNT(*) as event_count, l.event_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
-            ->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('l.campaign_id', ':campaignId'),
-                    $q->expr()->eq('l.is_scheduled', ':true'),
-                    $q->expr()->lte('l.trigger_date', ':now')
-                )
-            )
+            ->where($expr)
             ->setParameter('campaignId', $campaignId)
             ->setParameter('now', $date->format('Y-m-d H:i:s'))
             ->setParameter('true', true, \PDO::PARAM_BOOL)

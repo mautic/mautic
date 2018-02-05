@@ -261,4 +261,96 @@ class LegacyEventRepository extends CommonRepository
 
         return $events;
     }
+
+    /**
+     * Get the non-action log.
+     *
+     * @param            $campaignId
+     * @param array      $leads
+     * @param array      $havingEvents
+     * @param array      $excludeEvents
+     * @param bool|false $excludeScheduledFromHavingEvents
+     *
+     * @return array
+     */
+    public function getEventLog($campaignId, $leads = [], $havingEvents = [], $excludeEvents = [], $excludeScheduledFromHavingEvents = false)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
+            ->where(
+                $q->expr()->eq('e.campaign_id', (int) $campaignId)
+            )
+            ->groupBy('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled');
+
+        if (!empty($leads)) {
+            $leadsQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $leadsQb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'include_leads')
+                ->where(
+                    $leadsQb->expr()->eq('include_leads.lead_id', 'e.lead_id'),
+                    $leadsQb->expr()->in('include_leads.lead_id', $leads)
+                );
+
+            $q->andWhere(
+                sprintf('EXISTS (%s)', $leadsQb->getSQL())
+            );
+        }
+
+        if (!empty($havingEvents)) {
+            $eventsQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $eventsQb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'include_events')
+                ->where(
+                    $eventsQb->expr()->eq('include_events.lead_id', 'e.lead_id'),
+                    $eventsQb->expr()->in('include_events.event_id', $havingEvents)
+                );
+
+            if ($excludeScheduledFromHavingEvents) {
+                $eventsQb->andWhere(
+                    $eventsQb->expr()->eq('include_events.is_scheduled', ':false')
+                );
+                $q->setParameter('false', false, 'boolean');
+            }
+
+            $q->having(
+                sprintf('EXISTS (%s)', $eventsQb->getSQL())
+            );
+        }
+
+        if (!empty($excludeEvents)) {
+            $eventsQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $eventsQb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'exclude_events')
+                ->where(
+                    $eventsQb->expr()->eq('exclude_events.lead_id', 'e.lead_id'),
+                    $eventsQb->expr()->in('exclude_events.event_id', $excludeEvents)
+                );
+
+            $eventsQb->andHaving(
+                sprintf('NOT EXISTS (%s)', $eventsQb->getSQL())
+            );
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        $log = [];
+        foreach ($results as $r) {
+            $leadId  = $r['lead_id'];
+            $eventId = $r['event_id'];
+
+            unset($r['lead_id']);
+            unset($r['event_id']);
+
+            $log[$leadId][$eventId] = $r;
+        }
+
+        unset($results);
+
+        return $log;
+    }
 }

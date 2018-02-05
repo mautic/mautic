@@ -25,13 +25,12 @@ use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\Console\Output\OutputInterface;
+use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 
 /**
- * Trait LegacyEventModelTrait.
- *
  * @deprecated 2.13.0 to be removed in 3.0
  */
-trait LegacyEventModelTrait
+class LegacyEventModel extends CommonFormModel
 {
     /**
      * @var DecisionExecutioner
@@ -52,6 +51,23 @@ trait LegacyEventModelTrait
      * @var
      */
     protected $triggeredEvents;
+
+    /**
+     * LegacyEventModel constructor.
+     *
+     * @param DecisionExecutioner  $decisionExecutioner
+     * @param KickoffExecutioner   $kickoffExecutioner
+     * @param ScheduledExecutioner $scheduledExecutioner
+     */
+    public function __construct(
+        DecisionExecutioner $decisionExecutioner,
+        KickoffExecutioner $kickoffExecutioner,
+        ScheduledExecutioner $scheduledExecutioner
+    ) {
+        $this->decisionExecutioner  = $decisionExecutioner;
+        $this->kickoffExecutioner   = $kickoffExecutioner;
+        $this->scheduledExecutioner = $scheduledExecutioner;
+    }
 
     /**
      * Trigger the root level action(s) in campaign(s).
@@ -704,7 +720,7 @@ trait LegacyEventModelTrait
 
                         $leads = $this->leadModel->getEntities(
                             [
-                                'filter' => [
+                                'filter'             => [
                                     'force' => [
                                         [
                                             'column' => 'l.id',

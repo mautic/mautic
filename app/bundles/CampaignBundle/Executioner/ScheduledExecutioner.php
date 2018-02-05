@@ -198,7 +198,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     private function prepareForExecution()
     {
         // Get counts by event
-        $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId());
+        $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->contactId);
         $totalScheduledCount   = array_sum($scheduledEvents);
         $this->scheduledEvents = array_keys($scheduledEvents);
         $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
@@ -224,6 +224,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     /**
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */

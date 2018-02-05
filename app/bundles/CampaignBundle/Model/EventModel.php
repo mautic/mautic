@@ -22,7 +22,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
-use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -33,10 +32,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class EventModel
  * {@inheritdoc}
  */
-class EventModel extends CommonFormModel
+class EventModel extends LegacyEventModel
 {
-    use LegacyEventModelTrait;
-
     /**
      * @var IpLookupHelper
      */
@@ -89,9 +86,8 @@ class EventModel extends CommonFormModel
         $this->campaignModel        = $campaignModel;
         $this->userModel            = $userModel;
         $this->notificationModel    = $notificationModel;
-        $this->decisionExecutioner  = $decisionExecutioner;
-        $this->kickoffExecutioner   = $kickoffExecutioner;
-        $this->scheduledExecutioner = $scheduledExecutioner;
+
+        parent::__construct($decisionExecutioner, $kickoffExecutioner, $scheduledExecutioner);
     }
 
     /**
