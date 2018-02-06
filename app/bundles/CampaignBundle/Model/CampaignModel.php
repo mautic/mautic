@@ -887,7 +887,6 @@ class CampaignModel extends CommonFormModel
     {
         foreach ($leads as $lead) {
             $dispatchEvent = false;
-
             if ($lead instanceof Lead) {
                 $leadId = $lead->getId();
             } else {
@@ -895,7 +894,8 @@ class CampaignModel extends CommonFormModel
                 $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             }
 
-            $campaignLead = (!$skipFindOne) ?
+            $this->removedLeads[$campaign->getId()][$leadId] = $leadId;
+            $campaignLead                                    = (!$skipFindOne) ?
                 $this->getCampaignLeadRepository()->findOneBy([
                     'lead'     => $lead,
                     'campaign' => $campaign,
@@ -947,7 +947,6 @@ class CampaignModel extends CommonFormModel
                 $this->em->detach($lead);
             }
 
-            $this->removedLeads[$campaign->getId()][$leadId] = $leadId;
             unset($campaignLead, $lead);
         }
     }
