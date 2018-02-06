@@ -101,6 +101,11 @@ class Form extends FormEntity
     private $renderStyle = false;
 
     /**
+     * @var bool
+     */
+    private $inContactTab = false;
+
+    /**
      * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateSubmitted" = "DESC"})
      *
@@ -204,6 +209,11 @@ class Form extends FormEntity
             ->nullable()
             ->build();
 
+        $builder->createField('inContactTab', 'boolean')
+            ->columnName('in_contact_tab')
+            ->nullable()
+            ->build();
+
         $builder->createOneToMany('submissions', 'Submission')
             ->setOrderBy(['dateSubmitted' => 'DESC'])
             ->mappedBy('form')
@@ -290,6 +300,7 @@ class Form extends FormEntity
                     'actions',
                     'template',
                     'inKioskMode',
+                    'inContactTab',
                     'renderStyle',
                     'formType',
                     'postAction',
@@ -733,6 +744,22 @@ class Form extends FormEntity
     public function setInKioskMode($inKioskMode)
     {
         $this->inKioskMode = $inKioskMode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInContactTab()
+    {
+        return $this->inContactTab;
+    }
+
+    /**
+     * @param mixed $inContactTab
+     */
+    public function setInContactTab($inContactTab)
+    {
+        $this->inContactTab = $inContactTab;
     }
 
     /**
