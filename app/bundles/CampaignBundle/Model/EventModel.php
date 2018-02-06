@@ -436,12 +436,13 @@ class EventModel extends CommonFormModel
             $this->triggerConditions($campaigns[$campaignId]);
         }
 
-        if (count($logs)) {
-            $this->getLeadEventLogRepository()->saveEntities($logs);
-        }
-
         if ($lead->getChanges()) {
             $this->leadModel->saveEntity($lead, false);
+        }
+
+        if (count($logs)) {
+            $this->em->persist($lead);
+            $this->getLeadEventLogRepository()->saveEntities($logs);
         }
 
         if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_DECISION_TRIGGER)) {
