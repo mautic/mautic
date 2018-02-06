@@ -91,44 +91,46 @@ class ContactsDataObjects
         $this->company = ['company[companyname]' => 'New Button Company'];
     }
 
-    public function verifyImportContacts(\ContactsTester $I)
+    public function verifyImportContacts(\ContactsTester $I, $contactId, $companyId)
     {
         $I->amGoingTo('Verify all contacts and companies are created');
-        $this->verifyContactCSV($I, 4, 'Stern', 'Caddie', 'scaddie0@theglobeandmail.com', 'Voonix', 2);
-        $this->verifyContactCSV($I, 5, 'Lalo', 'Santore', '', 'Blognation', 3);
-        $this->verifyContactCSV($I, 6, 'Edward', '', '', 'Thoughtblab', 4);
-        $this->verifyContactCSV($I, 7, '', '', '', 'Kaymbo', 5);
-        $this->verifyContactCSV($I, 8, 'Diandra', '', 'dmoncrieffe4@mediafire.com', 'Vipe', 6);
-        $this->verifyContactCSV($I, 9, '', 'Louden', 'wlouden5@house.gov', 'Jaxspan', 7);
-        $this->verifyContactCSV($I, 10, '', '', 'laubery6@w3.org', 'Shuffledrive', 8);
-        $this->verifyContactCSV($I, 11, 'Minnnie', 'Drinkhall', 'mdrinkhall7@earthlink.net', '', '');
-        $this->verifyContactCSV($I, 12, 'Lari', 'Frankling', '', '', '');
-        $this->verifyContactCSV($I, 13, 'Walden', '', '', '', '');
-        $this->verifyContactCSV($I, 14, 'Sheppard', '', 'smacdermida@goodreads.com', '', '');
-        $this->verifyContactCSV($I, 15, '', 'Osgardby', 'cosgardbyb@mysql.com', '', '');
-        $this->verifyContactCSV($I, 16, '', '', 'fbaackc@pagesperso-orange.fr', '', '');
-        $this->verifyContactCSV($I, 17, 'Carolyn', 'Ivannikov', 'civannikovd@boston.com', 'Tavu', 9);
-        $this->verifyContactCSV($I, 18, 'Linoel', 'Jee', 'ljeee@people.com.cn', 'Meemm', 10);
-        $this->verifyContactCSV($I, 19, 'Dorice', 'Wahner', 'dwahnerf@who.int', '', '');
-        $this->verifyContactCSV($I, 20, 'Keene', 'Wenzel', 'kwenzelg@virginia.edu', '', '');
-        $this->verifyContactCSV($I, 21, 'Zola', 'Cattemull', 'zcattemullh@pagesperso-orange.fr', '', '');
-        $this->verifyContactCSV($I, 22, 'Felizio', 'Hurich', 'fhurichi@com.com', 'Blogspan', 11);
-        $this->verifyContactCSV($I, 23, 'Jahn', 'Duck', 'dduck@bloggy.com', 'Blognation', 3);
+        $this->verifyContactCSV($I, $contactId, 'Stern', 'Caddie', 'scaddie0@theglobeandmail.com', 'Voonix', $companyId);
+        $this->verifyContactCSV($I, $contactId + 1, 'Lalo', 'Santore', '', 'Blognation', $companyId + 1);
+        $this->verifyContactCSV($I, $contactId + 2, 'Edward', '', '', 'Thoughtblab', $companyId + 2);
+        $this->verifyContactCSV($I, $contactId + 3, '', '', '', 'Kaymbo', $companyId + 3);
+        $this->verifyContactCSV($I, $contactId + 4, 'Diandra', '', 'dmoncrieffe4@mediafire.com', 'Vipe', $companyId + 4);
+        $this->verifyContactCSV($I, $contactId + 5, '', 'Louden', 'wlouden5@house.gov', 'Jaxspan', $companyId + 5);
+        $this->verifyContactCSV($I, $contactId + 6, '', '', 'laubery6@w3.org', 'Shuffledrive', $companyId + 6);
+        $this->verifyContactCSV($I, $contactId + 7, 'Minnnie', 'Drinkhall', 'mdrinkhall7@earthlink.net', '', '');
+        $this->verifyContactCSV($I, $contactId + 8, 'Lari', 'Frankling', '', '', '');
+        $this->verifyContactCSV($I, $contactId + 9, 'Walden', '', '', '', '');
+        $this->verifyContactCSV($I, $contactId + 10, 'Sheppard', '', 'smacdermida@goodreads.com', '', '');
+        $this->verifyContactCSV($I, $contactId + 11, '', 'Osgardby', 'cosgardbyb@mysql.com', '', '');
+        $this->verifyContactCSV($I, $contactId + 12, '', '', 'fbaackc@pagesperso-orange.fr', '', '');
+        $this->verifyContactCSV($I, $contactId + 13, 'Carolyn', 'Ivannikov', 'civannikovd@boston.com', 'Tavu', $companyId + 7);
+        $this->verifyContactCSV($I, $contactId + 14, 'Linoel', 'Jee', 'ljeee@people.com.cn', 'Meemm', $companyId + 8);
+        $this->verifyContactCSV($I, $contactId + 15, 'Dorice', 'Wahner', 'dwahnerf@who.int', '', '');
+        $this->verifyContactCSV($I, $contactId + 16, 'Keene', 'Wenzel', 'kwenzelg@virginia.edu', '', '');
+        $this->verifyContactCSV($I, $contactId + 17, 'Zola', 'Cattemull', 'zcattemullh@pagesperso-orange.fr', '', '');
+        $this->verifyContactCSV($I, $contactId + 18, 'Felizio', 'Hurich', 'fhurichi@com.com', 'Blogspan', $companyId + 9);
+        $this->verifyContactCSV($I, $contactId + 19, 'Jahn', 'Duck', 'dduck@bloggy.com', 'Blognation', $companyId + 1);
 
-        $this->verifyCompaniesCSV($I, 2, 'Voonix', 'scaddie0@zdnet.com', 'http://statcounter.com');
-        $this->verifyCompaniesCSV($I, 3, 'Blognation', 'johnny@blognation.com', 'http://columbia.edu');
-        $this->verifyCompaniesCSV($I, 4, 'Thoughtblab', 'ewardington2@imdb.com', 'http://gizmodo.com');
-        $this->verifyCompaniesCSV($I, 5, 'Kaymbo', 'amagor3@stanford.edu', 'http://multiply.com');
-        $this->verifyCompaniesCSV($I, 6, 'Vipe', 'dmoncrieffe4@prnewswire.com', 'http://hexun.com');
-        $this->verifyCompaniesCSV($I, 7, 'Jaxspan', 'wlouden5@google.ru', 'http://google.pl');
-        $this->verifyCompaniesCSV($I, 8, 'Shuffledrive', 'laubery6@prnewswire.com', 'http://unicef.org');
-        $this->verifyCompaniesCSV($I, 9, 'Tavu', 'civannikovd@dion.ne.jp', '');
-        $this->verifyCompaniesCSV($I, 10, 'Meemm', '', '');
-        $this->verifyCompaniesCSV($I, 11, 'Blogspan', '', 'http://abcd.la');
+        $this->verifyCompaniesCSV($I, $companyId, 'Voonix', 'scaddie0@zdnet.com', 'http://statcounter.com');
+        $this->verifyCompaniesCSV($I, $companyId + 1, 'Blognation', 'johnny@blognation.com', 'http://columbia.edu');
+        $this->verifyCompaniesCSV($I, $companyId + 2, 'Thoughtblab', 'ewardington2@imdb.com', 'http://gizmodo.com');
+        $this->verifyCompaniesCSV($I, $companyId + 3, 'Kaymbo', 'amagor3@stanford.edu', 'http://multiply.com');
+        $this->verifyCompaniesCSV($I, $companyId + 4, 'Vipe', 'dmoncrieffe4@prnewswire.com', 'http://hexun.com');
+        $this->verifyCompaniesCSV($I, $companyId + 5, 'Jaxspan', 'wlouden5@google.ru', 'http://google.pl');
+        $this->verifyCompaniesCSV($I, $companyId + 6, 'Shuffledrive', 'laubery6@prnewswire.com', 'http://unicef.org');
+        $this->verifyCompaniesCSV($I, $companyId + 7, 'Tavu', 'civannikovd@dion.ne.jp', '');
+        $this->verifyCompaniesCSV($I, $companyId + 8, 'Meemm', '', '');
+        $this->verifyCompaniesCSV($I, $companyId + 9, 'Blogspan', '', 'http://abcd.la');
     }
 
     public function verifyContactCSV(\ContactsTester $I, $id, $first, $last, $email, $company, $companyId)
     {
+        codecept_debug('ContactID is:'.$id);
+        codecept_debug('CompanyId is:'.$companyId);
         $I->amOnPage('s/contacts/view/'.$id);
         $I->waitForText('Engagements');
         if ($first != '') {
@@ -251,25 +253,25 @@ class ContactsDataObjects
     {
         if (isset($country)) {
             $I->click($this->contactPageObject['contactCountryField']);
-            $I->click(str_replace('$', '248', $this->contactPageObject['contactCountryOption']));
+            $I->click(str_replace('$', '184', $this->contactPageObject['contactCountryOption']));
         }
     }
 
     private function fillContactCompanyState(\ContactsTester $I, $state)
     {
         if (isset($state)) {
-//            $I->click($this->contactPageObject['companyStateField']);
+            $I->click($this->contactPageObject['companyStateField']);
             if ($state == 'CA') {
-                $I->fillField('company[companystate]', 'California');
-//                $I->click(str_replace('$', '6', $this->contactPageObject['companyStateOption']));
+//                $I->fillField('company[companystate]', 'California');
+                $I->click(str_replace('$', '6', $this->contactPageObject['companyStateOption']));
             }
             if ($state == 'FL') {
-                $I->fillField('company[companystate]', 'Florida');
-//                $I->click(str_replace('$', '10', $this->contactPageObject['companyStateOption']));
+//                $I->fillField('company[companystate]', 'Florida');
+                $I->click(str_replace('$', '10', $this->contactPageObject['companyStateOption']));
             }
             if ($state == 'MA') {
-                $I->fillField('company[companystate]', 'Massachusetts');
-//                $I->click(str_replace('$', '22', $this->contactPageObject['companyStateOption']));
+//                $I->fillField('company[companystate]', 'Massachusetts');
+                $I->click(str_replace('$', '22', $this->contactPageObject['companyStateOption']));
             }
         }
     }
@@ -278,7 +280,7 @@ class ContactsDataObjects
     {
         if (isset($country)) {
             $I->click($this->contactPageObject['companyCountryField']);
-            $I->click(str_replace('$', '248', $this->contactPageObject['companyCountryOption']));
+            $I->click(str_replace('$', '184', $this->contactPageObject['companyCountryOption']));
         }
     }
 }
