@@ -12,8 +12,8 @@ modules:
              password: '%DB_PASSWD%'
              dump: tests/_data/Contacts.sql
              #restart: true
-#             populate: true
-#             cleanup: false
+             populate: true
+             cleanup: false
              #reconnect: true
         - Asserts:
         - Cli:
