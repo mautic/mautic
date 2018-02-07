@@ -212,7 +212,7 @@ class ContactsCest
         $I->amOnPage('/s/contacts/view/3');
         $I->canSee('25 points');
         $I->canSee('Campaign action triggered');
-        $I->canSee('Add points / Manually added to campaign');
+        $I->canSee('1: Add points campaign / 25');
     }
 
     public function setToDoNotContact(ContactsTester $I)
@@ -226,6 +226,7 @@ class ContactsCest
         $I->fillField('lead_batch_dnc[reason]', 'No reason');
         $I->click(\Page\ModalPage::$SaveButton);
         $I->amOnPage('/s/contacts/view/4');
+        $I->wait(4);
         $I->canSee('Do Not Contact');
     }
 
@@ -255,7 +256,7 @@ class ContactsCest
         $I->checkOption('cb6');
         $I->click('//*[@id="leadTable"]/tbody/tr[6]/td[1]/div/div/button/i');
         $I->click('//*[@id="leadTable"]/tbody/tr[6]/td[1]/div/div/ul/li[2]/a/span/span');
-        $I->click('/html/body/div[4]/div/div/div[2]/button[2]');
+        $I->click('//button[text()][2]');
         $I->amOnPage('/s/contacts/view/6');
         $I->canSee('No contact with an id of 6 was found!');
     }
@@ -270,7 +271,9 @@ class ContactsCest
         $I->fillField('lead[lastname]', 'Contact');
         $I->fillField('lead[email]', 'quick@mailinator.com');
         $I->click('//div[@class="modal-form-buttons"]/button[2]');
-        $I->amOnPage('/s/contacts/view/24');
+        $currentContactId = $I->grabNumRecords('mautic_leads') + 1;
+        $I->amOnPage('/s/contacts/view/'.$currentContactId);
+        $I->wait(4);
         $I->canSee('Quick Add');
         $I->canSee('Contact');
         $I->canSee('quick@mailinator.com');
