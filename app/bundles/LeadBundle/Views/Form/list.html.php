@@ -14,7 +14,6 @@
 <div class="tab-content pa-md">
 
     <?php foreach ($leadForms as $leadForm):
-        print_r($leadForm['results'][0]);
         ?>
         <div class="tab-pane fade bdr-w-0 in active" id="test-container">
             a
