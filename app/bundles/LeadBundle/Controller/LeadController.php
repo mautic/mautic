@@ -370,6 +370,7 @@ class LeadController extends FormController
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'auditlog'          => $this->getAuditlogs($lead),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
+                    'leadForms'         => $this->getModel('form')->getRepository()->getFormsWithResults($lead->getId(), true),
                     'leadNotes'         => $this->forward(
                         'MauticLeadBundle:Note:index',
                         [

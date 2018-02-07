@@ -198,6 +198,31 @@ class FormRepository extends CommonRepository
     }
 
     /**
+     * Return Form entities and form results.
+     *
+     * @param null $leadId
+     * @param bool $inContactTab
+     *
+     * @return array
+     */
+    public function getFormsWithResults($leadId = null, $inContactTab = false)
+    {
+        if ($inContactTab) {
+            $entities = $this->getEntities(['filter'=>['force'=>[0=>['column' => 'f.inContactTab', 'expr' => 'eq', 'value' => 1]]]]);
+        } else {
+            $entities = $this->getEntities();
+        }
+
+        $formResults = [];
+        foreach ($entities as $key=>$entity) {
+            $formResults[$key]['entity']  = $entity;
+            $formResults[$key]['results'] = $this->getFormResults($entity[0], ['leadId'=>$leadId]);
+        }
+
+        return $formResults;
+    }
+
+    /**
      * Compile and return the form result table name.
      *
      * @param int    $formId

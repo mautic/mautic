@@ -47,7 +47,7 @@ class Version20180206225101 extends AbstractMauticMigration
     {
         $q = $this->connection->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'forms')
-      ->set('in_contact_tab', 0)
-      ->execute();
+            ->set('in_contact_tab', 0)
+            ->execute();
     }
 }
