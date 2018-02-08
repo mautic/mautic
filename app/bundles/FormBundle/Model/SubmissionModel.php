@@ -1143,9 +1143,9 @@ class SubmissionModel extends CommonFormModel
     public function getFormsWithResults($leadId = null, $inContactTab = false)
     {
         $formResults    = [];
-        $filters        = [];
         $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
 
+        $filters = [];
         if ($inContactTab) {
             $filters[] = ['column' => 'f.inContactTab', 'expr' => 'eq', 'value' => 1];
         }
