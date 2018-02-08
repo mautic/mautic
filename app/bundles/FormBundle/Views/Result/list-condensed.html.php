@@ -65,12 +65,6 @@ $formId = $form->getId();
                 <?php endforeach; ?>
             </tr>
         <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="<?php echo $fieldCount; ?>">
-                    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
-                </td>
-            </tr>
         <?php endif; ?>
         </tbody>
     </table>

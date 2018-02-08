@@ -1191,6 +1191,11 @@ class SubmissionModel extends CommonFormModel
                 ]
             );
 
+            if (empty($submissionEntities['count'])) {
+                unset($formResults[$key]);
+                continue;
+            }
+
             $formResults[$key]['results'] = $submissionEntities;
             $formResults[$key]['content'] = $this->templatingHelper->getTemplating()->render(
                 'MauticFormBundle:Result:list-condensed.html.php',
@@ -1208,6 +1213,6 @@ class SubmissionModel extends CommonFormModel
             );
         }
 
-        return $formResults;
+        return array_values($formResults);
     }
 }
