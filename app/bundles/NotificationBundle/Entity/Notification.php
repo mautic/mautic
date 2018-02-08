@@ -123,6 +123,19 @@ class Notification extends FormEntity
      */
     private $mobileSettings;
 
+    /**
+     * @var int
+     */
+    private $ttl;
+
+    /**
+     * @var int
+     */
+    private $priority;
+
+    /**
+     * @var array
+     */
     public function __clone()
     {
         $this->id        = null;
@@ -220,6 +233,12 @@ class Notification extends FormEntity
         $builder->createField('mobile', 'boolean')->build();
 
         $builder->createField('mobileSettings', 'array')->build();
+
+        $builder->createField('ttl', 'integer')
+            ->build();
+
+        $builder->createField('priority', 'integer')
+            ->build();
     }
 
     /**
@@ -266,6 +285,18 @@ class Notification extends FormEntity
                 }
             },
         ]));
+
+        $metadata->addConstraint(new Callback([
+            'callback' => function (Notification $notification, ExecutionContextInterface $context) {
+                $violations = ['test'];
+                if (count($violations) > 0) {
+                    $string = (string) $violations;
+                    $context->buildViolation($string)
+                            ->atPath('test')
+                            ->addViolation();
+                }
+            },
+        ]));
     }
 
     /**
@@ -295,6 +326,8 @@ class Notification extends FormEntity
                     'publishDown',
                     'readCount',
                     'sentCount',
+                    'ttl',
+                    'priority',
                 ]
             )
             ->build();
@@ -366,6 +399,16 @@ class Notification extends FormEntity
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Get file alias.
+     *
+     * @return string
+     */
+    public function getFileAlias()
+    {
+        return 'notification-file-'.$this->id;
     }
 
     /**
@@ -674,5 +717,39 @@ class Notification extends FormEntity
         $this->mobileSettings = $mobileSettings;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTtl()
+    {
+        return $this->ttl;
+    }
+
+    /**
+     * @param int $ttl
+     */
+    public function setTtl($ttl)
+    {
+        $this->isChanged('ttl', $ttl);
+        $this->ttl = $ttl;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->isChanged('priority', $priority);
+        $this->priority = $priority;
     }
 }

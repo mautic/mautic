@@ -138,6 +138,21 @@ return [
                 ],
                 'alias' => 'notification_api',
             ],
+            'mautic.notification.helper.notification_uploader' => [
+                'class'     => \Mautic\FormBundle\Helper\NotificationUploader::class,
+                'arguments' => [
+                    'mautic.helper.file_uploader',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+        ],
+        'validator' => [
+            'mautic.notification.validator.upload_field_validator' => [
+                'class'     => \Mautic\NotificationBundle\Validator\UploadNotificationValidator::class,
+                'arguments' => [
+                    'mautic.core.validator.file_upload',
+                ],
+            ],
         ],
         'models' => [
             'mautic.notification.model.notification' => [

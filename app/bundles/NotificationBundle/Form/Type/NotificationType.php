@@ -22,6 +22,17 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class NotificationType extends AbstractType
 {
+    const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'png,gif';
+
+    /**
+     * @var array
+     */
+    private $fileNames = ['action-icon-1', 'action-icon-2', 'chrome-firefox-icon-192-192', 'chrome-image-360-240', 'chrome-badge-72-72'];
+
+    // time to live, priority
+    //ttl 259,200 seconds - 72
+    //priority 1-10
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
