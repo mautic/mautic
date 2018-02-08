@@ -3,10 +3,10 @@
     <?php foreach ($leadForms as $leadForm): ?>
         <li class="active">
             <a href="#test-container" role="tab" data-toggle="tab">
-                        <span class="label label-primary mr-sm" id="TestCount">
+                        <span class="label label-primary mr-sm" id="form-<?php echo $leadForm['entity']->getAlias()?>">
                              <?php echo count($leadForm['results']); ?>
                         </span>
-                <?php echo $leadForm['entity'][0]->getName(); ?>
+                <?php echo $leadForm['entity']->getName(); ?>
             </a>
         </li>
     <?php endforeach; ?>
@@ -15,8 +15,10 @@
 
     <?php foreach ($leadForms as $leadForm):
         ?>
-        <div class="tab-pane fade bdr-w-0 in active" id="test-container">
-            a
+        <div class="tab-pane fade bdr-w-0 in active" id="form-<?php echo $leadForm['entity']->getAlias()?>">
+            <?php
+                               echo $leadForm['content'];
+            ?>
         </div>
     <?php endforeach; ?>
 

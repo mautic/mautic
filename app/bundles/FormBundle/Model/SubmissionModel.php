@@ -1130,4 +1130,75 @@ class SubmissionModel extends CommonFormModel
 
         unset($args, $actions, $availableActions);
     }
+
+    /**
+     * Return Forms with results to contacts tab
+     *ľ.
+     *
+     * @param null $leadId
+     * @param bool $inContactTab
+     *
+     * @return array
+     */
+    public function getFormsWithResults($leadId = null, $inContactTab = false)
+    {
+        $formResults    = [];
+        $filters        = [];
+        $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
+
+        if ($inContactTab) {
+            $filters[] = ['column' => 'f.inContactTab', 'expr' => 'eq', 'value' => 1];
+        }
+        $formEntities = $this->formModel->getEntities(
+            [
+                'filter' => ['force' => $filters],
+            ]
+        );
+
+        foreach ($formEntities as $key => $entity) {
+            $formResults[$key]['entity'] = $entity[0];
+            $form                        = $entity[0];
+            $start                       = 0;
+            $limit                       = 999;
+            $orderBy                     = 's.date_submitted';
+            $orderByDir                  = 'DESC';
+            $filters                     = [];
+            $filters[]                   = ['column' => 's.form_id', 'expr' => 'eq', 'value' => $form->getId()];
+            $filters[]                   = ['column' => 's.lead_id', 'expr' => 'eq', 'value' => $leadId];
+
+            //get the results
+            $submissionEntities = $this->getEntities(
+                [
+                    'start'          => $start,
+                    'limit'          => $limit,
+                    'filter'         => ['force' => $filters],
+                    'orderBy'        => $orderBy,
+                    'orderByDir'     => $orderByDir,
+                    'form'           => $form,
+                    'withTotalCount' => true,
+                ]
+            );
+
+            $count   = $submissionEntities['count'];
+            $results = $submissionEntities['results'];
+
+            $formResults[$key]['results'] = $submissionEntities;
+            $formResults[$key]['content'] = $this->templatingHelper->getTemplating()->render(
+                'MauticFormBundle:Result:list-condensed.html.php',
+                [
+                    'items'          => $results,
+                    'filters'        => $filters,
+                    'form'           => $form,
+                    'page'           => 1,
+                    'totalCount'     => $count,
+                    'limit'          => $limit,
+                    'tmpl'           => '',
+                    'canDelete'      => false,
+                    'viewOnlyFields' => $viewOnlyFields,
+                ]
+            );
+        }
+
+        return $formResults;
+    }
 }
