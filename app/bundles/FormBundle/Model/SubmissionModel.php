@@ -1146,9 +1146,21 @@ class SubmissionModel extends CommonFormModel
         $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
 
         $filters = [];
+
         if ($inContactTab) {
             $filters[] = ['column' => 'f.inContactTab', 'expr' => 'eq', 'value' => 1];
         }
+
+        $permissions = $this->security->isGranted(
+            ['form:forms:viewown', 'form:forms:viewother'],
+            'RETURN_ARRAY'
+        );
+        if ($permissions['form:forms:viewown'] || $permissions['form:forms:viewother']) {
+            if (!$permissions['form:forms:viewother']) {
+                $filters[] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->userHelper->getUser()->getId()];
+            }
+        }
+
         $formEntities = $this->formModel->getEntities(
             [
                 'filter' => ['force' => $filters],
@@ -1179,18 +1191,15 @@ class SubmissionModel extends CommonFormModel
                 ]
             );
 
-            $count   = $submissionEntities['count'];
-            $results = $submissionEntities['results'];
-
             $formResults[$key]['results'] = $submissionEntities;
             $formResults[$key]['content'] = $this->templatingHelper->getTemplating()->render(
                 'MauticFormBundle:Result:list-condensed.html.php',
                 [
-                    'items'          => $results,
+                    'items'          => $submissionEntities['results'],
                     'filters'        => $filters,
                     'form'           => $form,
                     'page'           => 1,
-                    'totalCount'     => $count,
+                    'totalCount'     => $submissionEntities['count'],
                     'limit'          => $limit,
                     'tmpl'           => '',
                     'canDelete'      => false,
