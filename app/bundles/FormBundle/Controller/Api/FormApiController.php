@@ -176,12 +176,12 @@ class FormApiController extends CommonApiController
                     $fieldParams['alias'] = InputHelper::filename($fieldParams['alias']);
 
                     if (!in_array($fieldParams['alias'], $aliases)) {
-                        $fieldEntityArray['alias'] = $fieldParams['alias'];
+                        $fieldEntityArray['alias'] = str_replace('-', '', $fieldParams['alias']);
                     }
                 }
 
                 if (empty($fieldEntityArray['alias'])) {
-                    $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
+                    $fieldEntityArray['alias'] = str_replace('-', '', $fieldParams['alias']) = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
                 }
 
                 $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
