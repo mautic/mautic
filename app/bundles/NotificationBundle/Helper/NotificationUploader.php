@@ -11,14 +11,12 @@
 
 namespace Mautic\NotificationBundle\Helper;
 
+use GuzzleHttp\Psr7\UploadedFile;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
-use Mautic\FormBundle\Crate\UploadFileCrate;
-use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Entity\Submission;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Model\NotificationModel;
 
 class NotificationUploader
 {
@@ -39,108 +37,67 @@ class NotificationUploader
     }
 
     /**
-     * @param UploadFileCrate $filesToUpload
-     * @param Submission      $submission
-     *
-     * @throws FileUploadException
+     * @param Notification $notification
+     * @param $request
+     * @param FileUploader      $fileUploader
+     * @param NotificationModel $notificationModel
      */
-    public function uploadFiles(UploadFileCrate $filesToUpload, Notification $notification)
+    public function uploadFiles(Notification $notification, $request, FileUploader $fileUploader, NotificationModel $notificationModel)
     {
+        $files         = $request->files->all();
         $uploadedFiles = [];
-        $alias         = ''; //Only for IDE - will be overriden by foreach
-
-        try {
-            foreach ($filesToUpload as $fileFieldCrate) {
-                $field           = $fileFieldCrate->getField();
-                $alias           = $field->getAlias();
-                $uploadDir       = $this->getUploadDir($field);
-                $fileName        = $this->fileUploader->upload($uploadDir, $fileFieldCrate->getUploadedFile());
-                $result[$alias]  = $fileName;
-                $uploadedFiles[] = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+        foreach ($notificationModel->getUploadFilesName() as $fileName) {
+            /* @var UploadedFile $file */
+            if (empty($files[$fileName])) {
+                continue;
             }
-            //    $submission->setResults($result);
-        } catch (FileUploadException $e) {
-            foreach ($uploadedFiles as $filePath) {
-                $this->fileUploader->delete($filePath);
+            $file = $files[$fileName];
+            try {
+                $uploadDir    = $this->getUploadDir($notification);
+                $uploadedFile = $fileUploader->upload($uploadDir, $file);
+                $var          = 'set'.ucfirst($fileName);
+                $notification->$var($uploadedFile);
+                $uploadedFiles[$fileName] = $uploadDir.DIRECTORY_SEPARATOR.$uploadedFile;
+            } catch (FileUploadException $e) {
+                foreach ($uploadedFiles as $filePath) {
+                    $fileUploader->delete($filePath);
+                }
             }
-            throw new FileUploadException($alias);
         }
     }
 
     /**
-     * @param Field  $field
-     * @param string $fileName
+     * @param Notification $notification
+     * @param string       $fileName
      *
      * @return string
      */
-    public function getCompleteFilePath(Field $field, $fileName)
+    public function getCompleteFilePath(Notification $notification, $fileName)
     {
-        $uploadDir = $this->getUploadDir($field);
+        $uploadDir = $this->getUploadDir($notification);
 
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName;
     }
 
-    public function deleteAllFilesOfFormField(Field $field)
+    /**
+     * @param Notification $notification
+     */
+    public function deleteAllFilesOfNotification(Notification $notification)
     {
-        if (!$field->isFileType()) {
-            return;
-        }
-
-        $uploadDir = $this->getUploadDir($field);
+        $uploadDir = $this->getUploadDir($notification);
         $this->fileUploader->delete($uploadDir);
     }
 
-    public function deleteFilesOfForm(Form $form)
-    {
-        $formUploadDir = $this->getUploadDirOfForm($form);
-        $this->fileUploader->delete($formUploadDir);
-    }
-
     /**
-     * @param Submission $submission
-     *
-     * @todo Refactor code that result can be accessed normally and not only as a array of values
-     */
-    public function deleteUploadedFiles(Submission $submission)
-    {
-        $fields = $submission->getForm()->getFields();
-        foreach ($fields as $field) {
-            $this->deleteFileOfFormField($submission, $field);
-        }
-    }
-
-    private function deleteFileOfFormField(Submission $submission, Field $field)
-    {
-        $alias   = $field->getAlias();
-        $results = $submission->getResults();
-
-        if (!$field->isFileType() || empty($results[$alias])) {
-            return;
-        }
-
-        $fileName = $results[$alias];
-        $filePath = $this->getCompleteFilePath($field, $fileName);
-        $this->fileUploader->delete($filePath);
-    }
-
-    /**
-     * @param Field $field
+     * @param Notification $notification
      *
      * @return string
      */
-    private function getUploadDir(Field $field)
+    private function getUploadDir(Notification $notification)
     {
-        $fieldId       = $field->getId();
-        $formUploadDir = $this->getUploadDirOfForm($field->getForm());
+        $notificationId        = $notification->getId();
+        $notificationUploadDir = $this->getUploadDirOfNotification($notification);
 
-        return $formUploadDir.DIRECTORY_SEPARATOR.$fieldId;
-    }
-
-    private function getUploadDirOfForm(Form $form)
-    {
-        $formId    = $form->getId();
-        $uploadDir = $this->coreParametersHelper->getParameter('form_upload_dir');
-
-        return $uploadDir.DIRECTORY_SEPARATOR.$formId;
+        return $notificationUploadDir.DIRECTORY_SEPARATOR.$notificationId;
     }
 }

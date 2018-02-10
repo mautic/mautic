@@ -39,7 +39,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @var array
      */
-    private $fileNames = ['action-icon-1'];
+    private $uploadFilesName = ['actionButtonIcon1'];
     //private $fileNames = ['action-icon-1', 'action-icon-2', 'chrome-firefox-icon-192-192', 'chrome-image-360-240', 'chrome-badge-72-72'];
 
     // time to live, priority
@@ -160,6 +160,19 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         }
 
         return $entity;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param Email $entity
+     * @param       $unlock
+     *
+     * @return mixed
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        parent::saveEntity($entity, $unlock);
     }
 
     /**
@@ -368,5 +381,13 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         }
 
         return $results;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUploadFilesName()
+    {
+        return $this->uploadFilesName;
     }
 }

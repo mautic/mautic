@@ -67,9 +67,9 @@ if ($notification->getId()) {
                                 <?php echo $view['form']->row($form['url']); ?>
                                 <?php echo $view['form']->row($form['button']); ?>
                                 <?php echo $view['form']->row($form['actionButtonIcon1']); ?>
+                                <?php echo $view['form']->row($form['actionButtonIcon1_delete']); ?>
                             </div>
                             <div class="col-md-6">
-                                <?php include 'preview.html.php'; ?>
                             </div>
                         </div>
                     </div>

@@ -138,8 +138,8 @@ return [
                 ],
                 'alias' => 'notification_api',
             ],
-            'mautic.notification.helper.notification_uploader' => [
-                'class'     => \Mautic\FormBundle\Helper\NotificationUploader::class,
+            'mautic.notification.helper.uploader' => [
+                'class'     => \Mautic\NotificationBundle\Helper\NotificationUploader::class,
                 'arguments' => [
                     'mautic.helper.file_uploader',
                     'mautic.helper.core_parameters',
@@ -284,5 +284,6 @@ return [
         'gcm_sender_id'                      => '482941778795',
         'notification_subdomain_name'        => null,
         'welcomenotification_enabled'        => true,
+        'notification_upload_dir'            => '%kernel.root_dir%/../notification/files/form',
     ],
 ];

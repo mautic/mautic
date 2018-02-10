@@ -14,9 +14,11 @@ namespace Mautic\NotificationBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\File;
 
 /**
  * Class NotificationType.
@@ -81,17 +83,6 @@ class NotificationType extends AbstractType
         );
 
         $builder->add(
-            'actionButtonIcon1',
-            'text',
-            [
-                'label'      => 'mautic.notification.form.heading',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
-            ]
-        );
-
-        $builder->add(
             'message',
             'textarea',
             [
@@ -132,6 +123,44 @@ class NotificationType extends AbstractType
                 'required' => false,
             ]
         );
+
+        $builder->add(
+            'actionButtonIcon1',
+            'file',
+            [
+                'label'      => 'mautic.notification.form.button.icon',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'toolbar' => 'mautic.notification.form.button.icon.tooltip',
+                ],
+                'mapped'      => false,
+                'constraints' => [
+                    new File(
+                        [
+                            'mimeTypes' => [
+                                'image/gif',
+                                'image/jpeg',
+                                'image/png',
+                            ],
+                            'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid',
+                        ]
+                    ),
+                ],
+            ]
+        );
+        if (!empty($options['data']->getActionButtonIcon1())) {
+            $builder->add(
+                'actionButtonIcon1_delete',
+                CheckboxType::class,
+                [
+                    'label'      => 'mautic.notification.form.button.icon.delete',
+                    'label_attr' => ['class' => 'control-label'],
+                    'mapped'     => false,
+                ]
+            );
+        }
 
         $builder->add('isPublished', 'yesno_button_group');
 
@@ -278,7 +307,8 @@ class NotificationType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\NotificationBundle\Entity\Notification',
+                'data_class'               => 'Mautic\NotificationBundle\Entity\Notification',
+                'actionButtonIcon1_delete' => false,
             ]
         );
 

@@ -294,18 +294,6 @@ class Notification extends FormEntity
                 }
             },
         ]));
-
-        $metadata->addConstraint(new Callback([
-            'callback' => function (Notification $notification, ExecutionContextInterface $context) {
-                $violations = ['test'];
-                if (count($violations) > 0) {
-                    $string = (string) $violations[0];
-                    ////   $context->buildViolation($string)
-                         //   ->atPath('test')
-                     //       ->addViolation();
-                }
-            },
-        ]));
     }
 
     /**
