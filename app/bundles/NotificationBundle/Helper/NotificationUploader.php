@@ -58,7 +58,7 @@ class NotificationUploader
                 $result[$alias]  = $fileName;
                 $uploadedFiles[] = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
             }
-            $submission->setResults($result);
+            //    $submission->setResults($result);
         } catch (FileUploadException $e) {
             foreach ($uploadedFiles as $filePath) {
                 $this->fileUploader->delete($filePath);

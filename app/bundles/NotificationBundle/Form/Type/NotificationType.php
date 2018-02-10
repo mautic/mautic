@@ -14,6 +14,7 @@ namespace Mautic\NotificationBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -23,15 +24,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class NotificationType extends AbstractType
 {
     const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'png,gif';
-
-    /**
-     * @var array
-     */
-    private $fileNames = ['action-icon-1', 'action-icon-2', 'chrome-firefox-icon-192-192', 'chrome-image-360-240', 'chrome-badge-72-72'];
-
-    // time to live, priority
-    //ttl 259,200 seconds - 72
-    //priority 1-10
 
     /**
      * @param FormBuilderInterface $builder
@@ -79,6 +71,17 @@ class NotificationType extends AbstractType
 
         $builder->add(
             'heading',
+            'text',
+            [
+                'label'      => 'mautic.notification.form.heading',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'actionButtonIcon1',
             'text',
             [
                 'label'      => 'mautic.notification.form.heading',
@@ -186,6 +189,42 @@ class NotificationType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'priority',
+            ChoiceType::class,
+            [
+                'choices'     => $this->getRangeChoices(1, 10),
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.notification.form.priority',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.notification.form.priority.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'ttl',
+            ChoiceType::class,
+            [
+                'choices'     => $this->getRangeChoices(1, 72),
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.notification.form.time.to.live',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.notification.form.time.to.live.tooltip',
+                ],
+            ]
+        );
+
         $builder->add('buttons', 'form_buttons');
 
         if (!empty($options['update_select'])) {
@@ -214,6 +253,22 @@ class NotificationType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+    }
+
+    /**
+     * @param int $min
+     * @param int $max
+     *
+     * @return array
+     */
+    private function getRangeChoices($min, $max)
+    {
+        $choices = [];
+        for ($i = $min; $i <= $max; ++$i) {
+            $choices[$i] = $i;
+        }
+
+        return $choices;
     }
 
     /**

@@ -37,6 +37,16 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     protected $pageTrackableModel;
 
     /**
+     * @var array
+     */
+    private $fileNames = ['action-icon-1'];
+    //private $fileNames = ['action-icon-1', 'action-icon-2', 'chrome-firefox-icon-192-192', 'chrome-image-360-240', 'chrome-badge-72-72'];
+
+    // time to live, priority
+    //ttl 259,200 seconds - 72
+    //priority 1-10
+
+    /**
      * NotificationModel constructor.
      *
      * @param TrackableModel $pageTrackableModel

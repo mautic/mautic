@@ -17,7 +17,37 @@ $header = ($notification->getId()) ?
     $view['translator']->trans('mautic.notification.header.new');
 
 $view['slots']->set('headerTitle', $header);
+if ($notification->getId()) {
+    $customButtons = [
+        [
+            'attr' => [
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'data-header' => $view['translator']->trans('mautic.notification.notification.header.preview'),
+                'data-footer' => 'false',
+                'href'        => $view['router']->path(
+                    'mautic_notification_action',
+                    ['objectId' => $notification->getId(), 'objectAction' => 'preview']
+                ),
+            ],
+            'btnText'   => $view['translator']->trans('mautic.notification.preview'),
+            'iconClass' => 'fa fa-share',
+            'primary'   => false,
+            'priority'  => 10,
+        ],
+    ];
 
+    $view['slots']->set(
+        'actions',
+        $view->render(
+            'MauticCoreBundle:Helper:page_actions.html.php',
+            [
+                'routeBase'     => 'notification',
+                'customButtons' => $customButtons,
+            ]
+        )
+    );
+}
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -36,6 +66,7 @@ $view['slots']->set('headerTitle', $header);
                                 <?php echo $view['form']->row($form['message']); ?>
                                 <?php echo $view['form']->row($form['url']); ?>
                                 <?php echo $view['form']->row($form['button']); ?>
+                                <?php echo $view['form']->row($form['actionButtonIcon1']); ?>
                             </div>
                             <div class="col-md-6">
                                 <?php include 'preview.html.php'; ?>
@@ -50,6 +81,11 @@ $view['slots']->set('headerTitle', $header);
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['language']); ?>
+            <hr />
+            <h5><?php echo $view['translator']->trans('mautic.config.tab.notificationconfig'); ?></h5>
+            <br />
+            <?php echo $view['form']->row($form['ttl']); ?>
+            <?php echo $view['form']->row($form['priority']); ?>
             <hr />
             <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
             <br />

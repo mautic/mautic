@@ -134,6 +134,11 @@ class Notification extends FormEntity
     private $priority;
 
     /**
+     * @var string
+     */
+    private $actionButtonIcon1;
+
+    /**
      * @var array
      */
     public function __clone()
@@ -239,6 +244,10 @@ class Notification extends FormEntity
 
         $builder->createField('priority', 'integer')
             ->build();
+
+        $builder->createField('actionButtonIcon1', 'string')
+            ->columnName('action_button_icon_1')
+            ->build();
     }
 
     /**
@@ -290,10 +299,10 @@ class Notification extends FormEntity
             'callback' => function (Notification $notification, ExecutionContextInterface $context) {
                 $violations = ['test'];
                 if (count($violations) > 0) {
-                    $string = (string) $violations;
-                    $context->buildViolation($string)
-                            ->atPath('test')
-                            ->addViolation();
+                    $string = (string) $violations[0];
+                    ////   $context->buildViolation($string)
+                         //   ->atPath('test')
+                     //       ->addViolation();
                 }
             },
         ]));
@@ -751,5 +760,22 @@ class Notification extends FormEntity
     {
         $this->isChanged('priority', $priority);
         $this->priority = $priority;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionButtonIcon1()
+    {
+        return $this->actionButtonIcon1;
+    }
+
+    /**
+     * @param string $actionButtonIcon1
+     */
+    public function setActionButtonIcon1($actionButtonIcon1)
+    {
+        $this->isChanged('actionButtonIcon1', $actionButtonIcon1);
+        $this->actionButtonIcon1 = $actionButtonIcon1;
     }
 }
