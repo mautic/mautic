@@ -11,9 +11,11 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -23,13 +25,25 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class ConfigType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var TranslatorInterface
      */
-    private $factory;
+    private $translator;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * @var TransportType
+     */
+    private $transportType;
+
+    /**
+     * ConfigType constructor.
+     *
+     * @param TranslatorInterface $translator
+     * @param TransportType       $transportType
+     */
+    public function __construct(TranslatorInterface $translator, TransportType $transportType)
     {
-        $this->factory = $factory;
+        $this->translator    = $translator;
+        $this->transportType = $transportType;
     }
 
     /**
@@ -51,7 +65,7 @@ class ConfigType extends AbstractType
                 'required' => false,
                 'data'     => (array_key_exists('unsubscribe_text', $options['data']) && !empty($options['data']['unsubscribe_text']))
                     ? $options['data']['unsubscribe_text']
-                    : $this->factory->getTranslator()->trans(
+                    : $this->translator->trans(
                         'mautic.email.unsubscribe.text',
                         ['%link%' => '|URL|']
                     ),
@@ -71,7 +85,7 @@ class ConfigType extends AbstractType
                 'required' => false,
                 'data'     => (array_key_exists('webview_text', $options['data']) && !empty($options['data']['webview_text']))
                     ? $options['data']['webview_text']
-                    : $this->factory->getTranslator()->trans(
+                    : $this->translator->trans(
                         'mautic.email.webview.text',
                         ['%link%' => '|URL|']
                     ),
@@ -91,7 +105,7 @@ class ConfigType extends AbstractType
                 'required' => false,
                 'data'     => (array_key_exists('unsubscribe_message', $options['data']) && !empty($options['data']['unsubscribe_message']))
                     ? $options['data']['unsubscribe_message']
-                    : $this->factory->getTranslator()->trans(
+                    : $this->translator->trans(
                         'mautic.email.unsubscribed.success',
                         [
                             '%resubscribeUrl%' => '|URL|',
@@ -114,7 +128,7 @@ class ConfigType extends AbstractType
                 'required' => false,
                 'data'     => (array_key_exists('resubscribe_message', $options['data']) && !empty($options['data']['resubscribe_message']))
                     ? $options['data']['resubscribe_message']
-                    : $this->factory->getTranslator()->trans(
+                    : $this->translator->trans(
                         'mautic.email.resubscribed.success',
                         [
                             '%unsubscribeUrl%' => '|URL|',
@@ -137,7 +151,7 @@ class ConfigType extends AbstractType
                 'required' => false,
                 'data'     => (!empty($options['data']['default_signature_text']))
                     ? $options['data']['default_signature_text']
-                    : $this->factory->getTranslator()->trans(
+                    : $this->translator->trans(
                         'mautic.email.default.signature',
                         [
                             '%from_name%' => '|FROM_NAME|',
@@ -207,21 +221,9 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_transport',
-            'choice',
+            ChoiceType::class,
             [
-                'choices' => [
-                    'mautic.transport.amazon'       => 'mautic.email.config.mailer_transport.amazon',
-                    'mautic.transport.elasticemail' => 'mautic.email.config.mailer_transport.elasticemail',
-                    'gmail'                         => 'mautic.email.config.mailer_transport.gmail',
-                    'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
-                    'mautic.transport.mailjet'      => 'mautic.email.config.mailer_transport.mailjet',
-                    'smtp'                          => 'mautic.email.config.mailer_transport.smtp',
-                    'mail'                          => 'mautic.email.config.mailer_transport.mail',
-                    'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
-                    'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
-                    'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
-                    'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
-                ],
+                'choices'  => $this->transportType->getTransportTypes(),
                 'label'    => 'mautic.email.config.mailer.transport',
                 'required' => false,
                 'attr'     => [
@@ -241,7 +243,6 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.convert.embed.images.tooltip',
-
                 ],
                 'data'     => empty($options['data']['mailer_convert_embed_images']) ? false : true,
                 'required' => false,
@@ -257,7 +258,6 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.append.tracking.pixel.tooltip',
-
                 ],
                 'data'     => empty($options['data']['mailer_append_tracking_pixel']) ? false : true,
                 'required' => false,
@@ -273,15 +273,14 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.disable.trackable.urls.tooltip',
-
                 ],
                 'data'     => empty($options['data']['disable_trackable_urls']) ? false : true,
                 'required' => false,
             ]
         );
 
-        $smtpServiceShowConditions  = '{"config_emailconfig_mailer_transport":["smtp"]}';
-        $amazonRegionShowConditions = '{"config_emailconfig_mailer_transport":["mautic.transport.amazon"]}';
+        $smtpServiceShowConditions  = '{"config_emailconfig_mailer_transport":['.$this->transportType->getSmtpService().']}';
+        $amazonRegionShowConditions = '{"config_emailconfig_mailer_transport":['.$this->transportType->getAmazonService().']}';
 
         $builder->add(
             'mailer_host',
@@ -359,15 +358,7 @@ class ConfigType extends AbstractType
                 "plain",
                 "login",
                 "cram-md5"
-            ], "config_emailconfig_mailer_transport":[
-                "mautic.transport.mandrill",
-                "mautic.transport.mailjet",
-                "mautic.transport.sendgrid",
-                "mautic.transport.elasticemail",
-                "mautic.transport.amazon",
-                "mautic.transport.postmark",
-                "gmail"
-            ]
+            ], "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresLogin().']
         }';
 
         $mailerLoginPasswordShowConditions = '{
@@ -375,31 +366,15 @@ class ConfigType extends AbstractType
                 "plain",
                 "login",
                 "cram-md5"
-            ], "config_emailconfig_mailer_transport":[
-                "mautic.transport.elasticemail",
-                "mautic.transport.sendgrid",
-                "mautic.transport.amazon",
-                "mautic.transport.postmark",
-                "mautic.transport.mailjet",
-                "gmail"
-            ]
+            ], "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresPassword().']
         }';
 
         $mailerLoginUserHideConditions = '{
-         "config_emailconfig_mailer_transport":[
-                "mail",
-                "sendmail",
-                "mautic.transport.sparkpost"
-            ]
+         "config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedLogin().']
         }';
 
         $mailerLoginPasswordHideConditions = '{
-         "config_emailconfig_mailer_transport":[
-                "mail",
-                "sendmail",
-                "mautic.transport.sparkpost",
-                "mautic.transport.mandrill"
-            ]
+         "config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedPassword().']
         }';
 
         $builder->add(
@@ -438,7 +413,7 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $apiKeyShowConditions = '{"config_emailconfig_mailer_transport":["mautic.transport.sparkpost", "mautic.transport.mandrill"]}';
+        $apiKeyShowConditions = '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresApiKey().']}';
         $builder->add(
             'mailer_api_key',
             'password',
@@ -510,7 +485,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'        => 'form-control',
                     'tooltip'      => 'mautic.email.config.mailer.mailjet.sandbox',
-                    'data-show-on' => '{"config_emailconfig_mailer_transport":["mautic.transport.mailjet"]}',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getMailjetService().']}',
                 ],
                 'data'     => empty($options['data']['mailer_mailjet_sandbox']) ? false : true,
                 'required' => false,
@@ -526,7 +501,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'        => 'form-control',
                     'tooltip'      => 'mautic.email.config.mailer.mailjet.sandbox.mail',
-                    'data-show-on' => '{"config_emailconfig_mailer_transport":["mautic.transport.mailjet"]}',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getMailjetService().']}',
                     'data-hide-on' => '{"config_emailconfig_mailer_mailjet_sandbox_0":"checked"}',
                 ],
                 'constraints' => [

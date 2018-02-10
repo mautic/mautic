@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-use \Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 $formName = '_'.strtolower(
         InputHelper::alphanum(
@@ -44,8 +44,8 @@ if (empty($preview)):
             var headline = document.getElementsByClassName('mf-headline');
             if (headline.length) {
                 headline[0].style.display = "none";
-
             }
+
             var tagline = document.getElementsByClassName('mf-tagline');
             if (tagline.length) {
                 tagline[0].style.display = "none";

@@ -160,6 +160,10 @@ return [
                     'mautic.lead.model.field',
                 ],
             ],
+
+            'mautic.plugin.model.integration_entity' => [
+                'class' => Mautic\PluginBundle\Model\IntegrationEntityModel::class,
+            ],
         ],
     ],
 ];

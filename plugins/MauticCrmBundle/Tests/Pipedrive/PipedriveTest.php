@@ -12,8 +12,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
-use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 abstract class PipedriveTest extends MauticMysqlTestCase
 {
@@ -115,7 +113,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    protected function createUser($isAdmin = true, $email = 'admin@admin.com', $username = 'admin')
+    protected function createUser($isAdmin = true, $email = 'admin@pipedrive-admin.com', $username = 'pipedrive-admin')
     {
         $role = new Role();
         $role->setName('Test');
@@ -215,41 +213,5 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
         $this->em->persist($company);
         $this->em->flush();
-    }
-
-    protected function loginUser()
-    {
-        $session = $this->container->get('session');
-        $session->clear();
-
-        $this->client->getCookieJar()->set(new Cookie(session_name(), true));
-
-        // dummy call to bypass the hasPreviousSession check
-        $this->client->request('GET', '/');
-
-        $userModel = $this->client->getContainer()->get('mautic.model.factory')->getModel('user');
-        $role      = new Role();
-        $role->setName('Test');
-        $role->setDescription('Test 123');
-        $role->setIsAdmin(1);
-
-        $this->em->persist($role);
-
-        $user = $userModel->getEntity();
-        $user->setFirstName('Admin');
-        $user->setLastName('User');
-        $user->setUsername('admin');
-        $user->setEmail('admin@admin.com');
-        $user->setPassword(123456);
-        $user->setRole($role);
-
-        $userModel->saveEntity($user);
-
-        $token = new UsernamePasswordToken($user, $user->getPassword(), 'mautic', $user->getRoles());
-        $this->container->get('security.context')->setToken($token);
-
-        $session = $this->container->get('session');
-        $session->set('_security_'.'mautic', serialize($token));
-        $session->save();
     }
 }

@@ -10,7 +10,7 @@
  */
 $data = $event['extra']['log']['metadata'];
 
-if (isset($data['failed'])) {
+if (isset($data['failed']) || !isset($data['timeline'])) {
     return;
 }
 ?>

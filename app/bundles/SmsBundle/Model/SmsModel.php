@@ -67,7 +67,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @param MessageQueueModel $messageQueueModel
      * @param AbstractSmsApi    $smsApi
      */
-    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel,         AbstractSmsApi $smsApi)
+    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, AbstractSmsApi $smsApi)
     {
         $this->pageTrackableModel = $pageTrackableModel;
         $this->leadModel          = $leadModel;

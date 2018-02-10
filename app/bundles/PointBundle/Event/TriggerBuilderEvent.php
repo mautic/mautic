@@ -65,10 +65,16 @@ class TriggerBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            ['group', 'label', 'callback'],
+            ['group', 'label'],
             ['callback'],
             $event
         );
+
+        //Support for old way with callback and new event based system
+        //Could be removed after all events will be refactored to events. The key 'eventName' will be mandatory and 'callback' will be removed.
+        if (!array_key_exists('callback', $event) && !array_key_exists('eventName', $event)) {
+            throw new InvalidArgumentException("One of the 'callback' or 'eventName' has to be provided. Use 'eventName' for new code");
+        }
 
         $event['label']       = $this->translator->trans($event['label']);
         $event['group']       = $this->translator->trans($event['group']);

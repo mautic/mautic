@@ -40,10 +40,11 @@ class DoNotContactRepository extends CommonRepository
      * @param null            $reason
      * @param null            $listId
      * @param ChartQuery|null $chartQuery
+     * @param bool            $combined
      *
      * @return array|int
      */
-    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ChartQuery $chartQuery = null)
+    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -70,20 +71,34 @@ class DoNotContactRepository extends CommonRepository
         }
 
         if ($listId) {
-            $q->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = dnc.lead_id');
+            if (!$combined) {
+                $q->innerJoin('dnc', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = dnc.lead_id');
 
-            if (true === $listId) {
-                $q->addSelect('cs.leadlist_id')
-                    ->groupBy('cs.leadlist_id');
-            } elseif (is_array($listId)) {
-                $q->andWhere(
-                    $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
-                )
-                    ->addSelect('cs.leadlist_id')
-                    ->groupBy('cs.leadlist_id');
+                if (true === $listId && !$combined) {
+                    $q->addSelect('cs.leadlist_id')
+                        ->groupBy('cs.leadlist_id');
+                } elseif (is_array($listId)) {
+                    $q->andWhere(
+                        $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
+                    );
+
+                    if (!$combined) {
+                        $q->addSelect('cs.leadlist_id')
+                            ->groupBy('cs.leadlist_id');
+                    }
+                } else {
+                    $q->andWhere('cs.leadlist_id = :list_id')
+                        ->setParameter('list_id', $listId);
+                }
             } else {
-                $q->andWhere('cs.leadlist_id = :list_id')
-                    ->setParameter('list_id', $listId);
+                $subQ = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $subQ->select('distinct(list.lead_id)')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list')
+                    ->andWhere(
+                        $q->expr()->in('list.leadlist_id', array_map('intval', $listId))
+                    );
+
+                $q->innerJoin('dnc', sprintf('(%s)', $subQ->getSQL()), 'cs', 'cs.lead_id = dnc.lead_id');
             }
         }
 
@@ -93,7 +108,7 @@ class DoNotContactRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        if (true === $listId || is_array($listId)) {
+        if ((true === $listId || is_array($listId)) && !$combined) {
             // Return list group of counts
             $byList = [];
             foreach ($results as $result) {
@@ -107,8 +122,10 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param int|null $leadId
-     * @param array    $options
+     * @param null  $leadId
+     * @param array $options
+     *
+     * @return array
      */
     public function getTimelineStats($leadId = null, array $options = [])
     {

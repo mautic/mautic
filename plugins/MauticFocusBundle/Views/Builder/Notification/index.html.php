@@ -14,8 +14,8 @@ echo $view->render(
     'MauticFocusBundle:Builder\Modal:index.html.php',
     [
         'focus'    => $focus,
-        'form'     => $form,
         'preview'  => $preview,
         'clickUrl' => $clickUrl,
+        'htmlMode' => $htmlMode,
     ]
 );

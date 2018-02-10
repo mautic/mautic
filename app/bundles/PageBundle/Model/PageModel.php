@@ -36,6 +36,8 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
+use Mautic\QueueBundle\Queue\QueueName;
+use Mautic\QueueBundle\Queue\QueueService;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -90,6 +92,16 @@ class PageModel extends FormModel
     protected $pageTrackableModel;
 
     /**
+     * @var DateTimeHelper
+     */
+    protected $dateTimeHelper;
+
+    /**
+     * @var QueueService
+     */
+    protected $queueService;
+
+    /**
      * PageModel constructor.
      *
      * @param CookieHelper   $cookieHelper
@@ -98,6 +110,7 @@ class PageModel extends FormModel
      * @param FieldModel     $leadFieldModel
      * @param RedirectModel  $pageRedirectModel
      * @param TrackableModel $pageTrackableModel
+     * @param QueueService   $queueService
      */
     public function __construct(
         CookieHelper $cookieHelper,
@@ -105,7 +118,8 @@ class PageModel extends FormModel
         LeadModel $leadModel,
         FieldModel $leadFieldModel,
         RedirectModel $pageRedirectModel,
-        TrackableModel $pageTrackableModel
+        TrackableModel $pageTrackableModel,
+        QueueService $queueService
     ) {
         $this->cookieHelper       = $cookieHelper;
         $this->ipLookupHelper     = $ipLookupHelper;
@@ -114,6 +128,7 @@ class PageModel extends FormModel
         $this->pageRedirectModel  = $pageRedirectModel;
         $this->pageTrackableModel = $pageTrackableModel;
         $this->dateTimeHelper     = new DateTimeHelper();
+        $this->queueService       = $queueService;
     }
 
     /**
@@ -378,7 +393,9 @@ class PageModel extends FormModel
         //should the url include the category
         if ($this->catInUrl) {
             $category = $entity->getCategory();
-            $catSlug  = (!empty($category)) ? $category->getAlias() :
+            $catSlug  = (!empty($category))
+                ? $category->getAlias()
+                :
                 $this->translator->trans('mautic.core.url.uncategorized');
         }
 
@@ -402,15 +419,32 @@ class PageModel extends FormModel
     }
 
     /**
-     * Record page hit.
+     * @param Hit $hit
      *
-     * @param           $page
-     * @param Request   $request
-     * @param string    $code
-     * @param Lead|null $lead
-     * @param array     $query
-     *
-     * @return Hit $hit
+     * @return array|mixed
+     */
+    protected function generateClickThrough(Hit $hit)
+    {
+        $query = $hit->getQuery();
+
+        // Check for any clickthrough info
+        $clickthrough = [];
+        if (!empty($query['ct'])) {
+            $clickthrough = $query['ct'];
+            if (!is_array($clickthrough)) {
+                $clickthrough = $this->decodeArrayFromUrl($clickthrough);
+            }
+        }
+
+        return $clickthrough;
+    }
+
+    /**
+     * @param Page|Redirect $page
+     * @param Request       $request
+     * @param string        $code
+     * @param Lead|null     $lead
+     * @param array         $query
      *
      * @throws \Exception
      */
@@ -426,21 +460,90 @@ class PageModel extends FormModel
             $query = $this->getHitQuery($request, $page);
         }
 
+        // Get lead if required
+        if (null == $lead) {
+            $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
+        }
+
+        if (!$lead || !$lead->getId()) {
+            // Lead came from a non-trackable IP so ignore
+            return;
+        }
+        $this->leadModel->saveEntity($lead);
+
+        $ipAddress                                 = $this->ipLookupHelper->getIpAddress();
+        list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
+
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
-
+        $hit->setTrackingId($trackingId);
         // Check for existing IP
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
         $hit->setIpAddress($ipAddress);
 
-        // Check for any clickthrough info
-        $clickthrough = [];
-        if (!empty($query['ct'])) {
-            $clickthrough = $query['ct'];
-            if (!is_array($clickthrough)) {
-                $clickthrough = $this->decodeArrayFromUrl($clickthrough);
-            }
+        // Set info from request
+        $hit->setQuery($query);
+        $hit->setCode($code);
 
+        // Wrap in a try/catch to prevent deadlock errors on busy servers
+        try {
+            $this->em->persist($hit);
+            $this->em->flush($hit);
+        } catch (\Exception $exception) {
+            if (MAUTIC_ENV === 'dev') {
+                throw $exception;
+            } else {
+                $this->logger->addError(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
+            }
+        }
+
+        //save hit to the cookie to use to update the exit time
+        if ($hit) {
+            $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId() ?: null);
+        }
+
+        if ($this->queueService->isQueueEnabled()) {
+            $msg = [
+                'hitId'   => $hit->getId(),
+                'pageId'  => $page ? $page->getId() : null,
+                'request' => $request,
+                'leadId'  => $lead ? $lead->getId() : null,
+                'isNew'   => $trackingNewlyGenerated,
+            ];
+            $this->queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
+        } else {
+            $this->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated);
+        }
+    }
+
+    /**
+     * Process page hit.
+     *
+     * @param Hit           $hit
+     * @param Page|Redirect $page
+     * @param Request       $request
+     * @param Lead          $lead
+     * @param bool          $trackingNewlyGenerated
+     * @param bool          $activeRequest
+     *
+     * @throws \Exception
+     */
+    public function processPageHit(Hit $hit, $page, Request $request, Lead $lead, $trackingNewlyGenerated, $activeRequest = true)
+    {
+        // Store Page/Redirect association
+        if ($page) {
+            if ($page instanceof Page) {
+                $hit->setPage($page);
+            } else {
+                $hit->setRedirect($page);
+            }
+        }
+
+        // Check for any clickthrough info
+        $clickthrough = $this->generateClickThrough($hit);
+        if (!empty($clickthrough)) {
             if (!empty($clickthrough['channel'])) {
                 if (count($clickthrough['channel']) === 1) {
                     $channelId = reset($clickthrough['channel']);
@@ -464,15 +567,7 @@ class PageModel extends FormModel
             }
         }
 
-        // Get lead if required
-        if (null == $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
-        }
-
-        if (!$lead || !$lead->getId()) {
-            // Lead came from a non-trackable IP so ignore
-            return;
-        }
+        $query = $hit->getQuery() ? $hit->getQuery() : [];
 
         if (isset($query['timezone_offset']) && !$lead->getTimezone()) {
             // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
@@ -480,8 +575,6 @@ class PageModel extends FormModel
             $timezone = (-1 * $query['timezone_offset'] * 60);
             $lead->setTimezone($this->dateTimeHelper->guessTimezoneFromOffset($timezone));
         }
-
-        $this->leadModel->saveEntity($lead);
 
         // Set info from request
         $query = InputHelper::cleanArray($query);
@@ -499,10 +592,13 @@ class PageModel extends FormModel
         }
 
         // Store tracking ID
-        list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
-        $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
 
+        if (!$activeRequest) {
+            // Queue is consuming this hit outside of the lead's active request so this must be set in order for listeners to know who the request belongs to
+            $this->leadModel->setSystemCurrentLead($lead);
+        }
+        $trackingId = $hit->getTrackingId();
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
             if (!empty($lastHit)) {
@@ -514,9 +610,10 @@ class PageModel extends FormModel
         // Check if this is a unique page hit
         $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
 
+        $clickthrough = $this->generateClickThrough($hit);
+
         if (!empty($page)) {
             if ($page instanceof Page) {
-                $hit->setPage($page);
                 $hit->setPageLanguage($page->getLanguage());
 
                 $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
@@ -530,8 +627,6 @@ class PageModel extends FormModel
                     );
                 }
             } elseif ($page instanceof Redirect) {
-                $hit->setRedirect($page);
-
                 try {
                     $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
 
@@ -556,6 +651,7 @@ class PageModel extends FormModel
         }
 
         //glean info from the IP address
+        $ipAddress = $hit->getIpAddress();
         if ($details = $ipAddress->getIpDetails()) {
             $hit->setCountry($details['country']);
             $hit->setRegion($details['region']);
@@ -564,7 +660,6 @@ class PageModel extends FormModel
             $hit->setOrganization($details['organization']);
         }
 
-        $hit->setCode($code);
         if (!$hit->getReferer()) {
             $hit->setReferer($request->server->get('HTTP_REFERER'));
         }
@@ -586,7 +681,7 @@ class PageModel extends FormModel
                 }
             }
 
-            if ($queryHasUtmTags) {
+            if ($queryHasUtmTags && $lead) {
                 $utmTags = new UtmTag();
                 $utmTags->setDateAdded($hit->getDateHit());
                 $utmTags->setUrl($hit->getUrl());
@@ -658,6 +753,9 @@ class PageModel extends FormModel
             // The device fingerprint has changed, or it was not set previously.
             $device->setDeviceFingerprint($query['fingerprint']);
         }
+
+        $this->leadModel->saveEntity($lead);
+
         $this->em->persist($device);
         $this->em->flush($device);
         $hit->setDeviceStat($device);
@@ -678,14 +776,9 @@ class PageModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
-            $event = new PageHitEvent($hit, $request, $code, $clickthrough, $isUnique);
+            $event = new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique);
             $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
         }
-
-        //save hit to the cookie to use to update the exit time
-        $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId());
-
-        return $hit;
     }
 
     /**
@@ -719,7 +812,6 @@ class PageModel extends FormModel
 
                 // if additional data were sent with the tracking pixel
                 if (isset($query)) {
-
                     // URL attr 'd' is encoded so let's decode it first.
                     $decoded = false;
                     if (isset($query['d'])) {
@@ -991,7 +1083,7 @@ class PageModel extends FormModel
             $label = empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'];
 
             // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
-            $chart->setDataset($label,  $result['count']);
+            $chart->setDataset($label, $result['count']);
         }
 
         return $chart->render();

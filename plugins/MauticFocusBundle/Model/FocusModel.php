@@ -176,7 +176,7 @@ class FocusModel extends FormModel
     {
         // If cached is not an array, rebuild to support the new format
         $cached = json_decode($focus->getCache(), true);
-        if ($isPreview || $byPassCache || empty($cached)) {
+        if ($isPreview || $byPassCache || empty($cached) || !isset($cached['js'])) {
             $focusArray = $focus->toArray();
 
             $url = '';
@@ -222,7 +222,12 @@ class FocusModel extends FormModel
         $tokenEvent = new TokenReplacementEvent($cached['focus'], $lead, ['focus_id' => $focus->getId()]);
         $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
         $focusContent = $tokenEvent->getContent();
-        $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent);
+        $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent, $formReplaced);
+        if (!$formReplaced && !empty($cached['form'])) {
+            // Form token missing so just append the form
+            $focusContent .= $cached['form'];
+        }
+
         $focusContent = $this->templating->getTemplating()->getEngine('MauticFocusBundle:Builder:content.html.php')->escape($focusContent, 'js');
 
         return str_replace('{focus_content}', $focusContent, $cached['js']);
@@ -268,14 +273,19 @@ class FocusModel extends FormModel
             ]
         ) : '';
 
-        return ($isPreview)
-            ?
-            str_replace('{focus_form}', $formContent, $content)
-            :
-            [
-                'focus' => $content,
-                'form'  => $formContent,
-            ];
+        if ($isPreview) {
+            $content = str_replace('{focus_form}', $formContent, $content, $formReplaced);
+            if (!$formReplaced && !empty($formContent)) {
+                $content .= $formContent;
+            }
+
+            return $content;
+        }
+
+        return [
+            'focus' => $content,
+            'form'  => $formContent,
+        ];
     }
 
     /**
@@ -401,14 +411,14 @@ class FocusModel extends FormModel
 
         if ($focus->getType() != 'notification') {
             if ($focus->getType() == 'link') {
-                $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_CLICK]);
+                $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_CLICK, 'focus_id' => $focus->getId()]);
                 if (!$canViewOthers) {
                     $this->limitQueryToCreator($q);
                 }
                 $data = $query->loadAndBuildTimeData($q);
                 $chart->setDataset($this->translator->trans('mautic.focus.graph.clicks'), $data);
             } else {
-                $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_FORM]);
+                $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_FORM, 'focus_id' => $focus->getId()]);
                 if (!$canViewOthers) {
                     $this->limitQueryToCreator($q);
                 }

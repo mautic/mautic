@@ -110,24 +110,30 @@ if ($tmpl == 'index') {
                         ); ?>" data-toggle="ajax">
                             <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
                             <?php
-                            $hasVariants     = $item->isVariant();
-                            $hasTranslations = $item->isTranslation();
+                            $hasVariants        = $item->isVariant();
+                            $hasTranslations    = $item->isTranslation();
+                            $isPreferenceCenter = $item->isPreferenceCenter();
 
-                            if ($hasVariants || $hasTranslations): ?>
+                            if ($hasVariants || $hasTranslations || $isPreferenceCenter): ?>
                                 <span>
                                 <?php if ($hasVariants): ?>
                                     <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.ab_test'); ?>">
                                             <i class="fa fa-fw fa-sitemap"></i>
                                         </span>
                                 <?php endif; ?>
-                                    <?php if ($hasTranslations): ?>
-                                        <span data-toggle="tooltip" title="<?php echo $view['translator']->trans(
-                                            'mautic.core.icon_tooltip.translation'
-                                        ); ?>">
-                                            <i class="fa fa-fw fa-language"></i>
-                                        </span>
-                                    <?php endif; ?>
-                                 </span>
+                                <?php if ($hasTranslations): ?>
+                                    <span data-toggle="tooltip" title="<?php echo $view['translator']->trans(
+                                        'mautic.core.icon_tooltip.translation'
+                                    ); ?>">
+                                        <i class="fa fa-fw fa-language"></i>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if ($isPreferenceCenter): ?>
+                                    <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.preference_center'); ?>">
+                                        <i class="fa fa-fw fa-cog"></i>
+                                    </span>
+                                <?php endif; ?>
+                                </span>
                             <?php endif; ?>
                         </a>
                     </td>

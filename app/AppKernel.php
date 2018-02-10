@@ -34,7 +34,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 10;
+    const MINOR_VERSION = 12;
 
     /**
      * Patch version number.
@@ -174,6 +174,7 @@ class AppKernel extends Kernel
             new Mautic\PageBundle\MauticPageBundle(),
             new Mautic\PluginBundle\MauticPluginBundle(),
             new Mautic\PointBundle\MauticPointBundle(),
+            new Mautic\QueueBundle\MauticQueueBundle(),
             new Mautic\ReportBundle\MauticReportBundle(),
             new Mautic\SmsBundle\MauticSmsBundle(),
             new Mautic\StageBundle\MauticStageBundle(),
@@ -182,6 +183,9 @@ class AppKernel extends Kernel
             new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
             new LightSaml\SpBundle\LightSamlSpBundle(),
             new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
+            // These two bundles do DI based on config, so they need to be loaded after config is declared in MauticQueueBundle
+            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
+            new Leezy\PheanstalkBundle\LeezyPheanstalkBundle(),
         ];
 
         //dynamically register Mautic Plugin Bundles

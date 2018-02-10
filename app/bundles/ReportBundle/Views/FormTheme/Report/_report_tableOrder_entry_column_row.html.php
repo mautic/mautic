@@ -4,7 +4,7 @@
         <?php foreach ($form->vars['choices'] as $column) {
     ?>
         <option value="<?php echo $column->value; ?>"<?php echo ($column->value == $form->vars['data']) ? ' selected' : ''; ?>><?php echo $column->label; ?></option>
-        <?php 
+        <?php
 } ?>
     </select>
 </div>

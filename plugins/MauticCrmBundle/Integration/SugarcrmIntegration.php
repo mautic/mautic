@@ -11,13 +11,12 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -384,7 +383,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $params['max_results'] = 100;
         if (!isset($params['offset'])) {
             //First call
-             $params['offset'] = 0;
+            $params['offset'] = 0;
         }
 
         $query = $params;
@@ -516,136 +515,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \DateTime|null $startDate
-     * @param \DateTime|null $endDate
-     * @param                $leadId
-     *
-     * @return array
-     */
-    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId)
-    {
-        $leadIds = (!is_array($leadId)) ? [$leadId] : $leadId;
-
-        $leadActivity = [];
-        $options      = ['leadIds' => $leadIds, 'basic_select' => true, 'fromDate' => $startDate, 'toDate' => $endDate];
-
-        /** @var LeadModel $leadModel */
-        $leadModel      = $this->factory->getModel('lead');
-        $pointsRepo     = $leadModel->getPointLogRepository();
-        $results        = $pointsRepo->getLeadTimelineEvents(null, $options);
-        $pointChangeLog = [];
-        foreach ($results as $result) {
-            if (!isset($pointChangeLog[$result['lead_id']])) {
-                $pointChangeLog[$result['lead_id']] = [];
-            }
-            $pointChangeLog[$result['lead_id']][] = $result;
-        }
-        unset($results);
-
-        /** @var EmailModel $emailModel */
-        $emailModel = $this->factory->getModel('email');
-        $emailRepo  = $emailModel->getStatRepository();
-        $results    = $emailRepo->getLeadStats(null, $options);
-        $emailStats = [];
-        foreach ($results as $result) {
-            if (!isset($emailStats[$result['lead_id']])) {
-                $emailStats[$result['lead_id']] = [];
-            }
-            $emailStats[$result['lead_id']][] = $result;
-        }
-        unset($results);
-
-        /** @var SubmissionModel $formSubmissionModel */
-        $formSubmissionModel = $this->factory->getModel('form.submission');
-        $submissionRepo      = $formSubmissionModel->getRepository();
-        $results             = $submissionRepo->getSubmissions($options);
-        $formSubmissions     = [];
-        foreach ($results as $result) {
-            if (!isset($formSubmissions[$result['lead_id']])) {
-                $formSubmissions[$result['lead_id']] = [];
-            }
-            $formSubmissions[$result['lead_id']][] = $result;
-        }
-        unset($results);
-
-        $translator = $this->getTranslator();
-        foreach ($leadIds as $leadId) {
-            $i        = 0;
-            $activity = [];
-
-            if (isset($pointChangeLog[$leadId])) {
-                foreach ($pointChangeLog[$leadId] as $row) {
-                    $typeString = "mautic.{$row['type']}.{$row['type']}";
-                    $typeString = ($translator->hasId($typeString)) ? $translator->trans($typeString) : ucfirst($row['type']);
-                    if ((int) $row['delta'] > 0) {
-                        $subject = 'added';
-                    } else {
-                        $subject = 'subtracted';
-                        $row['delta'] *= -1;
-                    }
-                    $pointsString = $translator->transChoice(
-                        "mautic.sugarcrm.activity.points_{$subject}",
-                        $row['delta'],
-                        ['%points%' => $row['delta']]
-                    );
-                    $activity[$i]['eventType']   = 'point';
-                    $activity[$i]['name']        = $translator->trans('mautic.sugarcrm.activity.point')." ($pointsString)";
-                    $activity[$i]['description'] = "$typeString: {$row['eventName']} / {$row['actionName']}";
-                    $activity[$i]['dateAdded']   = $row['dateAdded'];
-                    $activity[$i]['id']          = 'pointChange'.$row['id'];
-                    ++$i;
-                }
-            }
-
-            if (isset($emailStats[$leadId])) {
-                foreach ($emailStats[$leadId] as $row) {
-                    switch (true) {
-                        case !empty($row['storedSubject']):
-                            $name = $row['storedSubject'];
-                            break;
-                        case !empty($row['subject']):
-                            $name = $row['subject'];
-                            break;
-                        case !empty($row['email_name']):
-                            $name = $row['email_name'];
-                            break;
-                        default:
-                            $name = $translator->trans('mautic.email.timeline.event.custom_email');
-                    }
-
-                    $activity[$i]['eventType']   = 'email';
-                    $activity[$i]['name']        = $translator->trans('mautic.sugarcrm.activity.email').": $name";
-                    $activity[$i]['description'] = $translator->trans('mautic.email.sent').": $name";
-                    $activity[$i]['dateAdded']   = $row['dateSent'];
-                    $activity[$i]['id']          = 'emailStat'.$row['id'];
-                    ++$i;
-                }
-            }
-
-            if (isset($formSubmissions[$leadId])) {
-                foreach ($formSubmissions[$leadId] as $row) {
-                    $activity[$i]['eventType']   = 'form';
-                    $activity[$i]['name']        = $this->getTranslator()->trans('mautic.sugarcrm.activity.form').': '.$row['name'];
-                    $activity[$i]['description'] = $translator->trans('mautic.form.event.submitted').': '.$row['name'];
-                    $activity[$i]['dateAdded']   = $row['dateSubmitted'];
-                    $activity[$i]['id']          = 'formSubmission'.$row['id'];
-                    ++$i;
-                }
-            }
-
-            $leadActivity[$leadId] = [
-                'records' => $activity,
-            ];
-
-            unset($activity);
-        }
-
-        unset($pointChangeLog, $emailStats, $formSubmissions);
-
-        return $leadActivity;
-    }
-
-    /**
      * @param array      $params
      * @param null|array $query
      *
@@ -735,7 +604,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function prepareRequest($url, $parameters, $method, $settings, $authType)
     {
         if ($authType == 'oauth2' && empty($settings['authorize_session']) && isset($this->keys['access_token'])) {
-
             // Append the access token as the oauth-token header
             $headers = [
                 "oauth-token: {$this->keys['access_token']}",
@@ -852,8 +720,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         if (isset($data[$RECORDS_LIST_NAME]) and $object !== 'Activity') {
-
-        //Get assigned user ids
+            //Get assigned user ids
             $assignedUserIds            = [];
             $onwerEmailByAssignedUserId = [];
             if ($object == 'Leads' || $object == 'Contacts' || $object == 'Accounts') {
@@ -876,7 +743,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 $onwerEmailByAssignedUserId = $this->getApiHelper()->getEmailBySugarUserId(['ids' => $assignedUserIds]);
             }
 
-//Get all leads emails
+            //Get all leads emails
             $checkEmailsInSugar = [];
             if ($object == 'Leads') {
                 if ($SUGAR_VERSION == '6') {
@@ -1070,25 +937,25 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             ]);
         }
         if ($formArea == 'features') {
-            //if (isset($this->keys['version']) && $this->keys['version'] == '6') {
-                $builder->add(
-                    'updateOwner',
-                    'choice',
-                    [
-                        'choices' => [
-                            'updateOwner' => 'mautic.sugarcrm.updateOwner',
-                        ],
-                        'expanded'    => true,
-                        'multiple'    => true,
-                        'label'       => 'mautic.sugarcrm.form.updateOwner',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'empty_value' => false,
-                        'required'    => false,
-                        'attr'        => [
-                            'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
-                        ],
-                    ]
-                );
+            $builder->add(
+                'updateOwner',
+                'choice',
+                [
+                    'choices' => [
+                        'updateOwner' => 'mautic.sugarcrm.updateOwner',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.sugarcrm.form.updateOwner',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
+                    ],
+                ]
+            );
+
             $builder->add(
                 'updateBlanks',
                 'choice',
@@ -1104,24 +971,41 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'required'    => false,
                 ]
             );
+
             $builder->add(
-                    'objects',
-                    'choice',
-                    [
-                        'choices' => [
-                            'Leads'    => 'mautic.sugarcrm.object.lead',
-                            'Contacts' => 'mautic.sugarcrm.object.contact',
-                            'company'  => 'mautic.sugarcrm.object.company',
-                        ],
-                        'expanded'    => true,
-                        'multiple'    => true,
-                        'label'       => 'mautic.sugarcrm.form.objects_to_pull_from',
-                        'label_attr'  => ['class' => ''],
-                        'empty_value' => false,
-                        'required'    => false,
-                    ]
-                );
-            //}
+                'objects',
+                'choice',
+                [
+                    'choices' => [
+                        'Leads'    => 'mautic.sugarcrm.object.lead',
+                        'Contacts' => 'mautic.sugarcrm.object.contact',
+                        'company'  => 'mautic.sugarcrm.object.company',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.sugarcrm.form.objects_to_pull_from',
+                    'label_attr'  => ['class' => ''],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );
+
+            $builder->add(
+                'activityEvents',
+                ChoiceType::class,
+                [
+                    'choices'    => $this->leadModel->getEngagementTypes(),
+                    'label'      => 'mautic.salesforce.form.activity_included_events',
+                    'label_attr' => [
+                        'class'       => 'control-label',
+                        'data-toggle' => 'tooltip',
+                        'title'       => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip'),
+                    ],
+                    'multiple'   => true,
+                    'empty_data' => ['point.gained', 'form.submitted', 'email.read'], // BC with pre 2.11.0
+                    'required'   => false,
+                ]
+            );
         }
     }
 
@@ -1133,8 +1017,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $settings                           = parent::getFormSettings();
         $settings['requires_callback']      = false;
         $settings['requires_authorization'] = true;
-            //'requires_callback'      => false,
-            //'requires_authorization' => true,
+        //'requires_callback'      => false,
+        //'requires_authorization' => true,
         return $settings;
     }
 
@@ -1278,10 +1162,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return $leadFields;
     }
-/*
- * @param array $params
- * @return mixed
-*/
+
     /**
      * @param array $params
      *
@@ -1297,11 +1178,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
         $leadFields              = $config['leadFields'];
         if (!empty($leadFields)) {
-            if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
-                unset($leadFields[$key]);
+            if ($keys = array_keys($leadFields, 'mauticContactTimelineLink')) {
+                foreach ($keys as $key) {
+                    unset($leadFields[$key]);
+                }
             }
-            if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
-                unset($leadFields[$key]);
+
+            if ($keys = array_keys($leadFields, 'mauticContactIsContactableByEmail')) {
+                foreach ($keys as $key) {
+                    unset($leadFields[$key]);
+                }
             }
 
             $fields = implode(', l.', $leadFields);
@@ -1325,7 +1211,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
         $checkEmailsInSugar = [];
         $deletedSugarLeads  = [];
-        $sugarIdMapping     = [];
         foreach ($leadsToUpdate as $object => $records) {
             foreach ($records as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
@@ -1396,7 +1281,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $result = $apiHelper->syncLeadsToSugar($mauticData);
         }
 
-        return $this->processCompositeResponse($result, $sugarIdMapping);
+        return $this->processCompositeResponse($result);
     }
 
     /**
@@ -1473,7 +1358,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                 $contactSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarFieldMappings['Contacts'], $config);
                             }
                             if (isset($sugarFieldMappings['Leads']) && !empty($sugarFieldMappings['Leads'])) {
-                                $leadSugarFields = $this->getBlankFieldsToUpdate($leadSugarFields, $sugarLeadRecord,  $sugarFieldMappings['Leads'], $config);
+                                $leadSugarFields = $this->getBlankFieldsToUpdate($leadSugarFields, $sugarLeadRecord, $sugarFieldMappings['Leads'], $config);
                             }
                             $this->buildCompositeBody(
                                 $mauticData,
@@ -1499,6 +1384,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return [$checkEmailsInSugar, $deletedSugarLeads];
     }
+
     /**
      * @param $lead
      *
@@ -1583,12 +1469,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param       $response
-     * @param array $sugarcrmIdMapping
+     * @param array $response
      *
      * @return array
      */
-    protected function processCompositeResponse($response, array $sugarcrmIdMapping = [])
+    protected function processCompositeResponse($response)
     {
         $created         = 0;
         $errored         = 0;
@@ -1644,20 +1529,20 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         ++$created;
                     } else {
                         // Record was updated
-                    if ($integrationEntityId) {
-                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
-                        $integrationEntity->setLastSyncDate(new \DateTime());
-                    } else {
-                        // Found in Sugarcrm so create a new record for it
-                        $integrationEntity = new IntegrationEntity();
-                        $integrationEntity->setDateAdded(new \DateTime());
-                        $integrationEntity->setLastSyncDate(new \DateTime());
-                        $integrationEntity->setIntegration($this->getName());
-                        $integrationEntity->setIntegrationEntity($object);
-                        $integrationEntity->setIntegrationEntityId($sugarcrmIdMapping[$contactId]);
-                        $integrationEntity->setInternalEntity('lead');
-                        $integrationEntity->setInternalEntityId($contactId);
-                    }
+                        if ($integrationEntityId) {
+                            $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+                            $integrationEntity->setLastSyncDate(new \DateTime());
+                        } else {
+                            // Found in Sugarcrm so create a new record for it
+                            $integrationEntity = new IntegrationEntity();
+                            $integrationEntity->setDateAdded(new \DateTime());
+                            $integrationEntity->setLastSyncDate(new \DateTime());
+                            $integrationEntity->setIntegration($this->getName());
+                            $integrationEntity->setIntegrationEntity($object);
+                            $integrationEntity->setIntegrationEntityId($item['id']);
+                            $integrationEntity->setInternalEntity('lead');
+                            $integrationEntity->setInternalEntityId($contactId);
+                        }
 
                         $persistEntities[] = $integrationEntity;
                         ++$updated;
@@ -1677,6 +1562,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return [$updated, $created, $errored];
     }
+
     /**
      * @param       $fieldsToUpdate
      * @param array $objects
@@ -1700,6 +1586,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return $fieldsToUpdate;
     }
+
     /**
      * @param        $config
      * @param null   $object

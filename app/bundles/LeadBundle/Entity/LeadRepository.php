@@ -13,13 +13,14 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
-use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * LeadRepository.
@@ -29,6 +30,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     use CustomFieldRepositoryTrait;
     use ExpressionHelperTrait;
     use OperatorListTrait;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
 
     /**
      * @var array
@@ -46,11 +52,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @var TriggerModel
      */
     private $triggerModel;
-
-    /**
-     * @var
-     */
-    private $pointChanges;
 
     /**
      * Used by search functions to search social profiles.
@@ -80,6 +81,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setTriggerModel(TriggerModel $triggerModel)
     {
         $this->triggerModel = $triggerModel;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -142,6 +151,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return $results;
+    }
+
+    /**
+     * @param $email
+     *
+     * @return Lead[]
+     */
+    public function getContactsByEmail($email)
+    {
+        $contacts = $this->getLeadsByFieldValue('email', $email);
+
+        // Attempt to search for contacts without a + suffix
+        if (empty($contacts) && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts)) {
+            $email    = $parts[1].'@'.$parts[3];
+            $contacts = $this->getLeadsByFieldValue('email', $email);
+        }
+
+        return $contacts;
     }
 
     /**
@@ -838,102 +865,23 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 );
                 $returnParameter = true;
                 break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailsent'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailsent', [], null, 'en_US'):
-                $this->applySearchQueryRelationship(
-                    $q,
-                    [
-                        [
-                            'from_alias' => 'l',
-                            'table'      => 'email_stats',
-                            'alias'      => 'es',
-                            'condition'  => 'l.id = es.lead_id',
-                        ],
-                    ],
-                    $innerJoinTables,
-                    $this->generateFilterExpression($q, 'es.email_id', $eqExpr, $unique, null)
-                );
-                $filter->strict  = 1;
-                $returnParameter = true;
-                break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailread'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailread', [], null, 'en_US'):
-                $this->applySearchQueryRelationship(
-                    $q,
-                    [
-                        [
-                            'from_alias' => 'l',
-                            'table'      => 'email_stats',
-                            'alias'      => 'es',
-                            'condition'  => 'l.id = es.lead_id',
-                        ],
-                    ],
-                    $innerJoinTables,
-                    $this->generateFilterExpression($q, 'es.email_id', $eqExpr, $unique, null)
-                );
-                $q->andWhere('es.is_read=1');
-                $filter->strict  = 1;
-                $returnParameter = true;
-                break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailqueued'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailqueued', [], null, 'en_US'):
-                $this->applySearchQueryRelationship(
-                    $q,
-                    [
-                        [
-                            'from_alias' => 'l',
-                            'table'      => 'message_queue',
-                            'alias'      => 'mq',
-                            'condition'  => 'l.id = mq.lead_id',
-                        ],
-                    ],
-                    $innerJoinTables,
-                    $this->generateFilterExpression($q, 'mq.channel_id', $eqExpr, $unique, null)
-                );
-                $q->andWhere('mq.channel = \'email\' and mq.status = \''.MessageQueue::STATUS_SENT.'\'');
-                $filter->strict  = 1;
-                $returnParameter = true;
-                break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailpending'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailpending', [], null, 'en_US'):
-                /** @var EmailRepository $emailRepo */
-                $emailRepo  = $this->getEntityManager()->getRepository('MauticEmailBundle:Email');
-                $emailId    = (int) $string;
-                $email      = $emailRepo->getEntity($emailId);
-                $variantIds = $email->getRelatedEntityIds();
-                $nq         = $emailRepo->getEmailPendingQuery($emailId, $variantIds);
-                if ($nq instanceof QueryBuilder) {
-                    $nq->select('l.id'); // select only id
-                    $nsql = $nq->getSQL();
-                    foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
-                        $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
-                    }
-                    $expr = $q->expr()->$inExpr('l.id', sprintf('(%s)', $nsql));
-                } else {
-                    $this->applySearchQueryRelationship(
-                        $q,
-                        [
-                            [
-                                'from_alias' => 'l',
-                                'table'      => 'message_queue',
-                                'alias'      => 'mq',
-                                'condition'  => 'l.id = mq.lead_id',
-                            ],
-                        ],
-                        $innerJoinTables,
-                        $this->generateFilterExpression($q, 'mq.channel_id', $eqExpr, $unique, null)
-                    );
-                    $q->andWhere('mq.channel = \'email\' and mq.status = \''.MessageQueue::STATUS_PENDING.'\'');
-                }
-                $filter->strict  = 1;
-                $returnParameter = true;
-                break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
                 }
                 $returnParameter = true;
                 break;
+        }
+
+        if ($this->dispatcher) {
+            $event = new LeadBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
+            $this->dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+            if ($event->isSearchDone()) {
+                $returnParameter = $event->getReturnParameters();
+                $filter->strict  = $event->getStrict();
+                $expr            = $event->getSubQuery();
+                $parameters      = array_merge($parameters, $event->getParameters());
+            }
         }
 
         if ($returnParameter) {
@@ -967,10 +915,13 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.tag',
             'mautic.lead.lead.searchcommand.stage',
             'mautic.lead.lead.searchcommand.duplicate',
-            'mautic.lead.lead.searchcommand.emailsent',
-            'mautic.lead.lead.searchcommand.emailread',
-            'mautic.lead.lead.searchcommand.emailqueued',
-            'mautic.lead.lead.searchcommand.emailpending',
+            'mautic.lead.lead.searchcommand.email_sent',
+            'mautic.lead.lead.searchcommand.email_read',
+            'mautic.lead.lead.searchcommand.email_queued',
+            'mautic.lead.lead.searchcommand.email_pending',
+            'mautic.lead.lead.searchcommand.sms_sent',
+            'mautic.lead.lead.searchcommand.web_sent',
+            'mautic.lead.lead.searchcommand.mobile_sent',
         ];
 
         if (!empty($this->availableSearchFields)) {
@@ -1124,7 +1075,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param null         $whereExpression
      * @param null         $having
      */
-    protected function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null)
+    public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null)
     {
         $primaryTable = $tables[0];
         unset($tables[0]);
@@ -1200,20 +1151,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param Lead $entity
      */
-    protected function preSaveEntity($entity)
-    {
-        // Get the point changes prior to persisting since the Doctrine postPersist lifecycle callback will reset
-        $this->pointChanges = $entity->getPointChanges();
-    }
-
-    /**
-     * @param Lead $entity
-     */
     protected function postSaveEntity($entity)
     {
         // Check if points need to be appended
-        if ($this->pointChanges) {
-            $newPoints = $this->updateContactPoints($this->pointChanges, $entity->getId());
+        if ($entity->getPointChanges()) {
+            $newPoints = $this->updateContactPoints($entity->getPointChanges(), $entity->getId());
 
             // Set actual points so that code using getPoints knows the true value
             $entity->setActualPoints($newPoints);

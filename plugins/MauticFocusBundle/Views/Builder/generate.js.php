@@ -120,7 +120,9 @@ switch ($style) {
                     Focus.modalsDismissed["<?php echo $focus['id']; ?>"] = true;
 
                     // Remove iframe
-                    Focus.iframe.parentNode.removeChild(Focus.iframe);
+                    if (Focus.iframe.parentNode) {
+                        Focus.iframe.parentNode.removeChild(Focus.iframe);
+                    }
 
                     var overlays = document.getElementsByClassName('mf-modal-overlay-<?php echo $focus['id']; ?>');
                     if (overlays.length) {
@@ -211,37 +213,37 @@ switch ($style) {
                 if (Focus.debug)
                     console.log('scroll event registered');
 
-                    <?php if ($useTimeout): ?>
-                    if (Focus.debug)
-                        console.log('timeout event registered');
+                <?php if ($useTimeout): ?>
+                if (Focus.debug)
+                    console.log('timeout event registered');
 
-                    setTimeout(function () {
-                        window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
-                    }, <?php echo $timeout; ?>);
+                setTimeout(function () {
+                    window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
+                }, <?php echo $timeout; ?>);
 
-                    <?php else: ?>
+                <?php else: ?>
 
-                     window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
+                window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
 
-                   <?php endif; ?>
+                <?php endif; ?>
 
                 <?php elseif ($useUnloadEvent): ?>
                 if (Focus.debug)
                     console.log('show when visitor leaves');
 
-                    <?php if ($useTimeout): ?>
-                    if (Focus.debug)
-                        console.log('timeout event registered');
+                <?php if ($useTimeout): ?>
+                if (Focus.debug)
+                    console.log('timeout event registered');
 
-                    setTimeout(function () {
-                        document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
-                    }, <?php echo $timeout; ?>);
-
-                    <?php else: ?>
-
+                setTimeout(function () {
                     document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+                }, <?php echo $timeout; ?>);
 
-                    <?php endif; ?>
+                <?php else: ?>
+
+                document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+
+                <?php endif; ?>
 
                 // Add a listener to every link
                 <?php if ($linkActivation): ?>
@@ -266,21 +268,21 @@ switch ($style) {
                 if (Focus.debug)
                     console.log('show immediately');
 
-                    <?php if ($useTimeout): ?>
-                    if (Focus.debug)
-                        console.log('timeout event registered');
+                <?php if ($useTimeout): ?>
+                if (Focus.debug)
+                    console.log('timeout event registered');
 
-                    setTimeout(function () {
-                        // Give a slight delay to allow browser to process style injection into header
-                        Focus.engageVisitor();
-                    }, <?php echo $timeout; ?>);
-
-                    <?php else: ?>
-
+                setTimeout(function () {
                     // Give a slight delay to allow browser to process style injection into header
                     Focus.engageVisitor();
+                }, <?php echo $timeout; ?>);
 
-                    <?php endif; ?>
+                <?php else: ?>
+
+                // Give a slight delay to allow browser to process style injection into header
+                Focus.engageVisitor();
+
+                <?php endif; ?>
 
                 <?php endif; ?>
             },
@@ -496,7 +498,7 @@ switch ($style) {
                     console.log('mautic_focus_<?php echo $focus['id']; ?> cookie set for ' + now);
 
                 Focus.cookies.removeItem('mautic_focus_<?php echo $focus['id']; ?>');
-                Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', now, Infinity);
+                Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', now, Infinity, '/');
 
                 <?php if ($style == 'bar'): ?>
                 var collapser = document.getElementsByClassName('mf-bar-collapser-<?php echo $focus['id']; ?>');
@@ -525,21 +527,15 @@ switch ($style) {
                 Focus.iframeWidth = 0;
                 Focus.iframeResizeInterval = setInterval(function () {
                     if (Focus.iframeHeight !== Focus.iframe.style.height) {
-                        var trueHeight = Math.max(
-                            Math.max(Focus.iframeDoc.body.scrollHeight, Focus.iframeDoc.documentElement.scrollHeight),
-                            Math.max(Focus.iframeDoc.body.offsetHeight, Focus.iframeDoc.documentElement.offsetHeight),
-                            Math.max(Focus.iframeDoc.body.clientHeight, Focus.iframeDoc.documentElement.clientHeight)
-                        );
-
-                        var useHeight = ((window.innerHeight < trueHeight || trueHeight === 0) ?
-                            window.innerHeight : trueHeight);
+                        var useHeight = ((window.innerHeight < Focus.iframeFocus.offsetHeight) ?
+                            window.innerHeight : Focus.iframeFocus.offsetHeight);
 
                         useHeight += 10;
                         useHeight = useHeight + 'px';
 
                         if (Focus.debug) {
                             console.log('window inner height = ' + window.innerHeight);
-                            console.log('iframe offset height = ' + trueHeight);
+                            console.log('iframe offset height = ' + Focus.iframeFocus.offsetHeight);
                             console.log('iframe height set to ' + useHeight)
                         }
 
@@ -549,18 +545,12 @@ switch ($style) {
 
                     <?php if (in_array($style, ['modal', 'notification'])): ?>
                     if (Focus.iframeWidth !== Focus.iframe.style.width) {
-                        var trueWidth = Math.max(
-                            Math.max(Focus.iframeDoc.body.scrollWidth, Focus.iframeDoc.documentElement.scrollWidth),
-                            Math.max(Focus.iframeDoc.body.offsetWidth, Focus.iframeDoc.documentElement.offsetWidth),
-                            Math.max(Focus.iframeDoc.body.clientWidth, Focus.iframeDoc.documentElement.clientWidth)
-                        );
-
                         if (Focus.debug) {
                             console.log('window inner width = ' + window.innerWidth);
-                            console.log('iframe offset width = ' + trueWidth);
+                            console.log('iframe offset width = ' +  Focus.iframeFocus.offsetWidth);
                         }
 
-                        if (window.innerWidth < trueWidth || trueWidth === 0) {
+                        if (window.innerWidth <  Focus.iframeFocus.offsetWidth) {
                             // Responsive iframe
                             Focus.addClass(Focus.iframeFocus, 'mf-responsive');
                             Focus.addClass(Focus.iframe, 'mf-responsive');
@@ -570,8 +560,8 @@ switch ($style) {
                                 console.log('iframe set to responsive width: ');
 
                         } else {
-                            Focus.iframe.style.width = trueWidth + 'px';
-                            Focus.iframe.width = trueWidth + 'px';
+                            Focus.iframe.style.width =  Focus.iframeFocus.offsetWidth + 'px';
+                            Focus.iframe.width =  Focus.iframeFocus.offsetWidth + 'px';
                             Focus.removeClass(Focus.iframeFocus, 'mf-responsive');
                             Focus.removeClass(Focus.iframe, 'mf-responsive');
 

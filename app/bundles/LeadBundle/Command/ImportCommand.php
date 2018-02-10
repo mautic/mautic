@@ -30,6 +30,7 @@ class ImportCommand extends ContainerAwareCommand
         $this->setName('mautic:import')
             ->setDescription('Imports data to Mautic')
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to import. Defaults to next in the queue.', false)
+            ->addOption('--limit', '-l', InputOption::VALUE_OPTIONAL, 'Maximum number of records to import for this script execution.', 0)
             ->setHelp(
                 <<<'EOT'
 The <info>%command.name%</info> command starts to import CSV files when some are created.
@@ -54,6 +55,7 @@ EOT
 
         $progress = new Progress($output);
         $id       = (int) $input->getOption('id');
+        $limit    = (int) $input->getOption('limit');
 
         if ($id) {
             $import = $model->getEntity($id);
@@ -81,7 +83,7 @@ EOT
             ]
         ).'</info>');
 
-        $success = $model->startImport($import, $progress);
+        $success = $model->startImport($import, $progress, $limit);
 
         // Import was delayed
         if ($import->getStatus() === $import::DELAYED) {

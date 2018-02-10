@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\LeadBundle\Entity\lead;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
+use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 
 class LeadSubscriberTest extends CommonMocks
 {
@@ -72,7 +73,11 @@ class LeadSubscriberTest extends CommonMocks
         $auditLogModel->expects($this->once())
             ->method('writeToLog');
 
-        $subscriber = new LeadSubscriber($ipLookupHelper, $auditLogModel);
+        $leadEventDispatcher = $this->getMockBuilder(LeadChangeEventDispatcher::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $subscriber = new LeadSubscriber($ipLookupHelper, $auditLogModel, $leadEventDispatcher);
 
         $leadEvent = $this->getMockBuilder(LeadEvent::class)
             ->disableOriginalConstructor()

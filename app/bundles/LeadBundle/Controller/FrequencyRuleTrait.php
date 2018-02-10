@@ -60,6 +60,17 @@ trait FrequencyRuleTrait
             ]
         );
 
+        //find the email
+        $currentChannelId = null;
+        if (!empty($viewParameters['idHash'])) {
+            $emailModel = $this->getModel('email');
+            if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
+                if ($email = $stat->getEmail()) {
+                    $currentChannelId = $email->getId();
+                }
+            }
+        }
+
         if (null == $data) {
             $data = $this->getFrequencyRuleFormData($lead, $allChannels, $leadChannels, $isPublic);
         }
@@ -80,7 +91,7 @@ trait FrequencyRuleTrait
         if ('GET' !== $method) {
             if (!$this->isFormCancelled($form)) {
                 if ($this->isFormValid($form, $data)) {
-                    $this->persistFrequencyRuleFormData($lead, $form->getData(), $allChannels, $leadChannels);
+                    $this->persistFrequencyRuleFormData($lead, $form->getData(), $allChannels, $leadChannels, $currentChannelId);
 
                     return true;
                 }
@@ -158,8 +169,9 @@ trait FrequencyRuleTrait
      * @param array $formData
      * @param array $allChannels
      * @param       $leadChannels
+     * @param int   $currentChannelId
      */
-    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels)
+    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels, $currentChannelId = null)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
@@ -177,6 +189,9 @@ trait FrequencyRuleTrait
         $dncChannels = array_diff($allChannels, $formData['subscribed_channels']);
         if (!empty($dncChannels)) {
             foreach ($dncChannels as $channel) {
+                if ($currentChannelId) {
+                    $channel = [$channel => $currentChannelId];
+                }
                 $model->addDncForLead($lead, $channel, 'user', ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL);
             }
         }

@@ -29,6 +29,7 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         'Access-Control-Allow-Headers'     => 'Origin, X-Requested-With, Content-Type',
         'Access-Control-Allow-Methods'     => 'PUT, GET, POST, DELETE, OPTIONS',
         'Access-Control-Allow-Credentials' => 'true',
+        'Access-Control-Max-Age'           => 10 * 60 * 60, // 10 min, max age for Chrome
     ];
 
     /**

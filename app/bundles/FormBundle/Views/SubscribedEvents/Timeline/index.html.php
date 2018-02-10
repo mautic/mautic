@@ -39,7 +39,15 @@ $results    = $submission->getResults();
 && $results[$field->getAlias()] != []
 ) : ?>
 			<dt><?php echo $field->getLabel(); ?></dt>
-			<dd><?php echo $results[$field->getAlias()]; ?></dd>
+			<dd>
+                <?php if ($field->isFileType()) : ?>
+                <a href="<?php echo $view['router']->path('mautic_form_file_download', ['submissionId' => $submission->getId(), 'field' => $field->getAlias()]); ?>">
+                    <?php echo $results[$field->getAlias()]; ?>
+                </a>
+                <?php else : ?>
+                    <?php echo $results[$field->getAlias()]; ?>
+                <?php endif; ?>
+            </dd>
 		<?php endif; ?>
 	<?php endforeach; ?>
 <?php endif; ?>

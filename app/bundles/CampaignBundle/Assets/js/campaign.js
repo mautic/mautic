@@ -21,17 +21,24 @@ Mautic.campaignOnLoad = function (container, response) {
         });
 
         // set hover and double click functions for the event buttons
-        mQuery('#CampaignCanvas .list-campaign-event, #CampaignCanvas .list-campaign-source').off('.eventbuttons')
-            .on('mouseover.eventbuttons', function() {
-                mQuery(this).find('.campaign-event-buttons').removeClass('hide');
-            })
-            .on('mouseout.eventbuttons', function() {
-                mQuery(this).find('.campaign-event-buttons').addClass('hide');
-            })
-            .on('dblclick.eventbuttons', function(event) {
-                event.preventDefault();
-                mQuery(this).find('.btn-edit').first().click();
+        if (!(mQuery('.preview').length)) {
+            mQuery('#CampaignCanvas .list-campaign-event, #CampaignCanvas .list-campaign-source').off('.eventbuttons')
+                .on('mouseover.eventbuttons', function() {
+                    mQuery(this).find('.campaign-event-buttons').removeClass('hide');
+                })
+                .on('mouseout.eventbuttons', function() {
+                    mQuery(this).find('.campaign-event-buttons').addClass('hide');
+                })
+                .on('dblclick.eventbuttons', function(event) {
+                    event.preventDefault();
+                    mQuery(this).find('.btn-edit').first().click();
+                });
+        } else {
+            mQuery("#CampaignCanvas div.list-campaign-event").each(function () {
+                var thisId = mQuery(this).attr('id');
+                var option  = mQuery('#'+thisId+' option[value="' + mQuery(this).val() + '"]');
             });
+        }
 
         // setup chosen
         mQuery('.campaign-event-selector').on('chosen:showing_dropdown', function (event) {
@@ -104,6 +111,7 @@ Mautic.campaignOnLoad = function (container, response) {
             Mautic.launchCampaignEditor();
             Mautic.processBuilderErrors(response);
         }
+
     }
 };
 
@@ -388,6 +396,20 @@ Mautic.launchCampaignEditor = function() {
     if (mQuery('#CampaignEvent_newsource').length) {
         Mautic.campaignBuilderPrepareNewSource();
     }
+
+    if (Mautic.campaignBuilderCanvasSettings) {
+        Mautic.campaignBuilderInstance.setSuspendDrawing(true);
+        Mautic.campaignBuilderReconnectEndpoints();
+        Mautic.campaignBuilderInstance.setSuspendDrawing(false, true);
+    }
+    Mautic.campaignBuilderInstance.repaintEverything();
+};
+
+/**
+ * Launch campaign preview view
+ */
+Mautic.launchCampaignPreview = function() {
+    Mautic.stopIconSpinPostEvent();
 
     if (Mautic.campaignBuilderCanvasSettings) {
         Mautic.campaignBuilderInstance.setSuspendDrawing(true);
@@ -729,11 +751,15 @@ Mautic.prepareCampaignCanvas = function() {
             callback();
         });
 
-        //enable drag and drop
-        Mautic.campaignBuilderInstance.draggable(
-            document.querySelectorAll("#CampaignCanvas .draggable"),
-            Mautic.campaignDragOptions
-        );
+        if (mQuery('.preview').length) {
+            Mautic.launchCampaignPreview();
+        } else {
+            //enable drag and drop
+            Mautic.campaignBuilderInstance.draggable(
+                document.querySelectorAll("#CampaignCanvas .draggable"),
+                Mautic.campaignDragOptions
+            );
+        }
     }
 };
 
@@ -1485,9 +1511,11 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
             });
             Mautic.campaignBuilderAnchorClickedAllowedEvents = allowedEvents;
 
-            var el = (mQuery(event.target).hasClass('jtk-endpoint')) ? event.target : mQuery(event.target).parents('.jtk-endpoint')[0];
-            Mautic.campaignBuilderAnchorClickedPosition = Mautic.campaignBuilderGetEventPosition(el);
-            Mautic.campaignBuilderUpdateEventList(allowedEvents, false, 'groups');
+            if (!(mQuery('.preview').length)) {
+                var el = (mQuery(event.target).hasClass('jtk-endpoint')) ? event.target : mQuery(event.target).parents('.jtk-endpoint')[0];
+                Mautic.campaignBuilderAnchorClickedPosition = Mautic.campaignBuilderGetEventPosition(el);
+                Mautic.campaignBuilderUpdateEventList(allowedEvents, false, 'groups');
+            }
 
             // Disable the list items not allowed
             mQuery('.campaign-event-selector:not(#SourceList) option').prop('disabled', false);

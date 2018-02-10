@@ -98,7 +98,6 @@ class MailchimpApi extends EmailMarketingApi
             $parameters = array_merge($parameters, ['merge_fields' => $fields]);
         }
         $parameters['email_address'] = $email;
-        $parameters['status']        = 'subscribed';
 
         return $this->request('lists/'.$listId.'/members', $parameters, 'POST');
     }

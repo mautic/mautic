@@ -119,6 +119,10 @@ trait CustomFieldEntityTrait
 
         if (property_exists($this, $property) && method_exists($this, $setter)) {
             // Fixed custom field so use the setter but don't get caught in a loop such as a custom field called "notes"
+            // Set empty value as null
+            if ($value === '') {
+                $value = null;
+            }
             $this->$setter($value);
         }
 
@@ -171,11 +175,11 @@ trait CustomFieldEntityTrait
      * @param string $field
      * @param string $group
      *
-     * @return array|false
+     * @return mixed
      */
     public function getFieldValue($field, $group = null)
     {
-        if (isset($this->updatedFields[$field])) {
+        if (array_key_exists($field, $this->updatedFields)) {
             return $this->updatedFields[$field];
         }
 
@@ -183,7 +187,7 @@ trait CustomFieldEntityTrait
             return CustomFieldHelper::fixValueType($field['type'], $field['value']);
         }
 
-        return false;
+        return null;
     }
 
     /**

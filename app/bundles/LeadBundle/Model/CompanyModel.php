@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
@@ -53,15 +53,22 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     protected $companyFields;
 
     /**
+     * @var EmailValidator
+     */
+    protected $emailValidator;
+
+    /**
      * CompanyModel constructor.
      *
-     * @param FieldModel $leadFieldModel
-     * @param Session    $session
+     * @param FieldModel     $leadFieldModel
+     * @param Session        $session
+     * @param EmailValidator $validator
      */
-    public function __construct(FieldModel $leadFieldModel, Session $session)
+    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator)
     {
         $this->leadFieldModel = $leadFieldModel;
         $this->session        = $session;
+        $this->emailValidator = $validator;
     }
 
     /**
@@ -209,10 +216,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param Company    $company
      * @param array      $data
      * @param bool|false $overwriteWithBlank
-     *
-     * @return array
      */
-    public function setFieldValues(Company &$company, array $data, $overwriteWithBlank = false)
+    public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false)
     {
         //save the field values
         $fieldValues = $company->getFields();
@@ -231,7 +236,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
             $fieldValues = $fields;
         }
-
         //update existing values
         foreach ($fieldValues as $group => &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
@@ -242,6 +246,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 if (array_key_exists($alias, $data)) {
                     $curValue = $field['value'];
                     $newValue = $data[$alias];
+
+                    if (is_array($newValue)) {
+                        $newValue = implode('|', $newValue);
+                    }
 
                     if ($curValue !== $newValue && (strlen($newValue) > 0 || (strlen($newValue) === 0 && $overwriteWithBlank))) {
                         $field['value'] = $newValue;
@@ -358,9 +366,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->getCompanyLeadRepository()->saveEntities($persistCompany);
         }
 
-        // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear(CompanyLead::class);
-
         if (!empty($companyName)) {
             $currentCompanyName = $lead->getCompany();
             if ($currentCompanyName !== $companyName) {
@@ -379,7 +384,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        //unset($lead, $persistCompany, $companies);
+        // Clear CompanyLead entities from Doctrine memory
+        $this->em->clear(CompanyLead::class);
 
         return $contactAdded;
     }
@@ -456,7 +462,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             );
 
             if ($companyLead == null) {
-
                 // Lead is not part of this list
                 continue;
             }
@@ -728,7 +733,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $hasEmail = (!empty($fields['companyemail']) && !empty($data[$fields['companyemail']]));
 
         if ($hasEmail) {
-            MailHelper::validateEmail($data[$fields['companyemail']]);
+            $this->emailValidator->validate($data[$fields['companyemail']], false);
         }
 
         if ($hasName) {
@@ -791,7 +796,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         foreach ($this->fetchCompanyFields() as $entityField) {
             if (isset($fieldData[$entityField['alias']])) {
-                $fieldData[$entityField['alias']] = InputHelper::clean($fieldData[$entityField['alias']]);
+                $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
 
                 if ('NULL' === $fieldData[$entityField['alias']]) {
                     $fieldData[$entityField['alias']] = null;
@@ -808,7 +813,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 // Skip if the value is in the CSV row
                 continue;
             } elseif ($entityField['defaultValue']) {
-
                 // Fill in the default value if any
                 $fieldData[$entityField['alias']] = ('multiselect' === $entityField['type']) ? [$entityField['defaultValue']] : $entityField['defaultValue'];
             }
