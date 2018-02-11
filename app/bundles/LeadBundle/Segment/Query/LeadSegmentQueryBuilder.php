@@ -13,6 +13,7 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\LeadSegmentFilters;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -32,6 +33,9 @@ class LeadSegmentQueryBuilder
 
     /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager */
     private $schema;
+
+    /** @var array */
+    private $relatedSegments = [];
 
     /**
      * LeadSegmentQueryBuilder constructor.
@@ -54,20 +58,59 @@ class LeadSegmentQueryBuilder
      *
      * @todo Remove $id?
      */
-    public function getLeadsSegmentQueryBuilder($id, LeadSegmentFilters $leadSegmentFilters)
+    public function assembleContactsSegmentQueryBuilder(LeadSegmentFilters $leadSegmentFilters, $backReference = null)
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
 
         $queryBuilder->select('*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
+        $references = [];
+
         /** @var LeadSegmentFilter $filter */
         foreach ($leadSegmentFilters as $filter) {
-            //dump($filter->__toString());
+            $segmentIdArray = is_array($filter->getParameterValue()) ? $filter->getParameterValue() : [$filter->getParameterValue()];
+            //  We will handle references differently than regular segments
+            if ($filter->isContactSegmentReference()) {
+                if (!is_null($backReference) || in_array($backReference, $this->getContactSegmentRelations($segmentIdArray))) {
+                    throw new SegmentQueryException('Circular reference detected.');
+                }
+                $references = $references + $segmentIdArray;
+            }
             $queryBuilder = $filter->applyQuery($queryBuilder);
         }
 
         return $queryBuilder;
+    }
+
+    /**
+     * Get the list of segment's related segments.
+     *
+     * @param $id array
+     *
+     * @return array
+     */
+    private function getContactSegmentRelations(array $id)
+    {
+        $referencedContactSegments = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->findBy(
+            ['id' => $id]
+        );
+
+        $relations = [];
+        foreach ($referencedContactSegments as $segment) {
+            $filters = $segment->getFilters();
+            foreach ($filters as $filter) {
+                if ($filter['field'] == 'leadlist') {
+                    $relations[] = $filter['filter'];
+                }
+            }
+        }
+
+        if (count($relations)) {
+            dump('referenced segment(s) has '.count($relations).' relations');
+        }
+
+        return $relations;
     }
 
     /**
@@ -153,14 +196,14 @@ class LeadSegmentQueryBuilder
                                 'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId));
         $queryBuilder->addJoinCondition($tableAlias,
                                         $queryBuilder->expr()->andX(
-                                            $queryBuilder->expr()->orX(
-                                                $queryBuilder->expr()->isNull($tableAlias.'.manually_removed'),
-                                                $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 0)
-                                            ),
+//                                            $queryBuilder->expr()->orX(
+//                                                $queryBuilder->expr()->isNull($tableAlias.'.manually_removed'),
+//                                                $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 0)
+//                                            ),
                                             $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1)
                                         )
         );
-        $queryBuilder->andWhere($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'));
+        $queryBuilder->orWhere($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'));
 
         return $queryBuilder;
     }

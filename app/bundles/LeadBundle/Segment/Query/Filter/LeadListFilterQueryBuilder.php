@@ -71,8 +71,60 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
      * @param LeadSegmentFilter $filter
      *
      * @return QueryBuilder
+     *
+     * @throws \Mautic\LeadBundle\Segment\Exception\SegmentQueryException
      */
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
+    {
+        $segmentIds = $filter->getParameterValue();
+
+        if (!is_array($segmentIds)) {
+            $segmentIds = [intval($segmentIds)];
+        }
+
+        $ids      = [];
+        $leftIds  = [];
+        $innerIds = [];
+
+        foreach ($segmentIds as $segmentId) {
+            $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
+
+            $contactSegments = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->findBy(
+                ['id'    => $segmentId]
+            );
+
+            foreach ($contactSegments as $contactSegment) {
+                $filters             = $this->leadSegmentFilterFactory->getLeadListFilters($contactSegment);
+                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($filters);
+                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubsribedQuery($segmentQueryBuilder, $contactSegment->getId());
+                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
+                $segmentQueryBuilder->select('l.id');
+
+                $parameters = $segmentQueryBuilder->getParameters();
+                foreach ($parameters as $key=>$value) {
+                    $queryBuilder->setParameter($key, $value);
+                }
+
+                $segmentAlias = $this->generateRandomParameterName();
+                if ($exclusion) {
+                    $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
+                    $queryBuilder->andWhere($queryBuilder->expr()->isNull($segmentAlias.'.id'));
+                } else {
+                    $queryBuilder->innerJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
+                }
+            }
+        }
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param QueryBuilder      $queryBuilder
+     * @param LeadSegmentFilter $filter
+     *
+     * @return QueryBuilder
+     */
+    public function applyQueryBak(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
         $segmentIds = $filter->getParameterValue();
 

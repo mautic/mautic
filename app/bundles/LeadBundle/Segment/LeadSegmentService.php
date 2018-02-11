@@ -59,18 +59,19 @@ class LeadSegmentService
 
     /**
      * @param LeadList $leadList
-     * @param          $segmentFilters
      * @param          $batchLimiters
      *
      * @return Query\QueryBuilder|QueryBuilder
      */
-    private function getNewLeadListLeadsQuery(LeadList $leadList, $segmentFilters, $batchLimiters)
+    private function getNewLeadListLeadsQuery(LeadList $leadList, $batchLimiters)
     {
         if (!is_null($this->preparedQB)) {
             return $this->preparedQB;
         }
 
-        $queryBuilder = $this->leadSegmentQueryBuilder->getLeadsSegmentQueryBuilder($leadList->getId(), $segmentFilters);
+        $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($leadList);
+
+        $queryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
         $queryBuilder = $this->leadSegmentQueryBuilder->addNewLeadsRestrictions($queryBuilder, $leadList->getId(), $batchLimiters);
         $queryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubsribedQuery($queryBuilder, $leadList->getId());
         //dump($queryBuilder->getSQL());
@@ -103,7 +104,7 @@ class LeadSegmentService
             ];
         }
 
-        $qb = $this->getNewLeadListLeadsQuery($leadList, $segmentFilters, $batchLimiters);
+        $qb = $this->getNewLeadListLeadsQuery($leadList, $batchLimiters);
         $qb = $this->leadSegmentQueryBuilder->wrapInCount($qb);
 
         $this->logger->debug('Segment QB: Create SQL: '.$qb->getDebugOutput(), ['segmentId' => $leadList->getId()]);
@@ -124,9 +125,7 @@ class LeadSegmentService
      */
     public function getNewLeadListLeads(LeadList $leadList, array $batchLimiters, $limit = 1000)
     {
-        $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($leadList);
-
-        $queryBuilder = $this->getNewLeadListLeadsQuery($leadList, $segmentFilters, $batchLimiters);
+        $queryBuilder = $this->getNewLeadListLeadsQuery($leadList, $batchLimiters);
         $queryBuilder->select('DISTINCT l.id');
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $leadList->getId()]);
@@ -164,7 +163,7 @@ class LeadSegmentService
     {
         $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($leadList);
 
-        $queryBuilder = $this->leadSegmentQueryBuilder->getLeadsSegmentQueryBuilder($leadList->getId(), $segmentFilters);
+        $queryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
 
         $queryBuilder->rightJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp', 'l.id = orp.lead_id and orp.leadlist_id = '.$leadList->getId());
         $queryBuilder->andWhere($queryBuilder->expr()->andX(

@@ -220,4 +220,12 @@ class LeadSegmentFilter
     {
         return $this->filterQueryBuilder->applyQuery($queryBuilder, $this);
     }
+
+    /**
+     * @return bool
+     */
+    public function isContactSegmentReference()
+    {
+        return $this->getField() === 'leadlist';
+    }
 }

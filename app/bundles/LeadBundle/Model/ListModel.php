@@ -831,9 +831,6 @@ class ListModel extends FormModel
         $batchLimiters = ['dateTime' => $dtHelper->toUtcString()];
         $list          = ['id' => $leadList->getId(), 'filters' => $leadList->getFilters()];
 
-        //@todo remove this debug line
-        $dtHelper = new DateTimeHelper('2017-10-01 00:00:00');
-
         $this->dispatcher->dispatch(
             LeadEvents::LIST_PRE_PROCESS_LIST, new ListPreProcessListEvent($list, false)
         );
@@ -841,7 +838,7 @@ class ListModel extends FormModel
         // Get a count of leads to add
         $newLeadsCount = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
 
-        // Ensure the same list is used each batch
+        // Ensure the same list is used each batch <- would love to know how
         $batchLimiters['maxId'] = (int) $newLeadsCount[$leadList->getId()]['maxId'];
 
         // Number of total leads to process

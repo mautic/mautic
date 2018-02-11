@@ -23,13 +23,16 @@ class CheckQueryBuildersCommand extends ModeratedCommand
     /** @var Logger */
     private $logger;
 
+    /** @var bool */
+    private $skipOld = false;
+
     protected function configure()
     {
         $this
             ->setName('mautic:segments:check-builders')
             ->setDescription('Compare output of query builders for given segments')
             ->addOption('--segment-id', '-i', InputOption::VALUE_OPTIONAL, 'Set the ID of segment to process')
-            ;
+            ->addOption('--skip-old', null, InputOption::VALUE_NONE, 'Skip old query builder');
 
         parent::configure();
     }
@@ -42,8 +45,9 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
         $listModel = $container->get('mautic.lead.model.list');
 
-        $id      = $input->getOption('segment-id');
-        $verbose = $input->getOption('verbose');
+        $id            = $input->getOption('segment-id');
+        $verbose       = $input->getOption('verbose');
+        $this->skipOld = $input->getOption('skip-old');
 
         if ($id) {
             $list = $listModel->getEntity($id);
@@ -85,17 +89,22 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
     private function runSegment($output, $verbose, $l, ListModel $listModel)
     {
-        $output->write('<info>Running segment '.$l->getId().'...old...');
+        $output->write('<info>Running segment '.$l->getId().'...');
 
-        $this->logger->info(sprintf('Running OLD segment #%d', $l->getId()));
+        if (!$this->skipOld) {
+            $output->write('old...');
+            $this->logger->info(sprintf('Running OLD segment #%d', $l->getId()));
 
-        $timer1    = microtime(true);
-        $processed = $listModel->getVersionOld($l);
-        $timer1    = microtime(true) - $timer1;
+            $timer1    = microtime(true);
+            $processed = $listModel->getVersionOld($l);
+            $timer1    = microtime(true) - $timer1;
+        } else {
+            $processed = ['count'=>-1, 'maxId'=>-1];
+            $timer1    = 0;
+        }
 
         $this->logger->info(sprintf('Running NEW segment #%d', $l->getId()));
 
-        $output->write('new...');
         $timer2     = microtime(true);
         $processed2 = $listModel->getVersionNew($l);
         $timer2     = microtime(true) - $timer2;
