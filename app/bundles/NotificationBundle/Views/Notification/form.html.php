@@ -51,56 +51,110 @@ if ($notification->getId()) {
 ?>
 
 <?php echo $view['form']->start($form); ?>
-<div class="box-layout">
-    <div class="col-md-9 height-auto bg-white">
-        <div class="row">
-            <div class="col-xs-12">
-                <!-- tabs controls -->
-                <!--/ tabs controls -->
-                <div class="tab-content pa-md">
-                    <div class="tab-pane fade in active bdr-w-0" id="notification-container">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <?php echo $view['form']->row($form['name']); ?>
-                                <?php echo $view['form']->row($form['heading']); ?>
-                                <?php echo $view['form']->row($form['message']); ?>
-                                <?php echo $view['form']->row($form['url']); ?>
-                                <?php echo $view['form']->row($form['button']); ?>
-                                <?php echo $view['form']->row($form['actionButtonIcon1']); ?>
-                                <?php echo $view['form']->row($form['actionButtonIcon1_delete']); ?>
+    <div class="box-layout">
+        <div class="col-md-9 height-auto bg-white">
+            <div class="row">
+                <div class="col-xs-12">
+                    <!-- tabs controls -->
+                    <!--/ tabs controls -->
+                    <div class="tab-content pa-md">
+                        <div class="tab-pane fade in active bdr-w-0" id="notification-container">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form['name']); ?>
+                                    <?php echo $view['form']->row($form['heading']); ?>
+                                    <?php echo $view['form']->row($form['url']); ?>
+
+                                </div>
+                                <div class="col-md-6">
+
+                                    <?php echo $view['form']->row($form['message']); ?>
+                                </div>
                             </div>
-                            <div class="col-md-6">
+                            <br>
+                            <h4>
+                                <?php echo $view['translator']->trans('mautic.notification.form.action.button'); ?> 1                  <small><a href="https://documentation.onesignal.com/docs/action-buttons" target="_blank"><?php echo $view['translator']->trans('mautic.notification.read.docs'); ?></a></small></h4>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form['button']); ?>
+                                    <?php echo $view['form']->row($form['actionButtonUrl1']); ?>
+                                </div>
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form['actionButtonIcon1']); ?>
+                                    <?php if (!empty($notification->getActionButtonIcon1())): ?>
+                                        <?php echo $view['form']->row($form['actionButtonIcon1_delete']); ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <br>
+                            <h4>
+                                <?php echo $view['translator']->trans('mautic.notification.form.action.button'); ?> 2                  <small><a href="https://documentation.onesignal.com/docs/action-buttons" target="_blank"><?php echo $view['translator']->trans('mautic.notification.read.docs'); ?></a></small></h4>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form['actionButtonText2']); ?>
+                                    <?php echo $view['form']->row($form['actionButtonUrl2']); ?>
+                                </div>
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form['actionButtonIcon2']); ?>
+                                    <?php if (!empty($notification->getActionButtonIcon1())): ?>
+                                        <?php echo $view['form']->row($form['actionButtonIcon2_delete']); ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <br>
+                            <h4>
+                                <?php echo $view['translator']->trans('mautic.notification.form.images'); ?> 2                  <small><a href="https://documentation.onesignal.com/docs/web-push-notification-icons" target="_blank"><?php echo $view['translator']->trans('mautic.notification.read.docs'); ?></a></small></h4>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form['icon']); ?>
+                                    <?php if (!empty($notification->getIcon())): ?>
+                                        <?php echo $view['form']->row($form['icon_delete']); ?>
+                                    <?php endif; ?>
+                                    <?php echo $view['form']->row($form['badge']); ?>
+                                    <?php if (!empty($notification->getBadge())): ?>
+                                        <?php echo $view['form']->row($form['badge_delete']); ?>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form['image']); ?>
+                                    <?php if (!empty($notification->getImage())): ?>
+                                        <?php echo $view['form']->row($form['image_delete']); ?>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3 bg-white height-auto bdr-l">
-        <div class="pr-lg pl-lg pt-md pb-md">
-            <?php echo $view['form']->row($form['category']); ?>
-            <?php echo $view['form']->row($form['language']); ?>
-            <hr />
-            <h5><?php echo $view['translator']->trans('mautic.config.tab.notificationconfig'); ?></h5>
-            <br />
-            <?php echo $view['form']->row($form['ttl']); ?>
-            <?php echo $view['form']->row($form['priority']); ?>
-            <hr />
-            <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
-            <br />
-            <?php
-            foreach ($form['utmTags'] as $i => $utmTag):
-                echo $view['form']->row($utmTag);
-            endforeach;
-            ?>
-            <div class="hide">
-                <?php echo $view['form']->row($form['isPublished']); ?>
-                <?php echo $view['form']->row($form['publishUp']); ?>
-                <?php echo $view['form']->row($form['publishDown']); ?>
-                <?php echo $view['form']->rest($form); ?>
+        <div class="col-md-3 bg-white height-auto bdr-l">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                <?php echo $view['form']->row($form['category']); ?>
+                <?php echo $view['form']->row($form['language']); ?>
+                <hr/>
+                <h5><?php echo $view['translator']->trans('mautic.config.tab.notificationconfig'); ?></h5>
+                <br/>
+                <?php echo $view['form']->row($form['ttl']); ?>
+                <?php echo $view['form']->row($form['priority']); ?>
+                <hr/>
+                <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+                <br/>
+                <?php
+                foreach ($form['utmTags'] as $i => $utmTag):
+                    echo $view['form']->row($utmTag);
+                endforeach;
+                ?>
+                <div class="hide">
+                    <?php echo $view['form']->row($form['isPublished']); ?>
+                    <?php echo $view['form']->row($form['publishUp']); ?>
+                    <?php echo $view['form']->row($form['publishDown']); ?>
+                    <?php echo $view['form']->rest($form); ?>
+                </div>
             </div>
         </div>
     </div>
-</div>
 <?php echo $view['form']->end($form); ?>

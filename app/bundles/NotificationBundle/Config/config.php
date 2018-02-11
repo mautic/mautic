@@ -76,7 +76,11 @@ return [
         ],
         'forms' => [
             'mautic.form.type.notification' => [
-                'class' => 'Mautic\NotificationBundle\Form\Type\NotificationType',
+                'class'    => 'Mautic\NotificationBundle\Form\Type\NotificationType',
+                'arguments'=> [
+                    'translator',
+                    'mautic.notification.helper.uploader',
+                ],
                 'alias' => 'notification',
             ],
             'mautic.form.type.mobile.notification' => [
@@ -284,6 +288,6 @@ return [
         'gcm_sender_id'                      => '482941778795',
         'notification_subdomain_name'        => null,
         'welcomenotification_enabled'        => true,
-        'notification_upload_dir'            => '%kernel.root_dir%/../notification/files/form',
+        'notification_upload_dir'            => 'media/images/notifications',
     ],
 ];

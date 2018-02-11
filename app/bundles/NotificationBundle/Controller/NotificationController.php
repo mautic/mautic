@@ -446,7 +446,6 @@ class NotificationController extends FormController
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
-
         ///Check for a submitted form and process it
         if (!$ignorePost && $method == 'POST') {
             $valid = false;
@@ -455,7 +454,7 @@ class NotificationController extends FormController
                     //form is valid so process the data
                     $fileUploader        = $this->get('mautic.helper.file_uploader');
                     $noificationUploader = $this->get('mautic.notification.helper.uploader');
-                    $noificationUploader->uploadFiles($entity, $this->request, $fileUploader, $model);
+                    $noificationUploader->uploadFiles($entity, $this->request, $fileUploader, $model, $form);
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                     $this->addFlash(

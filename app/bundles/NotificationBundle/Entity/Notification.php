@@ -139,6 +139,41 @@ class Notification extends FormEntity
     private $actionButtonIcon1;
 
     /**
+     * @var string
+     */
+    private $actionButtonUrl1;
+
+    /**
+     * @var string
+     */
+    private $actionButtonText2;
+
+    /**
+     * @var string
+     */
+    private $actionButtonIcon2;
+
+    /**
+     * @var string
+     */
+    private $actionButtonUrl2;
+
+    /**
+     * @var string
+     */
+    private $icon;
+
+    /**
+     * @var string
+     */
+    private $image;
+
+    /**
+     * @var string
+     */
+    private $badge;
+
+    /**
      * @var array
      */
     public function __clone()
@@ -247,6 +282,38 @@ class Notification extends FormEntity
 
         $builder->createField('actionButtonIcon1', 'string')
             ->columnName('action_button_icon_1')
+            ->nullable()
+            ->build();
+
+        $builder->createField('actionButtonUrl1', 'string')
+            ->columnName('action_button_url_1')
+            ->nullable()
+            ->build();
+
+        $builder->createField('actionButtonText2', 'string')
+            ->columnName('action_button_text_2')
+            ->nullable()
+            ->build();
+
+        $builder->createField('actionButtonIcon2', 'string')
+            ->columnName('action_button_icon_2')
+            ->build();
+
+        $builder->createField('actionButtonUrl2', 'string')
+            ->columnName('action_button_url_2')
+            ->nullable()
+            ->build();
+
+        $builder->createField('icon', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('image', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('badge', 'string')
+            ->nullable()
             ->build();
     }
 
@@ -765,5 +832,124 @@ class Notification extends FormEntity
     {
         $this->isChanged('actionButtonIcon1', $actionButtonIcon1);
         $this->actionButtonIcon1 = $actionButtonIcon1;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionButtonUrl1()
+    {
+        return $this->actionButtonUrl1;
+    }
+
+    /**
+     * @param string $actionButtonUrl1
+     */
+    public function setActionButtonUrl1($actionButtonUrl1)
+    {
+        $this->isChanged('actionButtonUrl1', $actionButtonUrl1);
+        $this->actionButtonUrl1 = $actionButtonUrl1;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionButtonText2()
+    {
+        return $this->actionButtonText2;
+    }
+
+    /**
+     * @param string $actionButtonText2
+     */
+    public function setActionButtonText2($actionButtonText2)
+    {
+        $this->isChanged('actionButtonText2', $actionButtonText2);
+        $this->actionButtonText2 = $actionButtonText2;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionButtonIcon2()
+    {
+        return $this->actionButtonIcon2;
+    }
+
+    /**
+     * @param string $actionButtonIcon2
+     */
+    public function setActionButtonIcon2($actionButtonIcon2)
+    {
+        $this->isChanged('actionButtonIcon2', $actionButtonIcon2);
+        $this->actionButtonIcon2 = $actionButtonIcon2;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionButtonUrl2()
+    {
+        return $this->actionButtonUrl2;
+    }
+
+    /**
+     * @param string $actionButtonUrl2
+     */
+    public function setActionButtonUrl2($actionButtonUrl2)
+    {
+        $this->isChanged('actionButtonUrl2', $actionButtonUrl2);
+        $this->actionButtonUrl2 = $actionButtonUrl2;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param string $icon
+     */
+    public function setIcon($icon)
+    {
+        $this->isChanged('icon', $icon);
+        $this->icon = $icon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBadge()
+    {
+        return $this->badge;
+    }
+
+    /**
+     * @param string $badge
+     */
+    public function setBadge($badge)
+    {
+        $this->isChanged('badge', $badge);
+        $this->badge = $badge;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImage($image)
+    {
+        $this->isChanged('image', $image);
+        $this->image = $image;
     }
 }

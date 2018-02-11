@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Model\NotificationModel;
+use Symfony\Component\Form\Form;
 
 class NotificationUploader
 {
@@ -42,26 +43,35 @@ class NotificationUploader
      * @param FileUploader      $fileUploader
      * @param NotificationModel $notificationModel
      */
-    public function uploadFiles(Notification $notification, $request, FileUploader $fileUploader, NotificationModel $notificationModel)
+    public function uploadFiles(Notification $notification, $request, FileUploader $fileUploader, NotificationModel $notificationModel, Form $form)
     {
-        $files         = $request->files->all();
+        $files         = $request->files->all()['notification'];
+
         $uploadedFiles = [];
+        $deteledFiles  = [];
         foreach ($notificationModel->getUploadFilesName() as $fileName) {
+            $getVar          = 'get'.ucfirst($fileName);
+            $setVar          = 'set'.ucfirst($fileName);
+
+            $uploadDir    = $this->getUploadDir($notification);
+
+            // Delete file
+            if (!empty($form->get($fileName.'_delete')->getData())) {
+                $fileUploader->delete($uploadDir.DIRECTORY_SEPARATOR.$notification->$getVar());
+                $notification->$setVar('');
+            }
+
             /* @var UploadedFile $file */
             if (empty($files[$fileName])) {
                 continue;
             }
             $file = $files[$fileName];
+
             try {
-                $uploadDir    = $this->getUploadDir($notification);
                 $uploadedFile = $fileUploader->upload($uploadDir, $file);
-                $var          = 'set'.ucfirst($fileName);
-                $notification->$var($uploadedFile);
-                $uploadedFiles[$fileName] = $uploadDir.DIRECTORY_SEPARATOR.$uploadedFile;
+                $notification->$setVar($uploadedFile);
             } catch (FileUploadException $e) {
-                foreach ($uploadedFiles as $filePath) {
-                    $fileUploader->delete($filePath);
-                }
+                $fileUploader->delete($uploadDir.DIRECTORY_SEPARATOR.$uploadedFile);
             }
         }
     }
@@ -89,15 +99,22 @@ class NotificationUploader
     }
 
     /**
+     * @param $notification
+     *
+     * @return string
+     */
+    public function getFullUrl($notification, $fileName)
+    {
+        return $this->coreParametersHelper->getParameter('site_url').DIRECTORY_SEPARATOR.$this->coreParametersHelper->getParameter('notification_upload_dir').DIRECTORY_SEPARATOR.$notification->getId().DIRECTORY_SEPARATOR.$fileName;
+    }
+
+    /**
      * @param Notification $notification
      *
      * @return string
      */
     private function getUploadDir(Notification $notification)
     {
-        $notificationId        = $notification->getId();
-        $notificationUploadDir = $this->getUploadDirOfNotification($notification);
-
-        return $notificationUploadDir.DIRECTORY_SEPARATOR.$notificationId;
+        return $this->coreParametersHelper->getParameter('kernel.root_dir').DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.$this->coreParametersHelper->getParameter('notification_upload_dir').DIRECTORY_SEPARATOR.$notification->getId();
     }
 }
