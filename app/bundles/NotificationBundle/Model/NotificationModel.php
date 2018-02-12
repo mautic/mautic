@@ -153,19 +153,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param Email $entity
-     * @param       $unlock
-     *
-     * @return mixed
-     */
-    public function saveEntity($entity, $unlock = true)
-    {
-        parent::saveEntity($entity, $unlock);
-    }
-
-    /**
      * @param Notification $notification
      * @param Lead         $lead
      * @param string       $source

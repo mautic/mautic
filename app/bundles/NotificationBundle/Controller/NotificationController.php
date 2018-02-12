@@ -284,7 +284,6 @@ class NotificationController extends FormController
 
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
-
         ///Check for a submitted form and process it
         if ($method == 'POST') {
             $valid = false;
