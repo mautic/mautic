@@ -80,6 +80,7 @@ return [
                 'arguments'=> [
                     'translator',
                     'mautic.notification.helper.uploader',
+                    'mautic.notification.model.notification',
                 ],
                 'alias' => 'notification',
             ],

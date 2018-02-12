@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\NotificationBundle\Helper\NotificationUploader;
+use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -42,13 +43,20 @@ class NotificationType extends AbstractType
     protected $notificationUploader;
 
     /**
+     * @var NotificationModel
+     */
+    protected $notificationModel;
+
+    /**
      * @param Translator           $translator
      * @param NotificationUploader $notificationUploader
+     * @param NotificationModel    $notificationModel
      */
-    public function __construct(Translator $translator, NotificationUploader $notificationUploader)
+    public function __construct(Translator $translator, NotificationUploader $notificationUploader, NotificationModel $notificationModel)
     {
         $this->translator           = $translator;
         $this->notificationUploader = $notificationUploader;
+        $this->notificationModel    = $notificationModel;
     }
 
     /**
@@ -147,10 +155,11 @@ class NotificationType extends AbstractType
             'actionButtonUrl1',
             'url',
             [
-                'label'      => 'mautic.notification.form.url',
+                'label'      => 'mautic.notification.form.button.url',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class'  => 'form-control',
+                    'tooltip'=> 'mautic.notification.form.button.url.tooltip',
                 ],
                 'required' => false,
             ]
@@ -160,10 +169,11 @@ class NotificationType extends AbstractType
             'actionButtonUrl2',
             'url',
             [
-                'label'      => 'mautic.notification.form.url',
+                'label'      => 'mautic.notification.form.button.url',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class'  => 'form-control',
+                    'tooltip'=> 'mautic.notification.form.button.url.tooltip',
                 ],
                 'required' => false,
             ]
@@ -173,11 +183,11 @@ class NotificationType extends AbstractType
             'button',
             'text',
             [
-                'label'      => 'mautic.notification.form.button',
+                'label'      => 'mautic.notification.form.button.text',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.notification.form.button.tooltip',
+                    'tooltip' => 'mautic.notification.form.button.text.tooltip',
                 ],
                 'required' => false,
             ]
@@ -187,11 +197,11 @@ class NotificationType extends AbstractType
             'actionButtonText2',
             'text',
             [
-                'label'      => 'mautic.notification.form.button',
+                'label'      => 'mautic.notification.form.button.text',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.notification.form.button.tooltip',
+                    'tooltip' => 'mautic.notification.form.button.text.tooltip',
                 ],
                 'required' => false,
             ]
@@ -208,6 +218,7 @@ class NotificationType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.notification.form.button.icon.tooltip',
                 ],
+                'mapped'      => false,
                 'constraints' => [
                     new File(
                         [
@@ -222,11 +233,17 @@ class NotificationType extends AbstractType
                 ],
             ]
         );
+
+        $fileName = '';
+        if ($options['data']->getId()) {
+            $notification =  $this->notificationModel->getEntity($options['data']->getId());
+            $fileName     = $notification->getActionButtonIcon1();
+        }
         $builder->add(
             'actionButtonIcon1_delete',
             CheckboxType::class,
             [
-                'label'      => $this->translator->trans('mautic.notification.form.button.icon.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getActionButtonIcon1()), '%file%'=>$options['data']->getActionButtonIcon1()]),
+                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $fileName), '%file%'=>$fileName]),
                 'label_attr' => ['class' => 'control-label'],
                 'mapped'     => false,
                 'data'       => false,
@@ -392,7 +409,7 @@ class NotificationType extends AbstractType
             'icon_delete',
             CheckboxType::class,
             [
-                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getActionButtonIcon1()), '%file%'=>$options['data']->getActionButtonIcon1()]),
+                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getIcon()), '%file%'=>$options['data']->getIcon()]),
                 'label_attr' => ['class' => 'control-label'],
                 'mapped'     => false,
                 'data'       => false,
@@ -429,7 +446,7 @@ class NotificationType extends AbstractType
             'image_delete',
             CheckboxType::class,
             [
-                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getActionButtonIcon1()), '%file%'=>$options['data']->getActionButtonIcon1()]),
+                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getImage()), '%file%'=>$options['data']->getImage()]),
                 'label_attr' => ['class' => 'control-label'],
                 'mapped'     => false,
                 'data'       => false,
@@ -465,7 +482,7 @@ class NotificationType extends AbstractType
             'badge_delete',
             CheckboxType::class,
             [
-                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getActionButtonIcon1()), '%file%'=>$options['data']->getActionButtonIcon1()]),
+                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getBadge()), '%file%'=>$options['data']->getBadge()]),
                 'label_attr' => ['class' => 'control-label'],
                 'mapped'     => false,
                 'data'       => false,

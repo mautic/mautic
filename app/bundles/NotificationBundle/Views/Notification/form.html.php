@@ -32,8 +32,21 @@ if ($notification->getId()) {
             ],
             'btnText'   => $view['translator']->trans('mautic.notification.preview'),
             'iconClass' => 'fa fa-share',
-            'primary'   => false,
-            'priority'  => 10,
+            'primary'   => true,
+            'priority'  => 1,
+        ],
+        [
+            'attr' => [
+                'data-toggle' => '',
+                'data-target' => '',
+                'target'      => '_blank',
+                'data-footer' => 'false',
+                'href'        => 'https://documentation.onesignal.com/docs/web-push-overview',
+            ],
+            'btnText'   => $view['translator']->trans('mautic.notification.read.docs'),
+            'iconClass' => 'fa fa-file-text-o',
+            'primary'   => true,
+            'priority'  => 2,
         ],
     ];
 
@@ -68,7 +81,6 @@ if ($notification->getId()) {
 
                                 </div>
                                 <div class="col-md-6">
-
                                     <?php echo $view['form']->row($form['message']); ?>
                                 </div>
                             </div>
@@ -99,7 +111,7 @@ if ($notification->getId()) {
                                 </div>
                                 <div class="col-md-6">
                                     <?php echo $view['form']->row($form['actionButtonIcon2']); ?>
-                                    <?php if (!empty($notification->getActionButtonIcon1())): ?>
+                                    <?php if (!empty($notification->getActionButtonIcon2())): ?>
                                         <?php echo $view['form']->row($form['actionButtonIcon2_delete']); ?>
                                     <?php endif; ?>
                                 </div>
