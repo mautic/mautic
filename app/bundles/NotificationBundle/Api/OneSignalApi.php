@@ -75,8 +75,18 @@ class OneSignalApi extends AbstractNotificationApi
         $buttonId = $notification->getHeading();
         $title    = $notification->getHeading();
         $url      = $notification->getUrl();
-        $button   = $notification->getButton();
         $message  = $notification->getMessage();
+
+        $icon  = $notification->getIcon();
+        $image = $notification->getImage();
+
+        $actionButtonUrl1  = $notification->getActionButtonUrl1();
+        $actionButtonIcon1 = $this->notificationUploader->getFullUrl($notification, 'actionButtonIcon1');
+        $button            = $notification->getButton();
+
+        $actionButtonUrl2  = $notification->getActionButtonUrl1();
+        $actionButtonIcon2 = $this->notificationUploader->getFullUrl($notification, 'actionButtonIcon2');
+        $actionButtonText2 = $notification->getActionButtonText2();
 
         if (!is_array($playerId)) {
             $playerId = [$playerId];
@@ -109,8 +119,33 @@ class OneSignalApi extends AbstractNotificationApi
                 $data['buttons'][] = ['id' => $buttonId, 'text' => $button];
             }
         } else {
-            if ($button && $url) {
-                $data['web_buttons'][] = ['id' => $buttonId, 'text' => $button, 'url' => $url];
+            // action button 1
+            if ($button && $actionButtonUrl1) {
+                $data['web_buttons'][] = [
+                    'id'   => $buttonId,
+                    'text' => $button,
+                    'url'  => $actionButtonUrl1,
+                    'icon' => $actionButtonIcon1,
+                ];
+            }
+
+            // action button 2
+            if ($actionButtonText2 && $actionButtonUrl2) {
+                $data['web_buttons'][] = [
+                    'id'   => $buttonId,
+                    'text' => $actionButtonText2,
+                    'url'  => $actionButtonUrl2,
+                    'icon' => $actionButtonIcon2,
+                ];
+            }
+
+            if ($icon) {
+                $data['chrome_web_image'] = $icon;
+                $data['firefox_icon']     = $icon;
+            }
+
+            if ($image) {
+                $data['chrome_web_image'] = $image;
             }
         }
 

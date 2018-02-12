@@ -126,10 +126,6 @@ if ($notification->getId()) {
                                     <?php if (!empty($notification->getIcon())): ?>
                                         <?php echo $view['form']->row($form['icon_delete']); ?>
                                     <?php endif; ?>
-                                    <?php echo $view['form']->row($form['badge']); ?>
-                                    <?php if (!empty($notification->getBadge())): ?>
-                                        <?php echo $view['form']->row($form['badge_delete']); ?>
-                                    <?php endif; ?>
                                 </div>
                                 <div class="col-md-6">
                                     <?php echo $view['form']->row($form['image']); ?>

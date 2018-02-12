@@ -175,15 +175,25 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
         }
 
-        if ($url = $notification->getUrl()) {
-            $url = $this->notificationApi->convertToTrackedUrl(
-                $url,
-                [
-                    'notification' => $notification->getId(),
-                    'lead'         => $lead->getId(),
-                ],
-                $notification
-            );
+        // prevent rewrite notification entity
+        $sendNotification = clone $notification;
+
+        // trackable links and update Notification entity
+        $convertedLinks = ['url', 'actionButtonUrl1', 'actionButtonUrl2'];
+        foreach ($convertedLinks as $key) {
+            $getVar = 'get'.$key;
+            $setVar = 'set'.$key;
+            if ($url = $notification->$getVar()) {
+                $url = $this->notificationApi->convertToTrackedUrl(
+                    $url,
+                    [
+                        'notification' => $notification->getId(),
+                        'lead'         => $lead->getId(),
+                    ],
+                    $notification
+                );
+            }
+            $sendNotification->$setVar($url);
         }
 
         /** @var TokenReplacementEvent $tokenEvent */
@@ -202,9 +212,6 @@ class CampaignSubscriber extends CommonSubscriber
             new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
         );
 
-        // prevent rewrite notification entity
-        $sendNotification = clone $notification;
-        $sendNotification->setUrl($url);
         $sendNotification->setMessage($sendEvent->getMessage());
         $sendNotification->setHeading($sendEvent->getHeading());
 

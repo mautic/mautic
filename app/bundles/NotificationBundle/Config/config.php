@@ -140,6 +140,7 @@ return [
                     'mautic.http.connector',
                     'mautic.page.model.trackable',
                     'mautic.helper.integration',
+                    'mautic.notification.helper.uploader',
                 ],
                 'alias' => 'notification_api',
             ],

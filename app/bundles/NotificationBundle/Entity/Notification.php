@@ -169,11 +169,6 @@ class Notification extends FormEntity
     private $image;
 
     /**
-     * @var string
-     */
-    private $badge;
-
-    /**
      * @var array
      */
     public function __clone()
@@ -311,10 +306,6 @@ class Notification extends FormEntity
         $builder->createField('image', 'string')
             ->nullable()
             ->build();
-
-        $builder->createField('badge', 'string')
-            ->nullable()
-            ->build();
     }
 
     /**
@@ -385,6 +376,11 @@ class Notification extends FormEntity
             )
             ->addProperties(
                 [
+                    'actionButtonUrl1',
+                    'actionButtonIcon1',
+                    'actionButtonUrl2',
+                    'actionButtonIcon2',
+                    'actionButtonText2',
                     'utmTags',
                     'publishUp',
                     'publishDown',
@@ -917,23 +913,6 @@ class Notification extends FormEntity
     {
         $this->isChanged('icon', $icon);
         $this->icon = $icon;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBadge()
-    {
-        return $this->badge;
-    }
-
-    /**
-     * @param string $badge
-     */
-    public function setBadge($badge)
-    {
-        $this->isChanged('badge', $badge);
-        $this->badge = $badge;
     }
 
     /**

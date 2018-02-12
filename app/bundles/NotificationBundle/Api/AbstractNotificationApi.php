@@ -15,6 +15,7 @@ use Joomla\Http\Http;
 use Joomla\Http\Response;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Helper\NotificationUploader;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 
@@ -46,19 +47,26 @@ abstract class AbstractNotificationApi
     protected $integrationHelper;
 
     /**
+     * @var NotificationUploader
+     */
+    protected $notificationUploader;
+
+    /**
      * AbstractNotificationApi constructor.
      *
-     * @param MauticFactory     $factory
-     * @param Http              $http
-     * @param TrackableModel    $trackableModel
-     * @param IntegrationHelper $integrationHelper
+     * @param MauticFactory        $factory
+     * @param Http                 $http
+     * @param TrackableModel       $trackableModel
+     * @param IntegrationHelper    $integrationHelper
+     * @param NotificationUploader $notificationUploader
      */
-    public function __construct(MauticFactory $factory, Http $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper)
+    public function __construct(MauticFactory $factory, Http $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper, NotificationUploader $notificationUploader)
     {
-        $this->factory           = $factory;
-        $this->http              = $http;
-        $this->trackableModel    = $trackableModel;
-        $this->integrationHelper = $integrationHelper;
+        $this->factory              = $factory;
+        $this->http                 = $http;
+        $this->trackableModel       = $trackableModel;
+        $this->integrationHelper    = $integrationHelper;
+        $this->notificationUploader = $notificationUploader;
     }
 
     /**

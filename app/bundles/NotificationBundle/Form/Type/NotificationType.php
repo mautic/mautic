@@ -243,7 +243,7 @@ class NotificationType extends AbstractType
             'actionButtonIcon1_delete',
             CheckboxType::class,
             [
-                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $fileName), '%file%'=>$fileName]),
+                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], 'actionButtonIcon1'), '%file%'=>$fileName]),
                 'label_attr' => ['class' => 'control-label'],
                 'mapped'     => false,
                 'data'       => false,
@@ -280,7 +280,7 @@ class NotificationType extends AbstractType
             'actionButtonIcon2_delete',
             CheckboxType::class,
             [
-                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getActionButtonIcon2()), '%file%'=>$options['data']->getActionButtonIcon2()]),
+                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], 'actionButtonIcon2'), '%file%'=>$options['data']->getActionButtonIcon2()]),
                 'label_attr' => ['class' => 'control-label'],
                 'mapped'     => false,
                 'data'       => false,
@@ -409,7 +409,7 @@ class NotificationType extends AbstractType
             'icon_delete',
             CheckboxType::class,
             [
-                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getIcon()), '%file%'=>$options['data']->getIcon()]),
+                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], 'icon'), '%file%'=>$options['data']->getIcon()]),
                 'label_attr' => ['class' => 'control-label'],
                 'mapped'     => false,
                 'data'       => false,
@@ -446,43 +446,7 @@ class NotificationType extends AbstractType
             'image_delete',
             CheckboxType::class,
             [
-                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getImage()), '%file%'=>$options['data']->getImage()]),
-                'label_attr' => ['class' => 'control-label'],
-                'mapped'     => false,
-                'data'       => false,
-            ]
-        );
-
-        $builder->add(
-            'badge',
-            'file',
-            [
-                'label'      => 'mautic.notification.form.badge',
-                'label_attr' => ['class' => 'control-label'],
-                'required'   => false,
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.notification.form.badge.tooltip',
-                ],
-                'mapped'      => false,
-                'constraints' => [
-                    new File(
-                        [
-                            'mimeTypes' => [
-                                'image/gif',
-                                'image/png',
-                            ],
-                            'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid',
-                        ]
-                    ),
-                ],
-            ]
-        );
-        $builder->add(
-            'badge_delete',
-            CheckboxType::class,
-            [
-                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], $options['data']->getBadge()), '%file%'=>$options['data']->getBadge()]),
+                'label'      => $this->translator->trans('mautic.notification.form.delete', ['%url%'=> $this->notificationUploader->getFullUrl($options['data'], 'image'), '%file%'=>$options['data']->getImage()]),
                 'label_attr' => ['class' => 'control-label'],
                 'mapped'     => false,
                 'data'       => false,

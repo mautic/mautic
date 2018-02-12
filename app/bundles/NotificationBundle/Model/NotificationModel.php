@@ -37,11 +37,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     protected $pageTrackableModel;
 
     /**
-     * @var array
-     */
-    private $uploadFilesName = ['actionButtonIcon1', 'actionButtonIcon2', 'icon', 'image', 'badge'];
-
-    /**
      * NotificationModel constructor.
      *
      * @param TrackableModel $pageTrackableModel
@@ -376,13 +371,5 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         }
 
         return $results;
-    }
-
-    /**
-     * @return array
-     */
-    public function getUploadFilesName()
-    {
-        return $this->uploadFilesName;
     }
 }
