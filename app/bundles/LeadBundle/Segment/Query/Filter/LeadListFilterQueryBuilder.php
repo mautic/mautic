@@ -82,10 +82,6 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
             $segmentIds = [intval($segmentIds)];
         }
 
-        $ids      = [];
-        $leftIds  = [];
-        $innerIds = [];
-
         foreach ($segmentIds as $segmentId) {
             $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
 
@@ -177,47 +173,3 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
         return $queryBuilder;
     }
 }
-
-$sql ="ELECT
-					null
-				FROM
-					mautic_leads nlUhHOxv
-				LEFT JOIN mautic_lead_lists_leads dVzaIsGt ON
-					dVzaIsGt.lead_id = nlUhHOxv.id
-					AND dVzaIsGt.leadlist_id = 7
-				WHERE
-					(
-						(
-							EXISTS(
-								SELECT
-									null
-								FROM
-									mautic_lead_donotcontact MnuDztmo
-								WHERE
-									(
-										MnuDztmo.reason = 1
-									)
-									AND(
-										MnuDztmo.lead_id = l.id
-									)
-									AND(
-										MnuDztmo.channel = 'email'
-									)
-							)
-						)
-						OR(
-							dVzaIsGt.manually_added = '1'
-						)
-					)
-					AND(
-						nlUhHOxv.id = l.id
-					)
-					AND(
-						(
-							dVzaIsGt.manually_removed IS NULL
-						)
-						OR(
-							dVzaIsGt.manually_removed = ''
-						)
-					)
-			)";
