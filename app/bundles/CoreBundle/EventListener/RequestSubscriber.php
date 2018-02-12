@@ -49,17 +49,41 @@ class RequestSubscriber extends CommonSubscriber
     public function validateCsrfTokenForAjaxPost(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === Request::METHOD_POST) {
-            $csrfRequestToken = $request->headers->get('X-CSRF-Token');
-            $csrfSessionToken = $this->tokenManager->getToken('mautic_ajax_post')->getValue();
-            if ($csrfSessionToken !== $csrfRequestToken) {
-                $message  = $this->translator->trans('mautic.core.error.csrf', [], 'flashes');
-                $data     = ['flashes' => ['error' => $message]];
-                $content  = $this->templating->render('MauticCoreBundle:Notification:flash_messages.html.php', $data);
-                $response = new JsonResponse(['flashes' => $content], Response::HTTP_OK);
-                $event->setResponse($response);
-                $event->stopPropagation();
-            }
+
+        if ($this->isAjaxPost($request) && $this->isSecurePath($request) && !$this->isCsrfTokenFromRequestHeaderValid($request)) {
+            $message  = $this->translator->trans('mautic.core.error.csrf', [], 'flashes');
+            $data     = ['flashes' => ['error' => $message]];
+            $content  = $this->templating->render('MauticCoreBundle:Notification:flash_messages.html.php', $data);
+            $response = new JsonResponse(['flashes' => $content], Response::HTTP_OK);
+            $event->setResponse($response);
+            $event->stopPropagation();
         }
+    }
+
+    /**
+     * @param Request $request
+     */
+    private function isAjaxPost(Request $request)
+    {
+        return $request->isXmlHttpRequest() && $request->getMethod() === Request::METHOD_POST;
+    }
+
+    /**
+     * @param Request $request
+     */
+    private function isSecurePath(Request $request)
+    {
+        return preg_match('/^\/s\//', $request->getPathinfo()) === 1;
+    }
+
+    /**
+     * @param Request $request
+     */
+    private function isCsrfTokenFromRequestHeaderValid(Request $request)
+    {
+        $csrfRequestToken = $request->headers->get('X-CSRF-Token');
+        $csrfSessionToken = $this->tokenManager->getToken('mautic_ajax_post')->getValue();
+
+        return $csrfSessionToken === $csrfRequestToken;
     }
 }
