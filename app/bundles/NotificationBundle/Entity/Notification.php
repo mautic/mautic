@@ -277,33 +277,41 @@ class Notification extends FormEntity
 
         $builder->createField('actionButtonIcon1', 'string')
             ->columnName('action_button_icon_1')
+            ->length(512)
             ->nullable()
             ->build();
 
         $builder->createField('actionButtonUrl1', 'string')
             ->columnName('action_button_url_1')
+            ->length(512)
             ->nullable()
             ->build();
 
         $builder->createField('actionButtonText2', 'string')
             ->columnName('action_button_text_2')
+            ->length(512)
             ->nullable()
             ->build();
 
         $builder->createField('actionButtonIcon2', 'string')
             ->columnName('action_button_icon_2')
+            ->length(512)
+            ->nullable()
             ->build();
 
         $builder->createField('actionButtonUrl2', 'string')
             ->columnName('action_button_url_2')
+            ->length(512)
             ->nullable()
             ->build();
 
         $builder->createField('icon', 'string')
+            ->length(512)
             ->nullable()
             ->build();
 
         $builder->createField('image', 'string')
+            ->length(512)
             ->nullable()
             ->build();
     }
