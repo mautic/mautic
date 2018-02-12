@@ -442,6 +442,22 @@ class SubmissionRepository extends CommonRepository
     {
         //use DBAL to get entity fields
         $q = $this->_em->getConnection()->createQueryBuilder();
+
+        switch ($operatorExpr) {
+            case 'startsWith':
+                $operatorExpr    = 'like';
+                $value           = $value.'%';
+                break;
+            case 'endsWith':
+                $operatorExpr   = 'like';
+                $value          = '%'.$value;
+                break;
+            case 'contains':
+                $operatorExpr   = 'like';
+                $value          = '%'.$value.'%';
+                break;
+        }
+
         $q->select('s.id')
             ->from($this->getResultsTableName($form, $formAlias), 'r')
             ->leftJoin('r', MAUTIC_TABLE_PREFIX.'form_submissions', 's', 's.id = r.submission_id')
