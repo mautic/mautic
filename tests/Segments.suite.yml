@@ -1,20 +1,19 @@
-actor: ContactsTester
+actor: SegmentsTester
 modules:
     enabled:
+        - \Helper\Segments
         - WebDriver:
              url: '%MAUTIC_URL%'
              browser: chrome
-             wait: 8
-        - \Helper\Contacts
+             wait: 5
         - Db:
              dsn: 'mysql:host=%DB_HOST%;dbname=%DB_NAME%;port=%DB_PORT%'
              user: '%DB_USER%'
              password: '%DB_PASSWD%'
-             dump: tests/_data/Blank.sql
+             dump: tests/_data/Segments003.sql
              #restart: true
              populate: true
              cleanup: false
              #reconnect: true
         - Asserts:
         - Cli:
-
