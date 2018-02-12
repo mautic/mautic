@@ -7,10 +7,16 @@ use Page\NewContactPage;
 class ContactsCest
 {
     private $contactPageObjects = null;
+    private $isInitialized      = false;
 
     public function _before(ContactsTester $I)
     {
+        if (!$this->isInitialized) {
+            $this->isInitialized=true;
+            $I->FillInitialData();
+        }
         $I->loginToMautic();
+
         $this->contactPageObjects = NewContactPage::getContactPageObject();
     }
 
@@ -22,6 +28,8 @@ class ContactsCest
     public function CreateAContactAllFieldsAndCompany(ContactsTester $I)
     {
         $I->wantTo('Create a contact with all fields and new company (Primary) from new button with points not set up');
+        $I->canSeeNumRecords(2, 'mautic_lead_lists');
+        $I->canSeeNumRecords(1, 'mautic_campaigns');
         $currentContactId = $I->grabNumRecords('mautic_leads') + 1;
         $currentCompanyId = $I->grabNumRecords('mautic_companies') + 1;
         $I->amGoingTo('Open Contacts and click on New button');
@@ -75,6 +83,8 @@ class ContactsCest
     public function CreateAContactNoCompany10Points(ContactsTester $I)
     {
         $I->wantTo('Create a contact with all fields and no company from new button with 10 points set up');
+        $I->canSeeNumRecords(2, 'mautic_lead_lists');
+        $I->canSeeNumRecords(1, 'mautic_campaigns');
         $I->amGoingTo('Open Contacts and click on create new');
         $I->amOnPage(DashboardPage::$URL);
         $I->click(DashboardPage::$ContactPage);
@@ -226,7 +236,7 @@ class ContactsCest
         $I->fillField('lead_batch_dnc[reason]', 'No reason');
         $I->click(\Page\ModalPage::$SaveButton);
         $I->amOnPage('/s/contacts/view/4');
-        $I->wait(4);
+        $I->wait(6);
         $I->canSee('Do Not Contact');
     }
 
@@ -256,6 +266,7 @@ class ContactsCest
         $I->checkOption('cb6');
         $I->click('//*[@id="leadTable"]/tbody/tr[6]/td[1]/div/div/button/i');
         $I->click('//*[@id="leadTable"]/tbody/tr[6]/td[1]/div/div/ul/li[2]/a/span/span');
+        $I->wait(2);
         $I->click('//button[text()][2]');
         $I->amOnPage('/s/contacts/view/6');
         $I->canSee('No contact with an id of 6 was found!');
@@ -264,6 +275,7 @@ class ContactsCest
     public function quickAddContact(ContactsTester $I)
     {
         $I->wantTo('Add a contact via QuickAdd');
+        $currentContactId = $I->grabNumRecords('mautic_leads') + 1;
         $I->amOnPage('/s/contacts');
         $I->click('Quick Add');
         $I->wait(3);
@@ -271,9 +283,8 @@ class ContactsCest
         $I->fillField('lead[lastname]', 'Contact');
         $I->fillField('lead[email]', 'quick@mailinator.com');
         $I->click('//div[@class="modal-form-buttons"]/button[2]');
-        $currentContactId = $I->grabNumRecords('mautic_leads') + 1;
         $I->amOnPage('/s/contacts/view/'.$currentContactId);
-        $I->wait(4);
+        $I->wait(6);
         $I->canSee('Quick Add');
         $I->canSee('Contact');
         $I->canSee('quick@mailinator.com');
