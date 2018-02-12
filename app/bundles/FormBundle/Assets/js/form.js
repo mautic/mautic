@@ -131,6 +131,8 @@ Mautic.updateFormFieldValues = function (field) {
     field = mQuery(field);
     var fieldValue = field.val();
     var options = jQuery.parseJSON(field.attr('data-field-options'));
+    var types = jQuery.parseJSON(field.attr('data-field-types'));
+    var operatorField = mQuery('#campaignevent_properties_operator');
     var valueField = mQuery('#campaignevent_properties_value');
     var valueFieldAttrs = {
         'class': valueField.attr('class'),
@@ -139,7 +141,7 @@ Mautic.updateFormFieldValues = function (field) {
         'autocomplete': valueField.attr('autocomplete'),
         'value': valueField.attr('value')
     };
-
+    operatorField.find('option[value=date]').hide();
     if (typeof options[fieldValue] !== 'undefined' && !mQuery.isEmptyObject(options[fieldValue])) {
         var newValueField = mQuery('<select/>')
             .attr('class', valueFieldAttrs['class'])
@@ -147,7 +149,7 @@ Mautic.updateFormFieldValues = function (field) {
             .attr('name', valueFieldAttrs['name'])
             .attr('autocomplete', valueFieldAttrs['autocomplete'])
             .attr('value', valueFieldAttrs['value']);
-        mQuery.each(options[fieldValue], function(key, optionVal) {
+        mQuery.each(options[fieldValue], function (key, optionVal) {
             var option = mQuery("<option></option>")
                 .attr('value', optionVal)
                 .text(optionVal);
@@ -164,6 +166,32 @@ Mautic.updateFormFieldValues = function (field) {
             .attr('value', valueFieldAttrs['value']);
         valueField.replaceWith(newValueField);
     }
+
+    if (typeof types[fieldValue] !== 'undefined'   && types[fieldValue] == 'datetime') {
+        mQuery(newValueField).datetimepicker({
+            format: 'Y-m-d H:i',
+            lazyInit: true,
+            validateOnBlur: false,
+            allowBlank: true,
+            scrollInput: false
+        });
+        operatorField.find('option[value=date]').show();
+    } else if (typeof types[fieldValue] !== 'undefined'   && types[fieldValue] == 'date') {
+        mQuery(newValueField).datetimepicker({
+            timepicker: false,
+            format: 'Y-m-d',
+            lazyInit: true,
+            validateOnBlur: false,
+            allowBlank: true,
+            scrollInput: false,
+            closeOnDateSelect: true
+        });
+        var operatorField = mQuery('#campaignevent_properties_operator');
+        operatorField.find('option[value=date]').show();
+    }
+    operatorField.val();
+    operatorField.chosen('destroy');
+    Mautic.activateChosenSelect(operatorField);
 };
 
 Mautic.formFieldOnLoad = function (container, response) {

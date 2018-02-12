@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -77,10 +78,11 @@ class CampaignEventFormFieldValueType extends AbstractType
 
         // function to add 'template' choice field dynamically
         $func = function (FormEvent $e) use ($ff, $formModel) {
-            $data    = $e->getData();
-            $form    = $e->getForm();
-            $fields  = [];
-            $options = [];
+            $data        = $e->getData();
+            $form        = $e->getForm();
+            $fields      = [];
+            $fieldTypes  = [];
+            $options     = [];
 
             if ($form->has('field')) {
                 $form->remove('field');
@@ -92,11 +94,13 @@ class CampaignEventFormFieldValueType extends AbstractType
                 $formEntity = $formModel->getEntity($data['form']);
                 $formFields = $formEntity->getFields();
 
+                /** @var Field $field * */
                 foreach ($formFields as $field) {
                     if ($field->getType() != 'button') {
-                        $fields[$field->getAlias()]  = $field->getLabel();
-                        $options[$field->getAlias()] = [];
-                        $properties                  = $field->getProperties();
+                        $fields[$field->getAlias()]      = $field->getLabel();
+                        $fieldTypes[$field->getAlias()]  = $field->getType();
+                        $options[$field->getAlias()]     = [];
+                        $properties                      = $field->getProperties();
 
                         if (!empty($properties['list']['list'])) {
                             $options[$field->getAlias()] = [];
@@ -122,6 +126,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                     'attr'    => [
                         'onchange'           => 'Mautic.updateFormFieldValues(this)',
                         'data-field-options' => json_encode($options),
+                        'data-field-types'   => json_encode($fieldTypes),
                     ],
                 ]
             );

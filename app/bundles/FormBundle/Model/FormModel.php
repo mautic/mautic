@@ -858,6 +858,16 @@ class FormModel extends CommonFormModel
                 'expr'        => 'notLike',
                 'negate_expr' => 'like',
             ],
+            '!like' => [
+                'label'       => 'mautic.lead.list.form.operator.isnotlike',
+                'expr'        => 'notLike',
+                'negate_expr' => 'like',
+            ],
+            'date' => [
+                'label'       => 'mautic.lead.list.form.operator.date',
+                'expr'        => 'date', //special case
+                'negate_expr' => 'date',
+            ],
         ];
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
