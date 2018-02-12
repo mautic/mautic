@@ -44,10 +44,9 @@ class NotificationUploader
     /**
      * @param Notification $notification
      * @param $request
-     * @param FileUploader $fileUploader
-     * @param Form         $form
+     * @param Form $form
      */
-    public function uploadFiles(Notification $notification, $request, FileUploader $fileUploader, Form $form)
+    public function uploadFiles(Notification $notification, $request, Form $form)
     {
         $files         = $request->files->all()['notification'];
 
@@ -58,7 +57,7 @@ class NotificationUploader
 
             // Delete file
             if (!empty($form->get($fileName.'_delete')->getData())) {
-                $fileUploader->delete($uploadDir.DIRECTORY_SEPARATOR.$this->getEntityVar($notification, $fileName));
+                $this->fileUploader->delete($uploadDir.DIRECTORY_SEPARATOR.$this->getEntityVar($notification, $fileName));
                 $this->getEntityVar($notification, $fileName, 'set', '');
             }
 
@@ -69,10 +68,10 @@ class NotificationUploader
             $file = $files[$fileName];
 
             try {
-                $uploadedFile = $fileUploader->upload($uploadDir, $file);
+                $uploadedFile = $this->fileUploader->upload($uploadDir, $file);
                 $this->getEntityVar($notification, $fileName, 'set', $uploadedFile);
             } catch (FileUploadException $e) {
-                $fileUploader->delete($uploadDir.DIRECTORY_SEPARATOR.$uploadedFile);
+                $this->fileUploader->delete($uploadDir.DIRECTORY_SEPARATOR.$uploadedFile);
             }
         }
     }

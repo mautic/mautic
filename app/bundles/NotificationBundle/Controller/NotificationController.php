@@ -291,6 +291,11 @@ class NotificationController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($entity);
+                    // update entity if files was updated
+                    $this->get('mautic.notification.helper.uploader')->uploadFiles($entity, $this->request, $form);
+                    if (!empty($entity->getChanges())) {
+                        $model->saveEntity($entity);
+                    }
 
                     $this->addFlash(
                         'mautic.core.notice.created',
@@ -451,9 +456,7 @@ class NotificationController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
-                    $fileUploader        = $this->get('mautic.helper.file_uploader');
-                    $noificationUploader = $this->get('mautic.notification.helper.uploader');
-                    $noificationUploader->uploadFiles($entity, $this->request, $fileUploader, $form);
+                    $this->get('mautic.notification.helper.uploader')->uploadFiles($entity, $this->request, $form);
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                     $this->addFlash(
