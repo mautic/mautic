@@ -95,8 +95,14 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
 
             foreach ($contactSegments as $contactSegment) {
                 $filters             = $this->leadSegmentFilterFactory->getLeadListFilters($contactSegment);
+
                 $segmentQueryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($filters);
-                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubsribedQuery($segmentQueryBuilder, $contactSegment->getId());
+
+                //  If the segment contains no filters; it means its for manually subscribed only
+                if (count($filters)) {
+                    $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubsribedQuery($segmentQueryBuilder, $contactSegment->getId());
+                }
+
                 $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
                 $segmentQueryBuilder->select('l.id');
 

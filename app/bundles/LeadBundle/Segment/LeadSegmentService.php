@@ -218,6 +218,20 @@ class LeadSegmentService
     }
 
     /**
+     * Formatting helper.
+     *
+     * @param $inputSeconds
+     *
+     * @return string
+     */
+    private function format_period($inputSeconds)
+    {
+        $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
+
+        return $now->format('H:i:s.u');
+    }
+
+    /**
      * @param QueryBuilder $qb
      * @param int          $segmentId
      *
@@ -234,7 +248,7 @@ class LeadSegmentService
 
             $end = microtime(true) - $start;
 
-            $this->logger->debug('Segment QB: Query took: '.number_format(round($end * 100, 2), 3, '.', 's ').'ms. Result count: '.count($result), ['segmentId' => $segmentId]);
+            $this->logger->debug('Segment QB: Query took: '.$this->format_period($end).', Result count: '.count($result), ['segmentId' => $segmentId]);
         } catch (\Exception $e) {
             $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
                 'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),
@@ -261,7 +275,7 @@ class LeadSegmentService
 
             $end = microtime(true) - $start;
 
-            $this->logger->debug('Segment QB: Query took: '.round($end * 100, 2).'ms. Result count: '.count($result), ['segmentId' => $segmentId]);
+            $this->logger->debug('Segment QB: Query took: '.$this->format_period($end).'ms. Result count: '.count($result), ['segmentId' => $segmentId]);
         } catch (\Exception $e) {
             $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
                 'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),
