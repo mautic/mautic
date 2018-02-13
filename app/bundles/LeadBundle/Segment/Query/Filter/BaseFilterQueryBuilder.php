@@ -41,6 +41,10 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         return 'mautic.lead.query.builder.basic';
     }
 
+    public function getLogicGroupingExpression()
+    {
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -174,7 +178,19 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
             }
         } else {
-            $queryBuilder->$filterGlueFunc($expression);
+            if ($filterGlue === 'or') {
+                if ($queryBuilder->hasLogicStack()) {
+                    $queryBuilder->orWhere($queryBuilder->expr()->andX($queryBuilder->popLogicStack()));
+                } else {
+                    $queryBuilder->addToLogicStack($expression);
+                }
+            } else {
+                if ($queryBuilder->hasLogicStack()) {
+                    $queryBuilder->addToLogicStack($expression);
+                } else {
+                    $queryBuilder->$filterGlueFunc($expression);
+                }
+            }
         }
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);

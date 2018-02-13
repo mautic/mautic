@@ -62,6 +62,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
             $lists = $listModel->getEntities(
                 [
                     'iterator_mode' => true,
+                    'orderBy'       => 'l.id',
                 ]
             );
 

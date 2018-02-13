@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\LeadSegmentFilters;
+use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 
 /**
@@ -78,6 +79,10 @@ class LeadSegmentQueryBuilder
                 $references = $references + $segmentIdArray;
             }
             $queryBuilder = $filter->applyQuery($queryBuilder);
+        }
+
+        if ($queryBuilder->hasLogicStack()) {
+            $queryBuilder->orWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $queryBuilder->popLogicStack()));
         }
 
         return $queryBuilder;

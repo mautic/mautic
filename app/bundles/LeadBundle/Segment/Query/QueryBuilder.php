@@ -87,6 +87,11 @@ class QueryBuilder
     ];
 
     /**
+     * @var array
+     */
+    private $logicStack = [];
+
+    /**
      * The complete SQL string for this query.
      *
      * @var string
@@ -1600,5 +1605,30 @@ class QueryBuilder
         }
 
         return $sql;
+    }
+
+    public function hasLogicStack()
+    {
+        return count($this->logicStack);
+    }
+
+    public function getLogicStack()
+    {
+        return $this->logicStack;
+    }
+
+    public function popLogicStack()
+    {
+        $stack            = $this->logicStack;
+        $this->logicStack = [];
+
+        return $stack;
+    }
+
+    public function addToLogicStack($expression)
+    {
+        $this->logicStack[] = $expression;
+
+        return $this;
     }
 }
