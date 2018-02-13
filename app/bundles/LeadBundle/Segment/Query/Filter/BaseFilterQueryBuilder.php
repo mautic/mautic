@@ -11,6 +11,7 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
+use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -178,12 +179,12 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
             }
         } else {
+            // @todo remove stack logic, move it to the query builder
             if ($filterGlue === 'or') {
                 if ($queryBuilder->hasLogicStack()) {
-                    $queryBuilder->orWhere($queryBuilder->expr()->andX($queryBuilder->popLogicStack()));
-                } else {
-                    $queryBuilder->addToLogicStack($expression);
+                    $queryBuilder->orWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $queryBuilder->popLogicStack()));
                 }
+                $queryBuilder->addToLogicStack($expression);
             } else {
                 if ($queryBuilder->hasLogicStack()) {
                     $queryBuilder->addToLogicStack($expression);
