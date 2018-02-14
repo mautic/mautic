@@ -76,6 +76,7 @@ class AjaxController extends CommonAjaxController
             if ($field->getType() != 'button') {
                 $properties = $field->getProperties();
                 $options    = [];
+                $optionList = [];
 
                 if (!empty($properties['list']['list'])) {
                     //If the field is a SELECT field then the data gets stored in [list][list]
