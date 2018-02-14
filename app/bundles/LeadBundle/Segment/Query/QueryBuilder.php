@@ -1631,4 +1631,44 @@ class QueryBuilder
 
         return $this;
     }
+
+    public function applyStackLogic()
+    {
+        if ($this->hasLogicStack()) {
+            $parts = $this->getQueryParts();
+
+            if (!is_null($parts['where']) && !is_null($parts['having'])) {
+                $where  = $parts['where'];
+                $having = $parts['having'];
+
+                $fields = $this->extractFields($where);
+
+                foreach ($this->getLogicStack() as $expression) {
+                    $fields = array_merge($fields, $this->extractFields($expression));
+                }
+
+                $fields = array_diff($fields, $this->extractFields($having));
+
+                $this->andHaving($where);
+
+                $this->addSelect($fields);
+
+                $this->resetQueryPart('where');
+                $this->orHaving(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
+            } else {
+                $this->orWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
+            }
+        }
+    }
+
+    public function extractFields($expression)
+    {
+        $matches = [];
+
+        preg_match('/([a-zA-Z]+\.[a-zA-Z_]+)/', $expression instanceof CompositeExpression ? (string) $expression : $expression, $matches);
+
+        $matches = array_keys(array_flip($matches));
+
+        return $matches;
+    }
 }

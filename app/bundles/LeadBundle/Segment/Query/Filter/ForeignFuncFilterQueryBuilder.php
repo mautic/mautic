@@ -82,7 +82,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                 case 'in':
                     //@todo this logic needs to
                     if ($filterAggr) {
-                        $queryBuilder->innerJoin(
+                        $queryBuilder->leftJoin(
                             $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
                             $filter->getTable(),
                             $tableAlias,
@@ -152,6 +152,8 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
         }
 
         if ($queryBuilder->isJoinTable($filter->getTable())) {
+            var_dump($filterAggr);
+
             if ($filterAggr) {
                 $queryBuilder->andHaving($expression);
             } else {

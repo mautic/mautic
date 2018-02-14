@@ -58,27 +58,10 @@ class DncFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $queryBuilder->addJoinCondition($tableAlias, $expression);
 
-        /*
-         * 1) condition "eq with parameter value YES" and "neq with parameter value NO" are equal
-         * 2) condition "eq with parameter value NO" and "neq with parameter value YES" are equal
-         *
-         * If we want to include unsubscribed people (option 1) - we need IS NOT NULL condition (give me people which exists in table)
-         * If we do not want to include unsubscribed people (option 2) - we need IS NULL condition
-         *
-         * @todo refactor this piece of code
-         */
         if ($filter->getOperator() === 'eq') {
-            if ($filter->getParameterValue() === true) {
-                $queryType = 'isNotNull';
-            } else {
-                $queryType = 'isNull';
-            }
+            $queryType = $filter->getParameterValue() ? 'isNotNull' : 'isNull';
         } else {
-            if ($filter->getParameterValue() === true) {
-                $queryType = 'isNull';
-            } else {
-                $queryType = 'isNotNull';
-            }
+            $queryType = $filter->getParameterValue() ? 'isNull' : 'isNotNull';
         }
 
         $queryBuilder->andWhere($queryBuilder->expr()->$queryType($tableAlias.'.id'));

@@ -174,6 +174,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
         if ($queryBuilder->isJoinTable($filter->getTable())) {
             if ($filterAggr) {
+                throw new \Exception('should not be used use different query builder');
                 $queryBuilder->andHaving($expression);
             } else {
                 $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
@@ -182,7 +183,13 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             // @todo remove stack logic, move it to the query builder
             if ($filterGlue === 'or') {
                 if ($queryBuilder->hasLogicStack()) {
-                    $queryBuilder->orWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $queryBuilder->popLogicStack()));
+                    if (count($queryBuilder->getLogicStack())) {
+                        $orWhereExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $queryBuilder->popLogicStack());
+                    } else {
+                        $orWhereExpression = $queryBuilder->popLogicStack();
+                    }
+
+                    $queryBuilder->orWhere($orWhereExpression);
                 }
                 $queryBuilder->addToLogicStack($expression);
             } else {
