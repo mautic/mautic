@@ -34,6 +34,14 @@ class LeadSegmentFilterDescriptor extends \ArrayIterator
             'field'               => 'open_count',
         ];
 
+        $this->translations['lead_email_received'] = [
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table_field' => 'lead_id',
+            'foreign_table'       => 'email_stats',
+            'field'               => 'email_id',
+            'func'                => 'email_stats.is_read = 1',
+        ];
+
         $this->translations['hit_url_count'] = [
             'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
             'foreign_table'       => 'page_hits',
@@ -45,138 +53,138 @@ class LeadSegmentFilterDescriptor extends \ArrayIterator
         ];
 
         $this->translations['lead_email_read_date'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'email_stats',
-            'field'               => 'date_read',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'email_stats',
+            'field'         => 'date_read',
         ];
 
         $this->translations['hit_url_date'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'page_hits',
-            'field'               => 'date_hit',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
+            'field'         => 'date_hit',
         ];
 
         $this->translations['dnc_bounced'] = [
-            'type'                => DncFilterQueryBuilder::getServiceId(),
+            'type' => DncFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['dnc_bounced_sms'] = [
-            'type'                => DncFilterQueryBuilder::getServiceId(),
+            'type' => DncFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['dnc_unsubscribed'] = [
-            'type'                => DncFilterQueryBuilder::getServiceId(),
+            'type' => DncFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['dnc_unsubscribed_sms'] = [
-            'type'                => DncFilterQueryBuilder::getServiceId(),
+            'type' => DncFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['leadlist'] = [
-            'type'                => LeadListFilterQueryBuilder::getServiceId(),
+            'type' => LeadListFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['globalcategory'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'lead_categories',
-            'field'               => 'category_id',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_categories',
+            'field'         => 'category_id',
         ];
 
         $this->translations['tags'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'lead_tags_xref',
-            'field'               => 'tag_id',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_tags_xref',
+            'field'         => 'tag_id',
         ];
 
         $this->translations['lead_email_sent'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'email_stats',
-            'field'               => 'email_id',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'email_stats',
+            'field'         => 'email_id',
         ];
 
         $this->translations['device_type'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'lead_devices',
-            'field'               => 'device',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_devices',
+            'field'         => 'device',
         ];
 
         $this->translations['device_brand'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'lead_devices',
-            'field'               => 'device_brand',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_devices',
+            'field'         => 'device_brand',
         ];
 
         $this->translations['device_os'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'lead_devices',
-            'field'               => 'device_os_name',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_devices',
+            'field'         => 'device_os_name',
         ];
 
         $this->translations['device_model'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'lead_devices',
-            'field'               => 'device_model',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_devices',
+            'field'         => 'device_model',
         ];
 
         $this->translations['stage'] = [
-            'type'                => BaseFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'leads',
-            'field'               => 'stage_id',
+            'type'          => BaseFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'leads',
+            'field'         => 'stage_id',
         ];
 
         $this->translations['notification'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'push_ids',
-            'field'               => 'id',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'push_ids',
+            'field'         => 'id',
         ];
 
         $this->translations['page_id'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'page_hits',
-            'foreign_field'       => 'page_id',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
+            'foreign_field' => 'page_id',
         ];
 
         $this->translations['email_id'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'page_hits',
-            'foreign_field'       => 'email_id',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
+            'foreign_field' => 'email_id',
         ];
 
         $this->translations['redirect_id'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'page_hits',
-            'foreign_field'       => 'redirect_id',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
+            'foreign_field' => 'redirect_id',
         ];
 
         $this->translations['source'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'page_hits',
-            'foreign_field'       => 'source',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
+            'foreign_field' => 'source',
         ];
 
         $this->translations['hit_url'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'page_hits',
-            'field'               => 'url',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
+            'field'         => 'url',
         ];
 
         $this->translations['referer'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'page_hits',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
         ];
 
         $this->translations['source_id'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'page_hits',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
         ];
 
         $this->translations['url_title'] = [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'page_hits',
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
         ];
 
         $this->translations['sessions'] = [
-            'type'                => SessionsFilterQueryBuilder::getServiceId(),
+            'type' => SessionsFilterQueryBuilder::getServiceId(),
         ];
 
         parent::__construct($this->translations);

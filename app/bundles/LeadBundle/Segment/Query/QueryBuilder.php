@@ -21,6 +21,7 @@ namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Elastica\Exception\QueryBuilderException;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
 /**
@@ -1421,8 +1422,13 @@ class QueryBuilder
             foreach ($joins as $key => $join) {
                 if ($join['joinAlias'] == $alias) {
                     $result[$tbl][$key]['joinCondition'] = $join['joinCondition'].' and '.$expr;
+                    $inserted                            = true;
                 }
             }
+        }
+
+        if (!isset($inserted)) {
+            throw new QueryBuilderException('Inserting condition to nonexistent join '.$alias);
         }
 
         $this->setQueryPart('join', $result);

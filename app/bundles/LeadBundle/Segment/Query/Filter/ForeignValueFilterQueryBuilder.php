@@ -44,15 +44,44 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
 
-        if (!$tableAlias) {
-            $tableAlias = $this->generateRandomParameterName();
+        switch ($filterOperator) {
+            case 'notIn':
+                $tableAlias = $this->generateRandomParameterName();
+                $crate      = $filter->getCrate();
 
-            $queryBuilder = $queryBuilder->innerJoin(
-                $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
-                $filter->getTable(),
-                $tableAlias,
-                $tableAlias.'.lead_id = l.id'
-            );
+                if (is_null($crate['func']) && $crate['aggr']) {
+                    $where = ' AND '.str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $crate['aggr']);
+                } else {
+                    $where = '';
+                }
+
+                $queryBuilder = $queryBuilder->leftJoin(
+                    $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
+                    $filter->getTable(),
+                    $tableAlias,
+                    $tableAlias.'.lead_id = l.id'.$where
+                );
+
+                $expression = $queryBuilder->expr()->in(
+                    $tableAlias.'.'.$filter->getField(),
+                    $filterParametersHolder
+                );
+
+                $queryBuilder->setParametersPairs($filterParametersHolder, $filter->getParameterValue());
+
+                $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
+
+                break;
+            default:
+                if (!$tableAlias) {
+                    $tableAlias = $this->generateRandomParameterName();
+                }
+                $queryBuilder = $queryBuilder->innerJoin(
+                    $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
+                    $filter->getTable(),
+                    $tableAlias,
+                    $tableAlias.'.lead_id = l.id'
+                );
         }
 
         switch ($filterOperator) {
@@ -68,13 +97,21 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $tableAlias.'.lead_id');
                 $queryBuilder->andWhere($expression);
                 break;
+            case 'notIn':
+                $queryBuilder->addSelect($tableAlias.'.lead_id');
+                $expression = $queryBuilder->expr()->isNull(
+                    $tableAlias.'.lead_id');
+                $queryBuilder->andWhere($expression);
+                break;
             default:
                 $expression = $queryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );
+                dump('xxxx'.$expression);
                 $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
                 $queryBuilder->setParametersPairs($parameters, $filterParameters);
+                dump($queryBuilder->getQueryParts());
         }
 
         return $queryBuilder;

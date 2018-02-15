@@ -519,10 +519,13 @@ class LeadListRepository extends CommonRepository
                 $params  = $q->getParameters();
                 $sqlT    = $q->getSQL();
                 foreach ($params as $key=>$val) {
-                    if (!is_int($val) and !is_float($val)) {
+                    if (!is_int($val) and !is_float($val) and !is_array($val)) {
                         $val = "'$val'";
                     }
-                    $sqlT = str_replace(":{$key}", $val, $sqlT);
+                    if (is_array($val)) {
+                        $val = join(',', $val);
+                    }
+                    $sqlT                    = str_replace(":{$key}", $val, $sqlT);
                 }
 
                 $logger->debug(sprintf('Old version SQL: %s', $sqlT));
