@@ -86,9 +86,9 @@ class AjaxController extends CommonAjaxController
                     $optionList = $properties['optionlist']['list'];
                 } elseif (in_array($field->getType(), ['date', 'datetime'])) {
                     $fieldHelper = new \Mautic\LeadBundle\Helper\FormFieldHelper();
-                    $fieldHelper->setTranslator($this->factory->getTranslator());
+                    $fieldHelper->setTranslator($this->get('translator'));
                     $fieldValues = $fieldHelper->getDateChoices();
-                    $customText  = $this->factory->getTranslator()->trans('mautic.campaign.event.timed.choice.custom');
+                    $customText  =  $this->get('translator')->trans('mautic.campaign.event.timed.choice.custom');
                     $customValue = (empty($data['value']) || isset($fieldValues[$data['value']])) ? 'custom' : $data['value'];
                     $options     = array_merge(
                         [
