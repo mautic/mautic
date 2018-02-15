@@ -76,6 +76,7 @@ class AjaxController extends CommonAjaxController
             if ($field->getType() != 'button') {
                 $properties = $field->getProperties();
                 $options    = [];
+                $optionList = [];
 
                 if (!empty($properties['list']['list'])) {
                     //If the field is a SELECT field then the data gets stored in [list][list]
@@ -83,6 +84,18 @@ class AjaxController extends CommonAjaxController
                 } elseif (!empty($properties['optionlist']['list'])) {
                     //If the field is a radio or a checkbox then it will be stored in [optionlist][list]
                     $optionList = $properties['optionlist']['list'];
+                } elseif (in_array($field->getType(), ['date', 'datetime'])) {
+                    $fieldHelper = new \Mautic\LeadBundle\Helper\FormFieldHelper();
+                    $fieldHelper->setTranslator($this->factory->getTranslator());
+                    $fieldValues = $fieldHelper->getDateChoices();
+                    $customText  = $this->factory->getTranslator()->trans('mautic.campaign.event.timed.choice.custom');
+                    $customValue = (empty($data['value']) || isset($fieldValues[$data['value']])) ? 'custom' : $data['value'];
+                    $options     = array_merge(
+                        [
+                            $customValue => $customText,
+                        ],
+                        $fieldValues
+                    );
                 }
                 if (!empty($optionList)) {
                     foreach ($optionList as $listItem) {

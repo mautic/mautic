@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -70,6 +71,9 @@ class CampaignEventFormFieldValueType extends AbstractType
             'choice',
             [
                 'choices' => $choices,
+                'attr'    => [
+                    'onchange' => 'Mautic.updateFormOperators(this)',
+                ],
             ]
         );
 
@@ -77,10 +81,11 @@ class CampaignEventFormFieldValueType extends AbstractType
 
         // function to add 'template' choice field dynamically
         $func = function (FormEvent $e) use ($ff, $formModel) {
-            $data    = $e->getData();
-            $form    = $e->getForm();
-            $fields  = [];
-            $options = [];
+            $data        = $e->getData();
+            $form        = $e->getForm();
+            $fields      = [];
+            $fieldTypes  = [];
+            $options     = [];
 
             if ($form->has('field')) {
                 $form->remove('field');
@@ -92,11 +97,13 @@ class CampaignEventFormFieldValueType extends AbstractType
                 $formEntity = $formModel->getEntity($data['form']);
                 $formFields = $formEntity->getFields();
 
+                /** @var Field $field * */
                 foreach ($formFields as $field) {
                     if ($field->getType() != 'button') {
-                        $fields[$field->getAlias()]  = $field->getLabel();
-                        $options[$field->getAlias()] = [];
-                        $properties                  = $field->getProperties();
+                        $fields[$field->getAlias()]      = $field->getLabel();
+                        $fieldTypes[$field->getAlias()]  = $field->getType();
+                        $options[$field->getAlias()]     = [];
+                        $properties                      = $field->getProperties();
 
                         if (!empty($properties['list']['list'])) {
                             $options[$field->getAlias()] = [];
@@ -109,11 +116,30 @@ class CampaignEventFormFieldValueType extends AbstractType
                                     $options[$field->getAlias()][$option] = $option;
                                 }
                             }
+                        } elseif (in_array($field->getType(), ['date', 'datetime'])) {
+                            $fieldHelper = new \Mautic\LeadBundle\Helper\FormFieldHelper();
+                            $fieldHelper->setTranslator($this->factory->getTranslator());
+                            $fieldValues                 = $fieldHelper->getDateChoices();
+                            $customText                  = $this->factory->getTranslator()->trans('mautic.campaign.event.timed.choice.custom');
+                            $customValue                 = (empty($data['value']) || isset($fieldValues[$data['value']])) ? 'custom' : $data['value'];
+                            $options[$field->getAlias()] = array_merge(
+                                    [
+                                        $customValue => $customText,
+                                    ],
+                                    $fieldValues
+                                );
+
+                            $choiceAttr = function ($value, $key, $index) use ($customValue) {
+                                if ($customValue === $value) {
+                                    return ['data-custom' => 1];
+                                }
+
+                                return [];
+                            };
                         }
                     }
                 }
             }
-
             $form->add(
                 'field',
                 'choice',
@@ -122,6 +148,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                     'attr'    => [
                         'onchange'           => 'Mautic.updateFormFieldValues(this)',
                         'data-field-options' => json_encode($options),
+                        'data-field-types'   => json_encode($fieldTypes),
                     ],
                 ]
             );
@@ -135,7 +162,8 @@ class CampaignEventFormFieldValueType extends AbstractType
                         'label'      => 'mautic.form.field.form.value',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
-                            'class' => 'form-control',
+                            'class'                => 'form-control',
+                            'data-onload-callback' => 'updateLeadFieldValueOptions',
                         ],
                         'required'    => true,
                         'constraints' => [
@@ -154,9 +182,12 @@ class CampaignEventFormFieldValueType extends AbstractType
                         'label'      => 'mautic.form.field.form.value',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
-                            'class' => 'form-control not-chosen',
+                            'class'                => 'form-control not-chosen',
+                            'onchange'             => 'Mautic.updateLeadFieldValueOptions(this, true)',
+                            'data-onload-callback' => 'updateLeadFieldValueOptions',
                         ],
                         'required'    => true,
+                        'choice_attr' => $choiceAttr,
                         'constraints' => [
                             new NotBlank(
                                 ['message' => 'mautic.core.value.required']

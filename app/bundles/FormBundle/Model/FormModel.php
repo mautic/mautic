@@ -873,6 +873,11 @@ class FormModel extends CommonFormModel
                 'expr'        => 'contains',
                 'negate_expr' => 'contains',
             ],
+            'date' => [
+                'label'       => 'mautic.lead.list.form.operator.date',
+                'expr'        => 'date', //special case
+                'negate_expr' => 'date',
+            ],
         ];
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
