@@ -28,4 +28,6 @@ interface FilterDecoratorInterface
     public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate);
 
     public function getAggregateFunc(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+
+    public function getWhere(LeadSegmentFilterCrate $leadSegmentFilterCrate);
 }

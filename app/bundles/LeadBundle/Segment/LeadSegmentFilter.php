@@ -123,6 +123,14 @@ class LeadSegmentFilter
     /**
      * @return null|string
      */
+    public function getWhere()
+    {
+        return $this->filterDecorator->getWhere($this->leadSegmentFilterCrate);
+    }
+
+    /**
+     * @return null|string
+     */
     public function getGlue()
     {
         return $this->leadSegmentFilterCrate->getGlue();
