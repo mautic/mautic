@@ -10,6 +10,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterFactory;
@@ -112,9 +113,13 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
                     $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
                     $queryBuilder->andWhere($queryBuilder->expr()->isNull($segmentAlias.'.id'));
                 } else {
-                    $queryBuilder->innerJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
+                    $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
+                    $orExpressions[] = $queryBuilder->expr()->isNotNull($segmentAlias.'.id');
                 }
             }
+        }
+        if (isset($orExpressions)) {
+            $queryBuilder->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $orExpressions));
         }
 
         return $queryBuilder;

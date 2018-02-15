@@ -51,12 +51,12 @@ class LeadSegmentQueryBuilder
     }
 
     /**
-     * @param                    $id
      * @param LeadSegmentFilters $leadSegmentFilters
+     * @param null               $backReference
      *
      * @return QueryBuilder
      *
-     * @todo Remove $id?
+     * @throws SegmentQueryException
      */
     public function assembleContactsSegmentQueryBuilder(LeadSegmentFilters $leadSegmentFilters, $backReference = null)
     {
