@@ -28,7 +28,7 @@ class BaseDecorator implements FilterDecoratorInterface
     public function __construct(
         LeadSegmentFilterOperator $leadSegmentFilterOperator
     ) {
-        $this->leadSegmentFilterOperator   = $leadSegmentFilterOperator;
+        $this->leadSegmentFilterOperator = $leadSegmentFilterOperator;
     }
 
     public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)
@@ -111,5 +111,10 @@ class BaseDecorator implements FilterDecoratorInterface
     public function getAggregateFunc(LeadSegmentFilterCrate $leadSegmentFilterCrate)
     {
         return false;
+    }
+
+    public function getWhere(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return null;
     }
 }

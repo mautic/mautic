@@ -70,4 +70,15 @@ class CustomMappedDecorator extends BaseDecorator
         return isset($this->leadSegmentFilterDescriptor[$originalField]['func']) ?
             $this->leadSegmentFilterDescriptor[$originalField]['func'] : false;
     }
+
+    public function getWhere(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        $originalField = $leadSegmentFilterCrate->getField();
+
+        if (!isset($this->leadSegmentFilterDescriptor[$originalField]['where'])) {
+            return parent::getWhere($leadSegmentFilterCrate);
+        }
+
+        return $this->leadSegmentFilterDescriptor[$originalField]['where'];
+    }
 }
