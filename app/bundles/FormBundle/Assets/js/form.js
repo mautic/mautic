@@ -157,6 +157,7 @@ Mautic.updateFormFieldValues = function (field) {
         'value': valueField.attr('value')
     };
 
+    // date form field withhout date operat should skip options and display input width date picker
     var skipOptions = false;
     var dateFieldType = false;
     if(typeof types[fieldValue] !== 'undefined'   && (types[fieldValue] == 'date' || types[fieldValue] == 'datetime')){
@@ -192,8 +193,7 @@ Mautic.updateFormFieldValues = function (field) {
         valueField.replaceWith(newValueField);
     }
 
-
-
+    // rebuild operators with new operator date for form field date type
     var operators = {};
     if (typeof operatorField.data('field-operators') === 'undefined') {
         operatorField.find('option').each(function () {
@@ -218,8 +218,7 @@ Mautic.updateFormFieldValues = function (field) {
     operatorField.val(selectedOperator);
     operatorField.trigger('chosen:updated');
 
-    console.log(mQuery('#campaignevent_properties_operator').val());
-
+    // date/time picker
     if(skipOptions) {
         if (typeof types[fieldValue] !== 'undefined' && types[fieldValue] == 'datetime') {
             mQuery(newValueField).datetimepicker({
@@ -241,11 +240,9 @@ Mautic.updateFormFieldValues = function (field) {
             });
         }
     }else{
+        // date custom value
         mQuery('#campaignevent_properties_value').find('option[value=Custom]').attr("data-custom", "1");
         Mautic.updateLeadFieldValueOptions(mQuery('#campaignevent_properties_value'));
-    }
-
-    if(dateFieldType && !skipOptions){
     }
 };
 
