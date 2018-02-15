@@ -11,12 +11,13 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,11 +25,26 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class CampaignEventFormFieldValueType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * @var FormModel
+     */
+    protected $formModel;
+
+    /**
+     * CampaignEventFormFieldValueType constructor.
+     *
+     * @param TranslatorInterface $translator
+     * @param FormModel           $formModel
+     */
+    public function __construct(TranslatorInterface $translator, FormModel $formModel)
     {
-        $this->factory = $factory;
+        $this->translator          = $translator;
+        $this->formModel           = $formModel;
     }
 
     /**
@@ -58,7 +74,7 @@ class CampaignEventFormFieldValueType extends AbstractType
             ]
         );
 
-        $formModel = $this->factory->getModel('form.form');
+        $formModel = $this->formModel;
         $operators = $formModel->getFilterExpressionFunctions();
         $choices   = [];
 
@@ -118,9 +134,9 @@ class CampaignEventFormFieldValueType extends AbstractType
                             }
                         } elseif (in_array($field->getType(), ['date', 'datetime'])) {
                             $fieldHelper = new \Mautic\LeadBundle\Helper\FormFieldHelper();
-                            $fieldHelper->setTranslator($this->factory->getTranslator());
+                            $fieldHelper->setTranslator($this->translator);
                             $fieldValues                 = $fieldHelper->getDateChoices();
-                            $customText                  = $this->factory->getTranslator()->trans('mautic.campaign.event.timed.choice.custom');
+                            $customText                  = $this->translator->trans('mautic.campaign.event.timed.choice.custom');
                             $customValue                 = (empty($data['value']) || isset($fieldValues[$data['value']])) ? 'custom' : $data['value'];
                             $options[$field->getAlias()] = array_merge(
                                     [

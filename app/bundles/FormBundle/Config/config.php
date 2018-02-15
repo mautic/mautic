@@ -313,8 +313,11 @@ return [
                 'alias' => 'campaignevent_formsubmit',
             ],
             'mautic.form.type.campaignevent_form_field_value' => [
-                'class'     => CampaignEventFormFieldValueType::class,
-                'arguments' => 'mautic.factory',
+                'class'       => CampaignEventFormFieldValueType::class,
+                'arguments'   => [
+                    'translator',
+                    'mautic.form.model.form',
+                ],
                 'alias'     => 'campaignevent_form_field_value',
             ],
             'mautic.form.type.form_submitaction_sendemail' => [
