@@ -3,8 +3,14 @@
 
 class SegmentsCest
 {
+    private $isInitialized      = false;
+
     public function _before(SegmentsTester $I)
     {
+        if (!$this->isInitialized) {
+            $this->isInitialized=true;
+            $I->FillInitialData();
+        }
         $I->loginToMautic();
     }
 
