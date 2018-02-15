@@ -47,10 +47,9 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         switch ($filterOperator) {
             case 'notIn':
                 $tableAlias = $this->generateRandomParameterName();
-                $crate      = $filter->getCrate();
 
-                if (is_null($crate['func']) && $crate['aggr']) {
-                    $where = ' AND '.str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $crate['aggr']);
+                if (!is_null($filter->getWhere())) {
+                    $where = ' AND '.str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere());
                 } else {
                     $where = '';
                 }
@@ -108,10 +107,8 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );
-                dump('xxxx'.$expression);
                 $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
                 $queryBuilder->setParametersPairs($parameters, $filterParameters);
-                dump($queryBuilder->getQueryParts());
         }
 
         return $queryBuilder;

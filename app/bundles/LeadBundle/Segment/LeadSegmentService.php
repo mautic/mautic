@@ -79,8 +79,6 @@ class LeadSegmentService
         //dump($queryBuilder->execute());
         //exit;
 
-        dump($queryBuilder->getQueryParts());
-
         return $queryBuilder;
     }
 
