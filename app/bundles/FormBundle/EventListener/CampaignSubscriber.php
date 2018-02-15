@@ -143,14 +143,35 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setResult(false);
         }
 
-        $result = $this->formSubmissionModel->getRepository()->compareValue(
-            $lead->getId(),
-            $form->getId(),
-            $form->getAlias(),
-            $event->getConfig()['field'],
-            $event->getConfig()['value'],
-            $operators[$event->getConfig()['operator']]['expr']
-        );
+        if ($event->getConfig()['operator'] === 'date') {
+            // Set the date in system timezone since this is triggered by cron
+            $triggerDate = new \DateTime('now', new \DateTimeZone($this->params['default_timezone']));
+            $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
+
+            if (strpos($event->getConfig()['value'], '+P') !== false) { //add date
+                $triggerDate->add(new \DateInterval($interval)); //add the today date with interval
+                $result = $this->formSubmissionModel->getRepository()->compareDateValue($form, $event, $triggerDate->format('Y-m-d'));
+            } elseif (strpos($event->getConfig()['value'], '-P') !== false) { //subtract date
+                $triggerDate->sub(new \DateInterval($interval)); //subtract the today date with interval
+                $result = $this->formSubmissionModel->getRepository()->compareDateValue($form, $event, $triggerDate->format('Y-m-d'));
+            } elseif ($event->getConfig()['value'] === 'anniversary') {
+                /**
+                 * note: currently mautic campaign only one time execution
+                 * ( to integrate with: recursive campaign (future)).
+                 */
+                $result = $this->formSubmissionModel->getRepository()->compareDateMonthValue(
+                    $lead->getId(), $event->getConfig()['field'], $triggerDate);
+            }
+        } else {
+            $result = $this->formSubmissionModel->getRepository()->compareValue(
+                $lead->getId(),
+                $form->getId(),
+                $form->getAlias(),
+                $event->getConfig()['field'],
+                $event->getConfig()['value'],
+                $operators[$event->getConfig()['operator']]['expr']
+            );
+        }
 
         $event->setChannel('form', $form->getId());
 

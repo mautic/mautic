@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query;
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -471,6 +472,78 @@ class SubmissionRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('form', (int) $form)
             ->setParameter('value', $value);
+
+        $result = $q->execute()->fetch();
+
+        return !empty($result['id']);
+    }
+
+    /**
+     * Compare a form result value with defined date value for defined lead.
+     *
+     * @param Form                   $form
+     * @param CampaignExecutionEvent $event
+     * @param string                 $value to compare with
+     *
+     * @return bool
+     */
+    public function compareDateValue($form, $event, $value)
+    {
+        $formAlias = $form->getAlias();
+        $field     = $event->getConfig()['field'];
+        $lead      = $event->getLead();
+        $q         = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('s.id')
+        ->from($this->getResultsTableName($form->getId(), $formAlias), 'r')
+        ->leftJoin('r', MAUTIC_TABLE_PREFIX.'form_submissions', 's', 's.id = r.submission_id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('s.lead_id', ':lead'),
+                    $q->expr()->eq('s.form_id', ':form'),
+                    $q->expr()->eq('r.'.$field, ':value')
+                )
+            )
+            ->setParameter('lead', $lead->getId())
+            ->setParameter('form', $form->getId())
+            ->setParameter('value', $value);
+
+        $result = $q->execute()->fetch();
+
+        return !empty($result['id']);
+    }
+
+    /**
+     * Compare a form result value with defined date value ( only day and month compare for
+     * events such as anniversary) for defined lead.
+     *
+     * @param Form                   $form
+     * @param CampaignExecutionEvent $event
+     * @param object                 $value Date object to compare with
+     *
+     * @return bool
+     */
+    public function compareDateMonthValue($form, $event, $value)
+    {
+        $formAlias = $form->getAlias();
+        $field     = $event->getConfig()['field'];
+        $lead      = $event->getLead();
+
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('s.id')
+            ->from($this->getResultsTableName($form->getId(), $formAlias), 'r')
+            ->leftJoin('r', MAUTIC_TABLE_PREFIX.'form_submissions', 's', 's.id = r.submission_id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('s.lead_id', ':lead'),
+                    $q->expr()->eq('s.form_id', ':form'),
+                    $q->expr()->eq("MONTH(r. $field)", ':month'),
+                    $q->expr()->eq("DAY(r. $field)", ':day')
+                )
+            )
+            ->setParameter('lead', $lead->getId())
+            ->setParameter('form', $form->getId())
+            ->setParameter('month', $value->format('m'))
+            ->setParameter('day', $value->format('d'));
 
         $result = $q->execute()->fetch();
 

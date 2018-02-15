@@ -26,8 +26,6 @@
     </div>
 </div>
 
-
-
 <div class="row condition-custom-date-row" style="display: none;">
     <div class="col-sm-offset-4 col-sm-4">
         <div class="row">
