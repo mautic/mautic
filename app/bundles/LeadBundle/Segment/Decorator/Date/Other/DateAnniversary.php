@@ -61,4 +61,9 @@ class DateAnniversary implements FilterDecoratorInterface
     {
         return $this->dateDecorator->getAggregateFunc($leadSegmentFilterCrate);
     }
+
+    public function getWhere(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    {
+        return $this->dateDecorator->getWhere($leadSegmentFilterCrate);
+    }
 }
