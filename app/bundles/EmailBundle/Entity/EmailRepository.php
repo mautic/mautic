@@ -180,11 +180,20 @@ class EmailRepository extends CommonRepository
      * @param null $listIds
      * @param bool $countOnly
      * @param null $limit
+     * @param int  $minContactId
+     * @param int  $maxContactId
      *
      * @return QueryBuilder|int|array
      */
-    public function getEmailPendingQuery($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
-    {
+    public function getEmailPendingQuery(
+        $emailId,
+        $variantIds = null,
+        $listIds = null,
+        $countOnly = false,
+        $limit = null,
+        $minContactId = null,
+        $maxContactId = null
+    ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $dncQb->select('dnc.lead_id')
@@ -225,7 +234,7 @@ class EmailRepository extends CommonRepository
         $mqQb->where($messageExpr);
 
         // Only include those who belong to the associated lead lists
-        if (null === $listIds) {
+        if (is_null($listIds)) {
             // Get a list of lists associated with this email
             $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->select('el.leadlist_id')
@@ -281,6 +290,21 @@ class EmailRepository extends CommonRepository
             ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
+        if ($minContactId) {
+            $q->andWhere('l.id >= :minContactId');
+            $q->setParameter('minContactId', (int) $minContactId);
+        }
+
+        if ($maxContactId) {
+            $q->andWhere('l.id <= :maxContactId');
+            $q->setParameter('maxContactId', (int) $maxContactId);
+        }
+
+        // The results must be ordered if min or max contact ID filters are applied
+        if ($minContactId || $maxContactId) {
+            $q->orderBy('l.id');
+        }
+
         // Has an email
         $q->andWhere(
             $q->expr()->andX(
@@ -303,12 +327,21 @@ class EmailRepository extends CommonRepository
      * @param null $listIds
      * @param bool $countOnly
      * @param null $limit
+     * @param int  $minContactId
+     * @param int  $maxContactId
      *
      * @return array|int
      */
-    public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
-    {
-        $q = $this->getEmailPendingQuery($emailId, $variantIds, $listIds, $countOnly, $limit);
+    public function getEmailPendingLeads(
+        $emailId,
+        $variantIds = null,
+        $listIds = null,
+        $countOnly = false,
+        $limit = null,
+        $minContactId = false,
+        $maxContactId = null
+    ) {
+        $q = $this->getEmailPendingQuery($emailId, $variantIds, $listIds, $countOnly, $limit, $minContactId, $maxContactId);
 
         if (!($q instanceof QueryBuilder)) {
             return $q;
