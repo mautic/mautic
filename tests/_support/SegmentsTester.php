@@ -19,9 +19,9 @@ use Page\LoginPage;
  *
  * @SuppressWarnings(PHPMD)
  */
-class ContactsTester extends \Codeception\Actor
+class SegmentsTester extends \Codeception\Actor
 {
-    use _generated\ContactsTesterActions;
+    use _generated\SegmentsTesterActions;
 
     /**
      * Define custom actions here.
@@ -37,7 +37,7 @@ class ContactsTester extends \Codeception\Actor
         $I->fillField(LoginPage::$username, getenv('MAUTIC_ADMIN_USERNAME'));
         $I->fillField(LoginPage::$password, getenv('MAUTIC_ADMIN_PASSWORD'));
         $I->click(LoginPage::$login);
-        //$I->canSeeInCurrentUrl(getenv('MAUTIC_ENV').DashboardPage::$URL);
+        $I->canSeeInCurrentUrl(getenv('MAUTIC_ENV').DashboardPage::$URL);
 
         $I->saveSessionSnapshot('login');
     }
