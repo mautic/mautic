@@ -113,7 +113,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                             sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
                         );
                     } else {
-                        if ($filter->getTable() == 'companies') {
+                        if ($filter->getTable() == MAUTIC_TABLE_PREFIX.'companies') {
                             $relTable = $this->generateRandomParameterName();
                             $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = l.id');
                             $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');

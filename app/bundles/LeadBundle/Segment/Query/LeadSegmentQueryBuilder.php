@@ -159,20 +159,20 @@ class LeadSegmentQueryBuilder
 
         $tableAlias = $this->generateRandomParameterName();
         $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias, $tableAlias.'.lead_id = l.id');
-        $queryBuilder->addSelect($tableAlias.'.lead_id');
+        $queryBuilder->addSelect($tableAlias.'.lead_id AS '.$tableAlias.'_lead_id');
 
         $expression = $queryBuilder->expr()->andX(
             $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $leadListId),
             $queryBuilder->expr()->lte($tableAlias.'.date_added', "'".$whatever['dateTime']."'")
         );
 
-        $restrictionExpression = $queryBuilder->expr()->isNull($tableAlias.'.lead_id');
-
         $queryBuilder->addJoinCondition($tableAlias, $expression);
 
         if ($setHaving) {
+            $restrictionExpression = $queryBuilder->expr()->isNull($tableAlias.'_lead_id');
             $queryBuilder->andHaving($restrictionExpression);
         } else {
+            $restrictionExpression = $queryBuilder->expr()->isNull($tableAlias.'.lead_id');
             $queryBuilder->andWhere($restrictionExpression);
         }
 
