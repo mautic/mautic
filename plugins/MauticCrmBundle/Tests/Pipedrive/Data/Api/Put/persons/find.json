@@ -1,28 +1,3 @@
 {
-  "success": true,
-  "data": [
-    {
-      "id": 99,
-      "name": "New Test User",
-      "email": [
-        {
-          "label": "",
-          "value": "user@test.com",
-          "primary": true
-        }
-      ],
-      "phone": null,
-      "org_id": null,
-      "org_name": "",
-      "visible_to": "3"
-    }
-  ],
-  "additional_data": {
-    "search_method": "search_by_email",
-    "pagination": {
-      "start": 0,
-      "limit": 100,
-      "more_items_in_collection": false
-    }
-  }
+
 }

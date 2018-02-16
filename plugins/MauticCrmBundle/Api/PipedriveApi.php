@@ -126,13 +126,8 @@ class PipedriveApi extends CrmApi
         ];
 
         $response = $this->transport->get($url, $params);
-        $data     = $this->getResponseData($response);
 
-        if (!empty($data) && !empty($data['email']['value']) && $data['email']['value'] == $email) {
-            return $this->getResponseData($response);
-        }
-
-        return [];
+        return $this->getResponseData($response);
     }
 
     /**
