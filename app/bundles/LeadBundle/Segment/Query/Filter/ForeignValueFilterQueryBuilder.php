@@ -42,8 +42,6 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
 
-        $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
-
         switch ($filterOperator) {
             case 'notIn':
                 $tableAlias = $this->generateRandomParameterName();
@@ -72,15 +70,18 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 break;
             default:
+                $tableAlias = $queryBuilder->getTableAlias($filter->getTable(), 'inner');
+
                 if (!$tableAlias) {
                     $tableAlias = $this->generateRandomParameterName();
                 }
-                $queryBuilder = $queryBuilder->innerJoin(
+                $queryBuilder = $queryBuilder->leftJoin(
                     $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
                     $filter->getTable(),
                     $tableAlias,
                     $tableAlias.'.lead_id = l.id'
                 );
+                $queryBuilder->andWhere($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'));
         }
 
         switch ($filterOperator) {

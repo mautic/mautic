@@ -116,6 +116,7 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
                     $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
                     $orExpressions[] = $queryBuilder->expr()->isNotNull($segmentAlias.'.id');
                 }
+                $queryBuilder->addSelect($segmentAlias.'.id as '.$segmentAlias.'_id');
             }
         }
         if (isset($orExpressions)) {

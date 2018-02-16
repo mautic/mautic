@@ -63,7 +63,7 @@ class LeadSegmentQueryBuilder
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
 
-        $queryBuilder->select('*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         $references = [];
 
@@ -107,10 +107,6 @@ class LeadSegmentQueryBuilder
             }
         }
 
-        if (count($relations)) {
-            dump('referenced segment(s) has '.count($relations).' relations');
-        }
-
         return $relations;
     }
 
@@ -134,7 +130,6 @@ class LeadSegmentQueryBuilder
         }
 
         $qb->select('DISTINCT '.$primary.' as leadIdPrimary');
-
         foreach ($currentSelects as $select) {
             $qb->addSelect($select);
         }
@@ -157,7 +152,7 @@ class LeadSegmentQueryBuilder
      */
     public function addNewLeadsRestrictions(QueryBuilder $queryBuilder, $leadListId, $whatever)
     {
-        $queryBuilder->select('l.id');
+        //$queryBuilder->select('l.id');
 
         $parts     = $queryBuilder->getQueryParts();
         $setHaving = (count($parts['groupBy']) || !is_null($parts['having']));

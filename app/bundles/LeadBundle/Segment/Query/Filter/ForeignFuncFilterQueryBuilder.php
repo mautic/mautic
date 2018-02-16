@@ -152,8 +152,6 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
         }
 
         if ($queryBuilder->isJoinTable($filter->getTable())) {
-            var_dump($filterAggr);
-
             if ($filterAggr) {
                 $queryBuilder->andHaving($expression);
             } else {

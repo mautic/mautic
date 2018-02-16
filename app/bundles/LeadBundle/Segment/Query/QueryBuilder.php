@@ -1492,41 +1492,27 @@ class QueryBuilder
 
         $tableJoins = $this->getTableJoins($table);
 
-        if (!$tableJoins) {
-            return false;
-        }
-
-        $result = [];
-
         foreach ($tableJoins as $tableJoin) {
             if ($tableJoin['joinType'] == $joinType) {
-                $result[] = $tableJoin['joinAlias'];
-            }
-        }
-
-        if (!count($result)) {
-            throw new QueryException(sprintf('No alias found for %s, available tables: [%s]', $table, join(', ', $this->getTableAliases())));
-        }
-
-        return count($result) == 1 ? array_shift($result) : $result;
-    }
-
-    /**
-     * @param $tableName
-     *
-     * @return bool
-     */
-    public function getTableJoins($tableName)
-    {
-        foreach ($this->getQueryParts()['join'] as $join) {
-            foreach ($join as $joinPart) {
-                if ($tableName == $joinPart['joinAlias']) {
-                    return $joinPart;
-                }
+                return $tableJoin['joinAlias'];
             }
         }
 
         return false;
+    }
+
+    public function getTableJoins($tableName)
+    {
+        $found = [];
+        foreach ($this->getQueryParts()['join'] as $join) {
+            foreach ($join as $joinPart) {
+                if ($tableName == $joinPart['joinTable']) {
+                    $found[] = $joinPart;
+                }
+            }
+        }
+
+        return count($found) ? $found : [];
     }
 
     /**
@@ -1655,12 +1641,18 @@ class QueryBuilder
 
                 $fields = array_diff($fields, $this->extractFields($having));
 
-                $this->andHaving($where);
+                $select = array_unique(array_merge($this->getQueryPart('select'), $fields));
 
-                $this->addSelect($fields);
+                $whereConditionAlias = 'wh_'.substr(md5($where->__toString()), 0, 10);
+                $selectCondition     = sprintf('(%s) AS %s', $where->__toString(), $whereConditionAlias);
+
+                $this->orHaving($whereConditionAlias);
+
+                $this->addSelect($selectCondition);
 
                 $this->resetQueryPart('where');
-                $this->orHaving(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
+                //$this->orHaving(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
+                //$this->orHaving($this->popLogicStack());
             } else {
                 $this->orWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
             }

@@ -105,6 +105,7 @@ class LeadSegmentService
         }
 
         $qb = $this->getNewLeadListLeadsQuery($leadList, $batchLimiters);
+
         $qb = $this->leadSegmentQueryBuilder->wrapInCount($qb);
 
         $this->logger->debug('Segment QB: Create SQL: '.$qb->getDebugOutput(), ['segmentId' => $leadList->getId()]);
