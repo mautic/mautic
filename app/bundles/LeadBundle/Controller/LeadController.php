@@ -1980,9 +1980,14 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
+                'lead:batch:export',
             ],
             'RETURN_ARRAY'
         );
+
+        if (!$permissions['lead:batch:export']){
+            return $this->accessDenied();
+        }
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
