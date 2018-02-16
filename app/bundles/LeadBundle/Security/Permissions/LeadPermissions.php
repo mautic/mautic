@@ -24,6 +24,11 @@ class LeadPermissions extends AbstractPermissions
         parent::__construct($params);
 
         $this->permissions = [
+            'batch' => [
+                'import' => 2,
+                'export' => 4,
+                'full'=> 1024,
+            ],
             'lists' => [
                 'viewother'   => 2,
                 'editother'   => 8,
@@ -70,6 +75,17 @@ class LeadPermissions extends AbstractPermissions
             'data'   => (!empty($data['lists']) ? $data['lists'] : []),
             'bundle' => 'lead',
             'level'  => 'lists',
+        ]);
+
+        $builder->add('lead:batch', 'permissionlist', [
+            'choices' => [
+                'export'   => 'mautic.core.permissions.export',
+                'import'   => 'mautic.core.permissions.import',
+            ],
+            'label'  => 'mautic.lead.permissions.batch',
+            'data'   => (!empty($data['batch']) ? $data['batch'] : []),
+            'bundle' => 'lead',
+            'level'  => 'batch',
         ]);
 
         $builder->add('lead:fields', 'permissionlist', [
