@@ -63,7 +63,7 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
         $manager->persist($list);
         $manager->flush();
 
-        $this->container->get('mautic.lead.model.list')->rebuildListLeads($list);
+        $this->container->get('mautic.lead.model.list')->updateLeadList($list);
     }
 
     /**
