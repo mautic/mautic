@@ -82,6 +82,7 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionChangeCompanyScore', 4],
                 ['onCampaignTriggerActionDeleteContact', 6],
                 ['onCampaignTriggerActionChangeOwner', 7],
+                ['onCampaignTriggerActionUpdateCompany', 8],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];
@@ -115,6 +116,15 @@ class CampaignSubscriber extends CommonSubscriber
             'label'       => 'mautic.lead.lead.events.updatelead',
             'description' => 'mautic.lead.lead.events.updatelead_descr',
             'formType'    => 'updatelead_action',
+            'formTheme'   => 'MauticLeadBundle:FormTheme\ActionUpdateLead',
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+        ];
+        $event->addAction('lead.updatelead', $action);
+
+        $action = [
+            'label'       => 'mautic.lead.lead.events.updatecompany',
+            'description' => 'mautic.lead.lead.events.updatecompany_descr',
+            'formType'    => 'updatecompany_action',
             'formTheme'   => 'MauticLeadBundle:FormTheme\ActionUpdateLead',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
@@ -375,6 +385,20 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         $this->leadModel->deleteEntity($event->getLead());
+
+        return $event->setResult(true);
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerActionUpdateCompany(CampaignExecutionEvent $event)
+    {
+        if (!$event->checkContext('lead.updatecompany')) {
+            return;
+        }
+
+        $lead = $event->getLead();
 
         return $event->setResult(true);
     }
