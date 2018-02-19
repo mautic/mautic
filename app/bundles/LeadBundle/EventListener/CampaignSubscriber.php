@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\ChangeOwnerType;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -52,18 +53,25 @@ class CampaignSubscriber extends CommonSubscriber
     protected $listModel;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param LeadModel      $leadModel
      * @param FieldModel     $leadFieldModel
+     * @param CompanyModel   $companyModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel, ListModel $listModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel, ListModel $listModel, CompanyModel $companyModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel      = $leadModel;
-        $this->leadFieldModel = $leadFieldModel;
-        $this->listModel      = $listModel;
+        $this->ipLookupHelper    = $ipLookupHelper;
+        $this->leadModel         = $leadModel;
+        $this->leadFieldModel    = $leadFieldModel;
+        $this->listModel         = $listModel;
+        $this->companyModel      = $companyModel;
     }
 
     /**
@@ -125,10 +133,10 @@ class CampaignSubscriber extends CommonSubscriber
             'label'       => 'mautic.lead.lead.events.updatecompany',
             'description' => 'mautic.lead.lead.events.updatecompany_descr',
             'formType'    => 'updatecompany_action',
-            'formTheme'   => 'MauticLeadBundle:FormTheme\ActionUpdateLead',
+            'formTheme'   => 'MauticLeadBundle:FormTheme\ActionUpdateCompany',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
-        $event->addAction('lead.updatelead', $action);
+        $event->addAction('lead.updatecompany', $action);
 
         $action = [
             'label'       => 'mautic.lead.lead.events.changetags',
@@ -398,7 +406,16 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $lead = $event->getLead();
+        $lead    = $event->getLead();
+        $company = $lead->getPrimaryCompany();
+
+        if (empty($company['id'])) {
+            return;
+        }
+        $primaryCompany =  $this->companyModel->getEntity($company['id']);
+
+        $this->companyModel->setFieldValues($primaryCompany, $event->getConfig(), false);
+        $this->companyModel->saveEntity($primaryCompany);
 
         return $event->setResult(true);
     }
