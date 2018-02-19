@@ -61,32 +61,33 @@ class OneSignalApi extends AbstractNotificationApi
     }
 
     /**
-     * @param string|array $playerId     Player ID as string, or an array of player ID's
+     * @param string|array $playerId         Player ID as string, or an array of player ID's
+     * @param Notification $sendNotification cloned entity with trackable urls
      * @param Notification $notification
      *
      * @return Response
      *
      * @throws \Exception
      */
-    public function sendNotification($playerId, Notification $notification)
+    public function sendNotification($playerId, Notification $sendNotification, Notification $notification)
     {
         $data = [];
 
-        $buttonId = $notification->getHeading();
-        $title    = $notification->getHeading();
-        $url      = $notification->getUrl();
-        $message  = $notification->getMessage();
+        $buttonId = $sendNotification->getHeading();
+        $title    = $sendNotification->getHeading();
+        $url      = $sendNotification->getUrl();
+        $message  = $sendNotification->getMessage();
 
-        $icon  = $notification->getIcon();
-        $image = $notification->getImage();
+        $icon  = $this->notificationUploader->getFullUrl($notification, 'icon');
+        $image = $this->notificationUploader->getFullUrl($notification, 'image');
 
-        $actionButtonUrl1  = $notification->getActionButtonUrl1();
+        $actionButtonUrl1  = $sendNotification->getActionButtonUrl1();
         $actionButtonIcon1 = $this->notificationUploader->getFullUrl($notification, 'actionButtonIcon1');
-        $button            = $notification->getButton();
+        $button            = $sendNotification->getButton();
 
-        $actionButtonUrl2  = $notification->getActionButtonUrl1();
+        $actionButtonUrl2  = $sendNotification->getActionButtonUrl2();
         $actionButtonIcon2 = $this->notificationUploader->getFullUrl($notification, 'actionButtonIcon2');
-        $actionButtonText2 = $notification->getActionButtonText2();
+        $actionButtonText2 = $sendNotification->getActionButtonText2();
 
         if (!is_array($playerId)) {
             $playerId = [$playerId];
@@ -112,8 +113,8 @@ class OneSignalApi extends AbstractNotificationApi
             $data['url'] = $url;
         }
 
-        if ($notification->isMobile()) {
-            $this->addMobileData($data, $notification->getMobileSettings());
+        if ($sendNotification->isMobile()) {
+            $this->addMobileData($data, $sendNotification->getMobileSettings());
 
             if ($button) {
                 $data['buttons'][] = ['id' => $buttonId, 'text' => $button];
@@ -140,7 +141,7 @@ class OneSignalApi extends AbstractNotificationApi
             }
 
             if ($icon) {
-                $data['chrome_web_image'] = $icon;
+                $data['chrome_web_icon']  = $icon;
                 $data['firefox_icon']     = $icon;
             }
 
