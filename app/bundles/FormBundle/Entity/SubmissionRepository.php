@@ -466,6 +466,27 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
+     * @param Form  $form
+     */
+    public function getSubmissionCounts($form)
+    {
+        $q = <<<EOQ
+SELECT
+        COUNT(s.id) AS total,
+        COUNT(DISTINCT (s.lead_id)) AS `unique`
+    FROM
+        form_submissions AS s
+    WHERE
+        s.form_id = :id
+EOQ;
+
+        $stmt = $this->_em->getConnection()->prepare($q);
+        $stmt->bindValue('id', $form->getId());
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    /**
      * Compile and return the form result table name.
      *
      * @param int    $formId

@@ -236,10 +236,13 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
+        $submissionCounts = $this->getModel('form.submission')->getRepository()->getSubmissionCounts($activeForm);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'activeForm'  => $activeForm,
+                    'submissionCounts' => $submissionCounts,
                     'page'        => $page,
                     'logs'        => $logs,
                     'permissions' => $permissions,
