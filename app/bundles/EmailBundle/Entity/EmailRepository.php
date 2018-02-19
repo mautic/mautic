@@ -182,6 +182,7 @@ class EmailRepository extends CommonRepository
      * @param null $limit
      * @param int  $minContactId
      * @param int  $maxContactId
+     * @param bool $countWithMaxMin
      *
      * @return QueryBuilder|int|array
      */
@@ -192,7 +193,8 @@ class EmailRepository extends CommonRepository
         $countOnly = false,
         $limit = null,
         $minContactId = null,
-        $maxContactId = null
+        $maxContactId = null,
+        $countWithMaxMin = false
     ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -268,6 +270,11 @@ class EmailRepository extends CommonRepository
                     $q->expr()->eq('ll.manually_removed', ':false')
                 )
             );
+
+            if ($countWithMaxMin) {
+                $q->addSelect('MIN(l.id) as min_id');
+                $q->addSelect('MAX(l.id) as max_id');
+            }
         } else {
             $q->select('l.*');
 
@@ -290,12 +297,12 @@ class EmailRepository extends CommonRepository
             ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
-        if ($minContactId) {
+        if ($minContactId && is_numeric($minContactId)) {
             $q->andWhere('l.id >= :minContactId');
             $q->setParameter('minContactId', (int) $minContactId);
         }
 
-        if ($maxContactId) {
+        if ($maxContactId && is_numeric($maxContactId)) {
             $q->andWhere('l.id <= :maxContactId');
             $q->setParameter('maxContactId', (int) $maxContactId);
         }
@@ -329,6 +336,7 @@ class EmailRepository extends CommonRepository
      * @param null $limit
      * @param int  $minContactId
      * @param int  $maxContactId
+     * @param bool $countWithMaxMin
      *
      * @return array|int
      */
@@ -338,10 +346,20 @@ class EmailRepository extends CommonRepository
         $listIds = null,
         $countOnly = false,
         $limit = null,
-        $minContactId = false,
-        $maxContactId = null
+        $minContactId = null,
+        $maxContactId = null,
+        $countWithMaxMin = false
     ) {
-        $q = $this->getEmailPendingQuery($emailId, $variantIds, $listIds, $countOnly, $limit, $minContactId, $maxContactId);
+        $q = $this->getEmailPendingQuery(
+            $emailId,
+            $variantIds,
+            $listIds,
+            $countOnly,
+            $limit,
+            $minContactId,
+            $maxContactId,
+            $countWithMaxMin
+        );
 
         if (!($q instanceof QueryBuilder)) {
             return $q;
@@ -349,7 +367,10 @@ class EmailRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        if ($countOnly) {
+        if ($count && $countWithMaxMin) {
+            // array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
+            return $results;
+        } elseif ($countOnly) {
             return (isset($results[0])) ? $results[0]['count'] : 0;
         } else {
             $leads = [];

@@ -824,8 +824,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param bool  $countOnly       If true, return count otherwise array of leads
      * @param int   $limit           Max number of leads to retrieve
      * @param bool  $includeVariants If false, emails sent to a variant will not be included
-     * @param int   $minContactId
-     * @param int   $maxContactId
+     * @param int   $minContactId    Filter by min contact ID
+     * @param int   $maxContactId    Filter by max contact ID
+     * @param bool  $countWithMaxMin Add min_id and max_id info to the count result
      *
      * @return int|array
      */
@@ -836,7 +837,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $limit = null,
         $includeVariants = true,
         $minContactId = null,
-        $maxContactId = null
+        $maxContactId = null,
+        $countWithMaxMin = false
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
         $total      = $this->getRepository()->getEmailPendingLeads(
@@ -846,7 +848,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $countOnly,
             $limit,
             $minContactId,
-            $maxContactId
+            $maxContactId,
+            $countWithMaxMin
         );
 
         return $total;
