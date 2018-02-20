@@ -21,6 +21,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Event\SmsEvent;
+use Mautic\SmsBundle\Helper\SmsHelper;
 use Mautic\SmsBundle\SmsEvents;
 
 /**
@@ -49,23 +50,31 @@ class SmsSubscriber extends CommonSubscriber
     protected $assetTokenHelper;
 
     /**
+     * @var SmsHelper
+     */
+    protected $smsHelper;
+
+    /**
      * DynamicContentSubscriber constructor.
      *
      * @param AuditLogModel    $auditLogModel
      * @param TrackableModel   $trackableModel
      * @param PageTokenHelper  $pageTokenHelper
      * @param AssetTokenHelper $assetTokenHelper
+     * @param SmsHelper        $smsHelper
      */
     public function __construct(
         AuditLogModel $auditLogModel,
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper
+        AssetTokenHelper $assetTokenHelper,
+        SmsHelper $smsHelper
     ) {
         $this->auditLogModel    = $auditLogModel;
         $this->trackableModel   = $trackableModel;
         $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
+        $this->smsHelper        = $smsHelper;
     }
 
     /**
@@ -123,6 +132,11 @@ class SmsSubscriber extends CommonSubscriber
      */
     public function onTokenReplacement(TokenReplacementEvent $event)
     {
+        // Disable trackable urls
+        if ($this->smsHelper->getDisableTrackableUrls()) {
+            return;
+        }
+
         /** @var Lead $lead */
         $lead         = $event->getLead();
         $content      = $event->getContent();
