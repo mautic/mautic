@@ -745,7 +745,8 @@ class NotificationController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'notification' => $notification,
+                    'notification'         => $notification,
+                    'notificationUploader' => $this->get('mautic.notification.helper.uploader'),
                 ],
                 'contentTemplate' => 'MauticNotificationBundle:Notification:preview.html.php',
             ]
