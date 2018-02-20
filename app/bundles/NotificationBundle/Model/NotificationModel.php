@@ -65,14 +65,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @return \Mautic\NotificationBundle\Entity\PushIDRepository
-     */
-    public function getPushIDRepository()
-    {
-        return $this->em->getRepository('MauticNotificationBundle:PushID');
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getPermissionBase()
