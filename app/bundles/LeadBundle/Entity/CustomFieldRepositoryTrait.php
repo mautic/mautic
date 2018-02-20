@@ -308,9 +308,9 @@ trait CustomFieldRepositoryTrait
 
         //loop over results to put fields in something that can be assigned to the entities
         foreach ($values as $k => $r) {
-            $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
-
             if (isset($fields[$k])) {
+                $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
+
                 if (!is_null($r)) {
                     switch ($fields[$k]['type']) {
                         case 'number':

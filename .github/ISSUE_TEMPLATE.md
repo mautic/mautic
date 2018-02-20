@@ -1,3 +1,5 @@
+**Please DO NOT report security vulnerabilities here. Send them to security@mautic.com instead.**
+
 What type of report is this:
 
 | Q  | A

@@ -219,7 +219,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var string
      */
-    private $preferredProfileImage;
+    private $preferredProfileImage = 'gravatar';
 
     /**
      * @var bool
@@ -903,6 +903,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function setActualPoints($points)
     {
         $this->actualPoints = (int) $points;
+        $this->pointChanges = [];
     }
 
     /**

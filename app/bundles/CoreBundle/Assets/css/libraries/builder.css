@@ -5320,15 +5320,15 @@ div[data-section-focus="left"] {
   left: 0px;
 }
 div[data-section-focus="clone"] {
-    width: 25px;
-    height: 25px;
-    bottom: 62px;
-    left: 10px;
-    background: #4e5e9e;
-    color: #fff;
-    text-align: center;
-    border: 0;
-    line-height: 25px;
+  width: 25px;
+  height: 25px;
+  bottom: 62px;
+  left: 10px;
+  background: #4e5e9e;
+  color: #fff;
+  text-align: center;
+  border: 0;
+  line-height: 25px;
 }
 div[data-section-focus="handle"] {
   width: 25px;

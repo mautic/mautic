@@ -63,6 +63,9 @@ class MauticCoreExtension extends Extension
                         case 'integrations':
                             $defaultTag = 'mautic.integration';
                             break;
+                        case 'command':
+                            $defaultTag = 'console.command';
+                            break;
                         default:
                             $defaultTag = false;
                             break;

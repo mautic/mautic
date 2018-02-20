@@ -12,7 +12,10 @@
 namespace Mautic\DynamicContentBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -35,14 +38,27 @@ class DynamicContentApiController extends CommonController
             throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
         }
     }
+
     public function getAction($objectAlias)
     {
-        $lead    = $this->getModel('lead')->getCurrentLead();
-        $content = $this->get('mautic.helper.dynamicContent')->getDynamicContentForLead($objectAlias, $lead);
+        /** @var LeadModel $model */
+        $model = $this->getModel('lead');
+        /** @var DynamicContentHelper $helper */
+        $helper = $this->get('mautic.helper.dynamicContent');
+        /** @var Lead $lead */
+        $lead    = $model->getContactFromRequest();
+        $content = $helper->getDynamicContentForLead($objectAlias, $lead);
+
         if (empty($content)) {
-            $content = $this->get('mautic.helper.dynamicContent')->getDynamicContentSlotForLead($objectAlias, $lead);
+            $content = $helper->getDynamicContentSlotForLead($objectAlias, $lead);
         }
 
-        return empty($content) ? new Response('', Response::HTTP_NO_CONTENT) : new Response($content);
+        return empty($content)
+            ? new Response('', Response::HTTP_NO_CONTENT)
+            : new JsonResponse([
+                'content' => $content,
+                'id'      => $lead->getId(),
+                'sid'     => $model->getTrackingCookie()[0],
+            ]);
     }
 }

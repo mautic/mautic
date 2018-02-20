@@ -81,6 +81,21 @@ class UserModel extends FormModel
     }
 
     /**
+     * Get a list of users for an autocomplete input.
+     *
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     * @param array  $permissionLimiter
+     *
+     * @return array
+     */
+    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
+    {
+        return $this->getRepository()->getUserList($search, $limit, $start, $permissionLimiter);
+    }
+
+    /**
      * Checks for a new password and rehashes if necessary.
      *
      * @param User                     $entity

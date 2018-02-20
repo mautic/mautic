@@ -334,6 +334,5 @@ class PhpFormTranslationExtractor extends PhpExtractor
             '=>',
             self::MESSAGE_TOKEN,
         ],
-
     ];
 }

@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -730,7 +731,7 @@ class ListModel extends FormModel
     /**
      * @param string $alias
      *
-     * @return mixed
+     * @return array
      */
     public function getUserLists($alias = '')
     {
@@ -1319,6 +1320,7 @@ class ListModel extends FormModel
 
         return $results;
     }
+
     /**
      * Get a list of top (by leads added) lists.
      *
@@ -1569,5 +1571,26 @@ class ListModel extends FormModel
         ];
 
         return $chartData;
+    }
+
+    /**
+     * Get line chart data of hits.
+     *
+     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     *
+     * @return array
+     */
+    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    {
+        $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $contacts = $query->fetchTimeData('lead_lists_leads', 'date_added', $filter);
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts'), $contacts);
+
+        return $chart->render();
     }
 }

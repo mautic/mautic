@@ -10,12 +10,15 @@
  */
 ?>
 <div class="hide builder campaign-builder live">
-    <button type="button" class="btn btn-primary btn-close-campaign-builder" onclick="Mautic.closeCampaignBuilder();">
-        <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
-    </button>
-    <button type="button" class="btn btn-primary btn-apply-builder" onclick="Mautic.saveCampaignFromBuilder();">
-        <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
-    </button>
+    <div class="btns-builder">
+        <button type="button" class="btn btn-primary btn-apply-builder" onclick="Mautic.saveCampaignFromBuilder();">
+            <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
+        </button>
+        <button type="button" class="btn btn-primary btn-close-campaign-builder"
+                onclick="Mautic.closeCampaignBuilder();">
+            <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
+        </button>
+    </div>
     <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">test</div>
     <div class="builder-content">
         <div id="CampaignCanvas">
@@ -37,7 +40,8 @@
             endforeach;
 
             foreach ($campaignEvents as $event):
-                echo $view->render('MauticCampaignBundle:Event:generic.html.php', ['event' => $event, 'campaignId' => $campaignId]);
+                echo $view->render('MauticCampaignBundle:Event:generic.html.php',
+                    ['event' => $event, 'campaignId' => $campaignId]);
             endforeach;
 
             echo $view->render('MauticCampaignBundle:Campaign\Builder:index.html.php',
@@ -55,7 +59,7 @@
 <!-- dropped coordinates -->
 <input type="hidden" value="" id="droppedX"/>
 <input type="hidden" value="" id="droppedY"/>
-<input type="hidden" value="<?php echo $campaignId; ?>" id="campaignId"/>
+<input type="hidden" value="<?php echo $view->escape($campaignId); ?>" id="campaignId"/>
 
 <?php echo $view->render(
     'MauticCoreBundle:Helper:modal.html.php',
@@ -71,13 +75,13 @@
 <script>
     <?php if (!empty($canvasSettings)): ?>
     Mautic.campaignBuilderCanvasSettings =
-        <?php echo json_encode($canvasSettings, JSON_PRETTY_PRINT); ?>;
+    <?php echo json_encode($canvasSettings, JSON_PRETTY_PRINT); ?>;
     Mautic.campaignBuilderCanvasSources =
-        <?php echo json_encode($campaignSources, JSON_PRETTY_PRINT); ?>;
+    <?php echo json_encode($campaignSources, JSON_PRETTY_PRINT); ?>;
     Mautic.campaignBuilderCanvasEvents =
-        <?php echo json_encode($campaignEvents, JSON_PRETTY_PRINT); ?>;
+    <?php echo json_encode($campaignEvents, JSON_PRETTY_PRINT); ?>;
     <?php endif; ?>
 
     Mautic.campaignBuilderConnectionRestrictions =
-        <?php echo json_encode($eventSettings['connectionRestrictions'], JSON_PRETTY_PRINT); ?>;
+    <?php echo json_encode($eventSettings['connectionRestrictions'], JSON_PRETTY_PRINT); ?>;
 </script>
