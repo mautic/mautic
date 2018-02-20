@@ -72,8 +72,11 @@ class LeadSegmentService
         $segmentFilters = $this->leadSegmentFilterFactory->getLeadListFilters($leadList);
 
         $queryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
+        //dump($queryBuilder->getQueryPart('where'));
         $queryBuilder = $this->leadSegmentQueryBuilder->addNewLeadsRestrictions($queryBuilder, $leadList->getId(), $batchLimiters);
+        //dump($queryBuilder->getQueryPart('where'));
         $queryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubsribedQuery($queryBuilder, $leadList->getId());
+        //dump($queryBuilder->getQueryPart('where'));
         //dump($queryBuilder->getSQL());
         //dump($queryBuilder->getParameters());
         //dump($queryBuilder->execute());

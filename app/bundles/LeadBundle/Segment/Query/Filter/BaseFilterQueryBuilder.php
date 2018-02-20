@@ -140,11 +140,21 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             case 'notEmpty':
                 $expression = $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField());
                 break;
+            case 'neq':
+                if ($filter->getCrate()['type'] === 'boolean' && $filter->getParameterValue() == 1) {
+                    $expression = $queryBuilder->expr()->orX(
+                        $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
+                        $queryBuilder->expr()->$filterOperator(
+                            $tableAlias.'.'.$filter->getField(),
+                            $filterParametersHolder
+                        )
+                    );
+                    break;
+                }
             case 'startsWith':
             case 'endsWith':
             case 'gt':
             case 'eq':
-            case 'neq':
             case 'gte':
             case 'like':
             case 'notLike':
@@ -181,24 +191,26 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             }
         } else {
             // @todo remove stack logic, move it to the query builder
-            if ($filterGlue === 'or') {
-                if ($queryBuilder->hasLogicStack()) {
-                    if (count($queryBuilder->getLogicStack())) {
-                        $orWhereExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $queryBuilder->popLogicStack());
-                    } else {
-                        $orWhereExpression = $queryBuilder->popLogicStack();
-                    }
+            $queryBuilder->addLogic($expression, $filterGlue);
 
-                    $queryBuilder->orWhere($orWhereExpression);
-                }
-                $queryBuilder->addToLogicStack($expression);
-            } else {
-                if ($queryBuilder->hasLogicStack()) {
-                    $queryBuilder->addToLogicStack($expression);
-                } else {
-                    $queryBuilder->$filterGlueFunc($expression);
-                }
-            }
+//            if ($filterGlue === 'or') {
+//                if ($queryBuilder->hasLogicStack()) {
+//                    if ($queryBuilder->hasLogicStack()) {
+//                        $orWhereExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $queryBuilder->popLogicStack());
+//                    } else {
+//                        $orWhereExpression = $queryBuilder->popLogicStack();
+//                    }
+//
+//                    $queryBuilder->orWhere($orWhereExpression);
+//                }
+//                $queryBuilder->addToLogicStack($expression);
+//            } else {
+//                if ($queryBuilder->hasLogicStack()) {
+//                    $queryBuilder->addToLogicStack($expression);
+//                } else {
+//                    $queryBuilder->$filterGlueFunc($expression);
+//                }
+//            }
         }
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);

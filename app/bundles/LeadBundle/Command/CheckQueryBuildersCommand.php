@@ -49,7 +49,9 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         $verbose       = $input->getOption('verbose');
         $this->skipOld = $input->getOption('skip-old');
 
-        if ($id) {
+        $failed = $ok = 0;
+
+        if ($id && substr($id, strlen($id) - 1, 1) != '+') {
             $list = $listModel->getEntity($id);
 
             if (!$list) {
@@ -57,7 +59,12 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
                 return 1;
             }
-            $this->runSegment($output, $verbose, $list, $listModel);
+            $response = $this->runSegment($output, $verbose, $list, $listModel);
+            if ($response) {
+                ++$ok;
+            } else {
+                ++$failed;
+            }
         } else {
             $lists = $listModel->getEntities(
                 [
@@ -70,7 +77,15 @@ class CheckQueryBuildersCommand extends ModeratedCommand
                 // Get first item; using reset as the key will be the ID and not 0
                 $l = reset($l);
 
-                $this->runSegment($output, $verbose, $l, $listModel);
+                if (substr($id, strlen($id) - 1, 1) == '+' and $l->getId() < intval(trim($id, '+'))) {
+                    continue;
+                }
+                $response = $this->runSegment($output, $verbose, $l, $listModel);
+                if (!$response) {
+                    ++$failed;
+                } else {
+                    ++$ok;
+                }
             }
 
             unset($l);
@@ -78,7 +93,11 @@ class CheckQueryBuildersCommand extends ModeratedCommand
             unset($lists);
         }
 
-        return 0;
+        $total = $ok + $failed;
+        $output->writeln('');
+        $output->writeln(sprintf('<info>Total success rate: %d%%, %d succeeded: and <error>%s</error>%s failed...</info> ', round(($ok / $total) * 100), $ok, ($failed ? $failed : ''), (!$failed ? $failed : '')));
+
+        return $failed ? 1 : 0;
     }
 
     private function format_period($inputSeconds)
@@ -93,7 +112,6 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         $output->write('<info>Running segment '.$l->getId().'...');
 
         if (!$this->skipOld) {
-            $output->write('old...');
             $this->logger->info(sprintf('Running OLD segment #%d', $l->getId()));
 
             $timer1    = microtime(true);
@@ -113,9 +131,9 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         $processed2 = array_shift($processed2);
 
         if ((intval($processed['count']) != intval($processed2['count'])) or (intval($processed['maxId']) != intval($processed2['maxId']))) {
-            $output->write('<error>');
+            $output->write('<error>FAILED - ');
         } else {
-            $output->write('<info>');
+            $output->write('<info>OK - ');
         }
 
         $output->write(
@@ -134,5 +152,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         } else {
             $output->writeln('</info>');
         }
+
+        return !((intval($processed['count']) != intval($processed2['count'])) or (intval($processed['maxId']) != intval($processed2['maxId'])));
     }
 }

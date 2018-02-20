@@ -1437,6 +1437,36 @@ class QueryBuilder
     }
 
     /**
+     * @todo I need to rewrite it, it's no longer necessary like this, we have direct access to query parts
+     *
+     * @param $alias
+     * @param $expr
+     *
+     * @return $this
+     */
+    public function addOrJoinCondition($alias, $expr)
+    {
+        $result = $parts = $this->getQueryPart('join');
+
+        foreach ($parts as $tbl => $joins) {
+            foreach ($joins as $key => $join) {
+                if ($join['joinAlias'] == $alias) {
+                    $result[$tbl][$key]['joinCondition'] = $this->expr()->orX($join['joinCondition'], $expr);
+                    $inserted                            = true;
+                }
+            }
+        }
+
+        if (!isset($inserted)) {
+            throw new QueryBuilderException('Inserting condition to nonexistent join '.$alias);
+        }
+
+        $this->setQueryPart('join', $result);
+
+        return $this;
+    }
+
+    /**
      * @param $alias
      * @param $expr
      *
@@ -1624,6 +1654,38 @@ class QueryBuilder
         return $this;
     }
 
+    public function addLogic($expression, $glue)
+    {
+        dump('adding logic "'.$glue.'":'.$expression.'  stack:'.count($this->getLogicStack()));
+        if ($this->hasLogicStack() && $glue == 'and') {
+            dump('and where:'.$expression);
+            $this->addToLogicStack($expression);
+        } elseif ($this->hasLogicStack()) {
+            //            $logic = $queryBuilder->popLogicStack();
+            //            /** @var CompositeExpression $standingLogic */
+            //            $standingLogic = $queryBuilder->getQueryPart('where');
+            //            dump($logic);
+            //            $queryBuilder->orWhere("(" . join(' AND ', $logic) . ")");
+            //$this->applyStackLogic();
+            if ($glue == 'or') {
+                $this->applyStackLogic();
+            }
+            $this->addToLogicStack($expression);
+        } elseif ($glue == 'or') {
+            dump('or to stack: '.$expression);
+            $this->addToLogicStack($expression);
+        } else {
+//            if (!is_null($this->lastAndWhere)) {
+//                $this->andWhere($this->lastAndWhere);
+//                $this->lastAndWhere = null;
+//            } else {
+//                $this->lastAndWhere = $expression;
+//            }
+            $this->andWhere($expression);
+            dump('and where '.$expression);
+        }
+    }
+
     public function applyStackLogic()
     {
         if ($this->hasLogicStack()) {
@@ -1654,8 +1716,18 @@ class QueryBuilder
                 //$this->orHaving(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
                 //$this->orHaving($this->popLogicStack());
             } else {
+                dump('-------- or stack:');
+                dump($stack = $this->getLogicStack());
+                /* @var CompositeExpression $where */
+                dump('where:');
+                dump($where = $this->getQueryPart('where'));
+                // Stack need to be added to the last composite of type 'or'
+
                 $this->orWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
             }
+            dump('------- applied logic:'.(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()))->__toString());
+            dump('where:');
+            dump($this->getQueryPart('where'));
         }
     }
 

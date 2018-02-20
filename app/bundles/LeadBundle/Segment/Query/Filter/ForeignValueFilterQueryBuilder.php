@@ -27,6 +27,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
     /** {@inheritdoc} */
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
+        dump(get_class($this));
         $filterOperator = $filter->getOperator();
 
         $filterParameters = $filter->getParameterValue();
@@ -69,6 +70,17 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
 
                 break;
+            case 'neq':
+                $tableAlias   = $this->generateRandomParameterName();
+                $queryBuilder = $queryBuilder->leftJoin(
+                    $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
+                    $filter->getTable(),
+                    $tableAlias,
+                    $tableAlias.'.lead_id = l.id'
+                );
+
+                $queryBuilder->addLogic($queryBuilder->expr()->isNull($tableAlias.'.lead_id'), 'and');
+                break;
             default:
                 $tableAlias = $queryBuilder->getTableAlias($filter->getTable(), 'inner');
 
@@ -81,7 +93,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $tableAlias,
                     $tableAlias.'.lead_id = l.id'
                 );
-                $queryBuilder->andWhere($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'));
+                $queryBuilder->addLogic($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'), 'and');
         }
 
         switch ($filterOperator) {
@@ -89,6 +101,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addSelect($tableAlias.'.lead_id');
                 $expression = $queryBuilder->expr()->isNull(
                     $tableAlias.'.lead_id');
+                $queryBuilder->addLogic($expression, 'and');
                 $queryBuilder->andWhere($expression);
                 break;
             case 'notEmpty':
@@ -102,6 +115,15 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $expression = $queryBuilder->expr()->isNull(
                     $tableAlias.'.lead_id');
                 $queryBuilder->andWhere($expression);
+                break;
+            case 'neq':
+                $expression = $queryBuilder->expr()->eq(
+                    $tableAlias.'.'.$filter->getField(),
+                    $filterParametersHolder
+                );
+
+                $queryBuilder->addJoinCondition($tableAlias, $expression);
+                $queryBuilder->setParametersPairs($parameters, $filterParameters);
                 break;
             default:
                 $expression = $queryBuilder->expr()->$filterOperator(

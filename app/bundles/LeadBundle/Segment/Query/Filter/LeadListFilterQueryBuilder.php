@@ -111,7 +111,7 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
                 $segmentAlias = $this->generateRandomParameterName();
                 if ($exclusion) {
                     $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
-                    $queryBuilder->andWhere($queryBuilder->expr()->isNull($segmentAlias.'.id'));
+                    $expression = $queryBuilder->expr()->isNull($segmentAlias.'.id');
                 } else {
                     $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
                     $orExpressions[] = $queryBuilder->expr()->isNotNull($segmentAlias.'.id');
@@ -119,9 +119,32 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addSelect($segmentAlias.'.id as '.$segmentAlias.'_id');
             }
         }
-        if (isset($orExpressions)) {
-            $queryBuilder->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $orExpressions));
-        }
+
+        $expression = isset($orExpressions) ? '('.join(' OR ', $orExpressions).')' : $expression;
+
+        dump("====================================================================== EXPRESSION:\n");
+        dump($expression);
+
+        $queryBuilder->addLogic($expression, $filter->getGlue());
+
+//        if ($queryBuilder->hasLogicStack() && $filter->getGlue()=='AND') {
+//            $queryBuilder->addToLogicStack($expression);
+//        } else if ($queryBuilder->hasLogicStack()) {
+        ////            $logic = $queryBuilder->popLogicStack();
+        ////            /** @var CompositeExpression $standingLogic */
+        ////            $standingLogic = $queryBuilder->getQueryPart('where');
+        ////            dump($logic);
+        ////            $queryBuilder->orWhere("(" . join(' AND ', $logic) . ")");
+//            $queryBuilder->applyStackLogic();
+//            $queryBuilder->addToLogicStack($expression);
+//        } else {
+//            $queryBuilder->addToLogicStack($expression);
+//        }
+
+        dump("====================================================================== WHERE:\n");
+        dump($queryBuilder->getQueryPart('where'));
+        dump("====================================================================== STACK:\n");
+        dump($queryBuilder->getLogicStack());
 
         return $queryBuilder;
     }
