@@ -27,7 +27,6 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
     /** {@inheritdoc} */
     public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
     {
-        dump(get_class($this));
         $filterOperator = $filter->getOperator();
 
         $filterParameters = $filter->getParameterValue();
@@ -102,19 +101,18 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $expression = $queryBuilder->expr()->isNull(
                     $tableAlias.'.lead_id');
                 $queryBuilder->addLogic($expression, 'and');
-                $queryBuilder->andWhere($expression);
                 break;
             case 'notEmpty':
                 $queryBuilder->addSelect($tableAlias.'.lead_id');
                 $expression = $queryBuilder->expr()->isNull(
                     $tableAlias.'.lead_id');
-                $queryBuilder->andWhere($expression);
+                $queryBuilder->addLogic($expression, 'and');
                 break;
             case 'notIn':
                 $queryBuilder->addSelect($tableAlias.'.lead_id');
                 $expression = $queryBuilder->expr()->isNull(
                     $tableAlias.'.lead_id');
-                $queryBuilder->andWhere($expression);
+                $queryBuilder->addLogic($expression, 'and');
                 break;
             case 'neq':
                 $expression = $queryBuilder->expr()->eq(

@@ -1656,9 +1656,9 @@ class QueryBuilder
 
     public function addLogic($expression, $glue)
     {
-        dump('adding logic "'.$glue.'":'.$expression.'  stack:'.count($this->getLogicStack()));
+        //dump('adding logic "'.$glue.'":'.$expression.'  stack:'.count($this->getLogicStack()));
         if ($this->hasLogicStack() && $glue == 'and') {
-            dump('and where:'.$expression);
+            //dump('and where:'.$expression);
             $this->addToLogicStack($expression);
         } elseif ($this->hasLogicStack()) {
             //            $logic = $queryBuilder->popLogicStack();
@@ -1672,7 +1672,7 @@ class QueryBuilder
             }
             $this->addToLogicStack($expression);
         } elseif ($glue == 'or') {
-            dump('or to stack: '.$expression);
+            //dump('or to stack: '.$expression);
             $this->addToLogicStack($expression);
         } else {
 //            if (!is_null($this->lastAndWhere)) {
@@ -1682,7 +1682,7 @@ class QueryBuilder
 //                $this->lastAndWhere = $expression;
 //            }
             $this->andWhere($expression);
-            dump('and where '.$expression);
+            //dump('and where '.$expression);
         }
     }
 
@@ -1716,18 +1716,18 @@ class QueryBuilder
                 //$this->orHaving(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
                 //$this->orHaving($this->popLogicStack());
             } else {
-                dump('-------- or stack:');
-                dump($stack = $this->getLogicStack());
+                //dump('-------- or stack:');
+//                dump($stack = $this->getLogicStack());
                 /* @var CompositeExpression $where */
-                dump('where:');
-                dump($where = $this->getQueryPart('where'));
+//                dump('where:');
+//                dump($where = $this->getQueryPart('where'));
                 // Stack need to be added to the last composite of type 'or'
 
                 $this->orWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
             }
-            dump('------- applied logic:'.(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()))->__toString());
-            dump('where:');
-            dump($this->getQueryPart('where'));
+//            dump('------- applied logic:'.(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()))->__toString());
+//            dump('where:');
+//            dump($this->getQueryPart('where'));
         }
     }
 

@@ -10,7 +10,6 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\LeadSegmentFilter;
 use Mautic\LeadBundle\Segment\LeadSegmentFilterFactory;
@@ -87,11 +86,11 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
             $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
 
             $contactSegments = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->findBy(
-                ['id'    => $segmentId]
+                ['id' => $segmentId]
             );
 
             foreach ($contactSegments as $contactSegment) {
-                $filters             = $this->leadSegmentFilterFactory->getLeadListFilters($contactSegment);
+                $filters = $this->leadSegmentFilterFactory->getLeadListFilters($contactSegment);
 
                 $segmentQueryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($filters);
 
@@ -104,7 +103,7 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
                 $segmentQueryBuilder->select('l.id');
 
                 $parameters = $segmentQueryBuilder->getParameters();
-                foreach ($parameters as $key=>$value) {
+                foreach ($parameters as $key => $value) {
                     $queryBuilder->setParameter($key, $value);
                 }
 
@@ -122,82 +121,7 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $expression = isset($orExpressions) ? '('.join(' OR ', $orExpressions).')' : $expression;
 
-        dump("====================================================================== EXPRESSION:\n");
-        dump($expression);
-
         $queryBuilder->addLogic($expression, $filter->getGlue());
-
-//        if ($queryBuilder->hasLogicStack() && $filter->getGlue()=='AND') {
-//            $queryBuilder->addToLogicStack($expression);
-//        } else if ($queryBuilder->hasLogicStack()) {
-        ////            $logic = $queryBuilder->popLogicStack();
-        ////            /** @var CompositeExpression $standingLogic */
-        ////            $standingLogic = $queryBuilder->getQueryPart('where');
-        ////            dump($logic);
-        ////            $queryBuilder->orWhere("(" . join(' AND ', $logic) . ")");
-//            $queryBuilder->applyStackLogic();
-//            $queryBuilder->addToLogicStack($expression);
-//        } else {
-//            $queryBuilder->addToLogicStack($expression);
-//        }
-
-        dump("====================================================================== WHERE:\n");
-        dump($queryBuilder->getQueryPart('where'));
-        dump("====================================================================== STACK:\n");
-        dump($queryBuilder->getLogicStack());
-
-        return $queryBuilder;
-    }
-
-    /**
-     * @param QueryBuilder      $queryBuilder
-     * @param LeadSegmentFilter $filter
-     *
-     * @return QueryBuilder
-     */
-    public function applyQueryBak(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
-    {
-        $segmentIds = $filter->getParameterValue();
-
-        if (!is_array($segmentIds)) {
-            $segmentIds = [intval($segmentIds)];
-        }
-
-        $leftIds  = [];
-        $innerIds = [];
-
-        foreach ($segmentIds as $segmentId) {
-            $ids[]     = $segmentId;
-
-            $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
-            if ($exclusion) {
-                $leftIds[] = $segmentId;
-            } else {
-                $innerIds[] = $segmentId;
-            }
-        }
-
-        if (count($leftIds)) {
-            $leftAlias = $this->generateRandomParameterName();
-            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $leftAlias,
-                                    $queryBuilder->expr()->andX(
-                                        $queryBuilder->expr()->in($leftAlias.'.leadlist_id', $leftIds),
-                                        $queryBuilder->expr()->eq('l.id', $leftAlias.'.lead_id'))
-            );
-
-            $queryBuilder->andWhere(
-                    $queryBuilder->expr()->isNull($leftAlias.'.lead_id')
-            );
-        }
-
-        if (count($innerIds)) {
-            $innerAlias = $this->generateRandomParameterName();
-            $queryBuilder->innerJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $innerAlias,
-                                    $queryBuilder->expr()->andX(
-                                        $queryBuilder->expr()->in('l.id', $innerIds),
-                                        $queryBuilder->expr()->eq('l.id', $innerAlias.'.lead_id'))
-            );
-        }
 
         return $queryBuilder;
     }
