@@ -267,6 +267,9 @@ class PublicController extends CommonFormController
                 if (!empty($analytics)) {
                     $content = str_replace('</head>', $analytics."\n</head>", $content);
                 }
+                if ($entity->getNoIndex()) {
+                    $content = str_replace('</head>', "<meta name=\"robots\" content=\"noindex\">\n</head>", $content);
+                }
             }
 
             $this->get('templating.helper.assets')->addScript(
