@@ -109,7 +109,6 @@ class TwilioIntegration extends AbstractIntegration
                         'class' => 'form-control frequency',
                     ],
                 ]);
-
             $builder->add('frequency_time', 'choice',
                 [
                     'choices' => [
