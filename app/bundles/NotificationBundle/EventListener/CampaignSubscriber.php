@@ -221,6 +221,18 @@ class CampaignSubscriber extends CommonSubscriber
             $notification
         );
 
+        // enable/disable push_id
+        $results    = \GuzzleHttp\json_decode($response->body, true);
+        $invalidIds = !empty($results['errors']['invalid_player_ids']) ? $results['errors']['invalid_player_ids'] : [];
+        foreach ($pushIDs as $pushID) {
+            if (in_array($pushID->getPushID(), $invalidIds)) {
+                $pushID->setEnabled(false);
+            } else {
+                $pushID->setEnabled(true);
+            }
+        }
+        $this->notificationModel->getPushIDRepository()->saveEntities($pushIDs);
+
         $event->setChannel('notification', $notification->getId());
 
         // If for some reason the call failed, tell mautic to try again by return false
