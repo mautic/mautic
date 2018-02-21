@@ -112,15 +112,16 @@ class CampaignType extends AbstractType
             $builder->setAction($options['action']);
         }
 
+        echo $options['action'];
         $builder->add('buttons', 'form_buttons', [
             'pre_extra_buttons' => [
                 [
                     'name'  => 'builder',
                     'label' => 'mautic.campaign.campaign.launch.builder',
                     'attr'  => [
-                        'class'   => 'btn btn-default btn-dnd',
+                        'class'   => 'btn btn-default btn-dnd '.($options['data']->isCloned() ? ' btn-nospin' : ''),
                         'icon'    => 'fa fa-cube',
-                        'onclick' => 'Mautic.launchCampaignEditor();',
+                        'onclick' => $options['data']->isCloned() ? 'return alert("'.$this->translator->trans('mautic.campaign.campaign.launch.builder.alert').'");' : 'Mautic.launchCampaignEditor();',
                     ],
                 ],
             ],
