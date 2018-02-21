@@ -127,7 +127,7 @@ class FieldModel extends FormModel
             'object'   => 'lead',
         ],
         'attribution' => [
-            'type'       => 'number',
+            'type'       => 'currency',
             'properties' => ['roundmode' => 4, 'precision' => 2],
             'fixed'      => true,
             'listable'   => true,
@@ -923,6 +923,8 @@ class FieldModel extends FormModel
      */
     public static function getSchemaDefinition($alias, $type, $isUnique = false)
     {
+        $options = ['notnull' => false];
+
         // Unique is always a string in order to control index length
         if ($isUnique) {
             return [
@@ -940,6 +942,11 @@ class FieldModel extends FormModel
             case 'time':
             case 'boolean':
                 $schemaType = $type;
+                break;
+            case 'currency':
+                $options['precision'] = 19;
+                $options['scale'] = 4;
+                $schemaType = 'decimal';
                 break;
             case 'number':
                 $schemaType = 'float';
@@ -965,7 +972,7 @@ class FieldModel extends FormModel
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => ['notnull' => false],
+            'options' => $options,
         ];
     }
 }
