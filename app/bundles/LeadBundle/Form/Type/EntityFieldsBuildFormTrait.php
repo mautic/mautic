@@ -62,6 +62,7 @@ trait EntityFieldsBuildFormTrait
             }
 
             switch ($type) {
+                case 'currency':
                 case 'number':
                     if (empty($properties['precision'])) {
                         $properties['precision'] = null;
@@ -88,6 +89,7 @@ trait EntityFieldsBuildFormTrait
                             'constraints'   => $constraints,
                             'precision'     => $properties['precision'],
                             'rounding_mode' => isset($properties['roundmode']) ? (int) $properties['roundmode'] : 0,
+                            'preaddon'      => ($type == 'currency' ? 'fa fa-money' : null),
                         ]
                     );
                     break;

@@ -475,6 +475,7 @@ class FieldType extends AbstractType
                     break;
                 case 'date':
                 case 'email':
+                case 'currency':
                 case 'number':
                 case 'tel':
                 case 'text':

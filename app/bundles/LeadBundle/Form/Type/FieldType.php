@@ -371,6 +371,7 @@ class FieldType extends AbstractType
                         ]
                     );
                     break;
+                case 'currency':
                 case 'number':
                 case 'tel':
                 case 'url':

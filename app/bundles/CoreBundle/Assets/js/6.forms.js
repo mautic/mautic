@@ -585,7 +585,7 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
                 valueField.chosen('destroy');
             }
 
-            if (!mQuery.isEmptyObject(response.options) && response.fieldType !== 'number') {
+            if (!mQuery.isEmptyObject(response.options) && response.fieldType !== 'number' && response.fieldType !== 'currency') {
                 var newValueField = mQuery('<select/>')
                     .attr('class', valueFieldAttrs['class'])
                     .attr('id', valueFieldAttrs['id'])
