@@ -29,7 +29,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Segment\LeadSegmentService;
+use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Monolog\Logger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -49,7 +49,7 @@ class ListModel extends FormModel
     protected $coreParametersHelper;
 
     /**
-     * @var LeadSegmentService
+     * @var ContactSegmentService
      */
     private $leadSegmentService;
 
@@ -58,7 +58,7 @@ class ListModel extends FormModel
      *
      * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, LeadSegmentService $leadSegment)
+    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment)
     {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->leadSegmentService   = $leadSegment;

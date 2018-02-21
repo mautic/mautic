@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,74 +11,106 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
-use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
-use Mautic\LeadBundle\Segment\LeadSegmentFilterOperator;
-use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
+use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 
+/**
+ * Class CustomMappedDecorator.
+ */
 class CustomMappedDecorator extends BaseDecorator
 {
     /**
-     * @var LeadSegmentFilterDescriptor
+     * @var ContactSegmentFilterDictionary
      */
-    protected $leadSegmentFilterDescriptor;
+    protected $dictionary;
 
+    /**
+     * CustomMappedDecorator constructor.
+     *
+     * @param ContactSegmentFilterOperator   $contactSegmentFilterOperator
+     * @param ContactSegmentFilterDictionary $contactSegmentFilterDictionary
+     */
     public function __construct(
-        LeadSegmentFilterOperator $leadSegmentFilterOperator,
-        LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor
+        ContactSegmentFilterOperator $contactSegmentFilterOperator,
+        ContactSegmentFilterDictionary $contactSegmentFilterDictionary
     ) {
-        parent::__construct($leadSegmentFilterOperator);
-        $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
+        parent::__construct($contactSegmentFilterOperator);
+        $this->dictionary = $contactSegmentFilterDictionary;
     }
 
-    public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return null|string
+     */
+    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $originalField = $leadSegmentFilterCrate->getField();
+        $originalField = $contactSegmentFilterCrate->getField();
 
-        if (empty($this->leadSegmentFilterDescriptor[$originalField]['field'])) {
-            return parent::getField($leadSegmentFilterCrate);
+        if (empty($this->dictionary[$originalField]['field'])) {
+            return parent::getField($contactSegmentFilterCrate);
         }
 
-        return $this->leadSegmentFilterDescriptor[$originalField]['field'];
+        return $this->dictionary[$originalField]['field'];
     }
 
-    public function getTable(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return string
+     */
+    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $originalField = $leadSegmentFilterCrate->getField();
+        $originalField = $contactSegmentFilterCrate->getField();
 
-        if (empty($this->leadSegmentFilterDescriptor[$originalField]['foreign_table'])) {
-            return parent::getTable($leadSegmentFilterCrate);
+        if (empty($this->dictionary[$originalField]['foreign_table'])) {
+            return parent::getTable($contactSegmentFilterCrate);
         }
 
-        return MAUTIC_TABLE_PREFIX.$this->leadSegmentFilterDescriptor[$originalField]['foreign_table'];
+        return MAUTIC_TABLE_PREFIX.$this->dictionary[$originalField]['foreign_table'];
     }
 
-    public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return string
+     */
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $originalField = $leadSegmentFilterCrate->getField();
+        $originalField = $contactSegmentFilterCrate->getField();
 
-        if (!isset($this->leadSegmentFilterDescriptor[$originalField]['type'])) {
-            return parent::getQueryType($leadSegmentFilterCrate);
+        if (!isset($this->dictionary[$originalField]['type'])) {
+            return parent::getQueryType($contactSegmentFilterCrate);
         }
 
-        return $this->leadSegmentFilterDescriptor[$originalField]['type'];
+        return $this->dictionary[$originalField]['type'];
     }
 
-    public function getAggregateFunc(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return bool
+     */
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $originalField = $leadSegmentFilterCrate->getField();
+        $originalField = $contactSegmentFilterCrate->getField();
 
-        return isset($this->leadSegmentFilterDescriptor[$originalField]['func']) ?
-            $this->leadSegmentFilterDescriptor[$originalField]['func'] : false;
+        return isset($this->dictionary[$originalField]['func']) ?
+            $this->dictionary[$originalField]['func'] : false;
     }
 
-    public function getWhere(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     */
+    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $originalField = $leadSegmentFilterCrate->getField();
+        $originalField = $contactSegmentFilterCrate->getField();
 
-        if (!isset($this->leadSegmentFilterDescriptor[$originalField]['where'])) {
-            return parent::getWhere($leadSegmentFilterCrate);
+        if (!isset($this->dictionary[$originalField]['where'])) {
+            return parent::getWhere($contactSegmentFilterCrate);
         }
 
-        return $this->leadSegmentFilterDescriptor[$originalField]['where'];
+        return $this->dictionary[$originalField]['where'];
     }
 }

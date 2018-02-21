@@ -11,9 +11,9 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
-use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 
 class DateDefault implements FilterDecoratorInterface
 {
@@ -37,43 +37,43 @@ class DateDefault implements FilterDecoratorInterface
         $this->originalValue   = $originalValue;
     }
 
-    public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        return $this->dateDecorator->getField($leadSegmentFilterCrate);
+        return $this->dateDecorator->getField($contactSegmentFilterCrate);
     }
 
-    public function getTable(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        return $this->dateDecorator->getTable($leadSegmentFilterCrate);
+        return $this->dateDecorator->getTable($contactSegmentFilterCrate);
     }
 
-    public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        return $this->dateDecorator->getOperator($leadSegmentFilterCrate);
+        return $this->dateDecorator->getOperator($contactSegmentFilterCrate);
     }
 
-    public function getParameterHolder(LeadSegmentFilterCrate $leadSegmentFilterCrate, $argument)
+    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
     {
-        return $this->dateDecorator->getParameterHolder($leadSegmentFilterCrate, $argument);
+        return $this->dateDecorator->getParameterHolder($contactSegmentFilterCrate, $argument);
     }
 
-    public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return $this->originalValue;
     }
 
-    public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        return $this->dateDecorator->getQueryType($leadSegmentFilterCrate);
+        return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
     }
 
-    public function getAggregateFunc(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        return $this->dateDecorator->getAggregateFunc($leadSegmentFilterCrate);
+        return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }
 
-    public function getWhere(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        return $this->dateDecorator->getWhere($leadSegmentFilterCrate);
+        return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
     }
 }

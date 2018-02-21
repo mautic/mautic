@@ -11,8 +11,8 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Month;
 
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
-use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 
 abstract class DateMonthAbstract extends DateOptionAbstract
 {
@@ -35,7 +35,7 @@ abstract class DateMonthAbstract extends DateOptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected function getOperatorForBetweenRange(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
     {
         return $leadSegmentFilterCrate->getOperator() === '!=' ? 'notLike' : 'like';
     }

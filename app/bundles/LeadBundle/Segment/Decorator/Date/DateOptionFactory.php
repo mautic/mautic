@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayTomorrow;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday;
@@ -29,7 +30,6 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearNext;
 use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearThis;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
-use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\RelativeDate;
 
 class DateOptionFactory
@@ -53,11 +53,11 @@ class DateOptionFactory
     }
 
     /**
-     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
+     * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
      *
      * @return FilterDecoratorInterface
      */
-    public function getDateOption(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getDateOption(ContactSegmentFilterCrate $leadSegmentFilterCrate)
     {
         $originalValue        = $leadSegmentFilterCrate->getFilter();
         $relativeDateStrings  = $this->relativeDate->getRelativeDateStrings();

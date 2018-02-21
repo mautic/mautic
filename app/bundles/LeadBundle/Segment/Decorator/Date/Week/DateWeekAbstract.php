@@ -11,8 +11,8 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Week;
 
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
-use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
 
 abstract class DateWeekAbstract extends DateOptionAbstract
 {
@@ -42,7 +42,7 @@ abstract class DateWeekAbstract extends DateOptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected function getOperatorForBetweenRange(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
     {
         return $leadSegmentFilterCrate->getOperator() === '!=' ? 'notBetween' : 'between';
     }

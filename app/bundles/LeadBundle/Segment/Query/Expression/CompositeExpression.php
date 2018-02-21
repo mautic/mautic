@@ -20,13 +20,14 @@
 namespace Mautic\LeadBundle\Segment\Query\Expression;
 
 /**
- * Composite expression is responsible to build a group of similar expression.
+ * Composite expression is responsible to build a group of similar expression. Mautic MOD.
  *
  * @see   www.doctrine-project.org
  * @since  2.1
  *
  * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Jan Kozak <galvani78@gmail.com>
  */
 class CompositeExpression implements \Countable
 {
@@ -72,7 +73,7 @@ class CompositeExpression implements \Countable
      *
      * @param array $parts
      *
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
+     * @return self
      */
     public function addMultiple(array $parts = [])
     {
@@ -88,7 +89,7 @@ class CompositeExpression implements \Countable
      *
      * @param mixed $part
      *
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
+     * @return self
      */
     public function add($part)
     {

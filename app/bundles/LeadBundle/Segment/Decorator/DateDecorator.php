@@ -11,16 +11,21 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
-use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
+/**
+ * Class DateDecorator.
+ */
 class DateDecorator extends CustomMappedDecorator
 {
     /**
-     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @todo @petr please check this method
      *
      * @throws \Exception
      */
-    public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         throw new \Exception('Instance of Date option need to implement this function');
     }

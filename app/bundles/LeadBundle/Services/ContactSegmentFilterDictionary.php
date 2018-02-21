@@ -12,13 +12,19 @@
 namespace Mautic\LeadBundle\Services;
 
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\DncFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\LeadListFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
 
-class LeadSegmentFilterDescriptor extends \ArrayIterator
+/**
+ * Class ContactSegmentFilterDictionary
+ *
+ * @package Mautic\LeadBundle\Services
+ * @todo @petr Já jsem to myslím předělával už. Chtěl jsem z toho pak udělat i objekt, aby se člověk nemusel ptát na klíče v poli, ale pak jsme na to nesahali, protože to nebylo komplet
+ */
+class ContactSegmentFilterDictionary extends \ArrayIterator
 {
     private $translations;
 
@@ -65,23 +71,23 @@ class LeadSegmentFilterDescriptor extends \ArrayIterator
         ];
 
         $this->translations['dnc_bounced'] = [
-            'type' => DncFilterQueryBuilder::getServiceId(),
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['dnc_bounced_sms'] = [
-            'type' => DncFilterQueryBuilder::getServiceId(),
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['dnc_unsubscribed'] = [
-            'type' => DncFilterQueryBuilder::getServiceId(),
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['dnc_unsubscribed_sms'] = [
-            'type' => DncFilterQueryBuilder::getServiceId(),
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['leadlist'] = [
-            'type' => LeadListFilterQueryBuilder::getServiceId(),
+            'type' => SegmentReferenceFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['globalcategory'] = [

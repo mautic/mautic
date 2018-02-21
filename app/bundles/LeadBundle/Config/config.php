@@ -730,7 +730,7 @@ return [
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.special.dnc' => [
-                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\DncFilterQueryBuilder::class,
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.special.sessions' => [
@@ -738,7 +738,7 @@ return [
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.special.leadlist' => [
-                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\LeadListFilterQueryBuilder::class,
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder::class,
                 'arguments' => [
                     'mautic.lead.model.random_parameter_name',
                     'mautic.lead.repository.lead_segment_query_builder',
@@ -788,18 +788,18 @@ return [
                 ],
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [
-                'class'     => \Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor::class,
+                'class'     => \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary::class,
                 'arguments' => [],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [
-                'class'     => Mautic\LeadBundle\Segment\Query\LeadSegmentQueryBuilder::class,
+                'class'     => Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.random_parameter_name',
                 ],
             ],
             'mautic.lead.model.lead_segment_service' => [
-                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentService::class,
+                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentService::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_factory',
                     'mautic.lead.repository.lead_segment_query_builder',
@@ -807,7 +807,7 @@ return [
                 ],
             ],
             'mautic.lead.model.lead_segment_filter_factory' => [
-                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterFactory::class,
+                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_schema_cache',
                     '@service_container',
@@ -827,7 +827,7 @@ return [
                 ],
             ],
             'mautic.lead.model.lead_segment_filter_operator' => [
-                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterOperator::class,
+                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentFilterOperator::class,
                 'arguments' => [
                     'translator',
                     'event_dispatcher',

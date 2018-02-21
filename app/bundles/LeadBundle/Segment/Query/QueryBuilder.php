@@ -43,6 +43,8 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
  * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Jan Kozak <galvani78@gmail.com>
+ *
+ * @todo extend standing class instead of redefining everything
  */
 class QueryBuilder
 {
@@ -88,6 +90,8 @@ class QueryBuilder
     ];
 
     /**
+     * Unprocessed logic for segment processing.
+     *
      * @var array
      */
     private $logicStack = [];
@@ -1550,7 +1554,7 @@ class QueryBuilder
      *
      * @return string
      */
-    public function guessPrimaryLeadIdColumn()
+    public function guessPrimaryLeadContactIdColumn()
     {
         $parts     = $this->getQueryParts();
         $leadTable = $parts['from'][0]['alias'];
@@ -1592,8 +1596,7 @@ class QueryBuilder
     }
 
     /**
-     * @param              $table
-     * @param QueryBuilder $queryBuilder
+     * @param $table
      *
      * @return bool
      */
@@ -1629,16 +1632,25 @@ class QueryBuilder
         return $sql;
     }
 
+    /**
+     * @return bool
+     */
     public function hasLogicStack()
     {
-        return count($this->logicStack);
+        return count($this->logicStack) > 0;
     }
 
+    /**
+     * @return array
+     */
     public function getLogicStack()
     {
         return $this->logicStack;
     }
 
+    /**
+     * @return array
+     */
     public function popLogicStack()
     {
         $stack            = $this->logicStack;
@@ -1647,45 +1659,52 @@ class QueryBuilder
         return $stack;
     }
 
-    public function addToLogicStack($expression)
+    /**
+     * @param $expression
+     *
+     * @return $this
+     */
+    public function addLogicStack($expression)
     {
         $this->logicStack[] = $expression;
 
         return $this;
     }
 
+    /**
+     * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
+     *  as they need to be kept).
+     *
+     * @todo make this readable and explain
+     *
+     * @param $expression
+     * @param $glue
+     *
+     * @return $this
+     */
     public function addLogic($expression, $glue)
     {
-        //dump('adding logic "'.$glue.'":'.$expression.'  stack:'.count($this->getLogicStack()));
         if ($this->hasLogicStack() && $glue == 'and') {
-            //dump('and where:'.$expression);
-            $this->addToLogicStack($expression);
+            $this->addLogicStack($expression);
         } elseif ($this->hasLogicStack()) {
-            //            $logic = $queryBuilder->popLogicStack();
-            //            /** @var CompositeExpression $standingLogic */
-            //            $standingLogic = $queryBuilder->getQueryPart('where');
-            //            dump($logic);
-            //            $queryBuilder->orWhere("(" . join(' AND ', $logic) . ")");
-            //$this->applyStackLogic();
             if ($glue == 'or') {
                 $this->applyStackLogic();
             }
-            $this->addToLogicStack($expression);
+            $this->addLogicStack($expression);
         } elseif ($glue == 'or') {
-            //dump('or to stack: '.$expression);
-            $this->addToLogicStack($expression);
+            $this->addLogicStack($expression);
         } else {
-//            if (!is_null($this->lastAndWhere)) {
-//                $this->andWhere($this->lastAndWhere);
-//                $this->lastAndWhere = null;
-//            } else {
-//                $this->lastAndWhere = $expression;
-//            }
             $this->andWhere($expression);
-            //dump('and where '.$expression);
         }
+
+        return $this;
     }
 
+    /**
+     * Convert stored logic into regular where condition.
+     *
+     * @return $this
+     */
     public function applyStackLogic()
     {
         if ($this->hasLogicStack()) {
@@ -1693,17 +1712,6 @@ class QueryBuilder
 
             if (!is_null($parts['where']) && !is_null($parts['having'])) {
                 $where  = $parts['where'];
-                $having = $parts['having'];
-
-                $fields = $this->extractFields($where);
-
-                foreach ($this->getLogicStack() as $expression) {
-                    $fields = array_merge($fields, $this->extractFields($expression));
-                }
-
-                $fields = array_diff($fields, $this->extractFields($having));
-
-                $select = array_unique(array_merge($this->getQueryPart('select'), $fields));
 
                 $whereConditionAlias = 'wh_'.substr(md5($where->__toString()), 0, 10);
                 $selectCondition     = sprintf('(%s) AS %s', $where->__toString(), $whereConditionAlias);
@@ -1713,32 +1721,11 @@ class QueryBuilder
                 $this->addSelect($selectCondition);
 
                 $this->resetQueryPart('where');
-                //$this->orHaving(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
-                //$this->orHaving($this->popLogicStack());
             } else {
-                //dump('-------- or stack:');
-//                dump($stack = $this->getLogicStack());
-                /* @var CompositeExpression $where */
-//                dump('where:');
-//                dump($where = $this->getQueryPart('where'));
-                // Stack need to be added to the last composite of type 'or'
-
                 $this->orWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
             }
-//            dump('------- applied logic:'.(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()))->__toString());
-//            dump('where:');
-//            dump($this->getQueryPart('where'));
         }
-    }
 
-    public function extractFields($expression)
-    {
-        $matches = [];
-
-        preg_match('/([a-zA-Z]+\.[a-zA-Z_]+)/', $expression instanceof CompositeExpression ? (string) $expression : $expression, $matches);
-
-        $matches = array_keys(array_flip($matches));
-
-        return $matches;
+        return $this;
     }
 }

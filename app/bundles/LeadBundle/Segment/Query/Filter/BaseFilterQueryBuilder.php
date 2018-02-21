@@ -10,8 +10,8 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
-use Mautic\LeadBundle\Segment\LeadSegmentFilter;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
+use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -42,14 +42,10 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         return 'mautic.lead.query.builder.basic';
     }
 
-    public function getLogicGroupingExpression()
-    {
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         $filterOperator = $filter->getOperator();
         $filterGlue     = $filter->getGlue();
@@ -74,8 +70,6 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         }
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
-
-        $filterGlueFunc = $filterGlue.'Where';
 
         $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
 
@@ -184,33 +178,12 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
         if ($queryBuilder->isJoinTable($filter->getTable())) {
             if ($filterAggr) {
-                throw new \Exception('should not be used use different query builder');
-                $queryBuilder->andHaving($expression);
+                throw new SegmentQueryException('aggregate functions should not be used in basic filters. use different query builder');
             } else {
                 $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
             }
         } else {
-            // @todo remove stack logic, move it to the query builder
             $queryBuilder->addLogic($expression, $filterGlue);
-
-//            if ($filterGlue === 'or') {
-//                if ($queryBuilder->hasLogicStack()) {
-//                    if ($queryBuilder->hasLogicStack()) {
-//                        $orWhereExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $queryBuilder->popLogicStack());
-//                    } else {
-//                        $orWhereExpression = $queryBuilder->popLogicStack();
-//                    }
-//
-//                    $queryBuilder->orWhere($orWhereExpression);
-//                }
-//                $queryBuilder->addToLogicStack($expression);
-//            } else {
-//                if ($queryBuilder->hasLogicStack()) {
-//                    $queryBuilder->addToLogicStack($expression);
-//                } else {
-//                    $queryBuilder->$filterGlueFunc($expression);
-//                }
-//            }
         }
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);

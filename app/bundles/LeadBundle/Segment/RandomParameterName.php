@@ -11,6 +11,9 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+/**
+ * Class RandomParameterName.
+ */
 class RandomParameterName
 {
     /**

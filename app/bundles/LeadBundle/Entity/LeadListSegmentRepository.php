@@ -16,8 +16,8 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Segment\LeadSegmentFilterOld;
-use Mautic\LeadBundle\Segment\LeadSegmentFilters;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterOld;
+use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -48,7 +48,7 @@ class LeadListSegmentRepository
         $this->randomParameterName = $randomParameterName;
     }
 
-    public function getNewLeadsByListCount($id, LeadSegmentFilters $leadSegmentFilters, array $batchLimiters)
+    public function getNewLeadsByListCount($id, ContactSegmentFilters $leadSegmentFilters, array $batchLimiters)
     {
         //TODO
         $withMinId = false;
@@ -145,7 +145,7 @@ class LeadListSegmentRepository
         return $leads;
     }
 
-    private function generateSegmentExpression(LeadSegmentFilters $leadSegmentFilters, QueryBuilder $q, $listId = null)
+    private function generateSegmentExpression(ContactSegmentFilters $leadSegmentFilters, QueryBuilder $q, $listId = null)
     {
         $expr = $this->getListFilterExpr($leadSegmentFilters, $q, $listId);
 
@@ -157,13 +157,13 @@ class LeadListSegmentRepository
     }
 
     /**
-     * @param LeadSegmentFilters $leadSegmentFilters
-     * @param QueryBuilder       $q
-     * @param int                $listId
+     * @param ContactSegmentFilters $leadSegmentFilters
+     * @param QueryBuilder          $q
+     * @param int                   $listId
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
-    private function getListFilterExpr(LeadSegmentFilters $leadSegmentFilters, QueryBuilder $q, $listId)
+    private function getListFilterExpr(ContactSegmentFilters $leadSegmentFilters, QueryBuilder $q, $listId)
     {
         $parameters = [];
 
@@ -176,7 +176,7 @@ class LeadListSegmentRepository
         $groupExpr = $q->expr()->andX();
 
         foreach ($leadSegmentFilters as $k => $leadSegmentFilter) {
-            $leadSegmentFilter = new LeadSegmentFilterOld((array) $leadSegmentFilter->leadSegmentFilterCrate);
+            $leadSegmentFilter = new ContactSegmentFilterOld((array) $leadSegmentFilter->contactSegmentFilterCrate);
             //$object = $leadSegmentFilter->getObject();
 
             $column     = false;
@@ -1141,10 +1141,10 @@ class LeadListSegmentRepository
      * If there is a negate comparison such as not equal, empty, isNotLike or isNotIn then contacts without companies should
      * be included but the way the relationship is handled needs to be different to optimize best for a posit vs negate.
      *
-     * @param QueryBuilder       $q
-     * @param LeadSegmentFilters $leadSegmentFilters
+     * @param QueryBuilder          $q
+     * @param ContactSegmentFilters $leadSegmentFilters
      */
-    private function applyCompanyFieldFilters(QueryBuilder $q, LeadSegmentFilters $leadSegmentFilters)
+    private function applyCompanyFieldFilters(QueryBuilder $q, ContactSegmentFilters $leadSegmentFilters)
     {
         $joinType = $leadSegmentFilters->isListFiltersInnerJoinCompany() ? 'join' : 'leftJoin';
         // Join company tables for query optimization

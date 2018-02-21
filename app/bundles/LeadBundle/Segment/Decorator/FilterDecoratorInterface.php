@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,23 +11,28 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
-use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
+/**
+ * Interface FilterDecoratorInterface.
+ *
+ * @todo @petr document these functions please with phpdoc and meaningful description
+ */
 interface FilterDecoratorInterface
 {
-    public function getField(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 
-    public function getTable(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 
-    public function getOperator(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 
-    public function getParameterHolder(LeadSegmentFilterCrate $leadSegmentFilterCrate, $argument);
+    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument);
 
-    public function getParameterValue(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 
-    public function getQueryType(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 
-    public function getAggregateFunc(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 
-    public function getWhere(LeadSegmentFilterCrate $leadSegmentFilterCrate);
+    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 }

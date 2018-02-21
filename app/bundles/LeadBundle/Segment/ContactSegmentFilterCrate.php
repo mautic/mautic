@@ -11,9 +11,9 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-class LeadSegmentFilterCrate
+class ContactSegmentFilterCrate
 {
-    const LEAD_OBJECT    = 'lead';
+    const CONTACT_OBJECT    = 'lead';
     const COMPANY_OBJECT = 'company';
 
     /**
@@ -56,11 +56,16 @@ class LeadSegmentFilterCrate
      */
     private $func;
 
+    /**
+     * ContactSegmentFilterCrate constructor.
+     *
+     * @param array $filter
+     */
     public function __construct(array $filter)
     {
         $this->glue     = isset($filter['glue']) ? $filter['glue'] : null;
         $this->field    = isset($filter['field']) ? $filter['field'] : null;
-        $this->object   = isset($filter['object']) ? $filter['object'] : self::LEAD_OBJECT;
+        $this->object   = isset($filter['object']) ? $filter['object'] : self::CONTACT_OBJECT;
         $this->type     = isset($filter['type']) ? $filter['type'] : null;
         $this->display  = isset($filter['display']) ? $filter['display'] : null;
         $this->func     = isset($filter['func']) ? $filter['func'] : null;
@@ -95,9 +100,9 @@ class LeadSegmentFilterCrate
     /**
      * @return bool
      */
-    public function isLeadType()
+    public function isContactType()
     {
-        return $this->object === self::LEAD_OBJECT;
+        return $this->object === self::CONTACT_OBJECT;
     }
 
     /**
@@ -148,11 +153,17 @@ class LeadSegmentFilterCrate
         return $this->func;
     }
 
+    /**
+     * @return bool
+     */
     public function isDateType()
     {
         return $this->getType() === 'date' || $this->hasTimeParts();
     }
 
+    /**
+     * @return bool
+     */
     public function hasTimeParts()
     {
         return $this->getType() === 'datetime';

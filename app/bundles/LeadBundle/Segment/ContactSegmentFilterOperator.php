@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -16,7 +16,12 @@ use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class LeadSegmentFilterOperator
+/**
+ * Class ContactSegmentFilterOperator
+ *
+ * @package Mautic\LeadBundle\Segment
+ */
+class ContactSegmentFilterOperator
 {
     /**
      * @var TranslatorInterface
@@ -33,6 +38,13 @@ class LeadSegmentFilterOperator
      */
     private $operatorOptions;
 
+    /**
+     * ContactSegmentFilterOperator constructor.
+     *
+     * @param TranslatorInterface      $translator
+     * @param EventDispatcherInterface $dispatcher
+     * @param OperatorOptions          $operatorOptions
+     */
     public function __construct(
         TranslatorInterface $translator,
         EventDispatcherInterface $dispatcher,

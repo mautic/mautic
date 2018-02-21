@@ -3,7 +3,6 @@
 /*
  * @copyright   2014-2018 Mautic Contributors. All rights reserved
  * @author      Mautic
- * @author      Jan Kozak <galvani78@gmail.com>
  *
  * @link        http://mautic.org
  *
@@ -14,16 +13,16 @@ namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
-use Mautic\LeadBundle\Segment\LeadSegmentFilter;
-use Mautic\LeadBundle\Segment\LeadSegmentFilters;
+use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 
 /**
- * Class LeadSegmentQueryBuilder is responsible for building queries for segments.
+ * Class ContactSegmentQueryBuilder is responsible for building queries for segments.
  *
- * @todo add exceptions
+ * @todo add exceptions, remove related segments
  */
-class LeadSegmentQueryBuilder
+class ContactSegmentQueryBuilder
 {
     /** @var EntityManager */
     private $entityManager;
@@ -38,7 +37,7 @@ class LeadSegmentQueryBuilder
     private $relatedSegments = [];
 
     /**
-     * LeadSegmentQueryBuilder constructor.
+     * ContactSegmentQueryBuilder constructor.
      *
      * @param EntityManager       $entityManager
      * @param RandomParameterName $randomParameterName
@@ -51,14 +50,14 @@ class LeadSegmentQueryBuilder
     }
 
     /**
-     * @param LeadSegmentFilters $leadSegmentFilters
-     * @param null               $backReference
+     * @param ContactSegmentFilters $contactSegmentFilters
+     * @param null                  $backReference
      *
      * @return QueryBuilder
      *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder(LeadSegmentFilters $leadSegmentFilters, $backReference = null)
+    public function assembleContactsSegmentQueryBuilder(ContactSegmentFilters $contactSegmentFilters, $backReference = null)
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
@@ -67,9 +66,10 @@ class LeadSegmentQueryBuilder
 
         $references = [];
 
-        /** @var LeadSegmentFilter $filter */
-        foreach ($leadSegmentFilters as $filter) {
+        /** @var ContactSegmentFilter $filter */
+        foreach ($contactSegmentFilters as $filter) {
             $segmentIdArray = is_array($filter->getParameterValue()) ? $filter->getParameterValue() : [$filter->getParameterValue()];
+
             //  We will handle references differently than regular segments
             if ($filter->isContactSegmentReference()) {
                 if (!is_null($backReference) || in_array($backReference, $this->getContactSegmentRelations($segmentIdArray))) {
@@ -79,6 +79,7 @@ class LeadSegmentQueryBuilder
             }
             $queryBuilder = $filter->applyQuery($queryBuilder);
         }
+
         $queryBuilder->applyStackLogic();
 
         return $queryBuilder;
@@ -120,7 +121,7 @@ class LeadSegmentQueryBuilder
         // Add count functions to the query
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
         //  If there is any right join in the query we need to select its it
-        $primary = $qb->guessPrimaryLeadIdColumn();
+        $primary = $qb->guessPrimaryLeadContactIdColumn();
 
         $currentSelects = [];
         foreach ($qb->getQueryParts()['select'] as $select) {
@@ -145,15 +146,13 @@ class LeadSegmentQueryBuilder
      * Restrict the query to NEW members of segment.
      *
      * @param QueryBuilder $queryBuilder
-     * @param              $leadListId
+     * @param              $segmentId
      * @param              $whatever     @todo document this field
      *
      * @return QueryBuilder
      */
-    public function addNewLeadsRestrictions(QueryBuilder $queryBuilder, $leadListId, $whatever)
+    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId, $whatever)
     {
-        //$queryBuilder->select('l.id');
-
         $parts     = $queryBuilder->getQueryParts();
         $setHaving = (count($parts['groupBy']) || !is_null($parts['having']));
 
@@ -162,7 +161,7 @@ class LeadSegmentQueryBuilder
         $queryBuilder->addSelect($tableAlias.'.lead_id AS '.$tableAlias.'_lead_id');
 
         $expression = $queryBuilder->expr()->andX(
-            $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $leadListId),
+            $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId),
             $queryBuilder->expr()->lte($tableAlias.'.date_added', "'".$whatever['dateTime']."'")
         );
 
@@ -244,7 +243,7 @@ class LeadSegmentQueryBuilder
     /**
      * @param LeadSegmentFilterDescriptor $translator
      *
-     * @return LeadSegmentQueryBuilder
+     * @return ContactSegmentQueryBuilder
      *
      * @todo Remove this function
      */
@@ -268,7 +267,7 @@ class LeadSegmentQueryBuilder
     /**
      * @param \Doctrine\DBAL\Schema\AbstractSchemaManager $schema
      *
-     * @return LeadSegmentQueryBuilder
+     * @return ContactSegmentQueryBuilder
      *
      * @todo Remove this function
      */

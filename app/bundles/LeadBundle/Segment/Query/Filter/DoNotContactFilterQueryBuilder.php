@@ -11,13 +11,13 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Segment\LeadSegmentFilter;
+use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class DncFilterQueryBuilder.
+ * Class DoNotContactFilterQueryBuilder.
  */
-class DncFilterQueryBuilder extends BaseFilterQueryBuilder
+class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     /**
      * {@inheritdoc}
@@ -30,7 +30,7 @@ class DncFilterQueryBuilder extends BaseFilterQueryBuilder
     /**
      * {@inheritdoc}
      */
-    public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         //@todo look at this, the getCrate method is for debuggin only
         $parts   = explode('_', $filter->getCrate('field'));

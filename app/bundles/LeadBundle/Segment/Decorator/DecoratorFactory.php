@@ -11,16 +11,19 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
-use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
-use Mautic\LeadBundle\Services\LeadSegmentFilterDescriptor;
+use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 
+/**
+ * Class DecoratorFactory.
+ */
 class DecoratorFactory
 {
     /**
-     * @var LeadSegmentFilterDescriptor
+     * @var ContactSegmentFilterDictionary
      */
-    private $leadSegmentFilterDescriptor;
+    private $contactSegmentFilterDictionary;
 
     /**
      * @var BaseDecorator
@@ -37,32 +40,40 @@ class DecoratorFactory
      */
     private $dateOptionFactory;
 
+    /**
+     * DecoratorFactory constructor.
+     *
+     * @param ContactSegmentFilterDictionary $contactSegmentFilterDictionary
+     * @param BaseDecorator                  $baseDecorator
+     * @param CustomMappedDecorator          $customMappedDecorator
+     * @param DateOptionFactory              $dateOptionFactory
+     */
     public function __construct(
-        LeadSegmentFilterDescriptor $leadSegmentFilterDescriptor,
+        ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
         BaseDecorator $baseDecorator,
         CustomMappedDecorator $customMappedDecorator,
         DateOptionFactory $dateOptionFactory
     ) {
-        $this->baseDecorator               = $baseDecorator;
-        $this->customMappedDecorator       = $customMappedDecorator;
-        $this->dateOptionFactory           = $dateOptionFactory;
-        $this->leadSegmentFilterDescriptor = $leadSegmentFilterDescriptor;
+        $this->baseDecorator                  = $baseDecorator;
+        $this->customMappedDecorator          = $customMappedDecorator;
+        $this->dateOptionFactory              = $dateOptionFactory;
+        $this->contactSegmentFilterDictionary = $contactSegmentFilterDictionary;
     }
 
     /**
-     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
      * @return FilterDecoratorInterface
      */
-    public function getDecoratorForFilter(LeadSegmentFilterCrate $leadSegmentFilterCrate)
+    public function getDecoratorForFilter(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        if ($leadSegmentFilterCrate->isDateType()) {
-            return $this->dateOptionFactory->getDateOption($leadSegmentFilterCrate);
+        if ($contactSegmentFilterCrate->isDateType()) {
+            return $this->dateOptionFactory->getDateOption($contactSegmentFilterCrate);
         }
 
-        $originalField = $leadSegmentFilterCrate->getField();
+        $originalField = $contactSegmentFilterCrate->getField();
 
-        if (empty($this->leadSegmentFilterDescriptor[$originalField])) {
+        if (empty($this->contactSegmentFilterDictionary[$originalField])) {
             return $this->baseDecorator;
         }
 

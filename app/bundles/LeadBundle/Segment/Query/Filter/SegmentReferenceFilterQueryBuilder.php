@@ -11,24 +11,24 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Segment\LeadSegmentFilter;
-use Mautic\LeadBundle\Segment\LeadSegmentFilterFactory;
-use Mautic\LeadBundle\Segment\Query\LeadSegmentQueryBuilder;
+use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
+use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 
 /**
- * Class LeadListFilterQueryBuilder.
+ * Class SegmentReferenceFilterQueryBuilder.
  */
-class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
+class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     /**
-     * @var LeadSegmentQueryBuilder
+     * @var ContactSegmentQueryBuilder
      */
     private $leadSegmentQueryBuilder;
 
     /**
-     * @var LeadSegmentFilterFactory
+     * @var ContactSegmentFilterFactory
      */
     private $leadSegmentFilterFactory;
 
@@ -38,18 +38,18 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
     private $entityManager;
 
     /**
-     * LeadListFilterQueryBuilder constructor.
+     * SegmentReferenceFilterQueryBuilder constructor.
      *
-     * @param RandomParameterName      $randomParameterNameService
-     * @param LeadSegmentQueryBuilder  $leadSegmentQueryBuilder
-     * @param EntityManager            $entityManager
-     * @param LeadSegmentFilterFactory $leadSegmentFilterFactory
+     * @param RandomParameterName         $randomParameterNameService
+     * @param ContactSegmentQueryBuilder  $leadSegmentQueryBuilder
+     * @param EntityManager               $entityManager
+     * @param ContactSegmentFilterFactory $leadSegmentFilterFactory
      */
     public function __construct(
         RandomParameterName $randomParameterNameService,
-        LeadSegmentQueryBuilder $leadSegmentQueryBuilder,
+        ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
         EntityManager $entityManager,
-        LeadSegmentFilterFactory $leadSegmentFilterFactory
+        ContactSegmentFilterFactory $leadSegmentFilterFactory
     ) {
         parent::__construct($randomParameterNameService);
 
@@ -67,14 +67,14 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param QueryBuilder      $queryBuilder
-     * @param LeadSegmentFilter $filter
+     * @param QueryBuilder         $queryBuilder
+     * @param ContactSegmentFilter $filter
      *
      * @return QueryBuilder
      *
      * @throws \Mautic\LeadBundle\Segment\Exception\SegmentQueryException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         $segmentIds = $filter->getParameterValue();
 
@@ -90,7 +90,7 @@ class LeadListFilterQueryBuilder extends BaseFilterQueryBuilder
             );
 
             foreach ($contactSegments as $contactSegment) {
-                $filters = $this->leadSegmentFilterFactory->getLeadListFilters($contactSegment);
+                $filters = $this->leadSegmentFilterFactory->getSegmentFilters($contactSegment);
 
                 $segmentQueryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($filters);
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,7 +11,12 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-class LeadSegmentFilters implements \Iterator, \Countable
+/**
+ * Class ContactSegmentFilters is array object containing filters
+ *
+ * @package Mautic\LeadBundle\Segment
+ */
+class ContactSegmentFilters implements \Iterator, \Countable
 {
     /**
      * @var int
@@ -19,9 +24,9 @@ class LeadSegmentFilters implements \Iterator, \Countable
     private $position = 0;
 
     /**
-     * @var array|LeadSegmentFilter[]
+     * @var array|ContactSegmentFilter[]
      */
-    private $leadSegmentFilters = [];
+    private $contactSegmentFilters = [];
 
     /**
      * @var bool
@@ -33,16 +38,15 @@ class LeadSegmentFilters implements \Iterator, \Countable
      */
     private $listFiltersInnerJoinCompany = false;
 
-    public function addLeadSegmentFilter(LeadSegmentFilter $leadSegmentFilter)
+    /**
+     * @param ContactSegmentFilter $contactSegmentFilter
+     *
+     * @return $this
+     */
+    public function addContactSegmentFilter(ContactSegmentFilter $contactSegmentFilter)
     {
-        $this->leadSegmentFilters[] = $leadSegmentFilter;
-//        if ($leadSegmentFilter->isCompanyType()) {
-//            $this->hasCompanyFilter = true;
-//            // Must tell getLeadsByList how to best handle the relationship with the companies table
-//            if (!in_array($leadSegmentFilter->getFunc(), ['empty', 'neq', 'notIn', 'notLike'], true)) {
-//                $this->listFiltersInnerJoinCompany = true;
-//            }
-//        }
+        $this->contactSegmentFilters[] = $contactSegmentFilter;
+        return $this;
     }
 
     /**
@@ -50,11 +54,11 @@ class LeadSegmentFilters implements \Iterator, \Countable
      *
      * @see  http://php.net/manual/en/iterator.current.php
      *
-     * @return LeadSegmentFilter
+     * @return ContactSegmentFilter
      */
     public function current()
     {
-        return $this->leadSegmentFilters[$this->position];
+        return $this->contactSegmentFilters[$this->position];
     }
 
     /**
@@ -88,7 +92,7 @@ class LeadSegmentFilters implements \Iterator, \Countable
      */
     public function valid()
     {
-        return isset($this->leadSegmentFilters[$this->position]);
+        return isset($this->contactSegmentFilters[$this->position]);
     }
 
     /**
@@ -110,7 +114,7 @@ class LeadSegmentFilters implements \Iterator, \Countable
      */
     public function count()
     {
-        return count($this->leadSegmentFilters);
+        return count($this->contactSegmentFilters);
     }
 
     /**

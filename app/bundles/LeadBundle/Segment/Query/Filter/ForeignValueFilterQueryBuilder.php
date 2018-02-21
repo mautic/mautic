@@ -10,7 +10,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
-use Mautic\LeadBundle\Segment\LeadSegmentFilter;
+use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
@@ -25,7 +25,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /** {@inheritdoc} */
-    public function applyQuery(QueryBuilder $queryBuilder, LeadSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         $filterOperator = $filter->getOperator();
 

@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-use Mautic\LeadBundle\Segment\LeadSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 class DateOptionParameters
 {
@@ -36,10 +36,10 @@ class DateOptionParameters
     private $includeMidnigh;
 
     /**
-     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
-     * @param array                  $relativeDateStrings
+     * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
+     * @param array                     $relativeDateStrings
      */
-    public function __construct(LeadSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
+    public function __construct(ContactSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
     {
         $this->hasTimePart     = $leadSegmentFilterCrate->hasTimeParts();
         $this->timeframe       = $this->parseTimeFrame($leadSegmentFilterCrate, $relativeDateStrings);
@@ -80,12 +80,12 @@ class DateOptionParameters
     }
 
     /**
-     * @param LeadSegmentFilterCrate $leadSegmentFilterCrate
-     * @param array                  $relativeDateStrings
+     * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
+     * @param array                     $relativeDateStrings
      *
      * @return string
      */
-    private function parseTimeFrame(LeadSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
+    private function parseTimeFrame(ContactSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
     {
         $key = array_search($leadSegmentFilterCrate->getFilter(), $relativeDateStrings, true);
 
