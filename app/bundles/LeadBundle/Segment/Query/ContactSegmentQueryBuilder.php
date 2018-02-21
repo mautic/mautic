@@ -68,7 +68,6 @@ class ContactSegmentQueryBuilder
 
         /** @var ContactSegmentFilter $filter */
         foreach ($contactSegmentFilters as $filter) {
-            dump($filter->__toString());
             $segmentIdArray = is_array($filter->getParameterValue()) ? $filter->getParameterValue() : [$filter->getParameterValue()];
 
             //  We will handle references differently than regular segments

@@ -1685,7 +1685,6 @@ class QueryBuilder
      */
     public function addLogic($expression, $glue)
     {
-        dump('add logic: '.$expression.', glue: '.$glue);
         if ($this->hasLogicStack() && $glue == 'and') {
             $this->addLogicStack($expression);
         } elseif ($this->hasLogicStack()) {

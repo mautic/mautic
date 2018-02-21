@@ -66,9 +66,8 @@ class ContactSegmentService
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
-        dump($queryBuilder->getLogicStack());
         $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
-        $queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubsribedQuery($queryBuilder, $segment->getId());
+        //$queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubsribedQuery($queryBuilder, $segment->getId());
 
         return $queryBuilder;
     }
