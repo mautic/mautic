@@ -254,4 +254,12 @@ class ContactSegmentFilter
     {
         return $this->getField() === 'leadlist';
     }
+
+    /**
+     * @return bool
+     */
+    public function isColumnTypeBoolean()
+    {
+        return $this->contactSegmentFilterCrate->getType() === 'boolean';
+    }
 }
