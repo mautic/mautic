@@ -11,6 +11,7 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
@@ -41,8 +42,6 @@ class ContactSegmentFilter
     private $schemaCache;
 
     /**
-     * ContactSegmentFilter constructor.
-     *
      * @param ContactSegmentFilterCrate   $contactSegmentFilterCrate
      * @param FilterDecoratorInterface    $filterDecorator
      * @param TableSchemaColumnsCache     $cache
@@ -261,5 +260,13 @@ class ContactSegmentFilter
     public function isColumnTypeBoolean()
     {
         return $this->contactSegmentFilterCrate->getType() === 'boolean';
+    }
+
+    /**
+     * @return DoNotContactParts
+     */
+    public function getDoNotContactParts()
+    {
+        return new DoNotContactParts($this->contactSegmentFilterCrate->getField());
     }
 }
