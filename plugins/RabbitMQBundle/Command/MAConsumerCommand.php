@@ -16,6 +16,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Model\StageModel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -90,9 +92,11 @@ class MAConsumerCommand extends ModeratedCommand
         $leadModel = $container->get('mautic.lead.model.lead');
         $fieldModel = $container->get('mautic.lead.model.field');
 
+        $stageModel = $container->get('mautic.stage.model.stage');
+
         $output->writeln('<info>[*] Waiting for messages. To exit press CTRL+C</info>');
 
-        $callback = function($msg) use ($output, $integrationObject, $leadModel, $fieldModel) {
+        $callback = function($msg) use ($output, $integrationObject, $leadModel, $fieldModel, $stageModel) {
             $output->writeln("<info>[x] " . date("Y-m-d H:i:s") . " Received message from '" . $msg->delivery_info['routing_key'] . "': " . $msg->body . "</info>");
 
             $lead = new Lead();
@@ -150,6 +154,13 @@ class MAConsumerCommand extends ModeratedCommand
                 }
                 // Save the lead.
                 $leadModel->setFieldValues($lead, $data);
+
+                // Adding stage to lead
+                if(isset($data['stage'])){
+                    $stage = $stageModel->getRepository()->find($data['stage']);
+                    $lead->setStage($stage);
+                }
+
                 $leadModel->saveEntity($lead, true, false);
             }
             $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);

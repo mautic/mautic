@@ -127,7 +127,7 @@ class SFConsumerCommand extends ModeratedCommand
 
         $callback = function($msg) use ($output, $integrationObject) {
             $output->writeln("<info>[x] " . date("Y-m-d H:i:s") . " Received message from '" . $msg->delivery_info['routing_key'] . "': " . $msg->body . "</info>");
-
+            
             // Decode the message.
             $leadFields = json_decode($msg->body, true);
 

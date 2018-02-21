@@ -65,6 +65,12 @@ class LeadSubscriber extends CommonSubscriber
             }
         }
 
+        //Adding stage name field separated because stage is merged to lead trough stage_id
+        if(!empty($lead['stage']))
+            $leadData['stage'] = $lead['stage']->getName();
+        else
+            $leadData['stage'] = '';
+
         $leadData = $integrationObject->formatData($leadData);
 
         // There is a solution for sending only the changed data.        
