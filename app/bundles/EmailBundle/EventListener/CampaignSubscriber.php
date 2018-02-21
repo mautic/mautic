@@ -272,7 +272,6 @@ class CampaignSubscriber extends CommonSubscriber
         $config  = $event->getConfig();
         $emailId = (int) $config['email'];
         $email   = $this->emailModel->getEntity($emailId);
-        $emailId = (int) $config['email'];
 
         if (!$email || !$email->isPublished()) {
             return $event->setFailed('Email not found or published');
