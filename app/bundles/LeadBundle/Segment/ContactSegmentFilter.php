@@ -16,9 +16,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 
 /**
- * Class ContactSegmentFilter
- *
- * @package Mautic\LeadBundle\Segment
+ * Class ContactSegmentFilter.
  */
 class ContactSegmentFilter
 {
@@ -55,8 +53,7 @@ class ContactSegmentFilter
         FilterDecoratorInterface $filterDecorator,
         TableSchemaColumnsCache $cache,
         FilterQueryBuilderInterface $filterQueryBuilder
-    )
-    {
+    ) {
         $this->contactSegmentFilterCrate = $contactSegmentFilterCrate;
         $this->filterDecorator           = $filterDecorator;
         $this->schemaCache               = $cache;
@@ -158,7 +155,7 @@ class ContactSegmentFilter
     }
 
     /**
-     * @todo remove this, create functions to replace need for this
+     * @TODO remove this, create functions to replace need for this
      *
      * @param null $field
      *
@@ -170,7 +167,7 @@ class ContactSegmentFilter
      */
     public function getCrate($field = null)
     {
-        $fields = (array)$this->toArray();
+        $fields = (array) $this->toArray();
 
         if (is_null($field)) {
             return $fields;
@@ -180,7 +177,7 @@ class ContactSegmentFilter
             return $fields[$field];
         }
 
-        throw new \Exception('Unknown crate field "' . $field . "'");
+        throw new \Exception('Unknown crate field "'.$field."'");
     }
 
     /**
@@ -209,11 +206,11 @@ class ContactSegmentFilter
         return $this->filterQueryBuilder;
     }
 
-
     /**
-     * String representation of the object
+     * String representation of the object.
      *
      * @return string
+     *
      * @throws \Exception
      */
     public function __toString()
@@ -247,9 +244,10 @@ class ContactSegmentFilter
     }
 
     /**
-     * Whether the filter references another ContactSegment
+     * Whether the filter references another ContactSegment.
      *
-     * @todo replace if not used
+     * @TODO replace if not used
+     *
      * @return bool
      */
     public function isContactSegmentReference()

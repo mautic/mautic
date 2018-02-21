@@ -98,7 +98,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 case 'in':
                 case 'regexp':
                 case 'notRegexp':
-                    //@todo this logic needs to
+                    //@TODO this logic needs to
                     if ($filterAggr) {
                         $queryBuilder->leftJoin(
                             $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
@@ -143,7 +143,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                             $filterParametersHolder
                         )
                     );
-                    break;
+                    break;  // Break will be performed only if the condition above matches
                 }
             case 'startsWith':
             case 'endsWith':

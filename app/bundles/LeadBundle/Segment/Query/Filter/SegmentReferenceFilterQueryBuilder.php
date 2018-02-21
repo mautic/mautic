@@ -72,6 +72,8 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
      *
      * @return QueryBuilder
      *
+     * @throws \Doctrine\DBAL\Query\QueryException
+     * @throws \Exception
      * @throws \Mautic\LeadBundle\Segment\Exception\SegmentQueryException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
@@ -113,15 +115,12 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
                     $expression = $queryBuilder->expr()->isNull($segmentAlias.'.id');
                 } else {
                     $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
-                    $orExpressions[] = $queryBuilder->expr()->isNotNull($segmentAlias.'.id');
+                    $expression = $queryBuilder->expr()->isNotNull($segmentAlias.'.id');
                 }
                 $queryBuilder->addSelect($segmentAlias.'.id as '.$segmentAlias.'_id');
+                $queryBuilder->addLogic($expression, $filter->getGlue());
             }
         }
-
-        $expression = isset($orExpressions) ? '('.join(' OR ', $orExpressions).')' : $expression;
-
-        $queryBuilder->addLogic($expression, $filter->getGlue());
 
         return $queryBuilder;
     }

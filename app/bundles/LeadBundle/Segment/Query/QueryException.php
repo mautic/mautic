@@ -27,10 +27,10 @@ use Doctrine\DBAL\DBALException;
 class QueryException extends DBALException
 {
     /**
-     * @param string $alias
-     * @param array  $registeredAliases
+     * @param $alias
+     * @param $registeredAliases
      *
-     * @return \Doctrine\DBAL\Query\QueryException
+     * @return QueryException
      */
     public static function unknownAlias($alias, $registeredAliases)
     {
@@ -40,10 +40,10 @@ class QueryException extends DBALException
     }
 
     /**
-     * @param string $alias
-     * @param array  $registeredAliases
+     * @param $alias
+     * @param $registeredAliases
      *
-     * @return \Doctrine\DBAL\Query\QueryException
+     * @return QueryException
      */
     public static function nonUniqueAlias($alias, $registeredAliases)
     {

@@ -12,15 +12,15 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilters;
+use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 
 /**
  * Class ContactSegmentQueryBuilder is responsible for building queries for segments.
  *
- * @todo add exceptions, remove related segments
+ * @TODO add exceptions, remove related segments
  */
 class ContactSegmentQueryBuilder
 {
@@ -68,6 +68,7 @@ class ContactSegmentQueryBuilder
 
         /** @var ContactSegmentFilter $filter */
         foreach ($contactSegmentFilters as $filter) {
+            dump($filter->__toString());
             $segmentIdArray = is_array($filter->getParameterValue()) ? $filter->getParameterValue() : [$filter->getParameterValue()];
 
             //  We will handle references differently than regular segments
@@ -115,6 +116,8 @@ class ContactSegmentQueryBuilder
      * @param QueryBuilder $qb
      *
      * @return QueryBuilder
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function wrapInCount(QueryBuilder $qb)
     {
@@ -147,7 +150,7 @@ class ContactSegmentQueryBuilder
      *
      * @param QueryBuilder $queryBuilder
      * @param              $segmentId
-     * @param              $whatever     @todo document this field
+     * @param              $whatever     @TODO document this field
      *
      * @return QueryBuilder
      */
@@ -233,7 +236,7 @@ class ContactSegmentQueryBuilder
     /**
      * @return LeadSegmentFilterDescriptor
      *
-     * @todo Remove this function
+     * @TODO Remove this function
      */
     public function getTranslator()
     {
@@ -245,7 +248,7 @@ class ContactSegmentQueryBuilder
      *
      * @return ContactSegmentQueryBuilder
      *
-     * @todo Remove this function
+     * @TODO Remove this function
      */
     public function setTranslator($translator)
     {
@@ -257,7 +260,7 @@ class ContactSegmentQueryBuilder
     /**
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
      *
-     * @todo Remove this function
+     * @TODO Remove this function
      */
     public function getSchema()
     {
@@ -269,7 +272,7 @@ class ContactSegmentQueryBuilder
      *
      * @return ContactSegmentQueryBuilder
      *
-     * @todo Remove this function
+     * @TODO Remove this function
      */
     public function setSchema($schema)
     {

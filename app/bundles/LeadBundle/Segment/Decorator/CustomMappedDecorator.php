@@ -102,6 +102,8 @@ class CustomMappedDecorator extends BaseDecorator
 
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|null|string
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

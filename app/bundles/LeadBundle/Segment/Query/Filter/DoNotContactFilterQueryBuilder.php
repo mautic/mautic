@@ -32,7 +32,7 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
-        //@todo look at this, the getCrate method is for debuggin only
+        //@TODO look at this, the getCrate method is for debuggin only
         $parts   = explode('_', $filter->getCrate('field'));
         $channel = 'email';
 

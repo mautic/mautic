@@ -20,8 +20,7 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Elastica\Exception\QueryBuilderException;
+use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
 /**
@@ -35,16 +34,11 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
  * even if some vendors such as MySQL support it.
  *
  * @see    www.doctrine-project.org
- *
- * @todo rework this to extend the original Query Builder instead of writing new one
- *
  * @since  2.1
  *
  * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Jan Kozak <galvani78@gmail.com>
- *
- * @todo extend standing class instead of redefining everything
  */
 class QueryBuilder
 {
@@ -226,6 +220,8 @@ class QueryBuilder
      * for insert, update and delete statements.
      *
      * @return \Doctrine\DBAL\Driver\Statement|int
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function execute()
     {
@@ -247,6 +243,8 @@ class QueryBuilder
      * </code>
      *
      * @return string the SQL query string
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function getSQL()
     {
@@ -1110,12 +1108,10 @@ class QueryBuilder
     }
 
     /**
-     * Sets SQL parts.
+     * @param $queryPartName
+     * @param $value
      *
-     * @param array $queryPartNames
-     * @param array $value
-     *
-     * @return $this this QueryBuilder instance
+     * @return $this
      */
     public function setQueryPart($queryPartName, $value)
     {
@@ -1145,7 +1141,7 @@ class QueryBuilder
     /**
      * @return string
      *
-     * @throws \Doctrine\DBAL\Query\QueryException
+     * @throws \Doctrine\DBAL\DBALException
      */
     private function getSQLForSelect()
     {
@@ -1169,7 +1165,9 @@ class QueryBuilder
     }
 
     /**
-     * @return string[]
+     * @return array
+     *
+     * @throws QueryException
      */
     private function getFromClauses()
     {
@@ -1259,10 +1257,9 @@ class QueryBuilder
     }
 
     /**
-     * Gets a string representation of this QueryBuilder which corresponds to
-     * the final SQL query being constructed.
+     * @return string
      *
-     * @return string the string representation of this QueryBuilder
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function __toString()
     {
@@ -1341,10 +1338,12 @@ class QueryBuilder
     }
 
     /**
-     * @param string $fromAlias
-     * @param array  $knownAliases
+     * @param       $fromAlias
+     * @param array $knownAliases
      *
      * @return string
+     *
+     * @throws QueryException
      */
     private function getSQLForJoins($fromAlias, array &$knownAliases)
     {
@@ -1411,7 +1410,7 @@ class QueryBuilder
     }
 
     /**
-     * @todo I need to rewrite it, it's no longer necessary like this, we have direct access to query parts
+     * @TODO I need to rewrite it, it's no longer necessary like this, we have direct access to query parts
      *
      * @param $alias
      * @param $expr
@@ -1441,7 +1440,7 @@ class QueryBuilder
     }
 
     /**
-     * @todo I need to rewrite it, it's no longer necessary like this, we have direct access to query parts
+     * @TODO I need to rewrite it, it's no longer necessary like this, we have direct access to query parts
      *
      * @param $alias
      * @param $expr
@@ -1616,7 +1615,9 @@ class QueryBuilder
     }
 
     /**
-     * @return mixed
+     * @return mixed|string
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function getDebugOutput()
     {
@@ -1675,7 +1676,7 @@ class QueryBuilder
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept).
      *
-     * @todo make this readable and explain
+     * @TODO make this readable and explain
      *
      * @param $expression
      * @param $glue
@@ -1684,6 +1685,7 @@ class QueryBuilder
      */
     public function addLogic($expression, $glue)
     {
+        dump('add logic: '.$expression.', glue: '.$glue);
         if ($this->hasLogicStack() && $glue == 'and') {
             $this->addLogicStack($expression);
         } elseif ($this->hasLogicStack()) {

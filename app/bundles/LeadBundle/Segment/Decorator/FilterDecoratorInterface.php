@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 /**
  * Interface FilterDecoratorInterface.
  *
- * @todo @petr document these functions please with phpdoc and meaningful description
+ * @TODO @petr document these functions please with phpdoc and meaningful description
  */
 interface FilterDecoratorInterface
 {

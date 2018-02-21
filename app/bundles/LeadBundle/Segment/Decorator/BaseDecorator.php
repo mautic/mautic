@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Segment\Decorator;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
+use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 
 /**
@@ -159,6 +160,8 @@ class BaseDecorator implements FilterDecoratorInterface
 
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return null|CompositeExpression|string
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

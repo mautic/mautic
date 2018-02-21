@@ -21,7 +21,7 @@ class DateDecorator extends CustomMappedDecorator
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @todo @petr please check this method
+     * @TODO @petr please check this method
      *
      * @throws \Exception
      */

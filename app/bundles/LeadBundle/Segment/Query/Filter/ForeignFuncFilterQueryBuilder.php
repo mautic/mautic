@@ -80,7 +80,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                 case 'lt':
                 case 'lte':
                 case 'in':
-                    //@todo this logic needs to
+                    //@TODO this logic needs to
                     if ($filterAggr) {
                         $queryBuilder->leftJoin(
                             $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),

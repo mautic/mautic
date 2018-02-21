@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\LeadListSegmentRepository;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Bridge\Monolog\Logger;
@@ -39,7 +38,6 @@ class ContactSegmentService
      */
     private $preparedQB;
 
-
     public function __construct(
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         ContactSegmentQueryBuilder $queryBuilder,
@@ -55,6 +53,7 @@ class ContactSegmentService
      * @param          $batchLimiters
      *
      * @return QueryBuilder
+     *
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
@@ -67,6 +66,7 @@ class ContactSegmentService
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
+        dump($queryBuilder->getLogicStack());
         $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
         $queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubsribedQuery($queryBuilder, $segment->getId());
 
@@ -98,6 +98,8 @@ class ContactSegmentService
         $qb = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
 
         $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
+
+        dump($qb->getLogicStack());
 
         $this->logger->debug('Segment QB: Create SQL: '.$qb->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
@@ -150,6 +152,7 @@ class ContactSegmentService
      * @param LeadList $segment
      *
      * @return QueryBuilder
+     *
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
@@ -174,6 +177,7 @@ class ContactSegmentService
      * @param LeadList $segment
      *
      * @return array
+     *
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
@@ -193,6 +197,7 @@ class ContactSegmentService
      * @param LeadList $segment
      *
      * @return array
+     *
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
