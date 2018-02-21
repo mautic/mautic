@@ -64,7 +64,6 @@ class ContactSegmentFilterFactory
 
         $filters = $leadList->getFilters();
         foreach ($filters as $filter) {
-            // ContactSegmentFilterCrate is for accessing $filter as an object
             $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
             $decorator = $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate);

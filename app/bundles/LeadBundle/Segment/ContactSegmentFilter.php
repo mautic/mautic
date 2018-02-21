@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 
 /**
- * Class ContactSegmentFilter.
+ * Class ContactSegmentFilter is used for accessing $filter as an object and to keep logic in an object.
  */
 class ContactSegmentFilter
 {
