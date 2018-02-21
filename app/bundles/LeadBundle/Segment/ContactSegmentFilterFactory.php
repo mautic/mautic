@@ -55,6 +55,7 @@ class ContactSegmentFilterFactory
      * @param LeadList $leadList
      *
      * @return ContactSegmentFilters
+     *
      * @throws \Exception
      */
     public function getSegmentFilters(LeadList $leadList)
@@ -82,7 +83,8 @@ class ContactSegmentFilterFactory
      * @param FilterDecoratorInterface  $decorator
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return object
+     * @return FilterQueryBuilderInterface
+     *
      * @throws \Exception
      */
     private function getQueryBuilderForFilter(FilterDecoratorInterface $decorator, ContactSegmentFilterCrate $contactSegmentFilterCrate)

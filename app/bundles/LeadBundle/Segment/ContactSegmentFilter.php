@@ -154,82 +154,11 @@ class ContactSegmentFilter
     }
 
     /**
-     * @TODO remove this, create functions to replace need for this
-     *
-     * @param null $field
-     *
-     * @return array|mixed
-     *
-     * @deprecated
-     *
-     * @throws \Exception
-     */
-    public function getCrate($field = null)
-    {
-        $fields = (array) $this->toArray();
-
-        if (is_null($field)) {
-            return $fields;
-        }
-
-        if (isset($fields[$field])) {
-            return $fields[$field];
-        }
-
-        throw new \Exception('Unknown crate field "'.$field."'");
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return [
-            'glue'     => $this->contactSegmentFilterCrate->getGlue(),
-            'field'    => $this->contactSegmentFilterCrate->getField(),
-            'object'   => $this->contactSegmentFilterCrate->getObject(),
-            'type'     => $this->contactSegmentFilterCrate->getType(),
-            'filter'   => $this->contactSegmentFilterCrate->getFilter(),
-            'display'  => $this->contactSegmentFilterCrate->getDisplay(),
-            'operator' => $this->contactSegmentFilterCrate->getOperator(),
-            'func'     => $this->contactSegmentFilterCrate->getFunc(),
-            'aggr'     => $this->getAggregateFunction(),
-        ];
-    }
-
-    /**
      * @return FilterQueryBuilderInterface
      */
     public function getFilterQueryBuilder()
     {
         return $this->filterQueryBuilder;
-    }
-
-    /**
-     * String representation of the object.
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    public function __toString()
-    {
-        if (!is_array($this->getParameterValue())) {
-            return sprintf('table:%s field:%s operator:%s holder:%s value:%s, crate:%s',
-                           $this->getTable(),
-                           $this->getField(),
-                           $this->getOperator(),
-                           $this->getParameterHolder('holder'),
-                           $this->getParameterValue(),
-                           print_r($this->getCrate(), true));
-        }
-
-        return sprintf('table:%s field:%s holder:%s value:%s, crate: %s',
-                       $this->getTable(),
-                       $this->getField(),
-                       print_r($this->getParameterHolder($this->getParameterValue()), true),
-                       print_r($this->getParameterValue(), true),
-                       print_r($this->getCrate(), true));
     }
 
     /**
