@@ -141,7 +141,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'description'     => 'mautic.email.campaign.event.send_descr',
                 'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType'        => 'emailsend_list',
-                'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
+                'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true, 'with_dnc_as_error'=> true],
                 'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
                 'channel'         => 'email',
                 'channelIdField'  => 'email',
@@ -272,6 +272,7 @@ class CampaignSubscriber extends CommonSubscriber
         $config  = $event->getConfig();
         $emailId = (int) $config['email'];
         $email   = $this->emailModel->getEntity($emailId);
+        $emailId = (int) $config['email'];
 
         if (!$email || !$email->isPublished()) {
             return $event->setFailed('Email not found or published');
@@ -285,7 +286,7 @@ class CampaignSubscriber extends CommonSubscriber
             'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
             'email_type'     => $type,
             'return_errors'  => true,
-            'dnc_as_error'   => true,
+            'dnc_as_error'   => (isset($config['dnc_as_error'])) ? $config['dnc_as_error'] : true,
         ];
 
         $event->setChannel('email', $emailId);

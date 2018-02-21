@@ -146,6 +146,23 @@ class EmailSendType extends AbstractType
                     'label' => 'mautic.email.send.preview.email',
                 ]
             );
+            if (!empty($options['with_dnc_as_error'])) {
+                $builder->add(
+                    'dnc_as_error',
+                    'yesno_button_group',
+                    [
+                        'label'      => 'mautic.email.send.dnc.as.error',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'     => 'form-control',
+                            'tooltip'   => 'mautic.email.send.dnc.as.error.tooltip',
+                        ],
+                        'data'     => isset($options['data']['dnc_as_error']) ? $options['data']['dnc_as_error'] : true,
+                        'required' => false,
+                    ]
+                );
+            }
+
             if (!empty($options['with_email_types'])) {
                 $data = (!isset($options['data']['priority'])) ? 2 : (int) $options['data']['priority'];
                 $builder->add(
@@ -195,11 +212,12 @@ class EmailSendType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'with_email_types' => false,
+                'with_email_types'  => false,
+                'with_dnc_as_error' => false,
             ]
         );
 
-        $resolver->setDefined(['update_select', 'with_email_types']);
+        $resolver->setDefined(['update_select', 'with_email_types', 'with_dnc_as_error']);
     }
 
     /**
