@@ -51,10 +51,6 @@ EOT
                         'The ID for a specifc channel to process broadcasts for pending contacts.'
                     ),
                     new InputOption(
-                        'segment-id', 'si', InputOption::VALUE_OPTIONAL,
-                        'The ID for a specifc segment to filter recipients.'
-                    ),
-                    new InputOption(
                         'min-contact-id', 'minci', InputOption::VALUE_OPTIONAL,
                         'Min contact ID to filter recipients.'
                     ),
@@ -88,7 +84,6 @@ EOT
         $channelId    = $input->getOption('id');
         $limit        = $input->getOption('limit');
         $batch        = $input->getOption('batch');
-        $segmentId    = $input->getOption('segment-id');
         $minContactId = $input->getOption('min-contact-id');
         $maxContactId = $input->getOption('max-contact-id');
         $key          = $channel.$channelId;
@@ -107,10 +102,6 @@ EOT
         $event->setBatch($batch);
         $event->setMinContactIdFilter($minContactId);
         $event->setMaxContactIdFilter($maxContactId);
-
-        if ($segmentId) {
-            $event->addSegmentFilter($this->getContainer()->get('mautic.lead.model.list')->getEntity($segmentId));
-        }
 
         $dispatcher->dispatch(ChannelEvents::CHANNEL_BROADCAST, $event);
 

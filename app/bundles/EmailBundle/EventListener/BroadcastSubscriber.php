@@ -79,7 +79,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
             $emailEntity                                            = $email[0];
             list($sentCount, $failedCount, $failedRecipientsByList) = $this->model->sendEmailToLists(
                 $emailEntity,
-                $event->getSegmentFilter(),
+                null,
                 $event->getLimit(),
                 $event->getBatch(),
                 $event->getOutput(),

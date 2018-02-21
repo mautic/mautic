@@ -11,7 +11,6 @@
 
 namespace Mautic\ChannelBundle\Event;
 
-use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -45,13 +44,6 @@ class ChannelBroadcastEvent extends Event
      * @var OutputInterface
      */
     protected $output;
-
-    /**
-     * Leave blank if you want to send to all segments defined in the channel entity at once.
-     *
-     * @var array of LeadList objects
-     */
-    private $segmentFilter = [];
 
     /**
      * Min contact ID filter can be used for process parallelization.
@@ -153,22 +145,6 @@ class ChannelBroadcastEvent extends Event
     public function getOutput()
     {
         return $this->output;
-    }
-
-    /**
-     * @param LeadList $segment
-     */
-    public function addSegmentFilter(LeadList $segment)
-    {
-        $this->segmentFilter[] = $segment;
-    }
-
-    /**
-     * @return array of LeadList objects
-     */
-    public function getSegmentFilter()
-    {
-        return $this->segmentFilter;
     }
 
     /**
