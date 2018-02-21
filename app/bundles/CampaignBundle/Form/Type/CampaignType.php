@@ -112,7 +112,6 @@ class CampaignType extends AbstractType
             $builder->setAction($options['action']);
         }
 
-        echo $options['action'];
         $builder->add('buttons', 'form_buttons', [
             'pre_extra_buttons' => [
                 [
