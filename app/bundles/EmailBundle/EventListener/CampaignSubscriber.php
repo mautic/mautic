@@ -294,7 +294,7 @@ class CampaignSubscriber extends CommonSubscriber
             'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
             'email_type'     => $type,
             'return_errors'  => true,
-            'dnc_as_error'   => $this->coreParametersHelper->getParameter('campaign_dnc_as_error', true),
+            'dnc_as_error'   => (bool) $this->coreParametersHelper->getParameter('campaign_dnc_as_error', true),
         ];
 
         $event->setChannel('email', $emailId);
@@ -311,11 +311,10 @@ class CampaignSubscriber extends CommonSubscriber
         if (empty($stats)) {
             $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
         }
-
         if (is_array($emailSent)) {
             // supress error log
-            if (empty($emailSent) && !$this->coreParametersHelper->getParameter('campaign_dnc_as_error', true)) {
-                $emailSent = false;
+            if (empty($emailSent) && empty($this->coreParametersHelper->getParameter('campaign_dnc_as_error', true))) {
+                return false;
             } else {
                 $errors = implode('<br />', $emailSent);
 
@@ -331,6 +330,7 @@ class CampaignSubscriber extends CommonSubscriber
                     'errors' => $emailSent,
                 ];
         }
+        print_r($emailSent);
 
         return $event->setResult($emailSent);
     }
