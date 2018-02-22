@@ -40,5 +40,6 @@ class SegmentsTester extends \Codeception\Actor
         $I->canSeeInCurrentUrl(getenv('MAUTIC_ENV').DashboardPage::$URL);
 
         $I->saveSessionSnapshot('login');
+        $I->runShellCommand('php app/console mautic:segments:update');
     }
 }

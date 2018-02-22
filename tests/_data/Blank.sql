@@ -3634,7 +3634,7 @@ CREATE TABLE `mautic_users` (
 
 LOCK TABLES `mautic_users` WRITE;
 /*!40000 ALTER TABLE `mautic_users` DISABLE KEYS */;
-INSERT INTO `mautic_users` VALUES (1,1,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'admin','$2y$13$Nr5bZ3qFsQSAej0qXmUiP.6WeOmCfsMZ73wRcr1lXGWKOdckNtMQS','Automated','User','automateduser@mautic.com',NULL,'','',NULL,NULL,'offline','a:0:{}',NULL);
+INSERT INTO `mautic_users` VALUES (1,1,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'admin','$2y$13$wm7FvGLm8yxudx1E8.ruvOuIktBLq0MVTTd5I1Tct9uRIbD6ARAY.','Automated','User','automateduser@mautic.com',NULL,'','','2018-02-22 03:10:33','2018-02-22 03:10:33','online','a:0:{}',NULL);
 /*!40000 ALTER TABLE `mautic_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3840,7 +3840,7 @@ CREATE TABLE `mautic_widgets` (
   `ordering` int(11) DEFAULT NULL,
   `params` longtext COLLATE utf8_unicode_ci COMMENT '(DC2Type:array)',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3849,6 +3849,7 @@ CREATE TABLE `mautic_widgets` (
 
 LOCK TABLES `mautic_widgets` WRITE;
 /*!40000 ALTER TABLE `mautic_widgets` DISABLE KEYS */;
+INSERT INTO `mautic_widgets` VALUES (1,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Contacts created','created.leads.in.time',100,330,NULL,0,'a:1:{s:5:\"lists\";s:21:\"identifiedVsAnonymous\";}'),(2,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Contact map','map.of.leads',75,445,NULL,1,'a:0:{}'),(3,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Top lists','top.lists',25,445,NULL,2,'a:0:{}'),(4,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Visits','page.hits.in.time',100,330,NULL,3,'a:0:{}'),(5,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Emails sent / opened','emails.in.time',100,330,NULL,4,'a:0:{}'),(6,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Unique/returning visitors','unique.vs.returning.leads',25,215,NULL,5,'a:0:{}'),(7,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Ignored/opened emails','ignored.vs.read.emails',25,215,NULL,6,'a:0:{}'),(8,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Identified vs anonymous leads','anonymous.vs.identified.leads',25,215,NULL,7,'a:0:{}'),(9,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Dwell times','dwell.times',25,215,NULL,8,'a:0:{}'),(10,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Recent activity','recent.activity',50,330,NULL,9,'a:0:{}'),(11,1,'2018-02-22 03:10:34',1,'Automated User',NULL,NULL,NULL,NULL,NULL,NULL,'Upcoming Emails','upcoming.emails',50,330,NULL,10,'a:0:{}');
 /*!40000 ALTER TABLE `mautic_widgets` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -3861,4 +3862,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-08  1:23:08
+-- Dump completed on 2018-02-21 21:11:34
