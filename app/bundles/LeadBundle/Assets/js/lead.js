@@ -797,7 +797,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
             html = mQuery('#field-templates .default_template_text').html();
             tempType = 'text';
 
-            if (selectedVal == 'currency' || selectedVal == 'number' || selectedVal == 'tel' || selectedVal == 'url' || selectedVal == 'email') {
+            if (selectedVal == 'money' || selectedVal == 'number' || selectedVal == 'tel' || selectedVal == 'url' || selectedVal == 'email') {
                 var replace = 'type="text"';
                 var regex = new RegExp(replace, "g");
                 html = html.replace(regex, 'type="' + selectedVal + '"');

@@ -81,7 +81,8 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
                                 'no'  => isset($properties['no']) ? $properties['no'] : '',
                             ]);
                             break;
-                        case 'currency':
+                        case 'money':
+                            // @todo - Support options like currency, divisor and scale (up to 4).
                         case 'number':
                             echo $view->render('MauticLeadBundle:Field:properties_number.html.php', [
                                 'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',

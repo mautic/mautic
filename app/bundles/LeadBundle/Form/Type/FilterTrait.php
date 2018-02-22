@@ -263,7 +263,7 @@ trait FilterTrait
                 break;
             case 'lookup':
             default:
-                if ('number' !== $fieldType && 'currency' !== $fieldType) {
+                if ('number' !== $fieldType && 'money' !== $fieldType) {
                     $attr = array_merge(
                         $attr,
                         [

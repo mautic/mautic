@@ -78,10 +78,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'email' => [
             'properties' => [],
         ],
-        'currency' => [
+        'money' => [
             'properties' => [
-                'roundmode' => [],
-                'precision' => [],
+                'scale' => [],
             ],
         ],
         'number' => [

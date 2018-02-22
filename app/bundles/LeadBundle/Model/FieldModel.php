@@ -127,8 +127,8 @@ class FieldModel extends FormModel
             'object'   => 'lead',
         ],
         'attribution' => [
-            'type'       => 'currency',
-            'properties' => ['roundmode' => 4, 'precision' => 2],
+            'type'       => 'money',
+            'properties' => ['scale' => 4],
             'fixed'      => true,
             'listable'   => true,
             'object'     => 'lead',
@@ -943,7 +943,7 @@ class FieldModel extends FormModel
             case 'boolean':
                 $schemaType = $type;
                 break;
-            case 'currency':
+            case 'money':
                 $options['precision'] = 19;
                 $options['scale'] = 4;
                 $schemaType = 'decimal';

@@ -126,7 +126,7 @@ class CompanyReportData
                 case 'email':
                     $type = 'email';
                     break;
-                case 'currency':
+                case 'money':
                     $type = 'decimal';
                     break;
                 case 'number':

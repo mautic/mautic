@@ -157,7 +157,7 @@ trait RequestTrait
                     }
                 }
                 break;
-            case 'currency':
+            case 'money':
                 $fieldData[$leadField['alias']] = filter_var($fieldData[$leadField['alias']], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
                 break;
             case 'number':

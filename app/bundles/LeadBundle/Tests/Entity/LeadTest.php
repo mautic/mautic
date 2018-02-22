@@ -197,10 +197,10 @@ class LeadTest extends \PHPUnit_Framework_TestCase
                     'type'  => 'number',
                     'value' => '1234',
                 ],
-                'currency' => [
-                    'alias' => 'currency',
-                    'label' => 'Currency',
-                    'type'  => 'currency',
+                'money' => [
+                    'alias' => 'money',
+                    'label' => 'Money',
+                    'type'  => 'money',
                     'value' => '1234.56',
                 ],
             ],
@@ -208,16 +208,16 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $data = [
             'boolean' => null,
             'number'  => null,
-            'currency'=> null,
+            'money'=> null,
         ];
 
         $this->cleanFields($data, $fields['core']['boolean']);
         $this->cleanFields($data, $fields['core']['number']);
-        $this->cleanFields($data, $fields['core']['currency']);
+        $this->cleanFields($data, $fields['core']['money']);
 
         $this->assertEquals(null, $data['boolean']);
         $this->assertEquals(null, $data['number']);
-        $this->assertEquals(null, $data['currency']);
+        $this->assertEquals(null, $data['money']);
     }
 
     public function testAttributionDateIsAdded()

@@ -62,7 +62,7 @@ trait EntityFieldsBuildFormTrait
             }
 
             switch ($type) {
-                case 'currency':
+                case 'money':
                     $attr['preaddon'] = 'fa fa-money';
                 case 'number':
                     if (empty($properties['precision'])) {
