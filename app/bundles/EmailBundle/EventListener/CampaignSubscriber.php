@@ -327,7 +327,6 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         $emailSent['campaign_disable_dnc_error'] = $this->coreParametersHelper->getParameter('campaign_disable_dnc_error', false);
-        $emailSent['campaign_disable_dnc_error'] = false;
 
         return $event->setResult($emailSent);
     }
