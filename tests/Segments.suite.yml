@@ -10,10 +10,10 @@ modules:
              dsn: 'mysql:host=%DB_HOST%;dbname=%DB_NAME%;port=%DB_PORT%'
              user: '%DB_USER%'
              password: '%DB_PASSWD%'
-             dump: tests/_data/Beta_Blank.sql
+             dump: tests/_data/Blank.sql
              #restart: true
-             #populate: true
-             #cleanup: false
+             populate: true
+             cleanup: false
              #reconnect: true
         - Asserts:
         - Cli:
