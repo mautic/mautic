@@ -64,10 +64,10 @@ trait EntityFieldsBuildFormTrait
             switch ($type) {
                 case 'money':
                     if (empty($properties['precision'])) {
-                        $properties['scale'] = 4;
+                        $properties['precision'] = 4;
                     }
                     else {
-                        $properties['scale'] = max((int) $properties['precision'], 4);
+                        $properties['precision'] = max((int) $properties['precision'], 4);
                     }
 
                     if ('' === $value) {
