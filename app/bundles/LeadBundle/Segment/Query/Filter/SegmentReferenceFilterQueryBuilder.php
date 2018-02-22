@@ -98,7 +98,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 //  If the segment contains no filters; it means its for manually subscribed only
                 if (count($filters)) {
-                    $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubsribedQuery($segmentQueryBuilder, $contactSegment->getId());
+                    $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
                 }
 
                 $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
