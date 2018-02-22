@@ -240,7 +240,7 @@ return [
         ],
     ],
     'parameters' => [
-        'campaign_time_wait_on_event_false' => 'PT1H',
-        'campaign_dnc_as_error'             => true,
+        'campaign_time_wait_on_event_false'      => 'PT1H',
+        'campaign_disable_dnc_error'             => false,
     ],
 ];
