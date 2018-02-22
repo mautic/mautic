@@ -82,7 +82,11 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
                             ]);
                             break;
                         case 'money':
-                            // @todo - Support options like currency, divisor and scale (up to 4).
+                            echo $view->render('MauticLeadBundle:Field:properties_money.html.php', [
+                                'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',
+                                'precision' => isset($properties['precision']) ? $properties['precision'] : '',
+                            ]);
+                            break;
                         case 'number':
                             echo $view->render('MauticLeadBundle:Field:properties_number.html.php', [
                                 'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',
@@ -187,6 +191,7 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
         <?php echo $defaultSelectTemplate; ?>
     </div>
 <?php
+    echo $view->render('MauticLeadBundle:Field:properties_money.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_number.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [

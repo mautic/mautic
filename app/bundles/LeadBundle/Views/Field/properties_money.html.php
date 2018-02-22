@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -12,8 +12,8 @@
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 
 $roundMode = (isset($roundMode)) ? $roundMode : '';
-$precision = (isset($precision)) ? $precision : '';
-$maxPrecision = (isset($maxPrecision)) ? $maxPrecision : '';
+$precision = (isset($precision)) ? $precision : '2';
+$maxPrecision = (isset($maxPrecision)) ? $maxPrecision : '4';
 
 $options = [
     NumberToLocalizedStringTransformer::ROUND_UP        => 'mautic.lead.field.form.number.roundup',
@@ -24,16 +24,16 @@ $options = [
 ];
 ?>
 
-<div class="number money">
+<div class="money">
     <div class="row">
         <div class="form-group col-xs-12 col-sm-8 col-md-6">
             <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.field.form.properties.numberrounding'); ?></label>
             <div class="input-group">
                 <select class="form-control not-chosen" autocomplete="false" name="leadfield[properties][roundmode]">
                     <?php foreach ($options as $v => $l): ?>
-                    <option value="<?php echo $view->escape($v); ?>"<?php if ($roundMode == $v) {
-    echo ' selected="selected"';
-} ?>><?php echo $view['translator']->trans($l); ?></option>
+                        <option value="<?php echo $view->escape($v); ?>"<?php if ($roundMode == $v) {
+                            echo ' selected="selected"';
+                        } ?>><?php echo $view['translator']->trans($l); ?></option>
                     <?php endforeach; ?>
                 </select>
 

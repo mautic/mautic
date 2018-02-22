@@ -63,7 +63,35 @@ trait EntityFieldsBuildFormTrait
 
             switch ($type) {
                 case 'money':
+                    if (empty($properties['precision'])) {
+                        $properties['scale'] = 4;
+                    }
+                    else {
+                        $properties['scale'] = max((int) $properties['precision'], 4);
+                    }
+
+                    if ('' === $value) {
+                        // Prevent transform errors
+                        $value = null;
+                    }
+
                     $attr['preaddon'] = 'fa fa-money';
+                    $builder->add(
+                        $alias,
+                        $type,
+                        [
+                            'required'      => $required,
+                            'label'         => $field['label'],
+                            'label_attr'    => ['class' => 'control-label'],
+                            'attr'          => $attr,
+                            'data'          => (null !== $value) ? filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) : $value,
+                            'mapped'        => $mapped,
+                            'constraints'   => $constraints,
+                            'scale'         => $properties['precision'],
+                            'currency'      => false,
+                        ]
+                    );
+                    break;
                 case 'number':
                     if (empty($properties['precision'])) {
                         $properties['precision'] = null;
