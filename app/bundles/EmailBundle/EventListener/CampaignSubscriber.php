@@ -312,15 +312,15 @@ class CampaignSubscriber extends CommonSubscriber
                 'errors' => $errors,
             ];
         } elseif (true !== $emailSent) {
-            // DNC to notification
-            if ($options['dnc_as_error']) {
-                $emailSent = [
+            $emailSent = [
                     'result' => false,
                     'errors' => $emailSent,
                 ];
-            } else {
-                $emailSent = false;
-            }
+        }
+
+        //  False result, but without failed notification
+        if (true !== $emailSent && !$options['dnc_as_error']) {
+            $emailSent = false;
         }
 
         return $event->setResult($emailSent);
