@@ -459,7 +459,7 @@ class LeadModel extends FormModel
      * @param Lead $entity
      * @param bool $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true, $dispatch = true)
     {
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
@@ -502,7 +502,13 @@ class LeadModel extends FormModel
 
         $this->setEntityDefaultValues($entity);
 
-        parent::saveEntity($entity, $unlock);
+        if($dispatch){
+            parent::saveEntity($entity, $unlock);
+        } else {
+            $isNew = $this->isNewEntity($entity);
+            parent::setTimestamps($entity, $isNew, $unlock);
+            parent::getRepository()->saveEntity($entity);
+        }
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
@@ -516,7 +522,7 @@ class LeadModel extends FormModel
     /**
      * @param object $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity, $dispatch = true)
     {
         // Delete custom avatar if one exists
         $imageDir = $this->pathsHelper->getSystemPath('images', true);
@@ -526,7 +532,13 @@ class LeadModel extends FormModel
             unlink($avatar);
         }
 
-        parent::deleteEntity($entity);
+        if($dispatch){
+            parent::deleteEntity($entity);
+        } else {
+            $id = $entity->getId();
+            $this->getRepository()->deleteEntity($entity);
+            $entity->deletedId = $id;
+        }
     }
 
     /**
@@ -1333,7 +1345,7 @@ class LeadModel extends FormModel
      *
      * @return Lead
      */
-    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
+    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true, $dispatch = true)
     {
         $this->logger->debug('LEAD: Merging leads');
 
@@ -1406,7 +1418,7 @@ class LeadModel extends FormModel
         $this->modifyTags($mergeWith, $addTags, null, false);
 
         //save the updated lead
-        $this->saveEntity($mergeWith, false);
+        $this->saveEntity($mergeWith, false, $dispatch);
 
         // Update merge records for the lead about to be deleted
         $this->getMergeRecordRepository()->moveMergeRecord($mergeFrom->getId(), $mergeWith->getId());
@@ -1417,7 +1429,7 @@ class LeadModel extends FormModel
             ->setDateAdded()
             ->setName($mergeFrom->getPrimaryIdentifier())
             ->setMergedId($mergeFrom->getId());
-        $this->getMergeRecordRepository()->saveEntity($mergeRecord);
+        $this->getMergeRecordRepository()->saveEntity($mergeRecord, true, $dispatch);
 
         //post merge events
         if ($this->dispatcher->hasListeners(LeadEvents::LEAD_POST_MERGE)) {
@@ -1425,7 +1437,7 @@ class LeadModel extends FormModel
         }
 
         //delete the old
-        $this->deleteEntity($mergeFrom);
+        $this->deleteEntity($mergeFrom, $dispatch);
 
         //return the merged lead
         return $mergeWith;
