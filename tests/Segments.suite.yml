@@ -14,8 +14,6 @@ modules:
              #restart: true
              populate: true
              cleanup: false
-             #populate: true
-             #cleanup: false
              #reconnect: true
         - Asserts:
         - Cli:

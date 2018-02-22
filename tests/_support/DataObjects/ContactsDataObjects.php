@@ -260,19 +260,18 @@ class ContactsDataObjects
     private function fillContactCompanyState(\ContactsTester $I, $state)
     {
         if (isset($state)) {
-//            $I->click($this->contactPageObject['companyStateField']);
+            $I->click($this->contactPageObject['companyStateField']);
             if ($state == 'CA') {
-                $I->fillField('company[companystate]', 'adsfadfa');
-                $I->fillField('company[companystate]', 'California');
-//                $I->click(str_replace('$', '6', $this->contactPageObject['companyStateOption']));
+//                $I->fillField('company[companystate]', 'California');
+                $I->click(str_replace('$', '6', $this->contactPageObject['companyStateOption']));
             }
             if ($state == 'FL') {
-                $I->fillField('company[companystate]', 'Florida');
-//                $I->click(str_replace('$', '10', $this->contactPageObject['companyStateOption']));
+//                $I->fillField('company[companystate]', 'Florida');
+                $I->click(str_replace('$', '10', $this->contactPageObject['companyStateOption']));
             }
             if ($state == 'MA') {
-                $I->fillField('company[companystate]', 'Massachusetts');
-//                $I->click(str_replace('$', '22', $this->contactPageObject['companyStateOption']));
+//                $I->fillField('company[companystate]', 'Massachusetts');
+                $I->click(str_replace('$', '22', $this->contactPageObject['companyStateOption']));
             }
         }
     }
