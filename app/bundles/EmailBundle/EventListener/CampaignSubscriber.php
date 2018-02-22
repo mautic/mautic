@@ -17,7 +17,6 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -60,32 +59,24 @@ class CampaignSubscriber extends CommonSubscriber
     private $sendEmailToUser;
 
     /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @param LeadModel            $leadModel
-     * @param EmailModel           $emailModel
-     * @param EventModel           $eventModel
-     * @param MessageQueueModel    $messageQueueModel
-     * @param SendEmailToUser      $sendEmailToUser
-     * @param CoreParametersHelper $coreParametersHelper
+     * @param LeadModel         $leadModel
+     * @param EmailModel        $emailModel
+     * @param EventModel        $eventModel
+     * @param MessageQueueModel $messageQueueModel
+     * @param SendEmailToUser   $sendEmailToUser
      */
     public function __construct(
         LeadModel $leadModel,
         EmailModel $emailModel,
         EventModel $eventModel,
         MessageQueueModel $messageQueueModel,
-        SendEmailToUser $sendEmailToUser,
-        CoreParametersHelper $coreParametersHelper
+        SendEmailToUser $sendEmailToUser
     ) {
-        $this->leadModel            = $leadModel;
-        $this->emailModel           = $emailModel;
-        $this->campaignEventModel   = $eventModel;
-        $this->messageQueueModel    = $messageQueueModel;
-        $this->sendEmailToUser      = $sendEmailToUser;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->leadModel          = $leadModel;
+        $this->emailModel         = $emailModel;
+        $this->campaignEventModel = $eventModel;
+        $this->messageQueueModel  = $messageQueueModel;
+        $this->sendEmailToUser    = $sendEmailToUser;
     }
 
     /**
@@ -158,20 +149,20 @@ class CampaignSubscriber extends CommonSubscriber
         );
 
         $event->addDecision(
-                'email.reply',
-                [
-                    'label'                  => 'mautic.email.campaign.event.reply',
-                    'description'            => 'mautic.email.campaign.event.reply_descr',
-                    'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-                    'connectionRestrictions' => [
-                        'source' => [
-                            'action' => [
-                                'email.send',
-                            ],
+            'email.reply',
+            [
+                'label'                  => 'mautic.email.campaign.event.reply',
+                'description'            => 'mautic.email.campaign.event.reply_descr',
+                'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'connectionRestrictions' => [
+                    'source' => [
+                        'action' => [
+                            'email.send',
                         ],
                     ],
-                ]
-            );
+                ],
+            ]
+        );
 
         $event->addAction(
             'email.send.to.user',
@@ -294,7 +285,7 @@ class CampaignSubscriber extends CommonSubscriber
             'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
             'email_type'     => $type,
             'return_errors'  => true,
-            'dnc_as_error'   => (bool) $this->coreParametersHelper->getParameter('campaign_dnc_as_error', true),
+            'dnc_as_error'   => true,
         ];
 
         $event->setChannel('email', $emailId);
@@ -311,26 +302,21 @@ class CampaignSubscriber extends CommonSubscriber
         if (empty($stats)) {
             $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
         }
-        if (is_array($emailSent)) {
-            // supress error log
-            if (empty($emailSent) && empty($this->coreParametersHelper->getParameter('campaign_dnc_as_error', true))) {
-                return false;
-            } else {
-                $errors = implode('<br />', $emailSent);
 
-                // Add to the metadata of the failed event
-                $emailSent = [
-                    'result' => false,
-                    'errors' => $errors,
-                ];
-            }
+        if (is_array($emailSent)) {
+            $errors = implode('<br />', $emailSent);
+
+            // Add to the metadata of the failed event
+            $emailSent = [
+                'result' => false,
+                'errors' => $errors,
+            ];
         } elseif (true !== $emailSent) {
             $emailSent = [
-                    'result' => false,
-                    'errors' => $emailSent,
-                ];
+                'result' => false,
+                'errors' => $emailSent,
+            ];
         }
-        print_r($emailSent);
 
         return $event->setResult($emailSent);
     }
