@@ -99,6 +99,17 @@ class TwilioIntegration extends AbstractIntegration
                     ],
                 ]
             );
+            $builder->add(
+                'disable_trackable_urls',
+                'yesno_button_group',
+                [
+                    'label' => 'mautic.sms.config.form.sms.disable_trackable_urls',
+                    'attr'  => [
+                        'tooltip' => 'mautic.sms.config.form.sms.disable_trackable_urls.tooltip',
+                    ],
+                    'data'=> !empty($data['disable_trackable_urls']) ? true : false,
+                ]
+            );
             $builder->add('frequency_number', 'number',
                 [
                     'precision'  => 0,
@@ -124,18 +135,6 @@ class TwilioIntegration extends AbstractIntegration
                         'class' => 'form-control frequency',
                     ],
                 ]);
-
-            $builder->add(
-                'disable_trackable_urls',
-                'yesno_button_group',
-                [
-                    'label' => 'mautic.sms.config.form.sms.disable_trackable_urls',
-                    'attr'  => [
-                        'tooltip' => 'mautic.sms.config.form.sms.disable_trackable_urls.tooltip',
-                    ],
-                    'data'=> !empty($data['disable_trackable_urls']) ? true : false,
-                ]
-            );
         }
     }
 }
