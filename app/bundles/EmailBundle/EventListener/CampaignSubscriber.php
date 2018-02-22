@@ -322,7 +322,6 @@ class CampaignSubscriber extends CommonSubscriber
                     'errors' => $emailSent,
                 ];
         }
-        print_r($emailSent);
 
         return $event->setResult($emailSent);
     }
