@@ -55,6 +55,21 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
+
+        $builder->add(
+                'campaign_dnc_as_error',
+                'yesno_button_group',
+                [
+                    'label'      => 'mautic.campaignconfig.campaign_send_email_dnc_error',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'     => 'form-control',
+                        'tooltip'   => 'mautic.campaignconfig.campaign_send_email_dnc_error.tooltip',
+                    ],
+                    'data'     => isset($options['data']['dnc_as_error']) ? $options['data']['dnc_as_error'] : true,
+                    'required' => false,
+                ]
+            );
     }
 
     /**

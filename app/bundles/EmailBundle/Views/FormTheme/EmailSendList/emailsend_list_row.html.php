@@ -11,26 +11,21 @@
 ?>
 
 <div class="row">
-    <div class="col-xs-<?php echo isset($form['dnc_as_error']) ? 6 : 12; ?>">
+    <div class="col-xs-<?php echo isset($form['email_type']) ? 7 : 12; ?>">
         <?php echo $view['form']->row($form['email']); ?>
     </div>
-    <?php if (isset($form['dnc_as_error'])): ?>
-        <div class="col-xs-6">
-            <?php echo $view['form']->row($form['dnc_as_error']); ?>
-        </div>
-    <?php endif; ?>
     <?php if (isset($form['email_type'])): ?>
         <div class="col-xs-5">
             <?php echo $view['form']->row($form['email_type']); ?>
         </div>
     <?php endif; ?>
     <?php if (isset($form['priority'])): ?>
-        <div id="priority" class="col-xs-3 queue_hide">
+        <div id="priority" class="col-xs-5 queue_hide">
             <?php echo $view['form']->row($form['priority']); ?>
         </div>
     <?php endif; ?>
     <?php if (isset($form['attempts'])): ?>
-        <div id="attempts" class="col-xs-3 queue_hide">
+        <div id="attempts" class="col-xs-5 queue_hide">
             <?php echo $view['form']->row($form['attempts']); ?>
         </div>
     <?php endif; ?>
