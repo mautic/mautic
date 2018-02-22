@@ -146,7 +146,6 @@ class EmailSendType extends AbstractType
                     'label' => 'mautic.email.send.preview.email',
                 ]
             );
-
             if (!empty($options['with_email_types'])) {
                 $data = (!isset($options['data']['priority'])) ? 2 : (int) $options['data']['priority'];
                 $builder->add(
@@ -196,7 +195,7 @@ class EmailSendType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'with_email_types'  => false,
+                'with_email_types' => false,
             ]
         );
 
