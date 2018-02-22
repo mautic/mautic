@@ -11,11 +11,11 @@
 ?>
 
 <div class="row">
-    <div class="col-xs-<?php echo isset($form['dnc_as_error']) ? 7 : 12; ?>">
+    <div class="col-xs-<?php echo isset($form['dnc_as_error']) ? 6 : 12; ?>">
         <?php echo $view['form']->row($form['email']); ?>
     </div>
     <?php if (isset($form['dnc_as_error'])): ?>
-        <div class="col-xs-5">
+        <div class="col-xs-6">
             <?php echo $view['form']->row($form['dnc_as_error']); ?>
         </div>
     <?php endif; ?>
