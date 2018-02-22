@@ -98,7 +98,7 @@ class ContactSegmentService
 
         $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
 
-        dump($qb->getLogicStack());
+        //dump($qb->getLogicStack());
 
         $this->logger->debug('Segment QB: Create SQL: '.$qb->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
