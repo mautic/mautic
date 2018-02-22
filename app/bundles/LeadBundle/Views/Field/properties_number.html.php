@@ -13,7 +13,6 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStrin
 
 $roundMode = (isset($roundMode)) ? $roundMode : '';
 $precision = (isset($precision)) ? $precision : '';
-$maxPrecision = (isset($maxPrecision)) ? $maxPrecision : '';
 
 $options = [
     NumberToLocalizedStringTransformer::ROUND_UP        => 'mautic.lead.field.form.number.roundup',
@@ -24,7 +23,7 @@ $options = [
 ];
 ?>
 
-<div class="number money">
+<div class="number">
     <div class="row">
         <div class="form-group col-xs-12 col-sm-8 col-md-6">
             <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.field.form.properties.numberrounding'); ?></label>
@@ -46,7 +45,7 @@ $options = [
         <div class="form-group col-xs-12 col-sm-8 col-md-6">
             <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.field.form.properties.numberprecision'); ?></label>
             <div class="input-group">
-                <input autocomplete="false" name="leadfield[properties][precision]" class="form-control" value="<?php echo $view->escape($precision); ?>" min="0" max="<?php echo $view->escape($maxPrecision); ?>" type="number" />
+                <input autocomplete="false" name="leadfield[properties][precision]" class="form-control" value="<?php echo $view->escape($precision); ?>" min="0" type="number" />
                 <span class="input-group-addon" data-toggle="tooltip" data-container="body"
                       data-placement="top" data-original-title="<?php echo $view['translator']->trans('mautic.lead.field.help.numberprecision'); ?>">
                     <i class="fa fa-question-circle"></i>

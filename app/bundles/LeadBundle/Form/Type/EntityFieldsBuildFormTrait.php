@@ -65,9 +65,8 @@ trait EntityFieldsBuildFormTrait
                 case 'money':
                     if (empty($properties['precision'])) {
                         $properties['precision'] = 4;
-                    }
-                    else {
-                        $properties['precision'] = max((int) $properties['precision'], 4);
+                    } else {
+                        $properties['precision'] = max((int)$properties['precision'], 4);
                     }
 
                     if ('' === $value) {

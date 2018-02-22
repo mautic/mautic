@@ -11,8 +11,8 @@
 
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 
-$roundMode = (isset($roundMode)) ? $roundMode : '';
-$precision = (isset($precision)) ? $precision : '2';
+$roundMode    = (isset($roundMode)) ? $roundMode : '';
+$precision    = (isset($precision)) ? $precision : '2';
 $maxPrecision = (isset($maxPrecision)) ? $maxPrecision : '4';
 
 $options = [
@@ -32,8 +32,8 @@ $options = [
                 <select class="form-control not-chosen" autocomplete="false" name="leadfield[properties][roundmode]">
                     <?php foreach ($options as $v => $l): ?>
                         <option value="<?php echo $view->escape($v); ?>"<?php if ($roundMode == $v) {
-                            echo ' selected="selected"';
-                        } ?>><?php echo $view['translator']->trans($l); ?></option>
+    echo ' selected="selected"';
+} ?>><?php echo $view['translator']->trans($l); ?></option>
                     <?php endforeach; ?>
                 </select>
 

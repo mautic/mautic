@@ -208,7 +208,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $data = [
             'boolean' => null,
             'number'  => null,
-            'money'=> null,
+            'money'   => null,
         ];
 
         $this->cleanFields($data, $fields['core']['boolean']);

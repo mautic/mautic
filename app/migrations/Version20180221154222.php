@@ -10,9 +10,9 @@
 
 namespace Mautic\Migrations;
 
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
+use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
  * Convert attribution field from a double float to a numeric/decimal for accurate currency storage.
@@ -27,7 +27,6 @@ class Version20180221154222 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-
         $table = $schema->getTable($this->prefix.'leads');
         if (
             $table->getColumn('attribution')->getScale() == 4 &&
@@ -40,6 +39,7 @@ class Version20180221154222 extends AbstractMauticMigration
 
     /**
      * @param Schema $schema
+     *
      * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
      */
     public function up(Schema $schema)

@@ -945,8 +945,8 @@ class FieldModel extends FormModel
                 break;
             case 'money':
                 $options['precision'] = 19;
-                $options['scale'] = 4;
-                $schemaType = 'decimal';
+                $options['scale']     = 4;
+                $schemaType           = 'decimal';
                 break;
             case 'number':
                 $schemaType = 'float';
