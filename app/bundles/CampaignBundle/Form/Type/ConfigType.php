@@ -66,7 +66,7 @@ class ConfigType extends AbstractType
                         'class'     => 'form-control',
                         'tooltip'   => 'mautic.campaignconfig.campaign_send_email_dnc_error.tooltip',
                     ],
-                    'data'     => isset($options['data']['campaign_disable_dnc_error']) ? $options['data']['campaign_disable_dnc_error'] : false,
+                    'data'     => isset($options['data']['campaign_disable_dnc_error']) ? (bool) $options['data']['campaign_disable_dnc_error'] : false,
                     'required' => false,
                 ]
             );
