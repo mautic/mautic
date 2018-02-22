@@ -304,24 +304,25 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (is_array($emailSent)) {
-            $errors = implode('<br />', $emailSent);
+            // supress error log
+            if (empty($emailSent) && !$options['dnc_as_error']) {
+                $emailSent = false;
+            } else {
+                $errors = implode('<br />', $emailSent);
 
-            // Add to the metadata of the failed event
-            $emailSent = [
-                'result' => false,
-                'errors' => $errors,
-            ];
+                // Add to the metadata of the failed event
+                $emailSent = [
+                    'result' => false,
+                    'errors' => $errors,
+                ];
+            }
         } elseif (true !== $emailSent) {
             $emailSent = [
                     'result' => false,
                     'errors' => $emailSent,
                 ];
         }
-
-        //  False result, but without failed notification
-        if (true !== $emailSent && !$options['dnc_as_error']) {
-            $emailSent = false;
-        }
+        print_r($emailSent);
 
         return $event->setResult($emailSent);
     }
