@@ -98,11 +98,13 @@ class ContactSegmentService
 
         $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
 
-        dump($qb->getLogicStack());
-
         $this->logger->debug('Segment QB: Create SQL: '.$qb->getDebugOutput(), ['segmentId' => $segment->getId()]);
-
-        $result = $this->timedFetch($qb, $segment->getId());
+        if (defined('blah_2')) {
+            echo $segment->getId().';2;"'.$qb->getDebugOutput()."\"\n";
+            $result = [];
+        } else {
+            $result = $this->timedFetch($qb, $segment->getId());
+        }
 
         return [$segment->getId() => $result];
     }
