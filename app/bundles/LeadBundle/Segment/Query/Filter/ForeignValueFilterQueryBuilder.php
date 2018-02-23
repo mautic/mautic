@@ -70,6 +70,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 break;
             case 'neq':
+            case 'notLike':
                 $tableAlias   = $this->generateRandomParameterName();
                 $queryBuilder = $queryBuilder->leftJoin(
                     $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
@@ -81,7 +82,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->isNull($tableAlias.'.lead_id'), 'and');
                 break;
             default:
-                $tableAlias = $queryBuilder->getTableAlias($filter->getTable(), 'inner');
+                $tableAlias = $queryBuilder->getTableAlias($filter->getTable(), 'left');
 
                 if (!$tableAlias) {
                     $tableAlias = $this->generateRandomParameterName();
@@ -92,6 +93,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $tableAlias,
                     $tableAlias.'.lead_id = l.id'
                 );
+
                 $queryBuilder->addLogic($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'), 'and');
         }
 
@@ -121,6 +123,14 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 );
 
                 $queryBuilder->addJoinCondition($tableAlias, $expression);
+                $queryBuilder->setParametersPairs($parameters, $filterParameters);
+                break;
+            case 'notLike':
+                $expression = $queryBuilder->expr()->like(
+                    $tableAlias.'.'.$filter->getField(),
+                    $filterParametersHolder
+                );
+                $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
                 $queryBuilder->setParametersPairs($parameters, $filterParameters);
                 break;
             default:
