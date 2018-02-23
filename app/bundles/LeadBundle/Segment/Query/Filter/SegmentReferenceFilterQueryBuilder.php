@@ -118,7 +118,12 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
                     $expression = $queryBuilder->expr()->isNotNull($segmentAlias.'.id');
                 }
                 $queryBuilder->addSelect($segmentAlias.'.id as '.$segmentAlias.'_id');
-                $queryBuilder->addLogic($expression, $filter->getGlue());
+
+                if (!$exclusion && count($segmentIds) > 1) {
+                    $queryBuilder->addLogic($expression, 'or');
+                } else {
+                    $queryBuilder->addLogic($expression, $filter->getGlue());
+                }
             }
         }
 

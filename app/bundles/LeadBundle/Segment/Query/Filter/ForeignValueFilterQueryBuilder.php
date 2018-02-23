@@ -99,17 +99,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         switch ($filterOperator) {
             case 'empty':
-                $queryBuilder->addSelect($tableAlias.'.lead_id');
-                $expression = $queryBuilder->expr()->isNull(
-                    $tableAlias.'.lead_id');
-                $queryBuilder->addLogic($expression, 'and');
-                break;
             case 'notEmpty':
-                $queryBuilder->addSelect($tableAlias.'.lead_id');
-                $expression = $queryBuilder->expr()->isNull(
-                    $tableAlias.'.lead_id');
-                $queryBuilder->addLogic($expression, 'and');
-                break;
             case 'notIn':
                 $queryBuilder->addSelect($tableAlias.'.lead_id');
                 $expression = $queryBuilder->expr()->isNull(

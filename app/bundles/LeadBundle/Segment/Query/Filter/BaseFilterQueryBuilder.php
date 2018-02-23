@@ -11,7 +11,6 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -160,31 +159,21 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             case 'between':
             case 'notBetween':
             case 'notRegexp':
-                if ($filterAggr) {
-                    $expression = $queryBuilder->expr()->$filterOperator(
-                        sprintf('%s(%s)', $filterAggr, $tableAlias.'.'.$filter->getField()),
-                        $filterParametersHolder
-                    );
-                } else {
                     $expression = $queryBuilder->expr()->$filterOperator(
                         $tableAlias.'.'.$filter->getField(),
                         $filterParametersHolder
                     );
-                }
+
                 break;
             default:
                 throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
         }
 
         if ($queryBuilder->isJoinTable($filter->getTable())) {
-            if ($filterAggr) {
-                throw new SegmentQueryException('aggregate functions should not be used in basic filters. use different query builder');
-            } else {
-                $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
-            }
-        } else {
-            $queryBuilder->addLogic($expression, $filterGlue);
+            $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
         }
+
+        $queryBuilder->addLogic($expression, $filterGlue);
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 

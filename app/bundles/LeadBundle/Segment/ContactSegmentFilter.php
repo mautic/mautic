@@ -207,7 +207,7 @@ class ContactSegmentFilter
     public function __toString()
     {
         $data = [
-            'column'       => $this->getColumn()->getName(),
+            'column'       => $this->getTable().'.'.$this->getField(),
             'operator'     => $this->getOperator(),
             'glue'         => $this->getGlue(),
             'queryBuilder' => get_class($this->getFilterQueryBuilder()),
