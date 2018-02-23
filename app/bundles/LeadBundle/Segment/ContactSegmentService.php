@@ -74,6 +74,29 @@ class ContactSegmentService
 
     /**
      * @param LeadList $segment
+     *
+     * @return QueryBuilder
+     *
+     * @throws Exception\SegmentQueryException
+     * @throws \Exception
+     */
+    private function getTotalSegmentContactsQuery(LeadList $segment)
+    {
+        if (!is_null($this->preparedQB)) {
+            return $this->preparedQB;
+        }
+
+        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+
+        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
+        $queryBuilder = $this->contactSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $segment->getId());
+        $queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $segment->getId());
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param LeadList $segment
      * @param array    $batchLimiters
      *
      * @return array
