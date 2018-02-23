@@ -107,18 +107,18 @@ class RabbitMQIntegration extends AbstractIntegration
      * Defines the additional key fields required by the plugin.
      * @return array Array of key fields.
      */
- 	public function getRequiredKeyFields()
- 	{
- 	    return [
- 	        'rabbitmq_location' => 'mautic.rabbitmq.config.location',
- 	        'rabbitmq_user' => 'mautic.rabbitmq.config.user',
- 	        'rabbitmq_password'  => 'mautic.rabbitmq.config.password',
+    public function getRequiredKeyFields()
+    {
+        return [
+            'rabbitmq_location' => 'mautic.rabbitmq.config.location',
+            'rabbitmq_user' => 'mautic.rabbitmq.config.user',
+            'rabbitmq_password'  => 'mautic.rabbitmq.config.password',
             'salesforce_client_id' => 'mautic.salesforce.config.client_id',
             'salesforce_client_secret' => 'mautic.salesforce.config.salesforce_client_secret',
             'salesforce_username' => 'mautic.salesforce.config.username',
             'salesforce_password' => 'mautic.salesforce.config.password'
- 	    ];
- 	}
+        ];
+    }
 
     /**
      * Defines which key fields are secret from the array returned from getRequiredKeyFields.
@@ -144,9 +144,30 @@ class RabbitMQIntegration extends AbstractIntegration
             'firstname' => 'first_name',
             'lastname' => 'last_name',
             'mobile' => 'mobile',
-            'address1' => 'address',
             'gender' => 'gender',
-            'birthday' => 'birthday'
+            'birthday' => 'birthday',
+            'points' => 'points',
+            'stage' => 'stage'
+        ];
+    }
+
+    /**
+    * The address field map used for populating address object should be defined here, the keys are the MA field names, while the values are the standardized values in RabbitMQ.
+    * @return array address field map array
+    */
+
+    public function getAddressFieldMap(){
+        //Commented lines are not defined yet
+        return [
+            "country"=>"country",
+            //""=>"country_code", 
+            "state"=>"state",
+            //""=>"state_code",
+            //""=>"county",
+            "city"=>"city",
+            "zipcode"=>"zip_code",
+            "address1"=>"address_line1",
+            "address2"=>"address_line2"
         ];
     }
 
@@ -160,7 +181,31 @@ class RabbitMQIntegration extends AbstractIntegration
             'Email' => 'email',
             'FirstName' => 'first_name',
             'LastName' => 'last_name',
-            'Company' => 'company'
+            'Company' => 'company',
+            'MobilePhone' => 'mobile',
+            'Gender__c' => 'gender',
+            'Birthday__c' => 'birthday',
+            'Status' => 'stage'
+        ];
+    }
+
+    /**
+    * The address field map used for populating address object should be defined here, the keys are the SF field names, while the values are the standardized values in RabbitMQ.
+    * @return array address field map array
+    */
+
+    public function getAddressFieldMapSF(){
+        //Commented lines are not defined yet
+        return [
+            "Country"=>"country",
+            //""=>"country_code", 
+            "State"=>"state",
+            //""=>"state_code",
+            //""=>"county",
+            "City"=>"city",
+            "PostalCode"=>"zip_code",
+            "Street"=>"address_line1",
+            //"address2"=>"address_line2"
         ];
     }
 
@@ -189,6 +234,49 @@ class RabbitMQIntegration extends AbstractIntegration
         foreach ($data as $key => $value) {
             if(isset($fieldMap[$key])){
                 $formattedLeadData[$fieldMap[$key]] = $value;
+            }
+        }
+        if($to_standard)
+            $formattedLeadData['address'] = $this->formatAddressData($data, $to_standard, $ma);
+        else if(isset($data['address'])){
+            $formattedLeadData = array_merge($formattedLeadData, $this->formatAddressData($data['address'], $to_standard, $ma));
+        }
+
+        if(!$to_standard && $ma && isset($data['stage'])){
+            if(isset($data['stage'])){
+                $stages = $this->em->getRepository('MauticStageBundle:Stage')->findBy(['name'=>$data['stage']]);
+                
+                if(count($stages)>0){
+                    $formattedLeadData['stage']=$stages[0]->getId();
+                }else{
+                    unset($formattedLeadData['stage']);
+                }
+            }else{
+                unset($formattedLeadData['stage']);
+            }
+        }
+
+        return $formattedLeadData;
+        
+    }
+
+    public function formatAddressData($data, $to_standard = true, $ma = true)
+    {
+        if($ma){
+            $addressFieldMap = $this->getAddressFieldMap();
+        } else {
+            $addressFieldMap = $this->getAddressFieldMapSF();
+        }
+
+        if(!$to_standard){
+            $addressFieldMap = array_flip($addressFieldMap);
+        }
+
+        $formattedLeadData = array();
+
+        foreach ($data as $key => $value) {
+            if(isset($addressFieldMap[$key])){
+                $formattedLeadData[$addressFieldMap[$key]] = $value;
             }
         }
 

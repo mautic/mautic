@@ -108,6 +108,7 @@ class SFConsumerCommand extends ModeratedCommand
 
 	    $connection = new AMQPStreamConnection($integrationObject->getLocation(), 5672, $integrationObject->getUser(), $integrationObject->getPassword());
 	    $channel = $connection->channel();
+        $channel->basic_qos(0, 1, false);
 
 	    // exchange, type, passive, durable, auto_delete
 	    $channel->exchange_declare('kiazaki', 'direct', false, true, false);
@@ -126,9 +127,9 @@ class SFConsumerCommand extends ModeratedCommand
 
         $callback = function($msg) use ($output, $integrationObject) {
             $output->writeln("<info>[x] " . date("Y-m-d H:i:s") . " Received message from '" . $msg->delivery_info['routing_key'] . "': " . $msg->body . "</info>");
-
+            
             // Decode the message.
-            $leadFields = json_decode(unserialize($msg->body), true);
+            $leadFields = json_decode($msg->body, true);
 
             // Check if the data is set.
             if(isset($leadFields['data'])){
@@ -184,6 +185,9 @@ class SFConsumerCommand extends ModeratedCommand
                     } else {
                         $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
                     }
+                } else {
+                    $output->writeln("<info>[!] No such lead found, nothing to delete!</info>");
+                    $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
                 }
             } else {
                 if(!empty($id)){
@@ -212,7 +216,9 @@ class SFConsumerCommand extends ModeratedCommand
                         $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag']);
                         $output->writeln("<error>[!] " . $response['errorCode'] . ": " . $response['message'] ."</error>");
                     } else {
+                        $output->writeln("<info>Before ACK.</info>");
                         $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+                        $output->writeln("<info>After ACK.</info>");
                     }
                 }
             }
