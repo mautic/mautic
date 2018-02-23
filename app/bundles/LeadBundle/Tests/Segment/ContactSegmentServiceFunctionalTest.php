@@ -3,10 +3,7 @@
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\CoreBundle\Test\MauticWebTestCase;
-use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
-use Monolog\Logger;
 
 /**
  * Class ContactSegmentServiceFunctionalTest
@@ -16,43 +13,41 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
 {
     public function testSegmentCountIsCorrect()
     {
-        /**
-         * @var ContactSegmentService
-         */
+        /** @var ContactSegmentService $contactSegmentService */
         $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
-        /*
-                $segmentTest1Ref = $this->fixtures->getReference('segment-test-1');
-                $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest1Ref);
-                $this->assertEquals(
-                    1,
-                    $segmentContacts[$segmentTest1Ref->getId()]['count'],
-                    'There should be 1 contacts in the segment-test-1 segment.'
-                );
 
-                $segmentTest2Ref = $this->fixtures->getReference('segment-test-2');
-                $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest2Ref);
-                $this->assertEquals(
-                    4,
-                    $segmentContacts[$segmentTest2Ref->getId()]['count'],
-                    'There should be 4 contacts in the segment-test-2 segment.'
-                );
+        $segmentTest1Ref = $this->fixtures->getReference('segment-test-1');
+        $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest1Ref);
+        $this->assertEquals(
+            1,
+            $segmentContacts[$segmentTest1Ref->getId()]['count'],
+            'There should be 1 contacts in the segment-test-1 segment.'
+        );
 
-                $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
-                $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest3Ref);
-                $this->assertEquals(
-                    24,
-                    $segmentContacts[$segmentTest3Ref->getId()]['count'],
-                    'There should be 24 contacts in the segment-test-3 segment'
-                );
+        $segmentTest2Ref = $this->fixtures->getReference('segment-test-2');
+        $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest2Ref);
+        $this->assertEquals(
+            4,
+            $segmentContacts[$segmentTest2Ref->getId()]['count'],
+            'There should be 4 contacts in the segment-test-2 segment.'
+        );
 
-                $segmentTest4Ref = $this->fixtures->getReference('segment-test-4');
-                $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest4Ref);
-                $this->assertEquals(
-                    1,
-                    $segmentContacts[$segmentTest4Ref->getId()]['count'],
-                    'There should be 1 contacts in the segment-test-4 segment.'
-                );
-        */
+        $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
+        $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest3Ref);
+        $this->assertEquals(
+            24,
+            $segmentContacts[$segmentTest3Ref->getId()]['count'],
+            'There should be 24 contacts in the segment-test-3 segment'
+        );
+
+        $segmentTest4Ref = $this->fixtures->getReference('segment-test-4');
+        $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest4Ref);
+        $this->assertEquals(
+            1,
+            $segmentContacts[$segmentTest4Ref->getId()]['count'],
+            'There should be 1 contacts in the segment-test-4 segment.'
+        );
+
         $segmentTest5Ref = $this->fixtures->getReference('segment-test-5');
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest5Ref);
         $this->assertEquals(
@@ -198,72 +193,39 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
         );
     }
 
-//
-//    public function testPublicSegmentsInContactPreferences()
-//    {
-//        /**
-//         * @var LeadListRepository $repo
-//         */
-//        $repo = $this->em->getRepository(LeadList::class);
-//
-//        $lists = $repo->getGlobalLists();
-//
-//        $segmentTest2Ref = $this->fixtures->getReference('segment-test-2');
-//
-//        $this->assertArrayNotHasKey(
-//            $segmentTest2Ref->getId(),
-//            $lists,
-//            'Non-public lists should not be returned by the `getGlobalLists()` method.'
-//        );
-//    }
-//
-//    public function testSegmentRebuildCommand()
-//    {
-//        /**
-//         * @var LeadListRepository $repo
-//         */
-//        $repo            = $this->em->getRepository(LeadList::class);
-//        $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
-//
-//        $this->runCommand('mautic:segments:update', [
-//            '-i'    => $segmentTest3Ref->getId(),
-//            '--env' => 'test',
-//        ]);
-//
-//        $logger = $this->getMockBuilder(Logger::class)
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        $segmentContacts = $repo->getLeadsByList([
-//            $segmentTest3Ref,
-//        ], ['countOnly' => true], $logger);
-//
-//        $this->assertEquals(
-//            24,
-//            $segmentContacts[$segmentTest3Ref->getId()]['count'],
-//            'There should be 24 contacts in the segment-test-3 segment after rebuilding from the command line.'
-//        );
-//
-//        // Remove the title from all contacts, rebuild the list, and check that list is updated
-//        $this->em->getConnection()->query(sprintf('UPDATE %sleads SET title = NULL;', MAUTIC_TABLE_PREFIX));
-//
-//        $this->runCommand('mautic:segments:update', [
-//            '-i'    => $segmentTest3Ref->getId(),
-//            '--env' => 'test',
-//        ]);
-//
-//        $logger = $this->getMockBuilder(Logger::class)
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        $segmentContacts = $repo->getLeadsByList([
-//            $segmentTest3Ref,
-//        ], ['countOnly' => true], $logger);
-//
-//        $this->assertEquals(
-//            0,
-//            $segmentContacts[$segmentTest3Ref->getId()]['count'],
-//            'There should be no contacts in the segment-test-3 segment after removing contact titles and rebuilding from the command line.'
-//        );
-//    }
+    public function testSegmentRebuildCommand()
+    {
+        /** @var ContactSegmentService $contactSegmentService */
+        $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
+        $segmentTest3Ref       = $this->fixtures->getReference('segment-test-3');
+
+        $this->runCommand('mautic:segments:update', [
+            '-i'    => $segmentTest3Ref->getId(),
+            '--env' => 'test',
+        ]);
+
+        $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest3Ref);
+
+        $this->assertEquals(
+            24,
+            $segmentContacts[$segmentTest3Ref->getId()]['count'],
+            'There should be 24 contacts in the segment-test-3 segment after rebuilding from the command line.'
+        );
+
+        // Remove the title from all contacts, rebuild the list, and check that list is updated
+        $this->em->getConnection()->query(sprintf('UPDATE %sleads SET title = NULL;', MAUTIC_TABLE_PREFIX));
+
+        $this->runCommand('mautic:segments:update', [
+            '-i'    => $segmentTest3Ref->getId(),
+            '--env' => 'test',
+        ]);
+
+        $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest3Ref);
+
+        $this->assertEquals(
+            0,
+            $segmentContacts[$segmentTest3Ref->getId()]['count'],
+            'There should be no contacts in the segment-test-3 segment after removing contact titles and rebuilding from the command line.'
+        );
+    }
 }

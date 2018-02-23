@@ -11,9 +11,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
 {
     public function testSegmentCountIsCorrect()
     {
-        /**
-         * @var LeadListRepository
-         */
+        /** @var LeadListRepository $repo */
         $repo                                               = $this->em->getRepository(LeadList::class);
         $segmentTest1Ref                                    = $this->fixtures->getReference('segment-test-1');
         $segmentTest2Ref                                    = $this->fixtures->getReference('segment-test-2');
@@ -73,7 +71,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
             ['countOnly' => true],
             $logger
         );
-        dump($segmentContacts);
+
         $this->assertEquals(
             1,
             $segmentContacts[$segmentTest1Ref->getId()]['count'],
@@ -209,9 +207,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
 
     public function testPublicSegmentsInContactPreferences()
     {
-        /**
-         * @var LeadListRepository
-         */
+        /** @var LeadListRepository $repo */
         $repo = $this->em->getRepository(LeadList::class);
 
         $lists = $repo->getGlobalLists();
@@ -227,9 +223,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
 
     public function testSegmentRebuildCommand()
     {
-        /**
-         * @var LeadListRepository
-         */
+        /** @var LeadListRepository $repo */
         $repo            = $this->em->getRepository(LeadList::class);
         $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
 
