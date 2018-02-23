@@ -10,7 +10,6 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
@@ -32,13 +31,7 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
-        //@TODO look at this, the getCrate method is for debuggin only
-        $parts   = explode('_', $filter->getCrate('field'));
-        $channel = 'email';
-
-        if (count($parts) === 3) {
-            $channel = $parts[2];
-        }
+        $doNotContactParts = $filter->getDoNotContactParts();
 
         $tableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'left');
 
@@ -66,8 +59,8 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $queryBuilder->andWhere($queryBuilder->expr()->$queryType($tableAlias.'.id'));
 
-        $queryBuilder->setParameter($exprParameter, ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED);
-        $queryBuilder->setParameter($channelParameter, $channel);
+        $queryBuilder->setParameter($exprParameter, $doNotContactParts->getParameterType());
+        $queryBuilder->setParameter($channelParameter, $doNotContactParts->getChannel());
 
         return $queryBuilder;
     }

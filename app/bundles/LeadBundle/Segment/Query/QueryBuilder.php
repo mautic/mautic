@@ -1557,6 +1557,9 @@ class QueryBuilder
     {
         $parts     = $this->getQueryParts();
         $leadTable = $parts['from'][0]['alias'];
+        if (!isset($parts['join'][$leadTable])) {
+            return $leadTable.'.id';
+        }
         $joins     = $parts['join'][$leadTable];
 
         foreach ($joins as $join) {

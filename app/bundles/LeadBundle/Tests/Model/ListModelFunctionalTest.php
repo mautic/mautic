@@ -73,7 +73,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
             ['countOnly' => true],
             $logger
         );
-
+        dump($segmentContacts);
         $this->assertEquals(
             1,
             $segmentContacts[$segmentTest1Ref->getId()]['count'],

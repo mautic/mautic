@@ -98,13 +98,46 @@ class ContactSegmentService
 
         $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
 
+        //dump($qb->getLogicStack());
+
         $this->logger->debug('Segment QB: Create SQL: '.$qb->getDebugOutput(), ['segmentId' => $segment->getId()]);
-        if (defined('blah_2')) {
-            echo $segment->getId().';2;"'.$qb->getDebugOutput()."\"\n";
-            $result = [];
-        } else {
-            $result = $this->timedFetch($qb, $segment->getId());
+
+        $result = $this->timedFetch($qb, $segment->getId());
+
+        return [$segment->getId() => $result];
+    }
+
+    /**
+     * @param LeadList $segment
+     *
+     * @return array
+     *
+     * @throws \Exception
+     *
+     * @todo This is almost copy of getNewLeadListLeadsCount method. Only difference is that it calls getTotalSegmentContactsQuery
+     */
+    public function getTotalLeadListLeadsCount(LeadList $segment)
+    {
+        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+
+        if (!count($segmentFilters)) {
+            $this->logger->debug('Segment QB: Segment has no filters', ['segmentId' => $segment->getId()]);
+
+            return [$segment->getId() => [
+                'count' => '0',
+                'maxId' => '0',
+            ],
+            ];
         }
+
+        $qb = $this->getTotalSegmentContactsQuery($segment);
+
+        $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
+
+        $this->logger->debug('Segment QB: Create SQL: '.$qb->getDebugOutput(), ['segmentId' => $segment->getId()]);
+        dump($qb->getDebugOutput());
+
+        $result = $this->timedFetch($qb, $segment->getId());
 
         return [$segment->getId() => $result];
     }

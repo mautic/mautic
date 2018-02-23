@@ -135,7 +135,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 $expression = $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField());
                 break;
             case 'neq':
-                if ($filter->getCrate()['type'] === 'boolean' && $filter->getParameterValue() == 1) {
+                if ($filter->isColumnTypeBoolean() && $filter->getParameterValue() == 1) {
                     $expression = $queryBuilder->expr()->orX(
                         $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
                         $queryBuilder->expr()->$filterOperator(

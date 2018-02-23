@@ -55,6 +55,7 @@ class ContactSegmentFilterFactory
      * @param LeadList $leadList
      *
      * @return ContactSegmentFilters
+     *
      * @throws \Exception
      */
     public function getSegmentFilters(LeadList $leadList)
@@ -63,7 +64,6 @@ class ContactSegmentFilterFactory
 
         $filters = $leadList->getFilters();
         foreach ($filters as $filter) {
-            // ContactSegmentFilterCrate is for accessing $filter as an object
             $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
             $decorator = $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate);
@@ -82,7 +82,8 @@ class ContactSegmentFilterFactory
      * @param FilterDecoratorInterface  $decorator
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return object
+     * @return FilterQueryBuilderInterface
+     *
      * @throws \Exception
      */
     private function getQueryBuilderForFilter(FilterDecoratorInterface $decorator, ContactSegmentFilterCrate $contactSegmentFilterCrate)

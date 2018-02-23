@@ -211,7 +211,7 @@ class ContactSegmentQueryBuilder
      *
      * @return QueryBuilder
      */
-    public function addManuallyUnsubsribedQuery(QueryBuilder $queryBuilder, $leadListId)
+    public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
     {
         $tableAlias = $this->generateRandomParameterName();
         $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias,
