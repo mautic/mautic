@@ -66,7 +66,7 @@ trait EntityFieldsBuildFormTrait
                     if (empty($properties['precision'])) {
                         $properties['precision'] = 4;
                     } else {
-                        $properties['precision'] = max((int)$properties['precision'], 4);
+                        $properties['precision'] = max((int) $properties['precision'], 4);
                     }
 
                     if ('' === $value) {
