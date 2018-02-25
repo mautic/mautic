@@ -117,10 +117,10 @@ class PipedriveIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function getFormCompanyFields1($settings = [])
+    public function getFormCompanyFields($settings = [])
     {
-        $settings['feature_settings']['objects'][] = self::ORGANIZATION_ENTITY_TYPE;
-        $fields                                    = $this->getAvailableLeadFields($settings);
+        $settings['feature_settings']['objects'][self::ORGANIZATION_ENTITY_TYPE] = self::COMPANY_ENTITY_TYPE;
+        $fields                                                                  = $this->getAvailableLeadFields($settings);
 
         return $fields;
     }
@@ -130,10 +130,10 @@ class PipedriveIntegration extends CrmAbstractIntegration
      *
      * @return array|mixed
      */
-    public function getFormLeadFields1($settings = [])
+    public function getFormLeadFields($settings = [])
     {
-        $settings['feature_settings']['objects'][] = self::PERSON_ENTITY_TYPE;
-        $fields                                    = $this->getAvailableLeadFields($settings);
+        $settings['feature_settings']['objects'][self::PERSON_ENTITY_TYPE] = 'contacts';
+        $fields                                                            = $this->getAvailableLeadFields($settings);
 
         // handle fields with are available in Pipedrive, but not listed
         return array_merge($fields, [
@@ -155,7 +155,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
     {
         $pipedriveFields      = [];
         $silenceExceptions    = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-
         if (isset($settings['feature_settings']['objects'])) {
             $pipedriveObjects = $settings['feature_settings']['objects'];
         } else {
@@ -165,7 +164,11 @@ class PipedriveIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if (!empty($pipedriveObjects) && is_array($pipedriveObjects)) {
-                    foreach ($pipedriveObjects as $object) {
+                    foreach ($pipedriveObjects as $pipeDriveObject=>$object) {
+                        if (!is_string($pipeDriveObject)) {
+                            continue;
+                        }
+
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
                         if ($fields = parent::getAvailableLeadFields($settings) && !empty($fields)) {
@@ -176,13 +179,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                         if (!isset($pipedriveFields[$object])) {
                             $pipedriveFields[$object] = [];
                         }
-
-                        if ($object == 'company') {
-                            $objectPipdrive = self::ORGANIZATION_ENTITY_TYPE;
-                        } else {
-                            $objectPipdrive = self::PERSON_ENTITY_TYPE;
-                        }
-                        $leadFields           = $this->getApiHelper()->getFields($objectPipdrive);
+                        $leadFields           = $this->getApiHelper()->getFields($pipeDriveObject);
                         $leadFields['fields'] = $leadFields;
                         if (isset($leadFields['fields'])) {
                             foreach ($leadFields['fields'] as $fieldInfo) {
@@ -203,6 +200,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
                         }
 
                         $this->cache->set('leadFields'.$cacheSuffix, $pipedriveFields[$object]);
+
+                        return $pipedriveFields[$object];
                     }
                 }
             }
