@@ -257,16 +257,4 @@ class PipedriveIntegration extends CrmAbstractIntegration
 
         return parent::getFormNotes($section);
     }
-
-    /**
-     * Get available company fields for choices in the config UI.
-     *
-     * @param array $settings
-     *
-     * @return array
-     */
-    public function getFormCompanyFields($settings = [])
-    {
-        return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
-    }
 }
