@@ -120,6 +120,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
         if (isset($settings['feature_settings']['objects'])) {
             $pipedriveObjects = $settings['feature_settings']['objects'];
         } else {
+            $settings                                = $this->settings->getFeatureSettings();
             $settings['feature_settings']['objects'] = $pipedriveObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
         }
 
@@ -267,5 +268,13 @@ class PipedriveIntegration extends CrmAbstractIntegration
     public function getFormCompanyFields($settings = [])
     {
         return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequiredFields()
+    {
+        return $this->requiredFields;
     }
 }
