@@ -16,7 +16,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
     private $apiHelper;
 
     private $requiredFields = [
-        'organization' => ['name'],
+        'company' => ['name'],
+        'contacts' => ['email'],
     ];
 
     /**
@@ -110,19 +111,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
         return isset($keys[$this->getClientSecretKey()]);
     }
 
-    /**
-     * Get available company fields for choices in the config UI.
-     *
-     * @param array $settings
-     *
-     * @return array
-     */
-    public function getFormCompanyFields($settings = [])
-    {
-        return $this->getAvailableLeadFields(['cache_suffix' => '.company']);
-    }
-
-    /**
+       /**
      * @return array|mixed
      */
     public function getAvailableLeadFields($settings = [])
@@ -132,9 +121,10 @@ class PipedriveIntegration extends CrmAbstractIntegration
         if (isset($settings['feature_settings']['objects'])) {
             $pipedriveObjects = $settings['feature_settings']['objects'];
         } else {
-            $settings                                = $this->settings->getFeatureSettings();
             $settings['feature_settings']['objects'] = $pipedriveObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
         }
+
+
         try {
             if ($this->isAuthorized()) {
                 if (!empty($pipedriveObjects) && is_array($pipedriveObjects)) {
@@ -169,13 +159,11 @@ class PipedriveIntegration extends CrmAbstractIntegration
                                     'required' => true,
                                 ];
                             }
-
                             foreach ($leadFields as $fieldInfo) {
                                 $pipedriveFields[$object][$fieldInfo['key']] = [
-                                    'type'     => 'string',
-                                    'label'    => $fieldInfo['name'],
-                                    //    'required' => (in_array($fieldInfo['key'], ['email', ['accountname']])),
-                                    'required' => true,
+                                        'type'     => 'string',
+                                        'label'    => $fieldInfo['name'],
+                                        'required' => isset($this->requiredFields[$object]) && in_array($fieldInfo['key'], $this->requiredFields[$object]),
                                 ];
                             }
                         }
@@ -191,7 +179,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
-
         return $pipedriveFields;
     }
 
@@ -238,13 +225,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
         }
     }
 
-    public function isCompanySupportEnabled()
-    {
-        $supportedFeatures = $this->getIntegrationSettings()->getFeatureSettings();
-
-        return isset($supportedFeatures['objects']) && in_array('company', $supportedFeatures['objects']);
-    }
-
     public function pushLead($lead, $config = [])
     {
         $leadExport = $this->factory->get('mautic_integration.pipedrive.export.lead');
@@ -270,5 +250,17 @@ class PipedriveIntegration extends CrmAbstractIntegration
         }
 
         return parent::getFormNotes($section);
+    }
+
+    /**
+     * Get available company fields for choices in the config UI.
+     *
+     * @param array $settings
+     *
+     * @return array
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
     }
 }
