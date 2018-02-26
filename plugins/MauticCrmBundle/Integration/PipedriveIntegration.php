@@ -119,10 +119,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        $settings['feature_settings']['objects'][self::ORGANIZATION_ENTITY_TYPE] = self::COMPANY_ENTITY_TYPE;
-        $fields                                                                  = $this->getAvailableLeadFields($settings);
-
-        return $fields;
+        return $this->getAvailableLeadFields(['cache_suffix' => '.company']);
     }
 
     /**
@@ -132,11 +129,10 @@ class PipedriveIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        $settings['feature_settings']['objects'][self::PERSON_ENTITY_TYPE] = 'contacts';
-        $fields                                                            = $this->getAvailableLeadFields($settings);
+        $fields =  $this->getAvailableLeadFields(['cache_suffix' => '.contacts']);
 
         // handle fields with are available in Pipedrive, but not listed
-        return array_merge($fields, [
+        return array_merge($fields['contacts'], [
             'last_name' => [
                 'label'    => 'Last Name',
                 'required' => true,
@@ -158,15 +154,16 @@ class PipedriveIntegration extends CrmAbstractIntegration
         if (isset($settings['feature_settings']['objects'])) {
             $pipedriveObjects = $settings['feature_settings']['objects'];
         } else {
-            $settings         = $this->settings->getFeatureSettings();
-            $pipedriveObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+            $settings                                = $this->settings->getFeatureSettings();
+            $settings['feature_settings']['objects'] = $pipedriveObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
         }
         try {
             if ($this->isAuthorized()) {
                 if (!empty($pipedriveObjects) && is_array($pipedriveObjects)) {
-                    foreach ($pipedriveObjects as $pipeDriveObject=>$object) {
-                        if (!is_string($pipeDriveObject)) {
-                            continue;
+                    foreach ($pipedriveObjects as $object) {
+                        $pipeDriveObject = self::PERSON_ENTITY_TYPE;
+                        if ($object == 'company') {
+                            $pipeDriveObject = self::ORGANIZATION_ENTITY_TYPE;
                         }
 
                         // Check the cache first
@@ -200,8 +197,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
                         }
 
                         $this->cache->set('leadFields'.$cacheSuffix, $pipedriveFields[$object]);
-
-                        return $pipedriveFields[$object];
                     }
                 }
             }
