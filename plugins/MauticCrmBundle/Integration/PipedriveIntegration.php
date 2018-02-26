@@ -269,12 +269,4 @@ class PipedriveIntegration extends CrmAbstractIntegration
     {
         return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
     }
-
-    /**
-     * @return array
-     */
-    public function getRequiredFields()
-    {
-        return $this->requiredFields;
-    }
 }

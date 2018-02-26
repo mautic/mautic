@@ -30,10 +30,9 @@ class Version20180226220043 extends AbstractMauticMigration
     {
         $integrationHelper    = $this->container->get('mautic.helper.integration');
         $pipedriveIntegration = $integrationHelper->getIntegrationObject('Pipedrive');
-        if (!$this->isAuthorized()) {
+        if (!$pipedriveIntegration->isAuthorized()) {
             throw new SkipMigrationException('Schema includes this migration');
         }
-        //$settings                 = $pipedriveIntegration->getIntegrationSettings()->getFeatureSettings();
     }
 
     /**
@@ -41,6 +40,17 @@ class Version20180226220043 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        // Please modify to your needs
+        $this->suppressNoSQLStatementError();
+
+        // Pipedrive BC set contacts object as enabled
+        $integrationModel         = $this->container->get('mautic.plugin.model.integration_entity');
+        $integrationHelper        = $this->container->get('mautic.helper.integration');
+        $pipedriveIntegration     = $integrationHelper->getIntegrationObject('Pipedrive');
+        $settings                 = $pipedriveIntegration->getIntegrationSettings()->getFeatureSettings();
+        if (empty($settings['objects']) || (!empty($settings['objects']) && !in_array('contacts', array_values($settings['objects'])))) {
+            $settings['objects'][] = 'contacts';
+            $pipedriveIntegration->getIntegrationSettings()->setFeatureSettings($settings);
+            $integrationModel->saveEntity($pipedriveIntegration->getIntegrationSettings());
+        }
     }
 }
