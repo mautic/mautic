@@ -51,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '-dev';
+    const EXTRA_VERSION = '';
 
     /**
      * @var array
@@ -89,7 +89,7 @@ class AppKernel extends Kernel
         if (defined('MAUTIC_INSTALLER')) {
             $uri = $request->getRequestUri();
             if (strpos($uri, 'installer') === false) {
-                $base = $request->getBaseUrl();
+                $base   = $request->getBaseUrl();
                 $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
                 if ((strpos(strtolower($_SERVER['SERVER_SOFTWARE']), 'apache') === false
