@@ -17,7 +17,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
 
     private $requiredFields = [
         'company' => ['name'],
-        'contacts' => ['email'],
     ];
 
     /**
@@ -111,7 +110,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
         return isset($keys[$this->getClientSecretKey()]);
     }
 
-       /**
+    /**
      * @return array|mixed
      */
     public function getAvailableLeadFields($settings = [])
@@ -124,7 +123,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
             $settings['feature_settings']['objects'] = $pipedriveObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
         }
 
-
         try {
             if ($this->isAuthorized()) {
                 if (!empty($pipedriveObjects) && is_array($pipedriveObjects)) {
@@ -134,16 +132,22 @@ class PipedriveIntegration extends CrmAbstractIntegration
                             $pipeDriveObject = self::ORGANIZATION_ENTITY_TYPE;
                         }
 
+                        // The object key for contacts should be 0 for some BC reasons
+                        if ($object == 'contacts') {
+                            $object = 0;
+                        }
+
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
                         if ($fields = parent::getAvailableLeadFields($settings) && !empty($fields)) {
-                            //  $pipedriveFields[$object] = $fields;
-                            // continue;
+                            $pipedriveFields[$object] = $fields;
+                            continue;
                         }
                         // Create the array if it doesn't exist to prevent PHP notices
                         if (!isset($pipedriveFields[$object])) {
                             $pipedriveFields[$object] = [];
                         }
+
                         $leadFields           = $this->getApiHelper()->getFields($pipeDriveObject);
                         if (isset($leadFields)) {
                             // handle fields with are available in Pipedrive, but not listed
@@ -179,6 +183,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
+
         return $pipedriveFields;
     }
 
