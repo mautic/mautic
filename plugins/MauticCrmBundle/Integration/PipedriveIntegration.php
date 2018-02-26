@@ -141,8 +141,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
                         if ($fields = parent::getAvailableLeadFields($settings) && !empty($fields)) {
-                            //   $pipedriveFields[$object] = $fields;
-                           // continue;
+                            $pipedriveFields[$object] = $fields;
+                            continue;
                         }
                         // Create the array if it doesn't exist to prevent PHP notices
                         if (!isset($pipedriveFields[$object])) {
