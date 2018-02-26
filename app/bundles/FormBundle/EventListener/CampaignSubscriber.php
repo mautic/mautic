@@ -160,7 +160,7 @@ class CampaignSubscriber extends CommonSubscriber
                  * ( to integrate with: recursive campaign (future)).
                  */
                 $result = $this->formSubmissionModel->getRepository()->compareDateMonthValue(
-                    $lead->getId(), $event->getConfig()['field'], $triggerDate);
+                    $form, $event, $triggerDate);
             }
         } else {
             $result = $this->formSubmissionModel->getRepository()->compareValue(
