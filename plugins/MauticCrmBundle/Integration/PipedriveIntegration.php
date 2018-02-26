@@ -257,4 +257,11 @@ class PipedriveIntegration extends CrmAbstractIntegration
 
         return parent::getFormNotes($section);
     }
+
+    public function isCompanySupportEnabled()
+    {
+        $supportedFeatures = $this->getIntegrationSettings()->getFeatureSettings();
+
+        return isset($supportedFeatures['objects']) && in_array('company', $supportedFeatures['objects']);
+    }
 }
