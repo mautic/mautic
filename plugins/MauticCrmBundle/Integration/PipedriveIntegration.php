@@ -141,8 +141,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
                         if ($fields = parent::getAvailableLeadFields($settings) && !empty($fields)) {
-                            $pipedriveFields[$object] = $fields;
-                            continue;
+                            //   $pipedriveFields[$object] = $fields;
+                           // continue;
                         }
                         // Create the array if it doesn't exist to prevent PHP notices
                         if (!isset($pipedriveFields[$object])) {
@@ -155,12 +155,12 @@ class PipedriveIntegration extends CrmAbstractIntegration
                             if ($object == 'contacts') {
                                 $pipedriveFields[$object]['first_name'] = [
                                     'type'     => 'string',
-                                    'label'    => 'First Name',
+                                    'label'    => $this->translator->trans('mautic.core.firstname'),
                                     'required' => true,
                                 ];
                                 $pipedriveFields[$object]['last_name'] = [
                                     'type'     => 'string',
-                                    'label'    => 'Last Name',
+                                    'label'    => $this->translator->trans('mautic.core.lastname'),
                                     'required' => true,
                                 ];
                             }
