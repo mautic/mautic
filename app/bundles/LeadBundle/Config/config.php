@@ -752,10 +752,59 @@ return [
                 ],
             ],
             'mautic.lead.model.list' => [
-                'class'     => 'Mautic\LeadBundle\Model\ListModel',
+                'class'     => \Mautic\LeadBundle\Model\ListModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'mautic.lead.model.lead_segment_service',
                 ],
+            ],
+            'mautic.lead.model.lead_segment_service' => [
+                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentService::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'mautic.lead.repository.lead_list_segment_repository',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_filter_factory' => [
+                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterFactory::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_date',
+                    'mautic.lead.model.lead_segment_filter_operator',
+                ],
+            ],
+            'mautic.lead.model.relative_date' => [
+                'class'     => \Mautic\LeadBundle\Segment\RelativeDate::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_filter_date' => [
+                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterDate::class,
+                'arguments' => [
+                    'mautic.lead.model.relative_date',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_filter_operator' => [
+                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterOperator::class,
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
+                    'mautic.lead.segment.operator_options',
+                ],
+            ],
+            'mautic.lead.model.random_parameter_name' => [
+                'class'     => \Mautic\LeadBundle\Segment\RandomParameterName::class,
+            ],
+            'mautic.lead.repository.lead_list_segment_repository' => [
+                'class'     => \Mautic\LeadBundle\Entity\LeadListSegmentRepository::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'event_dispatcher',
+                    'mautic.lead.model.random_parameter_name',
+                ],
+            ],
+            'mautic.lead.segment.operator_options' => [
+                'class'     => \Mautic\LeadBundle\Segment\OperatorOptions::class,
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel',
