@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -662,6 +663,39 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * @param array  $parameters
+     * @param Lead   $entity
+     * @param string $action
+     *
+     * @return mixed|void
+     */
+    protected function prepareParametersForBinding($parameters, $entity, $action)
+    {
+        if (isset($parameters['owner'])) {
+            $owner = $this->getModel('user.user')->getEntity((int) $parameters['owner']);
+            $entity->setOwner($owner);
+            unset($parameters['owner']);
+        }
+
+        if (isset($parameters['color'])) {
+            $entity->setColor($parameters['color']);
+            unset($parameters['color']);
+        }
+
+        if (isset($parameters['points'])) {
+            $entity->setPoints((int) $parameters['points']);
+            unset($parameters['points']);
+        }
+
+        if (isset($parameters['tags'])) {
+            $this->model->modifyTags($entity, $parameters['tags']);
+            unset($parameters['tags']);
+        }
+
+        return $parameters;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param \Mautic\LeadBundle\Entity\Lead &$entity
@@ -687,22 +721,6 @@ class LeadApiController extends CommonApiController
             }
 
             unset($originalParams['ipAddress']);
-        }
-
-        // Check for tags
-        if (isset($originalParams['tags'])) {
-            $this->model->modifyTags($entity, $originalParams['tags']);
-            unset($originalParams['tags']);
-        }
-
-        // Contact parameters which can be updated apart form contact fields
-        $contactParams = ['points', 'color', 'owner'];
-
-        foreach ($contactParams as $contactParam) {
-            if (isset($parameters[$contactParam])) {
-                $entity->setPoints($parameters[$contactParam]);
-                unset($parameters[$contactParam]);
-            }
         }
 
         // Check for lastActive date
