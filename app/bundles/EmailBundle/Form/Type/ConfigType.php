@@ -515,7 +515,7 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory", "smart"]}';
+        $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory"]}';
 
         $builder->add(
             'mailer_spool_type',
