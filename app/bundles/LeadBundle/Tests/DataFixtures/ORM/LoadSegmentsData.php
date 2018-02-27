@@ -486,6 +486,40 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => true,
             ],
+            [ // ID 26
+                'name'    => 'Segment with relative date - last week',
+                'alias'   => 'segment-with-relative-date-last-week',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'last week',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 27
+                'name'    => 'Segment with relative date - tomorrow',
+                'alias'   => 'segment-with-relative-date-tomorrow',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'tomorrow',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {

@@ -97,9 +97,9 @@ class ListModelFunctionalTest extends MauticWebTestCase
         );
 
         $this->assertEquals(
-            53,
+            54,
             $segmentContacts[$segmentTest5Ref->getId()]['count'],
-            'There should be 53 contacts in the segment-test-5 segment.'
+            'There should be 54 contacts in the segment-test-5 segment.'
         );
 
         $this->assertEquals(
