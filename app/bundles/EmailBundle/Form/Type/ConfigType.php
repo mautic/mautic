@@ -515,15 +515,16 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory"]}';
+        $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory", "smart"]}';
 
         $builder->add(
             'mailer_spool_type',
             'choice',
             [
                 'choices' => [
-                    'memory' => 'mautic.email.config.mailer_spool_type.memory',
-                    'file'   => 'mautic.email.config.mailer_spool_type.file',
+                    'memory'  => 'mautic.email.config.mailer_spool_type.memory',
+                    'file'    => 'mautic.email.config.mailer_spool_type.file',
+                    'smart'   => 'mautic.email.config.mailer_spool_type.smart',
                 ],
                 'label'      => 'mautic.email.config.mailer.spool.type',
                 'label_attr' => ['class' => 'control-label'],
