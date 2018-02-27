@@ -11,13 +11,15 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Week;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+
 class DateWeekNext extends DateWeekAbstract
 {
     /**
      * {@inheritdoc}
      */
-    protected function modifyBaseDate()
+    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $this->dateTimeHelper->setDateTime('midnight monday next week', null);
+        $dateTimeHelper->setDateTime('midnight monday next week', null);
     }
 }

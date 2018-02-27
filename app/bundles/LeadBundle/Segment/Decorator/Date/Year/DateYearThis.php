@@ -11,13 +11,15 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Year;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+
 class DateYearThis extends DateYearAbstract
 {
     /**
      * {@inheritdoc}
      */
-    protected function modifyBaseDate()
+    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $this->dateTimeHelper->setDateTime('midnight first day of this year', null);
+        $dateTimeHelper->setDateTime('midnight first day of this year', null);
     }
 }

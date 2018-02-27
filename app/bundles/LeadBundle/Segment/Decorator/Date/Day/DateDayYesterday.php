@@ -11,13 +11,15 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Day;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+
 class DateDayYesterday extends DateDayAbstract
 {
     /**
      * {@inheritdoc}
      */
-    protected function modifyBaseDate()
+    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $this->dateTimeHelper->modify('-1 day');
+        $dateTimeHelper->modify('-1 day');
     }
 }

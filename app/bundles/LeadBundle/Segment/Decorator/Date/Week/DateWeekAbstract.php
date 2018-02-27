@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Week;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
 
@@ -27,14 +28,14 @@ abstract class DateWeekAbstract extends DateOptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected function getValueForBetweenRange()
+    protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
         $dateFormat = $this->dateOptionParameters->hasTimePart() ? 'Y-m-d H:i:s' : 'Y-m-d';
-        $startWith  = $this->dateTimeHelper->toUtcString($dateFormat);
+        $startWith  = $dateTimeHelper->toUtcString($dateFormat);
 
         $modifier = $this->getModifierForBetweenRange().' -1 second';
-        $this->dateTimeHelper->modify($modifier);
-        $endWith = $this->dateTimeHelper->toUtcString($dateFormat);
+        $dateTimeHelper->modify($modifier);
+        $endWith = $dateTimeHelper->toUtcString($dateFormat);
 
         return [$startWith, $endWith];
     }

@@ -24,32 +24,27 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
     protected $dateDecorator;
 
     /**
-     * @var DateTimeHelper
-     */
-    protected $dateTimeHelper;
-
-    /**
      * @var DateOptionParameters
      */
     protected $dateOptionParameters;
 
     /**
      * @param DateDecorator        $dateDecorator
-     * @param DateTimeHelper       $dateTimeHelper
      * @param DateOptionParameters $dateOptionParameters
      */
-    public function __construct(DateDecorator $dateDecorator, DateTimeHelper $dateTimeHelper, DateOptionParameters $dateOptionParameters)
+    public function __construct(DateDecorator $dateDecorator, DateOptionParameters $dateOptionParameters)
     {
         $this->dateDecorator        = $dateDecorator;
-        $this->dateTimeHelper       = $dateTimeHelper;
         $this->dateOptionParameters = $dateOptionParameters;
     }
 
     /**
      * This function is responsible for setting date. $this->dateTimeHelper holds date with midnight today.
      * Eg. +1 day for "tomorrow", -1 for yesterday etc.
+     *
+     * @param DateTimeHelper $dateTimeHelper
      */
-    abstract protected function modifyBaseDate();
+    abstract protected function modifyBaseDate(DateTimeHelper $dateTimeHelper);
 
     /**
      * This function is responsible for date modification for between operator.
@@ -63,9 +58,11 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
      * This function returns a value if between range is needed. Could return string for like operator or array for between operator
      * Eg. //LIKE 2018-01-23% for today, //LIKE 2017-12-% for last month, //LIKE 2017-% for last year, array for this week.
      *
+     * @param DateTimeHelper $dateTimeHelper
+     *
      * @return string|array
      */
-    abstract protected function getValueForBetweenRange();
+    abstract protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper);
 
     /**
      * This function returns an operator if between range is needed. Could return like or between.
@@ -102,21 +99,23 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
 
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $this->modifyBaseDate();
+        $dateTimeHelper = new DateTimeHelper('midnight today', null, 'local');
+
+        $this->modifyBaseDate($dateTimeHelper);
 
         $modifier   = $this->getModifierForBetweenRange();
         $dateFormat = $this->dateOptionParameters->hasTimePart() ? 'Y-m-d H:i:s' : 'Y-m-d';
 
         if ($this->dateOptionParameters->isBetweenRequired()) {
-            return $this->getValueForBetweenRange();
+            return $this->getValueForBetweenRange($dateTimeHelper);
         }
 
         if ($this->dateOptionParameters->shouldIncludeMidnigh()) {
             $modifier .= ' -1 second';
-            $this->dateTimeHelper->modify($modifier);
+            $dateTimeHelper->modify($modifier);
         }
 
-        return $this->dateTimeHelper->toUtcString($dateFormat);
+        return $dateTimeHelper->toUtcString($dateFormat);
     }
 
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)

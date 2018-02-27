@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayTomorrow;
@@ -63,37 +62,35 @@ class DateOptionFactory
         $relativeDateStrings  = $this->relativeDate->getRelativeDateStrings();
         $dateOptionParameters = new DateOptionParameters($leadSegmentFilterCrate, $relativeDateStrings);
 
-        $dtHelper = new DateTimeHelper('midnight today', null, 'local');
-
         $timeframe = $dateOptionParameters->getTimeframe();
         switch ($timeframe) {
             case 'birthday':
             case 'anniversary':
                 return new DateAnniversary($this->dateDecorator);
             case 'today':
-                return new DateDayToday($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateDayToday($this->dateDecorator, $dateOptionParameters);
             case 'tomorrow':
-                return new DateDayTomorrow($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateDayTomorrow($this->dateDecorator, $dateOptionParameters);
             case 'yesterday':
-                return new DateDayYesterday($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateDayYesterday($this->dateDecorator, $dateOptionParameters);
             case 'week_last':
-                return new DateWeekLast($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateWeekLast($this->dateDecorator, $dateOptionParameters);
             case 'week_next':
-                return new DateWeekNext($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateWeekNext($this->dateDecorator, $dateOptionParameters);
             case 'week_this':
-                return new DateWeekThis($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateWeekThis($this->dateDecorator, $dateOptionParameters);
             case 'month_last':
-                return new DateMonthLast($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateMonthLast($this->dateDecorator, $dateOptionParameters);
             case 'month_next':
-                return new DateMonthNext($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateMonthNext($this->dateDecorator, $dateOptionParameters);
             case 'month_this':
-                return new DateMonthThis($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateMonthThis($this->dateDecorator, $dateOptionParameters);
             case 'year_last':
-                return new DateYearLast($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateYearLast($this->dateDecorator, $dateOptionParameters);
             case 'year_next':
-                return new DateYearNext($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateYearNext($this->dateDecorator, $dateOptionParameters);
             case 'year_this':
-                return new DateYearThis($this->dateDecorator, $dtHelper, $dateOptionParameters);
+                return new DateYearThis($this->dateDecorator, $dateOptionParameters);
             case $timeframe && (false !== strpos($timeframe[0], '-') || false !== strpos($timeframe[0], '+')):
                 return new DateRelativeInterval($this->dateDecorator, $originalValue);
             default:

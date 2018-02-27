@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Day;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
 
@@ -27,9 +28,9 @@ abstract class DateDayAbstract extends DateOptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected function getValueForBetweenRange()
+    protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
-        return $this->dateTimeHelper->toUtcString('Y-m-d%');
+        return $dateTimeHelper->toUtcString('Y-m-d%');
     }
 
     /**
