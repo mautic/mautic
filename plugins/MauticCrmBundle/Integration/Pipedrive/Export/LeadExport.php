@@ -24,7 +24,7 @@ class LeadExport extends AbstractPipedrive
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
         if ($integrationEntity) {
             return false;
-        } elseif (!empty($lead->getEmail())) {
+        } elseif (!defined('PHPUNIT_TESTSUITE') && !empty($lead->getEmail())) {
             // try find Pipedrive contact, create new entity but not new pipedrive contact, then update
             $personData = $this->getIntegration()->getApiHelper()->findByEmail($lead->getEmail());
             if (!empty($personData)) {
