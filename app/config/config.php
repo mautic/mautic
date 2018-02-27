@@ -250,19 +250,32 @@ $container->loadFromExtension('doctrine_migrations', [
 
 // Swiftmailer Configuration
 $mailerSettings = [
-    'transport'  => '%mautic.mailer_transport%',
-    'host'       => '%mautic.mailer_host%',
-    'port'       => '%mautic.mailer_port%',
-    'username'   => '%mautic.mailer_user%',
-    'password'   => '%mautic.mailer_password%',
-    'encryption' => '%mautic.mailer_encryption%',
-    'auth_mode'  => '%mautic.mailer_auth_mode%',
+    'default_mailer' => 'default',
+    'mailers'        => [
+        'default' => [
+            'transport'  => '%mautic.mailer_transport%',
+            'host'       => '%mautic.mailer_host%',
+            'port'       => '%mautic.mailer_port%',
+            'username'   => '%mautic.mailer_user%',
+            'password'   => '%mautic.mailer_password%',
+            'encryption' => '%mautic.mailer_encryption%',
+            'auth_mode'  => '%mautic.mailer_auth_mode%',
+        ],
+    ],
 ];
 
 // Only spool if using file as otherwise emails are not sent on redirects
 $spoolType = $container->getParameter('mautic.mailer_spool_type');
-if ($spoolType == 'file') {
-    $mailerSettings['spool'] = [
+
+if ($spoolType == 'smart') {
+    // smart mode add second, queue mailer
+    $mailerSettings['mailers']['queue']          = $mailerSettings['mailers']['default'];
+    $mailerSettings['mailers']['queue']['spool'] = [
+        'type' => '%mautic.mailer_spool_type%',
+        'path' => '%mautic.mailer_spool_path%',
+    ];
+} elseif ($spoolType == 'file') {
+    $mailerSettings['mailers']['default']['spool'] = [
         'type' => '%mautic.mailer_spool_type%',
         'path' => '%mautic.mailer_spool_path%',
     ];

@@ -582,6 +582,7 @@ return [
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_contacts',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [

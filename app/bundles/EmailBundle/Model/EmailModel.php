@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -121,18 +122,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     protected $sendModel;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * EmailModel constructor.
      *
-     * @param IpLookupHelper     $ipLookupHelper
-     * @param ThemeHelper        $themeHelper
-     * @param Mailbox            $mailboxHelper
-     * @param MailHelper         $mailHelper
-     * @param LeadModel          $leadModel
-     * @param CompanyModel       $companyModel
-     * @param TrackableModel     $pageTrackableModel
-     * @param UserModel          $userModel
-     * @param MessageQueueModel  $messageQueueModel
-     * @param SendEmailToContact $sendModel
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param ThemeHelper          $themeHelper
+     * @param Mailbox              $mailboxHelper
+     * @param MailHelper           $mailHelper
+     * @param LeadModel            $leadModel
+     * @param CompanyModel         $companyModel
+     * @param TrackableModel       $pageTrackableModel
+     * @param UserModel            $userModel
+     * @param MessageQueueModel    $messageQueueModel
+     * @param SendEmailToContact   $sendModel
+     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -144,18 +151,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         TrackableModel $pageTrackableModel,
         UserModel $userModel,
         MessageQueueModel $messageQueueModel,
-        SendEmailToContact $sendModel
+        SendEmailToContact $sendModel,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper     = $ipLookupHelper;
-        $this->themeHelper        = $themeHelper;
-        $this->mailboxHelper      = $mailboxHelper;
-        $this->mailHelper         = $mailHelper;
-        $this->leadModel          = $leadModel;
-        $this->companyModel       = $companyModel;
-        $this->pageTrackableModel = $pageTrackableModel;
-        $this->userModel          = $userModel;
-        $this->messageQueueModel  = $messageQueueModel;
-        $this->sendModel          = $sendModel;
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->themeHelper          = $themeHelper;
+        $this->mailboxHelper        = $mailboxHelper;
+        $this->mailHelper           = $mailHelper;
+        $this->leadModel            = $leadModel;
+        $this->companyModel         = $companyModel;
+        $this->pageTrackableModel   = $pageTrackableModel;
+        $this->userModel            = $userModel;
+        $this->messageQueueModel    = $messageQueueModel;
+        $this->sendModel            = $sendModel;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -1138,6 +1147,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $customHeaders       = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
         $emailType           = (isset($options['email_type'])) ? $options['email_type'] : '';
         $isMarketing         = (in_array($emailType, ['marketing']) || !empty($listId));
+        $isBroadcast         = (!empty($listId));
         $emailAttempts       = (isset($options['email_attempts'])) ? $options['email_attempts'] : 3;
         $emailPriority       = (isset($options['email_priority'])) ? $options['email_priority'] : MessageQueue::PRIORITY_NORMAL;
         $messageQueue        = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : null;
@@ -1152,6 +1162,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         if (!$email->getId()) {
             return false;
+        }
+
+        if ($isBroadcast && $this->coreParametersHelper->getParameter('mailer_spool_type') == 'smart') {
+            $this->sendModel->setMailer($this->factory->get('swiftmailer.mailer.queue'));
         }
 
         $singleEmail = false;

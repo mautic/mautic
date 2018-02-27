@@ -195,10 +195,11 @@ class EmailStepType extends AbstractType
             'button_group',
             [
                 'choice_list' => new ChoiceList(
-                    ['memory', 'file'],
+                    ['memory', 'file', 'smart'],
                     [
                         'mautic.email.config.mailer_spool_type.memory',
                         'mautic.email.config.mailer_spool_type.file',
+                        'mautic.email.config.mailer_spool_type.smart',
                     ]
                 ),
                 'label'       => 'mautic.install.form.email.spool_type',
