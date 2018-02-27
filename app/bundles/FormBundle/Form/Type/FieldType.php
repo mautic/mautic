@@ -422,7 +422,7 @@ class FieldType extends AbstractType
         // Put properties last so that the other values are available to form events
         $propertiesData = (isset($options['data']['properties'])) ? $options['data']['properties'] : [];
         if (!empty($options['customParameters'])) {
-            // $formTypeOptions = array_merge($formTypeOptions, ['data'=>$propertiesData]);
+            $formTypeOptions = array_merge($formTypeOptions, ['data'=>$propertiesData]);
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
         } else {
             switch ($type) {
