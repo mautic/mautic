@@ -190,6 +190,12 @@ return [
                     'doctrine.dbal.default_connection',
                 ],
             ],
+            'mautic.core.request.subscriber' => [
+                'class'     => \Mautic\CoreBundle\EventListener\RequestSubscriber::class,
+                'arguments' => [
+                    'security.csrf.token_manager',
+                ],
+            ],
             'mautic.core.stats.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
@@ -477,11 +483,12 @@ return [
                 'alias' => 'version',
             ],
             'mautic.helper.template.security' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\SecurityHelper',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\SecurityHelper::class,
                 'arguments' => [
                     'mautic.security',
                     'request_stack',
                     'event_dispatcher',
+                    'security.csrf.token_manager',
                 ],
                 'alias' => 'security',
             ],
