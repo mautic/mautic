@@ -17,8 +17,8 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * Class SecurityHelper.
@@ -58,8 +58,7 @@ class SecurityHelper extends Helper
         RequestStack $requestStack,
         EventDispatcherInterface $dispatcher,
         CsrfTokenManagerInterface $tokenManager
-    )
-    {
+    ) {
         $this->security     = $security;
         $this->request      = $requestStack->getCurrentRequest();
         $this->dispatcher   = $dispatcher;
@@ -117,9 +116,9 @@ class SecurityHelper extends Helper
     }
 
     /**
-     * Returns CSRF token string for an intention
+     * Returns CSRF token string for an intention.
      *
-     * @param  string $intention
+     * @param string $intention
      *
      * @return string
      */
