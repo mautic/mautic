@@ -41,14 +41,14 @@ class Version20170906161951 extends AbstractMauticMigration
         $fk  = $this->generatePropertyName('contact_merge_records', 'fk', ['contact_id']);
 
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}contact_merge_records (
-    id INT AUTO_INCREMENT NOT NULL, 
-    contact_id INT NOT NULL, 
-    date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)', 
-    merged_id INT NOT NULL, 
-    name VARCHAR(255) NOT NULL, 
-    INDEX $idx (contact_id), 
-    INDEX {$this->prefix}contact_merge_date_added (date_added), INDEX {$this->prefix}contact_merge_ids (merged_id), 
+CREATE TABLE IF NOT EXISTS {$this->prefix}contact_merge_records (
+    id INT AUTO_INCREMENT NOT NULL,
+    contact_id INT NOT NULL,
+    date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)',
+    merged_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    INDEX $idx (contact_id),
+    INDEX {$this->prefix}contact_merge_date_added (date_added), INDEX {$this->prefix}contact_merge_ids (merged_id),
     PRIMARY KEY(id)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
 SQL;

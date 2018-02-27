@@ -36,7 +36,7 @@ class Version20160926000001 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}lead_companies_change_log (
+CREATE TABLE IF NOT EXISTS {$this->prefix}lead_companies_change_log (
   id int(11) AUTO_INCREMENT NOT NULL,
   lead_id int(11) NOT NULL,
   company_id INT(11) NOT NULL,

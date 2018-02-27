@@ -41,7 +41,7 @@ class Version20160926000000 extends AbstractMauticMigration
         $ownerFk  = $this->generatePropertyName('companies', 'fk', ['owner_id']);
         $ownerIdx = $this->generatePropertyName('companies', 'idx', ['owner_id']);
         $sql      = <<<SQL
-CREATE TABLE {$this->prefix}companies (
+CREATE TABLE IF NOT EXISTS {$this->prefix}companies (
   `id` int(11) AUTO_INCREMENT NOT NULL,
   `companyname` varchar(255) DEFAULT NULL,
   `companydescription` text DEFAULT NULL,
@@ -94,16 +94,16 @@ SQL;
         $company_index = $this->generatePropertyName('companies_leads', 'idx', ['company_id']);
 
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}companies_leads (
-        lead_id INT NOT NULL, 
-        company_id INT NOT NULL, 
+CREATE TABLE IF NOT EXISTS {$this->prefix}companies_leads (
+        lead_id INT NOT NULL,
+        company_id INT NOT NULL,
         date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)',
         manually_added TINYINT(1) NOT NULL,
         manually_removed TINYINT(1) NOT NULL,
-        INDEX {$lead_index} (lead_id), 
+        INDEX {$lead_index} (lead_id),
         INDEX {$company_index} (company_id),
         PRIMARY KEY(company_id, lead_id)
-        ) 
+        )
         DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
 SQL;
 
@@ -122,8 +122,8 @@ SQL;
         $this->addSql("ALTER TABLE {$this->prefix}lead_fields ADD INDEX {$this->prefix}search_by_object (object)");
 
         $sql = <<<SQL
-INSERT INTO `{$this->prefix}lead_fields` (`is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `object`,`properties`) 
-VALUES 
+INSERT INTO `{$this->prefix}lead_fields` (`is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `object`,`properties`)
+VALUES
 (1, 'Company Name', 'companyname', 'text', 'core', NULL, 1, 1, 1, 1, 1, 0, 0, 18, 'company', 'a:0:{}'),
 (1, 'Description', 'companydescription', 'textarea', 'professional', NULL, 0, 1, 1, 1, 1, 0, 0, 17, 'company', 'a:0:{}'),
 (1, 'Company Address 1', 'companyaddress1', 'text', 'core', NULL, 0, 1, 1, 1, 1, 0, 0, 13, 'company', 'a:0:{}'),

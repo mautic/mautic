@@ -32,6 +32,14 @@ trait CustomFieldEntityTrait
     protected $updatedFields = [];
 
     /**
+     * A place events can use to pass data around on the object to prevent issues like creating a contact and having it processed to be sent back
+     * to the origin of creation in a webhook (like Pipedrive).
+     *
+     * @var array
+     */
+    protected $eventData = [];
+
+    /**
      * @param $name
      *
      * @return bool
@@ -240,6 +248,27 @@ trait CustomFieldEntityTrait
 
             return $this->fields;
         }
+    }
+
+    /**
+     * @param $key
+     */
+    public function getEventData($key)
+    {
+        return (isset($this->eventData[$key])) ? $this->eventData[$key] : null;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     *
+     * @return $this
+     */
+    public function setEventData($key, $value)
+    {
+        $this->eventData[$key] = $value;
+
+        return $this;
     }
 
     /**
