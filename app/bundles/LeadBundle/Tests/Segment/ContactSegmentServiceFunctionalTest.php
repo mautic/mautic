@@ -51,9 +51,9 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
         $segmentTest5Ref = $this->fixtures->getReference('segment-test-5');
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest5Ref);
         $this->assertEquals(
-            54,
+            53,
             $segmentContacts[$segmentTest5Ref->getId()]['count'],
-            'There should be 54 contacts in the segment-test-5 segment.'
+            'There should be 53 contacts in the segment-test-5 segment.'
         );
 
         $likePercentEndRef = $this->fixtures->getReference('like-percent-end');
