@@ -95,7 +95,7 @@ class EventDispatcher
             $this->dispatchExecutedEvent($config, $event, $success);
 
             $failed = $pendingEvent->getFailures();
-            $this->dispatchedFailedEvent($config, $event, $failed);
+            $this->dispatchedFailedEvent($config, $failed);
 
             $this->validateProcessedLogs($logs, $success, $failed);
 
