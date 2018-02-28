@@ -101,6 +101,22 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
+    public function testSegmentCountIsCorrectForRelativePlus()
+    {
+        $name = 'Relative plus';
+        $lead = $this->createLead($name, 'now', '+5 days');
+
+        $this->checkSegmentResult($name, $lead);
+    }
+
+    public function testSegmentCountIsCorrectForRelativeMinus()
+    {
+        $name = 'Relative minus';
+        $lead = $this->createLead($name, 'now', '-4 days');
+
+        $this->checkSegmentResult($name, $lead);
+    }
+
     /**
      * @param string $name
      * @param Lead   $lead

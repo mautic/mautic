@@ -772,6 +772,58 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
+            [ // ID 37
+                'name'    => 'Segment with relative date - relative plus',
+                'alias'   => 'segment-with-relative-date-relative-plus',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => '+5 days',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 38
+                'name'    => 'Segment with relative date - relative minus',
+                'alias'   => 'segment-with-relative-date-relative-minus',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => '-4 days',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {
