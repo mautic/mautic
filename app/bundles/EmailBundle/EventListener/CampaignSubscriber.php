@@ -309,10 +309,18 @@ class CampaignSubscriber implements EventSubscriberInterface
         foreach ($contacts as $logId => $contact) {
             $leadCredentials = $contact->getProfileFields();
             if (empty($leadCredentials['email'])) {
-                $event->fail(
-                    $pending->get($logId),
-                    $this->translator->trans('mautic.email.contact_has_no_email', ['%contact%' => $contact->getPrimaryIdentifier()])
+                // Pass with a note to the UI because no use retrying
+                /** @var LeadEventLog $log */
+                $log = $pending->get($logId);
+                $log->appendToMetadata(
+                    [
+                        'failed' => $this->translator->trans(
+                            'mautic.email.contact_already_received_marketing_email',
+                            ['%contact%' => $contact->getPrimaryIdentifier()]
+                        ),
+                    ]
                 );
+                $event->pass($pending->get($logId));
                 unset($contactIds[$contact->getId()]);
                 continue;
             }

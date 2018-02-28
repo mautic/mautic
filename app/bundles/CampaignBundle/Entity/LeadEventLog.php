@@ -434,6 +434,19 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @param $metadata
+     */
+    public function appendToMetadata($metadata)
+    {
+        if (!is_array($metadata)) {
+            // Assumed output for timeline
+            $metadata = ['timeline' => $metadata];
+        }
+
+        $this->metadata = array_merge($this->metadata, $metadata);
+    }
+
+    /**
+     * @param $metadata
      *
      * @return $this
      */
