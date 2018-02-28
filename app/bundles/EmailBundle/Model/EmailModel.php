@@ -1322,7 +1322,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->sendModel->finalFlush();
 
         // Get the errors to return
-        $errorMessages  = $this->sendModel->getErrors();
+        $errorMessages  = array_merge($errors, $this->sendModel->getErrors());
         $failedContacts = $this->sendModel->getFailedContacts();
 
         // Get sent counts to update email stats
