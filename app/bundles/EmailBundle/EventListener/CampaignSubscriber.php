@@ -310,17 +310,13 @@ class CampaignSubscriber implements EventSubscriberInterface
             $leadCredentials = $contact->getProfileFields();
             if (empty($leadCredentials['email'])) {
                 // Pass with a note to the UI because no use retrying
-                /** @var LeadEventLog $log */
-                $log = $pending->get($logId);
-                $log->appendToMetadata(
-                    [
-                        'failed' => $this->translator->trans(
-                            'mautic.email.contact_already_received_marketing_email',
-                            ['%contact%' => $contact->getPrimaryIdentifier()]
-                        ),
-                    ]
+                $event->passWithError(
+                    $pending->get($logId),
+                    $this->translator->trans(
+                        'mautic.email.contact_already_received_marketing_email',
+                        ['%contact%' => $contact->getPrimaryIdentifier()]
+                    )
                 );
-                $event->pass($pending->get($logId));
                 unset($contactIds[$contact->getId()]);
                 continue;
             }
@@ -352,8 +348,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
                 if ($this->translator->trans('mautic.email.dnc') === $reason) {
                     // Do not log DNC as errors because they'll be retried rather just let the UI know
-                    $log->appendToMetadata(['failed' => $reason]);
-                    $event->pass($log);
+                    $event->passWithError($log, $reason);
                     continue;
                 }
 

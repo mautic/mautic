@@ -115,20 +115,30 @@ class PendingEvent extends AbstractLogCollectionEvent
      */
     public function pass(LeadEventLog $log)
     {
-        if ($failedLog = $log->getFailedLog()) {
-            // Delete existing entries
-            $failedLog->setLog(null);
-            $log->setFailedLog(null);
-
-            $metadata = $log->getMetadata();
-            unset($metadata['errors']);
-            $log->setMetadata($metadata);
+        $metadata = $log->getMetadata();
+        unset($metadata['errors']);
+        if (isset($metadata['failed'])) {
+            unset($metadata['failed'], $metadata['reason']);
         }
-        $this->logChannel($log);
-        $log->setIsScheduled(false)
-            ->setDateTriggered($this->now);
+        $log->setMetadata($metadata);
 
-        $this->successful->add($log);
+        $this->passLog($log);
+    }
+
+    /**
+     * @param LeadEventLog $log
+     * @param              $error
+     */
+    public function passWithError(LeadEventLog $log, $error)
+    {
+        $log->appendToMetadata(
+            [
+                'failed' => 1,
+                'reason' => $error,
+            ]
+        );
+
+        $this->passLog($log);
     }
 
     /**
@@ -177,5 +187,22 @@ class PendingEvent extends AbstractLogCollectionEvent
             $log->setChannel($this->channel)
                 ->setChannelId($this->channelId);
         }
+    }
+
+    /**
+     * @param LeadEventLog $log
+     */
+    private function passLog(LeadEventLog $log)
+    {
+        if ($failedLog = $log->getFailedLog()) {
+            // Delete existing entries
+            $failedLog->setLog(null);
+            $log->setFailedLog(null);
+        }
+        $this->logChannel($log);
+        $log->setIsScheduled(false)
+            ->setDateTriggered($this->now);
+
+        $this->successful->add($log);
     }
 }
