@@ -24,15 +24,79 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
     public function testSegmentCountIsCorrectForTomorrow()
     {
         $name = 'Tomorrow';
-        $lead = $this->createLead('Tomorrow', 'midnight tomorrow', '+10 seconds');
+        $lead = $this->createLead($name, 'midnight tomorrow', '+10 seconds');
 
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForLastWeek()
+    public function testSegmentCountIsCorrectForYesterday()
+    {
+        $name = 'Yesterday';
+        $lead = $this->createLead($name, 'midnight today', '-10 seconds');
+
+        $this->checkSegmentResult($name, $lead);
+    }
+
+    public function testSegmentCountIsCorrectForWeekLast()
     {
         $name = 'Last week';
-        $lead = $this->createLead('Last week', 'midnight monday last week', '+2 days');
+        $lead = $this->createLead($name, 'midnight monday last week', '+2 days');
+
+        $this->checkSegmentResult($name, $lead);
+    }
+
+    public function testSegmentCountIsCorrectForWeekNext()
+    {
+        $name = 'Next week';
+        $lead = $this->createLead($name, 'midnight monday next week', '+2 days');
+
+        $this->checkSegmentResult($name, $lead);
+    }
+
+    public function testSegmentCountIsCorrectForWeekThis()
+    {
+        $name = 'This week';
+        $lead = $this->createLead($name, 'midnight monday this week', '+2 days');
+
+        $this->checkSegmentResult($name, $lead);
+    }
+
+    public function testSegmentCountIsCorrectForMonthLast()
+    {
+        $name = 'Last month';
+        $lead = $this->createLead($name, 'midnight first day of last month', '+2 days');
+
+        $this->checkSegmentResult($name, $lead);
+    }
+
+    public function testSegmentCountIsCorrectForMonthNext()
+    {
+        $name = 'Next month';
+        $lead = $this->createLead($name, 'midnight first day of next month', '+2 days');
+
+        $this->checkSegmentResult($name, $lead);
+    }
+
+    public function testSegmentCountIsCorrectForMonthThis()
+    {
+        $name = 'This month';
+        $lead = $this->createLead($name, 'midnight first day of this month', '+2 days');
+
+        $this->checkSegmentResult($name, $lead);
+    }
+
+    public function testSegmentCountIsCorrectForYearLast()
+    {
+        $name = 'Last year';
+        $lead = $this->createLead($name, 'midnight first day of last year', '+2 days');
+
+        $this->checkSegmentResult($name, $lead);
+    }
+
+    public function testSegmentCountIsCorrectForYearNext()
+    {
+        $name = 'Next year';
+        $lead = $this->createLead($name, 'midnight first day of next year', '+2 days');
 
         $this->checkSegmentResult($name, $lead);
     }
