@@ -295,9 +295,9 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
 
         // Determine if this email is transactional/marketing
-        $logAssignments  = [];
         $pending         = $event->getPending();
         $contacts        = $event->getContacts();
+        $contactIds      = $event->getContactIds();
         $credentialArray = [];
 
         /**
@@ -311,6 +311,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                     $pending->get($logId),
                     $this->translator->trans('mautic.email.contact_has_no_email', ['%contact%' => $contact->getPrimaryIdentifier()])
                 );
+                unset($contactIds[$contact->getId()]);
                 continue;
             }
 
@@ -319,7 +320,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if ('marketing' == $type) {
             // Determine if this lead has received the email before and if so, don't send it again
-            $stats = $this->emailModel->getStatRepository()->checkContactsSentEmail(array_keys($logAssignments), $emailId, true);
+            $stats = $this->emailModel->getStatRepository()->checkContactsSentEmail($contactIds, $emailId, true);
 
             foreach ($stats as $contactId => $sent) {
                 /** @var LeadEventLog $log */
@@ -337,7 +338,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             // Fail those that failed to send
             foreach ($errors as $failedContactId => $reason) {
-                $log = $pending->get($logAssignments[$failedContactId]);
+                $log = $event->findLogByContactId($failedContactId);
                 $event->fail($log, $reason);
                 unset($credentialArray[$log->getId()]);
             }

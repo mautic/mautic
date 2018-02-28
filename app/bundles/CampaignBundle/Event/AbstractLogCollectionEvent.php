@@ -92,7 +92,9 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
      */
     public function getContactIds()
     {
-        return array_keys($this->logContactXref);
+        $contactIds = array_keys($this->logContactXref);
+
+        return array_combine($contactIds, $contactIds);
     }
 
     /**
