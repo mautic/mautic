@@ -20,6 +20,7 @@ use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\EventArrayTrait;
+use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
@@ -127,6 +128,8 @@ class LegacyEventDispatcher
 
                     continue;
                 }
+
+                $this->processSuccessLog($log);
 
                 $this->dispatchExecutedEvent($config, $log);
             }
@@ -295,6 +298,13 @@ class LegacyEventDispatcher
             CampaignEvents::ON_EVENT_EXECUTED,
             new ExecutedEvent($config, $log)
         );
+
+        $collection = new ArrayCollection();
+        $collection->set($log->getId(), $log);
+        $this->dispatcher->dispatch(
+            CampaignEvents::ON_EVENT_EXECUTED_BATCH,
+            new ExecutedBatchEvent($config, $log->getEvent(), $collection)
+        );
     }
 
     /**
@@ -357,5 +367,23 @@ class LegacyEventDispatcher
             ->setReason($reason);
 
         $log->setFailedLog($failedLog);
+    }
+
+    /**
+     * @param LeadEventLog $log
+     */
+    private function processSuccessLog(LeadEventLog $log)
+    {
+        if ($failedLog = $log->getFailedLog()) {
+            // Delete existing entries
+            $failedLog->setLog(null);
+            $log->setFailedLog(null);
+        }
+
+        $metadata = $log->getMetadata();
+        unset($metadata['errors']);
+        $log->setMetadata($metadata);
+
+        $log->setIsScheduled(false);
     }
 }

@@ -29,15 +29,21 @@ class ScheduledEvent extends CampaignScheduledEvent
     private $eventLog;
 
     /**
+     * @var bool
+     */
+    private $isReschedule;
+
+    /**
      * ScheduledEvent constructor.
      *
      * @param AbstractEventAccessor $config
      * @param LeadEventLog          $log
      */
-    public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
+    public function __construct(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false)
     {
-        $this->eventConfig = $config;
-        $this->eventLog    = $log;
+        $this->eventConfig  = $config;
+        $this->eventLog     = $log;
+        $this->isReschedule = $isReschedule;
 
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
@@ -67,5 +73,13 @@ class ScheduledEvent extends CampaignScheduledEvent
     public function getLog()
     {
         return $this->eventLog;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReschedule()
+    {
+        return $this->isReschedule;
     }
 }

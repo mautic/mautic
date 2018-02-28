@@ -107,15 +107,17 @@ class EventScheduler
 
     /**
      * @param Event           $event
+     * @param \DateTime       $executionDate
      * @param ArrayCollection $contacts
+     * @param bool            $inactive
      */
-    public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts)
+    public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts, $inactive = false)
     {
         $config = $this->collector->getEventConfig($event);
 
         foreach ($contacts as $contact) {
             // Create the entry
-            $log = $this->eventLogger->buildLogEntry($event, $contact);
+            $log = $this->eventLogger->buildLogEntry($event, $contact, $inactive);
 
             // Schedule it
             $log->setTriggerDate($executionDate);
@@ -154,7 +156,7 @@ class EventScheduler
         $event  = $log->getEvent();
         $config = $this->collector->getEventConfig($event);
 
-        $this->dispatchScheduledEvent($config, $log);
+        $this->dispatchScheduledEvent($config, $log, true);
     }
 
     /**
@@ -191,13 +193,12 @@ class EventScheduler
 
         if (null === $comparedToDateTime) {
             $comparedToDateTime = clone $now;
-        } else {
-            // Prevent comparisons from modifying original object
-            $comparedToDateTime = clone $comparedToDateTime;
         }
 
         switch ($event->getTriggerMode()) {
             case Event::TRIGGER_MODE_IMMEDIATE:
+                $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
+
                 return $now;
             case Event::TRIGGER_MODE_INTERVAL:
                 return $this->intervalScheduler->getExecutionDateTime($event, $now, $comparedToDateTime);
@@ -211,12 +212,13 @@ class EventScheduler
     /**
      * @param AbstractEventAccessor $config
      * @param LeadEventLog          $log
+     * @param bool                  $isReschedule
      */
-    private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log)
+    private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false)
     {
         $this->dispatcher->dispatch(
             CampaignEvents::ON_EVENT_SCHEDULED,
-            new ScheduledEvent($config, $log)
+            new ScheduledEvent($config, $log, $isReschedule)
         );
     }
 

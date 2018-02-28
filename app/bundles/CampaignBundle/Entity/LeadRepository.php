@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -188,5 +189,165 @@ class LeadRepository extends CommonRepository
         $q->setParameter('leadId', $lead->getId());
 
         return (bool) $q->execute()->fetchColumn();
+    }
+
+    /**
+     * @param                $campaignId
+     * @param                $decisionId
+     * @param                $parentDecisionId
+     * @param                $startAtContactId
+     * @param ContactLimiter $limiter
+     *
+     * @return array
+     */
+    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, $startAtContactId, ContactLimiter $limiter)
+    {
+        // Main query
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('l.lead_id, l.date_added')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
+            // Order by ID so we can query by greater than X contact ID when batching
+            ->orderBy('l.lead_id')
+            ->setMaxResults($limiter->getBatchLimit())
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('decisionId', (int) $decisionId);
+
+        // Contact IDs
+        $expr = $q->expr()->andX();
+        if ($specificContactId = $limiter->getContactId()) {
+            // Still query for this ID in case the ID fed to the command no longer exists
+            $expr->add(
+                $q->expr()->eq('l.lead_id', ':contactId')
+            );
+            $q->setParameter('contactId', (int) $specificContactId);
+        } elseif ($contactIds = $limiter->getContactIdList()) {
+            $expr->add(
+                $q->expr()->in('l.lead_id', $contactIds)
+            );
+        } else {
+            $expr->add(
+                $q->expr()->gt('l.lead_id', ':minContactId')
+            );
+            $q->setParameter('minContactId', (int) $startAtContactId);
+
+            if ($maxContactId = $limiter->getMaxContactId()) {
+                $expr->add(
+                    $q->expr()->lte('l.lead_id', ':maxContactId')
+                );
+                $q->setParameter('maxContactId', $maxContactId);
+            }
+        }
+
+        // Limit to specific campaign
+        $expr->add(
+            $q->expr()->eq('l.campaign_id', ':campaignId')
+        );
+
+        // Limit to events that have not been executed or scheduled yet
+        $eventQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $eventQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->where(
+                $eventQb->expr()->andX(
+                    $eventQb->expr()->eq('log.event_id', ':decisionId'),
+                    $eventQb->expr()->eq('log.lead_id', 'l.lead_id'),
+                    $eventQb->expr()->eq('log.rotation', 'l.rotation')
+                )
+            );
+        $expr->add(
+            sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
+        );
+
+        if ($parentDecisionId) {
+            // Limit to events that have no grandparent or whose grandparent has already been executed
+            $grandparentQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $grandparentQb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'grandparent_log')
+                ->where(
+                    $grandparentQb->expr()->eq('grandparent_log.event_id', ':grandparentId'),
+                    $grandparentQb->expr()->eq('grandparent_log.lead_id', 'l.lead_id'),
+                    $grandparentQb->expr()->eq('grandparent_log.rotation', 'l.rotation')
+                );
+            $q->setParameter('grandparentId', (int) $parentDecisionId);
+
+            $expr->add(
+                sprintf('EXISTS (%s)', $grandparentQb->getSQL())
+            );
+        }
+
+        $q->where($expr);
+
+        $results  = $q->execute()->fetchAll();
+        $contacts = [];
+        foreach ($results as $result) {
+            $contacts[$result['lead_id']] = new \DateTime($result['date_added'], new \DateTimeZone('UTC'));
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * This is approximate because the query that fetches contacts per decision is based on if the grandparent has been executed or not.
+     *
+     * @param      $decisionId
+     * @param      $parentDecisionId
+     * @param null $specificContactId
+     *
+     * @return int
+     */
+    public function getInactiveContactCount($campaignId, array $decisionIds, ContactLimiter $limiter)
+    {
+        // Main query
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('count(*)')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
+            // Order by ID so we can query by greater than X contact ID when batching
+            ->orderBy('l.lead_id')
+            ->setParameter('campaignId', (int) $campaignId);
+
+        // Contact IDs
+        $expr = $q->expr()->andX();
+        if ($specificContactId = $limiter->getContactId()) {
+            // Still query for this ID in case the ID fed to the command no longer exists
+            $expr->add(
+                $q->expr()->eq('l.lead_id', ':contactId')
+            );
+            $q->setParameter('contactId', $specificContactId);
+        } elseif ($minContactId = $limiter->getMinContactId()) {
+            // Still query for this ID in case the ID fed to the command no longer exists
+            $expr->add(
+                'l.lead_id BETWEEN :minContactId AND :maxContactId'
+            );
+            $q->setParameter('minContactId', $limiter->getMinContactId())
+                ->setParameter('maxContactId', $limiter->getMaxContactId());
+        } elseif ($contactIds = $limiter->getContactIdList()) {
+            $expr->add(
+                $q->expr()->in('l.lead_id', $contactIds)
+            );
+        }
+
+        // Limit to specific campaign
+        $expr->add(
+            $q->expr()->eq('l.campaign_id', ':campaignId')
+        );
+
+        // Limit to events that have not been executed or scheduled yet
+        $eventQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $eventQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->where(
+                $eventQb->expr()->andX(
+                    $eventQb->expr()->in('log.event_id', $decisionIds),
+                    $eventQb->expr()->eq('log.lead_id', 'l.lead_id'),
+                    $eventQb->expr()->eq('log.rotation', 'l.rotation')
+                )
+            );
+        $expr->add(
+            sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
+        );
+
+        $q->where($expr);
+
+        return (int) $q->execute()->fetchColumn();
     }
 }

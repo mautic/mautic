@@ -70,6 +70,11 @@ class EventExecutioner
     private $now;
 
     /**
+     * @var Responses
+     */
+    private $responses;
+
+    /**
      * EventExecutioner constructor.
      *
      * @param EventCollector  $eventCollector
@@ -100,34 +105,45 @@ class EventExecutioner
     }
 
     /**
-     * @param Event $event
-     * @param Lead  $contact
-     *
-     * @return ArrayCollection
+     * @param \DateTime $now
+     */
+    public function setNow(\DateTime $now)
+    {
+        $this->now = $now;
+    }
+
+    /**
+     * @param Event          $event
+     * @param Lead           $contact
+     * @param Responses|null $responses
+     * @param Counter|null   $counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeForContact(Event $event, Lead $contact, Responses $responses = null)
+    public function executeForContact(Event $event, Lead $contact, Responses $responses = null, Counter $counter = null)
     {
+        $this->responses = $responses;
+
         $contacts = new ArrayCollection([$contact->getId() => $contact]);
 
-        $this->executeForContacts($event, $contacts, null, $responses);
+        $this->executeForContacts($event, $contacts, $counter);
     }
 
     /**
      * @param Event           $event
      * @param ArrayCollection $contacts
      * @param Counter|null    $counter
+     * @param bool            $inactive
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null, Responses $responses = null)
+    public function executeForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null, $inactive = false)
     {
         if (!$contacts->count()) {
             $this->logger->debug('CAMPAIGN: No contacts to process for event ID '.$event->getId());
@@ -136,18 +152,9 @@ class EventExecutioner
         }
 
         $config = $this->collector->getEventConfig($event);
-        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts);
+        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $inactive);
 
         $this->executeLogs($event, $logs, $counter);
-
-        if ($responses) {
-            // Extract responses
-            $responses->setFromLogs($logs);
-        }
-
-        // Save updated log entries and clear from memory
-        $this->eventLogger->persistCollection($logs)
-            ->clear();
     }
 
     /**
@@ -192,6 +199,21 @@ class EventExecutioner
     }
 
     /**
+     * @param Event           $event
+     * @param ArrayCollection $contacts
+     * @param bool            $inactive
+     */
+    public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, $inactive = false)
+    {
+        $config = $this->collector->getEventConfig($event);
+        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $inactive);
+
+        // Save updated log entries and clear from memory
+        $this->eventLogger->persistCollection($logs)
+            ->clear();
+    }
+
+    /**
      * @param Event             $event
      * @param EvaluatedContacts $contacts
      * @param Counter|null      $counter
@@ -218,6 +240,7 @@ class EventExecutioner
             $this->logger->debug('CAMPAIGN: Contact IDs '.implode(',', $negative->getKeys()).' failed evaluation for event ID '.$event->getId());
 
             $children = $event->getNegativeChildren();
+
             $childrenCounter->advanceEvaluated($children->count());
             $this->executeContactsForChildren($children, $negative, $childrenCounter);
         }
@@ -255,17 +278,17 @@ class EventExecutioner
     }
 
     /**
-     * @param Event           $event
      * @param ArrayCollection $children
      * @param ArrayCollection $contacts
      * @param Counter         $childrenCounter
+     * @param bool            $inactive
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeContactsForChildren(ArrayCollection $children, ArrayCollection $contacts, Counter $childrenCounter)
+    public function executeContactsForChildren(ArrayCollection $children, ArrayCollection $contacts, Counter $childrenCounter, $inactive = false)
     {
         /** @var Event $child */
         foreach ($children as $child) {
@@ -282,11 +305,11 @@ class EventExecutioner
             );
 
             if ($executionDate > $this->now) {
-                $this->scheduler->schedule($child, $executionDate, $contacts);
+                $this->scheduler->schedule($child, $executionDate, $contacts, $inactive);
                 continue;
             }
 
-            $this->executeForContacts($child, $contacts, $childrenCounter);
+            $this->executeForContacts($child, $contacts, $childrenCounter, $inactive);
         }
     }
 
@@ -309,7 +332,7 @@ class EventExecutioner
         $contacts = $this->eventLogger->extractContactsFromLogs($logs);
 
         // Update and clear any pending logs
-        $this->eventLogger->persistCollection($logs);
+        $this->persistLogs($logs);
 
         // Process conditions that are attached to this action
         $this->executeContactsForConditionChildren($event, $contacts, $counter);
@@ -331,7 +354,7 @@ class EventExecutioner
         $evaluatedContacts = $this->conditionExecutioner->executeLogs($config, $logs);
 
         // Update and clear any pending logs
-        $this->eventLogger->persistCollection($logs);
+        $this->persistLogs($logs);
 
         $this->executeContactsForDecisionPathChildren($event, $evaluatedContacts, $counter);
     }
@@ -352,8 +375,23 @@ class EventExecutioner
         $evaluatedContacts = $this->decisionExecutioner->executeLogs($config, $logs);
 
         // Update and clear any pending logs
-        $this->eventLogger->persistCollection($logs);
+        $this->persistLogs($logs);
 
         $this->executeContactsForDecisionPathChildren($event, $evaluatedContacts, $counter);
+    }
+
+    /**
+     * @param ArrayCollection $logs
+     */
+    private function persistLogs(ArrayCollection $logs)
+    {
+        if ($this->responses) {
+            // Extract responses
+            $this->responses->setFromLogs($logs);
+        }
+
+        // Save updated log entries and clear from memory
+        $this->eventLogger->persistCollection($logs)
+            ->clear();
     }
 }

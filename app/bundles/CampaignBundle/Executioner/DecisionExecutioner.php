@@ -73,7 +73,7 @@ class DecisionExecutioner
     private $scheduler;
 
     /**
-     * @var DecisionResponses
+     * @var Responses
      */
     private $responses;
 

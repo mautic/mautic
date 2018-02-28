@@ -17,6 +17,8 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
+use Mautic\CampaignBundle\Event\DecisionResultsEvent;
+use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
@@ -90,10 +92,10 @@ class EventDispatcher
             $this->dispatcher->dispatch($customEvent, $pendingEvent);
 
             $success = $pendingEvent->getSuccessful();
-            $this->dispatchExecutedEvent($config, $success);
+            $this->dispatchExecutedEvent($config, $event, $success);
 
             $failed = $pendingEvent->getFailures();
-            $this->dispatchedFailedEvent($config, $failed);
+            $this->dispatchedFailedEvent($config, $event, $failed);
 
             $this->validateProcessedLogs($logs, $success, $failed);
 
@@ -125,6 +127,19 @@ class EventDispatcher
     }
 
     /**
+     * @param $config
+     * @param $logs
+     * @param $evaluatedContacts
+     */
+    public function dispatchDecisionResultsEvent($config, $logs, $evaluatedContacts)
+    {
+        $this->dispatcher->dispatch(
+            CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS,
+            new DecisionResultsEvent($config, $logs, $evaluatedContacts)
+        );
+    }
+
+    /**
      * @param ConditionAccessor $config
      * @param LeadEventLog      $log
      *
@@ -143,7 +158,7 @@ class EventDispatcher
      * @param AbstractEventAccessor $config
      * @param ArrayCollection       $logs
      */
-    public function dispatchExecutedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
+    public function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
         foreach ($logs as $log) {
             $this->dispatcher->dispatch(
@@ -151,6 +166,11 @@ class EventDispatcher
                 new ExecutedEvent($config, $log)
             );
         }
+
+        $this->dispatcher->dispatch(
+            CampaignEvents::ON_EVENT_EXECUTED_BATCH,
+            new ExecutedBatchEvent($config, $event, $logs)
+        );
     }
 
     /**

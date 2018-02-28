@@ -107,13 +107,22 @@ final class CampaignEvents
     const ON_EVENT_EXECUTED = 'mautic.campaign_on_event_executed';
 
     /**
+     * The mautic.campaign_on_event_executed_batch event is dispatched when a batch of campaign events are executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\ExecutedBatchEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_EXECUTED_BATCH = 'mautic.campaign_on_event_executed_batch';
+
+    /**
      * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled or scheduling is modified.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\ScheduledEvent instance.
      *
      * @var string
      */
-    const ON_EVENT_SCHEDULED = 'matuic.campaign_on_event_scheduled';
+    const ON_EVENT_SCHEDULED = 'mautic.campaign_on_event_scheduled';
 
     /**
      * The mautic.campaign_on_event_scheduled_batch event is dispatched when a batch of events are scheduled at once.
@@ -122,7 +131,7 @@ final class CampaignEvents
      *
      * @var string
      */
-    const ON_EVENT_SCHEDULED_BATCH = 'matuic.campaign_on_event_scheduled_batch';
+    const ON_EVENT_SCHEDULED_BATCH = 'mautic.campaign_on_event_scheduled_batch';
 
     /**
      * The mautic.campaign_on_event_failed event is dispatched when an event fails for whatever reason.
@@ -131,7 +140,7 @@ final class CampaignEvents
      *
      * @var string
      */
-    const ON_EVENT_FAILED = 'matuic.campaign_on_event_failed';
+    const ON_EVENT_FAILED = 'mautic.campaign_on_event_failed';
 
     /**
      * The mautic.campaign_on_event_decision_evaluation event is dispatched when a campaign decision is to be evaluated.
@@ -141,6 +150,15 @@ final class CampaignEvents
      * @var string
      */
     const ON_EVENT_DECISION_EVALUATION = 'mautic.campaign_on_event_decision_evaluation';
+
+    /**
+     * The mautic.campaign_on_event_decision_evaluation_results event is dispatched when a batch of contacts were evaluted for a decision.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\DecisionBatchEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_DECISION_EVALUATION_RESULTS = 'mautic.campaign_on_event_decision_evaluation_results';
 
     /**
      * The mautic.campaign_on_event_decision_evaluation event is dispatched when a campaign decision is to be evaluated.

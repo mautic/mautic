@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CampaignBundle\Command\TriggerCampaignCommand;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 class TriggerCampaignCommandTest extends MauticMysqlTestCase
@@ -82,8 +81,7 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
      */
     public function testCampaignExecution()
     {
-        $command = new TriggerCampaignCommand();
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1], $command);
+        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
 
         // Let's analyze
         $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13]);
@@ -126,7 +124,7 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
 
         // Wait 15 seconds then execute the campaign again to send scheduled events
         sleep(15);
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1], $command);
+        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
 
         // Send email 1 should no longer be scheduled
         $byEvent = $this->getCampaignEventLogs([2]);
@@ -149,24 +147,25 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
         // Now let's simulate email opens
         foreach ($stats as $stat) {
             $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
-            $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+            $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent()));
         }
 
-        // Those 25 should now have open email decisions logged and the next email sent
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 10, 14]);
-        $this->assertCount(25, $byEvent[3]);
-        $this->assertCount(25, $byEvent[10]);
 
         // The non-action events attached to the decision should have no logs entries
         $this->assertCount(0, $byEvent[4]);
         $this->assertCount(0, $byEvent[5]);
         $this->assertCount(0, $byEvent[14]);
 
+        // Those 25 should now have open email decisions logged and the next email sent
+        $this->assertCount(25, $byEvent[3]);
+        $this->assertCount(25, $byEvent[10]);
+
         // Wait 15 seconds to go beyond the inaction timeframe
         sleep(15);
 
         // Execute the command again to trigger inaction related events
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1], $command);
+        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
 
         // Now we should have 50 email open decisions
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 14]);

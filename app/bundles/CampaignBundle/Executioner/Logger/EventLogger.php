@@ -87,21 +87,27 @@ class EventLogger
     /**
      * @param Event $event
      * @param null  $lead
+     * @param bool  $inactive
      *
      * @return LeadEventLog
      */
-    public function buildLogEntry(Event $event, $lead = null)
+    public function buildLogEntry(Event $event, $lead = null, $inactive = false)
     {
         $log = new LeadEventLog();
 
         $log->setIpAddress($this->ipLookupHelper->getIpAddress());
 
         $log->setEvent($event);
+        $log->setCampaign($event->getCampaign());
 
         if ($lead == null) {
             $lead = $this->leadModel->getCurrentLead();
         }
         $log->setLead($lead);
+
+        if ($inactive) {
+            $log->setNonActionPathTaken(true);
+        }
 
         $log->setDateTriggered(new \DateTime());
         $log->setSystemTriggered(defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'));
@@ -212,14 +218,15 @@ class EventLogger
      * @param Event                 $event
      * @param AbstractEventAccessor $config
      * @param ArrayCollection       $contacts
+     * @param bool                  $inactive
      *
      * @return ArrayCollection
      */
-    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts)
+    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $inactive = false)
     {
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
-            $log = $this->buildLogEntry($event, $contact);
+            $log = $this->buildLogEntry($event, $contact, $inactive);
             $log->setIsScheduled(false);
             $log->setDateTriggered(new \DateTime());
 

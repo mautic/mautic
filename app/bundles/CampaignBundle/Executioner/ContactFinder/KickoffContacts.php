@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFound;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -50,29 +51,28 @@ class KickoffContacts
     }
 
     /**
-     * @param      $campaignId
-     * @param      $limit
-     * @param null $specificContactId
+     * @param                $campaignId
+     * @param ContactLimiter $limiter
      *
-     * @return Lead[]|ArrayCollection
+     * @return ArrayCollection
      *
      * @throws NoContactsFound
      */
-    public function getContacts($campaignId, $limit, $specificContactId = null)
+    public function getContacts($campaignId, ContactLimiter $limiter)
     {
         // Get list of all campaign leads; start is always zero in practice because of $pendingOnly
-        if ($campaignLeads = ($specificContactId) ? [$specificContactId] : $this->campaignRepository->getCampaignLeadIds($campaignId, 0, $limit, true)) {
-            $this->logger->debug('CAMPAIGN: Processing the following contacts: '.implode(', ', $campaignLeads));
-        }
+        $campaignContacts = $this->campaignRepository->getPendingContactIds($campaignId, $limiter);
 
-        if (empty($campaignLeads)) {
+        if (empty($campaignContacts)) {
             // No new contacts found in the campaign
 
             throw new NoContactsFound();
         }
 
+        $this->logger->debug('CAMPAIGN: Processing the following contacts: '.implode(', ', $campaignContacts));
+
         // Fetch entity objects for the found contacts
-        $contacts = $this->leadRepository->getContactCollection($campaignLeads);
+        $contacts = $this->leadRepository->getContactCollection($campaignContacts);
 
         if (!count($contacts)) {
             // Just a precaution in case non-existent contacts are lingering in the campaign leads table
@@ -91,9 +91,9 @@ class KickoffContacts
      *
      * @return mixed
      */
-    public function getContactCount($campaignId, array $eventIds, $specificContactId = null)
+    public function getContactCount($campaignId, array $eventIds, ContactLimiter $limiter)
     {
-        return $this->campaignRepository->getCampaignLeadCount($campaignId, $specificContactId, $eventIds);
+        return $this->campaignRepository->getPendingEventContactCount($campaignId, $eventIds, $limiter);
     }
 
     /**

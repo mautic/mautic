@@ -604,7 +604,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|Event[]
      */
     public function getChildren()
     {
@@ -612,7 +612,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|Event[]
      */
     public function getPositiveChildren()
     {
@@ -622,11 +622,11 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|Event[]
      */
     public function getNegativeChildren()
     {
-        $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_ACTION));
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_INACTION));
 
         return $this->getChildren()->matching($criteria);
     }

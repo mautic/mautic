@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -527,6 +528,136 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
+     * @param                $campaignId
+     * @param array          $pendingEvents
+     * @param ContactLimiter $limiter
+     *
+     * @return int
+     */
+    public function getPendingEventContactCount($campaignId, array $pendingEvents, ContactLimiter $limiter)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('count(cl.lead_id) as lead_count')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.manually_removed', ':false')
+                )
+            )
+            ->setParameter('false', false, 'boolean');
+
+        if ($leadId = $limiter->getContactId()) {
+            $q->andWhere(
+                $q->expr()->eq('cl.lead_id', (int) $leadId)
+            );
+        } elseif ($minContactId = $limiter->getMinContactId()) {
+            $q->andWhere(
+                'cl.lead_id BETWEEN :minContactId AND :maxContactId'
+            )
+                ->setParameter('minContactId', $minContactId)
+                ->setParameter('maxContactId', $limiter->getMaxContactId());
+        } elseif ($contactIds = $limiter->getContactIdList()) {
+            $q->andWhere(
+                $q->expr()->in('cl.lead_id', $contactIds)
+            );
+        }
+
+        if (count($pendingEvents) > 0) {
+            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $sq->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
+                ->where(
+                    $sq->expr()->andX(
+                        $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
+                        $sq->expr()->in('e.event_id', $pendingEvents)
+                    )
+                );
+
+            $q->andWhere(
+                sprintf('NOT EXISTS (%s)', $sq->getSQL())
+            );
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return (int) $results[0]['lead_count'];
+    }
+
+    /**
+     * Get pending contact IDs for a campaign.
+     *
+     * @param                $campaignId
+     * @param ContactLimiter $limiter
+     *
+     * @return array
+     */
+    public function getPendingContactIds($campaignId, ContactLimiter $limiter)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('cl.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.manually_removed', ':false')
+                )
+            )
+            ->setParameter('false', false, 'boolean')
+            ->orderBy('cl.lead_id', 'ASC');
+
+        if ($contactId = $limiter->getContactId()) {
+            $q->andWhere(
+                $q->expr()->eq('cl.lead_id', $contactId)
+            );
+        } elseif ($minContactId = $limiter->getMinContactId()) {
+            $q->andWhere(
+                'cl.lead_id BETWEEN :minContactId AND :maxContactId'
+            )
+                ->setParameter('minContactId', $minContactId)
+                ->setParameter('maxContactId', $limiter->getMaxContactId());
+        } elseif ($contactIds = $limiter->getContactIdList()) {
+            $q->andWhere(
+                $q->expr()->in('cl.lead_id', $contactIds)
+            );
+        }
+
+        // Only leads that have not started the campaign
+        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $sq->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
+            ->where(
+                $sq->expr()->andX(
+                    $sq->expr()->eq('e.lead_id', 'cl.lead_id'),
+                    $sq->expr()->eq('e.campaign_id', ':campaignId'),
+                    $sq->expr()->eq('e.rotation', 'cl.rotation')
+                )
+            );
+
+        $q->andWhere(
+            sprintf('NOT EXISTS (%s)', $sq->getSQL())
+        )
+            ->setParameter('campaignId', (int) $campaignId);
+
+        if ($limit = $limiter->getBatchLimit()) {
+            $q->setMaxResults($limit);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        $leads = [];
+        foreach ($results as $r) {
+            $leads[] = $r['lead_id'];
+        }
+
+        unset($results);
+
+        return $leads;
+    }
+
+    /**
      * Get a count of leads that belong to the campaign.
      *
      * @param       $campaignId
@@ -577,7 +708,44 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
+     * Get lead data of a campaign.
+     *
+     * @param            $campaignId
+     * @param int        $start
+     * @param bool|false $limit
+     * @param array      $select
+     *
+     * @return mixed
+     */
+    public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = ['cl.lead_id'])
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select($select)
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.manually_removed', ':false')
+                )
+            )
+            ->setParameter('false', false, 'boolean')
+            ->orderBy('cl.lead_id', 'ASC');
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
      * Get lead IDs of a campaign.
+     *
+     * @deprecated 2.13.0 to be removed in 3.0
      *
      * @param            $campaignId
      * @param int        $start
@@ -618,7 +786,7 @@ class CampaignRepository extends CommonRepository
             $q->andWhere(
                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
             )
-            ->setParameter('campaignId', (int) $campaignId);
+                ->setParameter('campaignId', (int) $campaignId);
         }
 
         if (!empty($limit)) {
@@ -639,40 +807,5 @@ class CampaignRepository extends CommonRepository
         unset($results);
 
         return $leads;
-    }
-
-    /**
-     * Get lead data of a campaign.
-     *
-     * @param            $campaignId
-     * @param int        $start
-     * @param bool|false $limit
-     * @param array      $select
-     *
-     * @return mixed
-     */
-    public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = ['cl.lead_id'])
-    {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $q->select($select)
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
-            ->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
-                    $q->expr()->eq('cl.manually_removed', ':false')
-                )
-            )
-            ->setParameter('false', false, 'boolean')
-            ->orderBy('cl.lead_id', 'ASC');
-
-        if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
-        }
-
-        $results = $q->execute()->fetchAll();
-
-        return $results;
     }
 }

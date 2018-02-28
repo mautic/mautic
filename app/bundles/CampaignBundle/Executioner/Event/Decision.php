@@ -75,6 +75,8 @@ class Decision implements EventInterface
             }
         }
 
+        $this->dispatcher->dispatchDecisionResultsEvent($config, $logs, $evaluatedContacts);
+
         return $evaluatedContacts;
     }
 

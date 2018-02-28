@@ -51,7 +51,7 @@ class DateTime implements ScheduleModeInterface
 
         if ($now >= $triggerDate) {
             $this->logger->debug(
-                'CAMPAIGN: Date to execute ('.$triggerDate->format('Y-m-d H:i:s T').') compared to now ('
+                'CAMPAIGN: ('.$event->getId().') Date to execute ('.$triggerDate->format('Y-m-d H:i:s T').') compared to now ('
                 .$now->format('Y-m-d H:i:s T').') and is thus overdue'
             );
 
@@ -59,31 +59,5 @@ class DateTime implements ScheduleModeInterface
         }
 
         return $triggerDate;
-
-        /*
-        if ($negate) {
-            $this->logger->debug(
-                'CAMPAIGN: Negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('
-                .$now->format('Y-m-d H:i:s T').') and is thus '.(($pastDue) ? 'overdue' : 'not past due')
-            );
-
-            //it is past the scheduled trigger date and the lead has done nothing so return true to trigger
-            //the event otherwise false to do nothing
-            $return = ($pastDue) ? true : $action['triggerDate'];
-
-            // Save some RAM for batch processing
-            unset($now, $action);
-
-            return $return;
-        } elseif (!$pastDue) {
-            $this->logger->debug(
-                'CAMPAIGN: Non-negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('
-                .$now->format('Y-m-d H:i:s T').') and is thus not past due'
-            );
-
-            //schedule the event
-            return $action['triggerDate'];
-        }
-         * */
     }
 }

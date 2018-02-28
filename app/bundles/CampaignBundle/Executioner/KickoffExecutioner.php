@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFound;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFound;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
@@ -27,22 +28,19 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class KickoffExecutioner
+class KickoffExecutioner implements ExecutionerInterface
 {
+    use ContactRangeTrait;
+
     /**
-     * @var null|int
+     * @var ContactLimiter
      */
-    private $contactId;
+    private $limiter;
 
     /**
      * @var Campaign
      */
     private $campaign;
-
-    /**
-     * @var int
-     */
-    private $batchLimit = 100;
 
     /**
      * @var OutputInterface
@@ -119,56 +117,22 @@ class KickoffExecutioner
 
     /**
      * @param Campaign             $campaign
-     * @param int                  $batchLimit
+     * @param ContactLimiter       $limiter
      * @param OutputInterface|null $output
      *
      * @return Counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
      * @throws NotSchedulableException
      */
-    public function executeForCampaign(Campaign $campaign, $batchLimit = 100, OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null)
     {
-        $this->campaign   = $campaign;
-        $this->contactId  = null;
-        $this->batchLimit = $batchLimit;
-        $this->output     = ($output) ? $output : new NullOutput();
-
-        return $this->execute();
-    }
-
-    /**
-     * @param Campaign             $campaign
-     * @param                      $contactId
-     * @param OutputInterface|null $output
-     *
-     * @return Counter
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws NotSchedulableException
-     */
-    public function executeForContact(Campaign $campaign, $contactId, OutputInterface $output = null)
-    {
-        $this->campaign   = $campaign;
-        $this->contactId  = $contactId;
-        $this->output     = ($output) ? $output : new NullOutput();
-        $this->batchLimit = null;
-
-        return $this->execute();
-    }
-
-    /**
-     * @return Counter
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws NotSchedulableException
-     */
-    private function execute()
-    {
-        $this->counter = new Counter();
+        $this->campaign = $campaign;
+        $this->limiter  = $limiter;
+        $this->output   = ($output) ? $output : new NullOutput();
+        $this->counter  = new Counter();
 
         try {
             $this->prepareForExecution();
@@ -194,13 +158,14 @@ class KickoffExecutioner
     {
         $this->logger->debug('CAMPAIGN: Triggering kickoff events');
 
+        $this->progressBar  = null;
         $this->batchCounter = 0;
 
         $this->rootEvents = $this->campaign->getRootEvents();
         $totalRootEvents  = $this->rootEvents->count();
         $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
 
-        $totalContacts      = $this->kickoffContacts->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->contactId);
+        $totalContacts      = $this->kickoffContacts->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
         $totalKickoffEvents = $totalRootEvents * $totalContacts;
 
         $this->output->writeln(
@@ -208,17 +173,17 @@ class KickoffExecutioner
                 'mautic.campaign.trigger.event_count',
                 [
                     '%events%' => $totalKickoffEvents,
-                    '%batch%'  => $this->batchLimit,
+                    '%batch%'  => $this->limiter->getBatchLimit(),
                 ]
             )
         );
 
-        $this->progressBar = ProgressBarHelper::init($this->output, $totalKickoffEvents);
-        $this->progressBar->start();
-
         if (!$totalKickoffEvents) {
             throw new NoEventsFound();
         }
+
+        $this->progressBar = ProgressBarHelper::init($this->output, $totalKickoffEvents);
+        $this->progressBar->start();
     }
 
     /**
@@ -235,7 +200,7 @@ class KickoffExecutioner
         $this->counter->advanceEventCount($this->rootEvents->count());
 
         // Loop over contacts until the entire campaign is executed
-        $contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->batchLimit, $this->contactId);
+        $contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->limiter);
         while ($contacts->count()) {
             /** @var Event $event */
             foreach ($this->rootEvents as $event) {
@@ -262,7 +227,7 @@ class KickoffExecutioner
             $this->kickoffContacts->clear();
 
             // Get the next batch
-            $contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->batchLimit, $this->contactId);
+            $contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->limiter);
         }
     }
 }

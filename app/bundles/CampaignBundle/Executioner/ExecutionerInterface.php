@@ -12,25 +12,17 @@
 namespace Mautic\CampaignBundle\Executioner;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Symfony\Component\Console\Output\OutputInterface;
 
 interface ExecutionerInterface
 {
     /**
      * @param Campaign             $campaign
-     * @param                      $contactId
+     * @param ContactLimiter       $limiter
      * @param OutputInterface|null $output
      *
      * @return mixed
      */
-    public function executeForContact(Campaign $campaign, $contactId, OutputInterface $output = null);
-
-    /**
-     * @param Campaign             $campaign
-     * @param int                  $batchLimit
-     * @param OutputInterface|null $output
-     *
-     * @return mixed
-     */
-    public function executeForCampaign(Campaign $campaign, $batchLimit = 100, OutputInterface $output = null);
+    public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null);
 }

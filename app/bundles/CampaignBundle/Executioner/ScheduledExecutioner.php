@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContacts;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFound;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
@@ -29,6 +30,8 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ScheduledExecutioner implements ExecutionerInterface
 {
+    use ContactRangeTrait;
+
     /**
      * @var LeadEventLogRepository
      */
@@ -65,14 +68,9 @@ class ScheduledExecutioner implements ExecutionerInterface
     private $campaign;
 
     /**
-     * @var
+     * @var ContactLimiter
      */
-    private $contactId;
-
-    /**
-     * @var int
-     */
-    private $batchLimit;
+    private $limiter;
 
     /**
      * @var OutputInterface
@@ -93,6 +91,11 @@ class ScheduledExecutioner implements ExecutionerInterface
      * @var Counter
      */
     private $counter;
+
+    /**
+     * @var \DateTime
+     */
+    private $now;
 
     /**
      * ScheduledExecutioner constructor.
@@ -122,60 +125,25 @@ class ScheduledExecutioner implements ExecutionerInterface
 
     /**
      * @param Campaign             $campaign
-     * @param int                  $batchLimit
+     * @param ContactLimiter       $limiter
      * @param OutputInterface|null $output
      *
      * @return Counter|mixed
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function executeForCampaign(Campaign $campaign, $batchLimit = 100, OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null)
     {
         $this->campaign   = $campaign;
-        $this->batchLimit = $batchLimit;
+        $this->limiter    = $limiter;
         $this->output     = ($output) ? $output : new NullOutput();
+        $this->counter    = new Counter();
 
         $this->logger->debug('CAMPAIGN: Triggering scheduled events');
-
-        return $this->execute();
-    }
-
-    /**
-     * @param Campaign             $campaign
-     * @param                      $contactId
-     * @param OutputInterface|null $output
-     *
-     * @return Counter|mixed
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Scheduler\Exception\NotSchedulableException
-     * @throws \Doctrine\ORM\Query\QueryException
-     */
-    public function executeForContact(Campaign $campaign, $contactId, OutputInterface $output = null)
-    {
-        $this->campaign   = $campaign;
-        $this->contactId  = $contactId;
-        $this->output     = ($output) ? $output : new NullOutput();
-        $this->batchLimit = null;
-
-        return $this->execute();
-    }
-
-    /**
-     * @return Counter
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Scheduler\Exception\NotSchedulableException
-     * @throws \Doctrine\ORM\Query\QueryException
-     */
-    private function execute()
-    {
-        $this->counter = new Counter();
 
         try {
             $this->prepareForExecution();
@@ -193,12 +161,78 @@ class ScheduledExecutioner implements ExecutionerInterface
     }
 
     /**
+     * @param array                $logIds
+     * @param OutputInterface|null $output
+     *
+     * @return Counter
+     *
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws \Doctrine\ORM\Query\QueryException
+     */
+    public function executeByIds(array $logIds, OutputInterface $output = null)
+    {
+        $this->output  = ($output) ? $output : new NullOutput();
+        $this->counter = new Counter();
+
+        if (!$logIds) {
+            return $this->counter;
+        }
+
+        $logs           = $this->repo->getScheduledById($logIds);
+        $totalLogsFound = $logs->count();
+        $this->counter->advanceEvaluated($totalLogsFound);
+
+        $this->logger->debug('CAMPAIGN: '.$logs->count().' events scheduled to execute.');
+        $this->output->writeln(
+            $this->translator->trans(
+                'mautic.campaign.trigger.event_count',
+                [
+                    '%events%' => $totalLogsFound,
+                    '%batch%'  => 'n/a',
+                ]
+            )
+        );
+
+        if (!$logs->count()) {
+            return $this->counter;
+        }
+
+        $this->progressBar = ProgressBarHelper::init($this->output, $totalLogsFound);
+        $this->progressBar->start();
+
+        // Validate that the schedule is still appropriate
+        $now = new \DateTime();
+        $this->validateSchedule($logs, $now);
+        $scheduledLogCount = $totalLogsFound - $logs->count();
+        $this->progressBar->advance($scheduledLogCount);
+
+        // Organize the logs by event ID
+        $organized = $this->organizeByEvent($logs);
+        foreach ($organized as $organizedLogs) {
+            $this->progressBar->advance($organizedLogs->count());
+
+            $event = $organizedLogs->first()->getEvent();
+            $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
+        }
+
+        $this->progressBar->finish();
+
+        return $this->counter;
+    }
+
+    /**
      * @throws NoEventsFound
      */
     private function prepareForExecution()
     {
+        $this->progressBar = null;
+        $this->now         = new \Datetime();
+
         // Get counts by event
-        $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->contactId);
+        $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
         $totalScheduledCount   = array_sum($scheduledEvents);
         $this->scheduledEvents = array_keys($scheduledEvents);
         $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
@@ -208,17 +242,17 @@ class ScheduledExecutioner implements ExecutionerInterface
                 'mautic.campaign.trigger.event_count',
                 [
                     '%events%' => $totalScheduledCount,
-                    '%batch%'  => $this->batchLimit,
+                    '%batch%'  => $this->limiter->getBatchLimit(),
                 ]
             )
         );
 
-        $this->progressBar = ProgressBarHelper::init($this->output, $totalScheduledCount);
-        $this->progressBar->start();
-
         if (!$totalScheduledCount) {
             throw new NoEventsFound();
         }
+
+        $this->progressBar = ProgressBarHelper::init($this->output, $totalScheduledCount);
+        $this->progressBar->start();
     }
 
     /**
@@ -253,7 +287,7 @@ class ScheduledExecutioner implements ExecutionerInterface
      */
     private function executeScheduled($eventId, \DateTime $now)
     {
-        $logs = $this->repo->getScheduled($eventId, $this->batchLimit, $this->contactId);
+        $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         $this->scheduledContacts->hydrateContacts($logs);
 
         while ($logs->count()) {
@@ -262,30 +296,31 @@ class ScheduledExecutioner implements ExecutionerInterface
             $this->counter->advanceEvaluated($logs->count());
 
             // Validate that the schedule is still appropriate
-            $this->validateSchedule($logs, $event, $now);
+            $this->validateSchedule($logs, $now);
 
             // Execute if there are any that did not get rescheduled
             $this->executioner->executeLogs($event, $logs, $this->counter);
 
             // Get next batch
             $this->scheduledContacts->clear();
-            $logs = $this->repo->getScheduled($eventId, $this->batchLimit, $this->contactId);
+            $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         }
     }
 
     /**
      * @param ArrayCollection $logs
-     * @param Event           $event
      * @param \DateTime       $now
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function validateSchedule(ArrayCollection $logs, Event $event, \DateTime $now)
+    private function validateSchedule(ArrayCollection $logs, \DateTime $now)
     {
         // Check if the event should be scheduled (let the schedulers do the debug logging)
         /** @var LeadEventLog $log */
         foreach ($logs as $key => $log) {
             if ($createdDate = $log->getDateTriggered()) {
+                $event = $log->getEvent();
+
                 // Date Triggered will be when the log entry was first created so use it to compare to ensure that the event's schedule
                 // hasn't been changed since this event was first scheduled
                 $executionDate = $this->scheduler->getExecutionDateTime($event, $now, $createdDate);
@@ -304,5 +339,27 @@ class ScheduledExecutioner implements ExecutionerInterface
                 }
             }
         }
+    }
+
+    /**
+     * @param ArrayCollection $logs
+     *
+     * @return ArrayCollection[]
+     */
+    private function organizeByEvent(ArrayCollection $logs)
+    {
+        $organized = [];
+        /** @var LeadEventLog $log */
+        foreach ($logs as $log) {
+            $event = $log->getEvent();
+
+            if (!isset($organized[$event->getId()])) {
+                $organized[$event->getId()] = new ArrayCollection();
+            }
+
+            $organized[$event->getId()]->set($log->getId(), $log);
+        }
+
+        return $organized;
     }
 }

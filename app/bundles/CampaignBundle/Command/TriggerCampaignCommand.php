@@ -11,16 +11,23 @@
 
 namespace Mautic\CampaignBundle\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignTriggerEvent;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class TriggerCampaignCommand.
@@ -28,9 +35,108 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class TriggerCampaignCommand extends ModeratedCommand
 {
     /**
+     * @var CampaignModel
+     */
+    private $campaignModel;
+
+    /**
      * @var EventDispatcher
      */
-    protected $dispatcher;
+    private $dispatcher;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var KickoffExecutioner
+     */
+    private $kickoffExecutioner;
+
+    /**
+     * @var ScheduledExecutioner
+     */
+    private $scheduledExecutioner;
+
+    /**
+     * @var InactiveExecutioner
+     */
+    private $inactiveExecutioner;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var OutputInterface
+     */
+    protected $output;
+
+    /**
+     * @var bool
+     */
+    private $kickoffOnly = false;
+
+    /**
+     * @var bool
+     */
+    private $inactiveOnly = false;
+
+    /**
+     * @var bool
+     */
+    private $scheduleOnly = false;
+
+    /**
+     * @var ContactLimiter
+     */
+    private $limiter;
+
+    /**
+     * @var Campaign
+     */
+    private $campaign;
+
+    /**
+     * TriggerCampaignCommand constructor.
+     *
+     * @param CampaignModel            $campaignModel
+     * @param EventDispatcherInterface $dispatcher
+     * @param TranslatorInterface      $translator
+     * @param KickoffExecutioner       $kickoffExecutioner
+     * @param ScheduledExecutioner     $scheduledExecutioner
+     * @param InactiveExecutioner      $inactiveExecutioner
+     * @param EntityManagerInterface   $em
+     * @param LoggerInterface          $logger
+     */
+    public function __construct(
+        CampaignModel $campaignModel,
+        EventDispatcherInterface $dispatcher,
+        TranslatorInterface $translator,
+        KickoffExecutioner $kickoffExecutioner,
+        ScheduledExecutioner $scheduledExecutioner,
+        InactiveExecutioner $inactiveExecutioner,
+        EntityManagerInterface $em,
+        LoggerInterface $logger
+    ) {
+        parent::__construct();
+
+        $this->campaignModel        = $campaignModel;
+        $this->dispatcher           = $dispatcher;
+        $this->translator           = $translator;
+        $this->kickoffExecutioner   = $kickoffExecutioner;
+        $this->scheduledExecutioner = $scheduledExecutioner;
+        $this->inactiveExecutioner  = $inactiveExecutioner;
+        $this->em                   = $em;
+        $this->logger               = $logger;
+    }
 
     /**
      * {@inheritdoc}
@@ -47,120 +153,130 @@ class TriggerCampaignCommand extends ModeratedCommand
                 'Trigger events for a specific campaign.  Otherwise, all campaigns will be triggered.',
                 null
             )
-            ->addOption('--scheduled-only', null, InputOption::VALUE_NONE, 'Trigger only scheduled events')
-            ->addOption('--negative-only', null, InputOption::VALUE_NONE, 'Trigger only negative events, i.e. with a "no" decision path.')
-            ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 100.', 100)
             ->addOption(
-                '--max-events',
-                '-m',
+                '--contact-id',
+                null,
                 InputOption::VALUE_OPTIONAL,
-                'Set max number of events to process per campaign for this script execution. Defaults to all.',
-                0
+                'Trigger events for a specific contact.',
+                null
+            )
+            ->addOption(
+                '--contact-ids',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'CSV of contact IDs to evaluate.'
+            )
+            ->addOption(
+                '--min-contact-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Trigger events starting at a specific contact ID.',
+                null
+            )
+            ->addOption(
+                '--max-contact-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Trigger events starting up to a specific contact ID.',
+                null
+            )
+            ->addOption(
+                '--kickoff-only',
+                null,
+                InputOption::VALUE_NONE,
+                'Just kickoff the campaign'
+            )
+            ->addOption(
+                '--scheduled-only',
+                null,
+                InputOption::VALUE_NONE,
+                'Just execute scheduled events'
+            )
+            ->addOption(
+                '--inactive-only',
+                null,
+                InputOption::VALUE_NONE,
+                'Just execute scheduled events'
+            )
+            ->addOption(
+                '--batch-limit',
+                '-l',
+                InputOption::VALUE_OPTIONAL,
+                'Set batch size of contacts to process per round. Defaults to 100.',
+                100
+            )
+            // @deprecated 2.13.0 to be removed in 3.0; use inactive-only instead
+            ->addOption(
+                '--negative-only',
+                null,
+                InputOption::VALUE_NONE,
+                'Just execute the inactive events'
             );
 
         parent::configure();
     }
 
     /**
-     * {@inheritdoc}
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int|null
+     *
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
+        $this->output       = $output;
+        $this->kickoffOnly  = $input->getOption('kickoff-only');
+        $this->scheduleOnly = $input->getOption('scheduled-only');
+        $this->inactiveOnly = $input->getOption('inactive-only') || $input->getOption('negative-only');
 
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel          = $container->get('mautic.campaign.model.campaign');
-        $this->dispatcher       = $container->get('event_dispatcher');
-        $this->translator       = $container->get('translator');
-        $this->em               = $container->get('doctrine')->getManager();
-        $this->output           = $output;
-        $id                     = $input->getOption('campaign-id');
-        $scheduleOnly           = $input->getOption('scheduled-only');
-        $negativeOnly           = $input->getOption('negative-only');
-        $batchLimit             = $input->getOption('batch-limit');
-
-        /* @var KickoffExecutioner $kickoff */
-        $this->kickoff = $container->get('mautic.campaign.executioner.kickoff');
-        /* @var ScheduledExecutioner $scheduled */
-        $this->scheduled = $container->get('mautic.campaign.executioner.scheduled');
+        $batchLimit   = $input->getOption('batch-limit');
+        $contactMinId = $input->getOption('min-contact-id');
+        $contactMaxId = $input->getOption('max-contact-id');
+        $contactId    = $input->getOption('contact-id');
+        if ($contactIds = $input->getOption('contact-ids')) {
+            $contactIds = array_map(
+                function ($id) {
+                    return (int) trim($id);
+                },
+                explode(',', $contactIds)
+            );
+        }
+        $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
+        $id = $input->getOption('campaign-id');
         if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
         }
 
+        // Specific campaign;
         if ($id) {
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
-            if (!$campaign = $campaignModel->getEntity($id)) {
+            if ($campaign = $this->campaignModel->getEntity($id)) {
+                $this->triggerCampaign($campaign);
+            } else {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
-
-                return 0;
             }
 
-            $this->triggerCampaign($campaign, $negativeOnly, $scheduleOnly, $batchLimit);
-        } else {
-            $campaigns = $campaignModel->getEntities(
-                [
-                    'iterator_mode' => true,
-                ]
-            );
+            $this->completeRun();
 
-            while (($next = $campaigns->next()) !== false) {
-                // Key is ID and not 0
-                $campaign = reset($next);
-                $this->triggerCampaign($campaign, $negativeOnly, $scheduleOnly, $batchLimit);
-            }
+            return 0;
         }
 
-        $this->completeRun();
+        // All published campaigns
+        /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
+        $campaigns = $this->campaignModel->getEntities(['iterator_mode' => true]);
+
+        while (($next = $campaigns->next()) !== false) {
+            // Key is ID and not 0
+            $campaign = reset($next);
+            $this->triggerCampaign($campaign);
+        }
 
         return 0;
-    }
-
-    private function triggerCampaign(Campaign $campaign, $negativeOnly, $scheduleOnly, $batchLimit)
-    {
-        if (!$campaign->isPublished()) {
-            return;
-        }
-
-        if (!$this->dispatchTriggerEvent($campaign)) {
-            return;
-        }
-
-        $this->output->writeln('<info>'.$this->translator->trans('mautic.campaign.trigger.triggering', ['%id%' => $campaign->getId()]).'</info>');
-        if (!$negativeOnly && !$scheduleOnly) {
-            //trigger starting action events for newly added contacts
-            $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.starting').'</comment>');
-            $counter = $this->kickoff->executeForCampaign($campaign, $batchLimit, $this->output);
-            $this->output->writeln(
-                '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $counter->getExecuted()]).'</comment>'
-                ."\n"
-            );
-        }
-
-        if (!$negativeOnly) {
-            $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
-            $counter = $this->scheduled->executeForCampaign($campaign, $batchLimit, $this->output);
-            $this->output->writeln(
-                '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $counter->getExecuted()]).'</comment>'
-                ."\n"
-            );
-        }
-
-        /*
-        if (!$scheduleOnly) {
-            //find and trigger "no" path events
-            $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.negative').'</comment>');
-            $processed = $model->triggerNegativeEvents($c, $totalProcessed, $batch, $max, $output);
-            $output->writeln(
-                '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'
-                ."\n"
-            );
-        }
-        */
-
-        $this->em->detach($campaign);
     }
 
     /**
@@ -181,5 +297,111 @@ class TriggerCampaignCommand extends ModeratedCommand
         }
 
         return true;
+    }
+
+    /**
+     * @param Campaign $campaign
+     *
+     * @throws \Exception
+     */
+    private function triggerCampaign(Campaign $campaign)
+    {
+        if (!$campaign->isPublished()) {
+            return;
+        }
+
+        if (!$this->dispatchTriggerEvent($campaign)) {
+            return;
+        }
+
+        $this->campaign = $campaign;
+
+        try {
+            $this->output->writeln('<info>'.$this->translator->trans('mautic.campaign.trigger.triggering', ['%id%' => $campaign->getId()]).'</info>');
+            if (!$this->inactiveOnly && !$this->scheduleOnly) {
+                $this->executeKickoff();
+            }
+
+            if (!$this->inactiveOnly && !$this->kickoffOnly) {
+                $this->executeScheduled();
+            }
+
+            if (!$this->scheduleOnly && !$this->kickoffOnly) {
+                $this->executeInactive();
+            }
+
+            // Don't detach in tests since this command will be ran multiple times in the same process
+            if ('test' !== MAUTIC_ENV) {
+                $this->em->detach($campaign);
+            }
+        } catch (\Exception $exception) {
+            if ('prod' !== MAUTIC_ENV) {
+                // Throw the exception for dev/test mode
+                throw $exception;
+            }
+
+            $this->logger->error('CAMPAIGN: '.$exception->getMessage());
+        }
+    }
+
+    /**
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
+     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     */
+    private function executeKickoff()
+    {
+        //trigger starting action events for newly added contacts
+        $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.starting').'</comment>');
+
+        $counter = $this->kickoffExecutioner->execute($this->campaign, $this->limiter, $this->output);
+
+        $this->output->writeln(
+            '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $counter->getExecuted()])
+            .'</comment>'
+        );
+        $this->output->writeln('');
+    }
+
+    /**
+     * @throws \Doctrine\ORM\Query\QueryException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
+     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     */
+    private function executeScheduled()
+    {
+        $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
+
+        $counter = $this->scheduledExecutioner->execute($this->campaign, $this->limiter, $this->output);
+
+        $this->output->writeln(
+            "\n".
+            '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $counter->getExecuted()])
+            .'</comment>'
+        );
+        $this->output->writeln('');
+    }
+
+    /**
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
+     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     */
+    private function executeInactive()
+    {
+        //find and trigger "no" path events
+        $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.negative').'</comment>');
+
+        $counter = $this->inactiveExecutioner->execute($this->campaign, $this->limiter, $this->output);
+
+        $this->output->writeln(
+            '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $counter->getExecuted()])
+            .'</comment>'
+        );
+        $this->output->writeln('');
     }
 }

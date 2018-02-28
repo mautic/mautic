@@ -221,12 +221,18 @@ return [
             'mautic.campaign.model.event'     => [
                 'class'     => 'Mautic\CampaignBundle\Model\EventModel',
                 'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.lead.model.lead',
-                    'mautic.campaign.model.campaign',
                     'mautic.user.model.user',
                     'mautic.core.model.notification',
+                    'mautic.campaign.model.campaign',
+                    'mautic.lead.model.lead',
+                    'mautic.helper.ip_lookup',
                     'mautic.campaign.executioner.active_decision',
+                    'mautic.campaign.executioner.kickoff',
+                    'mautic.campaign.executioner.scheduled',
+                    'mautic.campaign.executioner.inactive',
+                    'mautic.campaign.executioner',
+                    'mautic.campaign.event_dispatcher',
+                    'mautic.campaign.event_collector',
                 ],
             ],
             'mautic.campaign.model.event_log' => [
@@ -281,6 +287,15 @@ return [
                 'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContacts::class,
                 'arguments' => [
                     'mautic.lead.repository.lead',
+                ],
+            ],
+            'mautic.campaign.contact_finder.inactive'     => [
+                'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContacts::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead',
+                    'mautic.campaign.repository.campaign',
+                    'mautic.campaign.repository.lead',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.campaign.event_dispatcher'        => [
@@ -395,6 +410,27 @@ return [
                     'mautic.campaign.scheduler',
                 ],
             ],
+            'mautic.campaign.executioner.inactive'     => [
+                'class'     => \Mautic\CampaignBundle\Executioner\InactiveExecutioner::class,
+                'arguments' => [
+                    'mautic.campaign.contact_finder.inactive',
+                    'monolog.logger.mautic',
+                    'translator',
+                    'mautic.campaign.scheduler',
+                    'mautic.campaign.helper.inactivity',
+                    'mautic.campaign.executioner',
+                ],
+            ],
+            'mautic.campaign.helper.inactivity' => [
+                'class'     => \Mautic\CampaignBundle\Executioner\Helper\InactiveHelper::class,
+                'arguments' => [
+                    'mautic.campaign.scheduler',
+                    'mautic.campaign.contact_finder.inactive',
+                    'mautic.campaign.repository.lead_event_log',
+                    'mautic.campaign.repository.event',
+                    'monolog.logger.mautic',
+                ],
+            ],
             // @deprecated 2.13.0 for BC support; to be removed in 3.0
             'mautic.campaign.legacy_event_dispatcher' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher::class,
@@ -405,6 +441,38 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.factory',
                 ],
+            ],
+        ],
+        'commands' => [
+            'mautic.campaign.command.trigger' => [
+                'class'     => \Mautic\CampaignBundle\Command\TriggerCampaignCommand::class,
+                'arguments' => [
+                    'mautic.campaign.model.campaign',
+                    'event_dispatcher',
+                    'translator',
+                    'mautic.campaign.executioner.kickoff',
+                    'mautic.campaign.executioner.scheduled',
+                    'mautic.campaign.executioner.inactive',
+                    'doctrine.orm.entity_manager',
+                    'monolog.logger.mautic',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.campaign.command.execute' => [
+                'class'     => \Mautic\CampaignBundle\Command\ExecuteEventCommand::class,
+                'arguments' => [
+                    'mautic.campaign.executioner.scheduled',
+                    'translator',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.campaign.command.validate' => [
+                'class'     => \Mautic\CampaignBundle\Command\ValidateEventCommand::class,
+                'arguments' => [
+                    'mautic.campaign.executioner.inactive',
+                    'translator',
+                ],
+                'tag' => 'console.command',
             ],
         ],
     ],

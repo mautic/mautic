@@ -298,7 +298,7 @@ class LeadEventLog implements ChannelInterface
      *
      * @return $this
      */
-    public function setEvent($event)
+    public function setEvent(Event $event)
     {
         $this->event = $event;
 

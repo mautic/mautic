@@ -318,7 +318,7 @@ class CommonRepository extends EntityRepository
      *
      * @param array $args
      *
-     * @return Paginator
+     * @return array|\Doctrine\ORM\Internal\Hydration\IterableResult|Paginator
      */
     public function getEntities(array $args = [])
     {

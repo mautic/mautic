@@ -62,8 +62,8 @@ class EventRepository extends LegacyEventRepository
             ->from(LeadEventLog::class, 'log_event')
             ->where(
                 $eventQb->expr()->andX(
-                    $eventQb->expr()->eq('IDENTITY(log_event.event)', 'IDENTITY(e.parent)'),
-                    $eventQb->expr()->eq('IDENTITY(log_event.lead)', 'IDENTITY(l.lead)'),
+                    $eventQb->expr()->eq('log_event.event', 'e'),
+                    $eventQb->expr()->eq('log_event.lead', 'l.lead'),
                     $eventQb->expr()->eq('log_event.rotation', 'l.rotation')
                 )
             );
@@ -73,8 +73,8 @@ class EventRepository extends LegacyEventRepository
         $parentQb->select('parent_log_event.id')
             ->from(LeadEventLog::class, 'parent_log_event')
             ->where(
-                $parentQb->expr()->eq('IDENTITY(parent_log_event.event)', 'IDENTITY(e.parent)'),
-                $parentQb->expr()->eq('IDENTITY(parent_log_event.lead)', 'IDENTITY(l.lead)'),
+                $parentQb->expr()->eq('parent_log_event.event', 'e.parent'),
+                $parentQb->expr()->eq('parent_log_event.lead', 'l.lead'),
                 $parentQb->expr()->eq('parent_log_event.rotation', 'l.rotation')
             );
 
