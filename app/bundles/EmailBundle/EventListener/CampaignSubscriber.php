@@ -279,7 +279,9 @@ class CampaignSubscriber implements EventSubscriberInterface
         $email   = $this->emailModel->getEntity($emailId);
 
         if (!$email || !$email->isPublished()) {
-            return $event->failAll('Email not found or published');
+            $event->failAll('Email not found or published');
+
+            return;
         }
 
         $event->setChannel('email', $emailId);
