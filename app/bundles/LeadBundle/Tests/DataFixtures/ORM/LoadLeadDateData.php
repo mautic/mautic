@@ -48,16 +48,52 @@ class LoadLeadDateData extends AbstractFixture implements OrderedFixtureInterfac
 
         $data = [
             [
+                'name'         => 'Today',
+                'initialTime'  => 'midnight today',
+                'dateModifier' => '+10 seconds',
+            ],
+            [
                 'name'         => 'Tomorrow',
                 'initialTime'  => 'midnight tomorrow',
                 'dateModifier' => '+10 seconds',
+            ],
+            [
+                'name'         => 'Yesterday',
+                'initialTime'  => 'midnight today',
+                'dateModifier' => '-10 seconds',
             ],
             [
                 'name'         => 'Last week',
                 'initialTime'  => 'midnight monday last week',
                 'dateModifier' => '+2 days',
             ],
+            [
+                'name'         => 'Next week',
+                'initialTime'  => 'midnight monday next week',
+                'dateModifier' => '+2 days',
+            ],
+            [
+                'name'         => 'This week',
+                'initialTime'  => 'midnight monday this week',
+                'dateModifier' => '+2 days',
+            ],
+            [
+                'name'         => 'Last month',
+                'initialTime'  => 'midnight first day of last month',
+                'dateModifier' => '+2 days',
+            ],
+            [
+                'name'         => 'Next month',
+                'initialTime'  => 'midnight first day of next month',
+                'dateModifier' => '+2 days',
+            ],
+            [
+                'name'         => 'This month',
+                'initialTime'  => 'midnight first day of this month',
+                'dateModifier' => '+2 days',
+            ],
         ];
+        $data = [];
 
         foreach ($data as $lead) {
             $this->createLead($leadRepository, $lead['name'], $lead['initialTime'], $lead['dateModifier']);
