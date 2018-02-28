@@ -34,6 +34,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class TriggerCampaignCommand extends ModeratedCommand
 {
+    use ContactIdsInputTrait;
+
     /**
      * @var CampaignModel
      */
@@ -235,14 +237,8 @@ class TriggerCampaignCommand extends ModeratedCommand
         $contactMinId = $input->getOption('min-contact-id');
         $contactMaxId = $input->getOption('max-contact-id');
         $contactId    = $input->getOption('contact-id');
-        if ($contactIds = $input->getOption('contact-ids')) {
-            $contactIds = array_map(
-                function ($id) {
-                    return (int) trim($id);
-                },
-                explode(',', $contactIds)
-            );
-        }
+        $contactIds   = $this->getContactIds($input);
+
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);

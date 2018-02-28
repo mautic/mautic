@@ -25,6 +25,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class ValidateEventCommand extends Command
 {
+    use ContactIdsInputTrait;
+
     /**
      * @var InactiveExecutioner
      */
@@ -92,14 +94,7 @@ class ValidateEventCommand extends Command
 
         $decisionId = $input->getOption('decision-id');
         $contactId  = $input->getOption('contact-id');
-        if ($contactIds = $input->getOption('contact-ids')) {
-            $contactIds = array_map(
-                function ($id) {
-                    return (int) trim($id);
-                },
-                explode(',', $contactIds)
-            );
-        }
+        $contactIds = $this->getContactIds($input);
 
         if (!$contactIds && !$contactId) {
             $output->writeln(
