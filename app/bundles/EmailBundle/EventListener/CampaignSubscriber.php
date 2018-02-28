@@ -345,6 +345,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             // Fail those that failed to send
             foreach ($errors as $failedContactId => $reason) {
                 $log = $event->findLogByContactId($failedContactId);
+                unset($credentialArray[$log->getId()]);
 
                 if ($this->translator->trans('mautic.email.dnc') === $reason) {
                     // Do not log DNC as errors because they'll be retried rather just let the UI know
@@ -353,7 +354,6 @@ class CampaignSubscriber implements EventSubscriberInterface
                 }
 
                 $event->fail($log, $reason);
-                unset($credentialArray[$log->getId()]);
             }
 
             // Pass everyone else
