@@ -874,14 +874,6 @@ return [
             'mautic.lead.model.random_parameter_name' => [
                 'class'     => \Mautic\LeadBundle\Segment\RandomParameterName::class,
             ],
-            'mautic.lead.repository.lead_list_segment_repository' => [
-                'class'     => \Mautic\LeadBundle\Entity\LeadListSegmentRepository::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'event_dispatcher',
-                    'mautic.lead.model.random_parameter_name',
-                ],
-            ],
             'mautic.lead.segment.operator_options' => [
                 'class'     => \Mautic\LeadBundle\Segment\OperatorOptions::class,
             ],
