@@ -42,7 +42,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     {
         $this
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.')
-            ->addOption('--bypass-locking', '-b', InputOption::VALUE_NONE, 'Bypass locking.')
+            ->addOption('--bypass-locking', null, InputOption::VALUE_NONE, 'Bypass locking.')
             ->addOption(
                 '--timeout',
                 '-t',
