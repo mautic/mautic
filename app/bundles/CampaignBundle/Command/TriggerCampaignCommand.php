@@ -272,6 +272,8 @@ class TriggerCampaignCommand extends ModeratedCommand
             $this->triggerCampaign($campaign);
         }
 
+        $this->completeRun();
+
         return 0;
     }
 
