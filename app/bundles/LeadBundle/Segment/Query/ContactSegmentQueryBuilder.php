@@ -233,30 +233,6 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @return LeadSegmentFilterDescriptor
-     *
-     * @TODO Remove this function
-     */
-    public function getTranslator()
-    {
-        return $this->translator;
-    }
-
-    /**
-     * @param LeadSegmentFilterDescriptor $translator
-     *
-     * @return ContactSegmentQueryBuilder
-     *
-     * @TODO Remove this function
-     */
-    public function setTranslator($translator)
-    {
-        $this->translator = $translator;
-
-        return $this;
-    }
-
-    /**
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
      *
      * @TODO Remove this function
