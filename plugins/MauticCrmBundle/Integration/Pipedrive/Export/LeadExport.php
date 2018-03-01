@@ -14,7 +14,7 @@ class LeadExport extends AbstractPipedrive
     {
         // stop for anynomouse
         if (!defined('PHPUNIT_TESTSUITE') && $lead->isAnonymous()) {
-            return false;
+            //    return false;
         }
 
         $mappedData        = $this->getMappedLeadData($lead);
@@ -24,7 +24,7 @@ class LeadExport extends AbstractPipedrive
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
         if ($integrationEntity) {
             return false;
-        } elseif (!defined('PHPUNIT_TESTSUITE') && !empty($lead->getEmail())) {
+        } elseif (1 == 0 && !defined('PHPUNIT_TESTSUITE') && !empty($lead->getEmail())) {
             // try find Pipedrive contact, create new entity but not new pipedrive contact, then update
             $personData = $this->getIntegration()->getApiHelper()->findByEmail($lead->getEmail());
             if (!empty($personData)) {
