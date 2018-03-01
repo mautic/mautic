@@ -1411,14 +1411,14 @@ class QueryBuilder
 
     /**
      * @TODO I need to rewrite it, it's no longer necessary like this, we have direct access to query parts
-     * @TODO Throwing \Exception - replace it with any specific one? Functions calling this method does not handle exception, is it neccessary?
+     * @TODO Throwing QueryException - Functions calling this method do not handle exception, is it neccessary?
      *
      * @param $alias
      * @param $expr
      *
      * @return $this
      *
-     * @throws \Exception
+     * @throws QueryException
      */
     public function addJoinCondition($alias, $expr)
     {
@@ -1434,7 +1434,7 @@ class QueryBuilder
         }
 
         if (!isset($inserted)) {
-            throw new \Exception('Inserting condition to nonexistent join '.$alias);
+            throw new QueryException('Inserting condition to nonexistent join '.$alias);
         }
 
         $this->setQueryPart('join', $result);
@@ -1444,11 +1444,15 @@ class QueryBuilder
 
     /**
      * @TODO I need to rewrite it, it's no longer necessary like this, we have direct access to query parts
+     * @TODO This function seems not used at all
+     * @TODO Throwing QueryException - Functions calling this method do not handle exception, is it neccessary?
      *
      * @param $alias
      * @param $expr
      *
      * @return $this
+     *
+     * @throws QueryException
      */
     public function addOrJoinCondition($alias, $expr)
     {
@@ -1464,7 +1468,7 @@ class QueryBuilder
         }
 
         if (!isset($inserted)) {
-            throw new QueryBuilderException('Inserting condition to nonexistent join '.$alias);
+            throw new QueryException('Inserting condition to nonexistent join '.$alias);
         }
 
         $this->setQueryPart('join', $result);
