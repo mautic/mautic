@@ -439,7 +439,6 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param       $campaignId
      * @param array $ids
      *
      * @return ArrayCollection
