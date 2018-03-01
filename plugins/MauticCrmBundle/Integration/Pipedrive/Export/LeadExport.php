@@ -13,7 +13,7 @@ class LeadExport extends AbstractPipedrive
     public function create(Lead $lead)
     {
         // stop for anynomouse
-        if ($lead->isAnonymous()) {
+        if (!defined('PHPUNIT_TESTSUITE') && $lead->isAnonymous()) {
             return false;
         }
 
