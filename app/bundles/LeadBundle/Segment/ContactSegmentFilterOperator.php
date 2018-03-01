@@ -17,9 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class ContactSegmentFilterOperator
- *
- * @package Mautic\LeadBundle\Segment
+ * Class ContactSegmentFilterOperator.
  */
 class ContactSegmentFilterOperator
 {

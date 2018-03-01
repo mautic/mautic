@@ -19,9 +19,8 @@ use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
 
 /**
- * Class ContactSegmentFilterDictionary
+ * Class ContactSegmentFilterDictionary.
  *
- * @package Mautic\LeadBundle\Services
  * @todo @petr Já jsem to myslím předělával už. Chtěl jsem z toho pak udělat i objekt, aby se člověk nemusel ptát na klíče v poli, ale pak jsme na to nesahali, protože to nebylo komplet
  */
 class ContactSegmentFilterDictionary extends \ArrayIterator

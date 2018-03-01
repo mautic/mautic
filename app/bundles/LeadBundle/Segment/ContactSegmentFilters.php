@@ -12,9 +12,7 @@
 namespace Mautic\LeadBundle\Segment;
 
 /**
- * Class ContactSegmentFilters is array object containing filters
- *
- * @package Mautic\LeadBundle\Segment
+ * Class ContactSegmentFilters is array object containing filters.
  */
 class ContactSegmentFilters implements \Iterator, \Countable
 {
@@ -46,6 +44,7 @@ class ContactSegmentFilters implements \Iterator, \Countable
     public function addContactSegmentFilter(ContactSegmentFilter $contactSegmentFilter)
     {
         $this->contactSegmentFilters[] = $contactSegmentFilter;
+
         return $this;
     }
 
