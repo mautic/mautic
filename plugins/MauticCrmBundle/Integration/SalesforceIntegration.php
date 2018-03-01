@@ -2724,7 +2724,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => [$sfObject]]]);
 
         //get company fields from Mautic that have been mapped
-        $mauticCompanyFieldString = implode(', l.', $config['companyFields']);
+        $mauticCompanyFieldString = 'companyname';
+        if (!empty($config['companyFields'])) {
+            $mauticCompanyFieldString = implode(', l.', $config['companyFields']);
+        }
         $mauticCompanyFieldString = 'l.'.$mauticCompanyFieldString;
 
         $fieldKeys          = array_keys($config['companyFields']);
