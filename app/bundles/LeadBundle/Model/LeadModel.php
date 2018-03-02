@@ -548,7 +548,7 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
+    public function setFieldValues(Lead $lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
     {
         if ($fetchSocialProfiles) {
             //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
@@ -1055,7 +1055,7 @@ class LeadModel extends FormModel
         }
 
         // Run values through setFieldValues to clean them first
-        $this->setFieldValues($lead, $queryFields);
+        $this->setFieldValues($lead, $queryFields, false, false);
         $cleanFields = $lead->getFields();
 
         $uniqueFields    = $this->leadFieldModel->getUniqueIdentifierFields();
