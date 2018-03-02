@@ -981,7 +981,7 @@ return [
         'date_format_short'    => 'D, M d',
         'date_format_dateonly' => 'F j, Y',
         'date_format_timeonly' => 'g:i a',
-        'ip_lookup_service'    => 'maxmind_download',
+        'ip_lookup_service'    => '',
         'ip_lookup_auth'       => '',
         'ip_lookup_config'     => [],
         'transifex_username'   => '',
