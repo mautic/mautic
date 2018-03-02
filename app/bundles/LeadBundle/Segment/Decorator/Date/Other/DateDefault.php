@@ -33,8 +33,8 @@ class DateDefault implements FilterDecoratorInterface
      */
     public function __construct(DateDecorator $dateDecorator, $originalValue)
     {
-        $this->dateDecorator   = $dateDecorator;
-        $this->originalValue   = $originalValue;
+        $this->dateDecorator = $dateDecorator;
+        $this->originalValue = $originalValue;
     }
 
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)

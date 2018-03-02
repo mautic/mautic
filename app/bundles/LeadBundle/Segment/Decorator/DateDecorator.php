@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 /**
@@ -28,5 +29,10 @@ class DateDecorator extends CustomMappedDecorator
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         throw new \Exception('Instance of Date option need to implement this function');
+    }
+
+    public function getDefaultDate()
+    {
+        return new DateTimeHelper('midnight today', null, 'local');
     }
 }

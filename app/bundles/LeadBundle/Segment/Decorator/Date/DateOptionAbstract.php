@@ -99,7 +99,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
 
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $dateTimeHelper = new DateTimeHelper('midnight today', null, 'local');
+        $dateTimeHelper = $this->dateDecorator->getDefaultDate();
 
         $this->modifyBaseDate($dateTimeHelper);
 

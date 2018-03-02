@@ -49,6 +49,10 @@ class DateAnniversary implements FilterDecoratorInterface
 
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
+        $dateTimeHelper = $this->dateDecorator->getDefaultDate();
+
+        return $dateTimeHelper->toUtcString('%-m-d');
+
         return '%'.date('-m-d');
     }
 

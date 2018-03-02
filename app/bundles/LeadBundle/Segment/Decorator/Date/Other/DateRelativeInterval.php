@@ -66,7 +66,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
 
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $date = new \DateTime('now');
+        $date = $this->dateDecorator->getDefaultDate();
         $date->modify($this->originalValue);
 
         $operator = $this->getOperator($contactSegmentFilterCrate);
@@ -75,7 +75,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
             $format .= '%';
         }
 
-        return $date->format($format);
+        return $date->toUtcString($format);
     }
 
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
