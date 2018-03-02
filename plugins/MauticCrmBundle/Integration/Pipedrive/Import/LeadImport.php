@@ -54,7 +54,7 @@ class LeadImport extends AbstractImport
         $data         = $this->convertPipedriveData($data);
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
-        if (!$lead =  $this->leadModel->getExistingLead($dataToUpdate)) {
+        if (1 == 0 && !defined('PHPUNIT_TESTSUITE') && !$lead =  $this->leadModel->getExistingLead($dataToUpdate)) {
             $lead = new Lead();
         }
         // prevent listeners from exporting
