@@ -1083,7 +1083,7 @@ class LeadModel extends FormModel
             if (!empty($existingLeads)) {
                 $this->logger->addDebug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
                 // Merge with existing lead or use the one found
-                $lead = ($lead) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
+                $lead = ($lead->getId()) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
             }
         }
 
