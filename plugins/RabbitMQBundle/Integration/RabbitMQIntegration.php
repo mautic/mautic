@@ -255,7 +255,7 @@ class RabbitMQIntegration extends AbstractIntegration
                 unset($formattedLeadData['stage']);
             }
         }
-
+        
         return $formattedLeadData;
         
     }

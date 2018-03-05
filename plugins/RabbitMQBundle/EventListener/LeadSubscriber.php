@@ -130,11 +130,11 @@ class LeadSubscriber extends CommonSubscriber
         $channel = $connection->channel();
 
         // exchange, type, passive, durable, auto_delete
-        $channel->exchange_declare('kiazaki', 'direct', false, true, false);
+        $channel->exchange_declare('kiazaki', 'topic', false, true, false);
 
         $msg = new AMQPMessage($data);
 
-        $channel->basic_publish($msg, 'kiazaki', 'mautic');
+        $channel->basic_publish($msg, 'kiazaki', 'mautic.contact');
 
         $channel->close();
         $connection->close();

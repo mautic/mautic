@@ -111,16 +111,16 @@ class SFConsumerCommand extends ModeratedCommand
         $channel->basic_qos(0, 1, false);
 
 	    // exchange, type, passive, durable, auto_delete
-	    $channel->exchange_declare('kiazaki', 'direct', false, true, false);
+	    $channel->exchange_declare('kiazaki', 'topic', false, true, false);
 
 	    // queue, passive, durable, exclusive, auto_delete
-		$channel->queue_declare('salesforce', false, true, false, false);
+		$channel->queue_declare('salesforce.contact', false, true, false, false);
 
 	    // Declare the route_keys to listen to
-	    $routing_keys = ['mailengine', 'mautic'];
+	    $routing_keys = ['mailengine.contact', 'mautic.contact'];
 
 	    foreach($routing_keys as $routing_key) {
-	        $channel->queue_bind('salesforce', 'kiazaki', $routing_key);
+	        $channel->queue_bind('salesforce.contact', 'kiazaki', $routing_key);
 	    }
 
 	    $output->writeln('<info>[*] Waiting for messages. To exit press CTRL+C</info>');
@@ -224,7 +224,7 @@ class SFConsumerCommand extends ModeratedCommand
             }
 	    };
 
-	    $channel->basic_consume('salesforce', '', false, false, false, false, $callback);
+	    $channel->basic_consume('salesforce.contact', '', false, false, false, false, $callback);
 
 	    while(count($channel->callbacks)) {
 	        $channel->wait();
