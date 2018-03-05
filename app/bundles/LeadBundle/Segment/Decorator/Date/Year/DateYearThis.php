@@ -20,6 +20,6 @@ class DateYearThis extends DateYearAbstract
      */
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $dateTimeHelper->setDateTime('midnight first day of this year', null);
+        $dateTimeHelper->setDateTime('midnight first day of January this year', null);
     }
 }
