@@ -523,7 +523,7 @@ class EmailRepository extends CommonRepository
     /**
      * Up the read/sent counts.
      *
-     * @param            $id
+     * @param int        $id
      * @param string     $type
      * @param int        $increaseBy
      * @param bool|false $variant

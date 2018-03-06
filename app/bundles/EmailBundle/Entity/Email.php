@@ -241,8 +241,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('replyToAddress', Type::STRING, 'reply_to_address');
         $builder->addNullableField('bccAddress', Type::STRING, 'bcc_address');
         $builder->addNullableField('template', Type::STRING);
-        $builder->addNullableField('content', Type::ARRAY);
-        $builder->addNullableField('utmTags', Type::ARRAY, 'utm_tags');
+        $builder->addNullableField('content', Type::TARRAY);
+        $builder->addNullableField('utmTags', Type::TARRAY, 'utm_tags');
         $builder->addNullableField('plainText', Type::TEXT, 'plain_text');
         $builder->addNullableField('customHtml', Type::TEXT, 'custom_html');
         $builder->addNullableField('emailType', Type::TEXT, 'email_type');
