@@ -235,70 +235,23 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
 
         $builder->addIdColumns();
-        $builder->createField('subject', Type::TEXT)
-            ->nullable()
-            ->build();
-
-        $builder->createField('fromAddress', Type::STRING)
-            ->columnName('from_address')
-            ->nullable()
-            ->build();
-
-        $builder->createField('fromName', Type::STRING)
-            ->columnName('from_name')
-            ->nullable()
-            ->build();
-
-        $builder->createField('replyToAddress', Type::STRING)
-            ->columnName('reply_to_address')
-            ->nullable()
-            ->build();
-
-        $builder->createField('bccAddress', Type::STRING)
-            ->columnName('bcc_address')
-            ->nullable()
-            ->build();
-
-        $builder->createField('template', Type::STRING)
-            ->nullable()
-            ->build();
-
-        $builder->createField('content', Type::ARRAY)
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTags', Type::ARRAY)
-            ->columnName('utm_tags')
-            ->nullable()
-            ->build();
-
-        $builder->createField('plainText', Type::TEXT)
-            ->columnName('plain_text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('customHtml', Type::TEXT)
-            ->columnName('custom_html')
-            ->nullable()
-            ->build();
-
-        $builder->createField('emailType', Type::TEXT)
-            ->columnName('email_type')
-            ->nullable()
-            ->build();
-
+        $builder->addNullableField('subject', Type::TEXT);
+        $builder->addNullableField('fromAddress', Type::STRING, 'from_address');
+        $builder->addNullableField('fromName', Type::STRING, 'from_name');
+        $builder->addNullableField('replyToAddress', Type::STRING, 'reply_to_address');
+        $builder->addNullableField('bccAddress', Type::STRING, 'bcc_address');
+        $builder->addNullableField('template', Type::STRING);
+        $builder->addNullableField('content', Type::ARRAY);
+        $builder->addNullableField('utmTags', Type::ARRAY, 'utm_tags');
+        $builder->addNullableField('plainText', Type::TEXT, 'plain_text');
+        $builder->addNullableField('customHtml', Type::TEXT, 'custom_html');
+        $builder->addNullableField('emailType', Type::TEXT, 'email_type');
         $builder->addPublishDates();
-
-        $builder->createField('readCount', Type::INTEGER)
-            ->columnName('read_count')
-            ->build();
-
-        $builder->createField('sentCount', Type::INTEGER)
-            ->columnName('sent_count')
-            ->build();
-
+        $builder->addNamedField('readCount', Type::INTEGER, 'read_count');
+        $builder->addNamedField('sentCount', Type::INTEGER, 'sent_count');
+        $builder->addNamedField('variantSentCount', Type::INTEGER, 'variant_sent_count');
+        $builder->addNamedField('variantReadCount', Type::INTEGER, 'variant_read_count');
         $builder->addField('revision', Type::INTEGER);
-
         $builder->addCategory();
 
         $builder->createManyToMany('lists', LeadList::class)
@@ -319,14 +272,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
         self::addDynamicContentMetadata($builder);
-
-        $builder->createField('variantSentCount', Type::INTEGER)
-            ->columnName('variant_sent_count')
-            ->build();
-
-        $builder->createField('variantReadCount', Type::INTEGER)
-            ->columnName('variant_read_count')
-            ->build();
 
         $builder->createManyToOne('unsubscribeForm', Form::class)
             ->addJoinColumn('unsubscribeform_id', 'id', true, false, 'SET NULL')
