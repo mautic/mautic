@@ -207,6 +207,7 @@ class PublicController extends CommonFormController
                     // add frequencyPresent if posting custom preference center
                     if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
                         $html = $prefCenter->getCustomHtml();
+
                         $viewParameters['frequencyPresent'] = false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency);
                     }
                     return $this->postActionRedirect(
