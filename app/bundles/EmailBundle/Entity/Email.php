@@ -194,6 +194,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->readCount        = 0;
         $this->revision         = 0;
         $this->variantSentCount = 0;
+        $this->variantReadCount = 0;
         $this->variantStartDate = null;
         $this->emailType        = null;
         $this->sessionId        = 'new_'.hash('sha1', uniqid(mt_rand()));
@@ -216,6 +217,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Clear stats.
+     *
+     * @deprecated since 2.13.0, to be removed in 3.0.0 - not used anywhere
      */
     public function clearStats()
     {
