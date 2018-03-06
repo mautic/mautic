@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
@@ -229,78 +230,78 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('emails')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository')
+            ->setCustomRepositoryClass(EmailRepository::class)
             ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
             ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
 
         $builder->addIdColumns();
-        $builder->createField('subject', 'text')
+        $builder->createField('subject', Type::TEXT)
             ->nullable()
             ->build();
 
-        $builder->createField('fromAddress', 'string')
+        $builder->createField('fromAddress', Type::STRING)
             ->columnName('from_address')
             ->nullable()
             ->build();
 
-        $builder->createField('fromName', 'string')
+        $builder->createField('fromName', Type::STRING)
             ->columnName('from_name')
             ->nullable()
             ->build();
 
-        $builder->createField('replyToAddress', 'string')
+        $builder->createField('replyToAddress', Type::STRING)
             ->columnName('reply_to_address')
             ->nullable()
             ->build();
 
-        $builder->createField('bccAddress', 'string')
+        $builder->createField('bccAddress', Type::STRING)
             ->columnName('bcc_address')
             ->nullable()
             ->build();
 
-        $builder->createField('template', 'string')
+        $builder->createField('template', Type::STRING)
             ->nullable()
             ->build();
 
-        $builder->createField('content', 'array')
+        $builder->createField('content', Type::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('utmTags', 'array')
+        $builder->createField('utmTags', Type::ARRAY)
             ->columnName('utm_tags')
             ->nullable()
             ->build();
 
-        $builder->createField('plainText', 'text')
+        $builder->createField('plainText', Type::TEXT)
             ->columnName('plain_text')
             ->nullable()
             ->build();
 
-        $builder->createField('customHtml', 'text')
+        $builder->createField('customHtml', Type::TEXT)
             ->columnName('custom_html')
             ->nullable()
             ->build();
 
-        $builder->createField('emailType', 'text')
+        $builder->createField('emailType', Type::TEXT)
             ->columnName('email_type')
             ->nullable()
             ->build();
 
         $builder->addPublishDates();
 
-        $builder->createField('readCount', 'integer')
+        $builder->createField('readCount', Type::INTEGER)
             ->columnName('read_count')
             ->build();
 
-        $builder->createField('sentCount', 'integer')
+        $builder->createField('sentCount', Type::INTEGER)
             ->columnName('sent_count')
             ->build();
 
-        $builder->addField('revision', 'integer');
+        $builder->addField('revision', Type::INTEGER);
 
         $builder->addCategory();
 
-        $builder->createManyToMany('lists', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToMany('lists', LeadList::class)
             ->setJoinTable('email_list_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
@@ -319,23 +320,23 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         self::addVariantMetadata($builder, self::class);
         self::addDynamicContentMetadata($builder);
 
-        $builder->createField('variantSentCount', 'integer')
+        $builder->createField('variantSentCount', Type::INTEGER)
             ->columnName('variant_sent_count')
             ->build();
 
-        $builder->createField('variantReadCount', 'integer')
+        $builder->createField('variantReadCount', Type::INTEGER)
             ->columnName('variant_read_count')
             ->build();
 
-        $builder->createManyToOne('unsubscribeForm', 'Mautic\FormBundle\Entity\Form')
+        $builder->createManyToOne('unsubscribeForm', Form::class)
             ->addJoinColumn('unsubscribeform_id', 'id', true, false, 'SET NULL')
             ->build();
 
-        $builder->createManyToOne('preferenceCenter', 'Mautic\PageBundle\Entity\Page')
+        $builder->createManyToOne('preferenceCenter', Page::class)
             ->addJoinColumn('preference_center_id', 'id', true, false, 'SET NULL')
             ->build();
 
-        $builder->createManyToMany('assetAttachments', 'Mautic\AssetBundle\Entity\Asset')
+        $builder->createManyToMany('assetAttachments', Asset::class)
             ->setJoinTable('email_assets_xref')
             ->addInverseJoinColumn('asset_id', 'id', false, false, 'CASCADE')
             ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
