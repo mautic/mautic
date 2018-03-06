@@ -1065,8 +1065,10 @@ class EmailController extends FormController
             //reset
             $clone->clearStats();
             $clone->setSentCount(0);
+            $clone->setReadCount(0);
             $clone->setRevision(0);
             $clone->setVariantSentCount(0);
+            $clone->setVariantReadCount(0);
             $clone->setVariantStartDate(null);
             $clone->setIsPublished(false);
             $clone->setEmailType($emailType);
