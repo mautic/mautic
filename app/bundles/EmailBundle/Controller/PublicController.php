@@ -210,6 +210,7 @@ class PublicController extends CommonFormController
 
                         $viewParameters['frequencyPresent'] = false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency);
                     }
+
                     return $this->postActionRedirect(
                         [
                             'returnUrl'       => $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]),
