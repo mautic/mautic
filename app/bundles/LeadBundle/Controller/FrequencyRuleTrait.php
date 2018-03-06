@@ -91,7 +91,7 @@ trait FrequencyRuleTrait
         if ('GET' !== $method) {
             if (!$this->isFormCancelled($form)) {
                 if ($this->isFormValid($form, $data)) {
-                    $this->persistFrequencyRuleFormData($lead, $form->getData(), $allChannels, $leadChannels, $currentChannelId);
+                    $this->persistFrequencyRuleFormData($lead, $form->getData(), $allChannels, $leadChannels, $currentChannelId, $viewParameters);
 
                     return true;
                 }
@@ -171,7 +171,7 @@ trait FrequencyRuleTrait
      * @param       $leadChannels
      * @param int   $currentChannelId
      */
-    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels, $currentChannelId = null)
+    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels, $currentChannelId = null, &$viewParameters = [])
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
@@ -186,13 +186,15 @@ trait FrequencyRuleTrait
             }
         }
 
-        $dncChannels = array_diff($allChannels, $formData['subscribed_channels']);
-        if (!empty($dncChannels)) {
-            foreach ($dncChannels as $channel) {
-                if ($currentChannelId) {
-                    $channel = [$channel => $currentChannelId];
+        if ($viewParameters['frequencyPresent']) {
+            $dncChannels = array_diff($allChannels, $formData['subscribed_channels']);
+            if (!empty($dncChannels)) {
+                foreach ($dncChannels as $channel) {
+                    if ($currentChannelId) {
+                        $channel = [$channel => $currentChannelId];
+                    }
+                    $model->addDncForLead($lead, $channel, 'user', ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL);
                 }
-                $model->addDncForLead($lead, $channel, 'user', ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL);
             }
         }
 
