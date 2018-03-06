@@ -189,7 +189,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function __clone()
     {
         $this->id               = null;
-        $this->stats            = new ArrayCollection();
         $this->sentCount        = 0;
         $this->readCount        = 0;
         $this->revision         = 0;
@@ -200,6 +199,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->sessionId        = 'new_'.hash('sha1', uniqid(mt_rand()));
         $this->clearTranslations();
         $this->clearVariants();
+        $this->clearStats();
 
         parent::__clone();
     }
@@ -217,8 +217,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Clear stats.
-     *
-     * @deprecated since 2.13.0, to be removed in 3.0.0 - not used anywhere
      */
     public function clearStats()
     {
