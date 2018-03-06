@@ -204,6 +204,11 @@ class PublicController extends CommonFormController
 
                 $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action);
                 if (true === $form) {
+                    // add frequencyPresent if posting custom preference center
+                    if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
+                        $html = $prefCenter->getCustomHtml();
+                        $viewParameters['frequencyPresent'] = false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency);
+                    }
                     return $this->postActionRedirect(
                         [
                             'returnUrl'       => $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]),
@@ -217,13 +222,8 @@ class PublicController extends CommonFormController
                 /** @var Page $prefCenter */
                 if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
                     $html = $prefCenter->getCustomHtml();
-                    // check if tokens are present
-                    $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
-                                        false !== strpos($html, BuilderSubscriber::saveprefsRegex);
-                    $frequencyPresent = false !== strpos($html, 'data-slot="channelfrequency"') ||
-                                        false !== strpos($html, BuilderSubscriber::channelfrequency);
-                    $tokensPresent = $savePrefsPresent && $frequencyPresent;
-                    if ($tokensPresent) {
+                    // check if save button present
+                    if (false !== strpos($html, 'data-slot="saveprefsbutton"') || false !== strpos($html, BuilderSubscriber::saveprefsRegex)) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
                         $params = array_merge(
