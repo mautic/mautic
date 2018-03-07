@@ -20,7 +20,7 @@ $view->extend('MauticCoreBundle:Default:slim.html.php');
     'mautic_plugin_timeline_view', ['leadId' => $lead->getId(), 'integration' => $integration]
 ) : $view['router']->path('mautic_plugin_timeline_index', ['integration' => $integration]); ?>" class="panel" id="timeline-filters">
     <div class="form-control-icon pa-xs">
-        <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" value="<?php echo $events['filters']['search']; ?>">
+        <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" value="<?php echo $view->escape($events['filters']['search']); ?>">
         <span class="the-icon fa fa-search text-muted mt-xs"></span>
     </div>
     <?php if (isset($events['types']) && is_array($events['types'])) : ?>
@@ -28,7 +28,7 @@ $view->extend('MauticCoreBundle:Default:slim.html.php');
             <div class="col-xs-6">
                 <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="<?php echo $view['translator']->trans('mautic.lead.lead.filter.bundles.include.placeholder'); ?>">
                     <?php foreach ($events['types'] as $typeKey => $typeName) : ?>
-                        <option value="<?php echo $typeKey; ?>"<?php echo in_array($typeKey, $events['filters']['includeEvents']) ? ' selected' : ''; ?> >
+                        <option value="<?php echo $view->escape($typeKey); ?>"<?php echo in_array($typeKey, $events['filters']['includeEvents']) ? ' selected' : ''; ?> >
                             <?php echo $typeName; ?>
                         </option>
                     <?php endforeach; ?>
@@ -37,7 +37,7 @@ $view->extend('MauticCoreBundle:Default:slim.html.php');
             <div class="col-xs-6">
                 <select name="excludeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="<?php echo $view['translator']->trans('mautic.lead.lead.filter.bundles.exclude.placeholder'); ?>">
                     <?php foreach ($events['types'] as $typeKey => $typeName) : ?>
-                        <option value="<?php echo $typeKey; ?>"<?php echo in_array($typeKey, $events['filters']['excludeEvents']) ? ' selected' : ''; ?> >
+                        <option value="<?php echo $view->escape($typeKey); ?>"<?php echo in_array($typeKey, $events['filters']['excludeEvents']) ? ' selected' : ''; ?> >
                             <?php echo $typeName; ?>
                         </option>
                     <?php endforeach; ?>
@@ -47,7 +47,7 @@ $view->extend('MauticCoreBundle:Default:slim.html.php');
     <?php endif; ?>
 
     <?php if (isset($lead)) : ?>
-        <input type="hidden" name="leadId" id="leadId" value="<?php echo $lead->getId(); ?>"/>
+        <input type="hidden" name="leadId" id="leadId" value="<?php echo $view->escape($lead->getId()); ?>"/>
     <?php endif; ?>
 </form>
 

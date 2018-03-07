@@ -20,6 +20,8 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * @ORM\Entity
@@ -148,7 +150,7 @@ class Tweet extends FormEntity
         $builder->addCategory();
         $builder->addNullableField('mediaId', Type::STRING, 'media_id');
         $builder->addNullableField('mediaPath', Type::STRING, 'media_path');
-        $builder->addField('text', Type::STRING);
+        $builder->addField('text', Type::STRING, ['length' => 280]);
         $builder->addNullableField('sentCount', Type::INTEGER, 'sent_count');
         $builder->addNullableField('favoriteCount', Type::INTEGER, 'favorite_count');
         $builder->addNullableField('retweetCount', Type::INTEGER, 'retweet_count');
@@ -198,6 +200,20 @@ class Tweet extends FormEntity
                 ]
             )
             ->build();
+    }
+
+    /**
+     * Constraints for required fields.
+     *
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('text', new Assert\Length(
+            [
+                'max' => 280,
+            ]
+        ));
     }
 
     /**

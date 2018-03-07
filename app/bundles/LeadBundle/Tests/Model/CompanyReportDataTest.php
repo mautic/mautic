@@ -107,6 +107,15 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $field = new Field();
+        $field->setType('email');
+        $field->setAlias('email');
+        $field->setLabel('Email');
+
+        $fieldModelMock->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([$field]);
+
         $eventMock->expects($this->once())
             ->method('hasColumn')
             ->with('comp.id')
@@ -131,6 +140,15 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
         $eventMock = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $field = new Field();
+        $field->setType('email');
+        $field->setAlias('email');
+        $field->setLabel('Email');
+
+        $fieldModelMock->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([$field]);
 
         $eventMock->expects($this->any())
             ->method('hasColumn')

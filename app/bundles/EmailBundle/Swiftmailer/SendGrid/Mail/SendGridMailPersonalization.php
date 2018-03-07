@@ -55,7 +55,7 @@ class SendGridMailPersonalization
             }
 
             foreach ($metadata[$recipientEmail]['tokens'] as $token => $value) {
-                $personalization->addSubstitution($token, $value);
+                $personalization->addSubstitution($token, (string) $value);
             }
 
             $mail->addPersonalization($personalization);

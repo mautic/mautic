@@ -24,7 +24,7 @@ if (is_array($item)) {
 ?>
 <div class="input-group input-group-sm">
     <span class="input-group-addon">
-        <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb<?php echo $id; ?>" value="<?php echo $id; ?>"/>
+        <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb<?php echo $id; ?>" value="<?php echo $view->escape($id); ?>"/>
     </span>
 
     <div class="input-group-btn">

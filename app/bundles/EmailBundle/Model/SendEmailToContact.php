@@ -382,8 +382,8 @@ class SendEmailToContact
                 $this->dncModel->addDncForContact(
                     $contactId,
                     ['email' => $this->emailEntityId],
-                    $this->translator->trans('mautic.email.bounce.reason.bad_email'),
                     DNC::BOUNCED,
+                    $this->translator->trans('mautic.email.bounce.reason.bad_email'),
                     true,
                     false
                 );
