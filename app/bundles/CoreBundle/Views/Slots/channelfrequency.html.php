@@ -24,7 +24,7 @@ $channelNumber = 0;
                     <input type="checkbox" id="<?php echo $channel->value ?>"
                            name="lead_contact_frequency_rules[subscribed_channels][]"
                            onclick="togglePreferredChannel(this.value);"
-                           value="<?php echo $channel->value ?>" <?php echo $checked; ?>>
+                           value="<?php echo $view->escape($channel->value) ?>" <?php echo $checked; ?>>
                     <label for="<?php echo $channel->value ?>" id="is-contactable-<?php echo $channel->value ?>" data-channel="<?php echo $channelName; ?>">
                         <?php echo $view['translator']->trans('mautic.lead.contact.me.label', ['%channel%' => $channelName]); ?>
                     </label>
@@ -97,4 +97,3 @@ $channelNumber = 0;
     </tbody>
 </table>
 <?php endif; ?>
-
