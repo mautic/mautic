@@ -1442,7 +1442,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {
             //update and create (one query) every 200 records
-            print_r($lead);
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
