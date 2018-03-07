@@ -19,6 +19,21 @@ class SegmentsCest
     {
     }
 
+    public function StartSegments(SegmentsTester $I)
+    {
+        $I->amOnPage('/s/segments');
+        $totalSegments =$I->haveInDatabase('mautic_lead_lists');
+        for ($segments=1; $segments <= $totalSegments; ++$segments) {
+            $I->click('/html/body/section/section/div/div[2]/div[2]/div/table/tbody/tr['.$segments.']/td[2]/div/i[1]');
+        }
+        $I->wait(5);
+        for ($segments=1; $segments <= $totalSegments; ++$segments) {
+            $I->click('/html/body/section/section/div/div[2]/div[2]/div/table/tbody/tr['.$segments.']/td[2]/div/i[1]');
+        }
+
+        $I->wait(15);
+    }
+
     // tests
     public function TestEqualFilter(SegmentsTester $I)
     {
@@ -165,6 +180,45 @@ class SegmentsCest
         $I->cantSee($this->allLeads[24]['firstname']);
         $I->cantSee($this->allLeads[25]['firstname']);
         $I->canSeeNumRecords(count($this->allLeads) - 5, 'mautic_lead_lists_leads', ['leadlist_id' => '16']);
+    }
+
+    public function TestDateGreater(SegmentsTester $I)
+    {
+        $I->amOnPage('/s/segments/view/17');
+        $I->cantSee($this->allLeads[26]['firstname']);
+        $I->cantSee($this->allLeads[29]['firstname']);
+        $I->canSeeNumRecords(2, 'mautic_lead_lists_leads', ['leadlist_id' => '17']);
+    }
+
+    public function TestDateGreaterEqual(SegmentsTester $I)
+    {
+        $I->amOnPage('/s/segments/view/18');
+        $I->cantSee($this->allLeads[26]['firstname']);
+        $I->cantSee($this->allLeads[28]['firstname']);
+        $I->cantSee($this->allLeads[29]['firstname']);
+        $I->canSeeNumRecords(3, 'mautic_lead_lists_leads', ['leadlist_id' => '18']);
+    }
+
+    public function TestDateLess(SegmentsTester $I)
+    {
+        $I->amOnPage('/s/segments/view/19');
+        $I->cantSee($this->allLeads[27]['firstname']);
+        $I->canSeeNumRecords(1, 'mautic_lead_lists_leads', ['leadlist_id' => '19']);
+    }
+
+    public function TestDateLessEqual(SegmentsTester $I)
+    {
+        $I->amOnPage('/s/segments/view/20');
+        $I->cantSee($this->allLeads[27]['firstname']);
+        $I->cantSee($this->allLeads[28]['firstname']);
+        $I->canSeeNumRecords(2, 'mautic_lead_lists_leads', ['leadlist_id' => '20']);
+    }
+
+    public function TestDateGreaterTomorrow(SegmentsTester $I)
+    {
+        $I->amOnPage('/s/segments/view/21');
+        $I->cantSee($this->allLeads[29]['firstname']);
+        $I->canSeeNumRecords(1, 'mautic_lead_lists_leads', ['leadlist_id' => '21']);
     }
 
     public function Test(SegmentsTester $I)
