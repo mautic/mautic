@@ -106,7 +106,7 @@ $hasFeatureErrors =
         <?php if (count($form['apiKeys']) && !empty($callbackUrl)): ?>
             <div class="well well-sm">
                 <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
-                <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $callbackUrl; ?>" class="form-control"/>
+                <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $view->escape($callbackUrl); ?>" class="form-control"/>
             </div>
         <?php endif; ?>
         <?php if (isset($form['authButton'])): ?>

@@ -374,4 +374,4 @@ $showActions = count($activeFormActions);
 </div>
 <!--/ end: box layout -->
 
-<input type="hidden" name="entityId" id="entityId" value="<?php echo $activeForm->getId(); ?>"/>
+<input type="hidden" name="entityId" id="entityId" value="<?php echo $view->escape($activeForm->getId()); ?>"/>

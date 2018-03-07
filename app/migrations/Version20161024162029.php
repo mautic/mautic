@@ -48,7 +48,7 @@ class Version20161024162029 extends AbstractMauticMigration
         $categoryFk  = $this->generatePropertyName('lead_categories', 'fk', ['category_id']);
 
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}lead_categories (
+CREATE TABLE IF NOT EXISTS {$this->prefix}lead_categories (
   id int(11) AUTO_INCREMENT NOT NULL,
   category_id int(11) NOT NULL,
   lead_id int(11) NOT NULL,
