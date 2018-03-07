@@ -463,6 +463,7 @@ class LeadField extends FormEntity
     {
         return $this->object;
     }
+
     /**
      * Set object.
      *
@@ -487,6 +488,7 @@ class LeadField extends FormEntity
     {
         return $this->order;
     }
+
     /**
      * Set isVisible.
      *

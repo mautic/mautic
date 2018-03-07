@@ -20,6 +20,11 @@ use Mautic\LeadBundle\Entity\Company;
 class CompanyEvent extends CommonEvent
 {
     /**
+     * @var int
+     */
+    protected $score;
+
+    /**
      * @param Company $company
      * @param bool    $isNew
      * @param int     $score

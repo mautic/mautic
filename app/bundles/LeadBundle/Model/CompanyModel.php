@@ -12,11 +12,16 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Mautic\CoreBundle\Form\RequestTrait;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
@@ -30,7 +35,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 {
-    use DefaultValueTrait;
+    use DefaultValueTrait, RequestTrait;
 
     /**
      * @var Session
@@ -43,15 +48,27 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     protected $leadFieldModel;
 
     /**
+     * @var array
+     */
+    protected $companyFields;
+
+    /**
+     * @var EmailValidator
+     */
+    protected $emailValidator;
+
+    /**
      * CompanyModel constructor.
      *
-     * @param FieldModel $leadFieldModel
-     * @param Session    $session
+     * @param FieldModel     $leadFieldModel
+     * @param Session        $session
+     * @param EmailValidator $validator
      */
-    public function __construct(FieldModel $leadFieldModel, Session $session)
+    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator)
     {
         $this->leadFieldModel = $leadFieldModel;
         $this->session        = $session;
+        $this->emailValidator = $validator;
     }
 
     /**
@@ -199,10 +216,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param Company    $company
      * @param array      $data
      * @param bool|false $overwriteWithBlank
-     *
-     * @return array
      */
-    public function setFieldValues(Company &$company, array $data, $overwriteWithBlank = false)
+    public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false)
     {
         //save the field values
         $fieldValues = $company->getFields();
@@ -232,6 +247,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 if (array_key_exists($alias, $data)) {
                     $curValue = $field['value'];
                     $newValue = $data[$alias];
+
+                    if (is_array($newValue)) {
+                        $newValue = implode('|', $newValue);
+                    }
 
                     if ($curValue !== $newValue && (strlen($newValue) > 0 || (strlen($newValue) === 0 && $overwriteWithBlank))) {
                         $field['value'] = $newValue;
@@ -348,9 +367,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->getCompanyLeadRepository()->saveEntities($persistCompany);
         }
 
-        // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear(CompanyLead::class);
-
         if (!empty($companyName)) {
             $currentCompanyName = $lead->getCompany();
             if ($currentCompanyName !== $companyName) {
@@ -369,7 +385,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        //unset($lead, $persistCompany, $companies);
+        // Clear CompanyLead entities from Doctrine memory
+        $this->em->clear(CompanyLead::class);
 
         return $contactAdded;
     }
@@ -446,7 +463,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             );
 
             if ($companyLead == null) {
-
                 // Lead is not part of this list
                 continue;
             }
@@ -637,5 +653,187 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         //return the merged company
         return $mainCompany;
+    }
+
+    /**
+     * @return array
+     */
+    public function fetchCompanyFields()
+    {
+        if (empty($this->companyFields)) {
+            $this->companyFields = $this->leadFieldModel->getEntities(
+                [
+                    'filter' => [
+                        'force' => [
+                            [
+                                'column' => 'f.isPublished',
+                                'expr'   => 'eq',
+                                'value'  => true,
+                            ],
+                            [
+                                'column' => 'f.object',
+                                'expr'   => 'eq',
+                                'value'  => 'company',
+                            ],
+                        ],
+                    ],
+                    'hydration_mode' => 'HYDRATE_ARRAY',
+                ]
+            );
+        }
+
+        return $this->companyFields;
+    }
+
+    /**
+     * @param $mappedFields
+     * @param $data
+     *
+     * @return array
+     */
+    public function extractCompanyDataFromImport(array &$mappedFields, array &$data)
+    {
+        $companyData    = [];
+        $companyFields  = [];
+        $internalFields = $this->fetchCompanyFields();
+
+        foreach ($mappedFields as $mauticField => $importField) {
+            foreach ($internalFields as $entityField) {
+                if ($entityField['alias'] === $mauticField) {
+                    $companyData[$importField]   = $data[$importField];
+                    $companyFields[$mauticField] = $importField;
+                    unset($data[$importField]);
+                    unset($mappedFields[$mauticField]);
+                    break;
+                }
+            }
+        }
+
+        return [$companyFields, $companyData];
+    }
+
+    /**
+     * @param array        $fields
+     * @param array        $data
+     * @param null         $owner
+     * @param null         $list
+     * @param null         $tags
+     * @param bool         $persist
+     * @param LeadEventLog $eventLog
+     *
+     * @return bool|null
+     *
+     * @throws \Exception
+     */
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
+    {
+        $fields = array_flip($fields);
+
+        // Let's check for an existing company by name
+        $hasName  = (!empty($fields['companyname']) && !empty($data[$fields['companyname']]));
+        $hasEmail = (!empty($fields['companyemail']) && !empty($data[$fields['companyemail']]));
+
+        if ($hasEmail) {
+            $this->emailValidator->validate($data[$fields['companyemail']], false);
+        }
+
+        if ($hasName) {
+            $companyName    = isset($fields['companyname']) ? $data[$fields['companyname']] : null;
+            $companyCity    = isset($fields['companycity']) ? $data[$fields['companycity']] : null;
+            $companyCountry = isset($fields['companycountry']) ? $data[$fields['companycountry']] : null;
+            $companyState   = isset($fields['companystate']) ? $data[$fields['companystate']] : null;
+
+            $found   = $companyName ? $this->getRepository()->identifyCompany($companyName, $companyCity, $companyCountry, $companyState) : false;
+            $company = ($found) ? $this->em->getReference('MauticLeadBundle:Company', $found['id']) : new Company();
+            $merged  = $found;
+        } else {
+            return null;
+        }
+
+        if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
+            $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
+            $company->setDateAdded($dateAdded->getUtcDateTime());
+        }
+        unset($fields['dateAdded']);
+
+        if (!empty($fields['dateModified']) && !empty($data[$fields['dateModified']])) {
+            $dateModified = new DateTimeHelper($data[$fields['dateModified']]);
+            $company->setDateModified($dateModified->getUtcDateTime());
+        }
+        unset($fields['dateModified']);
+
+        if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
+            $userRepo      = $this->em->getRepository('MauticUserBundle:User');
+            $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
+            if ($createdByUser !== null) {
+                $company->setCreatedBy($createdByUser);
+            }
+        }
+        unset($fields['createdByUser']);
+
+        if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
+            $userRepo       = $this->em->getRepository('MauticUserBundle:User');
+            $modifiedByUser = $userRepo->findByIdentifier($data[$fields['modifiedByUser']]);
+            if ($modifiedByUser !== null) {
+                $company->setModifiedBy($modifiedByUser);
+            }
+        }
+        unset($fields['modifiedByUser']);
+
+        if ($owner !== null) {
+            $company->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
+        }
+
+        // Set profile data using the form so that values are validated
+        $fieldData = [];
+        foreach ($fields as $entityField => $importField) {
+            // Prevent overwriting existing data with empty data
+            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
+                $fieldData[$entityField] = $data[$importField];
+            }
+        }
+
+        $fieldErrors = [];
+
+        foreach ($this->fetchCompanyFields() as $entityField) {
+            if (isset($fieldData[$entityField['alias']])) {
+                $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
+
+                if ('NULL' === $fieldData[$entityField['alias']]) {
+                    $fieldData[$entityField['alias']] = null;
+
+                    continue;
+                }
+
+                try {
+                    $this->cleanFields($fieldData, $entityField);
+                } catch (\Exception $exception) {
+                    $fieldErrors[] = $entityField['alias'].': '.$exception->getMessage();
+                }
+
+                // Skip if the value is in the CSV row
+                continue;
+            } elseif ($entityField['defaultValue']) {
+                // Fill in the default value if any
+                $fieldData[$entityField['alias']] = ('multiselect' === $entityField['type']) ? [$entityField['defaultValue']] : $entityField['defaultValue'];
+            }
+        }
+
+        if ($fieldErrors) {
+            $fieldErrors = implode("\n", $fieldErrors);
+
+            throw new \Exception($fieldErrors);
+        }
+
+        // All clear
+        foreach ($fieldData as $field => $value) {
+            $company->addUpdatedField($field, $value);
+        }
+
+        if ($persist) {
+            $this->saveEntity($company);
+        }
+
+        return $merged;
     }
 }

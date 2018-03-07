@@ -14,6 +14,7 @@ namespace Mautic\ReportBundle\Generator;
 use Doctrine\DBAL\Connection;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -98,14 +99,14 @@ class ReportGenerator
     /**
      * Gets form.
      *
-     * @param \Mautic\ReportBundle\Entity\Report $entity  Report Entity
-     * @param array                              $options Parameters set by the caller
+     * @param Report $entity  Report Entity
+     * @param array  $options Parameters set by the caller
      *
-     * @return \Symfony\Component\Form\Form
+     * @return \Symfony\Component\Form\FormInterface
      */
     public function getForm(Report $entity, $options)
     {
-        return $this->formFactory->createBuilder('report', $entity, $options)->getForm();
+        return $this->formFactory->createBuilder(ReportType::class, $entity, $options)->getForm();
     }
 
     /**

@@ -51,34 +51,6 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
-
-        $builder->add(
-            'track_contact_by_ip',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.page.config.form.track_contact_by_ip',
-                'data'  => (bool) $options['data']['track_contact_by_ip'],
-                'attr'  => [
-                    'tooltip' => 'mautic.page.config.form.track_contact_by_ip.tooltip',
-                ],
-            ]
-        );
-
-        $builder->add('track_by_fingerprint', 'yesno_button_group', [
-            'label' => 'mautic.page.config.form.track.by.fingerprint',
-            'data'  => (bool) $options['data']['track_by_fingerprint'],
-            'attr'  => [
-                'tooltip' => 'mautic.page.config.form.track.by.fingerprint.tooltip',
-            ],
-        ]);
-
-        $builder->add('track_by_tracking_url', 'yesno_button_group', [
-            'label' => 'mautic.page.config.form.track.by.tracking.url',
-            'data'  => (bool) $options['data']['track_by_tracking_url'],
-            'attr'  => [
-                'tooltip' => 'mautic.page.config.form.track.by.tracking.url.tooltip',
-            ],
-        ]);
     }
 
     /**

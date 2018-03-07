@@ -151,10 +151,6 @@ Mautic.processPageContent = function (response) {
             }
         }
 
-        if (response.flashes) {
-            Mautic.setFlashes(response.flashes);
-        }
-
         if (response.notifications) {
             Mautic.setNotifications(response.notifications);
         }
@@ -312,6 +308,18 @@ Mautic.onPageLoad = function (container, response, inModal) {
     mQuery(container + " *[data-toggle='time']").each(function() {
         Mautic.activateDateTimeInputs(this, 'time');
     });
+
+    // Initialize callback options
+    mQuery(container + " *[data-onload-callback]").each(function() {
+        var callback = function(el) {
+            if (typeof window["Mautic"][mQuery(el).attr('data-onload-callback')] == 'function') {
+                window["Mautic"][mQuery(el).attr('data-onload-callback')].apply('window', [el]);
+            }
+        }
+
+        mQuery(document).ready(callback(this));
+    });
+
 
     mQuery(container + " input[data-toggle='color']").each(function() {
         Mautic.activateColorPicker(this);
@@ -514,7 +522,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
                 editor.popups.hideAll();
             });
 
-            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
             var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
             if (textarea.hasClass('editor-email')) {
@@ -707,6 +715,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 };
 
+/**
+ *
+ * @param jQueryObject
+ */
 Mautic.makeConfirmationsAlive = function(jQueryObject) {
     jQueryObject.off('click.confirmation');
     jQueryObject.on('click.confirmation', function (event) {
@@ -716,6 +728,10 @@ Mautic.makeConfirmationsAlive = function(jQueryObject) {
     });
 };
 
+/**
+ *
+ * @param jQueryObject
+ */
 Mautic.makeModalsAlive = function(jQueryObject) {
     jQueryObject.off('click.ajaxmodal');
     jQueryObject.on('click.ajaxmodal', function (event) {
@@ -725,6 +741,10 @@ Mautic.makeModalsAlive = function(jQueryObject) {
     });
 };
 
+/**
+ *
+ * @param jQueryObject
+ */
 Mautic.makeLinksAlive = function(jQueryObject) {
     jQueryObject.off('click.ajax');
     jQueryObject.on('click.ajax', function (event) {
@@ -1180,7 +1200,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
     var format = mQuery(el).data('format');
     if (type == 'datetime') {
         mQuery(el).datetimepicker({
-            format: (format) ? format : 'Y-m-d H:i',
+            format: (format) ? format : 'Y-m-d H:i:s',
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
@@ -1199,7 +1219,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
     } else if (type == 'time') {
         mQuery(el).datetimepicker({
             datepicker: false,
-            format: (format) ? format : 'H:i',
+            format: (format) ? format : 'H:i:s',
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,

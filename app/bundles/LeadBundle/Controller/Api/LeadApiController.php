@@ -21,6 +21,8 @@ use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -43,7 +45,7 @@ class LeadApiController extends CommonApiController
         $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
-        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
+        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'stageList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
 
         parent::initialize($event);
     }
@@ -53,12 +55,70 @@ class LeadApiController extends CommonApiController
      */
     public function newEntityAction()
     {
-        $existingLeads = $this->getExistingLeads();
-        if (!empty($existingLeads)) {
-            return parent::editEntityAction($existingLeads[0]->getId());
+        if ($existingLead = $this->getExistingLead($this->request->request->all())) {
+            $this->request->setMethod('PATCH');
+
+            return parent::editEntityAction($existingLead->getId());
         }
 
         return parent::newEntityAction();
+    }
+
+    /**
+     * @return array|\Symfony\Component\HttpFoundation\Response
+     */
+    public function newEntitiesAction()
+    {
+        $entity = $this->model->getEntity();
+
+        if (!$this->checkEntityAccess($entity, 'create')) {
+            return $this->accessDenied();
+        }
+
+        $parameters = $this->request->request->all();
+
+        $valid = $this->validateBatchPayload($parameters);
+        if ($valid instanceof Response) {
+            return $valid;
+        }
+
+        $this->inBatchMode = true;
+        $entities          = [];
+        $errors            = [];
+        $statusCodes       = [];
+        foreach ($parameters as $key => $params) {
+            $method     = 'POST';
+            $entity     = $this->getNewEntity($params);
+            $statusCode = Codes::HTTP_CREATED;
+
+            if ($existingLead = $this->getExistingLead($params)) {
+                $method     = 'PATCH';
+                $entity     = $existingLead;
+                $statusCode = Codes::HTTP_OK;
+            }
+
+            $this->processBatchForm($key, $entity, $params, $method, $errors, $entities);
+
+            if (isset($errors[$key])) {
+                $statusCodes[$key] = $errors[$key]['code'];
+            } else {
+                $statusCodes[$key] = $statusCode;
+            }
+        }
+
+        $payload = [
+            $this->entityNameMulti => $entities,
+            'statusCodes'          => $statusCodes,
+        ];
+
+        if (!empty($errors)) {
+            $payload['errors'] = $errors;
+        }
+
+        $view = $this->view($payload, Codes::HTTP_CREATED);
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
     }
 
     /**
@@ -66,26 +126,25 @@ class LeadApiController extends CommonApiController
      */
     public function editEntityAction($id)
     {
-        $existingLeads = $this->getExistingLeads();
-        if (isset($existingLeads[0]) && $existingLeads[0] instanceof Lead) {
+        if ($existingLead = $this->getExistingLead($this->request->request->all(), $id)) {
             $entity = $this->model->getEntity($id);
-            if ($entity instanceof Lead && $existingLeads[0]->getId() != $entity->getId()) {
-                $this->model->mergeLeads($existingLeads[0], $entity, false);
-            }
+            $this->model->mergeLeads($existingLead, $entity, false);
         }
 
         return parent::editEntityAction($id);
     }
 
     /**
-     * Get existing duplicated contacts based on unique fields and the request data.
+     * Get existing duplicated contact based on unique fields and the request data.
      *
-     * @return array
+     * @param array $parameters
+     * @param null  $id
+     *
+     * @return null|Lead
      */
-    protected function getExistingLeads()
+    protected function getExistingLead(array $parameters, $id = null)
     {
-        // Check for an email to see if the lead already exists
-        $parameters          = $this->request->request->all();
+        // Check to see if contacts exist based on unique identifiers
         $uniqueLeadFields    = $this->getModel('lead.field')->getUniqueIdentiferFields();
         $uniqueLeadFieldData = [];
 
@@ -96,12 +155,14 @@ class LeadApiController extends CommonApiController
         }
 
         if (count($uniqueLeadFieldData)) {
-            return $this->get('doctrine.orm.entity_manager')->getRepository(
+            $leads = $this->get('doctrine.orm.entity_manager')->getRepository(
                 'MauticLeadBundle:Lead'
-            )->getLeadsByUniqueFields($uniqueLeadFieldData, null, 1);
+            )->getLeadsByUniqueFields($uniqueLeadFieldData, $id, 1);
+
+            return ($leads) ? $leads[0] : null;
         }
 
-        return [];
+        return null;
     }
 
     /**
@@ -420,7 +481,7 @@ class LeadApiController extends CommonApiController
     public function getAllActivityAction($lead = null)
     {
         $canViewOwn    = $this->security->isGranted('lead:leads:viewown');
-        $canViewOthers = $this->security->isGranted('lead:leads:others');
+        $canViewOthers = $this->security->isGranted('lead:leads:viewother');
 
         if (!$canViewOthers && !$canViewOwn) {
             return $this->accessDenied();
@@ -680,5 +741,32 @@ class LeadApiController extends CommonApiController
         }
 
         $this->setCustomFieldValues($entity, $form, $parameters);
+    }
+
+    /**
+     * Helper method to be used in FrequencyRuleTrait.
+     *
+     * @param Form $form
+     *
+     * @return bool
+     */
+    protected function isFormCancelled($form = null)
+    {
+        return false;
+    }
+
+    /**
+     * Helper method to be used in FrequencyRuleTrait.
+     *
+     * @param Form  $form
+     * @param array $data
+     *
+     * @return bool
+     */
+    protected function isFormValid(Form $form, array $data = null)
+    {
+        $form->submit($data, 'PATCH' !== $this->request->getMethod());
+
+        return $form->isValid();
     }
 }

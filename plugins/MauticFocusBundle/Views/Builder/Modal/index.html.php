@@ -26,7 +26,7 @@ $animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '
                 <a href="javascript:void(0)"<?php if (!empty($preview)): echo ' onclick="Mautic.closeFocusModal(\''.$style.'\')"'; endif; ?>>x</a>
             </div>
             <div class="mf-content">
-                <?php if ((!empty($focus['htmlMode']) && in_array($focus['htmlMode'], ['editor', 'html']) && $htmlMode = $focus['htmlMode']) || (!empty($focus['html_mode']) && in_array($focus['html_mode'], ['editor', 'html']) && $htmlMode = $focus['html_mode'])): ?>
+                <?php if (in_array($htmlMode, ['editor', 'html'])): ?>
                     <?php echo html_entity_decode($focus[$htmlMode]); ?>
                 <?php else: ?>
                 <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
@@ -34,11 +34,8 @@ $animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '
                     <div class="mf-tagline"><?php echo $props['content']['tagline']; ?></div>
                 <?php endif; ?>
                 <div class="mf-inner-container">
-                    <?php if ($focus['type'] == 'form' && !empty($form)): ?>
-                        <?php echo $view->render(
-                            'MauticFocusBundle:Builder:form.html.php',
-                            ['form' => $form, 'style' => $focus['style'], 'focusId' => $focus['id'], 'preview' => $preview]
-                        ); ?>
+                    <?php if ($focus['type'] == 'form'): ?>
+                        {focus_form}
                     <?php elseif ($focus['type'] == 'link'): ?>
                         <a href="<?php echo (empty($preview)) ? $clickUrl
                             : '#'; ?>" class="mf-link" target="<?php echo ($props['content']['link_new_window']) ? '_new' : '_parent'; ?>">

@@ -22,16 +22,6 @@
         </testsuite>
     </testsuites>
 
-    <!-- Set these in your phpunit.xml to your local test db
-    <php>
-        <server name="DB_HOST" value="127.0.0.1" />
-        <server name="DB_PORT" value="3306" />
-        <server name="DB_USER" value="" />
-        <server name="DB_PASSWD" value="" />
-        <server name="DB_NAME" value="mautictest" />
-    </php>
-    -->
-
     <filter>
         <whitelist>
             <directory>bundles</directory>

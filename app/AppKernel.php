@@ -34,14 +34,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 9;
+    const MINOR_VERSION = 13;
 
     /**
      * Patch version number.
      *
      * @const integer
      */
-    const PATCH_VERSION = 3;
+    const PATCH_VERSION = 0;
 
     /**
      * Extra version identifier.
@@ -51,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '-dev';
+    const EXTRA_VERSION = 'dev';
 
     /**
      * @var array
@@ -89,7 +89,8 @@ class AppKernel extends Kernel
         if (defined('MAUTIC_INSTALLER')) {
             $uri = $request->getRequestUri();
             if (strpos($uri, 'installer') === false) {
-                $base = $request->getBaseUrl();
+                $base   = $request->getBaseUrl();
+                $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
                 if ((strpos(strtolower($_SERVER['SERVER_SOFTWARE']), 'apache') === false
                     || !file_exists(__DIR__.'../.htaccess')
@@ -98,10 +99,10 @@ class AppKernel extends Kernel
                         'index'
                     ) === false)
                 ) {
-                    $base .= '/index.php';
+                    $prefix .= '/index.php';
                 }
 
-                return new RedirectResponse($base.'/installer');
+                return new RedirectResponse($request->getUriForPath($prefix.'/installer'));
             }
         }
 
@@ -174,6 +175,7 @@ class AppKernel extends Kernel
             new Mautic\PageBundle\MauticPageBundle(),
             new Mautic\PluginBundle\MauticPluginBundle(),
             new Mautic\PointBundle\MauticPointBundle(),
+            new Mautic\QueueBundle\MauticQueueBundle(),
             new Mautic\ReportBundle\MauticReportBundle(),
             new Mautic\SmsBundle\MauticSmsBundle(),
             new Mautic\StageBundle\MauticStageBundle(),
@@ -182,6 +184,9 @@ class AppKernel extends Kernel
             new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
             new LightSaml\SpBundle\LightSamlSpBundle(),
             new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
+            // These two bundles do DI based on config, so they need to be loaded after config is declared in MauticQueueBundle
+            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
+            new Leezy\PheanstalkBundle\LeezyPheanstalkBundle(),
         ];
 
         //dynamically register Mautic Plugin Bundles

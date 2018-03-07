@@ -34,7 +34,6 @@ class Filemanager
 
     public function __construct($extraConfig = '')
     {
-
         // getting default config file
         $content        = file_get_contents('../../scripts/filemanager.config.js.default');
         $config_default = json_decode($content, true);
@@ -268,7 +267,6 @@ class Filemanager
                             $file
                         )
                     ) {
-
                         // check if file is writable and readable
                         if (!$this->has_system_permission($current_path.$file, ['w', 'r'])) {
                             $protected   = 1;
@@ -475,7 +473,6 @@ class Filemanager
 
     public function move()
     {
-
         // dynamic fileroot dir must be used when enabled
         if ($this->dynamic_fileroot != '') {
             $rootDir = $this->dynamic_fileroot;
@@ -622,7 +619,6 @@ class Filemanager
         $this->setParams();
 
         if (!isset($_FILES['fileR']) || !is_uploaded_file($_FILES['fileR']['tmp_name'])) {
-
             // if fileSize limit set by the user is greater than size allowed in php.ini file, we apply server restrictions
             // and log a warning into file
             if ($this->config['upload']['fileSizeLimit'] > $this->getMaxUploadFileSize()) {
@@ -738,7 +734,6 @@ class Filemanager
         $this->setParams();
 
         if (!isset($_FILES['newfile']) || !is_uploaded_file($_FILES['newfile']['tmp_name'])) {
-
             // if fileSize limit set by the user is greater than size allowed in php.ini file, we apply server restrictions
             // and log a warning into file
             if ($this->config['upload']['fileSizeLimit'] > $this->getMaxUploadFileSize()) {
@@ -865,7 +860,7 @@ class Filemanager
      *
      * @return bool
      *
-     * @link     http://stackoverflow.com/questions/17584869/zip-main-folder-with-sub-folder-inside
+     * @see http://stackoverflow.com/questions/17584869/zip-main-folder-with-sub-folder-inside
      */
     public function zipFile($source, $destination, $flag = '')
     {
@@ -924,7 +919,6 @@ class Filemanager
                 $this->error(sprintf($this->lang('INVALID_FILE_TYPE')), true);
             }
         } else {
-
             // check if permission is granted
             if (is_dir($current_path) && $this->config['security']['allowFolderDownload'] == false) {
                 $this->error(sprintf($this->lang('NOT_ALLOWED')), true);
@@ -956,7 +950,7 @@ class Filemanager
             $this->__log(__METHOD__.' - downloading '.$current_path);
             exit();
         } else {
-            $this->error(sprintf($this->lang('FILE_DOES_NOT_EXIST'), $current_path));
+            $this->error(sprintf($this->lang('FILE_DOES_NOT_EXIST'), $this->getRelPath()));
         }
     }
 
@@ -965,7 +959,6 @@ class Filemanager
         $current_path = $this->getFullPath();
 
         if (isset($this->get['path']) && file_exists($current_path)) {
-
             // if $thumbnail is set to true we return the thumbnail
             if ($this->config['options']['generateThumbnails'] == true && $thumbnail == true) {
                 // get thumbnail (and create it if needed)
@@ -983,7 +976,7 @@ class Filemanager
 
             exit();
         } else {
-            $this->error(sprintf($this->lang('FILE_DOES_NOT_EXIST'), $current_path));
+            $this->error(sprintf($this->lang('FILE_DOES_NOT_EXIST'), $this->getRelPath()));
         }
     }
 
@@ -1047,7 +1040,6 @@ class Filemanager
 
     private function get_file_info($path = '', $thumbnail = false)
     {
-
         // DO NOT  rawurlencode() since $current_path it
         // is used for displaying name file
         if ($path == '') {
@@ -1078,7 +1070,6 @@ class Filemanager
         if (is_dir($current_path)) {
             $this->item['preview'] = $this->config['icons']['path'].$this->config['icons']['directory'];
         } elseif (in_array(strtolower($this->item['filetype']), array_map('strtolower', $this->config['images']['imagesExt']))) {
-
             // svg should not be previewed as raster formats images
             if ($this->item['filetype'] == 'svg') {
                 $this->item['preview'] = $current_path;
@@ -1116,9 +1107,7 @@ class Filemanager
     private function getFullPath($path = '')
     {
         if ($path == '') {
-            if (isset($this->get['path'])) {
-                $path = $this->get['path'];
-            }
+            $path = $this->getRelPath();
         }
 
         if ($this->config['options']['fileRoot'] !== false) {
@@ -1140,6 +1129,14 @@ class Filemanager
     }
 
     /**
+     * @return mixed|string
+     */
+    private function getRelPath()
+    {
+        return (isset($this->get['path'])) ? $this->get['path'] : '';
+    }
+
+    /**
      * format path regarding the initial configuration.
      *
      * @param string $path
@@ -1157,7 +1154,6 @@ class Filemanager
 
     private function sortFiles($array)
     {
-
         // handle 'NAME_ASC'
         if ($this->config['options']['fileSorting'] == 'NAME_ASC') {
             $array = array_reverse($array);
@@ -1206,11 +1202,11 @@ class Filemanager
         return $array;
     }
 
-// @todo to remove
-// private function startsWith($haystack, $needle) {
-//     // search backwards starting from haystack length characters from the end
-//     return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== FALSE;
-// }
+    // @todo to remove
+    // private function startsWith($haystack, $needle) {
+    //     // search backwards starting from haystack length characters from the end
+    //     return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== FALSE;
+    // }
 
     private function is_valid_path($path)
     {
@@ -1252,7 +1248,7 @@ class Filemanager
         $path_parts = pathinfo($file);
 
         // if there is no extension
-        if (!isset($path_parts ['extension'])) {
+        if (!isset($path_parts['extension'])) {
             // we check if no extension file are allowed
             return (bool) $this->config['security']['allowNoExtension'];
         }
@@ -1356,7 +1352,7 @@ class Filemanager
             'ű' => 'u',
             'û' => 'u',
             'ü' => 'u',
-            'ý' => 'y',
+            'ỳ' => 'y',
             'ý' => 'y',
             'þ' => 'b',
             'ÿ' => 'y',
@@ -1448,7 +1444,6 @@ class Filemanager
 
         // if thumbnail does not exist we generate it
         if (!file_exists($thumbnail_fullpath)) {
-
             // create folder if it does not exist
             if (!file_exists(dirname($thumbnail_fullpath))) {
                 mkdir(dirname($thumbnail_fullpath), 0755, true);
@@ -1473,7 +1468,10 @@ class Filemanager
         $sanitized = strip_tags($var);
         $sanitized = str_replace('http://', '', $sanitized);
         $sanitized = str_replace('https://', '', $sanitized);
-        $sanitized = str_replace('../', '', $sanitized);
+        $count     = 1;
+        while ($count > 0) {
+            $sanitized = str_replace('../', '', $sanitized, $count);
+        }
 
         return $sanitized;
     }
@@ -1501,7 +1499,6 @@ class Filemanager
 
     private function loadLanguageFile()
     {
-
         // we load langCode var passed into URL if present and if exists
         // else, we use default configuration var
         $lang = $this->config['options']['culture'];

@@ -329,6 +329,7 @@ class PublicController extends CommonFormController
      */
     public function previewAction($id = 0)
     {
+        /** @var FormModel $model */
         $objectId          = (empty($id)) ? InputHelper::int($this->request->get('id')) : $id;
         $css               = InputHelper::string($this->request->get('css'));
         $model             = $this->getModel('form.form');

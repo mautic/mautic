@@ -94,7 +94,6 @@ class EmailType extends AbstractType
                     'label'      => 'mautic.email.subject',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => ['class' => 'form-control'],
-                    'required'   => false,
                 ]
             )->addModelTransformer($emojiTransformer)
         );
@@ -214,6 +213,7 @@ class EmailType extends AbstractType
                 'attr'       => [
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
+                    'tooltip'     => 'mautic.email.form.publishdown.help',
                 ],
                 'format'   => 'yyyy-MM-dd HH:mm',
                 'required' => false,
@@ -265,7 +265,28 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'            => 'form-control',
-                        'tootlip'          => 'mautic.email.form.unsubscribeform.tooltip',
+                        'tooltip'          => 'mautic.email.form.unsubscribeform.tooltip',
+                        'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
+                    ],
+                    'required'    => false,
+                    'multiple'    => false,
+                    'empty_value' => '',
+                ]
+            )
+                ->addModelTransformer($transformer)
+        );
+
+        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
+        $builder->add(
+            $builder->create(
+                'preferenceCenter',
+                'preference_center_list',
+                [
+                    'label'      => 'mautic.email.form.preference_center',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'            => 'form-control',
+                        'tooltip'          => 'mautic.email.form.preference_center.tooltip',
                         'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
                     ],
                     'required'    => false,
@@ -464,29 +485,21 @@ class EmailType extends AbstractType
             ],
         ];
 
+        $builder->add(
+            'buttons',
+            'form_buttons',
+            [
+                'pre_extra_buttons' => $customButtons,
+            ]
+        );
+
         if (!empty($options['update_select'])) {
-            $builder->add(
-                'buttons',
-                'form_buttons',
-                [
-                    'apply_text'        => false,
-                    'pre_extra_buttons' => $customButtons,
-                ]
-            );
             $builder->add(
                 'updateSelect',
                 'hidden',
                 [
                     'data'   => $options['update_select'],
                     'mapped' => false,
-                ]
-            );
-        } else {
-            $builder->add(
-                'buttons',
-                'form_buttons',
-                [
-                    'pre_extra_buttons' => $customButtons,
                 ]
             );
         }

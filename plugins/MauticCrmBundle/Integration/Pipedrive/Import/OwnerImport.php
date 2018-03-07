@@ -6,6 +6,13 @@ use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
 
 class OwnerImport extends AbstractImport
 {
+    /**
+     * @param array $data
+     *
+     * @return bool
+     *
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
     public function create(array $data = [])
     {
         $pipedriveOwner = $this->em->getRepository(PipedriveOwner::class)->findOneByOwnerId($data['id']);

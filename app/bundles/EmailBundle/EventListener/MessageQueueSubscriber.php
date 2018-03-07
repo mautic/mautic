@@ -68,36 +68,36 @@ class MessageQueueSubscriber extends CommonSubscriber
                 'email_type' => 'marketing',
             ];
 
-            /** @var MessageQueue $message */
-            foreach ($messages as $id => $message) {
-                if ($email && $message->getLead()) {
-                    $contact = $message->getLead()->getProfileFields();
-                    if (empty($contact['email'])) {
-                        // No email so just let this slide
-                        $message->setProcessed();
-                        $message->setSuccess();
-                    }
-                    $sendTo[$contact['id']]            = $contact;
-                    $messagesByContact[$contact['id']] = $message;
-                } else {
-                    $message->setFailed();
+        /** @var MessageQueue $message */
+        foreach ($messages as $id => $message) {
+            if ($email && $message->getLead() && $email->isPublished()) {
+                $contact = $message->getLead()->getProfileFields();
+                if (empty($contact['email'])) {
+                    // No email so just let this slide
+                    $message->setProcessed();
+                    $message->setSuccess();
                 }
+                $sendTo[$contact['id']]            = $contact;
+                $messagesByContact[$contact['id']] = $message;
+            } else {
+                $message->setFailed();
             }
+        }
 
         if (count($sendTo)) {
             $options['resend_message_queue'] = $messagesByContact;
             $errors                          = $this->emailModel->sendEmail($email, $sendTo, $options);
 
-                // Let's see who was successful
-                foreach ($messagesByContact as $contactId => $message) {
-                    // If the message is processed, it was rescheduled by sendEmail
-                    if (!$message->isProcessed()) {
-                        $message->setProcessed();
-                        if (empty($errors[$contactId])) {
-                            $message->setSuccess();
-                        }
+            // Let's see who was successful
+            foreach ($messagesByContact as $contactId => $message) {
+                // If the message is processed, it was rescheduled by sendEmail
+                if (!$message->isProcessed()) {
+                    $message->setProcessed();
+                    if (empty($errors[$contactId])) {
+                        $message->setSuccess();
                     }
                 }
+            }
         }
 
         $event->stopPropagation();

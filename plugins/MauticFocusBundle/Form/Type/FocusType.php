@@ -41,7 +41,7 @@ class FocusType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html', 'editor' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('focus', $options));
 
         $builder->add(
@@ -219,8 +219,7 @@ class FocusType extends AbstractType
                 'multiple'    => false,
                 'empty_value' => '',
                 'attr'        => [
-                    'onchange'     => 'Mautic.focusUpdatePreview()',
-                    'data-show-on' => '{"focus_html_mode_1":""}',
+                    'onchange' => 'Mautic.focusUpdatePreview()',
                 ],
             ]
         );
@@ -229,23 +228,44 @@ class FocusType extends AbstractType
             $builder->setAction($options['action']);
         }
 
-        $builder->add(
-            'buttons',
-            'form_buttons',
+        $customButtons = [
             [
-                'pre_extra_buttons' => [
-                    [
-                        'name'  => 'builder',
-                        'label' => 'mautic.core.builder',
-                        'attr'  => [
-                            'class'   => 'btn btn-default btn-dnd btn-nospin',
-                            'icon'    => 'fa fa-cube',
-                            'onclick' => 'Mautic.launchFocusBuilder();',
-                        ],
-                    ],
+                'name'  => 'builder',
+                'label' => 'mautic.core.builder',
+                'attr'  => [
+                    'class'   => 'btn btn-default btn-dnd btn-nospin',
+                    'icon'    => 'fa fa-cube',
+                    'onclick' => 'Mautic.launchFocusBuilder();',
                 ],
-            ]
-        );
+            ],
+        ];
+
+        if (!empty($options['update_select'])) {
+            $builder->add(
+                'buttons',
+                'form_buttons',
+                [
+                    'apply_text'        => false,
+                    'pre_extra_buttons' => $customButtons,
+                ]
+            );
+            $builder->add(
+                'updateSelect',
+                'hidden',
+                [
+                    'data'   => $options['update_select'],
+                    'mapped' => false,
+                ]
+            );
+        } else {
+            $builder->add(
+                'buttons',
+                'form_buttons',
+                [
+                    'pre_extra_buttons' => $customButtons,
+                ]
+            );
+        }
     }
 
     /**
@@ -258,6 +278,7 @@ class FocusType extends AbstractType
                 'data_class' => 'MauticPlugin\MauticFocusBundle\Entity\Focus',
             ]
         );
+        $resolver->setDefined(['update_select']);
     }
 
     /**

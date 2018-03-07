@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PluginBundle\Test;
+namespace Mautic\PluginBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\BundleHelper;
@@ -17,11 +17,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
-use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Entity\PluginRepository;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
@@ -130,53 +127,6 @@ class ConfigFormTest extends KernelTestCase
                     )
                 );
 
-        $apiKeys = ['client_id' => 'clientid',
-            'client_secret'     => 'clientsecret',
-            'access_token'      => 'abc',
-            'oath_token_secret' => 'oauth_secret',
-            'refresh_token'     => 'refresh_token',
-            'signature'         => 'signature',
-            'scope'             => 'scope',
-            'token_type'        => 'today',
-            'instance_url'      => 'https://test.com', ];
-        $featureSettings = [
-            'updateOwner' => [
-                ],
-            'objects' => [
-                    0 => 'Lead',
-                ],
-            'leadFields' => [
-                    'Company'   => 'company',
-                    'FirstName' => 'firstname',
-                    'LastName'  => 'lastname',
-                    'Email'     => 'email',
-                ],
-            'update_mautic' => [
-                    'Company'   => '0',
-                    'FirstName' => '0',
-                    'LastName'  => '0',
-                    'Email'     => '0',
-                ],
-            'companyFields' => [
-                    'Name' => 'companyname',
-                ],
-            'update_mautic_company' => [
-                    'Name' => '0',
-                ],
-        ];
-
-        $entityManager->expects($this
-            ->any())->method('getIntegrationSettings')->willReturn(
-                $this->returnValue(
-                    [
-                        [
-                            'plugin_id'       => 1,
-                            'name'            => 'TestIntegration',
-                            'api_keys'        => $apiKeys,
-                            'is_published'    => true,
-                            'feature_sttings' => $featureSettings,
-
-        ], ]));
         $integrationHelper = new IntegrationHelper(
             self::$kernel,
             $entityManager,

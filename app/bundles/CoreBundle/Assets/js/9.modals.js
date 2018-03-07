@@ -200,9 +200,6 @@ Mautic.processModalContent = function (response, target) {
         //assume the content is to refresh main app
         Mautic.processPageContent(response);
     } else {
-        if (response.flashes) {
-            Mautic.setFlashes(response.flashes);
-        }
 
         if (response.notifications) {
             Mautic.setNotifications(response.notifications);

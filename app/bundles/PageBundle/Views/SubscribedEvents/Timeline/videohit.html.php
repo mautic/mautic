@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\CoreBundle\Helper\InputHelper;
+
 $viewTime = $duration = $percentage = $unknown = $view['translator']->trans('mautic.core.unknown');
 
 if ($event['extra']['hit']['time_watched']) {
@@ -52,5 +55,5 @@ $icon = (isset($event['icon'])) ? $event['icon'] : '';
     <dd class="ellipsis"><?php echo $event['extra']['hit']['url'] ? $view['assets']->makeLinks($event['extra']['hit']['url']) : $view['translator']->trans('mautic.core.unknown'); ?></dd>
 </dl>
 <div class="small">
-    <?php echo $event['extra']['hit']['user_agent']; ?>
+    <?php echo InputHelper::clean($event['extra']['hit']['user_agent']); ?>
 </div>

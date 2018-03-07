@@ -11,7 +11,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'leadImport');
-$view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.import.leads'));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.import.leads', ['%object%' => $view['request']->getParameter('object')]));
 
 ?>
 <?php if (isset($form['file'])): ?>

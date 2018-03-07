@@ -35,10 +35,21 @@ mQuery.ajaxSetup({
             settings.url = settings.url + queryGlue + 'mauticLastNotificationId=' + mQuery('#mauticLastNotificationId').val();
         }
 
+        // Set CSRF token to each AJAX POST request
+        if (settings.type == 'POST') {
+            request.setRequestHeader('X-CSRF-Token', mauticAjaxCsrf);
+        }
+
         return true;
     },
 
     cache: false
+});
+
+mQuery( document ).ajaxComplete(function(event, xhr, settings) {
+    xhr.always(function(response) {
+        if (response.flashes) Mautic.setFlashes(response.flashes);
+    });
 });
 
 // Force stop the page loading bar when no more requests are being in progress
@@ -139,6 +150,18 @@ var Mautic = {
 
         Mautic.addKeyboardShortcut('shift+s', 'Global Search', function (e) {
             mQuery('#globalSearchContainer .search-button').click();
+        });
+
+        Mautic.addKeyboardShortcut('mod+z', 'Undo change', function (e) {
+            if (mQuery('.btn-undo').length) {
+                mQuery('.btn-undo').click();
+            }
+        });
+
+        Mautic.addKeyboardShortcut('mod+shift+z', 'Redo change', function (e) {
+            if (mQuery('.btn-redo').length) {
+                mQuery('.btn-redo').click();
+            }
         });
 
         Mousetrap.bind('?', function (e) {
@@ -270,6 +293,28 @@ var Mautic = {
      */
     stopModalLoadingBar: function (modalTarget) {
         mQuery(modalTarget + ' .modal-loading-bar').removeClass('active');
+    },
+
+    /**
+     * Activate label loading spinner
+     *
+     * @param button (jQuery element)
+     */
+    activateButtonLoadingIndicator: function (button) {
+        button.prop('disabled', true);
+        if (!button.find('.fa-spinner.fa-spin').length) {
+            button.append(mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>'));
+        }
+    },
+
+    /**
+     * Remove the spinner from label
+     *
+     * @param button (jQuery element)
+     */
+    removeButtonLoadingIndicator: function (button) {
+        button.prop('disabled', false);
+        button.find('.fa-spinner').remove();
     },
 
     /**
@@ -825,5 +870,22 @@ var Mautic = {
                 }
             }
         });
+    },
+
+    /**
+     * Check if the browser supports local storage
+     *
+     * @returns {boolean}
+     */
+    isLocalStorageSupported: function() {
+        try {
+            // Check if localStorage is supported
+            localStorage.setItem('mautic.test', 'mautic');
+            localStorage.removeItem('mautic.test');
+
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 };

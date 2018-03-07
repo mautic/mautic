@@ -101,5 +101,5 @@ final class FormEvents
      *
      * @var string
      */
-    const ON_EXECUTE_SUBMIT_ACTION = 'matuic.form.on_execute_submit_action';
+    const ON_EXECUTE_SUBMIT_ACTION = 'mautic.form.on_execute_submit_action';
 }

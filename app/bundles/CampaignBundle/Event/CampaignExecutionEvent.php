@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -20,7 +21,7 @@ use Symfony\Component\EventDispatcher\Event;
 class CampaignExecutionEvent extends Event
 {
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     protected $lead;
 
@@ -45,7 +46,7 @@ class CampaignExecutionEvent extends Event
     protected $systemTriggered;
 
     /**
-     * @var bool
+     * @var bool|array
      */
     protected $result;
 
@@ -77,11 +78,11 @@ class CampaignExecutionEvent extends Event
     /**
      * CampaignExecutionEvent constructor.
      *
-     * @param                   $args
-     * @param                   $result
+     * @param array             $args
+     * @param bool              $result
      * @param LeadEventLog|null $log
      */
-    public function __construct($args, $result, LeadEventLog $log = null)
+    public function __construct(array $args, $result, LeadEventLog $log = null)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
@@ -94,11 +95,32 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\Lead
+     * @return Lead
      */
     public function getLead()
     {
         return $this->lead;
+    }
+
+    /**
+     * Returns array with lead fields and owner ID if exist.
+     *
+     * @return array
+     */
+    public function getLeadFields()
+    {
+        $lead         = $this->getLead();
+        $isLeadEntity = ($lead instanceof Lead);
+
+        // In case Lead is a scalar value:
+        if (!$isLeadEntity && !is_array($lead)) {
+            $lead = [];
+        }
+
+        $leadFields             = $isLeadEntity ? $lead->getProfileFields() : $lead;
+        $leadFields['owner_id'] = $isLeadEntity && ($owner = $lead->getOwner()) ? $owner->getId() : 0;
+
+        return $leadFields;
     }
 
     /**

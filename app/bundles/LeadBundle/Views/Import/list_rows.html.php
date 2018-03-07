@@ -8,6 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+/** @var \Mautic\LeadBundle\Entity\Import $item */
 ?>
 <?php foreach ($items as $item): ?>
     <tr>
@@ -18,7 +20,7 @@
         </td>
         <td>
             <div>
-                <?php if (in_array($item->getStatus(), [$item::QUEUED, $item::IN_PROGRESS, $item::STOPPED]) && $permissions[$permissionBase.':publish']) : ?>
+                <?php if (!in_array($item->getStatus(), [$item::FAILED, $item::IMPORTED, $item::MANUAL]) && $permissions[$permissionBase.':publish']): ?>
                 <?php echo $view->render(
                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                     ['item' => $item, 'model' => 'lead.import']
@@ -27,7 +29,7 @@
                 <?php if ($view['security']->hasEntityAccess(true, $permissions[$permissionBase.':viewother'], $item->getCreatedBy())) : ?>
                     <a href="<?php echo $view['router']->path(
                         $actionRoute,
-                        ['objectAction' => 'view', 'objectId' => $item->getId()]
+                        ['objectAction' => 'view', 'objectId' => $item->getId(), 'object' => $app->getRequest()->get('object', 'contacts')]
                     ); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>

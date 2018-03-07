@@ -33,6 +33,10 @@ trait RequestTrait
                         if (is_object($entity)) {
                             $setter = 'set'.ucfirst($name);
                             // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
+                            // If value is array and count 1, return value of array as string
+                            if (is_array($params[$name]) && count($params[$name]) == 1) {
+                                $params[$name] = end($params[$name]);
+                            }
                             $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
                             $data = (bool) $data;
                             try {
@@ -63,16 +67,23 @@ trait RequestTrait
                             // Date placeholder was used so just ignore it to allow import of the field
                             unset($params[$name]);
                         } else {
-                            switch ($type) {
-                                case 'datetime':
-                                    $params[$name] = (new \DateTime($params[$name]))->format('Y-m-d H:i');
-                                    break;
-                                case 'date':
-                                    $params[$name] = (new \DateTime($params[$name]))->format('Y-m-d');
-                                    break;
-                                case 'time':
-                                    $params[$name] = (new \DateTime($params[$name]))->format('H:i');
-                                    break;
+                            if (($timestamp = strtotime($params[$name])) === false) {
+                                $timestamp = null;
+                            }
+                            if ($timestamp) {
+                                switch ($type) {
+                                    case 'datetime':
+                                        $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                        break;
+                                    case 'date':
+                                        $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                                        break;
+                                    case 'time':
+                                        $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                                        break;
+                                }
+                            } else {
+                                unset($params[$name]);
                             }
                         }
                         break;
@@ -119,16 +130,21 @@ trait RequestTrait
                     // Date placeholder was used so just ignore it to allow import of the field
                     unset($fieldData[$leadField['alias']]);
                 } else {
-                    switch ($leadField['type']) {
-                        case 'datetime':
-                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d H:i');
-                            break;
-                        case 'date':
-                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d');
-                            break;
-                        case 'time':
-                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('H:i');
-                            break;
+                    if (($timestamp = strtotime($fieldData[$leadField['alias']])) === false) {
+                        $timestamp = null;
+                    }
+                    if ($timestamp) {
+                        switch ($leadField['type']) {
+                            case 'datetime':
+                                $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                break;
+                            case 'date':
+                                $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                                break;
+                            case 'time':
+                                $fieldData[$leadField['alias']] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                                break;
+                        }
                     }
                 }
                 break;
@@ -143,6 +159,9 @@ trait RequestTrait
                 break;
             case 'number':
                 $fieldData[$leadField['alias']] = (float) $fieldData[$leadField['alias']];
+                break;
+            case 'email':
+                $fieldData[$leadField['alias']] = InputHelper::email($fieldData[$leadField['alias']]);
                 break;
         }
     }

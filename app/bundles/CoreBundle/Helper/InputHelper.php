@@ -243,7 +243,7 @@ class InputHelper
     {
         $value = str_replace(' ', '_', $value);
 
-        return preg_replace("/[^a-z0-9\.\_]/", '', strtolower($value));
+        return preg_replace("/[^a-z0-9\.\_-]/", '', strtolower($value));
     }
 
     /**
@@ -345,8 +345,10 @@ class InputHelper
         }
 
         $value = substr($value, 0, 254);
+        $value = filter_var($value, FILTER_SANITIZE_EMAIL);
+        $value = str_replace('..', '.', $value);
 
-        return filter_var($value, FILTER_SANITIZE_EMAIL);
+        return trim($value);
     }
 
     /**
@@ -361,6 +363,12 @@ class InputHelper
     {
         $value = self::clean($value, $urldecode);
 
+        // Return empty array for empty values
+        if (empty($value)) {
+            return [];
+        }
+
+        // Put a value into array if not an array
         if (!is_array($value)) {
             $value = [$value];
         }

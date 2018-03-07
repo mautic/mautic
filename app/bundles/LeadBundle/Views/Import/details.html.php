@@ -20,7 +20,7 @@ $view['slots']->set(
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
-            'routeBase'       => 'contact_import',
+            'routeBase'       => 'import',
             'langVar'         => 'lead.import',
             'templateButtons' => [
                 'close' => $view['security']->hasEntityAccess(
@@ -28,6 +28,11 @@ $view['slots']->set(
                     $permissions['lead:imports:viewother'],
                     $item->getCreatedBy()
                 ),
+            ],
+            'routeVars' => [
+                'close' => [
+                    'object' => $app->getRequest()->get('object', 'contacts'),
+                ],
             ],
         ]
     )
@@ -219,6 +224,6 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
-    <input name="entityId" id="entityId" type="hidden" value="<?php echo $item->getId(); ?>"/>
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $view->escape($item->getId()); ?>"/>
 </div>
 <!--/ end: box layout -->

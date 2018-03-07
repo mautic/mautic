@@ -10,12 +10,15 @@
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
-$view['slots']->set('mauticContent', 'leadImport');
-$view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.import.leads'));
+$object = $app->getRequest()->get('object', 'contacts');
 
-$percent = $progress->toPercent();
-$id      = ($complete) ? 'leadImportProgressComplete' : 'leadImportProgress';
-$header  = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.donotleave';
+$view['slots']->set('mauticContent', 'leadImport');
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.import.leads', ['%object%' => $object]));
+
+$percent    = $progress->toPercent();
+$id         = ($complete) ? 'leadImportProgressComplete' : 'leadImportProgress';
+$header     = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.donotleave';
+$indexRoute = $object === 'contacts' ? 'mautic_contact_index' : 'mautic_company_index';
 ?>
 
 <div class="row ma-lg" id="<?php echo $id; ?>">
@@ -23,7 +26,7 @@ $header  = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.dono
         <div class="panel panel-<?php echo ($complete) ? 'success' : 'danger'; ?>">
             <div class="panel-heading">
 
-                <h4 class="panel-title"><?php echo $view['translator']->trans($header); ?></h4>
+                <h4 class="panel-title"><?php echo $view['translator']->trans($header, ['object' => $object]); ?></h4>
             </div>
             <div class="panel-body">
                 <?php if (!$complete): ?>
@@ -80,15 +83,15 @@ $header  = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.dono
                     </div>
                 <?php else: ?>
                     <div>
-                        <a class="btn btn-success" href="<?php echo $view['router']->path('mautic_contact_index'); ?>" data-toggle="ajax">
-                            <?php echo $view['translator']->trans('mautic.lead.list.view_leads'); ?>
+                        <a class="btn btn-success" href="<?php echo $view['router']->path($indexRoute); ?>" data-toggle="ajax">
+                            <?php echo $view['translator']->trans('mautic.lead.list.view_'.$object); ?>
                         </a>
-                        <a class="btn btn-success" href="<?php echo $view['router']->path('mautic_contact_import_index'); ?>" data-toggle="ajax">
+                        <a class="btn btn-success" href="<?php echo $view['router']->path('mautic_import_index', ['object' => $object]); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.lead.view.imports'); ?>
                         </a>
                         <a class="btn btn-success" href="<?php echo $view['router']->path(
-                            'mautic_contact_import_action',
-                            ['objectAction' => 'view', 'objectId' => $import->getId()]
+                            'mautic_import_action',
+                            ['objectAction' => 'view', 'objectId' => $import->getId(), 'object' => $object]
                         ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.lead.import.result.info', ['%import%' => $import->getName()]); ?>
                         </a>

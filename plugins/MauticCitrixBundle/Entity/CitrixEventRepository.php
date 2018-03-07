@@ -62,6 +62,11 @@ class CitrixEventRepository extends CommonRepository
      */
     public function getEventsForTimeline($product, $leadId = null, array $options = [])
     {
+        $eventType = null;
+        if (is_array($product)) {
+            list($product, $eventType) = $product;
+        }
+
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'plugin_citrix_events', 'c')
             ->select('c.*');
@@ -70,6 +75,13 @@ class CitrixEventRepository extends CommonRepository
             $query->expr()->eq('c.product', ':product')
         )
             ->setParameter('product', $product);
+
+        if ($eventType) {
+            $query->andWhere(
+                $query->expr()->eq('c.event_type', ':type')
+            )
+                ->setParameter('type', $eventType);
+        }
 
         if ($leadId) {
             $query->andWhere('c.lead_id = '.(int) $leadId);

@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
 $wrap = true;
 $view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_TOOLBAR_ACTIONS, ButtonHelper::TYPE_GROUP);
@@ -39,6 +39,13 @@ include 'action_button_helper.php';
         </div>
 
         <div class="col-xs-6 col-lg-4 va-m text-right">
+            <?php if (!empty($buttonHelp)): ?>
+                 <div class="input-group-btn">
+                    <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#<?php echo $searchId; ?>-search-help">
+                        <i class="fa fa-question-circle"></i>
+                    </button>
+                </div>
+            <?php endif; ?>
             <?php echo $view['buttons']->renderButtons(); ?>
         </div>
     </div>

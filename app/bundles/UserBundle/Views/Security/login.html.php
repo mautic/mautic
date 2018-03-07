@@ -8,6 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 if (!$app->getRequest()->isXmlHttpRequest()):
     //load base template
     $view->extend('MauticUserBundle:Security:base.html.php');
@@ -23,7 +24,7 @@ endif;
         <span class="input-group-addon"><i class="fa fa-user"></i></span>
         <label for="username" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?></label>
         <input type="text" id="username" name="_username"
-               class="form-control input-lg" value="<?php echo $last_username ?>" required autofocus
+               class="form-control input-lg" value="<?php echo $view->escape($last_username) ?>" required autofocus
                placeholder="<?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?>" />
     </div>
     <div class="input-group mb-md">
@@ -42,7 +43,7 @@ endif;
         </label>
     </div>
 
-    <input type="hidden" name="_csrf_token" value="<?php echo $view['form']->csrfToken('authenticate') ?>" />
+    <input type="hidden" name="_csrf_token" value="<?php echo $view->escape($view['form']->csrfToken('authenticate')) ?>" />
     <button class="btn btn-lg btn-primary btn-block" type="submit"><?php echo $view['translator']->trans('mautic.user.auth.form.loginbtn'); ?></button>
 
     <div class="mt-sm text-right">
