@@ -2,10 +2,6 @@
 
 namespace Mautic\CoreBundle\Test;
 
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
-
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
     /**
@@ -26,23 +22,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
-     * @param       $name
-     * @param array $params
+     * @param $file
      *
      * @throws \Exception
      */
-    protected function runCommand($name, array $params = [])
+    protected function applySqlFromFile($file)
     {
-        array_unshift($params, $name);
+        $connection = $this->container->get('doctrine.dbal.default_connection');
+        $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
+        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file} 2>&1 | grep -v \"Using a password\" || true";
 
-        $kernel      = $this->container->get('kernel');
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-
-        $input = new ArrayInput($params);
-
-        $output = new BufferedOutput();
-        $application->run($input, $output);
+        $lastLine = system($command, $status);
+        if (0 !== $status) {
+            throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
+        }
     }
 
     /**
@@ -65,7 +58,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             return;
         }
 
-        $this->restoreFromFile();
+        $this->applySqlFromFile($this->sqlDumpFile);
     }
 
     /**
@@ -106,19 +99,18 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         );
     }
 
+    /**
+     * @throws \Exception
+     */
     private function dumpToFile()
     {
         $connection = $this->container->get('doctrine.dbal.default_connection');
         $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysqldump --add-drop-table --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} > {$this->sqlDumpFile}";
-        system($command);
-    }
+        $command    = "mysqldump --add-drop-table --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} > {$this->sqlDumpFile} 2>&1 | grep -v \"Using a password\" || true";
 
-    private function restoreFromFile()
-    {
-        $connection = $this->container->get('doctrine.dbal.default_connection');
-        $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$this->sqlDumpFile} 2>&1 | grep -v \"Using a password\"";
-        system($command);
+        $lastLine = system($command, $status);
+        if (0 !== $status) {
+            throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
+        }
     }
 }

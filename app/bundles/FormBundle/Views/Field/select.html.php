@@ -36,10 +36,8 @@ if ((!empty($properties['empty_value']) || empty($field['defaultValue']) && empt
 HTML;
 endif;
 
-$options = (!empty($emptyOption)) ? [$emptyOption] : [];
-
-$optionBuilder = function (array $list) use (&$optionBuilder, $field, $view) {
-    $html = '';
+$optionBuilder = function (array $list, $emptyOptionHtml = '') use (&$optionBuilder, $field, $view) {
+    $html = $emptyOptionHtml;
     foreach ($list as $listValue => $listLabel):
         if (is_array($listLabel)) {
             // This is an option group
@@ -63,7 +61,7 @@ HTML;
     return $html;
 };
 
-$optionsHtml = $optionBuilder($list);
+$optionsHtml = $optionBuilder($list, $emptyOption);
 $html        = <<<HTML
 
             <div $containerAttr>{$label}{$help}

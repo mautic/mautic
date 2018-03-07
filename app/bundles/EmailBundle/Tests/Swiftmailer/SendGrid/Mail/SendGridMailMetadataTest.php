@@ -49,7 +49,6 @@ class SendGridMailMetadataTest extends \PHPUnit_Framework_TestCase
          */
         $mailSettings = $mail->getMailSettings();
         $bccSettings  = $mailSettings->getBccSettings();
-        dump($bccSettings->getEmail());
 
         $this->assertSame('bcc@example.com', $bccSettings->getEmail());
         $this->assertTrue($bccSettings->getEnable());

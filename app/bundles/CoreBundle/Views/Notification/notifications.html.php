@@ -38,7 +38,7 @@
                 </div>
             </div>
             <?php $lastNotification = reset($notifications); ?>
-            <input id="mauticLastNotificationId" type="hidden" value="<?php echo $lastNotification['id']; ?>" />
+            <input id="mauticLastNotificationId" type="hidden" value="<?php echo $view->escape($lastNotification['id']); ?>" />
         </div>
     </div>
 </li>
