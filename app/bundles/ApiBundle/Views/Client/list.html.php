@@ -80,12 +80,10 @@ endif;
                     <?php echo $item->getName(); ?>
                 </td>
                 <td class="visible-md visible-lg">
-                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $item->getPublicId(
-                    ); ?>"/>
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $view->escape($item->getPublicId()); ?>"/>
                 </td>
                 <td class="visible-md visible-lg">
-                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $item->getSecret(
-                    ); ?>"/>
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $view->escape($item->getSecret()); ?>"/>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>

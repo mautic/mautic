@@ -64,7 +64,7 @@ if (!isset($colSize)) {
                         ?>
                         <?php if ($optionGroup): ?><optgroup label="<?php echo $view['translator']->trans($groupId); ?>"><?php endif; ?>
                         <?php foreach ($groupPanels as $panelId => $panel): ?>
-                        <option id="<?php echo $panelId; ?>" value="<?php echo $panel['value']; ?>"
+                        <option id="<?php echo $panelId; ?>" value="<?php echo $view->escape($panel['value']); ?>"
                                 data-default-label="<?php echo $view->escape($panel['label']); ?>"
                             <?php if (isset($panel['attr'])): echo $panel['attr']; endif ?>
                             <?php if (!empty($panel['prototypeTemplatePlaceholders'])):
