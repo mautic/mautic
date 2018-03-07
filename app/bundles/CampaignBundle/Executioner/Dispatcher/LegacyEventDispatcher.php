@@ -14,7 +14,6 @@ namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -23,6 +22,7 @@ use Mautic\CampaignBundle\Event\EventArrayTrait;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -79,25 +79,35 @@ class LegacyEventDispatcher
         LeadModel $leadModel,
         MauticFactory $factory
     ) {
-        $this->dispatcher    = $dispatcher;
-        $this->scheduler     = $scheduler;
-        $this->logger        = $logger;
-        $this->leadModel     = $leadModel;
-        $this->factory       = $factory;
+        $this->dispatcher = $dispatcher;
+        $this->scheduler  = $scheduler;
+        $this->logger     = $logger;
+        $this->leadModel  = $leadModel;
+        $this->factory    = $factory;
     }
 
     /**
      * @param AbstractEventAccessor $config
+     * @param Event                 $event
      * @param ArrayCollection       $logs
      * @param                       $wasBatchProcessed
+     * @param PendingEvent          $pendingEvent
      *
      * @throws \ReflectionException
      */
-    public function dispatchCustomEvent(AbstractEventAccessor $config, ArrayCollection $logs, $wasBatchProcessed)
-    {
+    public function dispatchCustomEvent(
+        AbstractEventAccessor $config,
+        Event $event,
+        ArrayCollection $logs,
+        $wasBatchProcessed,
+        PendingEvent $pendingEvent
+    ) {
         $settings = $config->getConfig();
 
         if (!isset($settings['eventName']) && !isset($settings['callback'])) {
+            // Bad plugin
+            $pendingEvent->failAll('Invalid event configuration');
+
             return;
         }
 
@@ -121,7 +131,8 @@ class LegacyEventDispatcher
 
                 // Dispatch new events for legacy processed logs
                 if ($this->isFailed($result)) {
-                    $this->processFailedLog($result, $log);
+                    $this->processFailedLog($result, $log, $pendingEvent);
+
                     $this->scheduler->rescheduleFailure($log);
 
                     $this->dispatchFailedEvent($config, $log);
@@ -129,8 +140,7 @@ class LegacyEventDispatcher
                     continue;
                 }
 
-                $this->processSuccessLog($log);
-
+                $pendingEvent->pass($log);
                 $this->dispatchExecutedEvent($config, $log);
             }
         }
@@ -328,15 +338,14 @@ class LegacyEventDispatcher
     {
         return
             false === $result
-            || (is_array($result) && isset($result['result']) && false === $result['result'])
-        ;
+            || (is_array($result) && isset($result['result']) && false === $result['result']);
     }
 
     /**
      * @param              $result
      * @param LeadEventLog $log
      */
-    private function processFailedLog($result, LeadEventLog $log)
+    private function processFailedLog($result, LeadEventLog $log, PendingEvent $pendingEvent)
     {
         $this->logger->debug(
             'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
@@ -358,32 +367,6 @@ class LegacyEventDispatcher
             $reason = $metadata['reason'];
         }
 
-        if (!$failedLog = $log->getFailedLog()) {
-            $failedLog = new FailedLeadEventLog();
-        }
-
-        $failedLog->setLog($log)
-            ->setDateAdded(new \DateTime())
-            ->setReason($reason);
-
-        $log->setFailedLog($failedLog);
-    }
-
-    /**
-     * @param LeadEventLog $log
-     */
-    private function processSuccessLog(LeadEventLog $log)
-    {
-        if ($failedLog = $log->getFailedLog()) {
-            // Delete existing entries
-            $failedLog->setLog(null);
-            $log->setFailedLog(null);
-        }
-
-        $metadata = $log->getMetadata();
-        unset($metadata['errors']);
-        $log->setMetadata($metadata);
-
-        $log->setIsScheduled(false);
+        $pendingEvent->fail($log, $reason);
     }
 }

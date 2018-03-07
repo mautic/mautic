@@ -215,7 +215,8 @@ class KickoffExecutioner implements ExecutionerInterface
                     ' compared to '.$now->format('Y-m-d H:i:s')
                 );
 
-                if ($executionDate > $now) {
+                if ($this->scheduler->shouldSchedule($executionDate, $now)) {
+                    $this->counter->advanceTotalScheduled($contacts->count());
                     $this->scheduler->schedule($event, $executionDate, $contacts);
                     continue;
                 }
@@ -225,6 +226,11 @@ class KickoffExecutioner implements ExecutionerInterface
             }
 
             $this->kickoffContacts->clear();
+
+            if ($this->limiter->getContactId()) {
+                // No use making another call
+                break;
+            }
 
             // Get the next batch
             $contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->limiter);

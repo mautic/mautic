@@ -35,6 +35,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use ContactIdsInputTrait;
+    use WriteCountTrait;
 
     /**
      * @var CampaignModel
@@ -355,11 +356,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         $counter = $this->kickoffExecutioner->execute($this->campaign, $this->limiter, $this->output);
 
-        $this->output->writeln(
-            '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $counter->getExecuted()])
-            .'</comment>'
-        );
-        $this->output->writeln('');
+        $this->writeCounts($this->output, $this->translator, $counter);
     }
 
     /**
@@ -375,12 +372,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         $counter = $this->scheduledExecutioner->execute($this->campaign, $this->limiter, $this->output);
 
-        $this->output->writeln(
-            "\n".
-            '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $counter->getExecuted()])
-            .'</comment>'
-        );
-        $this->output->writeln('');
+        $this->writeCounts($this->output, $this->translator, $counter);
     }
 
     /**
@@ -396,10 +388,6 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         $counter = $this->inactiveExecutioner->execute($this->campaign, $this->limiter, $this->output);
 
-        $this->output->writeln(
-            '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $counter->getExecuted()])
-            .'</comment>'
-        );
-        $this->output->writeln('');
+        $this->writeCounts($this->output, $this->translator, $counter);
     }
 }

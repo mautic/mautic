@@ -192,7 +192,7 @@ class DecisionExecutioner
                 ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
             );
 
-            if ($executionDate > $now) {
+            if ($this->scheduler->shouldSchedule($executionDate, $now)) {
                 $this->scheduler->scheduleForContact($child, $executionDate, $this->contact);
                 continue;
             }

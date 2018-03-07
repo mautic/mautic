@@ -61,6 +61,6 @@ class Action implements EventInterface
         }
 
         // Execute to process the batch of contacts
-        $this->dispatcher->executeActionEvent($config, $event, $logs);
+        $this->dispatcher->dispatchActionEvent($config, $event, $logs);
     }
 }

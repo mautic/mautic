@@ -283,6 +283,11 @@ class InactiveExecutioner implements ExecutionerInterface
                 // Clear contacts from memory
                 $this->inactiveContacts->clear();
 
+                if ($this->limiter->getContactId()) {
+                    // No use making another call
+                    break;
+                }
+
                 // Get the next batch, starting with the max contact ID
                 $contacts = $this->inactiveContacts->getContacts($this->campaign->getId(), $decisionEvent, $startAtContactId, $this->limiter);
             }

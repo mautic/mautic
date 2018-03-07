@@ -23,6 +23,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class ExecuteEventCommand extends Command
 {
+    use WriteCountTrait;
+
     /**
      * @var ScheduledExecutioner
      */
@@ -87,12 +89,7 @@ class ExecuteEventCommand extends Command
 
         $counter = $this->scheduledExecutioner->executeByIds($ids, $output);
 
-        $output->writeln(
-            "\n".
-            '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $counter->getExecuted()])
-            .'</comment>'
-        );
-        $output->writeln('');
+        $this->writeCounts($output, $this->translator, $counter);
 
         return 0;
     }

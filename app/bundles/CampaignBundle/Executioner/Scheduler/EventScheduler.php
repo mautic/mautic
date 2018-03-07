@@ -109,15 +109,15 @@ class EventScheduler
      * @param Event           $event
      * @param \DateTime       $executionDate
      * @param ArrayCollection $contacts
-     * @param bool            $inactive
+     * @param bool            $validatingInaction
      */
-    public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts, $inactive = false)
+    public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts, $validatingInaction = false)
     {
         $config = $this->collector->getEventConfig($event);
 
         foreach ($contacts as $contact) {
             // Create the entry
-            $log = $this->eventLogger->buildLogEntry($event, $contact, $inactive);
+            $log = $this->eventLogger->buildLogEntry($event, $contact, $validatingInaction);
 
             // Schedule it
             $log->setTriggerDate($executionDate);
@@ -178,35 +178,67 @@ class EventScheduler
     }
 
     /**
-     * @param Event     $event
-     * @param \DateTime $now
-     *
-     * @return \DateTime
+     * @param Event          $event
+     * @param \DateTime|null $compareFromDateTime
+     * @param \DateTime|null $comparedToDateTime
+     ]     *
+     * @return \DateTime|mixed
      *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTime $now = null, \DateTime $comparedToDateTime = null)
+    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
     {
-        if (null === $now) {
-            $now = new \DateTime();
+        if (null === $compareFromDateTime) {
+            $compareFromDateTime = new \DateTime();
         }
 
         if (null === $comparedToDateTime) {
-            $comparedToDateTime = clone $now;
+            $comparedToDateTime = clone $compareFromDateTime;
         }
 
         switch ($event->getTriggerMode()) {
             case Event::TRIGGER_MODE_IMMEDIATE:
                 $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
 
-                return $now;
+                return $compareFromDateTime;
             case Event::TRIGGER_MODE_INTERVAL:
-                return $this->intervalScheduler->getExecutionDateTime($event, $now, $comparedToDateTime);
+                return $this->intervalScheduler->getExecutionDateTime($event, $compareFromDateTime, $comparedToDateTime);
             case Event::TRIGGER_MODE_DATE:
-                return $this->dateTimeScheduler->getExecutionDateTime($event, $now, $comparedToDateTime);
+                return $this->dateTimeScheduler->getExecutionDateTime($event, $compareFromDateTime, $comparedToDateTime);
         }
 
         throw new NotSchedulableException();
+    }
+
+    /**
+     * @param Event     $event
+     * @param \DateTime $compareFromDateTime
+     * @param \DateTime $now
+     *
+     * @return \DateTime|mixed
+     *
+     * @throws NotSchedulableException
+     */
+    public function getExecutionDateForInactivity(Event $event, \DateTime $compareFromDateTime, \DateTime $now)
+    {
+        $executionDate = $this->getExecutionDateTime($event, $compareFromDateTime, $now);
+
+        if ($this->shouldSchedule($executionDate, $compareFromDateTime)) {
+            return $compareFromDateTime;
+        }
+
+        return $executionDate;
+    }
+
+    /**
+     * @param \DateTime $executionDate
+     * @param \DateTime $now
+     *
+     * @return bool
+     */
+    public function shouldSchedule(\DateTime $executionDate, \DateTime $now)
+    {
+        return $executionDate > $now;
     }
 
     /**
@@ -224,6 +256,7 @@ class EventScheduler
 
     /**
      * @param AbstractEventAccessor $config
+     * @param Event                 $event
      * @param ArrayCollection       $logs
      */
     private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)

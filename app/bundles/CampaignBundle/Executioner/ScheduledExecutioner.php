@@ -288,9 +288,9 @@ class ScheduledExecutioner implements ExecutionerInterface
     private function executeScheduled($eventId, \DateTime $now)
     {
         $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
-        $this->scheduledContacts->hydrateContacts($logs);
-
         while ($logs->count()) {
+            $this->scheduledContacts->hydrateContacts($logs);
+
             $event = $logs->first()->getEvent();
             $this->progressBar->advance($logs->count());
             $this->counter->advanceEvaluated($logs->count());
@@ -330,8 +330,9 @@ class ScheduledExecutioner implements ExecutionerInterface
                     ' compared to '.$now->format('Y-m-d H:i:s')
                 );
 
-                if ($executionDate > $now) {
+                if ($this->scheduler->shouldSchedule($executionDate, $now)) {
                     // The schedule has changed for this event since first scheduled
+                    $this->counter->advanceTotalScheduled();
                     $this->scheduler->reschedule($log, $executionDate);
                     $logs->remove($key);
 

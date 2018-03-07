@@ -13,7 +13,6 @@ namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
-use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,6 +25,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ValidateEventCommand extends Command
 {
     use ContactIdsInputTrait;
+    use WriteCountTrait;
 
     /**
      * @var InactiveExecutioner
@@ -38,9 +38,10 @@ class ValidateEventCommand extends Command
     private $translator;
 
     /**
-     * ExecuteEventCommand constructor.
+     * ValidateEventCommand constructor.
      *
-     * @param ScheduledExecutioner $scheduledExecutioner
+     * @param InactiveExecutioner $inactiveExecutioner
+     * @param TranslatorInterface $translator
      */
     public function __construct(InactiveExecutioner $inactiveExecutioner, TranslatorInterface $translator)
     {
@@ -109,12 +110,7 @@ class ValidateEventCommand extends Command
         $limiter = new ContactLimiter(null, $contactId, null, null, $contactIds);
         $counter = $this->inactiveExecution->validate($decisionId, $limiter, $output);
 
-        $output->writeln(
-            "\n".
-            '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $counter->getExecuted()])
-            .'</comment>'
-        );
-        $output->writeln('');
+        $this->writeCounts($output, $this->translator, $counter);
 
         return 0;
     }

@@ -36,8 +36,6 @@ class ScheduledContacts
      * Hydrate contacts with custom field value, companies, etc.
      *
      * @param ArrayCollection $logs
-     *
-     * @return ArrayCollection
      */
     public function hydrateContacts(ArrayCollection $logs)
     {

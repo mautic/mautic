@@ -20,6 +20,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\DecisionExecutioner;
 use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
@@ -151,11 +152,8 @@ class LegacyEventModel extends CommonFormModel
         $leadId = null,
         $returnCounts = false
     ) {
-        if ($leadId) {
-            $counter = $this->kickoffExecutioner->executeForContact($campaign, $leadId, $output);
-        } else {
-            $counter = $this->kickoffExecutioner->executeForCampaign($campaign, $limit, $output);
-        }
+        $limiter = new ContactLimiter($limit, $leadId, null, null);
+        $counter = $this->kickoffExecutioner->execute($campaign, $limiter, $output);
 
         $totalEventCount += $counter->getEventCount();
 
@@ -192,7 +190,8 @@ class LegacyEventModel extends CommonFormModel
         OutputInterface $output = null,
         $returnCounts = false
     ) {
-        $counter = $this->scheduledExecutioner->executeForCampaign($campaign, $limit, $output);
+        $limiter = new ContactLimiter($limit, null, null, null);
+        $counter = $this->scheduledExecutioner->execute($campaign, $limiter, $output);
 
         $totalEventCount += $counter->getEventCount();
 
@@ -231,7 +230,8 @@ class LegacyEventModel extends CommonFormModel
     ) {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
-        $counter = $this->scheduledExecutioner->executeForCampaign($campaign, $limit, $output);
+        $limiter = new ContactLimiter($limit, null, null, null);
+        $counter = $this->scheduledExecutioner->execute($campaign, $limiter, $output);
 
         $totalEventCount += $counter->getEventCount();
 
@@ -360,7 +360,7 @@ class LegacyEventModel extends CommonFormModel
             case Event::TYPE_ACTION:
                 $logs = new ArrayCollection([$log]);
                 /* @var ActionAccessor $config */
-                $this->eventDispatcher->executeActionEvent($config, $event, $logs);
+                $this->eventDispatcher->dispatchActionEvent($config, $event, $logs);
 
                 return !$log->getFailedLog();
             case Event::TYPE_CONDITION:

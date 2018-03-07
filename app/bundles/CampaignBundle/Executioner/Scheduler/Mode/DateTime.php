@@ -22,10 +22,9 @@ class DateTime implements ScheduleModeInterface
     private $logger;
 
     /**
-     * EventScheduler constructor.
+     * DateTime constructor.
      *
      * @param LoggerInterface $logger
-     * @param \DateTime       $now
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -34,28 +33,28 @@ class DateTime implements ScheduleModeInterface
 
     /**
      * @param Event     $event
-     * @param \DateTime $now
+     * @param \DateTime $compareFromDateTime
      * @param \DateTime $comparedToDateTime
      *
      * @return \DateTime|mixed
      */
-    public function getExecutionDateTime(Event $event, \DateTime $now, \DateTime $comparedToDateTime)
+    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)
     {
         $triggerDate = $event->getTriggerDate();
 
         if (null === $triggerDate) {
             $this->logger->debug('CAMPAIGN: Trigger date is null');
 
-            return $now;
+            return $compareFromDateTime;
         }
 
-        if ($now >= $triggerDate) {
+        if ($compareFromDateTime >= $triggerDate) {
             $this->logger->debug(
                 'CAMPAIGN: ('.$event->getId().') Date to execute ('.$triggerDate->format('Y-m-d H:i:s T').') compared to now ('
-                .$now->format('Y-m-d H:i:s T').') and is thus overdue'
+                .$compareFromDateTime->format('Y-m-d H:i:s T').') and is thus overdue'
             );
 
-            return $now;
+            return $compareFromDateTime;
         }
 
         return $triggerDate;

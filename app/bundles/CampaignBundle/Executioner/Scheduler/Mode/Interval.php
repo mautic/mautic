@@ -24,10 +24,9 @@ class Interval implements ScheduleModeInterface
     private $logger;
 
     /**
-     * EventScheduler constructor.
+     * Interval constructor.
      *
      * @param LoggerInterface $logger
-     * @param \DateTime       $now
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -35,14 +34,15 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param Event          $event
-     * @param \DateTime|null $comparedToDateTime
+     * @param Event     $event
+     * @param \DateTime $compareFromDateTime
+     * @param \DateTime $comparedToDateTime
      *
-     * @return \Datetime
+     * @return \DateTime
      *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTime $now, \DateTime $comparedToDateTime)
+    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)
     {
         $interval = $event->getTriggerInterval();
         $unit     = $event->getTriggerIntervalUnit();
@@ -50,11 +50,10 @@ class Interval implements ScheduleModeInterface
         // Prevent comparisons from modifying original object
         $comparedToDateTime = clone $comparedToDateTime;
 
-        $this->logger->debug(
-            'CAMPAIGN: ('.$event->getId().') Adding interval of '.$interval.$unit.' to '.$comparedToDateTime->format('Y-m-d H:i:s T')
-        );
-
         try {
+            $this->logger->debug(
+                'CAMPAIGN: ('.$event->getId().') Adding interval of '.$interval.$unit.' to '.$comparedToDateTime->format('Y-m-d H:i:s T')
+            );
             $comparedToDateTime->add((new DateTimeHelper())->buildInterval($interval, $unit));
         } catch (\Exception $exception) {
             $this->logger->error('CAMPAIGN: Determining interval scheduled failed with "'.$exception->getMessage().'"');
@@ -62,16 +61,16 @@ class Interval implements ScheduleModeInterface
             throw new NotSchedulableException();
         }
 
-        if ($comparedToDateTime > $now) {
+        if ($comparedToDateTime > $compareFromDateTime) {
             $this->logger->debug(
                 "CAMPAIGN: Interval of $interval $unit to execute (".$comparedToDateTime->format('Y-m-d H:i:s T').') is later than now ('
-                .$now->format('Y-m-d H:i:s T')
+                .$compareFromDateTime->format('Y-m-d H:i:s T')
             );
 
             //the event is to be scheduled based on the time interval
             return $comparedToDateTime;
         }
 
-        return $now;
+        return $compareFromDateTime;
     }
 }

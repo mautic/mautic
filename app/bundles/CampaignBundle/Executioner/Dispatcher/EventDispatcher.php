@@ -77,27 +77,33 @@ class EventDispatcher
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
+     * @param ActionAccessor    $config
+     * @param Event             $event
+     * @param ArrayCollection   $logs
+     * @param PendingEvent|null $pendingEvent
+     *
+     * @return PendingEvent
      *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
+     * @throws \ReflectionException
      */
-    public function executeActionEvent(ActionAccessor $config, Event $event, ArrayCollection $logs)
+    public function dispatchActionEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null)
     {
+        if (!$pendingEvent) {
+            $pendingEvent = new PendingEvent($config, $event, $logs);
+        }
+
         // this if statement can be removed when legacy dispatcher is removed
         if ($customEvent = $config->getBatchEventName()) {
-            $pendingEvent = new PendingEvent($config, $event, $logs);
             $this->dispatcher->dispatch($customEvent, $pendingEvent);
 
             $success = $pendingEvent->getSuccessful();
-            $this->dispatchExecutedEvent($config, $event, $success);
-
-            $failed = $pendingEvent->getFailures();
-            $this->dispatchedFailedEvent($config, $failed);
+            $failed  = $pendingEvent->getFailures();
 
             $this->validateProcessedLogs($logs, $success, $failed);
+            $this->dispatchExecutedEvent($config, $event, $success);
+            $this->dispatchedFailedEvent($config, $failed);
 
             // Dispatch legacy ON_EVENT_EXECUTION event for BC
             $this->legacyDispatcher->dispatchExecutionEvents($config, $success, $failed);
@@ -105,7 +111,9 @@ class EventDispatcher
 
         // Execute BC eventName or callback. Or support case where the listener has been converted to batchEventName but still wants to execute
         // eventName for BC support for plugins that could be listening to it's own custom event.
-        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, ($customEvent));
+        $this->legacyDispatcher->dispatchCustomEvent($config, $event, $logs, ($customEvent), $pendingEvent);
+
+        return $pendingEvent;
     }
 
     /**
@@ -156,6 +164,7 @@ class EventDispatcher
 
     /**
      * @param AbstractEventAccessor $config
+     * @param Event                 $event
      * @param ArrayCollection       $logs
      */
     public function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)

@@ -491,13 +491,13 @@ class LeadEventLogRepository extends CommonRepository
             );
             $q->setParameter('contactId', (int) $contactId);
         } elseif ($minContactId = $limiter->getMinContactId()) {
-            $q->andWhere(
+            $expr->add(
                 'l.lead_id BETWEEN :minContactId AND :maxContactId'
-            )
-                ->setParameter('minContactId', $minContactId)
+            );
+            $q->setParameter('minContactId', $minContactId)
                 ->setParameter('maxContactId', $limiter->getMaxContactId());
         } elseif ($contactIds = $limiter->getContactIdList()) {
-            $q->andWhere(
+            $expr->add(
                 $q->expr()->in('l.lead_id', $contactIds)
             );
         }

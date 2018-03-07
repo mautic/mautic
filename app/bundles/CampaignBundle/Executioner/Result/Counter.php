@@ -39,15 +39,28 @@ class Counter
     private $totalExecuted = 0;
 
     /**
-     * Counts constructor.
+     * @var int
      */
-    public function __construct($eventCount = 0, $evaluated = 0, $executed = 0, $totalEvaluated = 0, $totalExecuted = 0)
+    private $totalScheduled = 0;
+
+    /**
+     * Counter constructor.
+     *
+     * @param int $eventCount
+     * @param int $evaluated
+     * @param int $executed
+     * @param int $totalEvaluated
+     * @param int $totalExecuted
+     * @param int $totalScheduled
+     */
+    public function __construct($eventCount = 0, $evaluated = 0, $executed = 0, $totalEvaluated = 0, $totalExecuted = 0, $totalScheduled = 0)
     {
         $this->eventCount     = $eventCount;
         $this->evaluated      = $evaluated;
         $this->executed       = $executed;
         $this->totalEvaluated = $totalEvaluated;
         $this->totalExecuted  = $totalExecuted;
+        $this->totalScheduled = $totalScheduled;
     }
 
     /**
@@ -134,5 +147,21 @@ class Counter
     public function advanceTotalExecuted($step = 1)
     {
         $this->totalExecuted += $step;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTotalScheduled()
+    {
+        return $this->totalScheduled;
+    }
+
+    /**
+     * @param int $step
+     */
+    public function advanceTotalScheduled($step = 1)
+    {
+        $this->totalScheduled += $step;
     }
 }

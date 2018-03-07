@@ -88,7 +88,7 @@ class InactiveHelper
     /**
      * @param \DateTime       $now
      * @param ArrayCollection $contacts
-     * @param array           $lastActiveDates
+     * @param                 $eventId
      * @param ArrayCollection $negativeChildren
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
@@ -117,8 +117,8 @@ class InactiveHelper
 
             // We have to loop over all the events till we have a confirmed event that is overdue
             foreach ($negativeChildren as $event) {
-                $excuctionDate = $this->scheduler->getExecutionDateTime($event, $now, $lastActiveDates[$contactId]);
-                if ($excuctionDate <= $now) {
+                $executionDate = $this->scheduler->getExecutionDateTime($event, $now, $lastActiveDates[$contactId]);
+                if ($executionDate <= $now) {
                     $isInactive = true;
                     break;
                 }
@@ -165,9 +165,9 @@ class InactiveHelper
     {
         $earliestDate = $lastActiveDate;
         foreach ($negativeChildren as $event) {
-            $excuctionDate = $this->scheduler->getExecutionDateTime($event, $lastActiveDate);
-            if ($excuctionDate <= $earliestDate) {
-                $earliestDate = $excuctionDate;
+            $executionDate = $this->scheduler->getExecutionDateTime($event, $lastActiveDate);
+            if ($executionDate <= $earliestDate) {
+                $earliestDate = $executionDate;
             }
         }
 
