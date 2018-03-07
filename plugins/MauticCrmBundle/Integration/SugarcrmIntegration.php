@@ -264,9 +264,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                     //6.x/community
 
                                     foreach ($fields['module_fields'] as $fieldInfo) {
-                                        if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'link', 'relate'])
+                                        if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'bool', 'link', 'relate'])
                                         ||
                                         ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
+                                                ||
+                                                ($fieldInfo['type'] == 'bool' && $fieldInfo['name'] == 'do_not_call')
                                         )) {
                                             $type      = 'string';
                                             $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
@@ -858,7 +860,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     } elseif ($object == 'Accounts') {
-                        $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $entity                = $this->getMauticCompany($dataObject, null);
                         $detachClass           = Company::class;
                         $mauticObjectReference = 'company';
                     } else {
@@ -1280,7 +1282,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if (!empty($mauticData)) {
             $result = $apiHelper->syncLeadsToSugar($mauticData);
         }
-
         return $this->processCompositeResponse($result);
     }
 
@@ -1441,11 +1442,19 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {
             //update and create (one query) every 200 records
-
+            print_r($lead);
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    $body[] = ['name' => $sugarField, 'value' => $lead[$mauticField]];
+                    $value = '';
+                    if ($sugarField === 'do_not_call'){
+                        if (is_bool($lead[$mauticField]) === true) {
+                            $value = 1;
+                        }
+                    } else {
+                        $value = $lead[$mauticField];
+                    }
+                    $body[] = ['name' => $sugarField, 'value' =>  $value];
                 } elseif ($required) {
                     $value  = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
                     $body[] = ['name' => $sugarField, 'value' => $value];
