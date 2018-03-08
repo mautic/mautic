@@ -28,7 +28,6 @@ class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($contactSegmentFilterCrate->getField());
         $this->assertTrue($contactSegmentFilterCrate->isContactType());
         $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
-        $this->assertNull($contactSegmentFilterCrate->getType());
         $this->assertNull($contactSegmentFilterCrate->getFilter());
         $this->assertNull($contactSegmentFilterCrate->getOperator());
         $this->assertFalse($contactSegmentFilterCrate->isBooleanType());
@@ -53,13 +52,12 @@ class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
-        $this->assertEquals('and', $contactSegmentFilterCrate->getGlue());
-        $this->assertEquals('date_identified', $contactSegmentFilterCrate->getField());
+        $this->assertSame('and', $contactSegmentFilterCrate->getGlue());
+        $this->assertSame('date_identified', $contactSegmentFilterCrate->getField());
         $this->assertTrue($contactSegmentFilterCrate->isContactType());
         $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
-        $this->assertEquals('datetime', $contactSegmentFilterCrate->getType());
         $this->assertNull($contactSegmentFilterCrate->getFilter());
-        $this->assertEquals('!empty', $contactSegmentFilterCrate->getOperator());
+        $this->assertSame('!empty', $contactSegmentFilterCrate->getOperator());
         $this->assertFalse($contactSegmentFilterCrate->isBooleanType());
         $this->assertTrue($contactSegmentFilterCrate->isDateType());
         $this->assertTrue($contactSegmentFilterCrate->hasTimeParts());
@@ -82,13 +80,12 @@ class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
-        $this->assertEquals('and', $contactSegmentFilterCrate->getGlue());
-        $this->assertEquals('date_identified', $contactSegmentFilterCrate->getField());
+        $this->assertSame('and', $contactSegmentFilterCrate->getGlue());
+        $this->assertSame('date_identified', $contactSegmentFilterCrate->getField());
         $this->assertTrue($contactSegmentFilterCrate->isContactType());
         $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
-        $this->assertEquals('date', $contactSegmentFilterCrate->getType());
         $this->assertNull($contactSegmentFilterCrate->getFilter());
-        $this->assertEquals('!empty', $contactSegmentFilterCrate->getOperator());
+        $this->assertSame('!empty', $contactSegmentFilterCrate->getOperator());
         $this->assertFalse($contactSegmentFilterCrate->isBooleanType());
         $this->assertTrue($contactSegmentFilterCrate->isDateType());
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
@@ -100,15 +97,36 @@ class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
     public function testBooleanFilter()
     {
         $filter = [
-            'type' => 'boolean',
+            'type'   => 'boolean',
+            'filter' => '1',
         ];
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
-        $this->assertEquals('boolean', $contactSegmentFilterCrate->getType());
+        $this->assertTrue($contactSegmentFilterCrate->getFilter());
         $this->assertTrue($contactSegmentFilterCrate->isBooleanType());
         $this->assertFalse($contactSegmentFilterCrate->isDateType());
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
+        $this->assertTrue($contactSegmentFilterCrate->filterValueDoNotNeedAdjustment());
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
+     */
+    public function testNumericFilter()
+    {
+        $filter = [
+            'type'   => 'number',
+            'filter' => '2',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $this->assertSame(2.0, $contactSegmentFilterCrate->getFilter());
+        $this->assertTrue($contactSegmentFilterCrate->isNumberType());
+        $this->assertFalse($contactSegmentFilterCrate->isDateType());
+        $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
+        $this->assertTrue($contactSegmentFilterCrate->filterValueDoNotNeedAdjustment());
     }
 
     /**

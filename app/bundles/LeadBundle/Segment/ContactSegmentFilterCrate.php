@@ -94,18 +94,17 @@ class ContactSegmentFilterCrate
     }
 
     /**
-     * @return string|null
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @return string|array|null
+     * @return string|array|bool|float|null
      */
     public function getFilter()
     {
+        switch ($this->getType()) {
+            case 'number':
+                return (float) $this->filter;
+            case 'boolean':
+                return (bool) $this->filter;
+        }
+
         return $this->filter;
     }
 
@@ -128,6 +127,14 @@ class ContactSegmentFilterCrate
     /**
      * @return bool
      */
+    public function isNumberType()
+    {
+        return $this->getType() === 'number';
+    }
+
+    /**
+     * @return bool
+     */
     public function isDateType()
     {
         return $this->getType() === 'date' || $this->hasTimeParts();
@@ -139,5 +146,23 @@ class ContactSegmentFilterCrate
     public function hasTimeParts()
     {
         return $this->getType() === 'datetime';
+    }
+
+    /**
+     * Filter value could be used directly - no modification (like regex etc.) needed.
+     *
+     * @return bool
+     */
+    public function filterValueDoNotNeedAdjustment()
+    {
+        return $this->isNumberType() || $this->isBooleanType();
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getType()
+    {
+        return $this->type;
     }
 }
