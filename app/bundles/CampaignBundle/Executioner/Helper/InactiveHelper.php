@@ -120,7 +120,7 @@ class InactiveHelper
                 continue;
             }
 
-            $earliestContactInactiveDate = $this->getEarliestInactiveDate($negativeChildren, $lastActiveDates[$contactId], $now);
+            $earliestContactInactiveDate = $this->getEarliestInactiveDate($negativeChildren, $lastActiveDates[$contactId]);
             $this->logger->debug(
                 'CAMPAIGN: Earliest date for inactivity for contact ID# '.$contactId.' is '.
                 $earliestContactInactiveDate->format('Y-m-d H:i:s T').' based on last active date of '.
@@ -170,11 +170,11 @@ class InactiveHelper
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTime $lastActiveDate, \DateTime $now)
+    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTime $lastActiveDate)
     {
         $earliestDate = null;
         foreach ($negativeChildren as $event) {
-            $executionDate = $this->scheduler->getExecutionDateTime($event, $lastActiveDate, $now);
+            $executionDate = $this->scheduler->getExecutionDateTime($event, $lastActiveDate);
             if (!$earliestDate || $executionDate < $earliestDate) {
                 $earliestDate = $executionDate;
             }
