@@ -186,7 +186,7 @@ class EventScheduler
      *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
+    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null, $validatingInaction = false)
     {
         if (null === $compareFromDateTime) {
             $compareFromDateTime = new \DateTime();
@@ -211,20 +211,49 @@ class EventScheduler
     }
 
     /**
-     * @param Event     $event
-     * @param \DateTime $compareFromDateTime
-     * @param \DateTime $now
+     * @param ArrayCollection|Event[] $events
+     * @param \DateTime               $now
      *
-     * @return \DateTime|mixed
+     * @return array
      *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateForInactivity(Event $event, \DateTime $compareFromDateTime, \DateTime $now)
+    public function getSortedExecutionDates(ArrayCollection $events, \DateTime $now)
     {
-        $executionDate = $this->getExecutionDateTime($event, $compareFromDateTime, $now);
+        $eventExecutionDates = [];
 
-        if ($this->shouldSchedule($executionDate, $compareFromDateTime)) {
-            return $compareFromDateTime;
+        /** @var Event $child */
+        foreach ($events as $child) {
+            $eventExecutionDates[$child->getId()] = $this->getExecutionDateTime($child, $now);
+        }
+        uasort($eventExecutionDates, function (\DateTime $a, \DateTime $b) {
+            if ($a === $b) {
+                return 0;
+            }
+
+            return $a < $b ? -1 : 1;
+        });
+
+        return $eventExecutionDates;
+    }
+
+    /**
+     * @param \DateTime $earliestDate
+     * @param \DateTime $now
+     * @param \DateTime $executionDate
+     *
+     * @return \DateTime
+     */
+    public function getExecutionDateForInactivity(\DateTime $earliestDate, \DateTime $now, \DateTime $executionDate)
+    {
+        if ($earliestDate === $executionDate) {
+            // Inactivity is based on the past
+            $executionDate = $now;
+        } elseif ($executionDate > $earliestDate) {
+            // Execute based on difference between earliest date of this group of events
+            $diff          = $earliestDate->diff($executionDate);
+            $executionDate = clone $now;
+            $executionDate->add($diff);
         }
 
         return $executionDate;

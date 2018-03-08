@@ -290,7 +290,10 @@ class EventExecutioner
      */
     public function executeContactsForChildren(ArrayCollection $children, ArrayCollection $contacts, Counter $childrenCounter, $validatingInaction = false)
     {
-        /** @var Event $child */
+        $eventExecutionDates = $this->scheduler->getSortedExecutionDates($children, $this->now);
+        /** @var \DateTime $earliestDate */
+        $earliestDate = reset($eventExecutionDates);
+
         foreach ($children as $child) {
             // Ignore decisions
             if (Event::TYPE_DECISION == $child->getEventType()) {
@@ -298,8 +301,11 @@ class EventExecutioner
                 continue;
             }
 
-            $executionDate = ($validatingInaction) ? $this->scheduler->getExecutionDateTime($child, $this->now)
-                : $this->scheduler->getExecutionDateTime($child, $this->now);
+            /** @var \DateTime $executionDate */
+            $executionDate = $eventExecutionDates[$child->getId()];
+            if ($validatingInaction) {
+                $this->scheduler->getExecutionDateForInactivity($earliestDate, $this->now, $executionDate);
+            }
 
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$child->getId().

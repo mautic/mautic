@@ -38,7 +38,7 @@ class Interval implements ScheduleModeInterface
      * @param \DateTime $compareFromDateTime
      * @param \DateTime $comparedToDateTime
      *
-     * @return \DateTime
+     * @return \DateTime|mixed
      *
      * @throws NotSchedulableException
      */
