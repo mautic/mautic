@@ -47,9 +47,6 @@ class Interval implements ScheduleModeInterface
         $interval = $event->getTriggerInterval();
         $unit     = $event->getTriggerIntervalUnit();
 
-        // Prevent comparisons from modifying original object
-        $comparedToDateTime = clone $comparedToDateTime;
-
         try {
             $this->logger->debug(
                 'CAMPAIGN: ('.$event->getId().') Adding interval of '.$interval.$unit.' to '.$comparedToDateTime->format('Y-m-d H:i:s T')
@@ -63,13 +60,18 @@ class Interval implements ScheduleModeInterface
 
         if ($comparedToDateTime > $compareFromDateTime) {
             $this->logger->debug(
-                "CAMPAIGN: Interval of $interval $unit to execute (".$comparedToDateTime->format('Y-m-d H:i:s T').') is later than now ('
-                .$compareFromDateTime->format('Y-m-d H:i:s T')
+                'CAMPAIGN: ('.$event->getId().') '.$comparedToDateTime->format('Y-m-d H:i:s T').' is later than '
+                .$compareFromDateTime->format('Y-m-d H:i:s T').' and thus returning '.$comparedToDateTime->format('Y-m-d H:i:s T')
             );
 
             //the event is to be scheduled based on the time interval
             return $comparedToDateTime;
         }
+
+        $this->logger->debug(
+            'CAMPAIGN: ('.$event->getId().') '.$comparedToDateTime->format('Y-m-d H:i:s T').' is earlier than '
+            .$compareFromDateTime->format('Y-m-d H:i:s T').' and thus returning '.$compareFromDateTime->format('Y-m-d H:i:s T')
+        );
 
         return $compareFromDateTime;
     }

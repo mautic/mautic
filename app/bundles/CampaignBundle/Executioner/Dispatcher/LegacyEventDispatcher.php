@@ -106,7 +106,9 @@ class LegacyEventDispatcher
 
         if (!isset($settings['eventName']) && !isset($settings['callback'])) {
             // Bad plugin
-            $pendingEvent->failAll('Invalid event configuration');
+            if (!$wasBatchProcessed) {
+                $pendingEvent->failAll('Invalid event configuration');
+            }
 
             return;
         }

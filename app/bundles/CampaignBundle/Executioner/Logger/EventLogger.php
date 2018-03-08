@@ -87,11 +87,11 @@ class EventLogger
     /**
      * @param Event $event
      * @param null  $lead
-     * @param bool  $inactive
+     * @param bool  $isInactiveEvent
      *
      * @return LeadEventLog
      */
-    public function buildLogEntry(Event $event, $lead = null, $inactive = false)
+    public function buildLogEntry(Event $event, $lead = null, $isInactiveEvent = false)
     {
         $log = new LeadEventLog();
 
@@ -105,7 +105,7 @@ class EventLogger
         }
         $log->setLead($lead);
 
-        if ($inactive) {
+        if ($isInactiveEvent) {
             $log->setNonActionPathTaken(true);
         }
 
@@ -218,15 +218,15 @@ class EventLogger
      * @param Event                 $event
      * @param AbstractEventAccessor $config
      * @param ArrayCollection       $contacts
-     * @param bool                  $inactive
+     * @param bool                  $isInactiveEvent
      *
      * @return ArrayCollection
      */
-    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $inactive = false)
+    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry = false)
     {
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
-            $log = $this->buildLogEntry($event, $contact, $inactive);
+            $log = $this->buildLogEntry($event, $contact, $isInactiveEntry);
             $log->setIsScheduled(false);
             $log->setDateTriggered(new \DateTime());
 

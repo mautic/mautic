@@ -143,7 +143,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null, $validatingInaction = false)
+    public function executeForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null, $isInactiveEvent = false)
     {
         if (!$contacts->count()) {
             $this->logger->debug('CAMPAIGN: No contacts to process for event ID '.$event->getId());
@@ -152,7 +152,7 @@ class EventExecutioner
         }
 
         $config = $this->collector->getEventConfig($event);
-        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $validatingInaction);
+        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
 
         $this->executeLogs($event, $logs, $counter);
     }
@@ -201,12 +201,12 @@ class EventExecutioner
     /**
      * @param Event           $event
      * @param ArrayCollection $contacts
-     * @param bool            $inactive
+     * @param bool            $isInactiveEvent
      */
-    public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, $inactive = false)
+    public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, $isInactiveEvent = false)
     {
         $config = $this->collector->getEventConfig($event);
-        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $inactive);
+        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
 
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
@@ -281,19 +281,14 @@ class EventExecutioner
      * @param ArrayCollection $children
      * @param ArrayCollection $contacts
      * @param Counter         $childrenCounter
-     * @param bool            $validatingInaction
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeContactsForChildren(ArrayCollection $children, ArrayCollection $contacts, Counter $childrenCounter, $validatingInaction = false)
+    public function executeContactsForChildren(ArrayCollection $children, ArrayCollection $contacts, Counter $childrenCounter)
     {
-        $eventExecutionDates = $this->scheduler->getSortedExecutionDates($children, $this->now);
-        /** @var \DateTime $earliestDate */
-        $earliestDate = reset($eventExecutionDates);
-
         foreach ($children as $child) {
             // Ignore decisions
             if (Event::TYPE_DECISION == $child->getEventType()) {
@@ -301,11 +296,7 @@ class EventExecutioner
                 continue;
             }
 
-            /** @var \DateTime $executionDate */
-            $executionDate = $eventExecutionDates[$child->getId()];
-            if ($validatingInaction) {
-                $this->scheduler->getExecutionDateForInactivity($earliestDate, $this->now, $executionDate);
-            }
+            $executionDate = $this->scheduler->getExecutionDateTime($child, $this->now);
 
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$child->getId().
@@ -314,11 +305,57 @@ class EventExecutioner
 
             if ($this->scheduler->shouldSchedule($executionDate, $this->now)) {
                 $childrenCounter->advanceTotalScheduled($contacts->count());
-                $this->scheduler->schedule($child, $executionDate, $contacts, $validatingInaction);
+                $this->scheduler->schedule($child, $executionDate, $contacts);
                 continue;
             }
 
-            $this->executeForContacts($child, $contacts, $childrenCounter, $validatingInaction);
+            $this->executeForContacts($child, $contacts, $childrenCounter);
+        }
+    }
+
+    /**
+     * @param ArrayCollection $children
+     * @param ArrayCollection $contacts
+     * @param Counter         $childrenCounter
+     * @param bool            $validatingInaction
+     *
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
+     */
+    public function executeContactsForInactiveChildren(ArrayCollection $children, ArrayCollection $contacts, Counter $childrenCounter, \DateTime $earliestLastActiveDateTime)
+    {
+        $eventExecutionDates = $this->scheduler->getSortedExecutionDates($children, $earliestLastActiveDateTime);
+
+        /** @var \DateTime $earliestExecutionDate */
+        $earliestExecutionDate = reset($eventExecutionDates);
+
+        foreach ($children as $child) {
+            // Ignore decisions
+            if (Event::TYPE_DECISION == $child->getEventType()) {
+                $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$child->getId().' as a decision');
+                continue;
+            }
+
+            $executionDate = $this->scheduler->getExecutionDateForInactivity(
+                $eventExecutionDates[$child->getId()],
+                $earliestExecutionDate,
+                $this->now
+            );
+
+            $this->logger->debug(
+                'CAMPAIGN: Event ID# '.$child->getId().
+                ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
+            );
+
+            if ($this->scheduler->shouldSchedule($executionDate, $this->now)) {
+                $childrenCounter->advanceTotalScheduled($contacts->count());
+                $this->scheduler->schedule($child, $executionDate, $contacts, true);
+                continue;
+            }
+
+            $this->executeForContacts($child, $contacts, $childrenCounter, true);
         }
     }
 

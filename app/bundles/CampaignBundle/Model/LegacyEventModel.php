@@ -637,7 +637,7 @@ class LegacyEventModel extends CommonFormModel
 
                 if ($triggerOn > $now) {
                     $this->logger->debug(
-                        'CAMPAIGN: Date to execute ('.$triggerOn->format('Y-m-d H:i:s T').') is later than now ('.$now->format('Y-m-d H:i:s T')
+                        'CAMPAIGN: Date to execute ('.$triggerOn->format('Y-m-d H:i:s T').') is later than ('.$now->format('Y-m-d H:i:s T')
                         .')'.(($action['decisionPath'] == 'no') ? ' so ignore' : ' so schedule')
                     );
 

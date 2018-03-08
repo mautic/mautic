@@ -32,6 +32,11 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
     private $prefix;
 
     /**
+     * @var \DateTime
+     */
+    private $eventDate;
+
+    /**
      * @throws \Exception
      */
     public function setUp()
@@ -56,12 +61,12 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
 
         // Schedule event
         date_default_timezone_set('UTC');
-        $event = new \DateTime();
-        $event->modify('+15 seconds');
-        $sql = str_replace('{SEND_EMAIL_1_TIMESTAMP}', $event->format('Y-m-d H:i:s'), $sql);
+        $this->eventDate = new \DateTime();
+        $this->eventDate->modify('+15 seconds');
+        $sql = str_replace('{SEND_EMAIL_1_TIMESTAMP}', $this->eventDate->format('Y-m-d H:i:s'), $sql);
 
-        $event->modify('+15 seconds');
-        $sql = str_replace('{CONDITION_TIMESTAMP}', $event->format('Y-m-d H:i:s'), $sql);
+        $this->eventDate->modify('+15 seconds');
+        $sql = str_replace('{CONDITION_TIMESTAMP}', $this->eventDate->format('Y-m-d H:i:s'), $sql);
 
         // Update the schema
         $tmpFile = $this->container->getParameter('kernel.cache_dir').'/campaign_schema.sql';
@@ -127,13 +132,16 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
 
         // Send email 1 should no longer be scheduled
-        $byEvent = $this->getCampaignEventLogs([2]);
+        $byEvent = $this->getCampaignEventLogs([2, 4]);
         $this->assertCount(50, $byEvent[2]);
         foreach ($byEvent[2] as $log) {
             if (1 === (int) $log['is_scheduled']) {
                 $this->fail('Sending Campaign Test Email 1 is still scheduled for lead ID '.$log['lead_id']);
             }
         }
+
+        // The non-action events attached to the decision should have no logs entries
+        $this->assertCount(0, $byEvent[4]);
 
         // Check that the emails actually sent
         $stats = $this->db->createQueryBuilder()
@@ -150,12 +158,13 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
             $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent()));
         }
 
-        $byEvent = $this->getCampaignEventLogs([3, 4, 5, 10, 14]);
+        $byEvent = $this->getCampaignEventLogs([3, 4, 5, 10, 14, 15]);
 
         // The non-action events attached to the decision should have no logs entries
         $this->assertCount(0, $byEvent[4]);
         $this->assertCount(0, $byEvent[5]);
         $this->assertCount(0, $byEvent[14]);
+        $this->assertCount(0, $byEvent[15]);
 
         // Those 25 should now have open email decisions logged and the next email sent
         $this->assertCount(25, $byEvent[3]);
@@ -168,7 +177,7 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
 
         // Now we should have 50 email open decisions
-        $byEvent = $this->getCampaignEventLogs([3, 4, 5, 14]);
+        $byEvent = $this->getCampaignEventLogs([3, 4, 5, 14, 15]);
         $this->assertCount(50, $byEvent[3]);
 
         // 25 should be marked as non_action_path_taken
@@ -182,12 +191,34 @@ class TriggerCampaignCommandTest extends MauticMysqlTestCase
         // Tag EmailNotOpen should all be scheduled for these 25 contacts because the condition's timeframe was shorter and therefore the
         // contact was sent down the inaction path
         $this->assertCount(25, $byEvent[14]);
+        $this->assertCount(25, $byEvent[15]);
+
+        $utcTimezone = new \DateTimeZone('UTC');
         foreach ($byEvent[14] as $log) {
             if (0 === (int) $log['is_scheduled']) {
                 $this->fail('Tag EmailNotOpen is not scheduled for lead ID '.$log['lead_id']);
             }
+
+            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
+            $diff         = $this->eventDate->diff($scheduledFor);
+
+            if (2 !== $diff->i) {
+                $this->fail('Tag EmailNotOpen should be scheduled for around 2 minutes ('.$diff->i.' minutes)');
+            }
         }
 
+        foreach ($byEvent[15] as $log) {
+            if (0 === (int) $log['is_scheduled']) {
+                $this->fail('Tag EmailNotOpen Again is not scheduled for lead ID '.$log['lead_id']);
+            }
+
+            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
+            $diff         = $this->eventDate->diff($scheduledFor);
+
+            if (6 !== $diff->i) {
+                $this->fail('Tag EmailNotOpen Again should be scheduled for around 6 minutes ('.$diff->i.' minutes)');
+            }
+        }
         $byEvent = $this->getCampaignEventLogs([6, 7, 8, 9]);
         $tags    = $this->getTagCounts();
 

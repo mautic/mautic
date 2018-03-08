@@ -109,15 +109,15 @@ class EventScheduler
      * @param Event           $event
      * @param \DateTime       $executionDate
      * @param ArrayCollection $contacts
-     * @param bool            $validatingInaction
+     * @param bool            $isInactiveEvent
      */
-    public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts, $validatingInaction = false)
+    public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
     {
         $config = $this->collector->getEventConfig($event);
 
         foreach ($contacts as $contact) {
             // Create the entry
-            $log = $this->eventLogger->buildLogEntry($event, $contact, $validatingInaction);
+            $log = $this->eventLogger->buildLogEntry($event, $contact, $isInactiveEvent);
 
             // Schedule it
             $log->setTriggerDate($executionDate);
@@ -186,14 +186,20 @@ class EventScheduler
      *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null, $validatingInaction = false)
+    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
     {
         if (null === $compareFromDateTime) {
             $compareFromDateTime = new \DateTime();
+        } else {
+            // Prevent comparisons from modifying original object
+            $compareFromDateTime = clone $compareFromDateTime;
         }
 
         if (null === $comparedToDateTime) {
             $comparedToDateTime = clone $compareFromDateTime;
+        } else {
+            // Prevent comparisons from modifying original object
+            $comparedToDateTime = clone $comparedToDateTime;
         }
 
         switch ($event->getTriggerMode()) {
@@ -212,20 +218,21 @@ class EventScheduler
 
     /**
      * @param ArrayCollection|Event[] $events
-     * @param \DateTime               $now
+     * @param \DateTime               $lastActiveDate
      *
      * @return array
      *
      * @throws NotSchedulableException
      */
-    public function getSortedExecutionDates(ArrayCollection $events, \DateTime $now)
+    public function getSortedExecutionDates(ArrayCollection $events, \DateTime $lastActiveDate)
     {
         $eventExecutionDates = [];
 
         /** @var Event $child */
         foreach ($events as $child) {
-            $eventExecutionDates[$child->getId()] = $this->getExecutionDateTime($child, $now);
+            $eventExecutionDates[$child->getId()] = $this->getExecutionDateTime($child, $lastActiveDate);
         }
+
         uasort($eventExecutionDates, function (\DateTime $a, \DateTime $b) {
             if ($a === $b) {
                 return 0;
@@ -238,25 +245,20 @@ class EventScheduler
     }
 
     /**
-     * @param \DateTime $earliestDate
+     * @param \DateTime $eventExecutionDate
+     * @param \DateTime $earliestExecutionDate
      * @param \DateTime $now
-     * @param \DateTime $executionDate
      *
      * @return \DateTime
      */
-    public function getExecutionDateForInactivity(\DateTime $earliestDate, \DateTime $now, \DateTime $executionDate)
+    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTime $now)
     {
-        if ($earliestDate === $executionDate) {
-            // Inactivity is based on the past
-            $executionDate = $now;
-        } elseif ($executionDate > $earliestDate) {
-            // Execute based on difference between earliest date of this group of events
-            $diff          = $earliestDate->diff($executionDate);
-            $executionDate = clone $now;
-            $executionDate->add($diff);
+        if ($earliestExecutionDate->getTimestamp() === $eventExecutionDate->getTimestamp()) {
+            // Inactivity is based on the "wait" period so execute now
+            return clone $now;
         }
 
-        return $executionDate;
+        return $eventExecutionDate;
     }
 
     /**

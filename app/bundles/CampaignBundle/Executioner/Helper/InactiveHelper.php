@@ -91,6 +91,8 @@ class InactiveHelper
      * @param                 $eventId
      * @param ArrayCollection $negativeChildren
      *
+     * @return \DateTime
+     *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
     public function removeContactsThatAreNotApplicable(\DateTime $now, ArrayCollection $contacts, $eventId, ArrayCollection $negativeChildren)
@@ -105,27 +107,32 @@ class InactiveHelper
             $lastActiveDates = $this->inactiveContacts->getDatesAdded();
         }
 
+        $earliestInactiveDate = $now;
+
         /* @var Event $event */
         foreach ($contactIds as $contactId) {
             if (!isset($lastActiveDates[$contactId])) {
                 // This contact does not have a last active date so likely the event is scheduled
                 $contacts->remove($contactId);
+
+                $this->logger->debug('CAMPAIGN: Contact ID# '.$contactId.' does not have a last active date');
+
                 continue;
             }
 
-            $isInactive = false;
+            $earliestContactInactiveDate = $this->getEarliestInactiveDate($negativeChildren, $lastActiveDates[$contactId], $now);
+            $this->logger->debug(
+                'CAMPAIGN: Earliest date for inactivity for contact ID# '.$contactId.' is '.
+                $earliestContactInactiveDate->format('Y-m-d H:i:s T').' based on last active date of '.
+                $lastActiveDates[$contactId]->format('Y-m-d H:i:s T')
+            );
 
-            // We have to loop over all the events till we have a confirmed event that is overdue
-            foreach ($negativeChildren as $event) {
-                $executionDate = $this->scheduler->getExecutionDateTime($event, $now, $lastActiveDates[$contactId]);
-                if ($executionDate <= $now) {
-                    $isInactive = true;
-                    break;
-                }
+            if ($earliestInactiveDate < $earliestContactInactiveDate) {
+                $earliestInactiveDate = $earliestContactInactiveDate;
             }
 
             // If any are found to be inactive, we process or schedule all the events associated with the inactive path of a decision
-            if (!$isInactive) {
+            if ($earliestContactInactiveDate > $now) {
                 $contacts->remove($contactId);
                 $this->logger->debug('CAMPAIGN: Contact ID# '.$contactId.' has been active and thus not applicable');
 
@@ -134,6 +141,8 @@ class InactiveHelper
 
             $this->logger->debug('CAMPAIGN: Contact ID# '.$contactId.' has not been active');
         }
+
+        return $earliestInactiveDate;
     }
 
     /**
@@ -157,20 +166,20 @@ class InactiveHelper
      * @param ArrayCollection $negativeChildren
      * @param \DateTime       $lastActiveDate
      *
-     * @return \DateTime
+     * @return \DateTime|null
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTime $lastActiveDate)
+    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTime $lastActiveDate, \DateTime $now)
     {
-        $earliestDate = $lastActiveDate;
+        $earliestDate = null;
         foreach ($negativeChildren as $event) {
-            $executionDate = $this->scheduler->getExecutionDateTime($event, $lastActiveDate);
-            if ($executionDate <= $earliestDate) {
+            $executionDate = $this->scheduler->getExecutionDateTime($event, $lastActiveDate, $now);
+            if (!$earliestDate || $executionDate < $earliestDate) {
                 $earliestDate = $executionDate;
             }
         }
 
-        return $lastActiveDate;
+        return $earliestDate;
     }
 }

@@ -268,14 +268,17 @@ class InactiveExecutioner implements ExecutionerInterface
                 $this->progressBar->advance($contacts->count());
                 $this->counter->advanceEvaluated($contacts->count());
 
-                $inactiveEvents = $decisionEvent->getNegativeChildren();
-                $this->helper->removeContactsThatAreNotApplicable($now, $contacts, $parentEventId, $inactiveEvents);
+                $inactiveEvents             = $decisionEvent->getNegativeChildren();
+                $earliestLastActiveDateTime = $this->helper->removeContactsThatAreNotApplicable($now, $contacts, $parentEventId, $inactiveEvents);
+
+                $this->logger->debug(
+                    'CAMPAIGN: ('.$decisionEvent->getId().') Earliest date for inactivity for this batch of contacts is '.
+                    $earliestLastActiveDateTime->format('Y-m-d H:i:s T')
+                );
 
                 if ($contacts->count()) {
-                    // For simplicity sake, we're going to execute or schedule from date of evaluation
-                    $this->executioner->setNow($now);
                     // Execute or schedule the events attached to the inactive side of the decision
-                    $this->executioner->executeContactsForChildren($inactiveEvents, $contacts, $this->counter, true);
+                    $this->executioner->executeContactsForInactiveChildren($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
                     // Record decision for these contacts
                     $this->executioner->recordLogsAsExecutedForEvent($decisionEvent, $contacts, true);
                 }
