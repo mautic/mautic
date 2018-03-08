@@ -237,9 +237,9 @@ abstract class AbstractFormController extends CommonController
     /**
      * generate $postActionVars with respect to available referer.
      *
-     * @param array $postActionVars
+     * @param array $vars
      *
-     * @return array $postActionVars
+     * @return array
      */
     protected function refererPostActionVars($vars)
     {
@@ -249,7 +249,7 @@ abstract class AbstractFormController extends CommonController
 
         $returnUrl                              = !empty($this->request->server->get('HTTP_REFERER'))
                                                 ? $this->request->server->get('HTTP_REFERER')
-                                                : $returnUrl;
+                                                : '';
         $vars['returnUrl']                      = $returnUrl;
 
         $urlMatcher                             = explode('/s/', $returnUrl);
@@ -258,6 +258,13 @@ abstract class AbstractFormController extends CommonController
                                                 ? $actionRoute['objectAction']
                                                 : 'index';
         $routeCtrlr                             = explode('\\', $actionRoute['_controller']);
+
+        // Correct the routes of plugins.
+        if ('MauticPlugin' === $routeCtrlr[0] && 0 === strpos($routeCtrlr[1], 'Mautic')) {
+            $routeCtrlr[0] = 'Mautic';
+            $routeCtrlr[1] = substr($routeCtrlr[1], 6);
+        }
+
         $vars['contentTemplate']                = $routeCtrlr[0].$routeCtrlr[1].':'.
                                                 ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).
                                                 ':'.$objAction;
