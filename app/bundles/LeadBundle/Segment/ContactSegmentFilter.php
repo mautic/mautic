@@ -188,7 +188,7 @@ class ContactSegmentFilter
      */
     public function isColumnTypeBoolean()
     {
-        return $this->contactSegmentFilterCrate->getType() === 'boolean';
+        return $this->contactSegmentFilterCrate->isBooleanType();
     }
 
     /**
