@@ -475,6 +475,7 @@ class SubmissionModel extends CommonFormModel
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
+        $queryArgs['simpleResults']  = true;
         $results                     = $this->getEntities($queryArgs);
         $translator                  = $this->translator;
 
@@ -512,7 +513,7 @@ class SubmissionModel extends CommonFormModel
                             $row = [
                                 $s['id'],
                                 $s['dateSubmitted']->format('Y-m-d H:i:s'),
-                                $s['ipAddress']['ipAddress'],
+                                $s['ipAddress'],
                                 $s['referer'],
                             ];
                             foreach ($s['results'] as $k2 => $r) {
