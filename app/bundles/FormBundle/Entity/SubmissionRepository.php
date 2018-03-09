@@ -98,7 +98,7 @@ class SubmissionRepository extends CommonRepository
 
         $dq->resetQueryPart('select');
         $fieldAliasSql = (!empty($fieldAliases)) ? ', '.implode(',r.', $fieldAliases) : '';
-        $dq->select('r.submission_id, s.date_submitted as dateSubmitted,i.ip_address as ipAddress'.$fieldAliasSql);
+        $dq->select('r.submission_id, s.date_submitted as dateSubmitted,s.referer,i.ip_address as ipAddress'.$fieldAliasSql);
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put form submission results in something that can be assigned to the entities
