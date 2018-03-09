@@ -19,48 +19,48 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 class DateWeekLastTest extends \PHPUnit_Framework_TestCase
 {
-//    /**
-//     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getOperator
-//     */
-//    public function testGetOperatorBetween()
-//    {
-//        $dateDecorator        = $this->createMock(DateDecorator::class);
-//        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
-//
-//        $dateOptionParameters->method('isBetweenRequired')
-//            ->willReturn(true);
-//
-//        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
-//
-//        $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
-//
-//        $this->assertEquals('between', $filterDecorator->getOperator($contactSegmentFilterCrate));
-//    }
-//
-//    /**
-//     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getOperator
-//     */
-//    public function testGetOperatorLessOrEqual()
-//    {
-//        $dateDecorator        = $this->createMock(DateDecorator::class);
-//        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
-//
-//        $dateDecorator->method('getOperator')
-//            ->with()
-//            ->willReturn('==<<'); //Test that value is really returned from Decorator
-//
-//        $dateOptionParameters->method('isBetweenRequired')
-//            ->willReturn(false);
-//
-//        $filter        = [
-//            'operator' => '=<',
-//        ];
-//        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-//
-//        $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
-//
-//        $this->assertEquals('==<<', $filterDecorator->getOperator($contactSegmentFilterCrate));
-//    }
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getOperator
+     */
+    public function testGetOperatorBetween()
+    {
+        $dateDecorator        = $this->createMock(DateDecorator::class);
+        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
+
+        $dateOptionParameters->method('isBetweenRequired')
+            ->willReturn(true);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
+
+        $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
+
+        $this->assertEquals('between', $filterDecorator->getOperator($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getOperator
+     */
+    public function testGetOperatorLessOrEqual()
+    {
+        $dateDecorator        = $this->createMock(DateDecorator::class);
+        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
+
+        $dateDecorator->method('getOperator')
+            ->with()
+            ->willReturn('==<<'); //Test that value is really returned from Decorator
+
+        $dateOptionParameters->method('isBetweenRequired')
+            ->willReturn(false);
+
+        $filter        = [
+            'operator' => '=<',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
+
+        $this->assertEquals('==<<', $filterDecorator->getOperator($contactSegmentFilterCrate));
+    }
 
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
