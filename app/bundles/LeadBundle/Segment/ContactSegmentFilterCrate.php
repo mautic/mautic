@@ -13,8 +13,8 @@ namespace Mautic\LeadBundle\Segment;
 
 class ContactSegmentFilterCrate
 {
-    const CONTACT_OBJECT    = 'lead';
-    const COMPANY_OBJECT    = 'company';
+    const CONTACT_OBJECT = 'lead';
+    const COMPANY_OBJECT = 'company';
 
     /**
      * @var string|null
@@ -44,17 +44,7 @@ class ContactSegmentFilterCrate
     /**
      * @var string|null
      */
-    private $display;
-
-    /**
-     * @var string|null
-     */
     private $operator;
-
-    /**
-     * @var string
-     */
-    private $func;
 
     /**
      * ContactSegmentFilterCrate constructor.
@@ -67,8 +57,6 @@ class ContactSegmentFilterCrate
         $this->field    = isset($filter['field']) ? $filter['field'] : null;
         $this->object   = isset($filter['object']) ? $filter['object'] : self::CONTACT_OBJECT;
         $this->type     = isset($filter['type']) ? $filter['type'] : null;
-        $this->display  = isset($filter['display']) ? $filter['display'] : null;
-        $this->func     = isset($filter['func']) ? $filter['func'] : null;
         $this->operator = isset($filter['operator']) ? $filter['operator'] : null;
         $this->filter   = isset($filter['filter']) ? $filter['filter'] : null;
     }
@@ -90,14 +78,6 @@ class ContactSegmentFilterCrate
     }
 
     /**
-     * @return string|null
-     */
-    public function getObject()
-    {
-        return $this->object;
-    }
-
-    /**
      * @return bool
      */
     public function isContactType()
@@ -114,27 +94,18 @@ class ContactSegmentFilterCrate
     }
 
     /**
-     * @return string|null
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @return string|array|null
+     * @return string|array|bool|float|null
      */
     public function getFilter()
     {
-        return $this->filter;
-    }
+        switch ($this->getType()) {
+            case 'number':
+                return (float) $this->filter;
+            case 'boolean':
+                return (bool) $this->filter;
+        }
 
-    /**
-     * @return string|null
-     */
-    public function getDisplay()
-    {
-        return $this->display;
+        return $this->filter;
     }
 
     /**
@@ -146,11 +117,19 @@ class ContactSegmentFilterCrate
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getFunc()
+    public function isBooleanType()
     {
-        return $this->func;
+        return $this->getType() === 'boolean';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNumberType()
+    {
+        return $this->getType() === 'number';
     }
 
     /**
@@ -167,5 +146,23 @@ class ContactSegmentFilterCrate
     public function hasTimeParts()
     {
         return $this->getType() === 'datetime';
+    }
+
+    /**
+     * Filter value could be used directly - no modification (like regex etc.) needed.
+     *
+     * @return bool
+     */
+    public function filterValueDoNotNeedAdjustment()
+    {
+        return $this->isNumberType() || $this->isBooleanType();
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getType()
+    {
+        return $this->type;
     }
 }

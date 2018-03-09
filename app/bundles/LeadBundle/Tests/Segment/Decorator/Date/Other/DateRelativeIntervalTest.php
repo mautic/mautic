@@ -97,7 +97,7 @@ class DateRelativeIntervalTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
      */
-    public function testGetParameterValueMinusMonthDaysWithNotEqualOperator()
+    public function testGetParameterValueMinusMonthWithNotEqualOperator()
     {
         $dateDecorator = $this->createMock(DateDecorator::class);
 
@@ -115,5 +115,74 @@ class DateRelativeIntervalTest extends \PHPUnit_Framework_TestCase
         $filterDecorator = new DateRelativeInterval($dateDecorator, '-3 months');
 
         $this->assertEquals('2017-12-02%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
+     */
+    public function testGetParameterValueDaysAgoWithNotEqualOperator()
+    {
+        $dateDecorator = $this->createMock(DateDecorator::class);
+
+        $date = new DateTimeHelper('2018-03-02', null, 'local');
+
+        $dateDecorator->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter = [
+            'operator' => '!=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $filterDecorator = new DateRelativeInterval($dateDecorator, '5 days ago');
+
+        $this->assertEquals('2018-02-25%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
+     */
+    public function testGetParameterValueYearsAgoWithGreaterOperator()
+    {
+        $dateDecorator = $this->createMock(DateDecorator::class);
+
+        $date = new DateTimeHelper('2018-03-02', null, 'local');
+
+        $dateDecorator->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter = [
+            'operator' => '>',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $filterDecorator = new DateRelativeInterval($dateDecorator, '2 years ago');
+
+        $this->assertEquals('2016-03-02', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
+     */
+    public function testGetParameterValueDaysWithEqualOperator()
+    {
+        $dateDecorator = $this->createMock(DateDecorator::class);
+
+        $date = new DateTimeHelper('2018-03-02', null, 'local');
+
+        $dateDecorator->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter = [
+            'operator' => '=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $filterDecorator = new DateRelativeInterval($dateDecorator, '5 days');
+
+        $this->assertEquals('2018-03-07%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 }

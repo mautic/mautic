@@ -73,7 +73,7 @@ class DateWeekLastTest extends \PHPUnit_Framework_TestCase
         $dateOptionParameters->method('isBetweenRequired')
             ->willReturn(true);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper('', null, 'local');
 
         $dateDecorator->method('getDefaultDate')
             ->with()
@@ -83,7 +83,16 @@ class DateWeekLastTest extends \PHPUnit_Framework_TestCase
 
         $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals(['2018-02-19', '2018-02-25'], $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $expectedDateStart = new \DateTime('monday last week');
+        $expectedDateEnd   = new \DateTime('sunday last week');
+
+        $this->assertEquals(
+            [
+                $expectedDateStart->format('Y-m-d'),
+                $expectedDateEnd->format('Y-m-d'),
+            ],
+            $filterDecorator->getParameterValue($contactSegmentFilterCrate)
+        );
     }
 
     /**
@@ -97,7 +106,7 @@ class DateWeekLastTest extends \PHPUnit_Framework_TestCase
         $dateOptionParameters->method('isBetweenRequired')
             ->willReturn(false);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper('', null, 'local');
 
         $dateDecorator->method('getDefaultDate')
             ->with()
@@ -110,6 +119,8 @@ class DateWeekLastTest extends \PHPUnit_Framework_TestCase
 
         $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('2018-02-19', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $expectedDate = new \DateTime('monday last week');
+
+        $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 }

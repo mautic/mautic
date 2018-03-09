@@ -123,11 +123,8 @@ class BaseDecorator implements FilterDecoratorInterface
     {
         $filter = $contactSegmentFilterCrate->getFilter();
 
-        switch ($contactSegmentFilterCrate->getType()) {
-            case 'number':
-                return (float) $filter;
-            case 'boolean':
-                return (bool) $filter;
+        if ($contactSegmentFilterCrate->filterValueDoNotNeedAdjustment()) {
+            return $filter;
         }
 
         switch ($this->getOperator($contactSegmentFilterCrate)) {
