@@ -73,7 +73,7 @@ class DateWeekNextTest extends \PHPUnit_Framework_TestCase
         $dateOptionParameters->method('isBetweenRequired')
             ->willReturn(true);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper('', null, 'local');
 
         $dateDecorator->method('getDefaultDate')
             ->with()
@@ -106,7 +106,7 @@ class DateWeekNextTest extends \PHPUnit_Framework_TestCase
         $dateOptionParameters->method('isBetweenRequired')
             ->willReturn(false);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper('', null, 'local');
 
         $dateDecorator->method('getDefaultDate')
             ->with()
