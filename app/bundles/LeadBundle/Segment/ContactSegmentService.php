@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -38,14 +39,21 @@ class ContactSegmentService
      */
     private $preparedQB;
 
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
     public function __construct(
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         ContactSegmentQueryBuilder $queryBuilder,
-        Logger $logger
+        Logger $logger,
+        EntityManager $entityManager
     ) {
         $this->contactSegmentFilterFactory = $contactSegmentFilterFactory;
         $this->contactSegmentQueryBuilder  = $queryBuilder;
         $this->logger                      = $logger;
+        $this->entityManager               = $entityManager;
     }
 
     /**
@@ -119,9 +127,15 @@ class ContactSegmentService
 
         $qb = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
 
-        $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
+        if (isset($batchLimiters['minId'])) {
+            $qb->andWhere($qb->expr()->gte('l.id', $qb->expr()->literal(intval($batchLimiters['minId']))));
+        }
 
-        //dump($qb->getLogicStack());
+        if (isset($batchLimiters['maxId'])) {
+            $qb->andWhere($qb->expr()->lte('l.id', $qb->expr()->literal(intval($batchLimiters['maxId']))));
+        }
+
+        $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
 
         $this->logger->debug('Segment QB: Create SQL: '.$qb->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
@@ -177,7 +191,7 @@ class ContactSegmentService
     public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000)
     {
         $queryBuilder = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
-        $queryBuilder->select('DISTINCT l.id');
+        $queryBuilder->select('DISTINCT l.*');
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
