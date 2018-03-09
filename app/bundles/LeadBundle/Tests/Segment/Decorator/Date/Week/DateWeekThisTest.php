@@ -83,7 +83,16 @@ class DateWeekThisTest extends \PHPUnit_Framework_TestCase
 
         $filterDecorator = new DateWeekThis($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals(['2018-02-26', '2018-03-04'], $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $expectedDateStart = new \DateTime('monday this week');
+        $expectedDateEnd   = new \DateTime('sunday this week');
+
+        $this->assertEquals(
+            [
+                $expectedDateStart->format('Y-m-d'),
+                $expectedDateEnd->format('Y-m-d'),
+            ],
+            $filterDecorator->getParameterValue($contactSegmentFilterCrate)
+        );
     }
 
     /**
@@ -110,6 +119,8 @@ class DateWeekThisTest extends \PHPUnit_Framework_TestCase
 
         $filterDecorator = new DateWeekThis($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('2018-02-26', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $expectedDate = new \DateTime('monday this week');
+
+        $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 }
