@@ -162,4 +162,27 @@ class DateRelativeIntervalTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('2016-03-02', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
+     */
+    public function testGetParameterValueDaysWithEqualOperator()
+    {
+        $dateDecorator = $this->createMock(DateDecorator::class);
+
+        $date = new DateTimeHelper('2018-03-02', null, 'local');
+
+        $dateDecorator->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter = [
+            'operator' => '=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $filterDecorator = new DateRelativeInterval($dateDecorator, '5 days');
+
+        $this->assertEquals('2018-03-07%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
 }
