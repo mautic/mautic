@@ -73,7 +73,7 @@ class DateYearNextTest extends \PHPUnit_Framework_TestCase
         $dateOptionParameters->method('isBetweenRequired')
             ->willReturn(true);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper('', null, 'local');
 
         $dateDecorator->method('getDefaultDate')
             ->with()
@@ -83,7 +83,9 @@ class DateYearNextTest extends \PHPUnit_Framework_TestCase
 
         $filterDecorator = new DateYearNext($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('2019-%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $expectedDate = new \DateTime('first day of january next year');
+
+        $this->assertEquals($expectedDate->format('Y-%'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
     /**
@@ -97,7 +99,7 @@ class DateYearNextTest extends \PHPUnit_Framework_TestCase
         $dateOptionParameters->method('isBetweenRequired')
             ->willReturn(false);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper('', null, 'local');
 
         $dateDecorator->method('getDefaultDate')
             ->with()
@@ -107,6 +109,8 @@ class DateYearNextTest extends \PHPUnit_Framework_TestCase
 
         $filterDecorator = new DateYearNext($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('2019-01-01', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $expectedDate = new \DateTime('first day of january next year');
+
+        $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 }
