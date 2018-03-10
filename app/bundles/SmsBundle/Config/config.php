@@ -137,6 +137,11 @@ return [
                 'path'            => '/smses',
                 'controller'      => 'MauticSmsBundle:Api\SmsApi',
             ],
+            'mautic_api_sendcontactsms' => [
+                'path'       => '/smses/{id}/contact/{leadId}/send',
+                'controller' => 'MauticSMSBundle:Api\SmsApi:sendContact',
+                'method'     => 'POST',
+            ],
         ],
     ],
     'menu' => [

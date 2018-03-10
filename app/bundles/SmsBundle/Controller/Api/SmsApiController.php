@@ -12,6 +12,7 @@
 namespace Mautic\SmsBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CampaignBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -31,6 +32,54 @@ class SmsApiController extends CommonApiController
         $this->entityNameMulti = 'smses';
 
         parent::initialize($event);
+    }
+
+    /**
+     * Send sms to contact.
+     *
+     * @param int  $id     Email ID
+     * @param Lead $leadId Contct ID
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function sendContactAction($id, $leadId)
+    {
+        $success = 0;
+        $error   = '';
+        $entity  = $this->model->getEntity($id);
+        if (null !== $entity) {
+            if (!$this->checkEntityAccess($entity, 'view')) {
+                return $this->accessDenied();
+            }
+
+            /** @var Lead $lead */
+            $lead = $this->checkLeadAccess($leadId, 'edit');
+            if ($lead instanceof Response) {
+                return $lead;
+            }
+
+            $result = $this->model->sendSms($entity, $lead, ['channel' => 'api']);
+
+            if (!empty($result['sent'])) {
+                $success = 1;
+            } else {
+                $error = $result['status'];
+            }
+
+            $view = $this->view(
+                [
+                    'success'          => $success,
+                    'error'            => $error,
+                ],
+                Codes::HTTP_OK
+            );
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
     }
 
     /**
