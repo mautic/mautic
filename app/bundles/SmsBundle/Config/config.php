@@ -139,7 +139,7 @@ return [
             ],
             'mautic_api_sendcontactsms' => [
                 'path'       => '/smses/{id}/contact/{leadId}/send',
-                'controller' => 'MauticSMSBundle:Api\SmsApi:sendContact',
+                'controller' => 'MauticSmsBundle:Api\SmsApi:sendContact',
                 'method'     => 'POST',
             ],
         ],

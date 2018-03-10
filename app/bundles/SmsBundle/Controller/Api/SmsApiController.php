@@ -11,7 +11,9 @@
 
 namespace Mautic\SmsBundle\Controller\Api;
 
+use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -20,6 +22,8 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class SmsApiController extends CommonApiController
 {
+    use LeadAccessTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -58,18 +62,16 @@ class SmsApiController extends CommonApiController
                 return $lead;
             }
 
-            $result = $this->model->sendSms($entity, $lead, ['channel' => 'api']);
-
+            $result = $this->model->sendSms($entity, $lead, ['channel' => 'api'])[$lead->getId()];
             if (!empty($result['sent'])) {
                 $success = 1;
-            } else {
-                $error = $result['status'];
             }
 
             $view = $this->view(
                 [
-                    'success'          => $success,
-                    'error'            => $error,
+                    'success'           => $success,
+                    'status'            => $this->get('translator')->trans($result['status']),
+                    'result'            => $result,
                 ],
                 Codes::HTTP_OK
             );
