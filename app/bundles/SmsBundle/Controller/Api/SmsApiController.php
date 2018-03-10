@@ -12,7 +12,6 @@
 namespace Mautic\SmsBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\CampaignBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -37,8 +36,8 @@ class SmsApiController extends CommonApiController
     /**
      * Send sms to contact.
      *
-     * @param int  $id     Email ID
-     * @param Lead $leadId Contct ID
+     * @param int $id     Email ID
+     * @param int $leadId Contact ID
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
@@ -54,7 +53,6 @@ class SmsApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            /** @var Lead $lead */
             $lead = $this->checkLeadAccess($leadId, 'edit');
             if ($lead instanceof Response) {
                 return $lead;
