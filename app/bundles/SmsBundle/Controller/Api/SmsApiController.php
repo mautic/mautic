@@ -49,8 +49,13 @@ class SmsApiController extends CommonApiController
      */
     public function sendContactAction($id, $leadId)
     {
+        $integration =  $this->get('mautic.helper.integration')->getIntegrationObject('Twilio');
+
+        if (!$integration || !$integration->getIntegrationSettings()->getIsPublished()) {
+            return $this->notFound();
+        }
+
         $success = 0;
-        $error   = '';
         $entity  = $this->model->getEntity($id);
         if (null !== $entity) {
             if (!$this->checkEntityAccess($entity, 'view')) {
