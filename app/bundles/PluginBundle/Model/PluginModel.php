@@ -70,8 +70,8 @@ class PluginModel extends FormModel
      */
     public function getLeadFields()
     {
-        $leadFields                                                                 =  $this->leadFieldModel->getFieldList();
-        $leadFields[$this->translator->trans('mautic.lead.field.group.core')]['id'] = $this->translator->trans('mautic.lead.report.contact_id');
+        $leadFields         =  $this->leadFieldModel->getFieldList();
+        $leadFields['Core'] = ['id' => $this->translator->trans('mautic.lead.report.contact_id')] + $leadFields['Core'];
 
         return $leadFields;
     }
