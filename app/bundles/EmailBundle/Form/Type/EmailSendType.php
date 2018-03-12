@@ -195,10 +195,10 @@ class EmailSendType extends AbstractType
                 );
             }
         }
-
-        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
-            $default = (isset($options['data']['immediately'])) ? $options['data']['immediately'] : false;
-            $builder->add(
+        if (!empty($options['with_immediately'])) {
+            if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
+                $default = (isset($options['data']['immediately'])) ? $options['data']['immediately'] : false;
+                $builder->add(
                 'immediately',
                 YesNoButtonGroupType::class,
                 [
@@ -209,14 +209,15 @@ class EmailSendType extends AbstractType
                     ],
                 ]
             );
-        } else {
-            $builder->add(
+            } else {
+                $builder->add(
                 'immediately',
                 HiddenType::class,
                 [
                     'data'  => false,
                 ]
             );
+            }
         }
     }
 
@@ -228,10 +229,11 @@ class EmailSendType extends AbstractType
         $resolver->setDefaults(
             [
                 'with_email_types' => false,
+                'with_immediately' => false,
             ]
         );
 
-        $resolver->setDefined(['update_select', 'with_email_types']);
+        $resolver->setDefined(['update_select', 'with_email_types', 'with_immediately']);
     }
 
     /**
