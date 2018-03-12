@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -39,21 +38,14 @@ class ContactSegmentService
      */
     private $preparedQB;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     public function __construct(
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         ContactSegmentQueryBuilder $queryBuilder,
-        Logger $logger,
-        EntityManager $entityManager
+        Logger $logger
     ) {
         $this->contactSegmentFilterFactory = $contactSegmentFilterFactory;
         $this->contactSegmentQueryBuilder  = $queryBuilder;
         $this->logger                      = $logger;
-        $this->entityManager               = $entityManager;
     }
 
     /**
