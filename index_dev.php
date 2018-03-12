@@ -7,6 +7,11 @@
  */
 define('MAUTIC_ROOT_DIR', __DIR__);
 
+//SSL terminating proxy workaround
+if(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'){
+    $_SERVER['HTTPS']='on'; 
+}
+
 // Fix for hosts that do not have date.timezone set, it will be reset based on users settings
 date_default_timezone_set('UTC');
 
