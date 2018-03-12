@@ -24,13 +24,13 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOperatorBetween()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
+        $dateDecorator = $this->createMock(DateDecorator::class);
 
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(true);
-
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
+        $filter        = [
+            'operator' => '=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateYearThis($dateDecorator, $dateOptionParameters);
 
@@ -42,20 +42,17 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOperatorLessOrEqual()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
+        $dateDecorator = $this->createMock(DateDecorator::class);
 
         $dateDecorator->method('getOperator')
             ->with()
-            ->willReturn('==<<'); //Test that value is really returned from Decorator
-
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(false);
+            ->willReturn('==<<');
 
         $filter        = [
-            'operator' => '=<',
+            'operator' => 'lte',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateYearThis($dateDecorator, $dateOptionParameters);
 
@@ -67,11 +64,7 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameterValueBetween()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
-
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(true);
+        $dateDecorator = $this->createMock(DateDecorator::class);
 
         $date = new DateTimeHelper('', null, 'local');
 
@@ -79,7 +72,11 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn($date);
 
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
+        $filter        = [
+            'operator' => '!=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateYearThis($dateDecorator, $dateOptionParameters);
 
@@ -93,11 +90,7 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameterValueSingle()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
-
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(false);
+        $dateDecorator = $this->createMock(DateDecorator::class);
 
         $date = new DateTimeHelper('', null, 'local');
 
@@ -105,7 +98,11 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn($date);
 
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
+        $filter        = [
+            'operator' => 'lt',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateYearThis($dateDecorator, $dateOptionParameters);
 

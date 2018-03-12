@@ -103,14 +103,14 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
 
         $this->modifyBaseDate($dateTimeHelper);
 
-        $modifier   = $this->getModifierForBetweenRange();
         $dateFormat = $this->dateOptionParameters->hasTimePart() ? 'Y-m-d H:i:s' : 'Y-m-d';
 
         if ($this->dateOptionParameters->isBetweenRequired()) {
             return $this->getValueForBetweenRange($dateTimeHelper);
         }
 
-        if ($this->dateOptionParameters->shouldIncludeMidnigh()) {
+        if ($this->dateOptionParameters->shouldUseLastDayOfRange()) {
+            $modifier = $this->getModifierForBetweenRange();
             $modifier .= ' -1 second';
             $dateTimeHelper->modify($modifier);
         }
