@@ -57,7 +57,7 @@ class FormSubscriber extends CommonSubscriber
             'label'           => 'mautic.email.form.action.sendemail.lead',
             'description'     => 'mautic.email.form.action.sendemail.lead.descr',
             'formType'        => 'emailsend_list',
-            'formTypeOptions' => ['update_select' => 'formaction_properties_email', 'with_immediately'=>true],
+            'formTypeOptions' => ['update_select' => 'formaction_properties_email', 'with_immediately' => true],
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
             'callback'        => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail',
         ];
