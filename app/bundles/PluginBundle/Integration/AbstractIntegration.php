@@ -1871,7 +1871,7 @@ abstract class AbstractIntegration
                     continue;
                 }
                 if ('id' === $leadFields[$integrationKey]) {
-                    $matched[$integrationKey] = $leadId;
+                    $matched[$integrationKey] = $lead->getId();
                     continue;
                 }
                 $mauticKey = $leadFields[$integrationKey];
