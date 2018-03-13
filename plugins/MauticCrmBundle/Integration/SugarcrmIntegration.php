@@ -268,7 +268,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                         ||
                                         ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
                                                 ||
-                                                ($fieldInfo['type'] == 'bool' && $fieldInfo['name'] == 'do_not_call')
+                                                ($fieldInfo['type'] == 'bool' && $fieldInfo['name'] == 'email_opt_out')
                                         )) {
                                             $type      = 'string';
                                             $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
@@ -1277,6 +1277,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
             }
         }
+        print_r($mauticData);
         /** @var SugarcrmApi $apiHelper */
         $apiHelper = $this->getApiHelper();
         if (!empty($mauticData)) {
@@ -1329,6 +1330,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         }
                     }
                 }
+
                 $sugarLeadRecords[] = $sugarLeadRecord;
             }
         } elseif (isset($sugarLead['records'])) { //Sugar 7
@@ -1382,6 +1384,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
             }
         }
+
 
         return [$checkEmailsInSugar, $deletedSugarLeads];
     }
