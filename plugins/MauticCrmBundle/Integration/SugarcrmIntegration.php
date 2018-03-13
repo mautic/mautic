@@ -1277,7 +1277,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
             }
         }
-        print_r($mauticData);
         /** @var SugarcrmApi $apiHelper */
         $apiHelper = $this->getApiHelper();
         if (!empty($mauticData)) {
