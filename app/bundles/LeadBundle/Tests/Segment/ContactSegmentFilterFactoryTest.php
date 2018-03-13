@@ -25,23 +25,23 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory
      */
-    public function testEmptyFilter()
+    public function testLeadFilter()
     {
         $tableSchemaColumnsCache = $this->createMock(TableSchemaColumnsCache::class);
         $container               = $this->createMock(Container::class);
         $decoratorFactory        = $this->createMock(DecoratorFactory::class);
 
         $filterDecorator = $this->createMock(FilterDecoratorInterface::class);
-        $decoratorFactory->expects($this->once())
+        $decoratorFactory->expects($this->exactly(3))
             ->method('getDecoratorForFilter')
             ->willReturn($filterDecorator);
 
-        $filterDecorator->expects($this->once())
+        $filterDecorator->expects($this->exactly(3))
             ->method('getQueryType')
             ->willReturn('MyQueryTypeId');
 
         $filterQueryBuilder = $this->createMock(FilterQueryBuilderInterface::class);
-        $container->expects($this->once())
+        $container->expects($this->exactly(3))
             ->method('get')
             ->with('MyQueryTypeId')
             ->willReturn($filterQueryBuilder);
@@ -59,11 +59,27 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit_Framework_TestCase
                 'display'  => null,
                 'operator' => '!empty',
             ],
+            [
+                'glue'     => 'and',
+                'type'     => 'text',
+                'field'    => 'hit_url',
+                'operator' => 'like',
+                'filter'   => 'test.com',
+                'display'  => '',
+            ],
+            [
+                'glue'     => 'or',
+                'type'     => 'lookup',
+                'field'    => 'state',
+                'operator' => '=',
+                'filter'   => 'QLD',
+                'display'  => '',
+            ],
         ]);
 
         $contactSegmentFilters = $contactSegmentFilterFactory->getSegmentFilters($leadList);
 
         $this->assertInstanceOf(ContactSegmentFilters::class, $contactSegmentFilters);
-        $this->assertCount(1, $contactSegmentFilters);
+        $this->assertCount(3, $contactSegmentFilters);
     }
 }
