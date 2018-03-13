@@ -286,8 +286,9 @@ abstract class AbstractCommonModel
      */
     public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [], $utmTags = [])
     {
-        $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::RELATIVE_PATH;
+        $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);
+
         $url .= (!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '';
 
         return $url;
