@@ -324,7 +324,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $this->getStatRepository()->saveEntities($stats);
             /** @var Stat $stat */
             foreach ($stats as $stat) {
-                $results[$stat->getLead()->getId()]['stat_id'] = $stat->getId();
+                $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
             }
             $this->em->clear(Stat::class);
         }
