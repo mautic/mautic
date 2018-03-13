@@ -1907,7 +1907,6 @@ class LeadModel extends FormModel
         if ($eventLog) {
             $action = $merged ? 'updated' : 'inserted';
             $eventLog->setAction($action);
-            $lead->addEventLog($eventLog);
         }
 
         if ($persist) {
@@ -1919,6 +1918,10 @@ class LeadModel extends FormModel
 
             if ($company !== null) {
                 $this->companyModel->addLeadToCompany($company, $lead);
+            }
+
+            if ($eventLog) {
+                $lead->addEventLog($eventLog);
             }
         }
 
