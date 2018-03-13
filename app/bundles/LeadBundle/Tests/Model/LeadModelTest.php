@@ -90,7 +90,7 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test that the Lead won't be set to the LeadEventLog if the Lead save fails.
+     * Test that the Lead will be set to the LeadEventLog if the Lead save succeed.
      */
     public function testImportWillSetLeadToLeadEventLogWhenLeadSaveSucceed()
     {
