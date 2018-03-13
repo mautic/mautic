@@ -11,7 +11,7 @@
 
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.campaign.campaigns'));
 if ($tmpl == 'index') {
-    $view->extend('MauticCoreBundle:Standard:index.html.php');
+    $view->extend('MauticCampaignBundle:Campaign:index.html.php');
 }
 
 ?>

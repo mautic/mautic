@@ -69,6 +69,11 @@ class CampaignModel extends CommonFormModel
     protected static $events;
 
     /**
+     * @var
+     */
+    protected $defaultCampaign;
+
+    /**
      * CampaignModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -81,6 +86,7 @@ class CampaignModel extends CommonFormModel
         $this->leadModel              = $leadModel;
         $this->leadListModel          = $leadListModel;
         $this->formModel              = $formModel;
+        $this->defaultCampaign        = $coreParametersHelper->getParameter('campaign_default_for_template');
         $this->batchSleepTime         = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
         $this->batchCampaignSleepTime = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
     }
@@ -1350,5 +1356,15 @@ class CampaignModel extends CommonFormModel
                 }
             }
         }
+    }
+
+    protected function getDefaultCampaign()
+    {
+        $default = null;
+        if(!empty($this->defaultCampaign)){
+            $default = getEntity($this->defaultCampaign);
+        }
+
+        return $default;
     }
 }

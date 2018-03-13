@@ -174,6 +174,7 @@ class CampaignController extends AbstractStandardFormController
      */
     protected function afterEntityClone($campaign, $oldCampaign)
     {
+        $campaign->setName($this->translator->trans('mautic.campaign.form.new_name_clone_text') . $campaign->getName());
         $tempId   = 'mautic_'.sha1(uniqid(mt_rand(), true));
         $objectId = $oldCampaign->getId();
 
