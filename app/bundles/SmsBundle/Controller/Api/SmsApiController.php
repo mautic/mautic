@@ -76,6 +76,7 @@ class SmsApiController extends CommonApiController
                 [
                     'success'           => $success,
                     'status'            => $this->get('translator')->trans($result['status']),
+                    'result'            => $result,
                 ],
                 Codes::HTTP_OK
             );
