@@ -107,7 +107,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                                         <div class="modal-header">
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span></button>
-                                            <h4 class="modal-title" id="<?php echo $k; ?>"><?php echo $item['name']; ?></h4>
+                                            <h4 class="modal-title" id="<?php echo $k; ?>"><?php echo htmlspecialchars($item['name']); ?></h4>
                                         </div>
                                         <div class="modal-body">
                                             <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
@@ -119,17 +119,17 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                     </td>
                     <td>
                         <div>
-                            <?php echo $item['name']; ?> (<?php echo $item['key']; ?>)
+                            <?php echo htmlspecialchars($item['name']); ?> (<?php echo htmlspecialchars($item['key']); ?>)
                         </div>
                     </td>
                     <td>
                         <div>
                             <?php if (isset($item['config']['authorUrl'])) : ?>
                                 <a href="<?php echo $item['config']['authorUrl']; ?>" target="_blank">
-                                    <?php echo $item['config']['author']; ?>
+                                    <?php echo htmlspecialchars($item['config']['author']); ?>
                                 </a>
                             <?php elseif (isset($item['config']['author'])) : ?>
-                                <?php echo $item['config']['author']; ?>
+                                <?php echo htmlspecialchars($item['config']['author']); ?>
                             <?php endif; ?>
                         </div>
                     </td>
@@ -138,7 +138,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                             <?php foreach ($item['config']['features'] as $feature) : ?>
                                 <span style="white-space: nowrap;">
                                     <span class="label label-default pa-4">
-                                        <?php echo $view['translator']->trans('mautic.core.theme.feature.'.$feature); ?>
+                                        <?php echo $view['translator']->trans('mautic.core.theme.feature.'.htmlspecialchars($feature)); ?>
                                     </span>
                                 </span>
                             <?php endforeach; ?>
