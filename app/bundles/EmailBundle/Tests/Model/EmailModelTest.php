@@ -26,6 +26,7 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
+use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -222,7 +223,9 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendToContactModel = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
+        $statHelper = new StatHelper($statRepository);
+
+        $sendToContactModel = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -457,7 +460,9 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendToContactModel = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
+        $statHelper = new StatHelper($statRepository);
+
+        $sendToContactModel = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,

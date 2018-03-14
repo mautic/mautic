@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\SendEmailToContact;
+use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\LeadBundle\Entity\Lead;
@@ -94,7 +95,9 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $model = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
+        $statHelper = new StatHelper($statRepository);
+
+        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
 
         $email = new Email();
         $model->setEmail($email);
@@ -166,7 +169,9 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $model = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
+        $statHelper = new StatHelper($statRepository);
+
+        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
         $model->setEmail($emailMock);
 
         $contacts             = $this->contacts;
@@ -286,7 +291,9 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $model = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
+        $statHelper = new StatHelper($statRepository);
+
+        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
         $model->setEmail($emailMock);
 
         $contacts             = $this->contacts;
@@ -399,8 +406,8 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $statRepository = $this->getMockBuilder(StatRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $statRepository->expects($this->exactly(2))
-            ->method('saveEntities');
+        $statRepository->expects($this->exactly(21))
+            ->method('saveEntity');
 
         $dncModel = $this->getMockBuilder(DoNotContact::class)
             ->disableOriginalConstructor()
@@ -413,7 +420,9 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $model = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
+        $statHelper = new StatHelper($statRepository);
+
+        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
         $model->setEmail($emailMock);
 
         // Let's generate 20 bogus contacts
@@ -544,7 +553,9 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $model = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
+        $statHelper = new StatHelper($statRepository);
+
+        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
         $model->setEmail($emailMock);
 
         foreach ($this->contacts as $contact) {

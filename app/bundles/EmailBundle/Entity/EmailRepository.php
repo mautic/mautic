@@ -531,6 +531,10 @@ class EmailRepository extends CommonRepository
      */
     public function upCount($id, $type = 'sent', $increaseBy = 1, $variant = false)
     {
+        if (!$increaseBy) {
+            return;
+        }
+
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'emails')
