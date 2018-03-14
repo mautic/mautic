@@ -1448,7 +1448,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
                     $value = '';
-                    if ($sugarField === 'do_not_call'){
+                    if ($sugarField === 'email_opt_out'){
                         if (is_bool($lead[$mauticField]) === true) {
                             $value = 1;
                         }
