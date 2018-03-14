@@ -142,7 +142,7 @@ class EmailRepositoryTest extends \PHPUnit_Framework_TestCase
             $countWithMaxMin
         );
 
-        $expectedQuery = "SELECT count(distinct(l.id)) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM leads l INNER JOIN lead_lists_leads ll ON (ll.leadlist_id IN (22, 33)) AND (ll.lead_id = l.id) AND (ll.manually_removed = :false) WHERE (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE stat.email_id = 5)) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.channel = 'email') AND (mq.status <> 'sent') AND (mq.channel_id = 5))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> '')) ORDER BY l.id ASC";
+        $expectedQuery = "SELECT count(distinct(l.id)) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM leads l INNER JOIN lead_lists_leads ll ON (ll.leadlist_id IN (22, 33)) AND (ll.lead_id = l.id) AND (ll.manually_removed = :false) WHERE (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE (dnc.channel = 'email') AND (dnc.lead_id >= :minContactId) AND (dnc.lead_id <= :maxContactId))) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE (stat.email_id = 5) AND (stat.lead_id >= :minContactId) AND (stat.lead_id <= :maxContactId))) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.channel = 'email') AND (mq.status <> 'sent') AND (mq.channel_id = 5) AND (mq.lead_id >= :minContactId) AND (mq.lead_id <= :maxContactId))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
 
         $expectedParams = [
             'false'        => false,

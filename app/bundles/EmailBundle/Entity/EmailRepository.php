@@ -289,28 +289,23 @@ class EmailRepository extends CommonRepository
                         $listQb->expr()->eq('ll.manually_removed', ':false')
                     )
                 );
+
+            $listQb = $this->setMinMaxIds($listQb, 'll.lead_id', $minContactId, $maxContactId);
+
             $q->innerJoin('l', sprintf('(%s)', $listQb->getSQL()), 'in_list', 'l.id = in_list.lead_id');
         }
+
+        $dncQb  = $this->setMinMaxIds($dncQb, 'dnc.lead_id', $minContactId, $maxContactId);
+        $mqQb   = $this->setMinMaxIds($mqQb, 'mq.lead_id', $minContactId, $maxContactId);
+        $statQb = $this->setMinMaxIds($statQb, 'stat.lead_id', $minContactId, $maxContactId);
+
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->andWhere(sprintf('l.id NOT IN (%s)', $dncQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
-        if ($minContactId && is_numeric($minContactId)) {
-            $q->andWhere('l.id >= :minContactId');
-            $q->setParameter('minContactId', (int) $minContactId);
-        }
-
-        if ($maxContactId && is_numeric($maxContactId)) {
-            $q->andWhere('l.id <= :maxContactId');
-            $q->setParameter('maxContactId', (int) $maxContactId);
-        }
-
-        // The results must be ordered if min or max contact ID filters are applied
-        if ($minContactId || $maxContactId) {
-            $q->orderBy('l.id');
-        }
+        $q = $this->setMinMaxIds($q, 'l.id', $minContactId, $maxContactId);
 
         // Has an email
         $q->andWhere(
@@ -619,5 +614,30 @@ class EmailRepository extends CommonRepository
         $qb->where($expr);
 
         return $qb->getQuery()->iterate();
+    }
+
+    /**
+     * Set Max and/or Min ID where conditions to the query builder.
+     *
+     * @param QueryBuilder $q
+     * @param string       $column
+     * @param int          $minContactId
+     * @param int          $maxContactId
+     *
+     * @return QueryBuilder
+     */
+    private function setMinMaxIds(QueryBuilder $q, $column, $minContactId, $maxContactId)
+    {
+        if ($minContactId && is_numeric($minContactId)) {
+            $q->andWhere($column.' >= :minContactId');
+            $q->setParameter('minContactId', $minContactId);
+        }
+
+        if ($maxContactId && is_numeric($maxContactId)) {
+            $q->andWhere($column.' <= :maxContactId');
+            $q->setParameter('maxContactId', $maxContactId);
+        }
+
+        return $q;
     }
 }
