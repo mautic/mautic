@@ -206,4 +206,171 @@ class BaseDecoratorTest extends \PHPUnit_Framework_TestCase
         ];
         $this->assertSame($expected, $baseDecorator->getParameterHolder($contactSegmentFilterCrate, $argument));
     }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueBoolean()
+    {
+        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
+
+        $baseDecorator = new BaseDecorator($contactSegmentFilterOperator);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'   => 'boolean',
+            'filter' => '1',
+        ]);
+
+        $this->assertTrue($baseDecorator->getParameterValue($contactSegmentFilterCrate));
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'   => 'boolean',
+            'filter' => '0',
+        ]);
+
+        $this->assertFalse($baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueNumber()
+    {
+        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
+
+        $baseDecorator = new BaseDecorator($contactSegmentFilterOperator);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'   => 'number',
+            'filter' => '1',
+        ]);
+
+        $this->assertSame(1.0, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueLikeNoPercent()
+    {
+        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
+
+        $baseDecorator = new BaseDecorator($contactSegmentFilterOperator);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'string',
+            'operator' => 'like',
+            'filter'   => 'Test string',
+        ]);
+
+        $this->assertSame('%Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueLikeWithOnePercent()
+    {
+        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
+
+        $baseDecorator = new BaseDecorator($contactSegmentFilterOperator);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'string',
+            'operator' => 'like',
+            'filter'   => '%Test string',
+        ]);
+
+        $this->assertSame('%Test string', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueLikeWithTwoPercent()
+    {
+        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
+
+        $baseDecorator = new BaseDecorator($contactSegmentFilterOperator);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'string',
+            'operator' => 'like',
+            'filter'   => '%Test string%',
+        ]);
+
+        $this->assertSame('%Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueStartsWith()
+    {
+        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
+
+        $baseDecorator = new BaseDecorator($contactSegmentFilterOperator);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'string',
+            'operator' => 'startsWith',
+            'filter'   => 'Test string',
+        ]);
+
+        $this->assertSame('Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueEndsWith()
+    {
+        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
+
+        $baseDecorator = new BaseDecorator($contactSegmentFilterOperator);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'string',
+            'operator' => 'endsWith',
+            'filter'   => 'Test string',
+        ]);
+
+        $this->assertSame('%Test string', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueContains()
+    {
+        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
+
+        $baseDecorator = new BaseDecorator($contactSegmentFilterOperator);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'string',
+            'operator' => 'contains',
+            'filter'   => 'Test string',
+        ]);
+
+        $this->assertSame('%Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueRegex()
+    {
+        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
+
+        $baseDecorator = new BaseDecorator($contactSegmentFilterOperator);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'string',
+            'operator' => 'contains',
+            'filter'   => 'Test string',
+        ]);
+
+        $this->assertSame('%Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
 }
