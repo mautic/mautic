@@ -13,23 +13,23 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.campaign.c
 
 $defaultCampaign = $view->container->getParameter('mautic.campaign_default_for_template');
 $forceDefault    = $view->container->getParameter('mautic.campaign_force_default');
-$new = $permissions['campaign:campaigns:create'];
-$customButtons = !isset($customButtons) ? [] : $customButtons;
+$new             = $permissions['campaign:campaigns:create'];
+$customButtons   = !isset($customButtons) ? [] : $customButtons;
 if ($permissions['campaign:campaigns:create'] && !empty($defaultCampaign)) {
-    $btnText         = $forceDefault ? $view['translator']->trans('mautic.core.form.new') : $view['translator']->trans(
+    $btnText   = $forceDefault ? $view['translator']->trans('mautic.core.form.new') : $view['translator']->trans(
         'mautic.campaign.button.new_from_template'
     );
     $iconClass = $forceDefault ? 'fa fa-plus' : 'fa fa-copy';
 
     $customButtons[] = [
-        'attr' => [
+        'attr'      => [
             'href' => $view['router']->path(
                 'mautic_campaign_action',
                 ['objectAction' => 'clone', 'objectId' => $defaultCampaign]
             ),
         ],
         'iconClass' => $iconClass,
-        'btnText' => $btnText,
+        'btnText'   => $btnText,
     ];
 
     // hide "new" template button, replace with custom button if we should force default

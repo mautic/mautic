@@ -242,6 +242,6 @@ return [
     'parameters' => [
         'campaign_time_wait_on_event_false' => 'PT1H',
         'campaign_default_for_template'     => "",
-        'campaign_force_default'     => 0,
+        'campaign_force_default'            => 0,
     ],
 ];
