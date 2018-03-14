@@ -11,8 +11,8 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.campaign.campaigns'));
 
-$defaultCampaign = $this->container->getParameter('mautic.campaign_default_for_template');
-$forceDefault    = $this->container->getParameter('mautic.campaign_force_default');
+$defaultCampaign = $view->container->getParameter('mautic.campaign_default_for_template');
+$forceDefault    = $view->container->getParameter('mautic.campaign_force_default');
 $new = $permissions['campaign:campaigns:create'];
 $customButtons = !isset($customButtons) ? [] : $customButtons;
 if ($permissions['campaign:campaigns:create'] && !empty($defaultCampaign)) {

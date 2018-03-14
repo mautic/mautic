@@ -1362,7 +1362,7 @@ class CampaignModel extends CommonFormModel
     {
         $default = null;
         if(!empty($this->defaultCampaign)){
-            $default = getEntity($this->defaultCampaign);
+            $default = $this->getEntity($this->defaultCampaign);
         }
 
         return $default;

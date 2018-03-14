@@ -27,12 +27,16 @@ class ConfigType extends AbstractType
     private $em;
 
     /**
+     * @var
+     */
+    private $translator;
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
         $this->translator = $factory->getTranslator();
-        $this->security   = $factory->getSecurity();
         $this->em         = $factory->getEntityManager();
     }
     /**
