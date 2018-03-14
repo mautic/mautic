@@ -56,8 +56,7 @@ class ConfigSubscriber extends CommonSubscriber
             // dont allow a force default if the campaign default is null
             $values['campaignconfig']['campaign_force_default'] = 0;
         }
-            $values['campaignconfig']['campaign_force_default'] = htmlspecialchars($values['campaignconfig']['campaign_force_default']);
-
+        $values['campaignconfig']['campaign_force_default'] = htmlspecialchars($values['campaignconfig']['campaign_force_default']);
 
         // Set updated values
         $event->setConfig($values);

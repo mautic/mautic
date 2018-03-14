@@ -116,8 +116,8 @@ class CampaignModel extends CommonFormModel
         $eventSettings  = $this->getEvents();
         $existingEvents = $entity->getEvents()->toArray();
         $events         =
-        $hierarchy =
-        $parentUpdated = [];
+        $hierarchy      =
+        $parentUpdated  = [];
 
         foreach ($sessionEvents as $properties) {
             $isNew = (!empty($properties['id']) && isset($existingEvents[$properties['id']])) ? false : true;
@@ -321,7 +321,7 @@ class CampaignModel extends CommonFormModel
                                     break;
                                 case 'anchor':
                                     foreach ($restrictions as $anchor) {
-                                        list($group, $anchor) = explode('.', $anchor);
+                                        list($group, $anchor)                                     = explode('.', $anchor);
                                         $connectionRestrictions[$restrictionType][$group][$key][] = $anchor;
                                     }
 
@@ -1277,7 +1277,7 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of hits.
      *
-     * @param string    $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat

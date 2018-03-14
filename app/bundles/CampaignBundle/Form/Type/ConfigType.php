@@ -20,7 +20,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ConfigType extends AbstractType
 {
-
     /**
      * @var
      */
