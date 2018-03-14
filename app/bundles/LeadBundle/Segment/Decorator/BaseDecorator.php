@@ -127,7 +127,7 @@ class BaseDecorator implements FilterDecoratorInterface
             return $filter;
         }
 
-        switch ($this->getOperator($contactSegmentFilterCrate)) {
+        switch ($contactSegmentFilterCrate->getOperator()) {
             case 'like':
             case 'notLike':
                 return strpos($filter, '%') === false ? '%'.$filter.'%' : $filter;
