@@ -203,7 +203,7 @@ return [
             ],
             'mautic.form.type.campaignconfig' => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\ConfigType',
-                'arguments' => 'translator',
+                'arguments' => 'mautic.factory',
                 'alias'     => 'campaignconfig',
             ],
         ],
@@ -241,5 +241,7 @@ return [
     ],
     'parameters' => [
         'campaign_time_wait_on_event_false' => 'PT1H',
+        'campaign_default_for_template'     => '',
+        'campaign_force_default'            => 0,
     ],
 ];

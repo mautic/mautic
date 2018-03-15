@@ -50,6 +50,13 @@ class ConfigSubscriber extends CommonSubscriber
         if (!empty($values['campaignconfig']['campaign_time_wait_on_event_false'])) {
             $values['campaignconfig']['campaign_time_wait_on_event_false'] = htmlspecialchars($values['campaignconfig']['campaign_time_wait_on_event_false']);
         }
+        if (!empty($values['campaignconfig']['campaign_default_for_template'])) {
+            $values['campaignconfig']['campaign_default_for_template'] = htmlspecialchars($values['campaignconfig']['campaign_default_for_template']);
+        } else {
+            // dont allow a force default if the campaign default is null
+            $values['campaignconfig']['campaign_force_default'] = 0;
+        }
+        $values['campaignconfig']['campaign_force_default'] = htmlspecialchars($values['campaignconfig']['campaign_force_default']);
 
         // Set updated values
         $event->setConfig($values);
