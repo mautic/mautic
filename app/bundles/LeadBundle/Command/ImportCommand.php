@@ -83,20 +83,11 @@ EOT
             ]
         ).'</info>');
 
-        $success = $model->startImport($import, $progress, $limit);
+        try {
+            $model->beginImport($import, $progress, $limit);
+        } catch (ImportFailedException $e) {
+            $model->logDebug($e->getMessage(), $import);
 
-        // Import was delayed
-        if ($import->getStatus() === $import::DELAYED) {
-            $output->writeln('<info>'.$translator->trans(
-                'mautic.lead.import.delayed',
-                [
-                    '%reason%' => $import->getStatusInfo(),
-                ]
-            ).'</info>');
-        }
-
-        // Import failed
-        if (!$success) {
             $output->writeln('<error>'.$translator->trans(
                 'mautic.lead.import.failed',
                 [
@@ -105,6 +96,17 @@ EOT
             ).'</error>');
 
             return 1;
+        } catch (ImportDelayedException $e) {
+            $this->logDebug($e->getMessage());
+
+            $output->writeln('<info>'.$translator->trans(
+                'mautic.lead.import.delayed',
+                [
+                    '%reason%' => $import->getStatusInfo(),
+                ]
+            ).'</info>');
+
+            return 0;
         }
 
         // Success
