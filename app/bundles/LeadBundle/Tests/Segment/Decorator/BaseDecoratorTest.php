@@ -254,6 +254,22 @@ class BaseDecoratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
+    public function testGetParameterValueNotLike()
+    {
+        $baseDecorator = $this->getDecorator();
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'string',
+            'operator' => '!like',
+            'filter'   => 'Test string',
+        ]);
+
+        $this->assertSame('%Test string%', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
     public function testGetParameterValueLikeWithOnePercent()
     {
         $baseDecorator = $this->getDecorator();
@@ -358,7 +374,23 @@ class BaseDecoratorTest extends \PHPUnit_Framework_TestCase
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
             'type'     => 'string',
             'operator' => 'regexp',
-            'filter'   => 'Test \\s string',
+            'filter'   => 'Test \\\s string',
+        ]);
+
+        $this->assertSame('Test \s string', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueNotRegex()
+    {
+        $baseDecorator = $this->getDecorator();
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'string',
+            'operator' => '!regexp',
+            'filter'   => 'Test \\\s string',
         ]);
 
         $this->assertSame('Test \s string', $baseDecorator->getParameterValue($contactSegmentFilterCrate));
