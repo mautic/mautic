@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Command;
 
+use Mautic\LeadBundle\Exception\ImportDelayedException;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -97,7 +99,7 @@ EOT
 
             return 1;
         } catch (ImportDelayedException $e) {
-            $this->logDebug($e->getMessage());
+            $model->logDebug($e->getMessage());
 
             $output->writeln('<info>'.$translator->trans(
                 'mautic.lead.import.delayed',
