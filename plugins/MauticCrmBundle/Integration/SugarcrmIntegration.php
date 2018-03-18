@@ -267,6 +267,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                         if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'bool', 'link', 'relate'])
                                         ||
                                         ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
+                                                ||
+                                                ($fieldInfo['type'] == 'bool' && $fieldInfo['name'] == 'email_opt_out')
                                         )) {
                                             $type      = 'string';
                                             $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
@@ -858,7 +860,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     } elseif ($object == 'Accounts') {
-                        $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $entity                = $this->getMauticCompany($dataObject, null);
                         $detachClass           = Company::class;
                         $mauticObjectReference = 'company';
                     } else {
@@ -1286,7 +1288,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if (!empty($mauticData)) {
             $result = $apiHelper->syncLeadsToSugar($mauticData);
         }
-
         return $this->processCompositeResponse($result);
     }
 
@@ -1334,6 +1335,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         }
                     }
                 }
+
                 $sugarLeadRecords[] = $sugarLeadRecord;
             }
         } elseif (isset($sugarLead['records'])) { //Sugar 7
@@ -1387,6 +1389,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
             }
         }
+
 
         return [$checkEmailsInSugar, $deletedSugarLeads];
     }
@@ -1447,11 +1450,18 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {
             //update and create (one query) every 200 records
-
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    $body[] = ['name' => $sugarField, 'value' => $lead[$mauticField]];
+                    $value = '';
+                    if ($sugarField === 'email_opt_out'){
+                        if (is_bool($lead[$mauticField]) === true) {
+                            $value = 1;
+                        }
+                    } else {
+                        $value = $lead[$mauticField];
+                    }
+                    $body[] = ['name' => $sugarField, 'value' =>  $value];
                 } elseif ($required) {
                     $value  = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
                     $body[] = ['name' => $sugarField, 'value' => $value];
