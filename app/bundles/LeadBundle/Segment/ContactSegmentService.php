@@ -151,7 +151,8 @@ class ContactSegmentService
      *
      * @throws \Exception
      *
-     * @todo This is almost copy of getNewLeadListLeadsCount method. Only difference is that it calls getTotalSegmentContactsQuery
+     * @nottotodo This is almost copy of getNewLeadListLeadsCount method. Only difference is that it calls getTotalSegmentContactsQuery
+     * @answer Yes it is, it's just a facade
      */
     public function getTotalLeadListLeadsCount(LeadList $segment)
     {

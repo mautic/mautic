@@ -11,6 +11,7 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\Exception\InvalidUseException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -79,49 +80,29 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
         if (!$tableAlias) {
             $tableAlias = $this->generateRandomParameterName();
-
-            switch ($filterOperator) {
-                case 'between':
-                case 'notBetween':
-                case 'notLike':
-                case 'notIn':
-                case 'empty':
-                case 'startsWith':
-                case 'gt':
-                case 'eq':
-                case 'neq':
-                case 'gte':
-                case 'like':
-                case 'lt':
-                case 'lte':
-                case 'in':
-                case 'regexp':
-                case 'notRegexp':
-                    //@TODO this logic needs to
-                    if ($filterAggr) {
-                        $queryBuilder->leftJoin(
+            if ($filterAggr) {
+                if ($filter->getTable() != MAUTIC_TABLE_PREFIX.'leads') {
+                    throw new InvalidUseException('You should use ForeignFuncFilterQueryBuilder instead.');
+                }
+                $queryBuilder->leftJoin(
                             $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
                             $filter->getTable(),
                             $tableAlias,
                             sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
                         );
-                    } else {
-                        if ($filter->getTable() == MAUTIC_TABLE_PREFIX.'companies') {
-                            $relTable = $this->generateRandomParameterName();
-                            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = l.id');
-                            $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
-                        } else {
-                            $queryBuilder->leftJoin(
+            } else {
+                if ($filter->getTable() == MAUTIC_TABLE_PREFIX.'companies') {
+                    $relTable = $this->generateRandomParameterName();
+                    $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = l.id');
+                    $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
+                } else {
+                    $queryBuilder->leftJoin(
                                 $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
                                 $filter->getTable(),
                                 $tableAlias,
                                 sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
                             );
-                        }
-                    }
-                    break;
-                default:
-                    throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
+                }
             }
         }
 

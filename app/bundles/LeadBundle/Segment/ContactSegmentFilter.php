@@ -174,8 +174,6 @@ class ContactSegmentFilter
     /**
      * Whether the filter references another ContactSegment.
      *
-     * @TODO replace if not used
-     *
      * @return bool
      */
     public function isContactSegmentReference()

@@ -1410,8 +1410,7 @@ class QueryBuilder
     }
 
     /**
-     * @TODO I need to rewrite it, it's no longer necessary like this, we have direct access to query parts
-     * @TODO Throwing QueryException - Functions calling this method do not handle exception, is it neccessary?
+     * Add AND condition to existing table alias.
      *
      * @param $alias
      * @param $expr
@@ -1428,40 +1427,6 @@ class QueryBuilder
             foreach ($joins as $key => $join) {
                 if ($join['joinAlias'] == $alias) {
                     $result[$tbl][$key]['joinCondition'] = $join['joinCondition'].' and '.$expr;
-                    $inserted                            = true;
-                }
-            }
-        }
-
-        if (!isset($inserted)) {
-            throw new QueryException('Inserting condition to nonexistent join '.$alias);
-        }
-
-        $this->setQueryPart('join', $result);
-
-        return $this;
-    }
-
-    /**
-     * @TODO I need to rewrite it, it's no longer necessary like this, we have direct access to query parts
-     * @TODO This function seems not used at all
-     * @TODO Throwing QueryException - Functions calling this method do not handle exception, is it neccessary?
-     *
-     * @param $alias
-     * @param $expr
-     *
-     * @return $this
-     *
-     * @throws QueryException
-     */
-    public function addOrJoinCondition($alias, $expr)
-    {
-        $result = $parts = $this->getQueryPart('join');
-
-        foreach ($parts as $tbl => $joins) {
-            foreach ($joins as $key => $join) {
-                if ($join['joinAlias'] == $alias) {
-                    $result[$tbl][$key]['joinCondition'] = $this->expr()->orX($join['joinCondition'], $expr);
                     $inserted                            = true;
                 }
             }
@@ -1685,8 +1650,6 @@ class QueryBuilder
     /**
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept).
-     *
-     * @TODO make this readable and explain
      *
      * @param $expression
      * @param $glue

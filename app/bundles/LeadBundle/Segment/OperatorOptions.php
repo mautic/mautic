@@ -68,15 +68,13 @@ class OperatorOptions
             'label'       => 'mautic.lead.list.form.operator.between',
             'expr'        => 'between', //special case
             'negate_expr' => 'notBetween',
-            // @TODO implement in list UI
-            'hide' => true,
+            'hide'        => true,
         ],
         '!between' => [
             'label'       => 'mautic.lead.list.form.operator.notbetween',
             'expr'        => 'notBetween', //special case
             'negate_expr' => 'between',
-            // @TODO implement in list UI
-            'hide' => true,
+            'hide'        => true,
         ],
         'in' => [
             'label'       => 'mautic.lead.list.form.operator.in',

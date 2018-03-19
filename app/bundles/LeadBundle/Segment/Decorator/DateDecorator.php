@@ -22,13 +22,11 @@ class DateDecorator extends CustomMappedDecorator
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @TODO @petr please check this method
-     *
      * @throws \Exception
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        throw new \Exception('Instance of Date option need to implement this function');
+        throw new \Exception('Instance of Date option needs to implement this function');
     }
 
     public function getDefaultDate()

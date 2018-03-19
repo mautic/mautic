@@ -67,44 +67,26 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 
         if (!$tableAlias) {
             $tableAlias = $this->generateRandomParameterName();
-
-            switch ($filterOperator) {
-                case 'notLike':
-                case 'notIn':
-                case 'startsWith':
-                case 'gt':
-                case 'eq':
-                case 'neq':
-                case 'gte':
-                case 'like':
-                case 'lt':
-                case 'lte':
-                case 'in':
-                    //@TODO this logic needs to
-                    if ($filterAggr) {
-                        $queryBuilder->leftJoin(
-                            $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
-                            $filter->getTable(),
-                            $tableAlias,
-                            sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
-                        );
-                    } else {
-                        if ($filter->getTable() == 'companies') {
-                            $relTable = $this->generateRandomParameterName();
-                            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = l.id');
-                            $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
-                        } else {
-                            $queryBuilder->leftJoin(
-                                $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
-                                $filter->getTable(),
-                                $tableAlias,
-                                sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
-                            );
-                        }
-                    }
-                    break;
-                default:
-                    throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
+            if ($filterAggr) {
+                $queryBuilder->leftJoin(
+                    $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
+                    $filter->getTable(),
+                    $tableAlias,
+                    sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
+                );
+            } else {
+                if ($filter->getTable() == 'companies') {
+                    $relTable = $this->generateRandomParameterName();
+                    $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = l.id');
+                    $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
+                } else {
+                    $queryBuilder->leftJoin(
+                        $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
+                        $filter->getTable(),
+                        $tableAlias,
+                        sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
+                    );
+                }
             }
         }
 
@@ -123,18 +105,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                 );
                 $queryBuilder->setParameter($emptyParameter, '');
                 break;
-            case 'startsWith':
-            case 'endsWith':
-            case 'gt':
-            case 'eq':
-            case 'neq':
-            case 'gte':
-            case 'like':
-            case 'notLike':
-            case 'lt':
-            case 'lte':
-            case 'notIn':
-            case 'in':
+            default:
                 if ($filterAggr) {
                     $expression = $queryBuilder->expr()->$filterOperator(
                         sprintf('%s(%s)', $filterAggr, $tableAlias.'.'.$filter->getField()),
@@ -147,8 +118,6 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                     );
                 }
                 break;
-            default:
-                throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
         }
 
         if ($queryBuilder->isJoinTable($filter->getTable())) {

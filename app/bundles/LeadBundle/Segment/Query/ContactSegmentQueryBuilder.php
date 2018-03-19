@@ -19,8 +19,6 @@ use Mautic\LeadBundle\Segment\RandomParameterName;
 
 /**
  * Class ContactSegmentQueryBuilder is responsible for building queries for segments.
- *
- * @TODO add exceptions, remove related segments
  */
 class ContactSegmentQueryBuilder
 {
@@ -29,12 +27,6 @@ class ContactSegmentQueryBuilder
 
     /** @var RandomParameterName */
     private $randomParameterName;
-
-    /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager */
-    private $schema;
-
-    /** @var array */
-    private $relatedSegments = [];
 
     /**
      * ContactSegmentQueryBuilder constructor.
@@ -46,7 +38,6 @@ class ContactSegmentQueryBuilder
     {
         $this->entityManager       = $entityManager;
         $this->randomParameterName = $randomParameterName;
-        $this->schema              = $this->entityManager->getConnection()->getSchemaManager();
     }
 
     /**
@@ -122,6 +113,7 @@ class ContactSegmentQueryBuilder
     {
         // Add count functions to the query
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
+
         //  If there is any right join in the query we need to select its it
         $primary = $qb->guessPrimaryLeadContactIdColumn();
 
@@ -149,11 +141,13 @@ class ContactSegmentQueryBuilder
      *
      * @param QueryBuilder $queryBuilder
      * @param              $segmentId
-     * @param              $whatever     @TODO document this field
+     * @param              $batchRestrictions
      *
      * @return QueryBuilder
+     *
+     * @throws QueryException
      */
-    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId, $whatever)
+    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId, $batchRestrictions)
     {
         $parts     = $queryBuilder->getQueryParts();
         $setHaving = (count($parts['groupBy']) || !is_null($parts['having']));
@@ -164,7 +158,7 @@ class ContactSegmentQueryBuilder
 
         $expression = $queryBuilder->expr()->andX(
             $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId),
-            $queryBuilder->expr()->lte($tableAlias.'.date_added', "'".$whatever['dateTime']."'")
+            $queryBuilder->expr()->lte($tableAlias.'.date_added', "'".$batchRestrictions['dateTime']."'")
         );
 
         $queryBuilder->addJoinCondition($tableAlias, $expression);
@@ -185,6 +179,8 @@ class ContactSegmentQueryBuilder
      * @param              $leadListId
      *
      * @return QueryBuilder
+     *
+     * @throws QueryException
      */
     public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
     {
@@ -193,10 +189,6 @@ class ContactSegmentQueryBuilder
                                 'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId));
         $queryBuilder->addJoinCondition($tableAlias,
                                         $queryBuilder->expr()->andX(
-//                                            $queryBuilder->expr()->orX(
-//                                                $queryBuilder->expr()->isNull($tableAlias.'.manually_removed'),
-//                                                $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 0)
-//                                            ),
                                             $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1)
                                         )
         );
@@ -210,6 +202,8 @@ class ContactSegmentQueryBuilder
      * @param              $leadListId
      *
      * @return QueryBuilder
+     *
+     * @throws QueryException
      */
     public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
     {
@@ -230,29 +224,5 @@ class ContactSegmentQueryBuilder
     private function generateRandomParameterName()
     {
         return $this->randomParameterName->generateRandomParameterName();
-    }
-
-    /**
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
-     *
-     * @TODO Remove this function
-     */
-    public function getSchema()
-    {
-        return $this->schema;
-    }
-
-    /**
-     * @param \Doctrine\DBAL\Schema\AbstractSchemaManager $schema
-     *
-     * @return ContactSegmentQueryBuilder
-     *
-     * @TODO Remove this function
-     */
-    public function setSchema($schema)
-    {
-        $this->schema = $schema;
-
-        return $this;
     }
 }
