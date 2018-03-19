@@ -35,14 +35,21 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($plugin->hasSecondaryDescription());
     }
 
-    public function testSecondaryDescription()
+    public function testSecondaryDescriptionWithUnixLineEnding()
     {
-        $description = <<<TXT
-This is the best plugin in the whole galaxy
----
-Learn more about it <a href="#">here</a>
-TXT;
-        $plugin = new Plugin();
+        $description = "This is the best plugin in the whole galaxy\n---\nLearn more about it <a href=\"#\">here</a>";
+        $plugin      = new Plugin();
+        $plugin->setDescription($description);
+        $this->assertEquals($description, $plugin->getDescription());
+        $this->assertEquals('This is the best plugin in the whole galaxy', $plugin->getPrimaryDescription());
+        $this->assertEquals('Learn more about it <a href="#">here</a>', $plugin->getSecondaryDescription());
+        $this->assertTrue($plugin->hasSecondaryDescription());
+    }
+
+    public function testSecondaryDescriptionWithWinLineEnding()
+    {
+        $description = "This is the best plugin in the whole galaxy\n\r---\n\rLearn more about it <a href=\"#\">here</a>";
+        $plugin      = new Plugin();
         $plugin->setDescription($description);
         $this->assertEquals($description, $plugin->getDescription());
         $this->assertEquals('This is the best plugin in the whole galaxy', $plugin->getPrimaryDescription());
