@@ -25,7 +25,7 @@
 1. 
 2. 
 
-#### Test of this PR required run command:
+#### Testing this PR requires running the following commands:
 Action |  Command  | Required
 | --- | --- | ---
 clear cache | php app/console cache:clear | 
