@@ -217,19 +217,24 @@ class ImportModel extends FormModel
      * @param Progress $progress
      * @param int      $limit    Number of records to import before delaying the import. 0 will import all
      *
-     * @throws \Exception
+     * @throws ImportFailedException
+     * @throws ImportDelayedException
      */
     public function beginImport(Import $import, Progress $progress, $limit = 0)
     {
         $this->setGhostImportsAsFailed();
 
         if (!$import) {
-            throw new ImportFailedException('import is empty, closing the import process');
+            $msg = 'import is empty, closing the import process';
+            $this->logDebug($msg, $import);
+            throw new ImportFailedException($msg);
         }
 
         if (!$import->canProceed()) {
             $this->saveEntity($import);
-            throw new ImportFailedException('import cannot be processed because '.$import->getStatusInfo());
+            $msg = 'import cannot be processed because '.$import->getStatusInfo();
+            $this->logDebug($msg, $import);
+            throw new ImportFailedException($msg);
         }
 
         if (!$this->checkParallelImportLimit()) {
@@ -239,7 +244,9 @@ class ImportModel extends FormModel
             );
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
             $this->saveEntity($import);
-            throw new ImportDelayedException('import cannot be processed because '.$import->getStatusInfo());
+            $msg = 'import is delayed because parrallel limit was hit. '.$import->getStatusInfo();
+            $this->logDebug($msg, $import);
+            throw new ImportDelayedException($msg);
         }
 
         $processed = $import->getProcessedRows();
@@ -720,7 +727,7 @@ class ImportModel extends FormModel
      * @param string $msg
      * @param Import $import
      */
-    public function logDebug($msg, Import $import = null)
+    protected function logDebug($msg, Import $import = null)
     {
         if (MAUTIC_ENV === 'dev') {
             $importId = $import ? '('.$import->getId().')' : '';
