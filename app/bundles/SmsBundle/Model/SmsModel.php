@@ -24,11 +24,11 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\SmsBundle\Api\AbstractSmsApi;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Event\SmsEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
+use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -57,7 +57,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @var
      */
-    protected $smsApi;
+    protected $transport;
 
     /**
      * SmsModel constructor.
@@ -65,14 +65,14 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @param TrackableModel    $pageTrackableModel
      * @param LeadModel         $leadModel
      * @param MessageQueueModel $messageQueueModel
-     * @param AbstractSmsApi    $smsApi
+     * @param TransportChain    $transport
      */
-    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, AbstractSmsApi $smsApi)
+    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport)
     {
         $this->pageTrackableModel = $pageTrackableModel;
         $this->leadModel          = $leadModel;
         $this->messageQueueModel  = $messageQueueModel;
-        $this->smsApi             = $smsApi;
+        $this->transport          = $transport;
     }
 
     /**
@@ -302,7 +302,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         'content' => $tokenEvent->getContent(),
                     ];
 
-                    $metadata = $this->smsApi->sendSms($leadPhoneNumber, $tokenEvent->getContent());
+                    $metadata = $this->transport->sendSms($leadPhoneNumber, $tokenEvent->getContent());
 
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;

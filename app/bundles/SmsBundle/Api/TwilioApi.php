@@ -62,9 +62,11 @@ class TwilioApi extends AbstractSmsApi
     }
 
     /**
-     * @param string $number
+     * @param $number
      *
      * @return string
+     *
+     * @throws NumberParseException
      */
     protected function sanitizeNumber($number)
     {

@@ -91,6 +91,23 @@ return [
                 ],
                 'alias' => 'sms_api',
             ],
+            'mautic.sms.transport_chain' => [
+                'class'     => '\Mautic\SmsBundle\Sms\TransportChain',
+                'arguments' => ['%mautic.sms_transport%', 'mautic.helper.integration', 'monolog.logger.mautic'],
+            ],
+            'mautic.sms.transport.twilio' => [
+                'class'     => 'Mautic\SmsBundle\Api\TwilioApi',
+                'arguments' => [
+                    'mautic.page.model.trackable',
+                    'mautic.helper.phone_number',
+                    'mautic.helper.integration',
+                    'monolog.logger.mautic',
+                ],
+                'alias' => 'mautic.sms.config.transport.twilio',
+                'tags'  => [
+                    'name' => 'mautic.sms_transport', 'Twilio',
+                ],
+            ],
         ],
         'models' => [
             'mautic.sms.model.sms' => [
@@ -165,5 +182,6 @@ return [
         'sms_sending_phone_number' => null,
         'sms_frequency_number'     => null,
         'sms_frequency_time'       => null,
+        'sms_transport'            => 'mautic.sms.transport.twilio',
     ],
 ];
