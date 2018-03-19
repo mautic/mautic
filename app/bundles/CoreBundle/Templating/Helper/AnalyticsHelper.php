@@ -69,7 +69,7 @@ class AnalyticsHelper extends Helper
     /**
      * @param string $content
      */
-    public function addCode(&$content)
+    public function addCode($content)
     {
         // Add analytics
         $analytics = $this->getCode();
