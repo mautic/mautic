@@ -67,6 +67,24 @@ class AnalyticsHelper extends Helper
     }
 
     /**
+     * @param string $content
+     */
+    public function addCode(&$content)
+    {
+        // Add analytics
+        $analytics = $this->getCode();
+
+        // Check for html doc
+        if (strpos($content, '<html') === false) {
+            $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
+        } elseif (strpos($content, '<head>') === false) {
+            $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
+        } elseif (!empty($analytics)) {
+            $content = str_replace('</head>', $analytics."\n</head>", $content);
+        }
+    }
+
+    /**
      * @return string
      */
     public function getName()

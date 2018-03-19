@@ -518,6 +518,11 @@ class PublicController extends CommonFormController
 
         $content = $event->getContent(true);
 
+        // Add analytics
+        if ($this->coreParametersHelper->getParameter('google_analytics_add_to_email_preview')) {
+            $this->get('mautic.helper.template.analytics')->addCode($content);
+        }
+
         return new Response($content);
     }
 
