@@ -51,15 +51,6 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
-
-        $builder->add(
-            'google_analytics_add_to_email_preview',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.page.config.form.google.analytics.add.to.email.preview',
-                'data'  => (bool) $options['data']['google_analytics_add_to_email_preview'],
-            ]
-        );
     }
 
     /**

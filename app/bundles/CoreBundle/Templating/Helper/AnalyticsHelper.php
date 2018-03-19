@@ -82,6 +82,8 @@ class AnalyticsHelper extends Helper
         } elseif (!empty($analytics)) {
             $content = str_replace('</head>', $analytics."\n</head>", $content);
         }
+
+        return $content;
     }
 
     /**

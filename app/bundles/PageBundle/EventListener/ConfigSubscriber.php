@@ -47,7 +47,6 @@ class ConfigSubscriber extends CommonSubscriber
             'parameters' => [
                 'cat_in_page_url'                       => false,
                 'google_analytics'                      => false,
-                'google_analytics_add_to_email_preview' => false,
             ],
         ]);
     }

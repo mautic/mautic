@@ -74,17 +74,7 @@ class PublicController extends CommonFormController
                 $content = '';
             }
 
-            // Add analytics
-            $analytics = $this->factory->getHelper('template.analytics')->getCode();
-
-            // Check for html doc
-            if (strpos($content, '<html') === false) {
-                $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
-            } elseif (strpos($content, '<head>') === false) {
-                $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
-            } elseif (!empty($analytics)) {
-                $content = str_replace('</head>', $analytics."\n</head>", $content);
-            }
+            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
 
             // Add subject as title
             if (!empty($subject)) {
@@ -518,9 +508,8 @@ class PublicController extends CommonFormController
 
         $content = $event->getContent(true);
 
-        // Add analytics
-        if ($this->coreParametersHelper->getParameter('google_analytics_add_to_email_preview')) {
-            $this->get('mautic.helper.template.analytics')->addCode($content);
+        if (!$this->security->isAnonymous()) {
+            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
         }
 
         return new Response($content);
