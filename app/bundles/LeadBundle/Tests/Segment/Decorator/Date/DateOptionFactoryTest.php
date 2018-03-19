@@ -222,6 +222,18 @@ class DateOptionFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
+    public function testRelativeAgo()
+    {
+        $filterName = '20 days ago';
+
+        $filterDecorator = $this->getFilterDecorator($filterName);
+
+        $this->assertInstanceOf(DateRelativeInterval::class, $filterDecorator);
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
+     */
     public function testDateDefault()
     {
         $filterName = '2018-01-01';

@@ -27,16 +27,6 @@ class ContactSegmentFilters implements \Iterator, \Countable
     private $contactSegmentFilters = [];
 
     /**
-     * @var bool
-     */
-    private $hasCompanyFilter = false;
-
-    /**
-     * @var bool
-     */
-    private $listFiltersInnerJoinCompany = false;
-
-    /**
      * @param ContactSegmentFilter $contactSegmentFilter
      *
      * @return $this
@@ -114,21 +104,5 @@ class ContactSegmentFilters implements \Iterator, \Countable
     public function count()
     {
         return count($this->contactSegmentFilters);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isHasCompanyFilter()
-    {
-        return $this->hasCompanyFilter;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isListFiltersInnerJoinCompany()
-    {
-        return $this->listFiltersInnerJoinCompany;
     }
 }

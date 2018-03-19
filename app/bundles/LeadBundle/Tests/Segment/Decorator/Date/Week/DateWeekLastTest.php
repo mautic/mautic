@@ -24,13 +24,13 @@ class DateWeekLastTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOperatorBetween()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
+        $dateDecorator = $this->createMock(DateDecorator::class);
 
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(true);
-
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
+        $filter        = [
+            'operator' => '=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
 
@@ -42,24 +42,20 @@ class DateWeekLastTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOperatorLessOrEqual()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
-
+        $dateDecorator = $this->createMock(DateDecorator::class);
         $dateDecorator->method('getOperator')
             ->with()
-            ->willReturn('==<<'); //Test that value is really returned from Decorator
-
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(false);
+            ->willReturn('=<');
 
         $filter        = [
-            'operator' => '=<',
+            'operator' => 'lte',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('==<<', $filterDecorator->getOperator($contactSegmentFilterCrate));
+        $this->assertEquals('=<', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
     /**
@@ -67,11 +63,7 @@ class DateWeekLastTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameterValueBetween()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
-
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(true);
+        $dateDecorator = $this->createMock(DateDecorator::class);
 
         $date = new DateTimeHelper('', null, 'local');
 
@@ -79,7 +71,11 @@ class DateWeekLastTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn($date);
 
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
+        $filter        = [
+            'operator' => '!=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
 
@@ -100,11 +96,7 @@ class DateWeekLastTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameterValueSingle()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
-
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(false);
+        $dateDecorator = $this->createMock(DateDecorator::class);
 
         $date = new DateTimeHelper('', null, 'local');
 
@@ -113,13 +105,64 @@ class DateWeekLastTest extends \PHPUnit_Framework_TestCase
             ->willReturn($date);
 
         $filter        = [
-            'operator' => '<',
+            'operator' => 'lt',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
 
         $expectedDate = new \DateTime('monday last week');
+
+        $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
+     */
+    public function testGetParameterValueforGreaterOperatorIncludesSunday()
+    {
+        $dateDecorator = $this->createMock(DateDecorator::class);
+
+        $date = new DateTimeHelper('', null, 'local');
+        $dateDecorator->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter        = [
+            'operator' => 'gt',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+
+        $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
+
+        $expectedDate = new \DateTime('sunday last week');
+
+        $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
+     */
+    public function testGetParameterValueForLessThanOperatorIncludesSunday()
+    {
+        $dateDecorator = $this->createMock(DateDecorator::class);
+
+        $date = new DateTimeHelper('', null, 'local');
+        $dateDecorator->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter        = [
+            'operator' => 'lte',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+
+        $filterDecorator = new DateWeekLast($dateDecorator, $dateOptionParameters);
+
+        $expectedDate = new \DateTime('sunday last week');
 
         $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }

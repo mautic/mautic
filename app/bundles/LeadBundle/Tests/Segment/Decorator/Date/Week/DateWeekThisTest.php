@@ -20,17 +20,17 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 class DateWeekThisTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekThis::getOperator
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getOperator
      */
     public function testGetOperatorBetween()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
+        $dateDecorator = $this->createMock(DateDecorator::class);
 
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(true);
-
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
+        $filter        = [
+            'operator' => '=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateWeekThis($dateDecorator, $dateOptionParameters);
 
@@ -38,40 +38,32 @@ class DateWeekThisTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekThis::getOperator
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getOperator
      */
     public function testGetOperatorLessOrEqual()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
-
+        $dateDecorator = $this->createMock(DateDecorator::class);
         $dateDecorator->method('getOperator')
             ->with()
-            ->willReturn('==<<'); //Test that value is really returned from Decorator
-
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(false);
+            ->willReturn('=<');
 
         $filter        = [
-            'operator' => '=<',
+            'operator' => 'lte',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateWeekThis($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('==<<', $filterDecorator->getOperator($contactSegmentFilterCrate));
+        $this->assertEquals('=<', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
     /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekThis::getParameterValue
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
      */
     public function testGetParameterValueBetween()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
-
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(true);
+        $dateDecorator = $this->createMock(DateDecorator::class);
 
         $date = new DateTimeHelper('', null, 'local');
 
@@ -79,7 +71,11 @@ class DateWeekThisTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn($date);
 
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
+        $filter        = [
+            'operator' => '!=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateWeekThis($dateDecorator, $dateOptionParameters);
 
@@ -96,15 +92,11 @@ class DateWeekThisTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekThis::getParameterValue
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
      */
     public function testGetParameterValueSingle()
     {
-        $dateDecorator        = $this->createMock(DateDecorator::class);
-        $dateOptionParameters = $this->createMock(DateOptionParameters::class);
-
-        $dateOptionParameters->method('isBetweenRequired')
-            ->willReturn(false);
+        $dateDecorator = $this->createMock(DateDecorator::class);
 
         $date = new DateTimeHelper('', null, 'local');
 
@@ -113,13 +105,64 @@ class DateWeekThisTest extends \PHPUnit_Framework_TestCase
             ->willReturn($date);
 
         $filter        = [
-            'operator' => '<',
+            'operator' => 'lt',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
 
         $filterDecorator = new DateWeekThis($dateDecorator, $dateOptionParameters);
 
         $expectedDate = new \DateTime('monday this week');
+
+        $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
+     */
+    public function testGetParameterValueforGreaterOperatorIncludesSunday()
+    {
+        $dateDecorator = $this->createMock(DateDecorator::class);
+
+        $date = new DateTimeHelper('', null, 'local');
+        $dateDecorator->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter        = [
+            'operator' => 'gt',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+
+        $filterDecorator = new DateWeekThis($dateDecorator, $dateOptionParameters);
+
+        $expectedDate = new \DateTime('sunday this week');
+
+        $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getParameterValue
+     */
+    public function testGetParameterValueForLessThanOperatorIncludesSunday()
+    {
+        $dateDecorator = $this->createMock(DateDecorator::class);
+
+        $date = new DateTimeHelper('', null, 'local');
+        $dateDecorator->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter        = [
+            'operator' => 'lte',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+
+        $filterDecorator = new DateWeekThis($dateDecorator, $dateOptionParameters);
+
+        $expectedDate = new \DateTime('sunday this week');
 
         $this->assertEquals($expectedDate->format('Y-m-d'), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }

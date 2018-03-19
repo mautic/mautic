@@ -127,9 +127,9 @@ class BaseDecorator implements FilterDecoratorInterface
             return $filter;
         }
 
-        switch ($this->getOperator($contactSegmentFilterCrate)) {
+        switch ($contactSegmentFilterCrate->getOperator()) {
             case 'like':
-            case 'notLike':
+            case '!like':
                 return strpos($filter, '%') === false ? '%'.$filter.'%' : $filter;
             case 'contains':
                 return '%'.$filter.'%';
@@ -138,7 +138,7 @@ class BaseDecorator implements FilterDecoratorInterface
             case 'endsWith':
                 return '%'.$filter;
             case 'regexp':
-            case 'notRegexp':
+            case '!regexp':
                 return $this->prepareRegex($filter);
         }
 
