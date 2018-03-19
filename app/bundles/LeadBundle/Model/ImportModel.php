@@ -392,6 +392,8 @@ class ImportModel extends FormModel
                 $import->increaseIgnoredCount();
                 $this->logImportRowError($eventLog, $errorMessage);
                 $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
+            } else {
+                $this->leadEventLogRepo->saveEntity($eventLog);
             }
 
             // Release entities in Doctrine's memory to prevent memory leak
