@@ -124,7 +124,7 @@ class CampaignModel extends CommonFormModel
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
 
             foreach ($properties as $f => $v) {
-                if ($f == 'id' && strpos($v, 'new') === 0) {
+                if ('id' == $f && 0 === strpos($v, 'new')) {
                     //set the temp ID used to be able to match up connections
                     $event->setTempId($v);
                 }
@@ -178,7 +178,7 @@ class CampaignModel extends CommonFormModel
                     $sourceDecision = (!empty($connection['anchors'][0])) ? $connection['anchors'][0]['endpoint'] : null;
                 }
 
-                if ($sourceDecision == 'leadsource') {
+                if ('leadsource' == $sourceDecision) {
                     // Lead source connection that does not matter
                     continue;
                 }
@@ -304,7 +304,7 @@ class CampaignModel extends CommonFormModel
 
                     if (isset($event['anchorRestrictions'])) {
                         foreach ($event['anchorRestrictions'] as $restriction) {
-                            list($group, $anchor) = explode('.', $restriction);
+                            list($group, $anchor)                             = explode('.', $restriction);
                             $connectionRestrictions['anchor'][$key][$group][] = $anchor;
                         }
                     }
@@ -363,7 +363,7 @@ class CampaignModel extends CommonFormModel
                 $channelIdField = $eventSettings[$properties['type']]['channelIdField'];
                 if (!empty($properties['properties'][$channelIdField])) {
                     if (is_array($properties['properties'][$channelIdField])) {
-                        if (count($properties['properties'][$channelIdField]) === 1) {
+                        if (1 === count($properties['properties'][$channelIdField])) {
                             // Only store channel ID if a single item was selected
                             $entity->setChannelId($properties['properties'][$channelIdField]);
                         }
@@ -394,7 +394,7 @@ class CampaignModel extends CommonFormModel
             return;
         } else {
             foreach ($hierarchy as $eventId => $parent) {
-                if ($parent == $root || $count === 1) {
+                if ($parent == $root || 1 === $count) {
                     $events[$eventId]->setOrder($order);
                     unset($hierarchy[$eventId]);
                     if (count($hierarchy)) {
@@ -415,7 +415,7 @@ class CampaignModel extends CommonFormModel
      */
     public function setCanvasSettings($entity, $settings, $persist = true, $events = null)
     {
-        if ($events === null) {
+        if (null === $events) {
             $events = $entity->getEvents();
         }
 
@@ -434,7 +434,7 @@ class CampaignModel extends CommonFormModel
         }
 
         foreach ($settings['nodes'] as &$node) {
-            if (strpos($node['id'], 'new') !== false) {
+            if (false !== strpos($node['id'], 'new')) {
                 // Find the real one and update the node
                 $node['id'] = str_replace($node['id'], $tempIds[$node['id']], $node['id']);
             }
@@ -446,7 +446,7 @@ class CampaignModel extends CommonFormModel
 
         foreach ($settings['connections'] as &$connection) {
             // Check source
-            if (strpos($connection['sourceId'], 'new') !== false) {
+            if (false !== strpos($connection['sourceId'], 'new')) {
                 // Find the real one and update the node
                 $connection['sourceId'] = str_replace(
                     $connection['sourceId'],
@@ -456,7 +456,7 @@ class CampaignModel extends CommonFormModel
             }
 
             // Check target
-            if (strpos($connection['targetId'], 'new') !== false) {
+            if (false !== strpos($connection['targetId'], 'new')) {
                 // Find the real one and update the node
                 $connection['targetId'] = str_replace(
                     $connection['targetId'],
@@ -469,7 +469,7 @@ class CampaignModel extends CommonFormModel
             if (!isset($connection['anchors']['source'])) {
                 $anchors = [];
                 foreach ($connection['anchors'] as $k => $anchor) {
-                    $type           = ($k === 0) ? 'source' : 'target';
+                    $type           = (0 === $k) ? 'source' : 'target';
                     $anchors[$type] = $anchor['endpoint'];
                 }
 
@@ -617,6 +617,7 @@ class CampaignModel extends CommonFormModel
                     }
                 }
 
+                // no break
             case 'forms':
             case null:
                 $choices['forms'] = [];
@@ -637,7 +638,7 @@ class CampaignModel extends CommonFormModel
             asort($typeChoices);
         }
 
-        return ($sourceType == null) ? $choices : $choices[$sourceType];
+        return (null == $sourceType) ? $choices : $choices[$sourceType];
     }
 
     /**
@@ -664,7 +665,7 @@ class CampaignModel extends CommonFormModel
     {
         static $campaigns = [];
 
-        if ($lead === null) {
+        if (null === $lead) {
             $lead = $this->leadModel->getCurrentLead();
         }
 
@@ -756,7 +757,7 @@ class CampaignModel extends CommonFormModel
             }
 
             $dispatchEvent = true;
-            if ($campaignLead != null) {
+            if (null != $campaignLead) {
                 if ($campaignLead->wasManuallyRemoved()) {
                     $campaignLead->setManuallyRemoved(false);
                     $campaignLead->setManuallyAdded($manuallyAdded);
@@ -885,7 +886,7 @@ class CampaignModel extends CommonFormModel
                     ]
                 );
 
-            if ($campaignLead == null) {
+            if (null == $campaignLead) {
                 if ($batchProcess) {
                     $this->em->detach($lead);
                     unset($lead);
@@ -1241,7 +1242,7 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of leads added to campaigns.
      *
-     * @param string    $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -1362,7 +1363,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Campaign();
         }
 

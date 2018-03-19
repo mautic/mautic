@@ -108,7 +108,6 @@ class ConfigType extends AbstractType
                 ]
             );
         }
-
     }
 
     public function getCampaignsForDefault()
@@ -120,7 +119,6 @@ class ConfigType extends AbstractType
         }
 
         return $result;
-
     }
 
     /**
