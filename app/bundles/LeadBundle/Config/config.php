@@ -748,7 +748,8 @@ return [
             'mautic.lead.model.field' => [
                 'class'     => 'Mautic\LeadBundle\Model\FieldModel',
                 'arguments' => [
-                    'mautic.schema.helper.factory',
+                    'mautic.schema.helper.index',
+                    'mautic.schema.helper.column',
                 ],
             ],
             'mautic.lead.model.list' => [
