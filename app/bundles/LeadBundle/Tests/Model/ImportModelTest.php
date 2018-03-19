@@ -162,7 +162,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->method('getParallelImportLimit')
             ->will($this->returnValue(1));
 
-        $model->expects($this->once())
+        $model->expects($this->exactly(2))
             ->method('logDebug');
 
         $model->setTranslator($this->getTranslatorMock());
@@ -204,6 +204,7 @@ class ImportModelTest extends StandardImportTestHelper
 
         try {
             $model->beginImport($entity, new Progress());
+            $this->fail();
         } catch (ImportDelayedException $e) {
             // This is expected
         }
@@ -274,6 +275,7 @@ class ImportModelTest extends StandardImportTestHelper
 
         try {
             $model->beginImport($entity, new Progress());
+            $this->fail();
         } catch (ImportFailedException $e) {
             // This is expected
         }

@@ -88,8 +88,6 @@ EOT
         try {
             $model->beginImport($import, $progress, $limit);
         } catch (ImportFailedException $e) {
-            $model->logDebug($e->getMessage(), $import);
-
             $output->writeln('<error>'.$translator->trans(
                 'mautic.lead.import.failed',
                 [
@@ -99,8 +97,6 @@ EOT
 
             return 1;
         } catch (ImportDelayedException $e) {
-            $model->logDebug($e->getMessage());
-
             $output->writeln('<info>'.$translator->trans(
                 'mautic.lead.import.delayed',
                 [
