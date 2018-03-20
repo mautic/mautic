@@ -51,11 +51,11 @@ EOT
                         'The ID for a specifc channel to process broadcasts for pending contacts.'
                     ),
                     new InputOption(
-                        'min-contact-id', 'n', InputOption::VALUE_OPTIONAL,
+                        'min-contact-id', null, InputOption::VALUE_OPTIONAL,
                         'Min contact ID to filter recipients.'
                     ),
                     new InputOption(
-                        'max-contact-id', 'x', InputOption::VALUE_OPTIONAL,
+                        'max-contact-id', null, InputOption::VALUE_OPTIONAL,
                         'Max contact ID to filter recipients.'
                     ),
                     new InputOption(
