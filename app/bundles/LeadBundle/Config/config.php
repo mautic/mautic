@@ -690,6 +690,11 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'leadlist_access',
             ],
+            \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
+                'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
+                'arguments' => ['mautic.lead.model.list'],
+                'tag'       => 'validator.constraint_validator',
+            ],
             'mautic.lead.constraint.alias' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator',
                 'arguments' => ['mautic.factory'],
