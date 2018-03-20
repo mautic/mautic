@@ -111,8 +111,7 @@
         "leezy/pheanstalk-bundle": "^3.2",
         "simshaun/recurr": "^3.0",
         "ramsey/uuid": "^3.7",
-        "sendgrid/sendgrid": "~6.0",
-        "messagebird/php-rest-api": "~1.9"
+        "sendgrid/sendgrid": "~6.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
