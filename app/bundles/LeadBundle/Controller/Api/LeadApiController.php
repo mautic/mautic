@@ -662,11 +662,7 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * @param array  $parameters
-     * @param Lead   $entity
-     * @param string $action
-     *
-     * @return mixed|void
+     * {@inheritdoc}
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
