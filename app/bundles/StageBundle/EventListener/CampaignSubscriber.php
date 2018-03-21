@@ -75,9 +75,15 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return $this|void
      */
     public function onCampaignTriggerActionChangeStage(CampaignExecutionEvent $event)
     {
+        if (!$event->checkContext('stage.change')) {
+            return;
+        }
+
         $stageChange = false;
         $lead        = $event->getLead();
         $leadStage   = null;
@@ -98,6 +104,7 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if ($stageChange) {
+            $this->logger->debug('CONTACT CAMPAIGN ACTION: Changing stage to '.$stageToChangeTo->getName().' to contact ID# '.$lead->getId());
             $lead->stageChangeLogEntry(
                 $stageToChangeTo,
                 $stageToChangeTo->getId().': '.$stageToChangeTo->getName(),

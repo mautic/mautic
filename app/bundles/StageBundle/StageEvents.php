@@ -71,6 +71,7 @@ final class StageEvents
      * @var string
      */
     const STAGE_ON_ACTION = 'mautic.stage_on_action';
+
     /**
      * The mautic.stage.on_campaign_trigger_action event is fired when the campaign action triggers.
      *

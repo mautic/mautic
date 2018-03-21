@@ -406,6 +406,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->cascadePersist()
             ->cascadeMerge()
             ->cascadeDetach()
+            ->fetchExtraLazy()
             ->addJoinColumn('stage_id', 'id', true, false, 'SET NULL')
             ->build();
 
