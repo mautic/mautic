@@ -11,13 +11,16 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\LeadBundle\Batches\Group\LeadsBatchGroup;
+use Mautic\LeadBundle\Batches\LeadBatchesTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,7 +28,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LeadController extends FormController
 {
-    use LeadDetailsTrait, FrequencyRuleTrait;
+    use LeadDetailsTrait, FrequencyRuleTrait, LeadBatchesTrait;
 
     /**
      * @param int $page
@@ -1428,69 +1431,13 @@ class LeadController extends FormController
     }
 
     /**
-     * Bulk edit lead lists.
+     * Batch update of segments
      *
-     * @param int $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return mixed|JsonResponse
      */
-    public function batchListsAction($objectId = 0)
+    public function batchListsAction()
     {
-        if ($this->request->getMethod() == 'POST') {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model = $this->getModel('lead');
-            $data  = $this->request->request->get('lead_batch', [], true);
-            $ids   = json_decode($data['ids'], true);
-
-            $entities = [];
-            if (is_array($ids)) {
-                $entities = $model->getEntities(
-                    [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
-                                ],
-                            ],
-                        ],
-                        'ignore_paginator' => true,
-                    ]
-                );
-            }
-
-            $count = 0;
-            foreach ($entities as $lead) {
-                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                    ++$count;
-
-                    if (!empty($data['add'])) {
-                        $model->addToLists($lead, $data['add']);
-                    }
-
-                    if (!empty($data['remove'])) {
-                        $model->removeFromLists($lead, $data['remove']);
-                    }
-                }
-            }
-
-            $this->addFlash(
-                'mautic.lead.batch_leads_affected',
-                [
-                    'pluralCount' => $count,
-                    '%count%'     => $count,
-                ]
-            );
-
-            return new JsonResponse(
-                [
-                    'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
-                ]
-            );
-        } else {
-            // Get a list of lists
+        return $this->handleBatchRequest(new LeadsBatchGroup(), 'batch.lead.segments', function () {
             /** @var \Mautic\LeadBundle\Model\ListModel $model */
             $model = $this->getModel('lead.list');
             $lists = $model->getUserLists();
@@ -1499,12 +1446,7 @@ class LeadController extends FormController
                 $items[$list['id']] = $list['name'];
             }
 
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchLists',
-                ]
-            );
+            $route = $this->generateUrl('mautic_contact_action', ['objectAction' => 'batchLists',]);
 
             return $this->delegateView(
                 [
@@ -1526,7 +1468,43 @@ class LeadController extends FormController
                     ],
                 ]
             );
-        }
+        });
+    }
+
+    /**
+     * Batch update of categories
+     *
+     * @return mixed|JsonResponse
+     */
+    public function batchCategoriesAction()
+    {
+        return $this->handleBatchRequest(new LeadsBatchGroup(), 'batch.lead.categories', function () {
+            /** @var CategoryModel $model */
+            $model = $this->getModel('category.category');
+            $entities = $model->getEntities()->getIterator();
+
+            /** @var Category $category */
+            foreach ($entities as $category) {
+                $items[$category->getId()] = $category->getTitle();
+            }
+
+            $route = $this->generateUrl('mautic_contact_action', ['objectAction' => 'batchCategories']);
+
+            return $this->delegateView([
+                'viewParameters' => [
+                    'form' => $this->createForm('lead_batch', [], [
+                        'action' => $route,
+                        'items' => $items,
+                    ])->createView(),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route' => $route,
+                ],
+            ]);
+        });
     }
 
     /**
