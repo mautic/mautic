@@ -151,6 +151,7 @@ return [
                     'mautic.campaign.model.event',
                     'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_user',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.email.campaignbundle.condition_subscriber' => [

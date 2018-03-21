@@ -1730,8 +1730,9 @@ class EventModel extends CommonFormModel
                     $repo->deleteEntity($log);
                     unset($log);
                 }
-
-                $this->notifyOfFailure($lead, $campaign->getCreatedBy(), $campaign->getName().' / '.$event['name']);
+                if (empty($response['campaign_disable_dnc_error'])) {
+                    $this->notifyOfFailure($lead, $campaign->getCreatedBy(), $campaign->getName().' / '.$event['name']);
+                }
                 $this->logger->debug($debug);
             } else {
                 $this->setEventStatus($log, true);
