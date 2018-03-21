@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Batches\Exception;
 
+use Mautic\CoreBundle\Batches\Adapter\HandlerAdapterInterface;
 use Mautic\CoreBundle\Batches\Group\BatchGroupInterface;
 
 /**
@@ -52,11 +53,12 @@ class BatchActionFailException extends \Exception
      * Thrown when you try to pass a source to a handler unless it is implemented.
      *
      * @param object $object
+     * @param HandlerAdapterInterface $handlerAdapter
      *
      * @return BatchActionFailException
      */
-    public static function sourceInHandlerNotImplementedYet($object)
+    public static function sourceInHandlerNotImplementedYet($object, HandlerAdapterInterface $handlerAdapter)
     {
-        return new self(sprintf('Source of class %s hasn\'t been implemented in this handler yet', get_class($object)));
+        return new self(sprintf('Source of class %s hasn\'t been implemented in handler %s', get_class($object), get_class($handlerAdapter)));
     }
 }

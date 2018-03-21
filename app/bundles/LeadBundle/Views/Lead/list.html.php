@@ -70,6 +70,17 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
             'btnText'   => $view['translator']->trans('mautic.lead.batch.dnc'),
             'iconClass' => 'fa fa-ban text-danger',
         ],
+        [
+            'attr' => [
+                'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchCategories']),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.categories'),
+            ],
+            'btnText' => $view['translator']->trans('mautic.lead.batch.categories'),
+            'iconClass' => 'fa fa-user'
+        ],
     ];
 }
 ?>
