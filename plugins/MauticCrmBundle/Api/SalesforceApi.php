@@ -325,6 +325,11 @@ class SalesforceApi extends CrmApi
     {
         $queryUrl = $this->integration->getQueryUrl();
 
+        if (defined('MAUTIC_ENV') && MAUTIC_ENV === 'dev') {
+            // Easier for testing
+            $this->requestSettings['headers']['Sforce-Query-Options'] = 'batchSize=200';
+        }
+
         if (!is_array($query)) {
             return $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
         }
