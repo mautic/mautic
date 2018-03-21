@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 class FieldAliasKeywordValidatorTest extends \PHPUnit_Framework_TestCase
 {
     private $listModelMock;
-    private $fieldAliasHelperMock;
+    private $fieldAliasHelperlMock;
     private $executionContextMock;
     private $validator;
 
