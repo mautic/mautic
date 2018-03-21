@@ -471,6 +471,7 @@ class SearchSubscriber extends CommonSubscriber
         }
 
         $this->leadRepo->applySearchQueryRelationship($q, $tables, true, $expr);
+
         $event->setReturnParameters(true); // replace search string
         $event->setStrict(true);           // don't use like
         $event->setSearchStatus(true);     // finish searching
