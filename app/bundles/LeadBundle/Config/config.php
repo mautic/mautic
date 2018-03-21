@@ -692,8 +692,11 @@ return [
             ],
             \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
                 'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
-                'arguments' => ['mautic.lead.model.list'],
                 'tag'       => 'validator.constraint_validator',
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'mautic.helper.field.alias',
+                ],
             ],
             'mautic.lead.constraint.alias' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator',
@@ -727,6 +730,10 @@ return [
                 'class'     => 'Mautic\LeadBundle\Templating\Helper\AvatarHelper',
                 'arguments' => ['mautic.factory'],
                 'alias'     => 'lead_avatar',
+            ],
+            'mautic.helper.field.alias' => [
+                'class'     => \Mautic\LeadBundle\Helper\FieldAliasHelper::class,
+                'arguments' => ['mautic.lead.model.field'],
             ],
         ],
         'models' => [

@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -28,11 +29,18 @@ class FieldAliasKeywordValidator extends ConstraintValidator
     private $listModel;
 
     /**
-     * @param ListModel $listModel
+     * @var FieldAliasHelper
      */
-    public function __construct(ListModel $listModel)
+    private $aliasHelper;
+
+    /**
+     * @param ListModel        $listModel
+     * @param FieldAliasHelper $aliasHelper
+     */
+    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper)
     {
-        $this->listModel = $listModel;
+        $this->listModel   = $listModel;
+        $this->aliasHelper = $aliasHelper;
     }
 
     /**
@@ -41,6 +49,8 @@ class FieldAliasKeywordValidator extends ConstraintValidator
      */
     public function validate($field, Constraint $constraint)
     {
+        $this->aliasHelper->makeAliasUnique($field);
+
         $segmentChoices = $this->listModel->getChoiceFields();
 
         if (isset($segmentChoices[$field->getObject()][$field->getAlias()])) {
