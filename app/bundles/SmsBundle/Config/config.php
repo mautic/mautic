@@ -116,7 +116,7 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.lead.model.lead',
                     'mautic.channel.model.queue',
-                    'mautic.sms.api',
+                    'mautic.sms.transport_chain',
                 ],
             ],
         ],

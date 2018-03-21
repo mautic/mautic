@@ -70,6 +70,7 @@ class TwilioApi extends AbstractSmsApi
      */
     protected function sanitizeNumber($number)
     {
+        return $number;
         $util   = PhoneNumberUtil::getInstance();
         $parsed = $util->parse($number, 'US');
 

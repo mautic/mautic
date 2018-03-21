@@ -72,7 +72,7 @@ class TransportChain
         $enabled = $this->getEnabledTransports();
 
         if (!array_key_exists($this->primaryTransport, $enabled)) {
-            throw new \Exception('Primary SMS transport is not enabled.');
+            throw new \Exception('Primary SMS transport is not enabled. '.$this->primaryTransport);
         }
 
         return $enabled[$this->primaryTransport];
@@ -116,7 +116,10 @@ class TransportChain
         $enabled = [];
         foreach ($this->transports as $alias=>$transport) {
             if (!isset($transport['published'])) {
-                $integration              = $this->integrationHelper->getIntegrationObject($transport['integrationAlias']);
+                $integration = $this->integrationHelper->getIntegrationObject($transport['integrationAlias']);
+                if (!$integration) {
+                    continue;
+                }
                 $transport['published']   = $integration->getIntegrationSettings()->getIsPublished();
                 $this->transports[$alias] = $transport;
             }
