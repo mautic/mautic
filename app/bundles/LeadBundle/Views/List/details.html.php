@@ -128,7 +128,7 @@ $view['slots']->set(
                         <div class="col-sm-5">
                             <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="<?php echo $view['translator']->trans('mautic.lead.lead.filter.bundles.include.placeholder'); ?>">
                                 <?php foreach ($events['types'] as $typeKey => $typeName) : ?>
-                                    <option value="<?php echo $typeKey; ?>">
+                                    <option value="<?php echo $view->escape($typeKey); ?>">
                                         <?php echo $typeName; ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -165,6 +165,6 @@ $view['slots']->set(
         <?php // echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]);?>
     </div>
     <!--/ right section -->
-    <input name="entityId" id="entityId" type="hidden" value="<?php echo $list->getId(); ?>" />
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $view->escape($list->getId()); ?>" />
 </div>
 <!--/ end: box layout -->

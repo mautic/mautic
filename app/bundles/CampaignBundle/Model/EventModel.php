@@ -403,6 +403,8 @@ class EventModel extends CommonFormModel
                             // non-action paths should not be processed by this because the contact already took action in order to get here
                             $childrenTriggered = true;
                             $this->logger->debug('CAMPAIGN: '.ucfirst($child['eventType']).' ID# '.$child['id'].' has a decision path of no');
+
+                            continue;
                         } else {
                             $this->logger->debug('CAMPAIGN: '.ucfirst($child['eventType']).' ID# '.$child['id'].' is being processed');
                         }

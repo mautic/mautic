@@ -59,7 +59,7 @@
 <!-- dropped coordinates -->
 <input type="hidden" value="" id="droppedX"/>
 <input type="hidden" value="" id="droppedY"/>
-<input type="hidden" value="<?php echo $campaignId; ?>" id="campaignId"/>
+<input type="hidden" value="<?php echo $view->escape($campaignId); ?>" id="campaignId"/>
 
 <?php echo $view->render(
     'MauticCoreBundle:Helper:modal.html.php',

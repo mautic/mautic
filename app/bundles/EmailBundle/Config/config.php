@@ -170,7 +170,10 @@ return [
                 ],
             ],
             'mautic.email.leadbundle.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\LeadSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'mautic.email.repository.emailReply',
+                ],
             ],
             'mautic.email.pointbundle.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\PointSubscriber',
@@ -467,6 +470,13 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
+                ],
+            ],
+            'mautic.email.repository.emailReply' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\EmailReply::class,
                 ],
             ],
             'mautic.email.repository.stat' => [
