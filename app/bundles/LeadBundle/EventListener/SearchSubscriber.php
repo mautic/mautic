@@ -172,19 +172,18 @@ class SearchSubscriber extends CommonSubscriber
             case $this->translator->trans('mautic.lead.lead.searchcommand.email_pending', [], null, 'en_US'):
                     $this->buildEmailPendingQuery($event);
                 break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_channel'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_channel', [], null, 'en_US'):
-            $this->buildClicksChannelQuery($event);
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source', [], null, 'en_US'):
+            $this->buildPageHitSourceQuery($event);
                 break;
 
-            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_channel_id'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_channel_id', [], null, 'en_US'):
-            $this->buildClicksChannelIdQuery($event);
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source_id', [], null, 'en_US'):
+            $this->buildPageHitSourceIdQuery($event);
                 break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_url'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_url', [], null, 'en_US'):
-            die(print_r('test'));
-                $this->buildClicksUrlQuery($event);
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_id', [], null, 'en_US'):
+                $this->buildPageHitIdQuery($event);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent', [], null, 'en_US'):
@@ -251,19 +250,19 @@ class SearchSubscriber extends CommonSubscriber
     /**
      * @param LeadBuildSearchEvent $event
      */
-    private function buildClicksChannelQuery(LeadBuildSearchEvent $event)
+    private function buildPageHitSourceQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
             [
                 'from_alias' => 'l',
                 'table'      => 'page_hits',
-                'alias'      => 'ph_channel',
-                'condition'  => 'l.id = ph_channel.lead_id',
+                'alias'      => 'ph',
+                'condition'  => 'l.id = ph.lead_id',
             ],
         ];
 
         $config = [
-            'column' => 'ph_channel.source',
+            'column' => 'ph.source',
         ];
 
         $this->buildJoinQuery($event, $tables, $config);
@@ -272,19 +271,19 @@ class SearchSubscriber extends CommonSubscriber
     /**
      * @param LeadBuildSearchEvent $event
      */
-    private function buildClicksChannelIdQuery(LeadBuildSearchEvent $event)
+    private function buildPageHitSourceIdQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
             [
                 'from_alias' => 'l',
                 'table'      => 'page_hits',
-                'alias'      => 'ph_id',
-                'condition'  => 'l.id = ph_id.lead_id',
+                'alias'      => 'ph',
+                'condition'  => 'l.id = ph.lead_id',
             ],
         ];
 
         $config = [
-            'column' => 'ph_id.source_id',
+            'column' => 'ph.source_id',
         ];
 
         $this->buildJoinQuery($event, $tables, $config);
@@ -293,19 +292,19 @@ class SearchSubscriber extends CommonSubscriber
     /**
      * @param LeadBuildSearchEvent $event
      */
-    private function buildClicksUrlQuery(LeadBuildSearchEvent $event)
+    private function buildPageHitIdQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
             [
                 'from_alias' => 'l',
                 'table'      => 'page_hits',
-                'alias'      => 'ph_url',
-                'condition'  => 'l.id = ph_url.lead_id',
+                'alias'      => 'ph',
+                'condition'  => 'l.id = ph.lead_id',
             ],
         ];
 
         $config = [
-            'column' => 'ph_url.url',
+            'column' => 'ph.redirect_id',
         ];
         $this->buildJoinQuery($event, $tables, $config);
     }

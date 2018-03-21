@@ -14,7 +14,6 @@
                     $totalClicks       = 0;
                     $totalUniqueClicks = 0;
                     foreach ($trackables as $link):
-                        die(print_r($link));
                         $totalClicks += $link['hits'];
                         $totalUniqueClicks += $link['unique_hits'];
                         ?>
@@ -25,9 +24,9 @@
                                 <span class="mt-xs label label-primary has-click-event clickable-stat">
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_read').':']
+                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.page_source').':email '.$view['translator']->trans('mautic.lead.lead.searchcommand.page_source_id').':'.$email->getId().' '.$view['translator']->trans('mautic.lead.lead.searchcommand.page_id').':'.$link['id']]
                             ); ?>" data-toggle="tooltip"
-                               title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
+                               title="<?php echo $view['translator']->trans('mautic.email.stat.simple.tooltip'); ?>">
                                <?php echo $link['unique_hits']; ?>
                             </a>
                         </span>
@@ -42,9 +41,9 @@
                         <span class="mt-xs label label-primary has-click-event clickable-stat">
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_read').':']
+                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.page_source').':email '.$view['translator']->trans('mautic.lead.lead.searchcommand.page_source_id').':'.$email->getId()]
                             ); ?>" data-toggle="tooltip"
-                               title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
+                               title="<?php echo $view['translator']->trans('mautic.email.stat.simple.tooltip'); ?>">
                         <?php echo $totalUniqueClicks; ?>
                             </a>
                         </span>
