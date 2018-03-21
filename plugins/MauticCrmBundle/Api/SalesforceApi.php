@@ -491,6 +491,39 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param array $names
+     * @param null  $requiredFieldString
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function getCompaniesByName(array $names, $requiredFieldString)
+    {
+        $names     = array_map([$this, 'escapeQueryValue'], $names);
+        $queryUrl  = $this->integration->getQueryUrl();
+        $findQuery = 'select Id, '.$requiredFieldString.' from Account where isDeleted = false and Name in (\''.implode("','", $names).'\')';
+
+        return $this->request('query', ['q' => $findQuery], 'GET', false, null, $queryUrl);
+    }
+
+    /**
+     * @param array $ids
+     * @param       $requiredFieldString
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function getCompaniesById(array $ids, $requiredFieldString)
+    {
+        $findQuery = 'select isDeleted, Id, '.$requiredFieldString.' from Account where  Id in (\''.implode("','", $ids).'\')';
+        $queryUrl  = $this->integration->getQueryUrl();
+
+        return $this->request('queryAll', ['q' => $findQuery], 'GET', false, null, $queryUrl);
+    }
+
+    /**
      * @param mixed $response
      * @param bool  $isRetry
      *
