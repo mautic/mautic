@@ -172,6 +172,20 @@ class SearchSubscriber extends CommonSubscriber
             case $this->translator->trans('mautic.lead.lead.searchcommand.email_pending', [], null, 'en_US'):
                     $this->buildEmailPendingQuery($event);
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_channel'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_channel', [], null, 'en_US'):
+            $this->buildClicksChannelQuery($event);
+                break;
+
+            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_channel_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_channel_id', [], null, 'en_US'):
+            $this->buildClicksChannelIdQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_url'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.clicks_url', [], null, 'en_US'):
+            die(print_r('test'));
+                $this->buildClicksUrlQuery($event);
+                break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent', [], null, 'en_US'):
                     $this->buildSmsSentQuery($event);
@@ -231,6 +245,68 @@ class SearchSubscriber extends CommonSubscriber
             ],
         ];
 
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildClicksChannelQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'page_hits',
+                'alias'      => 'ph_channel',
+                'condition'  => 'l.id = ph_channel.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'ph_channel.source',
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildClicksChannelIdQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'page_hits',
+                'alias'      => 'ph_id',
+                'condition'  => 'l.id = ph_id.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'ph_id.source_id',
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildClicksUrlQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'page_hits',
+                'alias'      => 'ph_url',
+                'condition'  => 'l.id = ph_url.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'ph_url.url',
+        ];
         $this->buildJoinQuery($event, $tables, $config);
     }
 
@@ -396,7 +472,6 @@ class SearchSubscriber extends CommonSubscriber
         }
 
         $this->leadRepo->applySearchQueryRelationship($q, $tables, true, $expr);
-
         $event->setReturnParameters(true); // replace search string
         $event->setStrict(true);           // don't use like
         $event->setSearchStatus(true);     // finish searching
