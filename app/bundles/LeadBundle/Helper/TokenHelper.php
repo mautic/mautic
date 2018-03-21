@@ -26,6 +26,10 @@ class TokenHelper
      */
     public static function findLeadTokens($content, $lead, $replace = false)
     {
+        if (!$lead) {
+            return $replace ? $content : [];
+        }
+
         // Search for bracket or bracket encoded
         // @deprecated BC support for leadfield
         $tokenRegex = [
