@@ -46,6 +46,9 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.sms.configbundle.subscriber' => [
+                'class' => Mautic\SmsBundle\EventListener\ConfigSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.sms' => [
@@ -65,6 +68,11 @@ return [
             'mautic.form.type.sms_list' => [
                 'class' => 'Mautic\SmsBundle\Form\Type\SmsListType',
                 'alias' => 'sms_list',
+            ],
+            'mautic.form.type.sms.config.form' => [
+                'class'     => \Mautic\SmsBundle\Form\Type\ConfigType::class,
+                'alias'     => 'smsconfig',
+                'arguments' => ['mautic.sms.transport_chain', 'translator'],
             ],
         ],
         'helpers' => [
@@ -103,7 +111,7 @@ return [
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
-                'alias' => 'mautic.sms.config.transport.twilio',
+                'alias' => 'mautic.sms.transport.twilio',
                 'tags'  => [
                     'name' => 'mautic.sms_transport', 'Twilio',
                 ],
