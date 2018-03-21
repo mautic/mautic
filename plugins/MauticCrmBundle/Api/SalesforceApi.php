@@ -325,14 +325,17 @@ class SalesforceApi extends CrmApi
     {
         $queryUrl = $this->integration->getQueryUrl();
 
+        if (defined('MAUTIC_ENV') && MAUTIC_ENV === 'dev') {
+            // Easier for testing
+            $this->requestSettings['headers']['Sforce-Query-Options'] = 'batchSize=200';
+        }
+
         if (!is_array($query)) {
             return $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
         }
 
         if (!empty($query['nextUrl'])) {
-            $queryType = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
-
-            return $this->request('query'.$queryType, [], 'GET', false, null, $queryUrl);
+            return $this->request(null, [], 'GET', false, null, $query['nextUrl']);
         }
 
         $organizationCreatedDate = $this->getOrganizationCreatedDate();
@@ -352,7 +355,7 @@ class SalesforceApi extends CrmApi
 
             $ignoreConvertedLeads = ($object == 'Lead') ? ' and ConvertedContactId = NULL' : '';
 
-            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end']
+            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
                 .$ignoreConvertedLeads;
 
             return $this->request('queryAll', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
@@ -421,7 +424,7 @@ class SalesforceApi extends CrmApi
 
         $query = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
         if ($modifiedSince) {
-            $query .= ' and LastModifiedDate >= '.$modifiedSince;
+            $query .= ' and SystemModStamp >= '.$modifiedSince;
         }
 
         $results = $this->request(null, ['q' => $query], 'GET', false, null, $queryUrl);

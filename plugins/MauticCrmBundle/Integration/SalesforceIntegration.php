@@ -908,7 +908,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         break;
                     }
 
-                    $params['nextUrl']  = $nextUrl;
+                    $query['nextUrl']  = $nextUrl;
                 }
 
                 if ($progress) {
