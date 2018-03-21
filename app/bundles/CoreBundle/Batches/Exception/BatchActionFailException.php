@@ -21,7 +21,7 @@ class BatchActionFailException extends \Exception
      */
     public static function unknownActionTypeInGroup($actionType, BatchGroupInterface $batchGroup)
     {
-        return new BatchActionFailException(sprintf(
+        return new self(sprintf(
             'Unknown batch action type "%s" in group %s. Please check registration inside group class.',
             $actionType,
             $batchGroup
@@ -35,7 +35,7 @@ class BatchActionFailException extends \Exception
      */
     public static function sourceAdapterNotSet()
     {
-        return new BatchActionFailException('Source adapter must be set to run a batch action.');
+        return new self('Source adapter must be set to run a batch action.');
     }
 
     /**
@@ -45,6 +45,18 @@ class BatchActionFailException extends \Exception
      */
     public static function handlerAdapterNotSet()
     {
-        return new BatchActionFailException('Handler adapter must be set to run a batch action.');
+        return new self('Handler adapter must be set to run a batch action.');
+    }
+
+    /**
+     * Thrown when you try to pass a source to a handler unless it is implemented.
+     *
+     * @param object $object
+     *
+     * @return BatchActionFailException
+     */
+    public static function sourceInHandlerNotImplementedYet($object)
+    {
+        return new self(sprintf('Source of class %s hasn\'t been implemented in this handler yet', get_class($object)));
     }
 }
