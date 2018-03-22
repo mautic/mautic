@@ -5,6 +5,20 @@
         <title>{pagetitle}</title>
         <meta name="description" content="{pagemetadescription}">
         {% endif %}
+        <style type="text/css" media="only screen and (max-width: 480px)">
+            /* Mobile styles */
+            @media only screen and (max-width: 480px) {
+
+                [class="w320"] {
+                    width: 320px !important;
+                }
+
+                [class="mobile-block"] {
+                    width: 100% !important;
+                    display: block !important;
+                }
+            }
+        </style>
     </head>
     <body>
         {{ outputScripts('bodyOpen') }}

@@ -3,15 +3,29 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         {% if page is defined %}
-        <title>{pagetitle}</title>
+            <title>{pagetitle}</title>
             <meta name="description" content="{pagemetadescription}">
-            {% endif %}
-        {% block stylesheets %}{% endblock %}
-            {{ outputHeadDeclarations() }}
-    </head>
-    <body>
-        {{ outputScripts('bodyOpen') }}
-        {% block content %}{% endblock %}
-        {{ outputScripts('bodyClose') }}
-    </body>
+        {% endif %}
+    {% block stylesheets %}{% endblock %}
+    {{ outputHeadDeclarations() }}
+    <style type="text/css" media="only screen and (max-width: 480px)">
+        /* Mobile styles */
+        @media only screen and (max-width: 480px) {
+
+            [class="w320"] {
+                width: 320px !important;
+            }
+
+            [class="mobile-block"] {
+                width: 100% !important;
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    {{ outputScripts('bodyOpen') }}
+{% block content %}{% endblock %}
+{{ outputScripts('bodyClose') }}
+</body>
 </html>

@@ -6,6 +6,20 @@
             <title>{{ page.getTitle() }}</title>
             <meta name="description" content="{{ page.metaDescription }}" />
         {% endif %}
+        <style type="text/css" media="only screen and (max-width: 480px)">
+            /* Mobile styles */
+            @media only screen and (max-width: 480px) {
+
+                [class="w320"] {
+                    width: 320px !important;
+                }
+
+                [class="mobile-block"] {
+                    width: 100% !important;
+                    display: block !important;
+                }
+            }
+        </style>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" type="text/css" />
         <link rel="stylesheet" href="{{ getAssetUrl('themes/coffee/css/coffee.css') }}" type="text/css" />

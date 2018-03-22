@@ -11,6 +11,20 @@
         <script type="text/javascript" src="{{ getAssetUrl('themes/'~template~'/js/jquery.min.js')}}"></script>
         <script type="text/javascript" src="{{ getAssetUrl('themes/'~template~'/js/parallax-element.js')}}"></script>
         <script type="text/javascript" src="{{ getAssetUrl('themes/'~template~'/js/extras.js')}}"></script>
+        <style type="text/css" media="only screen and (max-width: 480px)">
+            /* Mobile styles */
+            @media only screen and (max-width: 480px) {
+
+                [class="w320"] {
+                    width: 320px !important;
+                }
+
+                [class="mobile-block"] {
+                    width: 100% !important;
+                    display: block !important;
+                }
+            }
+        </style>
     </head>
     <body id="bodyTag">
         {{ outputScripts('bodyOpen') }}

@@ -8,6 +8,20 @@
         <link rel="stylesheet"href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" />
         <link rel="stylesheet" href="{{ getAssetUrl('themes/'~template~'/css/oxygen.css') }}" type="text/css" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style type="text/css" media="only screen and (max-width: 480px)">
+            /* Mobile styles */
+            @media only screen and (max-width: 480px) {
+
+                [class="w320"] {
+                    width: 320px !important;
+                }
+
+                [class="mobile-block"] {
+                    width: 100% !important;
+                    display: block !important;
+                }
+            }
+        </style>
     </head>
     <body>
         {{ outputScripts('bodyOpen') }}
