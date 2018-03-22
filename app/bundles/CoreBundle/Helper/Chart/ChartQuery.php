@@ -215,9 +215,10 @@ class ChartQuery extends AbstractChart
      * Modify database query for fetching the line time chart data.
      *
      * @param QueryBuilder $query
-     * @param string       $column      name
+     * @param string       $column       name
      * @param string       $tablePrefix
      * @param string       $countColumn
+     * @param bool|string  $isEnumerable true = COUNT, string sum = SUM
      */
     public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
     {
@@ -234,6 +235,8 @@ class ChartQuery extends AbstractChart
 
         if ($isEnumerable === true) {
             $count = 'COUNT('.$countColumn.') AS count';
+        } elseif ($isEnumerable == 'sum') {
+            $count = 'SUM('.$countColumn.') AS count';
         } else {
             $count = $countColumn.' AS count';
         }
