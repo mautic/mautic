@@ -2,8 +2,8 @@
 <html>
     <head>
         {% if page is defined %}
-            <title>{pagetitle}</title>
-            <meta name="description" content="{pagemetadescription}">
+        <title>{pagetitle}</title>
+        <meta name="description" content="{pagemetadescription}">
         {% endif %}
         <style type="text/css" media="only screen and (max-width: 480px)">
             /* Mobile styles */
@@ -22,7 +22,7 @@
     </head>
     <body>
         {{ outputScripts('bodyOpen') }}
-    {% block content %}{% endblock %}
-    {{ outputScripts('bodyClose') }}
+        {% block content %}{% endblock %}
+        {{ outputScripts('bodyClose') }}
 </body>
 </html>
