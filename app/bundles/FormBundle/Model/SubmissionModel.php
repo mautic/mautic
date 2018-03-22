@@ -1168,7 +1168,7 @@ class SubmissionModel extends CommonFormModel
             $formResults[$key]['entity'] = $entity[0];
             $form                        = $entity[0];
             $start                       = 0;
-            $limit                       = 999;
+            $limit                       = 99;
             $orderBy                     = 's.date_submitted';
             $orderByDir                  = 'DESC';
             $filters                     = [];
