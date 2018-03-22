@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -209,10 +210,7 @@ class Form extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->createField('inContactTab', 'boolean')
-            ->columnName('in_contact_tab')
-            ->nullable()
-            ->build();
+        $builder->addNullableField('inContactTab', Type::BOOLEAN, 'in_contact_tab');
 
         $builder->createOneToMany('submissions', 'Submission')
             ->setOrderBy(['dateSubmitted' => 'DESC'])
@@ -747,9 +745,9 @@ class Form extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getInContactTab()
+    public function isInContactTab()
     {
         return $this->inContactTab;
     }

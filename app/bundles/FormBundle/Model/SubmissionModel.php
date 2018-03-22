@@ -1132,11 +1132,10 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Return Forms with results to contacts tab
-     *ľ.
+     * Return Forms with results to contacts tab.
      *
-     * @param null $leadId
-     * @param bool $inContactTab
+     * @param int|null $leadId
+     * @param bool     $inContactTab
      *
      * @return array
      */
@@ -1155,10 +1154,8 @@ class SubmissionModel extends CommonFormModel
             ['form:forms:viewown', 'form:forms:viewother'],
             'RETURN_ARRAY'
         );
-        if ($permissions['form:forms:viewown'] || $permissions['form:forms:viewother']) {
-            if (!$permissions['form:forms:viewother']) {
-                $filters[] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->userHelper->getUser()->getId()];
-            }
+        if ($permissions['form:forms:viewown'] && !$permissions['form:forms:viewother']) {
+            $filters[] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->userHelper->getUser()->getId()];
         }
 
         $formEntities = $this->formModel->getEntities(
