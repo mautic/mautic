@@ -111,6 +111,7 @@ class FormType extends AbstractType
             'attr'  => [
                 'tooltip' => 'mautic.form.form.contacttab.tooltip',
             ],
+            'data'=> $options['data']->isInContactTab() ? true : false,
         ]);
 
         // Render style for new form by default
