@@ -11,7 +11,9 @@
 
 namespace Mautic\SmsBundle\Controller\Api;
 
+use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -20,6 +22,8 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class SmsApiController extends CommonApiController
 {
+    use LeadAccessTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -31,6 +35,56 @@ class SmsApiController extends CommonApiController
         $this->entityNameMulti = 'smses';
 
         parent::initialize($event);
+    }
+
+    /**
+     * Send sms to contact.
+     *
+     * @param int $id     Email ID
+     * @param int $leadId Contact ID
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function sendContactAction($id, $leadId)
+    {
+        $integration =  $this->get('mautic.helper.integration')->getIntegrationObject('Twilio');
+
+        if (!$integration || !$integration->getIntegrationSettings()->getIsPublished()) {
+            return $this->notFound();
+        }
+
+        $success = 0;
+        $entity  = $this->model->getEntity($id);
+        if (null !== $entity) {
+            if (!$this->checkEntityAccess($entity, 'view')) {
+                return $this->accessDenied();
+            }
+
+            $lead = $this->checkLeadAccess($leadId, 'edit');
+            if ($lead instanceof Response) {
+                return $lead;
+            }
+
+            $result = $this->model->sendSms($entity, $lead, ['channel' => 'api'])[$lead->getId()];
+            if (!empty($result['sent'])) {
+                $success = 1;
+            }
+
+            $view = $this->view(
+                [
+                    'success'           => $success,
+                    'status'            => $this->get('translator')->trans($result['status']),
+                    'result'            => $result,
+                ],
+                Codes::HTTP_OK
+            );
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
     }
 
     /**
