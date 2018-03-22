@@ -22,10 +22,10 @@
             }
         }
     </style>
-</head>
-<body>
-    {{ outputScripts('bodyOpen') }}
-{% block content %}{% endblock %}
-{{ outputScripts('bodyClose') }}
-</body>
+    </head>
+    <body>
+        {{ outputScripts('bodyOpen') }}
+        {% block content %}{% endblock %}
+        {{ outputScripts('bodyClose') }}
+    </body>
 </html>
