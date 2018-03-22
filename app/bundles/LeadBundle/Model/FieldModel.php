@@ -399,36 +399,7 @@ class FieldModel extends FormModel
         $objects = ['lead' => 'leads', 'company' => 'companies'];
         $alias   = $entity->getAlias();
         $object  = $objects[$entity->getObject()];
-
-        if ($isNew) {
-            if (empty($alias)) {
-                $alias = $entity->getName();
-            }
-
-            // clean the alias
-            $alias = $this->cleanAlias($alias, 'f_', 25);
-
-            // make sure alias is not already taken
-            $repo      = $this->getRepository();
-            $testAlias = $alias;
-            $aliases   = $repo->getAliases($entity->getId(), false, true, $entity->getObject());
-            $count     = (int) in_array($testAlias, $aliases);
-            $aliasTag  = $count;
-
-            while ($count) {
-                $testAlias = $alias.$aliasTag;
-                $count     = (int) in_array($testAlias, $aliases);
-                ++$aliasTag;
-            }
-
-            if ($testAlias != $alias) {
-                $alias = $testAlias;
-            }
-
-            $entity->setAlias($alias);
-        }
-
-        $type = $entity->getType();
+        $type    = $entity->getType();
 
         if ($type == 'time') {
             //time does not work well with list filters
