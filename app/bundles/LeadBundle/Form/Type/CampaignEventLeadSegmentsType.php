@@ -28,7 +28,7 @@ class CampaignEventLeadSegmentsType extends AbstractType
             'segments',
             'leadlist_choices',
             [
-                'global_only' => true,
+                'global_only' => false,
                 'label'       => 'mautic.lead.lead.lists',
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => true,
