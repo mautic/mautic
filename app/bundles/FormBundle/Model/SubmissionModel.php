@@ -1134,12 +1134,12 @@ class SubmissionModel extends CommonFormModel
     /**
      * Return Forms with results to contacts tab.
      *
-     * @param int|null $leadId
-     * @param bool     $inContactTab
+     * @param int  $leadId
+     * @param bool $inContactTab
      *
      * @return array
      */
-    public function getFormsWithResults($leadId = null, $inContactTab = false)
+    public function getFormsWithResults($leadId, $inContactTab = false)
     {
         $formResults    = [];
         $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];

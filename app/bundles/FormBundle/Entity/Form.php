@@ -753,7 +753,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @param mixed $inContactTab
+     * @param bool $inContactTab
      */
     public function setInContactTab($inContactTab)
     {
