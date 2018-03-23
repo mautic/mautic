@@ -3,9 +3,9 @@
     <?php foreach ($leadForms as $key => $leadForm): ?>
         <li<?php if ($key == 0): ?> class="active"<?php endif; ?>>
             <a href="#form-<?php echo $leadForm['entity']->getAlias() ?>" role="tab" data-toggle="tab">
-       <span class="label label-primary mr-sm" id="form-label-<?php echo $leadForm['entity']->getAlias() ?>">
-           <?php echo $leadForm['results']['count']; ?>
-       </span>
+                <span class="label label-primary mr-sm" id="form-label-<?php echo $leadForm['entity']->getAlias() ?>">
+                    <?php echo $leadForm['results']['count']; ?>
+                </span>
                 <?php echo $leadForm['entity']->getName(); ?>
             </a>
         </li>
