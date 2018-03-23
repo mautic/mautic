@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -1095,6 +1096,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
         try {
             if ($this->isAuthorized()) {
+                if (!is_null($lead->getOwner())) {
+                    $sugarOwnerId = $this->getApiHelper()->getIdBySugarEmail(['emails' => [$lead->getOwner()->getEmail()]]);
+                    if (!empty($sugarOwnerId)) {
+                        $mappedData[$object]['assigned_user_id'] = array_values($sugarOwnerId)[0];
+                    }
+                }
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
                 if (isset($createdLeadData['id'])) {
                     if (empty($integrationId)) {

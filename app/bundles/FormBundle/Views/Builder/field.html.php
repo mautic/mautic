@@ -151,7 +151,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                                         $label = $field->label;
                                         $value = $field->value;
                                         ?>
-                                        <option value="<?php echo $value?>" class="segment-filter <?php echo $icon; ?>" <?php if ($data === $value) {
+                                        <option value="<?php echo $view->escape($value) ?>" class="segment-filter <?php echo $icon; ?>" <?php if ($data === $value) {
                                             echo 'Selected';
                                         } ?> <?php echo $attrString; ?> ><?php echo $label; ?></option>
                                     <?php endforeach; ?>

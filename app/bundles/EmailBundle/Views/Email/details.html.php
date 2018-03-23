@@ -296,7 +296,7 @@ if (!$isEmbedded) {
                 <div class="input-group">
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly
-                           value="<?php echo $previewUrl; ?>"/>
+                           value="<?php echo $view->escape($previewUrl); ?>"/>
                     <span class="input-group-btn">
                         <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
                             <i class="fa fa-external-link"></i>
@@ -310,5 +310,5 @@ if (!$isEmbedded) {
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
-    <input name="entityId" id="entityId" type="hidden" value="<?php echo $email->getId(); ?>"/>
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $view->escape($email->getId()); ?>"/>
 </div>

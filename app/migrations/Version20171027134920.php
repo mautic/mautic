@@ -34,7 +34,7 @@ class Version20171027134920 extends AbstractMauticMigration
         $idx = $this->generatePropertyName('report_schedulers', 'idx', ['report_id']);
         $fk  = $this->generatePropertyName('report_schedulers', 'fk', ['report_id']);
 
-        $this->addSql("CREATE TABLE {$this->prefix}reports_schedulers (id INT AUTO_INCREMENT NOT NULL, report_id INT NOT NULL, schedule_date DATETIME NOT NULL COMMENT '(DC2Type:datetime)', INDEX $idx (report_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB");
+        $this->addSql("CREATE TABLE IF NOT EXISTS {$this->prefix}reports_schedulers (id INT AUTO_INCREMENT NOT NULL, report_id INT NOT NULL, schedule_date DATETIME NOT NULL COMMENT '(DC2Type:datetime)', INDEX $idx (report_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB");
         $this->addSql("ALTER TABLE {$this->prefix}reports_schedulers ADD CONSTRAINT $fk FOREIGN KEY (report_id) REFERENCES {$this->prefix}reports (id) ON DELETE CASCADE");
     }
 
