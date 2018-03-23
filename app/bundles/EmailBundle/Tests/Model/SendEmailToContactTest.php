@@ -11,13 +11,17 @@
 
 namespace Mautic\EmailBundle\Tests;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -320,6 +324,144 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $transport->getMetadatas());
 
         // We made it this far so all of the emails were processed despite a bad email in the batch
+    }
+
+    /**
+     * @testdox Test a tokenized transport that fills tokens correctly
+     *
+     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
+     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::send()
+     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
+     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
+     */
+    public function testBatchQueueContactsHaveTokensHydrated()
+    {
+        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+
+        $emailMock = $this->getMockBuilder(Email::class)
+            ->getMock();
+        $emailMock
+            ->method('getId')
+            ->will($this->returnValue(1));
+        $emailMock->method('getFromAddress')
+            ->willReturn('test@mautic.com');
+        $emailMock->method('getCustomHtml')
+            ->willReturn('Hi {contactfield=firstname}');
+
+        // Use our test token transport limiting to 1 recipient per queue
+        $transport = new BatchTransport(false, 1);
+        $mailer    = new \Swift_Mailer($transport);
+
+        // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
+        $factoryMock = $this->getMockBuilder(MauticFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $factoryMock->method('getParameter')
+            ->willReturnCallback(
+                function ($param) {
+                    switch ($param) {
+                        case 'mailer_spool_type':
+                            return 'memory';
+                        default:
+                            return '';
+                    }
+                }
+            );
+        $factoryMock->method('getLogger')
+            ->willReturn(
+                new NullLogger()
+            );
+
+        $mockEm = $this->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $factoryMock->method('getEntityManager')
+            ->willReturn($mockEm);
+
+        $mockDispatcher = $this->getMockBuilder(EventDispatcher::class)
+            ->getMock();
+        $mockDispatcher->method('dispatch')
+            ->willReturnCallback(
+                function ($eventName, EmailSendEvent $event) {
+                    $lead = $event->getLead();
+
+                    $tokens = [];
+                    foreach ($lead as $field => $value) {
+                        $tokens["{contactfield=$field}"] = $value;
+                    }
+                    $tokens['{hash}'] = $event->getIdHash();
+
+                    $event->addTokens($tokens);
+                }
+            );
+        $factoryMock->method('getDispatcher')
+            ->willReturn($mockDispatcher);
+        $routerMock = $this->getMockBuilder(Router::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $factoryMock->method('getRouter')
+            ->willReturn($routerMock);
+
+        $copyRepoMock = $this->getMockBuilder(CopyRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailModelMock = $this->getMockBuilder(EmailModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailModelMock->method('getCopyRepository')
+            ->willReturn($copyRepoMock);
+
+        $factoryMock->method('getModel')
+            ->willReturn($emailModelMock);
+
+        $mailHelper = $this->getMockBuilder(MailHelper::class)
+            ->setConstructorArgs([$factoryMock, $mailer])
+            ->setMethods(null)
+            ->getMock();
+
+        // Enable queueing
+        $mailHelper->enableQueue();
+
+        $statRepository = $this->getMockBuilder(StatRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $statRepository->method('saveEntity')
+            ->willReturnCallback(
+                function (Stat $stat) {
+                    $tokens = $stat->getTokens();
+                    $this->assertGreaterThan(1, count($tokens));
+                    $this->assertEquals($stat->getTrackingHash(), $tokens['{hash}']);
+                }
+            );
+
+        $dncModel = $this->getMockBuilder(DoNotContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $statHelper = new StatHelper($statRepository);
+
+        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
+        $model->setEmail($emailMock);
+
+        foreach ($this->contacts as $contact) {
+            try {
+                $model->setContact($contact)
+                    ->send();
+            } catch (FailedToSendToContactException $exception) {
+                // We're good here
+            } catch (BatchQueueMaxException $exception) {
+                $this->fail('BatchQueueMaxException thrown');
+            }
+        }
+
+        $model->finalFlush();
+
+        // Our fake transport should have processed 3 metadatas
+        $this->assertCount(4, $transport->getMetadatas());
     }
 
     /**
