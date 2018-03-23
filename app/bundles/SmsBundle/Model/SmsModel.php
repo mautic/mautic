@@ -263,6 +263,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             }
 
             $stats = [];
+            // @todo we should allow batch sending based on transport, MessageBird does support 20 SMS at once
+            // the transport chain is already prepared for it
             if (count($contacts)) {
                 /** @var Lead $lead */
                 foreach ($contacts as $lead) {

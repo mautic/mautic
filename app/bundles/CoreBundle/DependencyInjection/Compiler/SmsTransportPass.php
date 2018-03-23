@@ -12,10 +12,12 @@
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\RepeatablePassInterface;
+use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class SmsTransportPass implements CompilerPassInterface
+class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
 {
     public function process(ContainerBuilder $container)
     {
@@ -38,5 +40,10 @@ class SmsTransportPass implements CompilerPassInterface
                     $integrationId,
                 ]);
         }
+    }
+
+    public function setRepeatedPass(RepeatedPass $repeatedPass)
+    {
+        $this->repeatedPass = $repeatedPass;
     }
 }

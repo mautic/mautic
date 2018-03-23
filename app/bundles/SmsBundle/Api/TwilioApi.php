@@ -55,7 +55,9 @@ class TwilioApi extends AbstractSmsApi
 
             $keys = $integration->getDecryptedApiKeys();
 
-            $this->client = new \Services_Twilio($keys['username'], $keys['password']);
+            if (isset($keys['username']) && isset($keys['password'])) {
+                $this->client = new \Services_Twilio($keys['username'], $keys['password']);
+            }
         }
 
         parent::__construct($pageTrackableModel);

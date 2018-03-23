@@ -162,6 +162,10 @@ return [
                 'path'            => '/smses',
                 'controller'      => 'MauticSmsBundle:Api\SmsApi',
             ],
+            'mautic_api_smses_send' => [
+                'path'       => '/smses/{id}/contact/{contactId}/send',
+                'controller' => 'MauticSmsBundle:Api\SmsApi:send',
+            ],
         ],
     ],
     'menu' => [
