@@ -845,7 +845,6 @@ class EventModel extends CommonFormModel
 
             // Get a count
             $events = $repo->getScheduledEvents($campaignId, false, $limit);
-            $this->logger->debug('CAMPAIGN: events #'.print_r($events, true));
 
             if (empty($events)) {
                 unset($campaignEvents, $event, $leads, $eventSettings);
