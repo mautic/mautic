@@ -22,13 +22,17 @@
                             <td class="text-center"><?php echo $link['hits']; ?></td>
                             <td class="text-center">
                                 <span class="mt-xs label label-primary has-click-event clickable-stat">
+                        <?php if (isset($channel) && isset($entity)): ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.page_source').':email '.$view['translator']->trans('mautic.lead.lead.searchcommand.page_source_id').':'.$email->getId().' '.$view['translator']->trans('mautic.lead.lead.searchcommand.page_id').':'.$link['id']]
+                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.page_source').':'.$channel.' '.$view['translator']->trans('mautic.lead.lead.searchcommand.page_source_id').':'.$entity->getId().' '.$view['translator']->trans('mautic.lead.lead.searchcommand.page_id').':'.$link['id']]
                             ); ?>" data-toggle="tooltip"
                                title="<?php echo $view['translator']->trans('mautic.email.stat.simple.tooltip'); ?>">
                                <?php echo $link['unique_hits']; ?>
                             </a>
+                        <?php else: ?>
+                            <?php echo $link['unique_hits']; ?>
+                        <?php endif; ?>
                         </span>
                             <td><?php echo $link['redirect_id']; ?></td>
                         </tr>
@@ -39,13 +43,17 @@
                     <td class="text-center"><?php echo $totalClicks; ?></td>
                     <td class="text-center">
                         <span class="mt-xs label label-primary has-click-event clickable-stat">
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.page_source').':email '.$view['translator']->trans('mautic.lead.lead.searchcommand.page_source_id').':'.$email->getId()]
-                            ); ?>" data-toggle="tooltip"
-                               title="<?php echo $view['translator']->trans('mautic.email.stat.simple.tooltip'); ?>">
+                  <?php if (isset($channel) && isset($entity)): ?>
+                      <a href="<?php echo $view['router']->path(
+                          'mautic_contact_index',
+                          ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.page_source').':'.$channel.' '.$view['translator']->trans('mautic.lead.lead.searchcommand.page_source_id').':'.$entity->getId()]
+                      ); ?>" data-toggle="tooltip"
+                         title="<?php echo $view['translator']->trans('mautic.email.stat.simple.tooltip'); ?>">
                         <?php echo $totalUniqueClicks; ?>
                             </a>
+                  <?php else: ?>
+                      <?php echo $totalUniqueClicks; ?>
+                  <?php endif; ?>
                         </span>
                     </td>
                     <td></td>
