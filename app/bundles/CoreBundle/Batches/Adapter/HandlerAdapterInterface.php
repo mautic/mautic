@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\CoreBundle\Batches\Adapter;
 
 use Mautic\CoreBundle\Batches\Exception\BatchActionFailException;
@@ -8,8 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Via this interface you are able to define how to work with source.
- *
- * @author David Vurbs <david.vurbs@mautic.com>
  */
 interface HandlerAdapterInterface
 {

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\CoreBundle\Batches\Builder;
 
 use Mautic\CoreBundle\Batches\Action\BatchActionInterface;
@@ -8,8 +17,6 @@ use Mautic\CoreBundle\Batches\Adapter\SourceAdapterInterface;
 
 /**
  * Builder of batch action type. Simple way how to create a batch action.
- *
- * @author David Vurbs <david.vurbs@gmail.com>
  */
 interface BatchActionBuilderInterface
 {

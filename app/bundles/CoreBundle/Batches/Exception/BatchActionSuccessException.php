@@ -1,11 +1,18 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\CoreBundle\Batches\Exception;
 
 /**
  * Exception for handling success of an action run. Here should be set result attributions.
- *
- * @author David Vurbs <david.vurbs@mautic.com>
  */
 class BatchActionSuccessException extends \Exception
 {
