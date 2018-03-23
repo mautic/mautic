@@ -87,7 +87,7 @@ MauticJS.serialize = function(obj) {
 };
 
 MauticJS.documentReady = function(f) {
-    /in/.test(document.readyState) ? setTimeout('MauticJS.documentReady(' + f + ')', 9) : f();
+    /in/.test(document.readyState) ? setTimeout(function(){MauticJS.documentReady(f)}, 9) : f();
 };
 
 MauticJS.iterateCollection = function(collection) {
@@ -329,7 +329,7 @@ MauticJS.pixelLoaded = function(f) {
 */
 MauticJS.checkForTrackingPixel = function() {
     if (!/in/.test(document.readyState)) {
-        setTimeout('MauticJS.checkForTrackingPixel()', 9)
+        setTimeout(function(){MauticJS.checkForTrackingPixel()}, 9)
     } else {
         // Only fetch once a tracking pixel has been loaded
         var maxChecks  = 3000; // Keep it from indefinitely checking in case the pixel was never embedded

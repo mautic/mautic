@@ -222,6 +222,7 @@ class EmailRepository extends CommonRepository
                 $mqQb->expr()->eq('mq.channel_id', (int) $emailId)
             );
         }
+        $statQb->andWhere($statQb->expr()->isNotNull('stat.lead_id'));
         $mqQb->where($messageExpr);
 
         // Only include those who belong to the associated lead lists
