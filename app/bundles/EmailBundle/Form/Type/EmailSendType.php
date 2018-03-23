@@ -196,7 +196,7 @@ class EmailSendType extends AbstractType
             }
         }
         if (!empty($options['with_immediately'])) {
-            if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
+            if ($this->coreParametersHelper->getParameter('mailer_spool_type') === 'file') {
                 $default = (isset($options['data']['immediately'])) ? $options['data']['immediately'] : false;
                 $builder->add(
                 'immediately',
@@ -205,7 +205,7 @@ class EmailSendType extends AbstractType
                     'label' => 'mautic.form.action.sendemail.immediately',
                     'data'  => $default,
                     'attr'  => [
-                        'tooltip'    => 'mautic.form.action.sendemail.immediately.desc',
+                        'tooltip' => 'mautic.form.action.sendemail.immediately.desc',
                     ],
                 ]
             );
