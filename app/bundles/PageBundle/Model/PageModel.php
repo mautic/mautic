@@ -478,7 +478,7 @@ class PageModel extends FormModel
             list($company, $leadAdded, $companyEntity) =  IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
-            } else {
+            } elseif ($companyEntity instanceof Company) {
                 $this->companyModel->setFieldValues($companyEntity, $query);
                 $this->companyModel->saveEntity($companyEntity);
             }
