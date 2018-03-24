@@ -62,34 +62,34 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
         }
 
         switch ($constraint->getType()) {
-            case PhoneNumber::FIXED_LINE:
+            case PhoneNumberType::FIXED_LINE:
                 $validTypes = [PhoneNumberType::FIXED_LINE, PhoneNumberType::FIXED_LINE_OR_MOBILE];
                 break;
-            case PhoneNumber::MOBILE:
+            case PhoneNumberType::MOBILE:
                 $validTypes = [PhoneNumberType::MOBILE, PhoneNumberType::FIXED_LINE_OR_MOBILE];
                 break;
-            case PhoneNumber::PAGER:
+            case PhoneNumberType::PAGER:
                 $validTypes = [PhoneNumberType::PAGER];
                 break;
-            case PhoneNumber::PERSONAL_NUMBER:
+            case PhoneNumberType::PERSONAL_NUMBER:
                 $validTypes = [PhoneNumberType::PERSONAL_NUMBER];
                 break;
-            case PhoneNumber::PREMIUM_RATE:
+            case PhoneNumberType::PREMIUM_RATE:
                 $validTypes = [PhoneNumberType::PREMIUM_RATE];
                 break;
-            case PhoneNumber::SHARED_COST:
+            case PhoneNumberType::SHARED_COST:
                 $validTypes = [PhoneNumberType::SHARED_COST];
                 break;
-            case PhoneNumber::TOLL_FREE:
+            case PhoneNumberType::TOLL_FREE:
                 $validTypes = [PhoneNumberType::TOLL_FREE];
                 break;
-            case PhoneNumber::UAN:
+            case PhoneNumberType::UAN:
                 $validTypes = [PhoneNumberType::UAN];
                 break;
-            case PhoneNumber::VOIP:
+            case PhoneNumberType::VOIP:
                 $validTypes = [PhoneNumberType::VOIP];
                 break;
-            case PhoneNumber::VOICEMAIL:
+            case PhoneNumberType::VOICEMAIL:
                 $validTypes = [PhoneNumberType::VOICEMAIL];
                 break;
             default:
