@@ -12,7 +12,7 @@
 namespace Mautic\FormBundle\Validator\Constraint;
 
 use libphonenumber\NumberParseException;
-use libphonenumber\PhoneNumber as PhoneNumberObject;
+use libphonenumber\PhoneNumber;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberType;
 use libphonenumber\PhoneNumberUtil;
@@ -40,7 +40,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
 
         $phoneUtil = PhoneNumberUtil::getInstance();
 
-        if (false === $value instanceof PhoneNumberObject) {
+        if (false === $value instanceof PhoneNumber) {
             $value = (string) $value;
 
             try {
