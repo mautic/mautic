@@ -600,8 +600,8 @@ switch ($style) {
 
                 Focus.iframe = document.createElement('iframe');
                 Focus.iframe.style.border = 0;
-                Focus.iframe.style.width = "100%";
-                Focus.iframe.style.height = "100%";
+                Focus.iframe.style.width = "0";
+                Focus.iframe.style.height = "0";
                 Focus.iframe.src = "about:blank";
                 Focus.iframe.scrolling = "no";
                 Focus.iframe.className = "<?php echo $iframeClass; ?>";
