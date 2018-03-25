@@ -61,6 +61,13 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
+        $lead = $event->getLead();
+        if ($lead->getEventData('pipedrive.webhook')) {
+            // Don't export what was just imported
+            return;
+        }
+
+        /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
         if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
@@ -68,7 +75,7 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         $this->leadExport->setIntegration($integrationObject);
-        $this->leadExport->update($event->getLead());
+        $this->leadExport->update($lead);
     }
 
     /**
@@ -76,6 +83,13 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadPostDelete(Events\LeadEvent $event)
     {
+        $lead = $event->getLead();
+        if ($lead->getEventData('pipedrive.webhook')) {
+            // Don't export what was just imported
+            return;
+        }
+
+        /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
         if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
@@ -83,7 +97,7 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         $this->leadExport->setIntegration($integrationObject);
-        $this->leadExport->delete($event->getLead());
+        $this->leadExport->delete($lead);
     }
 
     /**
@@ -91,6 +105,13 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event)
     {
+        $lead = $event->getLead();
+        if ($lead->getEventData('pipedrive.webhook')) {
+            // Don't export what was just imported
+            return;
+        }
+
+        /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
         if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
@@ -98,6 +119,6 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         $this->leadExport->setIntegration($integrationObject);
-        $this->leadExport->update($event->getLead());
+        $this->leadExport->update($lead);
     }
 }

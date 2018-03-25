@@ -9,9 +9,12 @@ use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
@@ -123,18 +126,26 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->run($input, $output);
     }
 
-    protected function installDatabaseFixtures()
+    /**
+     * @param array|null $paths
+     */
+    protected function installDatabaseFixtures(array $paths = null)
     {
-        $paths  = [
-            dirname(__DIR__).'/../InstallBundle/InstallFixtures/ORM',
-            // Default user and roles
-            dirname(__DIR__).'/../UserBundle/DataFixtures/ORM',
-        ];
+        if (null === $paths) {
+            $paths = [
+                dirname(__DIR__).'/../InstallBundle/InstallFixtures/ORM',
+                // Default user and roles
+                dirname(__DIR__).'/../UserBundle/DataFixtures/ORM',
+            ];
+        }
+
         $loader = new ContainerAwareLoader($this->container);
 
         foreach ($paths as $path) {
             if (is_dir($path)) {
                 $loader->loadFromDirectory($path);
+            } elseif (file_exists($path)) {
+                $loader->loadFromFile($path);
             }
         }
 
@@ -162,5 +173,37 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function getCsrfToken($intention)
     {
         return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention);
+    }
+
+    /**
+     * @param              $name
+     * @param array        $params
+     * @param Command|null $command
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    protected function runCommand($name, array $params = [], Command $command = null)
+    {
+        $params      = array_merge(['command' => $name], $params);
+        $kernel      = $this->container->get('kernel');
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        if ($command) {
+            if ($command instanceof ContainerAwareCommand) {
+                $command->setContainer($this->container);
+            }
+
+            // Register the command
+            $application->add($command);
+        }
+
+        $input  = new ArrayInput($params);
+        $output = new BufferedOutput();
+        $application->run($input, $output);
+
+        return $output->fetch();
     }
 }
