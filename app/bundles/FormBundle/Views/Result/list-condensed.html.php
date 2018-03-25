@@ -21,7 +21,6 @@ $formId = $form->getId();
                     'sessionVar' => 'formresult.'.$formId,
                     'text'       => 'mautic.form.result.thead.date',
                     'class'      => 'col-formresult-date',
-                    'default'    => true,
                     'dataToggle' => 'date',
                 ]);
 
