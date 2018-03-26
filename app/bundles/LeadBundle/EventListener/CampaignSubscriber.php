@@ -408,14 +408,32 @@ class CampaignSubscriber extends CommonSubscriber
 
         $lead    = $event->getLead();
         $company = $lead->getPrimaryCompany();
+        $config  = $event->getConfig();
 
         if (empty($company['id'])) {
             return;
         }
+
         $primaryCompany =  $this->companyModel->getEntity($company['id']);
 
-        $this->companyModel->setFieldValues($primaryCompany, $event->getConfig(), false);
-        $this->companyModel->saveEntity($primaryCompany);
+        if (isset($config['companyname']) && $primaryCompany->getName() != $config['companyname']) {
+            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($config, $lead, $this->companyModel);
+            if ($leadAdded) {
+                $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+            } elseif ($companyEntity instanceof Company) {
+                $this->companyModel->setFieldValues($companyEntity, $config);
+                $this->companyModel->saveEntity($companyEntity);
+            }
+
+            if (!empty($company)) {
+                // Save after the lead in for new leads created
+                $this->companyModel->addLeadToCompany($companyEntity, $lead);
+                $this->setPrimaryCompany($companyEntity->getId(), $lead->getId());
+            }
+        } else {
+            $this->companyModel->setFieldValues($primaryCompany, $config, false);
+            $this->companyModel->saveEntity($primaryCompany);
+        }
 
         return $event->setResult(true);
     }
