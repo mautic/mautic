@@ -615,12 +615,6 @@ return [
                 'arguments' => [],
             ],
         ],
-        'helpers' => [
-            'mautic.helper.form.asubmit' => [
-                'class'     => \Mautic\EmailBundle\Helper\FormSubmitHelper::class,
-                'arguments' => ['mautic.helper.core_parameters'],
-            ],
-        ],
         'commands' => [
             'mautic.email.command.fetch' => [
                 'class'     => \Mautic\EmailBundle\Command\ProcessFetchEmailCommand::class,

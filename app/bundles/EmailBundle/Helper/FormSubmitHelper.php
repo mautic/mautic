@@ -12,25 +12,11 @@
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\LeadBundle\Entity\Lead;
 
 class FormSubmitHelper
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
-    public function __construct(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
-    }
-
     /**
      * @param               $tokens
      * @param Action        $action
@@ -80,7 +66,7 @@ class FormSubmitHelper
                         'source'      => ['form', $form->getId()],
                         'tokens'      => $tokens,
                         'ignoreDNC'   => true,
-                        'immediately' => ($factory->getParameter('mailer_spool_type') === 'file' && !empty($properties['immediately'])) ? true : false,
+                        'immediately' => ($factory->getParameter('mailer_spool_type') == 'file' && !empty($properties['immediately'])) ? true : false,
                     ];
                     $emailModel->sendEmail($email, $currentLead, $options);
                 }
