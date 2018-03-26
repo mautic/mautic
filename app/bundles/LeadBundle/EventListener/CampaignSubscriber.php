@@ -16,9 +16,11 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\ChangeOwnerType;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -428,7 +430,7 @@ class CampaignSubscriber extends CommonSubscriber
             if (!empty($company)) {
                 // Save after the lead in for new leads created
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
-                $this->setPrimaryCompany($companyEntity->getId(), $lead->getId());
+                $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
             }
         } else {
             $this->companyModel->setFieldValues($primaryCompany, $config, false);
