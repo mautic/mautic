@@ -15,7 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Connection\AMQPSSLConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
@@ -126,7 +126,17 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $connection = new AMQPStreamConnection($integrationObject->getLocation(), 5672, $integrationObject->getUser(), $integrationObject->getPassword());
+        $connection = new AMQPSSLConnection(
+            $integrationObject->getLocation(), 
+            5672, 
+            $integrationObject->getUser(), 
+            $integrationObject->getPassword(),
+            '/',
+            [
+                'cafile'=>$integrationObject->getCacert(),
+                'local_cert'=>$integrationObject->getCert(),
+                'local_pk'=>$integrationObject->getKey(),
+            ]);
         $channel = $connection->channel();
 
         // exchange, type, passive, durable, auto_delete

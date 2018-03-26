@@ -35,7 +35,10 @@ class RabbitMQIntegration extends AbstractIntegration
         return [
             'location' => $keys['rabbitmq_location'],
             'username' => $keys['rabbitmq_user'],
-            'password' => $keys['rabbitmq_password']
+            'password' => $keys['rabbitmq_password'],
+            'cacert'   => $keys['rabbitmq_cacert'],
+            'cert'     => $keys['rabbitmq_cert'],
+            'key'      => $keys['rabbimtq_key']
         ];
     }
 
@@ -59,6 +62,21 @@ class RabbitMQIntegration extends AbstractIntegration
         return $keys['rabbitmq_password'];
     }
 
+    public function getCacert(){
+        $keys = $this->getKeys();
+        return $keys['rabbitmq_cacert'];
+    }
+
+    public function getCert(){
+        $keys = $this->getKeys();
+        return $keys['rabbitmq_cert'];
+    }
+
+    public function getKey(){
+        $keys = $this->getKeys();
+        return $keys['rabbitmq_key'];
+    }
+
     public function getAuthenticationType()
     {
         return 'key';
@@ -73,7 +91,10 @@ class RabbitMQIntegration extends AbstractIntegration
         return [
             'rabbitmq_location' => 'mautic.rabbitmq.config.location',
             'rabbitmq_user' => 'mautic.rabbitmq.config.user',
-            'rabbitmq_password'  => 'mautic.rabbitmq.config.password'
+            'rabbitmq_password'  => 'mautic.rabbitmq.config.password',
+            'rabbitmq_cacert'   => 'mautic.rabbitmq.config.cacert',
+            'rabbitmq_cert' => 'mautic.rabbitmq.config.cert',
+            'rabbitmq_key'  => 'mautic.rabbitmq.config.key',
         ];
     }
 

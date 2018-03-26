@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListModel;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Connection\AMQPSSLConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
@@ -75,7 +75,17 @@ class MAConsumerCommand extends ModeratedCommand
             return;
         }
 
-        $connection = new AMQPStreamConnection($integrationObject->getLocation(), 5672, $integrationObject->getUser(), $integrationObject->getPassword());
+        $connection = new AMQPSSLConnection(
+            $integrationObject->getLocation(), 
+            5672, 
+            $integrationObject->getUser(), 
+            $integrationObject->getPassword(),
+            '/',
+            [
+                'cafile'=>$integrationObject->getCacert(),
+                'local_cert'=>$integrationObject->getCert(),
+                'local_pk'=>$integrationObject->getKey(),
+            ]);
         $channel = $connection->channel();
 
         // exchange, type, passive, durable, auto_delete
