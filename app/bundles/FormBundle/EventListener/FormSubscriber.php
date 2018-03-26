@@ -23,6 +23,7 @@ use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -184,7 +185,7 @@ class FormSubscriber extends CommonSubscriber
         $emails    = $this->getEmailsFromString($config['to']);
 
         if (!empty($emails)) {
-            $this->setMailer($config, $tokens, $emails);
+            $this->setMailer($config, $tokens, $emails, $lead);
 
             if (!empty($leadEmail)) {
                 // Reply to lead for user convenience
@@ -206,9 +207,7 @@ class FormSubscriber extends CommonSubscriber
 
         if ($config['copy_lead'] && !empty($leadEmail)) {
             // Send copy to lead
-            $this->setMailer($config, $tokens, $leadEmail);
-
-            $this->mailer->setLead($lead->getProfileFields());
+            $this->setMailer($config, $tokens, $leadEmail, $lead, false);
 
             $this->mailer->send(true);
         }
@@ -216,9 +215,7 @@ class FormSubscriber extends CommonSubscriber
         $owner = $lead !== null ? $lead->getOwner() : null;
         if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
             // Send copy to owner
-            $this->setMailer($config, $tokens, $owner->getEmail());
-
-            $this->mailer->setLead($lead->getProfileFields());
+            $this->setMailer($config, $tokens, $owner->getEmail(), $lead);
 
             $this->mailer->send(true);
         }
@@ -430,11 +427,13 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param array $config
-     * @param array $tokens
-     * @param       $to
+     * @param array     $config
+     * @param array     $tokens
+     * @param           $to
+     * @param Lead|null $lead
+     * @param bool      $internalSend
      */
-    private function setMailer(array $config, array $tokens, $to)
+    private function setMailer(array $config, array $tokens, $to, Lead $lead = null, $internalSend = true)
     {
         $this->mailer->reset();
 
@@ -448,5 +447,9 @@ class FormSubscriber extends CommonSubscriber
         $this->mailer->addTokens($tokens);
         $this->mailer->setBody($config['message']);
         $this->mailer->parsePlainText($config['message']);
+
+        if ($lead) {
+            $this->mailer->setLead($lead->getProfileFields(), $internalSend);
+        }
     }
 }
