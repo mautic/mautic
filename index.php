@@ -27,7 +27,7 @@ $loader = require_once __DIR__.'/app/autoload.php';
 //$apcLoader->register(true);
 
 \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
-
+error_reporting(E_NOTICE);
 $kernel = new AppKernel('prod', false);
 $kernel->loadClassCache();
 

@@ -118,7 +118,7 @@ class ConfigTrackingPageType extends AbstractType
             'yesno_button_group',
             [
                 'label' => 'mautic.page.config.form.tracking.anonymize.ip.enabled',
-                'data'  => !empty($options['data']['google_analytics_anonymize_ip']) ? true : false,
+                'data'  => (bool) $options['data']['google_analytics_anonymize_ip'],
                 'attr'  => [
                     'tooltip' => 'mautic.page.config.form.tracking.anonymize.ip.enabled.tooltip',
                 ],
