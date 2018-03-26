@@ -41,7 +41,7 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     {
         $this->message         = $message;
         $this->fromAddresses[] = key($message->getFrom());
-        $this->metadatas       = array_merge($this->metadatas, $this->getMetadata());
+        $this->metadatas[]     = $this->getMetadata();
 
         $messageArray = $this->messageToArray();
 
