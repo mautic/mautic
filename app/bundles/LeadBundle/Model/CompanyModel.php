@@ -77,9 +77,29 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function saveEntity($entity, $unlock = true)
     {
+        // Update leads primary company name
         $this->setEntityDefaultValues($entity, 'company');
+        $this->getCompanyLeadRepository()->updateLeadsPrimaryCompanyName($entity);
 
         parent::saveEntity($entity, $unlock);
+    }
+
+    /**
+     * Save an array of entities.
+     *
+     * @param array $entities
+     * @param bool  $unlock
+     *
+     * @return array
+     */
+    public function saveEntities($entities, $unlock = true)
+    {
+        // Update leads primary company name
+        foreach ($entities as $k => $entity) {
+            $this->setEntityDefaultValues($entity, 'company');
+            $this->getCompanyLeadRepository()->updateLeadsPrimaryCompanyName($entity);
+        }
+        parent::saveEntities($entities, $unlock);
     }
 
     /**
@@ -236,6 +256,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
             $fieldValues = $fields;
         }
+
         //update existing values
         foreach ($fieldValues as $group => &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
@@ -796,7 +817,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         foreach ($this->fetchCompanyFields() as $entityField) {
             if (isset($fieldData[$entityField['alias']])) {
-                $fieldData[$entityField['alias']] = InputHelper::clean($fieldData[$entityField['alias']]);
+                $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
 
                 if ('NULL' === $fieldData[$entityField['alias']]) {
                     $fieldData[$entityField['alias']] = null;

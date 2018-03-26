@@ -86,6 +86,8 @@ class TableSchemaHelper
      *
      * @param array $tables
      *
+     * @return $this
+     *
      * @throws SchemaException
      */
     public function addTables(array $tables)
@@ -104,6 +106,8 @@ class TableSchemaHelper
             $this->addTables[] = $table;
             $this->addTable($table, false);
         }
+
+        return $this;
     }
 
     /**
@@ -127,6 +131,8 @@ class TableSchemaHelper
      *                     )
      * @param $checkExists
      * @param $dropExisting
+     *
+     * @return $this
      *
      * @throws SchemaException
      */
@@ -174,16 +180,24 @@ class TableSchemaHelper
                 $newTable->$func($value);
             }
         }
+
+        return $this;
     }
 
     /**
-     * @param string $table
+     * @param $table
+     *
+     * @return $this
+     *
+     * @throws SchemaException
      */
     public function deleteTable($table)
     {
         if ($this->checkTableExists($table)) {
             $this->dropTables[] = $table;
         }
+
+        return $this;
     }
 
     /**

@@ -243,7 +243,7 @@ class InputHelper
     {
         $value = str_replace(' ', '_', $value);
 
-        return preg_replace("/[^a-z0-9\.\_]/", '', strtolower($value));
+        return preg_replace("/[^a-z0-9\.\_-]/", '', strtolower($value));
     }
 
     /**

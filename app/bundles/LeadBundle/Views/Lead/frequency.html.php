@@ -51,7 +51,7 @@ $leadName = $lead->getPrimaryIdentifier();
                         <input type="checkbox" id="<?php echo $channel->value ?>"
                                name="lead_contact_frequency_rules[subscribed_channels][]" class="control-label"
                                onclick="Mautic.togglePreferredChannel(this.value);"
-                               value="<?php echo $channel->value ?>" <?php echo $checked; ?>>
+                               value="<?php echo $view->escape($channel->value) ?>" <?php echo $checked; ?>>
                     </th>
                     <td class="col-md-1" style="vertical-align: top">
                         <div id="is-contactable-<?php echo $channel->value ?>" class="<?php echo $isContactable; ?> fw-sb">
@@ -74,7 +74,7 @@ $leadName = $lead->getPrimaryIdentifier();
                 <td class="col-md-1" style="vertical-align: top;" align="center">
                         <input type="radio" id="preferred_<?php echo $channel->value ?>"
                                name="lead_contact_frequency_rules[preferred_channel]" class="contact"
-                               value="<?php echo $channel->value ?>" <?php if ($form['preferred_channel']->vars['value'] == $channel->value) {
+                               value="<?php echo $view->escape($channel->value) ?>" <?php if ($form['preferred_channel']->vars['value'] == $channel->value) {
                                         echo $checked;
                                     } ?> <?php echo $disabled; ?>>
 
@@ -131,4 +131,3 @@ $leadName = $lead->getPrimaryIdentifier();
     </div>
 </div>
 <?php echo $view['form']->end($form); ?>
-

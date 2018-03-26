@@ -1052,6 +1052,7 @@ abstract class AbstractIntegration
                 $headers[$key] = $value;
             }
         }
+
         try {
             $timeout = (isset($settings['request_timeout'])) ? (int) $settings['request_timeout'] : 10;
             switch ($method) {

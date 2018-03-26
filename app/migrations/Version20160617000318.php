@@ -35,7 +35,7 @@ class Version20160617000318 extends AbstractMauticMigration
         $dwcVarIDX = $this->generatePropertyName('dynamic_content', 'idx', ['variant_parent_id']);
 
         $dwcSql = <<<SQL
-CREATE TABLE {$this->prefix}dynamic_content (
+CREATE TABLE IF NOT EXISTS {$this->prefix}dynamic_content (
   id INT AUTO_INCREMENT NOT NULL,
   category_id INT DEFAULT NULL,
   variant_parent_id INT DEFAULT NULL,
@@ -71,7 +71,7 @@ SQL;
         $dwc2DwcIDX  = $this->generatePropertyName('dynamic_content_lead_data', 'idx', ['dynamic_content_id']);
 
         $dwcSql2 = <<<SQL
-CREATE TABLE {$this->prefix}dynamic_content_lead_data (
+CREATE TABLE IF NOT EXISTS {$this->prefix}dynamic_content_lead_data (
   id INT AUTO_INCREMENT NOT NULL,
   lead_id INT NOT NULL,
   dynamic_content_id INT NOT NULL,

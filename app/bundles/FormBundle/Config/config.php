@@ -282,7 +282,7 @@ return [
                 'class' => FormFieldCaptchaType::class,
                 'alias' => 'formfield_captcha',
             ],
-            'muatic.form.type.field_propertypagebreak' => [
+            'mautic.form.type.field_propertypagebreak' => [
                 'class'     => FormFieldPageBreakType::class,
                 'arguments' => [
                     'translator',

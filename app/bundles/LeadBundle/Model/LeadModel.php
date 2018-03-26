@@ -1689,7 +1689,7 @@ class LeadModel extends FormModel
         foreach ($fields as $leadField => $importField) {
             // Prevent overwriting existing data with empty data
             if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
-                $fieldData[$leadField] = InputHelper::clean($data[$importField]);
+                $fieldData[$leadField] = InputHelper::_($data[$importField], 'string');
             }
         }
 
@@ -1907,7 +1907,6 @@ class LeadModel extends FormModel
         if ($eventLog) {
             $action = $merged ? 'updated' : 'inserted';
             $eventLog->setAction($action);
-            $lead->addEventLog($eventLog);
         }
 
         if ($persist) {
@@ -1919,6 +1918,10 @@ class LeadModel extends FormModel
 
             if ($company !== null) {
                 $this->companyModel->addLeadToCompany($company, $lead);
+            }
+
+            if ($eventLog) {
+                $lead->addEventLog($eventLog);
             }
         }
 
