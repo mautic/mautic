@@ -460,7 +460,6 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
 
         $model->finalFlush();
 
-        // Our fake transport should have processed 3 metadatas
         $this->assertCount(4, $transport->getMetadatas());
     }
 
