@@ -529,7 +529,7 @@ return [
                 'alias'     => 'updatelead_action',
             ],
             'mautic.form.type.updatecompany_action' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\UpdateCompanyActionType',
+                'class'     => Mautic\LeadBundle\Form\Type\UpdateCompanyActionType::class,
                 'arguments' => ['mautic.lead.model.field'],
                 'alias'     => 'updatecompany_action',
             ],

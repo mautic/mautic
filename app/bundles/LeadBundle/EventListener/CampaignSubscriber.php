@@ -67,11 +67,11 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel, ListModel $listModel, CompanyModel $companyModel)
     {
-        $this->ipLookupHelper    = $ipLookupHelper;
-        $this->leadModel         = $leadModel;
-        $this->leadFieldModel    = $leadFieldModel;
-        $this->listModel         = $listModel;
-        $this->companyModel      = $companyModel;
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->leadModel      = $leadModel;
+        $this->leadFieldModel = $leadFieldModel;
+        $this->listModel      = $listModel;
+        $this->companyModel   = $companyModel;
     }
 
     /**
