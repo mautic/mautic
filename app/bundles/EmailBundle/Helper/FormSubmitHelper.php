@@ -66,7 +66,7 @@ class FormSubmitHelper
                         'source'      => ['form', $form->getId()],
                         'tokens'      => $tokens,
                         'ignoreDNC'   => true,
-                        'immediately' => ($factory->getParameter('mailer_spool_type') == 'file' && !empty($properties['immediately'])) ? true : false,
+                        'immediately' => ($factory->getParameter('mailer_spool_type') === 'file' && !empty($properties['immediately'])) ? true : false,
                     ];
                     $emailModel->sendEmail($email, $currentLead, $options);
                 }
