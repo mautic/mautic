@@ -522,8 +522,9 @@ class ConfigType extends AbstractType
             'choice',
             [
                 'choices' => [
-                    'memory' => 'mautic.email.config.mailer_spool_type.memory',
-                    'file'   => 'mautic.email.config.mailer_spool_type.file',
+                    'memory'  => 'mautic.email.config.mailer_spool_type.memory',
+                    'file'    => 'mautic.email.config.mailer_spool_type.file',
+                    'smart'   => 'mautic.email.config.mailer_spool_type.smart',
                 ],
                 'label'      => 'mautic.email.config.mailer.spool.type',
                 'label_attr' => ['class' => 'control-label'],

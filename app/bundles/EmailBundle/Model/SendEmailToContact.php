@@ -29,6 +29,11 @@ class SendEmailToContact
     private $mailer;
 
     /**
+     * @var MailHelper
+     */
+    private $temporaryMailer = null;
+
+    /**
      * @var StatRepository
      */
     private $statRepo;
@@ -116,8 +121,12 @@ class SendEmailToContact
      * @param DoNotContact        $dncModel
      * @param TranslatorInterface $translator
      */
-    public function __construct(MailHelper $mailer, StatRepository $statRepository, DoNotContact $dncModel, TranslatorInterface $translator)
-    {
+    public function __construct(
+        MailHelper $mailer,
+        StatRepository $statRepository,
+        DoNotContact $dncModel,
+        TranslatorInterface $translator
+    ) {
         $this->mailer     = $mailer;
         $this->statRepo   = $statRepository;
         $this->dncModel   = $dncModel;
@@ -180,8 +189,13 @@ class SendEmailToContact
      *
      * @return $this
      */
-    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], array $slots = [])
-    {
+    public function setEmail(
+        Email $email,
+        array $channel = [],
+        array $customHeaders = [],
+        array $assetAttachments = [],
+        array $slots = []
+    ) {
         // Flush anything that's pending from a previous email
         $this->flush();
 
@@ -289,7 +303,21 @@ class SendEmailToContact
         $this->statRepo->clear();
         $this->dncModel->clearEntities();
 
+        if ($this->temporaryMailer != null) {
+            $this->mailer = clone $this->temporaryMailer;
+        }
         $this->mailer->reset();
+    }
+
+    /**
+     * @param $mailer
+     */
+    public function setMailer($mailer)
+    {
+        if ($this->temporaryMailer == null) {
+            $this->temporaryMailer = clone $this->mailer;
+        }
+        $this->mailer = $mailer;
     }
 
     /**
@@ -382,8 +410,8 @@ class SendEmailToContact
                 $this->dncModel->addDncForContact(
                     $contactId,
                     ['email' => $this->emailEntityId],
-                    DNC::BOUNCED,
                     $this->translator->trans('mautic.email.bounce.reason.bad_email'),
+                    DNC::BOUNCED,
                     true,
                     false
                 );
