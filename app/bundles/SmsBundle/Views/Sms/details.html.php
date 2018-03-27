@@ -157,6 +157,6 @@ if (!$isEmbedded) {
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
-    <input name="entityId" id="entityId" type="hidden" value="<?php echo $sms->getId(); ?>" />
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $view->escape($sms->getId()); ?>" />
 </div>
 <!--/ end: box layout -->
