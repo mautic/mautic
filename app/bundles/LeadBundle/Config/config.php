@@ -346,6 +346,7 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.lead.event.dispatcher',
                 ],
                 'methodCalls' => [
                     'setModelFactory' => ['mautic.model.factory'],
@@ -689,6 +690,14 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'leadlist_access',
             ],
+            \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
+                'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
+                'tag'       => 'validator.constraint_validator',
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'mautic.helper.field.alias',
+                ],
+            ],
             'mautic.lead.constraint.alias' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator',
                 'arguments' => ['mautic.factory'],
@@ -709,12 +718,22 @@ return [
                     \Mautic\LeadBundle\Entity\Lead::class,
                 ],
             ],
+            'mautic.lead.event.dispatcher' => [
+                'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
                 'class'     => 'Mautic\LeadBundle\Templating\Helper\AvatarHelper',
                 'arguments' => ['mautic.factory'],
                 'alias'     => 'lead_avatar',
+            ],
+            'mautic.helper.field.alias' => [
+                'class'     => \Mautic\LeadBundle\Helper\FieldAliasHelper::class,
+                'arguments' => ['mautic.lead.model.field'],
             ],
         ],
         'models' => [
@@ -741,7 +760,8 @@ return [
             'mautic.lead.model.field' => [
                 'class'     => 'Mautic\LeadBundle\Model\FieldModel',
                 'arguments' => [
-                    'mautic.schema.helper.factory',
+                    'mautic.schema.helper.index',
+                    'mautic.schema.helper.column',
                 ],
             ],
             'mautic.lead.model.list' => [

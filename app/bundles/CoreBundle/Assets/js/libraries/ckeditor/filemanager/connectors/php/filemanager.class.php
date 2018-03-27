@@ -950,7 +950,7 @@ class Filemanager
             $this->__log(__METHOD__.' - downloading '.$current_path);
             exit();
         } else {
-            $this->error(sprintf($this->lang('FILE_DOES_NOT_EXIST'), $current_path));
+            $this->error(sprintf($this->lang('FILE_DOES_NOT_EXIST'), $this->getRelPath()));
         }
     }
 
@@ -976,7 +976,7 @@ class Filemanager
 
             exit();
         } else {
-            $this->error(sprintf($this->lang('FILE_DOES_NOT_EXIST'), $current_path));
+            $this->error(sprintf($this->lang('FILE_DOES_NOT_EXIST'), $this->getRelPath()));
         }
     }
 
@@ -1107,9 +1107,7 @@ class Filemanager
     private function getFullPath($path = '')
     {
         if ($path == '') {
-            if (isset($this->get['path'])) {
-                $path = $this->get['path'];
-            }
+            $path = $this->getRelPath();
         }
 
         if ($this->config['options']['fileRoot'] !== false) {
@@ -1128,6 +1126,14 @@ class Filemanager
         // $this->__log("getFullPath() returned path : " . $full_path);
 
         return $full_path;
+    }
+
+    /**
+     * @return mixed|string
+     */
+    private function getRelPath()
+    {
+        return (isset($this->get['path'])) ? $this->get['path'] : '';
     }
 
     /**
@@ -1462,7 +1468,10 @@ class Filemanager
         $sanitized = strip_tags($var);
         $sanitized = str_replace('http://', '', $sanitized);
         $sanitized = str_replace('https://', '', $sanitized);
-        $sanitized = str_replace('../', '', $sanitized);
+        $count     = 1;
+        while ($count > 0) {
+            $sanitized = str_replace('../', '', $sanitized, $count);
+        }
 
         return $sanitized;
     }

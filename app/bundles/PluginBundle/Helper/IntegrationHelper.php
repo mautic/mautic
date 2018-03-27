@@ -668,7 +668,7 @@ class IntegrationHelper
                         }
                     }
                 }
-            } elseif ($identifierField == $f || strpos($f, $identifierField) !== false) {
+            } elseif ($identifierField === $f || strpos($f, $identifierField) !== false) {
                 $matchFound = true;
                 $identifier = (is_array($fields[$f])) ? $fields[$f]['value'] : $fields[$f];
             }

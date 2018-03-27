@@ -67,7 +67,7 @@
         "doctrine/cache": "~1.5.4",
         "doctrine/migrations": "~1.2.2",
         "doctrine/orm": "~2.5.4",
-        "doctrine/doctrine-bundle": "~1.6",
+        "doctrine/doctrine-bundle": "1.6.13",
         "doctrine/doctrine-cache-bundle": "~1.3.0",
         "doctrine/doctrine-fixtures-bundle": "~2.3.0",
         "doctrine/doctrine-migrations-bundle": "~1.1.1",
@@ -110,7 +110,8 @@
         "php-amqplib/rabbitmq-bundle": "^1.10",
         "leezy/pheanstalk-bundle": "^3.2",
         "simshaun/recurr": "^3.0",
-        "ramsey/uuid": "^3.7"
+        "ramsey/uuid": "^3.7",
+        "sendgrid/sendgrid": "~6.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
@@ -147,7 +148,10 @@
         "test": "phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml"
     },
     "config": {
-        "bin-dir": "bin"
+        "bin-dir": "bin",
+        "platform": {
+            "php": "5.6.19"
+        }
     },
     "extra": {
         "symfony-app-dir": "app",

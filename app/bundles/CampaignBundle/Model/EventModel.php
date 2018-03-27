@@ -403,6 +403,8 @@ class EventModel extends CommonFormModel
                             // non-action paths should not be processed by this because the contact already took action in order to get here
                             $childrenTriggered = true;
                             $this->logger->debug('CAMPAIGN: '.ucfirst($child['eventType']).' ID# '.$child['id'].' has a decision path of no');
+
+                            continue;
                         } else {
                             $this->logger->debug('CAMPAIGN: '.ucfirst($child['eventType']).' ID# '.$child['id'].' is being processed');
                         }
@@ -923,22 +925,25 @@ class EventModel extends CommonFormModel
                         'createdBy' => $campaign->getCreatedBy(),
                     ];
 
+                    // Skip If was lead was removed from campaign
                     // Execute event
-                    if ($this->executeEvent(
-                        $event,
-                        $campaign,
-                        $lead,
-                        $eventSettings,
-                        false,
-                        null,
-                        true,
-                        $log['id'],
-                        $evaluatedEventCount,
-                        $executedEventCount,
-                        $totalEventCount
-                    )
-                    ) {
-                        ++$scheduledExecutedCount;
+                    if (empty($this->campaignModel->getRemovedLeads()[$campaign->getId()][$leadId])) {
+                        if ($this->executeEvent(
+                            $event,
+                            $campaign,
+                            $lead,
+                            $eventSettings,
+                            false,
+                            null,
+                            true,
+                            $log['id'],
+                            $evaluatedEventCount,
+                            $executedEventCount,
+                            $totalEventCount
+                        )
+                        ) {
+                            ++$scheduledExecutedCount;
+                        }
                     }
 
                     if ($max && $totalEventCount >= $max) {
@@ -1582,6 +1587,7 @@ class EventModel extends CommonFormModel
         $result = true;
 
         // Create/get log entry
+        /*  @var LeadEventLog $log **/
         if ($logExists) {
             if (true === $logExists) {
                 $log = $logRepo->findOneBy(
@@ -2108,8 +2114,8 @@ class EventModel extends CommonFormModel
 
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = c.campaign_id')
-              ->andWhere('c.created_by = :userId')
-              ->setParameter('userId', $this->userHelper->getUser()->getId());
+                ->andWhere('c.created_by = :userId')
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $data = $query->loadAndBuildTimeData($q);

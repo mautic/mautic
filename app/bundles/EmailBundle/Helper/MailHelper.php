@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Helper;
 
+use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -20,7 +21,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -268,7 +269,7 @@ class MailHelper
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
-        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport) {
+        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof TokenTransportInterface) {
             $this->tokenizationEnabled = true;
         }
 
@@ -496,7 +497,7 @@ class MailHelper
      *                                  NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
      *                                  RETURN_ERROR       return an array of [success, $errors]; only one applicable if message is queued
      *
-     * @return bool
+     * @return bool|array
      */
     public function queue($dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO)
     {
@@ -775,28 +776,6 @@ class MailHelper
 
             unset($childBody, $bodyReplaced);
         }
-    }
-
-    /**
-     * Extract plain text from message.
-     *
-     * @param \Swift_Message $message
-     *
-     * @return string
-     */
-    public static function getPlainTextFromMessage(\Swift_Message $message)
-    {
-        $children = (array) $message->getChildren();
-
-        /** @var \Swift_Mime_MimeEntity $child */
-        foreach ($children as $child) {
-            $childType = $child->getContentType();
-            if ($childType == 'text/plain' && $child instanceof \Swift_MimePart) {
-                return $child->getBody();
-            }
-        }
-
-        return '';
     }
 
     /**
@@ -1817,9 +1796,7 @@ class MailHelper
      * @param string|null $emailAddress
      * @param null        $listId
      *
-     * @return Stat|void
-     *
-     * @throws \Doctrine\ORM\ORMException
+     * @return Stat
      */
     public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
     {
@@ -1830,7 +1807,11 @@ class MailHelper
 
         // Note if a lead
         if (null !== $this->lead) {
-            $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
+            try {
+                $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
+            } catch (ORMException $exception) {
+                // keep IDE happy
+            }
             $emailAddress = $this->lead['email'];
         }
 
@@ -1848,7 +1829,11 @@ class MailHelper
 
         // Note if sent from a lead list
         if (null !== $listId) {
-            $stat->setList($this->factory->getEntityManager()->getReference('MauticLeadBundle:LeadList', $listId));
+            try {
+                $stat->setList($this->factory->getEntityManager()->getReference('MauticLeadBundle:LeadList', $listId));
+            } catch (ORMException $exception) {
+                // keep IDE happy
+            }
         }
 
         $stat->setTrackingHash($this->idHash);
@@ -1884,7 +1869,11 @@ class MailHelper
         }
 
         if (isset($this->copies[$id])) {
-            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $this->copies[$id]));
+            try {
+                $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $this->copies[$id]));
+            } catch (ORMException $exception) {
+                // keep IDE happy
+            }
         }
 
         if ($persist) {

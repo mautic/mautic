@@ -119,16 +119,24 @@ $appendAttribute($containerAttr, 'class', $defaultContainerClass);
 if (isset($list) || isset($properties['syncList']) || isset($properties['list']) || isset($properties['optionlist'])) {
     $parseList           = [];
     $ignoreNumericalKeys = false;
-    if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']])) {
-        $leadFieldType = $contactFields[$field['leadField']]['type'];
+
+    if (!isset($contactFields)) {
+        $contactFields = [];
+    }
+    if (!isset($companyFields)) {
+        $companyFields = [];
+    }
+    $formFields = array_merge($contactFields, $companyFields);
+    if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($formFields[$field['leadField']])) {
+        $leadFieldType = $formFields[$field['leadField']]['type'];
         switch (true) {
-            case !empty($contactFields[$field['leadField']]['properties']['list']):
-                $parseList = $contactFields[$field['leadField']]['properties']['list'];
+            case !empty($formFields[$field['leadField']]['properties']['list']):
+                $parseList = $formFields[$field['leadField']]['properties']['list'];
                 break;
             case 'boolean' == $leadFieldType:
                 $parseList = [
-                    0 => $contactFields[$field['leadField']]['properties']['no'],
-                    1 => $contactFields[$field['leadField']]['properties']['yes'],
+                    0 => $formFields[$field['leadField']]['properties']['no'],
+                    1 => $formFields[$field['leadField']]['properties']['yes'],
                 ];
                 $ignoreNumericalKeys = true;
                 break;
@@ -161,8 +169,8 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
         }
     }
 
-    if ($field['leadField'] && !empty($contactFields[$field['leadField']]['type']) && in_array($contactFields[$field['leadField']]['type'], ['datetime', 'date'])) {
-        $tempLeadFieldType = $contactFields[$field['leadField']]['type'];
+    if ($field['leadField'] && !empty($formFields[$field['leadField']]['type']) && in_array($formFields[$field['leadField']]['type'], ['datetime', 'date'])) {
+        $tempLeadFieldType = $formFields[$field['leadField']]['type'];
         foreach ($parseList as $key => $aTemp) {
             if ($date = ($tempLeadFieldType == 'datetime' ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
                 $parseList[$key]['label'] = $date;

@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -22,6 +23,7 @@ use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -46,17 +48,23 @@ class FormSubscriber extends CommonSubscriber
     protected $ipLookupHelper;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * FormSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      * @param MailHelper     $mailer
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer, CoreParametersHelper $coreParametersHelper)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
-        $this->mailer         = $mailer->getMailer();
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->auditLogModel        = $auditLogModel;
+        $this->mailer               = $mailer->getMailer();
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -173,11 +181,11 @@ class FormSubscriber extends CommonSubscriber
 
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
-        $leadEmail = $lead->getEmail();
+        $leadEmail = $lead !== null ? $lead->getEmail() : null;
         $emails    = $this->getEmailsFromString($config['to']);
 
         if (!empty($emails)) {
-            $this->setMailer($config, $tokens, $emails);
+            $this->setMailer($config, $tokens, $emails, $lead);
 
             if (!empty($leadEmail)) {
                 // Reply to lead for user convenience
@@ -199,18 +207,15 @@ class FormSubscriber extends CommonSubscriber
 
         if ($config['copy_lead'] && !empty($leadEmail)) {
             // Send copy to lead
-            $this->setMailer($config, $tokens, $leadEmail);
-
-            $this->mailer->setLead($lead->getProfileFields());
+            $this->setMailer($config, $tokens, $leadEmail, $lead, false);
 
             $this->mailer->send(true);
         }
 
-        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && $lead->getOwner()) {
+        $owner = $lead !== null ? $lead->getOwner() : null;
+        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
             // Send copy to owner
-            $this->setMailer($config, $tokens, $lead->getOwner()->getEmail());
-
-            $this->mailer->setLead($lead->getProfileFields());
+            $this->setMailer($config, $tokens, $owner->getEmail(), $lead);
 
             $this->mailer->send(true);
         }
@@ -422,18 +427,29 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param array $config
-     * @param array $tokens
-     * @param       $to
+     * @param array     $config
+     * @param array     $tokens
+     * @param           $to
+     * @param Lead|null $lead
+     * @param bool      $internalSend
      */
-    private function setMailer(array $config, array $tokens, $to)
+    private function setMailer(array $config, array $tokens, $to, Lead $lead = null, $internalSend = true)
     {
         $this->mailer->reset();
+
+        // ingore queue
+        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file' && $config['immediately']) {
+            $this->mailer = $this->mailer->getSampleMailer();
+        }
 
         $this->mailer->setTo($to);
         $this->mailer->setSubject($config['subject']);
         $this->mailer->addTokens($tokens);
         $this->mailer->setBody($config['message']);
         $this->mailer->parsePlainText($config['message']);
+
+        if ($lead) {
+            $this->mailer->setLead($lead->getProfileFields(), $internalSend);
+        }
     }
 }

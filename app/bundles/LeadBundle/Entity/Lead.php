@@ -223,7 +223,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var string
      */
-    private $preferredProfileImage;
+    private $preferredProfileImage = 'gravatar';
 
     /**
      * @var bool

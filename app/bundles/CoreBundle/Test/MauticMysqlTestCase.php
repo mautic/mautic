@@ -2,48 +2,115 @@
 
 namespace Mautic\CoreBundle\Test;
 
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
-
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
+    /**
+     * @var string
+     */
+    private $sqlDumpFile = false;
+
+    /**
+     * @throws \Exception
+     */
     public function setUp()
     {
         parent::setUp();
 
+        $this->sqlDumpFile = $this->container->getParameter('kernel.cache_dir').'/fresh_db.sql';
+
+        $this->prepareDatabase();
+    }
+
+    /**
+     * @param $file
+     *
+     * @throws \Exception
+     */
+    protected function applySqlFromFile($file)
+    {
+        $connection = $this->container->get('doctrine.dbal.default_connection');
+        $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
+        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file} 2>&1 | grep -v \"Using a password\" || true";
+
+        $lastLine = system($command, $status);
+        if (0 !== $status) {
+            throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
+        }
+    }
+
+    /**
+     * Reset each test using a SQL file if possible to prevent from having to run the fixtures over and over.
+     *
+     * @throws \Exception
+     */
+    private function prepareDatabase()
+    {
+        if (!function_exists('system')) {
+            $this->installDatabase();
+
+            return;
+        }
+
+        if (!file_exists($this->sqlDumpFile)) {
+            $this->installDatabase();
+            $this->dumpToFile();
+
+            return;
+        }
+
+        $this->applySqlFromFile($this->sqlDumpFile);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function installDatabase()
+    {
         $this->createDatabase();
         $this->applyMigrations();
         $this->installDatabaseFixtures();
     }
 
+    /**
+     * @throws \Exception
+     */
     private function createDatabase()
     {
-        $this->runCommand('doctrine:database:drop', [
-            '--env'   => 'test',
-            '--force' => true,
-        ]);
+        $this->runCommand(
+            'doctrine:database:drop',
+            [
+                '--env'   => 'test',
+                '--force' => true,
+            ]
+        );
 
-        $this->runCommand('doctrine:database:create', [
-            '--env' => 'test',
-        ]);
+        $this->runCommand(
+            'doctrine:database:create',
+            [
+                '--env' => 'test',
+            ]
+        );
 
-        $this->runCommand('doctrine:schema:create', [
-            '--env' => 'test',
-        ]);
+        $this->runCommand(
+            'doctrine:schema:create',
+            [
+                '--env' => 'test',
+            ]
+        );
     }
 
-    protected function runCommand($name, array $params = [])
+    /**
+     * @throws \Exception
+     */
+    private function dumpToFile()
     {
-        array_unshift($params, $name);
+        $connection = $this->container->get('doctrine.dbal.default_connection');
+        $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
+        $command    = "mysqldump --add-drop-table --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} > {$this->sqlDumpFile} 2>&1 | grep -v \"Using a password\" || true";
 
-        $kernel      = $this->container->get('kernel');
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-
-        $input = new ArrayInput($params);
-
-        $output = new BufferedOutput();
-        $application->run($input, $output);
+        $lastLine = system($command, $status);
+        if (0 !== $status) {
+            throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
+        }
     }
 }

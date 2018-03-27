@@ -222,7 +222,7 @@ class LeadTimelineEvent extends Event
                 // Rename extra to details
                 if (isset($data['extra'])) {
                     $data['details'] = $data['extra'];
-                    $this->prepareDetailsForAPI($data['details']);
+                    $data['details'] = $this->prepareDetailsForAPI($data['details']);
                     unset($data['extra']);
                 }
 
@@ -233,6 +233,11 @@ class LeadTimelineEvent extends Event
                         $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
                     }
                 }
+            }
+
+            if (empty($data['eventId'])) {
+                // Every entry should have an eventId so generate one if the listener itself didn't handle this
+                $data['eventId'] = $this->generateEventId($data);
             }
 
             $this->events[$data['event']][] = $data;
@@ -612,8 +617,10 @@ class LeadTimelineEvent extends Event
      * Convert all snake case keys o camel case for API congruency.
      *
      * @param array $details
+     *
+     * @return array
      */
-    protected function prepareDetailsForAPI(array &$details)
+    private function prepareDetailsForAPI(array $details)
     {
         foreach ($details as $key => &$detailValues) {
             if (is_array($detailValues)) {
@@ -632,5 +639,17 @@ class LeadTimelineEvent extends Event
                 unset($details[$key]);
             }
         }
+
+        return $details;
+    }
+
+    /**
+     * Generate something consistent for this event to identify this log entry.
+     *
+     * @param array $data
+     */
+    private function generateEventId(array $data)
+    {
+        return $data['eventType'].hash('crc32', json_encode($data), false);
     }
 }

@@ -73,7 +73,7 @@ class PointActionHelper
 
         $hitRepository = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
         $lead          = $eventDetails->getLead();
-        $urlWithSqlWC  = str_replace('*', '%', $url);
+        $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
 
         if (isset($action['properties']['first_time']) && $action['properties']['first_time'] === true) {
             $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
@@ -105,7 +105,7 @@ class PointActionHelper
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             }
-            if (isset($hitStats['count']) && $hitStats['count'] === $action['properties']['page_hits']) {
+            if (isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits']) {
                 $changePoints['page_hits'] = true;
             } else {
                 $changePoints['page_hits'] = false;

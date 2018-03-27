@@ -295,7 +295,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param      $data
      * @param null $object
      *
-     * @return Company|void
+     * @return Company|null
      */
     public function getMauticCompany($data, $object = null)
     {
@@ -306,23 +306,17 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             // Assume JSON
             $data = json_decode($data, true);
         }
-        $config = $this->mergeConfigToFeatureSettings([]);
-
+        $config        = $this->mergeConfigToFeatureSettings([]);
         $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
-
-        // Find unique identifier fields used by the integration
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $companyModel = $this->factory->getModel('lead.company');
 
         // Default to new company
         $company         = new Company();
-        $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
+        $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $this->companyModel);
         if ($existingCompany[2]) {
             $company = $existingCompany[2];
         }
 
         $companyFieldTypes = $this->fieldModel->getFieldListWithProperties('company');
-
         foreach ($matchedFields as $companyField => $value) {
             if (isset($companyFieldTypes[$companyField]['type']) && $companyFieldTypes[$companyField]['type'] == 'text') {
                 $matchedFields[$companyField] = substr($value, 0, 255);
@@ -333,15 +327,17 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
             $fieldsToUpdate = array_intersect_key($config['companyFields'], $fieldsToUpdate);
             $matchedFields  = array_intersect_key($matchedFields, array_flip($fieldsToUpdate));
-            if (!isset($matchedFields['companyname'])) {
-                if (isset($matchedFields['companywebsite'])) {
-                    $matchedFields['companyname'] = $matchedFields['companywebsite'];
-                }
+        } else {
+            $matchedFields = $this->hydrateCompanyName($matchedFields);
+
+            // If we don't have an company name, don't create the company because it'll result in what looks like an "empty" company
+            if (empty($matchedFields['companyname'])) {
+                return null;
             }
-            $companyModel->setFieldValues($company, $matchedFields, false, false);
         }
 
-        $companyModel->saveEntity($company, false);
+        $this->companyModel->setFieldValues($company, $matchedFields, false);
+        $this->companyModel->saveEntity($company, false);
 
         return $company;
     }
@@ -621,5 +617,32 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $fieldMappings['create'] = $leadFields;
 
         return $fieldMappings;
+    }
+
+    /**
+     * @param array $matchedFields
+     *
+     * @return array
+     */
+    private function hydrateCompanyName(array $matchedFields)
+    {
+        if (!empty($matchedFields['companyname'])) {
+            return $matchedFields;
+        }
+
+        if (!empty($matchedFields['companywebsite'])) {
+            $matchedFields['companyname'] = $matchedFields['companywebsite'];
+
+            return $matchedFields;
+        }
+
+        // We need something as company name so save whatever we have
+        if ($firstMatchedField = reset($matchedFields)) {
+            $matchedFields['companyname'] = $firstMatchedField;
+
+            return $matchedFields;
+        }
+
+        return $matchedFields;
     }
 }
