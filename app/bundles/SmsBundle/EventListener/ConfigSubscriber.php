@@ -35,7 +35,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'SmsBundle',
             'formAlias'  => 'smsconfig',
-            'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
+            'formTheme'  => 'MauticSmsBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticSmsBundle'),
         ]);
     }
