@@ -12,7 +12,7 @@
 
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.header.smsconfig'); ?></h3>
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.smsconfig'); ?></h3>
     </div>
     <div class="panel-body">
         <div class="row">
