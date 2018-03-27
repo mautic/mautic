@@ -28,16 +28,24 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class DeviceModel extends FormModel
 {
-    /** @var CookieHelper */
+    /**
+     * @var CookieHelper
+     */
     private $cookieHelper;
 
-    /** @var LeadDeviceRepository */
+    /**
+     * @var LeadDeviceRepository
+     */
     private $leadDeviceRepository;
 
-    /** @var LeadModel */
+    /**
+     * @var LeadModel
+     */
     private $leadModel;
 
-    /** @var Request */
+    /**
+     * @var Request
+     */
     private $request;
 
     /**

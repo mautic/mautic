@@ -31,7 +31,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PublicController extends CommonFormController
 {
-    /** @var DeviceTrackingServiceInterface */
+    /**
+     * @var DeviceTrackingServiceInterface
+     */
     private $deviceTrackingService;
 
     /**

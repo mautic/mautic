@@ -23,16 +23,24 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class ContactTrackingService implements ContactTrackingServiceInterface
 {
-    /** @var CookieHelper */
+    /**
+     * @var CookieHelper
+     */
     private $cookieHelper;
 
-    /** @var LeadDeviceRepository */
+    /**
+     * @var LeadDeviceRepository
+     */
     private $leadDeviceRepository;
 
-    /** @var LeadRepository */
+    /**
+     * @var LeadRepository
+     */
     private $leadRepository;
 
-    /** @var Request|null */
+    /**
+     * @var Request|null
+     */
     private $request;
 
     /**
@@ -75,7 +83,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
             }
         }
 
-        $lead                        = $this->leadRepository->getEntity($leadId);
+        $lead = $this->leadRepository->getEntity($leadId);
         if ($lead === null) {
             return null;
         }

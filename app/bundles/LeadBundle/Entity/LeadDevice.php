@@ -75,7 +75,9 @@ class LeadDevice
      */
     private $deviceFingerprint;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $trackingId;
 
     /**

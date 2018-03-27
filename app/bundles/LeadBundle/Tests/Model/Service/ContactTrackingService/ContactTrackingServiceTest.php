@@ -24,16 +24,24 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class ContactTrackingServiceTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     private $cookieHelperMock;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     private $leadDeviceRepositoryMock;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     private $leadRepositoryMock;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     private $requestStackMock;
 
     protected function setUp()

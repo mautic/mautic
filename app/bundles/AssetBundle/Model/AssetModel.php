@@ -64,13 +64,19 @@ class AssetModel extends FormModel
      */
     protected $maxAssetSize;
 
-    /** @var DeviceCreatorServiceInterface */
+    /**
+     * @var DeviceCreatorServiceInterface
+     */
     private $deviceCreatorService;
 
-    /** @var DeviceDetectorFactoryInterface */
+    /**
+     * @var DeviceDetectorFactoryInterface
+     */
     private $deviceDetectorFactory;
 
-    /** @var DeviceTrackingServiceInterface */
+    /**
+     * @var DeviceTrackingServiceInterface
+     */
     private $deviceTrackingService;
 
     /**

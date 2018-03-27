@@ -54,7 +54,7 @@ class CookieHelper
     public function getCookie($key, $default = null)
     {
         if ($this->request === null) {
-            return null;
+            return $default;
         }
 
         return $this->request->cookies->get($key, $default);

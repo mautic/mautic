@@ -34,7 +34,9 @@ class AnalyticsHelper extends Helper
      */
     private $leadModel;
 
-    /** @var DeviceTrackingServiceInterface */
+    /**
+     * @var DeviceTrackingServiceInterface
+     */
     private $deviceTrackingService;
 
     /**

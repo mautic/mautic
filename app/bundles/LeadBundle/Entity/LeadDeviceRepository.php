@@ -165,41 +165,12 @@ class LeadDeviceRepository extends CommonRepository
      */
     public function getByTrackingId($trackingId)
     {
-        $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('ld.id as id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'ld');
+        /** @var LeadDevice $leadDevice */
+        $leadDevice = $this->findOneBy([
+            'tracking_id' => $trackingId,
+        ]);
 
-        $sq->where(
-            $sq->expr()->eq('ld.tracking_id', ':trackingId')
-        )
-            ->setParameter('trackingId', $trackingId);
-
-        //get the first match
-        $device = $sq->execute()->fetch();
-        if ($device === false) {
-            return null;
-        }
-
-        return $this->_em->getReference(LeadDevice::class, $device['id']);
-    }
-
-    /**
-     * @param int $leadId
-     *
-     * @return LeadDevice[]
-     */
-    public function getByLeadId($leadId)
-    {
-        $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id, es.lead_id as lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
-
-        $sq->where(
-            $sq->expr()->eq('es.lead_id', ':leadId')
-        )
-            ->setParameter('leadId', $leadId);
-
-        return $sq->execute()->fetchAll();
+        return $leadDevice;
     }
 
     /**
@@ -211,17 +182,11 @@ class LeadDeviceRepository extends CommonRepository
      */
     public function isAnyLeadDeviceTracked(Lead $lead)
     {
-        $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
+        $device = $this->findOneBy([
+            'lead_id' => $lead->getId(),
+            'tracking_id IS NOT NULL',
+        ]);
 
-        $sq->where(
-            $sq->expr()->eq('es.lead_id', ':leadId')
-        )->setParameter('leadId', $lead->getId());
-        $sq->where(
-            $sq->expr()->isNotNull('es.tracking_id')
-        );
-
-        return $sq->execute()->rowCount() !== 0;
+        return $device !== null;
     }
 }

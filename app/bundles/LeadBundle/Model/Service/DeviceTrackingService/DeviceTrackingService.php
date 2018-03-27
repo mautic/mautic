@@ -24,19 +24,29 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class DeviceTrackingService implements DeviceTrackingServiceInterface
 {
-    /** @var CookieHelper */
+    /**
+     * @var CookieHelper
+     */
     private $cookieHelper;
 
-    /** @var EntityManagerInterface */
+    /**
+     * @var EntityManagerInterface
+     */
     private $entityManager;
 
-    /** @var LeadDeviceRepository */
+    /**
+     * @var LeadDeviceRepository
+     */
     private $leadDeviceRepository;
 
-    /** @var RandomHelperInterface */
+    /**
+     * @var RandomHelperInterface
+     */
     private $randomHelper;
 
-    /** @var Request|null */
+    /**
+     * @var Request|null
+     */
     private $request;
 
     /**
