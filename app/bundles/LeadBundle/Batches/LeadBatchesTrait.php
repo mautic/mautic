@@ -2,9 +2,9 @@
 
 namespace Mautic\LeadBundle\Batches;
 
+use Mautic\CoreBundle\Batches\Action\BatchActionInterface;
 use Mautic\CoreBundle\Batches\Exception\BatchActionFailException;
 use Mautic\CoreBundle\Batches\Exception\BatchActionSuccessException;
-use Mautic\CoreBundle\Batches\Group\BatchGroupInterface;
 use Mautic\CoreBundle\Batches\Service\BatchesServiceInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,16 +16,15 @@ use Symfony\Component\HttpFoundation\Request;
  */
 trait LeadBatchesTrait
 {
-    public function handleBatchRequest(BatchGroupInterface $batchGroup, $actionName, \Closure $viewDelegateCallback)
+    public function handleBatchRequest(BatchActionInterface $batchAction, \Closure $viewDelegateCallback)
     {
         /** @var BatchesServiceInterface $batchesService */
         $batchesService = $this->get('mautic.batches');
 
         try {
-            $runner = $batchesService->createRunnerFromGroup(
+            $runner = $batchesService->createRunner(
                 $this->request,
-                $batchGroup,
-                $actionName
+                $batchAction
             );
 
             if ($this->request->isMethod(Request::METHOD_POST)) {
@@ -54,6 +53,6 @@ trait LeadBatchesTrait
             ]);
         }
 
-        return call_user_func_array($viewDelegateCallback, [$actionName]);
+        return call_user_func($viewDelegateCallback);
     }
 }

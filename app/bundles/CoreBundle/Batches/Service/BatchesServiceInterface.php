@@ -11,23 +11,22 @@
 
 namespace Mautic\CoreBundle\Batches\Service;
 
+use Mautic\CoreBundle\Batches\Action\BatchActionInterface;
 use Mautic\CoreBundle\Batches\Exception\BatchActionFailException;
-use Mautic\CoreBundle\Batches\Group\BatchGroupInterface;
 use Mautic\CoreBundle\Batches\Runner\BatchRunnerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 interface BatchesServiceInterface
 {
     /**
-     * Create batch action runner from group
+     * Create runner of single action
      *
      * @param Request               $request
-     * @param BatchGroupInterface   $batchGroup
-     * @param string                $actionName
+     * @param BatchActionInterface  $batchAction
      *
      * @throws BatchActionFailException
      *
      * @return BatchRunnerInterface
      */
-    public function createRunnerFromGroup(Request $request, BatchGroupInterface $batchGroup, $actionName);
+    public function createRunner(Request $request, BatchActionInterface $batchAction);
 }

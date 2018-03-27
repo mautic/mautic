@@ -50,7 +50,6 @@ class CategoriesHandlerAdapter implements HandlerAdapterInterface
         $this->security = $security;
     }
 
-
     /**
      * @see HandlerAdapterInterface::startup()
      * {@inheritdoc}

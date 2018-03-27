@@ -22,46 +22,10 @@ use Symfony\Component\HttpFoundation\Request;
 class BatchesService implements BatchesServiceInterface
 {
     /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * BatchesService constructor.
-     *
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @see BatchesServiceInterface::createRunnerFromGroup()
+     * @see BatchesServiceInterface::createRunner()
      * {@inheritdoc}
      */
-    public function createRunnerFromGroup(Request $request, BatchGroupInterface $batchGroup, $actionName)
-    {
-        $actions = $batchGroup->registerActions();
-
-        if (!array_key_exists($actionName, $actions)) {
-            throw BatchActionFailException::unknownActionTypeInGroup($actionName, $batchGroup);
-        }
-
-        return $this->createRunner($request, $actions[$actionName]);
-    }
-
-    /**
-     * Create runner of single action
-     *
-     * @param Request               $request
-     * @param BatchActionInterface  $batchAction
-     *
-     * @throws BatchActionFailException
-     *
-     * @return BatchRunnerInterface
-     */
-    private function createRunner(Request $request, BatchActionInterface $batchAction)
+    public function createRunner(Request $request, BatchActionInterface $batchAction)
     {
         if ($batchAction->getSourceAdapter() === null) {
             throw BatchActionFailException::sourceAdapterNotSet();

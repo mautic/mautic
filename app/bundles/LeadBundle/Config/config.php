@@ -729,28 +729,49 @@ return [
                 'class'     => \Mautic\LeadBundle\Batches\DataAdapter\LeadSourceAdapter::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
-                ]
+                ],
             ],
             'mautic.lead.batch.handler.segments' => [
                 'class'     => \Mautic\LeadBundle\Batches\Handler\LeadListHandlerAdapter::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.security',
-                ]
+                ],
             ],
             'mautic.lead.batch.handler.categories' => [
                 'class'     => \Mautic\LeadBundle\Batches\Handler\CategoriesHandlerAdapter::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.security',
-                ]
+                ],
             ],
             'mautic.lead.batch.handler.channels' => [
                 'class'     => \Mautic\LeadBundle\Batches\Handler\ChannelHandlerAdapter::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
-                ]
-            ]
+                ],
+            ],
+            'mautic.lead.batch.action.segments' => [
+                'class'     => \Mautic\CoreBundle\Batches\Action\BatchAction::class,
+                'arguments' => [
+                    'mautic.lead.batch.source.lead',
+                    'mautic.lead.batch.handler.segments',
+                ],
+            ],
+            'mautic.lead.batch.action.categories' => [
+                'class'     => \Mautic\CoreBundle\Batches\Action\BatchAction::class,
+                'arguments' => [
+                    'mautic.lead.batch.source.lead',
+                    'mautic.lead.batch.handler.categories',
+                ],
+            ],
+            'mautic.lead.batch.action.channels' => [
+                'class'     => \Mautic\CoreBundle\Batches\Action\BatchAction::class,
+                'arguments' => [
+                    'mautic.lead.batch.source.lead',
+                    'mautic.lead.batch.handler.channels',
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [

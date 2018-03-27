@@ -20,23 +20,6 @@ use Mautic\CoreBundle\Batches\Group\BatchGroupInterface;
 class BatchActionFailException extends \Exception
 {
     /**
-     * Thrown when batch action does not exist in batch group
-     *
-     * @param string                $actionType
-     * @param BatchGroupInterface   $batchGroup
-     *
-     * @return BatchActionFailException
-     */
-    public static function unknownActionTypeInGroup($actionType, BatchGroupInterface $batchGroup)
-    {
-        return new self(sprintf(
-            'Unknown batch action type "%s" in group %s. Please check registration inside group class.',
-            $actionType,
-            $batchGroup
-        ));
-    }
-
-    /**
      * Thrown when source adapter hasn't been set
      *
      * @return BatchActionFailException
