@@ -639,7 +639,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
         var fieldCallback = selectedOption.data("field-callback");
         if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
             fieldOptions = selectedOption.data("field-list");
-            Mautic[fieldCallback](filterIdBase + '_display', selectedFilter, fieldOptions);
+            Mautic[fieldCallback](filterIdBase + '_display', selectedFilter, fieldOptions, mQuery);
         }
     } else {
         mQuery(filter).attr('type', fieldType);

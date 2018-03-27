@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
