@@ -595,6 +595,13 @@ return [
                 ],
                 'alias' => 'lead_contact_frequency_rules',
             ],
+            'mautic.form.type.lead_contact_channels' => [
+                'class'     => \Mautic\LeadBundle\Form\Type\ContactChannelsType::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+                'alias'     => 'lead_contact_channels',
+            ],
             'mautic.form.type.campaignevent_lead_field_value' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
                 'arguments' => [

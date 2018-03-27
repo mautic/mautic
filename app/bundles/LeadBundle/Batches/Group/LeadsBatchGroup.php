@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Batches\Builder\BatchActionBuilder;
 use Mautic\CoreBundle\Batches\Group\BatchGroupInterface;
 use Mautic\LeadBundle\Batches\DataAdapter\LeadSourceAdapter;
 use Mautic\LeadBundle\Batches\Handler\CategoriesHandlerAdapter;
+use Mautic\LeadBundle\Batches\Handler\ChannelHandlerAdapter;
 use Mautic\LeadBundle\Batches\Handler\LeadListHandlerAdapter;
 
 /**
@@ -31,9 +32,15 @@ class LeadsBatchGroup implements BatchGroupInterface
             ->setHandlerAdapter(new CategoriesHandlerAdapter())
             ->build();
 
+        $leadChannelsAction = (new BatchActionBuilder())
+            ->setSourceAdapter(new LeadSourceAdapter())
+            ->setHandlerAdapter(new ChannelHandlerAdapter())
+            ->build();
+
         return [
             'batch.lead.segments'   => $leadSegmentsAction,
             'batch.lead.categories' => $leadCategoriesAction,
+            'batch.lead.channels'   => $leadChannelsAction,
         ];
     }
 }

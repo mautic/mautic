@@ -40,139 +40,17 @@ class ContactFrequencyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $showContactFrequency         = $this->coreParametersHelper->getParameter('show_contact_frequency');
-        $showContactPauseDates        = $this->coreParametersHelper->getParameter('show_contact_pause_dates');
-        $showContactPreferredChannels = $this->coreParametersHelper->getParameter('show_contact_preferred_channels');
         $showContactCategories        = $this->coreParametersHelper->getParameter('show_contact_categories');
         $showContactSegments          = $this->coreParametersHelper->getParameter('show_contact_segments');
 
         if (isset($options['channels']) && $options['channels']) {
             $builder->add(
-                'subscribed_channels',
-                'choice',
+                'lead_channels',
+                'lead_contact_channels',
                 [
-                    'choices'           => $options['channels'],
-                    'choices_as_values' => true,
-                    'expanded'          => true,
-                    'label_attr'        => ['class' => 'control-label'],
-                    'attr'              => ['onClick' => 'Mautic.togglePreferredChannel(this.value);'],
-                    'multiple'          => true,
-                    'label'             => false,
-                    'required'          => false,
+                    'channels' => $options['channels'],
                 ]
             );
-
-            if (!$options['public_view'] || $showContactPreferredChannels) {
-                $builder->add(
-                    'preferred_channel',
-                    'choice',
-                    [
-                        'choices'           => $options['channels'],
-                        'choices_as_values' => true,
-                        'expanded'          => false,
-                        'multiple'          => false,
-                        'label'             => 'mautic.lead.list.frequency.preferred.channel',
-                        'label_attr'        => ['class' => 'control-label'],
-                        'empty_value'       => false,
-                        'required'          => false,
-                        'attr'              => [
-                            'class'   => 'form-control',
-                            'tooltip' => 'mautic.lead.list.frequency.preferred.channel',
-                        ],
-                    ]
-                );
-            }
-
-            if (!$options['public_view'] || $showContactFrequency || $showContactPauseDates) {
-                foreach ($options['channels'] as $channel) {
-                    $attr = (isset($options['data']['subscribed_channels']) && !in_array($channel, $options['data']['subscribed_channels']))
-                        ? ['disabled' => 'disabled'] : [];
-
-                    $builder->add(
-                        'frequency_number_'.$channel,
-                        'integer',
-                        [
-                            'precision'  => 0,
-                            'label'      => 'mautic.lead.list.frequency.number',
-                            'label_attr' => ['class' => 'text-muted fw-n label1'],
-                            'attr'       => array_merge(
-                                $attr,
-                                [
-                                    'class' => 'frequency form-control',
-                                ]
-                            ),
-                            'required' => false,
-                        ]
-                    );
-
-                    $builder->add(
-                        'frequency_time_'.$channel,
-                        'choice',
-                        [
-                            'choices' => [
-                                FrequencyRule::TIME_DAY   => 'mautic.core.time.days',
-                                FrequencyRule::TIME_WEEK  => 'mautic.core.time.weeks',
-                                FrequencyRule::TIME_MONTH => 'mautic.core.time.months',
-                            ],
-                            'label'      => 'mautic.lead.list.frequency.times',
-                            'label_attr' => ['class' => 'text-muted fw-n frequency-label label2'],
-                            'multiple'   => false,
-                            'required'   => false,
-                            'attr'       => array_merge(
-                                $attr,
-                                [
-                                    'class' => 'form-control',
-                                ]
-                            ),
-                        ]
-                    );
-
-                    if ($options['public_view'] == false) {
-                        $attributes = array_merge(
-                            $attr,
-                            [
-                                'data-toggle' => 'date',
-                                'class'       => 'frequency-date form-control',
-                            ]
-                        );
-                        $type = 'datetime';
-                    } else {
-                        $attributes = array_merge(
-                            $attr,
-                            [
-                                'class' => 'form-control',
-                            ]
-                        );
-                        $type = 'date';
-                    }
-                    if (!$options['public_view'] || $showContactPauseDates) {
-                        $builder->add(
-                            'contact_pause_start_date_'.$channel,
-                            $type,
-                            [
-                                'widget'     => 'single_text',
-                                'label'      => false, //'mautic.lead.frequency.contact.start.date',
-                                'label_attr' => ['class' => 'text-muted fw-n label3'],
-                                'attr'       => $attributes,
-                                'format'     => 'yyyy-MM-dd',
-                                'required'   => false,
-                            ]
-                        );
-                        $builder->add(
-                            'contact_pause_end_date_'.$channel,
-                            $type,
-                            [
-                                'widget'     => 'single_text',
-                                'label'      => 'mautic.lead.frequency.contact.end.date',
-                                'label_attr' => ['class' => 'frequency-label text-muted fw-n label4'],
-                                'attr'       => $attributes,
-                                'format'     => 'yyyy-MM-dd',
-                                'required'   => false,
-                            ]
-                        );
-                    }
-                }
-            }
         }
 
         if (!$options['public_view']) {

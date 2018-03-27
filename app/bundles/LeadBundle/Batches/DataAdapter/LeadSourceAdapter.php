@@ -35,6 +35,7 @@ class LeadSourceAdapter implements SourceAdapterInterface
     public function getIdList(Request $request)
     {
         $data = $request->get('lead_batch', [], true);
+        //dump($request->get('lead_contact_channels'));
         return json_decode($data['ids'], true);
     }
 

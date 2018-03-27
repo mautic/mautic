@@ -1508,6 +1508,39 @@ class LeadController extends FormController
     }
 
     /**
+     * Batch update of channels
+     *
+     * @return mixed|JsonResponse
+     */
+    public function batchChannelsAction()
+    {
+        return $this->handleBatchRequest(new LeadsBatchGroup(), 'batch.lead.channels', function () {
+            /** @var LeadModel $model */
+            $model = $this->getModel('lead');
+
+            $route = $this->generateUrl('mautic_contact_action', ['objectAction' => 'batchChannels']);
+
+            return $this->delegateView([
+                'viewParameters' => [
+                    'form'         => $this->createForm('lead_contact_channels', [], [
+                        'action'        => $route,
+                        'channels'      => $model->getPreferenceChannels(),
+                        'public_view'   => false,
+                        'save_button'   => true,
+                    ])->createView(),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Batch:channel.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route' => $route,
+                ],
+            ]);
+        });
+
+    }
+
+    /**
      * Bulk edit lead campaigns.
      *
      * @param int $objectId

@@ -1484,8 +1484,8 @@ class LeadModel extends FormModel
         $channels       = $this->getPreferenceChannels();
 
         foreach ($channels as $ch) {
-            if (empty($data['preferred_channel'])) {
-                $data['preferred_channel'] = $ch;
+            if (empty($data['lead_channels']['preferred_channel'])) {
+                $data['lead_channels']['preferred_channel'] = $ch;
             }
 
             $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
@@ -1493,19 +1493,19 @@ class LeadModel extends FormModel
             $frequencyRule->setLead($lead);
             $frequencyRule->setDateAdded(new \DateTime());
 
-            if (!empty($data['frequency_number_'.$ch]) && !empty($data['frequency_time_'.$ch])) {
-                $frequencyRule->setFrequencyNumber($data['frequency_number_'.$ch]);
-                $frequencyRule->setFrequencyTime($data['frequency_time_'.$ch]);
+            if (!empty($data['lead_channels']['frequency_number_'.$ch]) && !empty($data['lead_channels']['frequency_time_'.$ch])) {
+                $frequencyRule->setFrequencyNumber($data['lead_channels']['frequency_number_'.$ch]);
+                $frequencyRule->setFrequencyTime($data['lead_channels']['frequency_time_'.$ch]);
             } else {
                 $frequencyRule->setFrequencyNumber(null);
                 $frequencyRule->setFrequencyTime(null);
             }
 
-            $frequencyRule->setPauseFromDate(!empty($data['contact_pause_start_date_'.$ch]) ? $data['contact_pause_start_date_'.$ch] : null);
-            $frequencyRule->setPauseToDate(!empty($data['contact_pause_end_date_'.$ch]) ? $data['contact_pause_end_date_'.$ch] : null);
+            $frequencyRule->setPauseFromDate(!empty($data['lead_channels']['contact_pause_start_date_'.$ch]) ? $data['lead_channels']['contact_pause_start_date_'.$ch] : null);
+            $frequencyRule->setPauseToDate(!empty($data['lead_channels']['contact_pause_end_date_'.$ch]) ? $data['lead_channels']['contact_pause_end_date_'.$ch] : null);
 
             $frequencyRule->setLead($lead);
-            $frequencyRule->setPreferredChannel($data['preferred_channel'] === $ch);
+            $frequencyRule->setPreferredChannel($data['lead_channels']['preferred_channel'] === $ch);
 
             if ($persist) {
                 $entities[$ch] = $frequencyRule;
