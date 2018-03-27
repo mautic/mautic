@@ -12,45 +12,34 @@
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
-use Mautic\SmsBundle\Api\TwilioApi;
 use Mautic\SmsBundle\Sms\TransportChain;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SmsTransportPassTest extends AbstractMauticTestCase
 {
-    private function getWilioMock()
-    {
-        return $this->getMockBuilder(TwilioApi::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
     public function testProcess()
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new SmsTransportPass(), PassConfig::TYPE_OPTIMIZE);
+        $container->addCompilerPass(new SmsTransportPass());
         $container
             ->register('foo')
-            ->addTag('mautic.sms_transport', ['alias'=>'fakeAliasDefault', 'fakeIntegration'])
             ->setPublic(true)
-            ->setSynthetic(true)
+            ->setAbstract(true)
+            ->addTag('mautic.sms_transport', ['alias'=>'fakeAliasDefault', 'fakeIntegrationDefault'])
         ;
-        $container->set('foo', $this->getWilioMock());
 
         $container
             ->register('chocolate')
             ->setPublic(true)
             ->setAbstract(true)
         ;
+
         $container
             ->register('bar')
             ->setPublic(true)
             ->setAbstract(true)
             ->addTag('mautic.sms_transport', ['alias'=>'fakeAlias', 'fakeIntegration'])
         ;
-        $container->set('bar', $this->getWilioMock());
 
         $transport = $this->getMockBuilder(TransportChain::class)
                             ->disableOriginalConstructor()
@@ -62,37 +51,16 @@ class SmsTransportPassTest extends AbstractMauticTestCase
             ->setClass(get_class($transport))
             ->setArguments(['foo', $this->container->get('mautic.helper.integration'), $this->container->get('monolog.logger.mautic')])
             ->setShared(false)
+            ->setSynthetic(true)
+            ->setAbstract(true)
         ;
 
-        $adds = 0;
-        $transport->expects($this->exactly(10000))
-                  ->method('addTransport')
-                  ->willReturnCallback(
-                      function ($endpoint, $parameters) use (&$adds) {
-                          ++$adds;
-                          var_dump($adds);
+        $pass = new SmsTransportPass();
+        $pass->process($container);
 
-                          return $this->countAdds(3);
-                      }
-                  );
+        $this->assertEquals(2, count($container->findTaggedServiceIds('mautic.sms_transport')));
 
-        $definition     = $container->getDefinition('mautic.sms.transport_chain');
-        var_dump($definition->getMethodCalls());
-
-        $container->compile();
-
-        $definition     = $container->getDefinition('mautic.sms.transport_chain');
-        var_dump($container->get('mautic.sms.transport_chain'));
-        var_dump($definition->getMethodCalls());
-
-        $this->assertCount(2, $container->findTaggedServiceIds('mautic.sms_transport'));
-
-        $this->assertEquals(3, $adds);
-    }
-
-    protected function process(ContainerBuilder $container)
-    {
-        $repeatedPass = new RepeatedPass([new SmsTransportPass()]);
-        $repeatedPass->process($container);
+        $this->assertCount(count($container->getDefinition('mautic.sms.transport_chain')->getMethodCalls()),
+                           $container->findTaggedServiceIds('mautic.sms_transport'));
     }
 }
