@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -99,6 +100,11 @@ class Form extends FormEntity
      * @var bool
      */
     private $renderStyle = false;
+
+    /**
+     * @var bool
+     */
+    private $inContactTab = false;
 
     /**
      * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
@@ -204,6 +210,8 @@ class Form extends FormEntity
             ->nullable()
             ->build();
 
+        $builder->addNullableField('inContactTab', Type::BOOLEAN, 'in_contact_tab');
+
         $builder->createOneToMany('submissions', 'Submission')
             ->setOrderBy(['dateSubmitted' => 'DESC'])
             ->mappedBy('form')
@@ -290,6 +298,7 @@ class Form extends FormEntity
                     'actions',
                     'template',
                     'inKioskMode',
+                    'inContactTab',
                     'renderStyle',
                     'formType',
                     'postAction',
@@ -733,6 +742,22 @@ class Form extends FormEntity
     public function setInKioskMode($inKioskMode)
     {
         $this->inKioskMode = $inKioskMode;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInContactTab()
+    {
+        return $this->inContactTab;
+    }
+
+    /**
+     * @param bool $inContactTab
+     */
+    public function setInContactTab($inContactTab)
+    {
+        $this->inContactTab = $inContactTab;
     }
 
     /**

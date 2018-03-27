@@ -106,6 +106,14 @@ class FormType extends AbstractType
             ],
         ]);
 
+        $builder->add('inContactTab', 'yesno_button_group', [
+            'label' => 'mautic.form.form.contacttab',
+            'attr'  => [
+                'tooltip' => 'mautic.form.form.contacttab.tooltip',
+            ],
+            'data'=> $options['data']->isInContactTab(),
+        ]);
+
         // Render style for new form by default
         if ($options['data']->getId() === null) {
             $options['data']->setRenderStyle(true);

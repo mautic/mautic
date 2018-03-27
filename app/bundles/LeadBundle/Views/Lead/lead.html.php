@@ -313,6 +313,17 @@ $view['slots']->set(
                         </a>
                     </li>
                 <?php endif; ?>
+
+                <?php if (!empty($leadForms)): ?>
+                    <li class="">
+                        <a href="#form-container" role="tab" data-toggle="tab">
+                        <span class="label label-primary mr-sm" id="FormCount">
+                            <?php echo count($leadForms); ?>
+                        </span>
+                            <?php echo $view['translator']->trans('mautic.lead.lead.tab.forms'); ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
                 
                 <?php echo $view['content']->getCustomContent('tabs', $mauticTemplateVars); ?>
             </ul>
@@ -391,6 +402,17 @@ $view['slots']->set(
                 </div>
             <?php endif; ?>
             <!--/ #place-container -->
+            <!-- #device-container -->
+            <?php if (!empty($leadForms)): ?>
+                <div class="tab-pane fade bdr-w-0 row" id="form-container">
+                    <?php
+                    echo $view->render('MauticLeadBundle:Form:list.html.php',
+                        [
+                            'leadForms' => $leadForms,
+                        ]); ?>
+                </div>
+            <?php endif; ?>
+            <!--/ #device-container -->
         </div>
         <!--/ end: tab-content -->
     </div>
