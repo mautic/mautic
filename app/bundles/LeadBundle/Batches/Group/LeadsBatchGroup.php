@@ -4,10 +4,7 @@ namespace Mautic\LeadBundle\Batches\Group;
 
 use Mautic\CoreBundle\Batches\Builder\BatchActionBuilder;
 use Mautic\CoreBundle\Batches\Group\BatchGroupInterface;
-use Mautic\LeadBundle\Batches\DataAdapter\LeadSourceAdapter;
-use Mautic\LeadBundle\Batches\Handler\CategoriesHandlerAdapter;
-use Mautic\LeadBundle\Batches\Handler\ChannelHandlerAdapter;
-use Mautic\LeadBundle\Batches\Handler\LeadListHandlerAdapter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Batch action group for lead table
@@ -17,24 +14,39 @@ use Mautic\LeadBundle\Batches\Handler\LeadListHandlerAdapter;
 class LeadsBatchGroup implements BatchGroupInterface
 {
     /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * LeadsBatchGroup constructor.
+     *
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
      * @see BatchGroupInterface::registerActions()
      * {@inheritdoc}
      */
     public function registerActions()
     {
         $leadSegmentsAction = (new BatchActionBuilder())
-            ->setSourceAdapter(new LeadSourceAdapter())
-            ->setHandlerAdapter(new LeadListHandlerAdapter())
+            ->setSourceAdapter($this->container->get('mautic.lead.batch.source.lead'))
+            ->setHandlerAdapter($this->container->get('mautic.lead.batch.handler.segments'))
             ->build();
 
         $leadCategoriesAction = (new BatchActionBuilder())
-            ->setSourceAdapter(new LeadSourceAdapter())
-            ->setHandlerAdapter(new CategoriesHandlerAdapter())
+            ->setSourceAdapter($this->container->get('mautic.lead.batch.source.lead'))
+            ->setHandlerAdapter($this->container->get('mautic.lead.batch.handler.categories'))
             ->build();
 
         $leadChannelsAction = (new BatchActionBuilder())
-            ->setSourceAdapter(new LeadSourceAdapter())
-            ->setHandlerAdapter(new ChannelHandlerAdapter())
+            ->setSourceAdapter($this->container->get('mautic.lead.batch.source.lead'))
+            ->setHandlerAdapter($this->container->get('mautic.lead.batch.handler.channels'))
             ->build();
 
         return [

@@ -39,6 +39,19 @@ class CategoriesHandlerAdapter implements HandlerAdapterInterface
     private $removeCategories = [];
 
     /**
+     * CategoriesHandlerAdapter constructor.
+     *
+     * @param LeadModel $leadModel
+     * @param CorePermissions $security
+     */
+    public function __construct(LeadModel $leadModel, CorePermissions $security)
+    {
+        $this->leadModel = $leadModel;
+        $this->security = $security;
+    }
+
+
+    /**
      * @see HandlerAdapterInterface::startup()
      * {@inheritdoc}
      */

@@ -20,12 +20,13 @@ class LeadSourceAdapter implements SourceAdapterInterface
     private $leadModel;
 
     /**
-     * @see SourceAdapterInterface::startup()
-     * {@inheritdoc}
+     * LeadSourceAdapter constructor.
+     *
+     * @param LeadModel $leadModel
      */
-    public function startup(ContainerInterface $container)
+    public function __construct(LeadModel $leadModel)
     {
-        $this->leadModel = $container->get('mautic.model.factory')->getModel('lead');
+        $this->leadModel = $leadModel;
     }
 
     /**

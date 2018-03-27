@@ -38,13 +38,15 @@ class LeadListHandlerAdapter implements HandlerAdapterInterface
     private $removeLeadLists = [];
 
     /**
-     * @see HandlerAdapterInterface::startup()
-     * {@inheritdoc}
+     * LeadListHandlerAdapter constructor.
+     *
+     * @param LeadModel $leadModel
+     * @param CorePermissions $security
      */
-    public function startup(ContainerInterface $container)
+    public function __construct(LeadModel $leadModel, CorePermissions $security)
     {
-        $this->leadModel = $container->get('mautic.model.factory')->getModel('lead');
-        $this->security = $container->get('mautic.security');
+        $this->leadModel = $leadModel;
+        $this->security = $security;
     }
 
     /**

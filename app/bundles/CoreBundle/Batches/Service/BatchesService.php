@@ -71,9 +71,6 @@ class BatchesService implements BatchesServiceInterface
             throw BatchActionFailException::handlerAdapterNotSet();
         }
 
-        $batchAction->getSourceAdapter()->startup($this->container);
-        $batchAction->getHandlerAdapter()->startup($this->container);
-
         $runner = new BatchRunner();
         $runner->setBatchAction($batchAction, $request);
         return $runner;

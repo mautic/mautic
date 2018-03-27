@@ -20,13 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 interface SourceAdapterInterface
 {
     /**
-     * Startup method with container. It is called right after a batch action is in run (before any other method on this object will be called).
-     *
-     * @param ContainerInterface $container
-     */
-    public function startup(ContainerInterface $container);
-
-    /**
      * Define how source objects will be loaded.
      *
      * @param int[] $ids

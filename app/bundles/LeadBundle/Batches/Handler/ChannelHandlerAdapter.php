@@ -42,12 +42,12 @@ class ChannelHandlerAdapter implements HandlerAdapterInterface
     private $contactPauseEndDateEmail;
 
     /**
-     * @see HandlerAdapterInterface::startup()
-     * {@inheritdoc}
+     * ChannelHandlerAdapter constructor.
+     * @param LeadModel $leadModel
      */
-    public function startup(ContainerInterface $container)
+    public function __construct(LeadModel $leadModel)
     {
-        $this->leadModel = $container->get('mautic.model.factory')->getModel('lead');
+        $this->leadModel = $leadModel;
     }
 
     /**

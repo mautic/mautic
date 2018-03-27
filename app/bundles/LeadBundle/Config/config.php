@@ -724,6 +724,34 @@ return [
                 ],
             ],
         ],
+        'batches' => [
+            'mautic.lead.batch.source.lead' => [
+                'class'     => \Mautic\LeadBundle\Batches\DataAdapter\LeadSourceAdapter::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ]
+            ],
+            'mautic.lead.batch.handler.segments' => [
+                'class'     => \Mautic\LeadBundle\Batches\Handler\LeadListHandlerAdapter::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.security',
+                ]
+            ],
+            'mautic.lead.batch.handler.categories' => [
+                'class'     => \Mautic\LeadBundle\Batches\Handler\CategoriesHandlerAdapter::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.security',
+                ]
+            ],
+            'mautic.lead.batch.handler.channels' => [
+                'class'     => \Mautic\LeadBundle\Batches\Handler\ChannelHandlerAdapter::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ]
+            ]
+        ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
                 'class'     => 'Mautic\LeadBundle\Templating\Helper\AvatarHelper',

@@ -1437,7 +1437,7 @@ class LeadController extends FormController
      */
     public function batchListsAction()
     {
-        return $this->handleBatchRequest(new LeadsBatchGroup(), 'batch.lead.segments', function () {
+        return $this->handleBatchRequest(new LeadsBatchGroup($this->container), 'batch.lead.segments', function () {
             /** @var \Mautic\LeadBundle\Model\ListModel $model */
             $model = $this->getModel('lead.list');
             $lists = $model->getUserLists();
@@ -1478,7 +1478,7 @@ class LeadController extends FormController
      */
     public function batchCategoriesAction()
     {
-        return $this->handleBatchRequest(new LeadsBatchGroup(), 'batch.lead.categories', function () {
+        return $this->handleBatchRequest(new LeadsBatchGroup($this->container), 'batch.lead.categories', function () {
             /** @var CategoryModel $model */
             $model = $this->getModel('category.category');
             $entities = $model->getEntities()->getIterator();
@@ -1514,7 +1514,7 @@ class LeadController extends FormController
      */
     public function batchChannelsAction()
     {
-        return $this->handleBatchRequest(new LeadsBatchGroup(), 'batch.lead.channels', function () {
+        return $this->handleBatchRequest(new LeadsBatchGroup($this->container), 'batch.lead.channels', function () {
             /** @var LeadModel $model */
             $model = $this->getModel('lead');
 
