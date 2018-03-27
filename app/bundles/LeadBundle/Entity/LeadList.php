@@ -300,5 +300,6 @@ class LeadList extends FormEntity
         $this->id    = null;
         $this->leads = new ArrayCollection();
         $this->setIsPublished(false);
+        $this->setAlias('');
     }
 }
