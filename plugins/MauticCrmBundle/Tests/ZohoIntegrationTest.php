@@ -47,7 +47,10 @@ class ZohoIntegrationTest extends \PHPUnit_Framework_TestCase
         $translator->expects($this->any())
                    ->method('trans')
                    ->willReturnArgument(0);
-        $this->integration = new ZohoIntegration();
+        $this->integration = $this->getMockBuilder(ZohoIntegration::class)
+            ->setMethods(['getApiHelper'])
+            ->getMock();
+
         $this->integration->setTranslator($translator);
         $this->integration->setEncryptionHelper($encryptionHelper);
         $eventMock = $this->getMockBuilder(Event::class)
@@ -123,7 +126,8 @@ class ZohoIntegrationTest extends \PHPUnit_Framework_TestCase
         $apiHelper->expects($this->any())
                        ->method('getLeadFields')
                        ->willReturn($leadFields);
-        $this->integration->setApiHelper($apiHelper);
+        $this->integration->method('getApiHelper')
+            ->willReturn($apiHelper);
         $this->integration->setIntegrationSettings($settings);
     }
 

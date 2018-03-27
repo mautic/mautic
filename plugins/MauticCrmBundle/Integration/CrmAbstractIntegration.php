@@ -188,18 +188,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Sets the API helper.
-     *
-     * @param object $helper
-     */
-    public function setApiHelper($helper)
-    {
-        if ($helper instanceof CrmApi) {
-            $this->helper = $helper;
-        }
-    }
-
-    /**
      * @param array $params
      */
     public function pushLeadActivity($params = [])
