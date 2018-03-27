@@ -187,7 +187,8 @@ class FormSubscriber extends CommonSubscriber
         if (!empty($emails)) {
             $this->setMailer($config, $tokens, $emails, $lead);
 
-            if (!empty($config['set_replyto']) && !empty($leadEmail)) {
+            // Check for !isset to keep BC to existing behavior prior to 2.13.0
+            if ((!isset($config['set_replyto']) || !empty($config['set_replyto'])) && !empty($leadEmail)) {
                 // Reply to lead for user convenience
                 $this->mailer->setReplyTo($leadEmail);
             }
