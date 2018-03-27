@@ -74,7 +74,6 @@ class MAConsumerCommand extends ModeratedCommand
             $output->writeln("<error>RabbitMQ password not set, check the plugin settings.</error>");
             return;
         }
-
         $connection = new AMQPSSLConnection(
             $integrationObject->getLocation(), 
             5672, 
@@ -82,9 +81,9 @@ class MAConsumerCommand extends ModeratedCommand
             $integrationObject->getPassword(),
             '/',
             [
-                'cafile'=>$integrationObject->getCacert(),
-                'local_cert'=>$integrationObject->getCert(),
-                'local_pk'=>$integrationObject->getKey(),
+                'cafile'=>getenv("RABBITMQ_SSL_CACERT_FILE"),
+                'local_cert'=>getenv("RABBITMQ_SSL_CERT_FILE"),
+                'local_pk'=>getenv("RABBITMQ_SSL_KEY_FILE"),
             ]);
         $channel = $connection->channel();
 
