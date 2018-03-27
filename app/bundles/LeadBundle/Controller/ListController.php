@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -305,7 +306,7 @@ class ListController extends FormController
      *
      * @return Response
      */
-    public function createSegmentModifyResponse($segment, array $postActionVars, $action, $ignorePost)
+    private function createSegmentModifyResponse($segment, array $postActionVars, $action, $ignorePost)
     {
         /** @var ListModel $segmentModel */
         $segmentModel = $this->getModel('lead.list');
@@ -314,6 +315,7 @@ class ListController extends FormController
             return $this->isLocked($postActionVars, $segment, 'lead.list');
         }
 
+        /** @var FormInterface $form */
         $form   = $segmentModel->createForm($segment, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
@@ -332,13 +334,34 @@ class ListController extends FormController
                             'objectId'     => $segment->getId(),
                         ]),
                     ]);
+
+                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                        $link = $this->generateUrl('mautic_segment_action', [
+                            'objectAction' => 'edit',
+                            'objectId' => $segment->getId(),
+                        ]);
+                        $postActionVars['contentTemplate'] = 'MauticLeadBundle:List:edit';
+                        $postActionVars['viewParameters'] = ['objectAction' => 'edit', 'objectId' => $segment->getId()];
+                        $postActionVars['returnUrl'] = $link;
+                        return $this->postActionRedirect($postActionVars);
+
+                    } else if ($form->get('buttons')->get('save')->isClicked()) {
+                        $link = $this->generateUrl('mautic_segment_action', [
+                            'objectAction' => 'view',
+                            'objectId' => $segment->getId(),
+                        ]);
+                        $postActionVars['contentTemplate'] = 'MauticLeadBundle:List:view';
+                        $postActionVars['viewParameters'] = ['objectAction' => 'view', 'objectId' => $segment->getId()];
+                        $postActionVars['returnUrl'] = $link;
+                        return $this->postActionRedirect($postActionVars);
+                    }
                 }
             } else {
                 //unlock the entity
                 $segmentModel->unlockEntity($segment);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled) {
                 return $this->postActionRedirect($postActionVars);
             }
         } else {
