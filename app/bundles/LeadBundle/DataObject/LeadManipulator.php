@@ -16,13 +16,19 @@ namespace Mautic\LeadBundle\DataObject;
  */
 class LeadManipulator
 {
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $bundleName;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $objectName;
 
-    /** @var int|null */
+    /**
+     * @var int|null
+     */
     private $objectId;
 
     /**
