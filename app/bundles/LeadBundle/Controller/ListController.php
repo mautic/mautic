@@ -306,7 +306,7 @@ class ListController extends FormController
      *
      * @return Response
      */
-    private function createSegmentModifyResponse($segment, array $postActionVars, $action, $ignorePost)
+    private function createSegmentModifyResponse(LeadList $segment, array $postActionVars, $action, $ignorePost)
     {
         /** @var ListModel $segmentModel */
         $segmentModel = $this->getModel('lead.list');
@@ -316,13 +316,12 @@ class ListController extends FormController
         }
 
         /** @var FormInterface $form */
-        $form   = $segmentModel->createForm($segment, $this->get('form.factory'), $action);
+        $form = $segmentModel->createForm($segment, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
-            $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                if ($this->isFormValid($form)) {
                     //form is valid so process the data
                     $segmentModel->saveEntity($segment, $form->get('buttons')->get('save')->isClicked());
 
@@ -336,24 +335,25 @@ class ListController extends FormController
                     ]);
 
                     if ($form->get('buttons')->get('apply')->isClicked()) {
-                        $link = $this->generateUrl('mautic_segment_action', [
+                        $contentTemplate                     = 'MauticLeadBundle:List:form.html.php';
+                        $postActionVars['contentTemplate']   = $contentTemplate;
+                        $postActionVars['forwardController'] = false;
+                        $postActionVars['returnUrl']         = $this->generateUrl('mautic_segment_action', [
                             'objectAction' => 'edit',
-                            'objectId' => $segment->getId(),
+                            'objectId'     => $segment->getId(),
                         ]);
-                        $postActionVars['contentTemplate'] = 'MauticLeadBundle:List:edit';
-                        $postActionVars['viewParameters'] = ['objectAction' => 'edit', 'objectId' => $segment->getId()];
-                        $postActionVars['returnUrl'] = $link;
-                        return $this->postActionRedirect($postActionVars);
+                        // Re-create the form once more with the fresh segment.
+                        // The alias was empty on redirect after cloning.
+                        $form                             = $segmentModel->createForm($segment, $this->get('form.factory'), $action);
+                        $postActionVars['viewParameters'] = [
+                            'objectAction' => 'edit',
+                            'objectId'     => $segment->getId(),
+                            'form'         => $this->setFormTheme($form, $contentTemplate, 'MauticLeadBundle:FormTheme\Filter'),
+                        ];
 
-                    } else if ($form->get('buttons')->get('save')->isClicked()) {
-                        $link = $this->generateUrl('mautic_segment_action', [
-                            'objectAction' => 'view',
-                            'objectId' => $segment->getId(),
-                        ]);
-                        $postActionVars['contentTemplate'] = 'MauticLeadBundle:List:view';
-                        $postActionVars['viewParameters'] = ['objectAction' => 'view', 'objectId' => $segment->getId()];
-                        $postActionVars['returnUrl'] = $link;
                         return $this->postActionRedirect($postActionVars);
+                    } else {
+                        return $this->viewAction($segment->getId());
                     }
                 }
             } else {
