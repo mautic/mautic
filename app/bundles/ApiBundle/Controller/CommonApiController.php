@@ -579,11 +579,25 @@ class CommonApiController extends FOSRestController implements MauticController
         $errors            = [];
         $statusCodes       = [];
         foreach ($parameters as $key => $params) {
-            $entity = $this->getNewEntity($params);
-            $this->processBatchForm($key, $entity, $params, 'POST', $errors, $entities);
+            // Can be new or an existing on based on params
+            $entity       = $this->getNewEntity($params);
+            $entityExists = false;
+            $method       = 'POST';
+            if ($entity->getId()) {
+                $entityExists = true;
+                $method       = 'PATCH';
+                if (!$this->checkEntityAccess($entity, 'edit')) {
+                    $this->setBatchError($key, 'mautic.core.error.accessdenied', Codes::HTTP_FORBIDDEN, $errors, $entities, $entity);
+                    $statusCodes[$key] = Codes::HTTP_FORBIDDEN;
+                    continue;
+                }
+            }
+            $this->processBatchForm($key, $entity, $params, $method, $errors, $entities);
 
             if (isset($errors[$key])) {
                 $statusCodes[$key] = $errors[$key]['code'];
+            } elseif ($entityExists) {
+                $statusCodes[$key] = Codes::HTTP_OK;
             } else {
                 $statusCodes[$key] = Codes::HTTP_CREATED;
             }
