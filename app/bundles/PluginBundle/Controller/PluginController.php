@@ -156,7 +156,7 @@ class PluginController extends FormController
         $authorize = $this->request->request->get('integration_details[in_auth]', false, true);
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationHelper = $this->get('mautic.helper.integration');
         /** @var AbstractIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject($name);
 
@@ -387,7 +387,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationHelper = $this->get('mautic.helper.integration');
 
         return $this->delegateView(
             [
@@ -611,9 +611,10 @@ class PluginController extends FormController
 
     public function viewSettingsAction($name)
     {
-        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationHelper = $this->get('mautic.helper.integration');
         $integrationObject = $integrationHelper->getIntegrationObject($name);
         $featureSettings = $integrationObject->getIntegrationSettings()->getFeatureSettings();
+        
         return new JsonResponse($featureSettings);
     }
 }
