@@ -4,17 +4,46 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeadImport extends AbstractImport
 {
-    public function __construct(EntityManager $em)
+    /**
+     * @var LeadModel
+     */
+    private $leadModel;
+
+    /**
+     * @var CompanyModel
+     */
+    private $companyModel;
+
+    /**
+     * LeadImport constructor.
+     *
+     * @param EntityManager $em
+     * @param LeadModel     $leadModel
+     */
+    public function __construct(EntityManager $em, LeadModel $leadModel, CompanyModel $companyModel)
     {
         parent::__construct($em);
+
+        $this->leadModel    = $leadModel;
+        $this->companyModel = $companyModel;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return bool
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
+     */
     public function create(array $data = [])
     {
         $integrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $data['id']]);
@@ -23,22 +52,20 @@ class LeadImport extends AbstractImport
             throw new \Exception('Lead already have integration', Response::HTTP_CONFLICT);
         }
 
-        $data         = $this->convertPipedriveData($data);
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
         $lead = new Lead();
 
-        foreach ($dataToUpdate as $field => $value) {
-            $lead->addUpdatedField($field, $value);
-        }
+        // prevent listeners from exporting
+        $lead->setEventData('pipedrive.webhook', 1);
+
+        $this->leadModel->setFieldValues($lead, $dataToUpdate);
 
         if (isset($data['owner_id'])) {
             $this->addOwnerToLead($data['owner_id'], $lead);
         }
-
-        $lead->setDateAdded(new \DateTime());
-        $lead->setPreferredProfileImage('gravatar');
-        $this->em->getRepository(Lead::class)->saveEntity($lead);
+        $this->leadModel->saveEntity($lead);
 
         $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $data['id'], $lead->getId());
 
@@ -53,6 +80,15 @@ class LeadImport extends AbstractImport
         return true;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return bool
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
+     */
     public function update(array $data = [])
     {
         $integrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $data['id']]);
@@ -63,25 +99,25 @@ class LeadImport extends AbstractImport
 
         /** @var Lead $lead * */
         $lead         = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
-        $data         = $this->convertPipedriveData($data);
+
+        // prevent listeners from exporting
+        $lead->setEventData('pipedrive.webhook', 1);
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
+
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
-        foreach ($dataToUpdate as $field => $value) {
-            $lead->addUpdatedField($field, $value);
-        }
-
-        $lead->setDateModified(new \DateTime());
+        $this->leadModel->setFieldValues($lead, $dataToUpdate);
 
         if (!isset($data['owner_id']) && $lead->getOwner()) {
             $lead->setOwner(null);
         } elseif (isset($data['owner_id'])) {
             $this->addOwnerToLead($data['owner_id'], $lead);
         }
+        $this->leadModel->saveEntity($lead);
 
         $integrationEntity->setLastSyncDate(new \DateTime());
-
-        $this->em->getRepository(Lead::class)->saveEntity($lead);
         $this->em->persist($integrationEntity);
+        $this->em->flush();
 
         if (!$this->getIntegration()->isCompanySupportEnabled()) {
             return;
@@ -93,9 +129,14 @@ class LeadImport extends AbstractImport
             $this->addLeadToCompany($data['org_id'], $lead);
         }
 
-        $this->em->flush();
+        return true;
     }
 
+    /**
+     * @param array $data
+     *
+     * @throws \Exception
+     */
     public function delete(array $data = [])
     {
         $integrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $data['id']]);
@@ -104,24 +145,39 @@ class LeadImport extends AbstractImport
             throw new \Exception('Lead doesn\'t have integration', Response::HTTP_NOT_FOUND);
         }
 
+        /** @var Lead $lead */
         $lead = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
 
         if (!$lead) {
             throw new \Exception('Lead doesn\'t exists in Mautic', Response::HTTP_NOT_FOUND);
         }
 
-        $this->em->transactional(function ($em) use ($lead, $integrationEntity) {
-            $em->remove($lead);
-            $em->remove($integrationEntity);
-        });
+        // prevent listeners from exporting
+        $lead->setEventData('pipedrive.webhook', 1);
+
+        $this->leadModel->deleteEntity($lead);
+
+        if (!empty($lead->deletedId)) {
+            $this->em->remove($integrationEntity);
+        }
     }
 
+    /**
+     * @param      $integrationOwnerId
+     * @param Lead $lead
+     */
     private function addOwnerToLead($integrationOwnerId, Lead $lead)
     {
         $mauticOwner = $this->getOwnerByIntegrationId($integrationOwnerId);
         $lead->setOwner($mauticOwner);
     }
 
+    /**
+     * @param      $companyName
+     * @param Lead $lead
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
     private function removeLeadFromCompany($companyName, Lead $lead)
     {
         $company = $this->em->getRepository(Company::class)->findOneByName($companyName);
@@ -130,18 +186,15 @@ class LeadImport extends AbstractImport
             return;
         }
 
-        $companyLead = $this->em->getRepository(CompanyLead::class)->findOneBy([
-            'lead'    => $lead,
-            'company' => $company->getId(),
-        ]);
-
-        if (!$companyLead) {
-            return;
-        }
-
-        $this->em->remove($companyLead);
+        $this->companyModel->removeLeadFromCompany($company, $lead);
     }
 
+    /**
+     * @param      $integrationCompanyId
+     * @param Lead $lead
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
     private function addLeadToCompany($integrationCompanyId, Lead $lead)
     {
         $integrationEntityCompany = $this->getCompanyIntegrationEntity(['integrationEntityId' => $integrationCompanyId]);
@@ -150,24 +203,10 @@ class LeadImport extends AbstractImport
             return;
         }
 
-        $company = $this->em->getRepository(Company::class)->findOneById($integrationEntityCompany->getInternalEntityId());
-
-        $companyLead = $this->em->getRepository(CompanyLead::class)->findOneBy([
-            'lead'    => $lead,
-            'company' => $company->getId(),
-        ]);
-
-        if ($companyLead) {
+        if (!$company = $this->companyModel->getEntity($integrationEntityCompany->getInternalEntityId())) {
             return;
         }
 
-        $companyLead = new CompanyLead();
-        $companyLead->setCompany($company);
-        $companyLead->setLead($lead);
-        $companyLead->setManuallyAdded(false);
-        $companyLead->setDateAdded(new \DateTime());
-
-        $this->em->persist($companyLead);
-        $lead->setCompany($company->getName());
+        $this->companyModel->addLeadToCompany($company, $lead);
     }
 }

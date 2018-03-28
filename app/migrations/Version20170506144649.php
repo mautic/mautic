@@ -38,11 +38,11 @@ class Version20170506144649 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}campaign_lead_event_failed_log (
-    log_id INT NOT NULL, 
-    date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)', 
-    reason LONGTEXT DEFAULT NULL, 
-    INDEX {$this->prefix}campaign_event_failed_date (date_added), 
+CREATE TABLE IF NOT EXISTS {$this->prefix}campaign_lead_event_failed_log (
+    log_id INT NOT NULL,
+    date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)',
+    reason LONGTEXT DEFAULT NULL,
+    INDEX {$this->prefix}campaign_event_failed_date (date_added),
     PRIMARY KEY(log_id)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;

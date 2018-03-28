@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric;
 
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
-/**
- * Class OpenSSLCryptography.
- */
 class OpenSSLCipher implements SymmetricCipherInterface
 {
     /** @var string */

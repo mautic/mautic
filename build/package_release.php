@@ -162,3 +162,5 @@ system('zip -r ../packages/'.$appVersion.'.zip . -x@../excludefiles.txt > /dev/n
 
 echo "Packaging Mautic Update Package\n";
 system('zip -r ../packages/'.$appVersion.'-update.zip -x@../excludefiles.txt -@ < modified_files.txt > /dev/null');
+
+system('openssl sha1 ../packages/'.$appVersion.'.zip');
