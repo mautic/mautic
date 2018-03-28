@@ -725,69 +725,22 @@ return [
             ],
         ],
         'batches' => [
-            'mautic.lead.batch.source.lead' => [
-                'class'     => \Mautic\LeadBundle\Batches\SourceAdapter\LeadSourceAdapter::class,
+            'mautic.lead.batch.change_categories_action_factory' => [
+                'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeCategoriesAction\ChangeCategoriesActionFactory::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                 ],
             ],
-            'mautic.lead.batch.handler.segments' => [
-                'class'     => \Mautic\LeadBundle\Batches\Handler\LeadSegmentHandlerAdapter::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.security',
-                ],
-            ],
-            'mautic.lead.batch.handler.categories' => [
-                'class'     => \Mautic\LeadBundle\Batches\Handler\LeadCategoryHandlerAdapter::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.security',
-                ],
-            ],
-            'mautic.lead.batch.handler.channels' => [
-                'class'     => \Mautic\LeadBundle\Batches\Handler\LeadChannelHandlerAdapter::class,
+            'mautic.lead.batch.change_segments_action_factory' => [
+                'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeSegmentsAction\ChangeSegmentsActionFactory::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                 ],
             ],
-            'mautic.lead.batch.action.segments' => [
-                'class'     => \Mautic\CoreBundle\Batches\Action\BatchAction::class,
+            'mautic.lead.batch.change_channels_action_factory' => [
+                'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeChannelsAction\ChangeChannelsActionFactory::class,
                 'arguments' => [
-                    'mautic.lead.batch.source.lead',
-                    'mautic.lead.batch.handler.segments',
-                ],
-            ],
-            'mautic.lead.batch.action.categories' => [
-                'class'     => \Mautic\CoreBundle\Batches\Action\BatchAction::class,
-                'arguments' => [
-                    'mautic.lead.batch.source.lead',
-                    'mautic.lead.batch.handler.categories',
-                ],
-            ],
-            'mautic.lead.batch.action.channels' => [
-                'class'     => \Mautic\CoreBundle\Batches\Action\BatchAction::class,
-                'arguments' => [
-                    'mautic.lead.batch.source.lead',
-                    'mautic.lead.batch.handler.channels',
-                ],
-            ],
-            'mautic.lead.batch.request.lead.segments' => [
-                'class'     => \Mautic\LeadBundle\Batches\Request\LeadSegmentRequest::class,
-                'arguments' => [
-                    'request_stack',
-                ],
-            ],
-            'mautic.lead.batch.request.lead.categories' => [
-                'class'     => \Mautic\LeadBundle\Batches\Request\LeadCategoryRequest::class,
-                'arguments' => [
-                    'request_stack',
-                ],
-            ],
-            'mautic.lead.batch.request.lead.channels' => [
-                'class'     => \Mautic\LeadBundle\Batches\Request\LeadChannelRequest::class,
-                'arguments' => [
-                    'request_stack',
+                    'mautic.lead.model.lead',
                 ],
             ],
         ],
