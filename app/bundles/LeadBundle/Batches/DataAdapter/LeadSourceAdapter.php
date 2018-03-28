@@ -35,7 +35,7 @@ class LeadSourceAdapter implements SourceAdapterInterface
      * @see SourceAdapterInterface::getIdList()
      * {@inheritdoc}
      */
-    public function getIdList(array $settings)
+    public function getIdList(array    $settings)
     {
         return json_decode($settings['ids'], true);
     }
@@ -59,5 +59,4 @@ class LeadSourceAdapter implements SourceAdapterInterface
             'ignore_paginator' => true,
         ]);
     }
-
 }
