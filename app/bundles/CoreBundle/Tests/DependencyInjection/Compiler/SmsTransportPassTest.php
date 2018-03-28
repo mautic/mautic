@@ -2,11 +2,6 @@
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- * @author      Jan Kozak <galvani78@gmail.com>
  */
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
@@ -25,26 +20,23 @@ class SmsTransportPassTest extends AbstractMauticTestCase
             ->register('foo')
             ->setPublic(true)
             ->setAbstract(true)
-            ->addTag('mautic.sms_transport', ['alias'=>'fakeAliasDefault', 'fakeIntegrationDefault'])
-        ;
+            ->addTag('mautic.sms_transport', ['alias'=>'fakeAliasDefault', 'fakeIntegrationDefault']);
 
         $container
             ->register('chocolate')
             ->setPublic(true)
-            ->setAbstract(true)
-        ;
+            ->setAbstract(true);
 
         $container
             ->register('bar')
             ->setPublic(true)
             ->setAbstract(true)
-            ->addTag('mautic.sms_transport', ['alias'=>'fakeAlias', 'fakeIntegration'])
-        ;
+            ->addTag('mautic.sms_transport', ['alias'=>'fakeAlias', 'fakeIntegration']);
 
         $transport = $this->getMockBuilder(TransportChain::class)
-                            ->disableOriginalConstructor()
-                            ->setMethods(['addTransport'])
-                            ->getMock();
+                          ->disableOriginalConstructor()
+                          ->setMethods(['addTransport'])
+                          ->getMock();
 
         $container
             ->register('mautic.sms.transport_chain')
@@ -52,8 +44,7 @@ class SmsTransportPassTest extends AbstractMauticTestCase
             ->setArguments(['foo', $this->container->get('mautic.helper.integration'), $this->container->get('monolog.logger.mautic')])
             ->setShared(false)
             ->setSynthetic(true)
-            ->setAbstract(true)
-        ;
+            ->setAbstract(true);
 
         $pass = new SmsTransportPass();
         $pass->process($container);

@@ -25,6 +25,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 class SmsApiController extends CommonApiController
 {
     use LeadAccessTrait;
+
     /**
      * @var SmsModel
      */
@@ -73,40 +74,41 @@ class SmsApiController extends CommonApiController
             return new JsonResponse(json_encode(['error' => ['message' => 'SMS transport is disabled.', 'code' => Codes::HTTP_EXPECTATION_FAILED]]));
         }
 
-        $message  = $this->model->getEntity((int) $id);
+        $message = $this->model->getEntity((int) $id);
 
         if (is_null($message)) {
             return $this->notFound();
         }
 
-        $contact  = $this->checkLeadAccess($contactId, 'edit');
+        $contact = $this->checkLeadAccess($contactId, 'edit');
 
         if ($contact instanceof Response) {
             return $this->accessDenied();
         }
 
-        $this->get('monolog.logger.mautic')->addDebug("Sending SMS #{$id} to contact #{$contactId}", ['originator'=>'api']);
+        $this->get('monolog.logger.mautic')
+             ->addDebug("Sending SMS #{$id} to contact #{$contactId}", ['originator' => 'api']);
 
         try {
             $response = $this->model->sendSms($message, $contact, ['channel' => 'api'])[$contact->getId()];
         } catch (\Exception $e) {
-            $this->get('monolog.logger.mautic')->addError($e->getMessage(), ['error'=>(array) $e]);
+            $this->get('monolog.logger.mautic')->addError($e->getMessage(), ['error' => (array) $e]);
 
             return new Response('Interval server error', Codes::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $success  = !empty($response['sent']);
+        $success = !empty($response['sent']);
 
         if (!$success) {
-            $this->get('monolog.logger.mautic')->addError('Failed to send SMS.', ['error'=> $response['status']]);
+            $this->get('monolog.logger.mautic')->addError('Failed to send SMS.', ['error' => $response['status']]);
         }
 
         $view = $this->view(
             [
-                'success'           => $success,
-                'status'            => $this->get('translator')->trans($response['status']),
-                'result'            => $response,
-                'errors'            => $success ? [] : [['message'=>$response['status']]],
+                'success' => $success,
+                'status'  => $this->get('translator')->trans($response['status']),
+                'result'  => $response,
+                'errors'  => $success ? [] : [['message' => $response['status']]],
             ],
             Codes::HTTP_OK  //  200 - is legacy, we cannot change it yet
         );

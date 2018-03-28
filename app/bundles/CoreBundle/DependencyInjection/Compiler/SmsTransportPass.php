@@ -34,11 +34,11 @@ class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
             $integrationId = array_pop($serviceTags);
 
             $definition->addMethodCall('addTransport', [
-                    $id,
-                    new Reference($id),
-                    $tags[0]['alias'],
-                    $integrationId,
-                ]);
+                $id,
+                new Reference($id),
+                $tags[0]['alias'],
+                $integrationId,
+            ]);
         }
     }
 
