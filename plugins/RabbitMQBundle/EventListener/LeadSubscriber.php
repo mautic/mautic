@@ -15,7 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Connection\AMQPSSLConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
@@ -126,15 +126,25 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $connection = new AMQPStreamConnection($integrationObject->getLocation(), 5672, $integrationObject->getUser(), $integrationObject->getPassword());
+        $connection = new AMQPSSLConnection(
+            $integrationObject->getLocation(), 
+            5672, 
+            $integrationObject->getUser(), 
+            $integrationObject->getPassword(),
+            '/',
+            [
+                'cafile'=>getenv("RABBITMQ_SSL_CACERT_FILE"),
+                'local_cert'=>getenv("RABBITMQ_SSL_CERT_FILE"),
+                'local_pk'=>getenv("RABBITMQ_SSL_KEY_FILE"),
+            ]);
         $channel = $connection->channel();
 
         // exchange, type, passive, durable, auto_delete
-        $channel->exchange_declare('kiazaki', 'direct', false, true, false);
+        $channel->exchange_declare('kiazaki', 'topic', false, true, false);
 
         $msg = new AMQPMessage($data);
 
-        $channel->basic_publish($msg, 'kiazaki', 'mautic');
+        $channel->basic_publish($msg, 'kiazaki', 'mautic.contact');
 
         $channel->close();
         $connection->close();

@@ -59,45 +59,6 @@ class RabbitMQIntegration extends AbstractIntegration
         return $keys['rabbitmq_password'];
     }
 
-    public function getSalesForceData() {
-        $keys = $this->getKeys();
-
-        return [
-            'client_id' => $keys['salesforce_client_id'],
-            'client_secret' => $keys['salesforce_client_secret'],
-            'username' => $keys['salesforce_username'],
-            'password' => $keys['salesforce_password']
-        ];
-    }
-
-    public function getSFClientId() {
-        $keys = $this->getKeys();
-
-        return $keys['salesforce_client_id'];
-    }
-
-
-    public function getSFClientSecret() {
-        $keys = $this->getKeys();
-
-        return $keys['salesforce_client_secret'];
-    }
-
-
-    public function getSFUsername() {
-        $keys = $this->getKeys();
-
-        return $keys['salesforce_username'];
-    }
-
-
-    public function getSFPassword() {
-        $keys = $this->getKeys();
-
-        return $keys['salesforce_password'];
-    }
-
-
     public function getAuthenticationType()
     {
         return 'key';
@@ -112,11 +73,7 @@ class RabbitMQIntegration extends AbstractIntegration
         return [
             'rabbitmq_location' => 'mautic.rabbitmq.config.location',
             'rabbitmq_user' => 'mautic.rabbitmq.config.user',
-            'rabbitmq_password'  => 'mautic.rabbitmq.config.password',
-            'salesforce_client_id' => 'mautic.salesforce.config.client_id',
-            'salesforce_client_secret' => 'mautic.salesforce.config.salesforce_client_secret',
-            'salesforce_username' => 'mautic.salesforce.config.username',
-            'salesforce_password' => 'mautic.salesforce.config.password'
+            'rabbitmq_password'  => 'mautic.rabbitmq.config.password'
         ];
     }
 
@@ -127,9 +84,7 @@ class RabbitMQIntegration extends AbstractIntegration
     public function getSecretKeys()
     {
         return [
-            'rabbitmq_password',
-            'salesforce_client_secret',
-            'salesforce_password'
+            'rabbitmq_password'
         ];
     }
 
@@ -172,44 +127,6 @@ class RabbitMQIntegration extends AbstractIntegration
     }
 
     /**
-     * The field map should be defined here, the keys are the SF field names, while the values are the standardized values in RabbitMQ. 
-     * @return array Field map array.
-     */
-    public function getFieldMapSF() 
-    {
-        return [
-            'Email' => 'email',
-            'FirstName' => 'first_name',
-            'LastName' => 'last_name',
-            'Company' => 'company',
-            'MobilePhone' => 'mobile',
-            'Gender__c' => 'gender',
-            'Birthday__c' => 'birthday',
-            'Status' => 'stage'
-        ];
-    }
-
-    /**
-    * The address field map used for populating address object should be defined here, the keys are the SF field names, while the values are the standardized values in RabbitMQ.
-    * @return array address field map array
-    */
-
-    public function getAddressFieldMapSF(){
-        //Commented lines are not defined yet
-        return [
-            "Country"=>"country",
-            //""=>"country_code", 
-            "State"=>"state",
-            //""=>"state_code",
-            //""=>"county",
-            "City"=>"city",
-            "PostalCode"=>"zip_code",
-            "Street"=>"address_line1",
-            //"address2"=>"address_line2"
-        ];
-    }
-
-    /**
      * Format the lead data to the structure that RabbitMQ requires.
      *
      * @param array The data we want to format.
@@ -217,13 +134,10 @@ class RabbitMQIntegration extends AbstractIntegration
      * 
      * @return array
      */
-    public function formatData($data, $to_standard = true, $ma = true)
+    public function formatData($data, $to_standard = true)
     {
-        if($ma){
-            $fieldMap = $this->getFieldMap();
-        } else {
-            $fieldMap = $this->getFieldMapSF();
-        }
+
+        $fieldMap = $this->getFieldMap();
 
         if(!$to_standard){
             $fieldMap = array_flip($fieldMap);
@@ -237,12 +151,12 @@ class RabbitMQIntegration extends AbstractIntegration
             }
         }
         if($to_standard)
-            $formattedLeadData['address'] = $this->formatAddressData($data, $to_standard, $ma);
+            $formattedLeadData['address'] = $this->formatAddressData($data, $to_standard);
         else if(isset($data['address'])){
-            $formattedLeadData = array_merge($formattedLeadData, $this->formatAddressData($data['address'], $to_standard, $ma));
+            $formattedLeadData = array_merge($formattedLeadData, $this->formatAddressData($data['address'], $to_standard));
         }
 
-        if(!$to_standard && $ma && isset($data['stage'])){
+        if(!$to_standard && isset($data['stage'])){
             if(isset($data['stage'])){
                 $stages = $this->em->getRepository('MauticStageBundle:Stage')->findBy(['name'=>$data['stage']]);
                 
@@ -255,18 +169,15 @@ class RabbitMQIntegration extends AbstractIntegration
                 unset($formattedLeadData['stage']);
             }
         }
-
+        
         return $formattedLeadData;
         
     }
 
-    public function formatAddressData($data, $to_standard = true, $ma = true)
+    public function formatAddressData($data, $to_standard = true)
     {
-        if($ma){
-            $addressFieldMap = $this->getAddressFieldMap();
-        } else {
-            $addressFieldMap = $this->getAddressFieldMapSF();
-        }
+
+        $addressFieldMap = $this->getAddressFieldMap();
 
         if(!$to_standard){
             $addressFieldMap = array_flip($addressFieldMap);
