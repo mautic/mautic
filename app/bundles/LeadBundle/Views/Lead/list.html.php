@@ -78,8 +78,8 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                 'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchCategories']),
                 'data-header' => $view['translator']->trans('mautic.lead.batch.categories'),
             ],
-            'btnText' => $view['translator']->trans('mautic.lead.batch.categories'),
-            'iconClass' => 'fa fa-user'
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.categories'),
+            'iconClass' => 'fa fa-user',
         ],
         [
             'attr' => [
@@ -89,8 +89,8 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                 'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchChannels']),
                 'data-header' => $view['translator']->trans('mautic.lead.batch.channels'),
             ],
-            'btnText' => $view['translator']->trans('mautic.lead.batch.channels'),
-            'iconClass' => 'fa fa-user'
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.channels'),
+            'iconClass' => 'fa fa-user',
         ],
     ];
 }

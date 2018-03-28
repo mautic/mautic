@@ -20,10 +20,10 @@ use Symfony\Component\HttpFoundation\Request;
 trait LeadBatchesTrait
 {
     /**
-     * Help handler for batch requests in lead
+     * Help handler for batch requests in lead.
      *
      * @param BatchActionInterface $batchAction
-     * @param \Closure $viewDelegateCallback
+     * @param \Closure             $viewDelegateCallback
      *
      * @return mixed|JsonResponse
      */
@@ -48,7 +48,6 @@ trait LeadBatchesTrait
                     'flashes'    => $this->getFlashContent(),
                 ]);
             }
-
         } catch (BatchActionFailException $e) {
             $this->addFlash($e->getMessage(), [], 'error', false);
 

@@ -130,7 +130,7 @@ trait FrequencyRuleTrait
 
         foreach ($allChannels as $channel) {
             if (isset($frequencyRules[$channel])) {
-                $frequencyRule                      = $frequencyRules[$channel];
+                $frequencyRule                                       = $frequencyRules[$channel];
                 $data['lead_channels']['frequency_number_'.$channel] = $frequencyRule['frequency_number'];
                 $data['lead_channels']['frequency_time_'.$channel]   = $frequencyRule['frequency_time'];
                 if ($frequencyRule['pause_from_date']) {
@@ -159,7 +159,7 @@ trait FrequencyRuleTrait
         }
 
         $data['lead_channels']['subscribed_channels'] = $leadChannels;
-        $this->isPublicView          = $isPublic;
+        $this->isPublicView                           = $isPublic;
 
         return $data;
     }

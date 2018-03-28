@@ -58,8 +58,8 @@ echo $view['form']->start($form, ['attr' => $attr]);
                 <input type="radio" id="preferred_<?php echo $channel->value ?>"
                        name="lead_contact_channels[preferred_channel]" class="contact"
                        value="<?php echo $view->escape($channel->value) ?>" <?php if ($form['preferred_channel']->vars['value'] == $channel->value) {
-                    echo $checked;
-                } ?> <?php echo $disabled; ?>>
+                            echo $checked;
+                        } ?> <?php echo $disabled; ?>>
 
             </td>
         </tr>

@@ -12,7 +12,6 @@
 namespace Mautic\CoreBundle\Batches\Adapter;
 
 use Mautic\CoreBundle\Batches\Exception\BatchActionFailException;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Via this interface you are able to define how to work with source.
@@ -20,37 +19,15 @@ use Symfony\Component\HttpFoundation\Request;
 interface HandlerAdapterInterface
 {
     /**
-     * Load needed parameters.
-     *
-     * @param array $parameters
-     */
-    public function loadSettings(array $parameters);
-
-    /**
-     * Get parameters from request
-     *
-     * @param Request $request
-     *
-     * @return array
-     */
-    public function getParameters(Request $request);
-
-    /**
      * Update objects by loaded settings.
      *
      * Parameter object's class depends on source. Keep logic of update in another private method. Inside this method should be only a if checking instance and call of these private methods.
      * In case of not implemented source, throw an exception documented bellow.
      *
-     * @param object $object
+     * @param int[] $ids
+     * @param
      *
      * @throws BatchActionFailException
      */
-    public function update($object);
-
-    /**
-     * Persist every object
-     *
-     * @param object[] $objects
-     */
-    public function store(array $objects);
+    public function update($ids);
 }

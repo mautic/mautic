@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Batches\Action;
 
 use Mautic\CoreBundle\Batches\Adapter\HandlerAdapterInterface;
 use Mautic\CoreBundle\Batches\Adapter\SourceAdapterInterface;
+use Mautic\CoreBundle\Batches\Request\BatchRequestInterface;
 
 class BatchAction implements BatchActionInterface
 {
@@ -29,8 +30,8 @@ class BatchAction implements BatchActionInterface
     /**
      * BatchAction constructor.
      *
-     * @param SourceAdapterInterface    $sourceAdapter
-     * @param HandlerAdapterInterface   $handlerAdapter
+     * @param SourceAdapterInterface  $sourceAdapter
+     * @param HandlerAdapterInterface $handlerAdapter
      */
     public function __construct(SourceAdapterInterface $sourceAdapter, HandlerAdapterInterface $handlerAdapter)
     {
@@ -39,20 +40,14 @@ class BatchAction implements BatchActionInterface
     }
 
     /**
-     * @see BatchActionInterface::getSourceAdapter()
+     * @see BatchActionInterface::run()
      * {@inheritdoc}
      */
-    public function getSourceAdapter()
+    public function run(BatchRequestInterface $batchRequest)
     {
-        return $this->sourceAdapter;
-    }
+        $objects = $this->sourceAdapter->loadObjectsById($batchRequest->getSourceIdList());
+        $this->handlerAdapter->update($objects);
 
-    /**
-     * @see BatchActionInterface::getHandlerAdapter()
-     * {@inheritdoc}
-     */
-    public function getHandlerAdapter()
-    {
-        return $this->handlerAdapter;
+        return count($objects);
     }
 }

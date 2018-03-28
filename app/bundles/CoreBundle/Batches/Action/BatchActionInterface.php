@@ -11,25 +11,16 @@ namespace Mautic\CoreBundle\Batches\Action;
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\CoreBundle\Batches\Adapter\HandlerAdapterInterface;
-use Mautic\CoreBundle\Batches\Adapter\SourceAdapterInterface;
+use Mautic\CoreBundle\Batches\Request\BatchRequestInterface;
 
-/**
- * Batch action type with all stuffs needed to be executed.
- */
 interface BatchActionInterface
 {
     /**
-     * Get source adapter.
+     * Run a batch action. Result is count of processed objects.
      *
-     * @return SourceAdapterInterface
-     */
-    public function getSourceAdapter();
-
-    /**
-     * Get handler.
+     * @param BatchRequestInterface $batchRequest
      *
-     * @return HandlerAdapterInterface
+     * @return int
      */
-    public function getHandlerAdapter();
+    public function run(BatchRequestInterface $batchRequest);
 }

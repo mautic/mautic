@@ -16,7 +16,6 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
-use Mautic\LeadBundle\Batches\Group\LeadsBatchGroup;
 use Mautic\LeadBundle\Batches\LeadBatchesTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -1431,7 +1430,7 @@ class LeadController extends FormController
     }
 
     /**
-     * Batch update of segments
+     * Batch update of segments.
      *
      * @return mixed|JsonResponse
      */
@@ -1446,7 +1445,7 @@ class LeadController extends FormController
                 $items[$list['id']] = $list['name'];
             }
 
-            $route = $this->generateUrl('mautic_contact_action', ['objectAction' => 'batchLists',]);
+            $route = $this->generateUrl('mautic_contact_action', ['objectAction' => 'batchLists']);
 
             return $this->delegateView(
                 [
@@ -1472,7 +1471,7 @@ class LeadController extends FormController
     }
 
     /**
-     * Batch update of categories
+     * Batch update of categories.
      *
      * @return mixed|JsonResponse
      */
@@ -1494,21 +1493,21 @@ class LeadController extends FormController
                 'viewParameters' => [
                     'form' => $this->createForm('lead_batch', [], [
                         'action' => $route,
-                        'items' => $items,
+                        'items'  => $items,
                     ])->createView(),
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'leadBatch',
-                    'route' => $route,
+                    'route'         => $route,
                 ],
             ]);
         });
     }
 
     /**
-     * Batch update of channels
+     * Batch update of channels.
      *
      * @return mixed|JsonResponse
      */
@@ -1533,11 +1532,10 @@ class LeadController extends FormController
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'leadBatch',
-                    'route' => $route,
+                    'route'         => $route,
                 ],
             ]);
         });
-
     }
 
     /**

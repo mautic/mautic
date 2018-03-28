@@ -24,13 +24,4 @@ interface SourceAdapterInterface
      * @return array
      */
     public function loadObjectsById(array $ids);
-
-    /**
-     * Get array of ids from settings.
-     *
-     * @param array $settings
-     *
-     * @return int[]
-     */
-    public function getIdList(array $settings);
 }

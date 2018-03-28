@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Batches\Adapter\HandlerAdapterInterface;
 class BatchActionFailException extends \Exception
 {
     /**
-     * Thrown when source adapter hasn't been set
+     * Thrown when source adapter hasn't been set.
      *
      * @return BatchActionFailException
      */
@@ -29,7 +29,7 @@ class BatchActionFailException extends \Exception
     }
 
     /**
-     * Thrown when handler adapter hasn't been set
+     * Thrown when handler adapter hasn't been set.
      *
      * @return BatchActionFailException
      */
@@ -41,7 +41,7 @@ class BatchActionFailException extends \Exception
     /**
      * Thrown when you try to pass a source to a handler unless it is implemented.
      *
-     * @param object $object
+     * @param object                  $object
      * @param HandlerAdapterInterface $handlerAdapter
      *
      * @return BatchActionFailException
