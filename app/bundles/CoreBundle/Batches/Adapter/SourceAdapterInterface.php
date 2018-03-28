@@ -11,8 +11,6 @@
 
 namespace Mautic\CoreBundle\Batches\Adapter;
 
-use Symfony\Component\HttpFoundation\Request;
-
 /**
  * Via this interface you are able to load source data.
  */
@@ -28,11 +26,11 @@ interface SourceAdapterInterface
     public function loadObjectsById(array $ids);
 
     /**
-     * Get array of ids from request.
+     * Get array of ids from settings.
      *
-     * @param Request $request
+     * @param array $settings
      *
      * @return int[]
      */
-    public function getIdList(Request $request);
+    public function getIdList(array $settings);
 }

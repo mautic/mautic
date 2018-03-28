@@ -20,11 +20,20 @@ use Symfony\Component\HttpFoundation\Request;
 interface HandlerAdapterInterface
 {
     /**
-     * Load parameters from request.
+     * Load needed parameters.
+     *
+     * @param array $parameters
+     */
+    public function loadSettings(array $parameters);
+
+    /**
+     * Get parameters from request
      *
      * @param Request $request
+     *
+     * @return array
      */
-    public function loadSettings(Request $request);
+    public function getParameters(Request $request);
 
     /**
      * Update objects by loaded settings.

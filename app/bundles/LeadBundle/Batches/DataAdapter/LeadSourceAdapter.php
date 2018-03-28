@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Batches\DataAdapter;
 
 use Mautic\CoreBundle\Batches\Adapter\SourceAdapterInterface;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\HttpFoundation\Request;
 
 class LeadSourceAdapter implements SourceAdapterInterface
 {
@@ -36,11 +35,9 @@ class LeadSourceAdapter implements SourceAdapterInterface
      * @see SourceAdapterInterface::getIdList()
      * {@inheritdoc}
      */
-    public function getIdList(Request $request)
+    public function getIdList(array $settings)
     {
-        $data = $request->get('lead_batch', [], true);
-        //dump($request->get('lead_contact_channels'));
-        return json_decode($data['ids'], true);
+        return json_decode($settings['ids'], true);
     }
 
     /**

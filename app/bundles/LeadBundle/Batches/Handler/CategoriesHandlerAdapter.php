@@ -53,15 +53,22 @@ class CategoriesHandlerAdapter implements HandlerAdapterInterface
     }
 
     /**
+     * @see HandlerAdapterInterface::getParameters()
+     * {@inheritdoc}
+     */
+    public function getParameters(Request $request)
+    {
+        return $request->get('lead_batch', [], true);
+    }
+
+    /**
      * @see HandlerAdapterInterface::loadSettings()
      * {@inheritdoc}
      */
-    public function loadSettings(Request $request)
+    public function loadSettings(array $settings)
     {
-        $data = $request->get('lead_batch', [], true);
-
-        $this->addCategories = array_key_exists('add', $data) ? $data['add'] : [];
-        $this->removeCategories = array_key_exists('remove', $data) ? $data['remove'] : [];
+        $this->addCategories = array_key_exists('add', $settings) ? $settings['add'] : [];
+        $this->removeCategories = array_key_exists('remove', $settings) ? $settings['remove'] : [];
     }
 
     /**

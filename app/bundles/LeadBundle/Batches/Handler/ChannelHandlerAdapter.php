@@ -60,19 +60,26 @@ class ChannelHandlerAdapter implements HandlerAdapterInterface
     }
 
     /**
+     * @see HandlerAdapterInterface::getParameters()
+     * {@inheritdoc}
+     */
+    public function getParameters(Request $request)
+    {
+        return $request->get('lead_contact_channels', []);
+    }
+
+    /**
      * @see HandlerAdapterInterface::loadSettings()
      * {@inheritdoc}
      */
-    public function loadSettings(Request $request)
+    public function loadSettings(array $settings)
     {
-        $leadContactChannels = $request->get('lead_contact_channels', []);
+        $this->subscribedChannels = (isset($settings['subscribed_channels']) ? $settings['subscribed_channels'] : []);
+        $this->frequencyNumberEmail = (isset($settings['frequency_number_email']) ? $settings['frequency_number_email'] : null);
+        $this->frequencyTimeEmail = (isset($settings['frequency_time_email']) ? $settings['frequency_time_email'] : null);
 
-        $this->subscribedChannels = (isset($leadContactChannels['subscribed_channels']) ? $leadContactChannels['subscribed_channels'] : []);
-        $this->frequencyNumberEmail = (isset($leadContactChannels['frequency_number_email']) ? $leadContactChannels['frequency_number_email'] : null);
-        $this->frequencyTimeEmail = (isset($leadContactChannels['frequency_time_email']) ? $leadContactChannels['frequency_time_email'] : null);
-
-        $this->contactPauseStartDateEmail = (isset($leadContactChannels['contact_pause_start_date_email']) ? new \DateTime($leadContactChannels['contact_pause_start_date_email']) : null);
-        $this->contactPauseEndDateEmail = (isset($leadContactChannels['contact_pause_end_date_email']) ? new \DateTime($leadContactChannels['contact_pause_end_date_email']) : null);
+        $this->contactPauseStartDateEmail = (isset($settings['contact_pause_start_date_email']) ? new \DateTime($settings['contact_pause_start_date_email']) : null);
+        $this->contactPauseEndDateEmail = (isset($settings['contact_pause_end_date_email']) ? new \DateTime($settings['contact_pause_end_date_email']) : null);
     }
 
     /**

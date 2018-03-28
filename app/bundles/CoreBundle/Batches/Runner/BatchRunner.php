@@ -51,9 +51,10 @@ class BatchRunner implements BatchRunnerInterface
             throw BatchActionFailException::handlerAdapterNotSet();
         }
 
-        $this->batchAction->getHandlerAdapter()->loadSettings($this->request);
+        $settings = $this->batchAction->getHandlerAdapter()->getParameters($this->request);
+        $this->batchAction->getHandlerAdapter()->loadSettings($settings);
         $objects = $this->batchAction->getSourceAdapter()->loadObjectsById(
-            $this->batchAction->getSourceAdapter()->getIdList($this->request)
+            $this->batchAction->getSourceAdapter()->getIdList($settings)
         );
 
         foreach ($objects as $object) {
