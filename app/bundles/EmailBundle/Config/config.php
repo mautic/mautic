@@ -170,7 +170,10 @@ return [
                 ],
             ],
             'mautic.email.leadbundle.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\LeadSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'mautic.email.repository.emailReply',
+                ],
             ],
             'mautic.email.pointbundle.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\PointSubscriber',
@@ -469,6 +472,13 @@ return [
                     'mautic.helper.paths',
                 ],
             ],
+            'mautic.email.repository.emailReply' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\EmailReply::class,
+                ],
+            ],
             'mautic.email.repository.stat' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
@@ -557,6 +567,12 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.email.helper.stat' => [
+                'class'     => \Mautic\EmailBundle\Stat\StatHelper::class,
+                'arguments' => [
+                    'mautic.email.repository.stat',
+                ],
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
@@ -584,7 +600,7 @@ return [
                 'class'     => \Mautic\EmailBundle\Model\SendEmailToContact::class,
                 'arguments' => [
                     'mautic.helper.mailer',
-                    'mautic.email.repository.stat',
+                    'mautic.email.helper.stat',
                     'mautic.lead.model.dnc',
                     'translator',
                 ],
