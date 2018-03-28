@@ -35,10 +35,21 @@ mQuery.ajaxSetup({
             settings.url = settings.url + queryGlue + 'mauticLastNotificationId=' + mQuery('#mauticLastNotificationId').val();
         }
 
+        // Set CSRF token to each AJAX POST request
+        if (settings.type == 'POST') {
+            request.setRequestHeader('X-CSRF-Token', mauticAjaxCsrf);
+        }
+
         return true;
     },
 
     cache: false
+});
+
+mQuery( document ).ajaxComplete(function(event, xhr, settings) {
+    xhr.always(function(response) {
+        if (response.flashes) Mautic.setFlashes(response.flashes);
+    });
 });
 
 // Force stop the page loading bar when no more requests are being in progress

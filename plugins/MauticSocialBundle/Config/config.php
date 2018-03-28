@@ -46,6 +46,12 @@ return [
                 'controller'      => 'MauticSocialBundle:Api\TweetApi',
             ],
         ],
+        'public' => [
+            'mautic_social_js_generate' => [
+                'path'       => '/social/generate/{formName}.js',
+                'controller' => 'MauticSocialBundle:Js:generate',
+            ],
+        ],
     ],
 
     'services' => [
