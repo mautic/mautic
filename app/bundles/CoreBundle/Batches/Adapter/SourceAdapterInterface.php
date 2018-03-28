@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Batches\Adapter;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

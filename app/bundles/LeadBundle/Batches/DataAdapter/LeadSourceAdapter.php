@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Batches\DataAdapter;
 
 use Mautic\CoreBundle\Batches\Adapter\SourceAdapterInterface;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

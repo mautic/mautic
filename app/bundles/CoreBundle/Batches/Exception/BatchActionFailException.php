@@ -12,7 +12,6 @@
 namespace Mautic\CoreBundle\Batches\Exception;
 
 use Mautic\CoreBundle\Batches\Adapter\HandlerAdapterInterface;
-use Mautic\CoreBundle\Batches\Group\BatchGroupInterface;
 
 /**
  * Exception that handles failing run of batch action.

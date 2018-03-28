@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Batches\Adapter\HandlerAdapterInterface;
 use Mautic\CoreBundle\Batches\Exception\BatchActionFailException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class ChannelHandlerAdapter implements HandlerAdapterInterface

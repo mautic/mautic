@@ -13,10 +13,7 @@ namespace Mautic\CoreBundle\Batches\Service;
 
 use Mautic\CoreBundle\Batches\Action\BatchActionInterface;
 use Mautic\CoreBundle\Batches\Exception\BatchActionFailException;
-use Mautic\CoreBundle\Batches\Group\BatchGroupInterface;
 use Mautic\CoreBundle\Batches\Runner\BatchRunner;
-use Mautic\CoreBundle\Batches\Runner\BatchRunnerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class BatchesService implements BatchesServiceInterface

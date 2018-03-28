@@ -6,9 +6,7 @@ use Mautic\CoreBundle\Batches\Adapter\HandlerAdapterInterface;
 use Mautic\CoreBundle\Batches\Exception\BatchActionFailException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -48,16 +46,6 @@ class CategoriesHandlerAdapter implements HandlerAdapterInterface
     {
         $this->leadModel = $leadModel;
         $this->security = $security;
-    }
-
-    /**
-     * @see HandlerAdapterInterface::startup()
-     * {@inheritdoc}
-     */
-    public function startup(ContainerInterface $container)
-    {
-        $this->leadModel = $container->get('mautic.model.factory')->getModel('lead');
-        $this->security = $container->get('mautic.security');
     }
 
     /**
