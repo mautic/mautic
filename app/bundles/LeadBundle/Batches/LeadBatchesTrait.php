@@ -1,51 +1,56 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\LeadBundle\Batches;
 
 use Mautic\CoreBundle\Batches\Action\BatchActionInterface;
 use Mautic\CoreBundle\Batches\Exception\BatchActionFailException;
-use Mautic\CoreBundle\Batches\Exception\BatchActionSuccessException;
-use Mautic\CoreBundle\Batches\Service\BatchesServiceInterface;
+use Mautic\CoreBundle\Batches\Runner\BatchRunner;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Trait LeadBatchesTrait
- *
- * @package Mautic\CoreBundle\Batches\Helpers
- */
 trait LeadBatchesTrait
 {
+    /**
+     * Help handler for batch requests in lead
+     *
+     * @param BatchActionInterface $batchAction
+     * @param \Closure $viewDelegateCallback
+     *
+     * @return mixed|JsonResponse
+     */
     public function handleBatchRequest(BatchActionInterface $batchAction, \Closure $viewDelegateCallback)
     {
-        /** @var BatchesServiceInterface $batchesService */
-        $batchesService = $this->get('mautic.batches');
-
         try {
-            $runner = $batchesService->createRunner(
-                $this->request,
-                $batchAction
+            $runner = new BatchRunner(
+                $batchAction,
+                $this->request
             );
 
             if ($this->request->isMethod(Request::METHOD_POST)) {
-                $runner->run();
+                $processedObjectsCount = $runner->run();
+
+                $this->addFlash('mautic.lead.batch_leads_affected', [
+                    'pluralCount' => $processedObjectsCount,
+                    '%count%'     => $processedObjectsCount,
+                ]);
+
+                return new JsonResponse([
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]);
             }
-
-        } catch (BatchActionSuccessException $successException) {
-            $this->addFlash('mautic.lead.batch_leads_affected', [
-                'pluralCount' => $successException->getCountProcessed(),
-                '%count%'     => $successException->getCountProcessed(),
-            ]);
-
-            return new JsonResponse([
-                'closeModal' => true,
-                'flashes'    => $this->getFlashContent(),
-            ]);
 
         } catch (BatchActionFailException $e) {
-            if ($this->container->getParameter('kernel.environment') === 'dev') {
-                $this->addFlash($e->getMessage(), [], 'error', false);
-            }
+            $this->addFlash($e->getMessage(), [], 'error', false);
 
             return new JsonResponse([
                 'closeModal' => true,

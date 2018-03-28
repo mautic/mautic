@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\LeadBundle\Batches\Handler;
 
 use Mautic\CoreBundle\Batches\Adapter\HandlerAdapterInterface;
@@ -9,11 +18,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Batch action handler of categories
- *
- * @author David Vurbs <david.vurbs@mautic.com>
- */
 class CategoriesHandlerAdapter implements HandlerAdapterInterface
 {
     /**

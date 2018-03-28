@@ -12,7 +12,7 @@
 namespace Mautic\CoreBundle\Batches\Runner;
 
 use Mautic\CoreBundle\Batches\Action\BatchActionInterface;
-use Mautic\CoreBundle\Batches\Exception\BatchActionSuccessException;
+use Mautic\CoreBundle\Batches\Exception\BatchActionFailException;
 use Symfony\Component\HttpFoundation\Request;
 
 class BatchRunner implements BatchRunnerInterface
@@ -28,10 +28,10 @@ class BatchRunner implements BatchRunnerInterface
     private $request;
 
     /**
-     * @see BatchRunnerInterface::setBatchAction()
+     * @see BatchRunnerInterface::__construct()
      * {@inheritdoc}
      */
-    public function setBatchAction(BatchActionInterface $batchAction, Request $request)
+    public function __construct(BatchActionInterface $batchAction, Request $request)
     {
         $this->batchAction =    $batchAction;
         $this->request =        $request;
@@ -43,6 +43,14 @@ class BatchRunner implements BatchRunnerInterface
      */
     public function run()
     {
+        if ($this->batchAction->getSourceAdapter() === null) {
+            throw BatchActionFailException::sourceAdapterNotSet();
+        }
+
+        if ($this->batchAction->getHandlerAdapter() === null) {
+            throw BatchActionFailException::handlerAdapterNotSet();
+        }
+
         $this->batchAction->getHandlerAdapter()->loadSettings($this->request);
         $objects = $this->batchAction->getSourceAdapter()->loadObjectsById(
             $this->batchAction->getSourceAdapter()->getIdList($this->request)
@@ -54,8 +62,6 @@ class BatchRunner implements BatchRunnerInterface
 
         $this->batchAction->getHandlerAdapter()->store($objects);
 
-        $successException = new BatchActionSuccessException();
-        $successException->setCountProcessed(count($objects));
-        throw $successException;
+        return count($objects);
     }
 }

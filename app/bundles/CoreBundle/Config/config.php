@@ -806,9 +806,6 @@ return [
                 'class'   => 'Joomla\Http\Http',
                 'factory' => ['Joomla\Http\HttpFactory', 'getHttp'],
             ],
-            'mautic.batches' => [
-                'class'     => \Mautic\CoreBundle\Batches\Service\BatchesService::class,
-            ],
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'    => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',

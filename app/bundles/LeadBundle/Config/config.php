@@ -732,7 +732,7 @@ return [
                 ],
             ],
             'mautic.lead.batch.handler.segments' => [
-                'class'     => \Mautic\LeadBundle\Batches\Handler\LeadListHandlerAdapter::class,
+                'class'     => \Mautic\LeadBundle\Batches\Handler\SegmentHandlerAdapter::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.security',

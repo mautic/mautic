@@ -13,7 +13,6 @@ namespace Mautic\CoreBundle\Batches\Runner;
 
 use Mautic\CoreBundle\Batches\Action\BatchActionInterface;
 use Mautic\CoreBundle\Batches\Exception\BatchActionFailException;
-use Mautic\CoreBundle\Batches\Exception\BatchActionSuccessException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -22,18 +21,19 @@ use Symfony\Component\HttpFoundation\Request;
 interface BatchRunnerInterface
 {
     /**
-     * Set batch action
+     * BatchRunnerInterface constructor.
      *
-     * @param BatchActionInterface  $batchAction
-     * @param Request               $request
+     * @param BatchActionInterface $batchAction
+     * @param Request $request
      */
-    public function setBatchAction(BatchActionInterface $batchAction, Request $request);
+    public function __construct(BatchActionInterface $batchAction, Request $request);
 
     /**
-     * Run a batch action
+     * Run a batch action. Result is count of processed objects.
      *
-     * @throws BatchActionSuccessException
      * @throws BatchActionFailException
+     *
+     * @return int
      */
     public function run();
 }
