@@ -2,15 +2,43 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\HttpFoundation\Response;
 
 class CompanyImport extends AbstractImport
 {
+    /**
+     * @var CompanyModel
+     */
+    private $companyModel;
+
+    /**
+     * CompanyImport constructor.
+     *
+     * @param EntityManager $em
+     * @param CompanyModel  $companyModel
+     */
+    public function __construct(EntityManager $em, CompanyModel $companyModel)
+    {
+        parent::__construct($em);
+
+        $this->companyModel = $companyModel;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return bool
+     *
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
+     */
     public function create(array $data = [])
     {
         if (!$this->getIntegration()->isCompanySupportEnabled()) {
-            return; //feature disabled
+            return false; //feature disabled
         }
 
         $integrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $data['id']]);
@@ -20,30 +48,38 @@ class CompanyImport extends AbstractImport
         }
 
         $company = new Company();
-        $data    = $this->convertPipedriveData($data);
-        $this->populateMappedCompanyData($company, $data);
 
+        // prevent listeners from exporting
+        $company->setEventData('pipedrive.webhook', 1);
+
+        $data    = $this->convertPipedriveData($data);
         if ($data['owner_id']) {
             $this->addOwnerToCompany($data['owner_id'], $company);
         }
 
-        $company->setDateAdded(new \DateTime());
-
-        $this->em->persist($company);
-        $this->em->flush();
+        $mappedData = $this->getMappedCompanyData($data);
+        $this->companyModel->setFieldValues($company, $mappedData);
+        $this->companyModel->saveEntity($company);
 
         $integrationEntity = $this->createIntegrationCompanyEntity(new \DateTime(), $data['id'], $company->getId());
-
         $this->em->persist($integrationEntity);
         $this->em->flush();
 
         return true;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return bool
+     *
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
+     */
     public function update(array $data = [])
     {
         if (!$this->getIntegration()->isCompanySupportEnabled()) {
-            return; //feature disabled
+            return false; //feature disabled
         }
 
         $integrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $data['id']]);
@@ -52,24 +88,33 @@ class CompanyImport extends AbstractImport
             return $this->create($data);
         }
 
+        /** @var Company $company */
         $company = $this->em->getRepository(Company::class)->findOneById($integrationEntity->getInternalEntityId());
+
+        // prevent listeners from exporting
+        $company->setEventData('pipedrive.webhook', 1);
+
         $data    = $this->convertPipedriveData($data);
-        $this->populateMappedCompanyData($company, $data);
-
-        $integrationEntity->setLastSyncDate(new \DateTime());
-
         if ($data['owner_id']) {
             $this->addOwnerToCompany($data['owner_id'], $company);
         }
 
-        $company->setDateModified(new \DateTime());
+        $mappedData = $this->getMappedCompanyData($data);
+        $this->companyModel->setFieldValues($company, $mappedData);
+        $this->companyModel->saveEntity($company);
 
-        $this->em->persist($company);
+        $integrationEntity->setLastSyncDate(new \DateTime());
         $this->em->persist($integrationEntity);
-
         $this->em->flush();
+
+        return true;
     }
 
+    /**
+     * @param array $data
+     *
+     * @throws \Exception
+     */
     public function delete(array $data = [])
     {
         if (!$this->getIntegration()->isCompanySupportEnabled()) {
@@ -82,19 +127,28 @@ class CompanyImport extends AbstractImport
             throw new \Exception('Company doesn\'t have integration', Response::HTTP_NOT_FOUND);
         }
 
+        /** @var Company $company */
         $company = $this->em->getRepository(Company::class)->findOneById($integrationEntity->getInternalEntityId());
 
         if (!$company) {
             throw new \Exception('Company doesn\'t exists', Response::HTTP_NOT_FOUND);
         }
 
-        $this->em->transactional(function ($em) use ($company, $integrationEntity) {
-            $em->remove($company);
-            $em->remove($integrationEntity);
-        });
+        // prevent listeners from exporting
+        $company->setEventData('pipedrive.webhook', 1);
+        $this->companyModel->deleteEntity($company);
+
+        if (!empty($company->deletedId)) {
+            $this->em->remove($integrationEntity);
+        }
     }
 
-    private function populateMappedCompanyData(Company $company, $data)
+    /**
+     * @param $data
+     *
+     * @return array
+     */
+    private function getMappedCompanyData(array $data)
     {
         $mappedData    = [];
         $companyFields = $this->getIntegration()->getIntegrationSettings()->getFeatureSettings()['companyFields'];
@@ -104,16 +158,16 @@ class CompanyImport extends AbstractImport
                 continue;
             }
 
-            $fieldName = substr($internalField, strlen($company::FIELD_ALIAS)); //remove column alias
-
-            $mappedData[$fieldName] = $data[$externalField];
+            $mappedData[$internalField] = $data[$externalField];
         }
 
-        foreach ($mappedData as $field => $value) {
-            $company->addUpdatedField($field, $value);
-        }
+        return $mappedData;
     }
 
+    /**
+     * @param         $integrationOwnerId
+     * @param Company $company
+     */
     private function addOwnerToCompany($integrationOwnerId, Company $company)
     {
         $mauticOwner = $this->getOwnerByIntegrationId($integrationOwnerId);

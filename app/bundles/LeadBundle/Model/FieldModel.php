@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Model;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
-use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -26,8 +26,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class FieldModel
- * {@inheritdoc}
+ * Class FieldModel.
  */
 class FieldModel extends FormModel
 {
@@ -264,9 +263,14 @@ class FieldModel extends FormModel
     ];
 
     /**
-     * @var SchemaHelperFactory
+     * @var IndexSchemaHelper
      */
-    protected $schemaHelperFactory;
+    private $indexSchemaHelper;
+
+    /**
+     * @var ColumnSchemaHelper
+     */
+    private $columnSchemaHelper;
 
     /**
      * @var array
@@ -276,11 +280,13 @@ class FieldModel extends FormModel
     /**
      * FieldModel constructor.
      *
-     * @param SchemaHelperFactory $schemaHelperFactory
+     * @param IndexSchemaHelper  $indexSchemaHelper
+     * @param ColumnSchemaHelper $columnSchemaHelper
      */
-    public function __construct(SchemaHelperFactory $schemaHelperFactory)
+    public function __construct(IndexSchemaHelper $indexSchemaHelper, ColumnSchemaHelper $columnSchemaHelper)
     {
-        $this->schemaHelperFactory = $schemaHelperFactory;
+        $this->indexSchemaHelper  = $indexSchemaHelper;
+        $this->columnSchemaHelper = $columnSchemaHelper;
     }
 
     /**
@@ -372,12 +378,13 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param   $entity
-     * @param   $unlock
+     * @param object $entity
+     * @param bool   $unlock
      *
      * @throws DBALException
-     *
-     * @return mixed
+     * @throws DriverException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -392,40 +399,7 @@ class FieldModel extends FormModel
         $objects = ['lead' => 'leads', 'company' => 'companies'];
         $alias   = $entity->getAlias();
         $object  = $objects[$entity->getObject()];
-
-        if ($isNew) {
-            if (empty($alias)) {
-                $alias = $entity->getName();
-            }
-
-            if (empty($object)) {
-                $object = $objects[$entity->getObject()];
-            }
-
-            // clean the alias
-            $alias = $this->cleanAlias($alias, 'f_', 25);
-
-            // make sure alias is not already taken
-            $repo      = $this->getRepository();
-            $testAlias = $alias;
-            $aliases   = $repo->getAliases($entity->getId(), false, true, $entity->getObject());
-            $count     = (int) in_array($testAlias, $aliases);
-            $aliasTag  = $count;
-
-            while ($count) {
-                $testAlias = $alias.$aliasTag;
-                $count     = (int) in_array($testAlias, $aliases);
-                ++$aliasTag;
-            }
-
-            if ($testAlias != $alias) {
-                $alias = $testAlias;
-            }
-
-            $entity->setAlias($alias);
-        }
-
-        $type = $entity->getType();
+        $type    = $entity->getType();
 
         if ($type == 'time') {
             //time does not work well with list filters
@@ -441,7 +415,7 @@ class FieldModel extends FormModel
 
         // Create the field as its own column in the leads table.
         /** @var ColumnSchemaHelper $leadsSchema */
-        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
+        $leadsSchema = $this->columnSchemaHelper->setName($object);
         $isUnique    = $entity->getIsUniqueIdentifier();
 
         // If the column does not exist in the contacts table, add it
@@ -452,12 +426,10 @@ class FieldModel extends FormModel
 
             try {
                 $leadsSchema->executeChanges();
-                $isCreated = true;
             } catch (DriverException $e) {
                 $this->logger->addWarning($e->getMessage());
 
                 if ($e->getErrorCode() === 1118 /* ER_TOO_BIG_ROWSIZE */) {
-                    $isCreated = false;
                     throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
                 } else {
                     throw $e;
@@ -473,7 +445,7 @@ class FieldModel extends FormModel
 
             // Update the unique_identifier_search index and add an index for this field
             /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-            $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', $object);
+            $modifySchema = $this->indexSchemaHelper->setName($object);
 
             if ('string' == $schemaDefinition['type']) {
                 try {
@@ -510,21 +482,42 @@ class FieldModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
+     * Build schema for each entity.
      *
-     * @param  $entity
+     * @param array $entities
+     * @param bool  $unlock
+     *
+     * @return array|void
+     *
+     * @throws DBALException
+     * @throws DriverException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     */
+    public function saveEntities($entities, $unlock = true)
+    {
+        foreach ($entities as $entity) {
+            $this->saveEntity($entity, $unlock);
+        }
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function deleteEntity($entity)
     {
         parent::deleteEntity($entity);
 
-        $objects = ['lead' => 'leads', 'company' => 'companies'];
-        $object  = $objects[$entity->getObject()];
-
-        //remove the column from the leads table
-        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
-        $leadsSchema->dropColumn($entity->getAlias());
-        $leadsSchema->executeChanges();
+        switch ($entity->getObject()) {
+            case 'lead':
+                $this->columnSchemaHelper->setName('leads')->dropColumn($entity->getAlias())->executeChanges();
+                break;
+            case 'company':
+                $this->columnSchemaHelper->setName('companies')->dropColumn($entity->getAlias())->executeChanges();
+                break;
+        }
     }
 
     /**
@@ -533,17 +526,26 @@ class FieldModel extends FormModel
      * @param array $ids
      *
      * @return array
+     *
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function deleteEntities($ids)
     {
         $entities = parent::deleteEntities($ids);
 
-        //remove the column from the leads table
-        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
-        foreach ($entities as $e) {
-            $leadsSchema->dropColumn($e->getAlias());
+        /** @var LeadField $entity */
+        foreach ($entities as $entity) {
+            switch ($entity->getObject()) {
+                case 'lead':
+                    $this->columnSchemaHelper->setName('leads')->dropColumn($entity->getAlias())->executeChanges();
+                    break;
+                case 'company':
+                    $this->columnSchemaHelper->setName('companies')->dropColumn($entity->getAlias())->executeChanges();
+                    break;
+            }
         }
-        $leadsSchema->executeChanges();
+
+        return $entities;
     }
 
     /**

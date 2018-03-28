@@ -151,10 +151,6 @@ Mautic.processPageContent = function (response) {
             }
         }
 
-        if (response.flashes) {
-            Mautic.setFlashes(response.flashes);
-        }
-
         if (response.notifications) {
             Mautic.setNotifications(response.notifications);
         }
