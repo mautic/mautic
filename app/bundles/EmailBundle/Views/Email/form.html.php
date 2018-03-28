@@ -62,6 +62,10 @@ $attr = $form->vars['attr'];
 
 $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
 
+if (!isset($previewUrl)) {
+    $previewUrl = '';
+}
+
 ?>
 
 <?php echo $view['form']->start($form, ['attr' => $attr]); ?>
