@@ -37,6 +37,10 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
 
 $isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
 
+if (!isset($previewUrl)) {
+    $previewUrl = '';
+}
+
 ?>
 
 <?php echo $view['form']->start($form, ['attr' => $attr]); ?>
