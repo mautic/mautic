@@ -1679,7 +1679,7 @@ class LeadModel extends FormModel
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null)
     {
         $fields    = array_flip($fields);
         $fieldData = [];
@@ -1928,7 +1928,8 @@ class LeadModel extends FormModel
         if ($persist) {
             $lead->setManipulator(new LeadManipulator(
                 'lead',
-                'lead'
+                'import',
+                $importId
             ));
             $this->saveEntity($lead);
 
