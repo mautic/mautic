@@ -22,10 +22,19 @@ class RandomHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue((bool) preg_match('#^[-a]+$#', $randomHelper->generate(1000, '-a')));
 
         $this->expectException(\InvalidArgumentException::class);
-        $randomHelper->generate();
-
+        $randomHelper->generate(0);
         $this->expectException(\InvalidArgumentException::class);
         $randomHelper->generate(1, '000');
+
+        // frequency check
+        $length = (int) 1e6;
+        $delta  = 0.1;
+        $s      = $randomHelper->generate($length, "\x01-\xFF");
+        $freq   = count_chars($s);
+        $this->assertSame(0, $freq[0]);
+        for ($i = 1; $i < 255; ++$i) {
+            $this->assertTrue($freq[$i] < $length / 255 * (1 + $delta) && $freq[$i] > $length / 255 * (1 - $delta));
+        }
     }
 
     /**
