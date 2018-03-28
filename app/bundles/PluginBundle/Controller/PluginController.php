@@ -614,7 +614,7 @@ class PluginController extends FormController
         $integrationHelper = $this->get('mautic.helper.integration');
         $integrationObject = $integrationHelper->getIntegrationObject($name);
         $featureSettings   = $integrationObject->getIntegrationSettings()->getFeatureSettings();
-        
+
         return new JsonResponse($featureSettings);
     }
 }
