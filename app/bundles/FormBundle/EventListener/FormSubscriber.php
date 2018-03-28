@@ -185,7 +185,7 @@ class FormSubscriber extends CommonSubscriber
         $emails    = $this->getEmailsFromString($config['to']);
 
         if (!empty($emails)) {
-            $this->setMailer($config, $tokens, $leadEmail, $lead);
+            $this->setMailer($config, $tokens, $emails, $lead);
 
             if (!empty($leadEmail)) {
                 // Reply to lead for user convenience

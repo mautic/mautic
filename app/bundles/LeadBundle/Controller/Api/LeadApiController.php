@@ -663,6 +663,41 @@ class LeadApiController extends CommonApiController
 
     /**
      * {@inheritdoc}
+     */
+    protected function prepareParametersForBinding($parameters, $entity, $action)
+    {
+        if (isset($parameters['owner'])) {
+            $owner = $this->getModel('user.user')->getEntity((int) $parameters['owner']);
+            $entity->setOwner($owner);
+            unset($parameters['owner']);
+        }
+
+        if (isset($parameters['color'])) {
+            $entity->setColor($parameters['color']);
+            unset($parameters['color']);
+        }
+
+        if (isset($parameters['points'])) {
+            $entity->setPoints((int) $parameters['points']);
+            unset($parameters['points']);
+        }
+
+        if (isset($parameters['tags'])) {
+            $this->model->modifyTags($entity, $parameters['tags']);
+            unset($parameters['tags']);
+        }
+
+        if (isset($parameters['stage'])) {
+            $stage = $this->getModel('stage.stage')->getEntity((int) $parameters['stage']);
+            $entity->setStage($stage);
+            unset($parameters['stage']);
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @param \Mautic\LeadBundle\Entity\Lead &$entity
      * @param                                $parameters
@@ -687,22 +722,6 @@ class LeadApiController extends CommonApiController
             }
 
             unset($originalParams['ipAddress']);
-        }
-
-        // Check for tags
-        if (isset($originalParams['tags'])) {
-            $this->model->modifyTags($entity, $originalParams['tags']);
-            unset($originalParams['tags']);
-        }
-
-        // Contact parameters which can be updated apart form contact fields
-        $contactParams = ['points', 'color', 'owner'];
-
-        foreach ($contactParams as $contactParam) {
-            if (isset($parameters[$contactParam])) {
-                $entity->setPoints($parameters[$contactParam]);
-                unset($parameters[$contactParam]);
-            }
         }
 
         // Check for lastActive date
