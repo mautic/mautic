@@ -949,7 +949,6 @@ Mautic.initSlotListeners = function() {
                 var clonedElem = cloneBtn.closest('[data-slot]');
                 clonedElem.clone().insertAfter(clonedElem);
                 Mautic.initSlotListeners();
-                Mautic.initSections();
                 Mautic.initSlots();
             });
 
