@@ -123,6 +123,12 @@ class CampaignEventFormFieldValueType extends AbstractType
                         'onchange'           => 'Mautic.updateFormFieldValues(this)',
                         'data-field-options' => json_encode($options),
                     ],
+                    'required'    => true,
+                    'constraints' => [
+                        new NotBlank(
+                            ['message' => 'mautic.core.value.required']
+                        ),
+                    ],
                 ]
             );
 
