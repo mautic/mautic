@@ -1271,6 +1271,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @return bool
      */
+    public function wasAnonymous()
+    {
+        return $this->dateIdentified == null && $this->isAnonymous() === false;
+    }
+
+    /**
+     * @return bool
+     */
     protected function getFirstSocialIdentity()
     {
         if (isset($this->fields['social'])) {
@@ -1577,7 +1585,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function checkDateIdentified()
     {
-        if ($this->dateIdentified == null && $this->isAnonymous() === false) {
+        if ($this->wasAnonymous()) {
             $this->dateIdentified            = new \DateTime();
             $this->changes['dateIdentified'] = ['', $this->dateIdentified];
         }

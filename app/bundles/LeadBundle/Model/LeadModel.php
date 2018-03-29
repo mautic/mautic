@@ -500,20 +500,24 @@ class LeadModel extends FormModel
                 $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
         }
-        $manipulator = $entity->getManipulator();
-        if ($manipulator !== null) {
-            $manipulationLog = new LeadEventLog();
-            $manipulationLog->setLead($entity);
-            $manipulationLog->setBundle($manipulator->getBundleName());
-            $manipulationLog->setObject($manipulator->getObjectName());
-            $manipulationLog->setObjectId($manipulator->getObjectId());
-            if ($entity->isNewlyCreated()) {
-                $manipulationLog->setAction('create');
-            } else {
-                $manipulationLog->setAction('identified');
+
+        if ($entity->isNewlyCreated() || $entity->wasAnonymous()) {
+            // Only store an entry once for created and once for identified, not every time the lead is saved
+            $manipulator = $entity->getManipulator();
+            if ($manipulator !== null) {
+                $manipulationLog = new LeadEventLog();
+                $manipulationLog->setLead($entity)
+                    ->setBundle($manipulator->getBundleName())
+                    ->setObject($manipulator->getObjectName())
+                    ->setObjectId($manipulator->getObjectId());
+                if ($entity->isNewlyCreated()) {
+                    $manipulationLog->setAction('create');
+                } else {
+                    $manipulationLog->setAction('identified');
+                }
+                $entity->addEventLog($manipulationLog);
+                $entity->setManipulator(null);
             }
-            $entity->addEventLog($manipulationLog);
-            $entity->setManipulator(null);
         }
 
         $this->setEntityDefaultValues($entity);
@@ -2944,10 +2948,19 @@ class LeadModel extends FormModel
         if ($persist) {
             // Set to prevent loops
             $this->currentLead = $lead;
+            $bundle            = $source            = 'lead';
+
+            if ($this->security->isAnonymous()) {
+                // Assume this is coming from some kind of web request
+                $bundle = 'page';
+                $source = 'tracking';
+            }
+
             $lead->setManipulator(new LeadManipulator(
-                'lead',
-                'lead'
+                $bundle,
+                $source
             ));
+
             $this->saveEntity($lead, false);
 
             $fields = $this->getLeadDetails($lead);
