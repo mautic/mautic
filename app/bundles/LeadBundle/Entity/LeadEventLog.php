@@ -101,7 +101,7 @@ class LeadEventLog
             ->addNullableField('properties', Type::JSON_ARRAY);
 
         $builder->createManyToOne('lead', Lead::class)
-            ->addJoinColumn('lead_id', 'id', true, false, 'SET NULL')
+            ->addJoinColumn('lead_id', 'id', true, false, 'CASCADE')
             ->inversedBy('eventLog')
             ->build();
     }
