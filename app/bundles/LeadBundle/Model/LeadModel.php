@@ -888,6 +888,7 @@ class LeadModel extends FormModel
         if ($returnTracking) {
             @trigger_error('Parameter $returnTracking is deprecated and will be removed in 3.0', E_USER_DEPRECATED);
         }
+
         $wasTrackedBefore = $this->deviceTrackingService->isTracked();
         $isUser           = (!$this->security->isAnonymous());
         if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
@@ -2844,6 +2845,32 @@ class LeadModel extends FormModel
         }
 
         return false;
+    }
+
+    /**
+     * @param bool $forceRegeneration
+     *
+     * @deprecated 2.13.0 to be removed in 3.0; use the DeviceTrackingService
+     */
+    public function getTrackingCookie($forceRegeneration = false)
+    {
+        $trackedDevice   = $this->deviceTrackingService->getTrackedDevice();
+        $trackingId      = null;
+        if ($trackedDevice !== null) {
+            $trackingId = $trackedDevice->getTrackingId();
+        }
+
+        return [$trackingId, false];
+    }
+
+    /**
+     * @param $leadId
+     *
+     * @deprecated 2.13.0 to be removed in 3.0
+     */
+    public function setLeadCookie($leadId)
+    {
+        // No longer used
     }
 
     /**
