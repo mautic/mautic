@@ -175,14 +175,14 @@ class LeadRepository extends CommonRepository
         $q->where(
                 $q->expr()->andX(
                     $q->expr()->eq('l.lead_id', ':leadId'),
-                    $q->expr()->in('l.campaign_id', $options['campaigns'])
+                    $q->expr()->in('l.campaign_id', $options['campaigns'], \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
                 )
             );
 
         if (!empty($options['dataAddedLimit'])) {
-            $q->andWhere(
-                    $q->expr()->{$options['expr']}('l.date_added', ':dateAdded')
-                )->setParameter('dateAdded', $options['dateAdded']);
+            $q->andWhere($q->expr()
+                ->{$options['expr']}('l.date_added', ':dateAdded'))
+                ->setParameter('dateAdded', $options['dateAdded']);
         }
 
         $q->setParameter('leadId', $lead->getId());
