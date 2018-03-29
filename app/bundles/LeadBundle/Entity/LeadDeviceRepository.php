@@ -167,7 +167,7 @@ class LeadDeviceRepository extends CommonRepository
     {
         /** @var LeadDevice $leadDevice */
         $leadDevice = $this->findOneBy([
-            'tracking_id' => $trackingId,
+            'trackingId' => $trackingId,
         ]);
 
         return $leadDevice;
@@ -182,11 +182,18 @@ class LeadDeviceRepository extends CommonRepository
      */
     public function isAnyLeadDeviceTracked(Lead $lead)
     {
-        $device = $this->findOneBy([
-            'lead_id' => $lead->getId(),
-            'tracking_id IS NOT NULL',
-        ]);
+        $alias = $this->getTableAlias();
+        $qb    = $this->createQueryBuilder($alias);
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq($alias.'.lead', ':lead'),
+                $qb->expr()->isNotNull($alias.'.trackingId')
+            )
+        )
+            ->setParameter('lead', $lead);
 
-        return $device !== null;
+        $devices = $qb->getQuery()->getResult();
+
+        return !empty($devices);
     }
 }
