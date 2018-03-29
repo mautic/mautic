@@ -32,22 +32,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class PublicController extends CommonFormController
 {
     /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
-
-    /**
-     * PublicController constructor.
-     *
-     * @param DeviceTrackingServiceInterface $deviceTrackingService
-     */
-    public function __construct(
-        DeviceTrackingServiceInterface $deviceTrackingService
-    ) {
-        $this->deviceTrackingService = $deviceTrackingService;
-    }
-
-    /**
      * @param         $slug
      * @param Request $request
      *
@@ -405,8 +389,9 @@ class PublicController extends CommonFormController
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
-        $lead          = $leadModel->getCurrentLead();
-        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $lead = $leadModel->getCurrentLead();
+        /** @var DeviceTrackingServiceInterface $trackedDevice */
+        $trackedDevice = $this->get('mautic.lead.service.device_tracking_service')->getTrackedDevice();
         $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
 
         /** @var TrackingHelper $trackingHelper */
@@ -590,10 +575,11 @@ class PublicController extends CommonFormController
             /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
 
-            $lead                                = $leadModel->getCurrentLead();
-            $trackedDevice                       = $this->deviceTrackingService->getTrackedDevice();
-            $trackingId                          = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
-            $data                                = [
+            $lead = $leadModel->getCurrentLead();
+            /** @var DeviceTrackingServiceInterface $trackedDevice */
+            $trackedDevice = $this->get('mautic.lead.service.device_tracking_service')->getTrackedDevice();
+            $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+            $data          = [
                 'id'        => ($lead) ? $lead->getId() : null,
                 'sid'       => $trackingId,
                 'device_id' => $trackingId,
