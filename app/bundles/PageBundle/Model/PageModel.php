@@ -476,7 +476,7 @@ class PageModel extends FormModel
         if (null == $lead) {
             $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
             // company
-            list($company, $leadAdded, $companyEntity) =  IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
+            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
@@ -495,12 +495,8 @@ class PageModel extends FormModel
             // Lead came from a non-trackable IP so ignore
             return;
         }
-        $lead->setManipulator(new LeadManipulator(
-            'page',
-            $page instanceof Page ? 'page' : 'redirect',
-            $page->getId()
-        ));
-        $this->leadModel->saveEntity($lead);
+
+        $this->setLeadManipulator($page, $lead);
 
         $ipAddress                                 = $this->ipLookupHelper->getIpAddress();
         list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
@@ -1024,7 +1020,7 @@ class PageModel extends FormModel
         $filters['lead_id'] = [
             'expression' => 'isNull',
         ];
-        $returnQ = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+        $returnQ            = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($allQ);
@@ -1197,5 +1193,33 @@ class PageModel extends FormModel
     public function getVariants(Page $entity)
     {
         return $entity->getVariants();
+    }
+
+    /**
+     * @param null|Page|Redirect $page
+     * @param Lead               $lead
+     */
+    private function setLeadManipulator($page, Lead $lead)
+    {
+        die(var_dump($lead->getId(), $lead->isNewlyCreated(), $lead->wasAnonymous()));
+        // Only save the lead and dispatch events if needed
+        if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
+            $source   = 'tracking';
+            $sourceId = null;
+            if ($page) {
+                $source   = $page instanceof Page ? 'page' : 'redirect';
+                $sourceId = $page->getId();
+            }
+
+            $lead->setManipulator(
+                new LeadManipulator(
+                    'page',
+                    $source,
+                    $sourceId
+                )
+            );
+
+            $this->leadModel->saveEntity($lead);
+        }
     }
 }
