@@ -779,7 +779,7 @@ class PageModel extends FormModel
             }
             $hit->setBrowserLanguages($languages);
         }
-        $this->leadModel->saveEntity($lead);
+
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
         if ($trackedDevice === null) {
             $deviceDetector = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
@@ -787,7 +787,8 @@ class PageModel extends FormModel
             $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
             $trackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
         }
-        if ($trackedDevice->getDeviceFingerprint() !== $query['fingerprint']) {
+
+        if (!empty($query['fingerprint']) && $trackedDevice->getDeviceFingerprint() !== $query['fingerprint']) {
             $trackedDevice->setDeviceFingerprint($query['fingerprint']);
         }
 
