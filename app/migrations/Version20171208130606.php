@@ -2,14 +2,14 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20171208130606 extends AbstractMigration
+class Version20171208130606 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
