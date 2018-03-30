@@ -24,26 +24,30 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Returns paginator with failed rows.
      *
-     * @param int   $importId
-     * @param array $args
+     * @param        $importId
+     * @param array  $args
+     * @param string $bundle
+     * @param string $object
      *
      * @return Paginator
      */
-    public function getFailedRows($importId, array $args = [])
+    public function getFailedRows($importId, array $args = [], $bundle = 'lead', $object = 'import')
     {
-        return $this->getSpecificRows($importId, 'failed', $args);
+        return $this->getSpecificRows($importId, 'failed', $args, $bundle, $object);
     }
 
     /**
      * Returns paginator with specific type of rows.
      *
-     * @param int    $importId
-     * @param string $type
+     * @param        $objectId
+     * @param        $action
      * @param array  $args
+     * @param string $bundle
+     * @param string $object
      *
      * @return Paginator
      */
-    public function getSpecificRows($importId, $type, array $args = [])
+    public function getSpecificRows($objectId, $action, array $args = [], $bundle = 'lead', $object = 'import')
     {
         return $this->getEntities(
             array_merge(
@@ -57,22 +61,22 @@ class LeadEventLogRepository extends CommonRepository
                         [
                             'column' => $this->getTableAlias().'.bundle',
                             'expr'   => 'eq',
-                            'value'  => 'lead',
+                            'value'  => $bundle,
                         ],
                         [
                             'column' => $this->getTableAlias().'.object',
                             'expr'   => 'eq',
-                            'value'  => 'import',
+                            'value'  => $object,
                         ],
                         [
                             'column' => $this->getTableAlias().'.action',
                             'expr'   => 'eq',
-                            'value'  => 'failed',
+                            'value'  => $action,
                         ],
                         [
                             'column' => $this->getTableAlias().'.objectId',
                             'expr'   => 'eq',
-                            'value'  => $importId,
+                            'value'  => $objectId,
                         ],
                     ],
                 ],
@@ -92,27 +96,59 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getEventsByLead($bundle, $object, Lead $lead = null, array $options)
+    public function getEventsByLead($bundle, $object, Lead $lead = null, array $options = [])
     {
         $alias = $this->getTableAlias();
         $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('*')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', $alias)
-            ->where($alias.'.bundle = :bundle')
-            ->setParameter('bundle', $bundle)
-            ->andWhere($alias.'.object = :object')
-            ->setParameter('object', $object);
+            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', $alias);
 
         if ($lead) {
             $qb->andWhere($alias.'.lead_id = :lead')
                 ->setParameter('lead', $lead->getId());
         }
 
+        $qb->andWhere($alias.'.bundle = :bundle')
+            ->setParameter('bundle', $bundle)
+            ->andWhere($alias.'.object = :object')
+            ->setParameter('object', $object);
+
         if (!empty($options['search'])) {
             $qb->andWhere($qb->expr()->like($alias.'.properties', $qb->expr()->literal('%'.$options['search'].'%')));
         }
 
-        return $this->getTimelineResults($qb, $options, $alias.'.original_file', $alias.'.date_added', ['query'], ['date_added']);
+        return $this->getTimelineResults($qb, $options, $alias.'.action', $alias.'.date_added', [], ['date_added']);
+    }
+
+    /**
+     * Loads data for specified lead events by action.
+     *
+     * @param string    $action
+     * @param Lead|null $lead
+     * @param array     $options
+     *
+     * @return array
+     */
+    public function getEventsByAction($action, Lead $lead = null, array $options = [])
+    {
+        $alias = $this->getTableAlias();
+        $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', $alias);
+
+        if ($lead) {
+            $qb->andWhere($alias.'.lead_id = :lead')
+                ->setParameter('lead', $lead->getId());
+        }
+
+        $qb->andWhere($alias.'.action = :action')
+            ->setParameter('action', $action);
+
+        if (!empty($options['search'])) {
+            $qb->andWhere($qb->expr()->like($alias.'.properties', $qb->expr()->literal('%'.$options['search'].'%')));
+        }
+
+        return $this->getTimelineResults($qb, $options, $alias.'.action', $alias.'.date_added', [], ['date_added']);
     }
 
     /**
