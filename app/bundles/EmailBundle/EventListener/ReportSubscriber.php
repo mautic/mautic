@@ -178,13 +178,10 @@ class ReportSubscriber extends CommonSubscriber
             ],
         ];
 
-        $companyColumns = $this->companyReportData->getCompanyData();
-
         $columns = array_merge(
             $columns,
             $event->getStandardColumns($prefix, [], 'mautic_email_action'),
-            $event->getCategoryColumns(),
-            $companyColumns
+            $event->getCategoryColumns()
         );
         $data = [
             'display_name' => 'mautic.email.emails',
@@ -266,6 +263,8 @@ class ReportSubscriber extends CommonSubscriber
                 ],
             ];
 
+            $companyColumns = $this->companyReportData->getCompanyData();
+
             $data = [
                 'display_name' => 'mautic.email.stats.report.table',
                 'columns'      => array_merge(
@@ -273,7 +272,8 @@ class ReportSubscriber extends CommonSubscriber
                     $statColumns,
                     $event->getCampaignByChannelColumns(),
                     $event->getLeadColumns(),
-                    $event->getIpColumn()
+                    $event->getIpColumn(),
+                    $companyColumns
                 ),
             ];
             $event->addTable(self::CONTEXT_EMAIL_STATS, $data, self::CONTEXT_EMAILS);
