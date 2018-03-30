@@ -459,7 +459,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
             $lead->setManipulator(new LeadManipulator(
                 'plugin',
-                $this->getName()
+                $this->getName(),
+                null,
+                $this->getDisplayName()
             ));
             $leadModel->saveEntity($lead, false);
         }

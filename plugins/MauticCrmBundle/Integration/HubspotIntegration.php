@@ -486,7 +486,9 @@ class HubspotIntegration extends CrmAbstractIntegration
                 try {
                     $lead->setManipulator(new LeadManipulator(
                         'plugin',
-                        $this->getName()
+                        $this->getName(),
+                        null,
+                        $this->getDisplayName()
                     ));
                     $this->leadModel->saveEntity($lead, false);
                     if (isset($company)) {

@@ -200,7 +200,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     private $color;
 
-    /** @var LeadManipulator */
+    /**
+     * @var LeadManipulator
+     */
     private $manipulator = null;
 
     /**

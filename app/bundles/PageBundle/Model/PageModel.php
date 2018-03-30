@@ -496,8 +496,6 @@ class PageModel extends FormModel
             return;
         }
 
-        $this->setLeadManipulator($page, $lead);
-
         $ipAddress                                 = $this->ipLookupHelper->getIpAddress();
         list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
 
@@ -617,6 +615,9 @@ class PageModel extends FormModel
         if (isset($query['page_title'])) {
             $hit->setUrlTitle($query['page_title']);
         }
+
+        // Add entry to contact log table
+        $this->setLeadManipulator($page, $hit, $lead);
 
         // Store tracking ID
         $hit->setLead($lead);
@@ -1199,13 +1200,12 @@ class PageModel extends FormModel
      * @param null|Page|Redirect $page
      * @param Lead               $lead
      */
-    private function setLeadManipulator($page, Lead $lead)
+    private function setLeadManipulator($page, Hit $hit, Lead $lead)
     {
-        die(var_dump($lead->getId(), $lead->isNewlyCreated(), $lead->wasAnonymous()));
         // Only save the lead and dispatch events if needed
         if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
-            $source   = 'tracking';
-            $sourceId = null;
+            $source   = 'hit';
+            $sourceId = $hit->getId();
             if ($page) {
                 $source   = $page instanceof Page ? 'page' : 'redirect';
                 $sourceId = $page->getId();
@@ -1215,7 +1215,8 @@ class PageModel extends FormModel
                 new LeadManipulator(
                     'page',
                     $source,
-                    $sourceId
+                    $sourceId,
+                    $hit->getUrl()
                 )
             );
 

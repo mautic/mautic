@@ -32,17 +32,24 @@ class LeadManipulator
     private $objectId;
 
     /**
+     * @var string|null
+     */
+    private $objectDescription;
+
+    /**
      * LeadManipulator constructor.
      *
-     * @param string|null $bundleName
-     * @param string|null $objectName
-     * @param int|null    $objectId
+     * @param null $bundleName
+     * @param null $objectName
+     * @param null $objectId
+     * @param null $objectDescription
      */
-    public function __construct($bundleName = null, $objectName = null, $objectId = null)
+    public function __construct($bundleName = null, $objectName = null, $objectId = null, $objectDescription = null)
     {
-        $this->bundleName = $bundleName;
-        $this->objectName = $objectName;
-        $this->objectId   = $objectId;
+        $this->bundleName        = $bundleName;
+        $this->objectName        = $objectName;
+        $this->objectId          = $objectId;
+        $this->objectDescription = $objectDescription;
     }
 
     /**
@@ -67,5 +74,10 @@ class LeadManipulator
     public function getObjectId()
     {
         return $this->objectId;
+    }
+
+    public function getObjectDescription()
+    {
+        return $this->objectDescription;
     }
 }

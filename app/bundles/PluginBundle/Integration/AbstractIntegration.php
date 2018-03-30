@@ -2069,7 +2069,9 @@ abstract class AbstractIntegration
             try {
                 $lead->setManipulator(new LeadManipulator(
                     'plugin',
-                    $this->getName()
+                    $this->getName(),
+                    null,
+                    $this->getDisplayName()
                 ));
                 $leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
