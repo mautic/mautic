@@ -55,10 +55,10 @@ Installing from source is only recommended if you are comfortable using the comm
 #### Mautic requirements
 
 1. See [Mautic requirements](https://www.mautic.org/download/requirements).
-2. PHP modules:
-	- required: `zip`, `xml`, `mcrypt`, `imap`, `mailparse`
-	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
-	- recommended for development: `xdebug`
+2. PHP extensions:
+	- required: `zip`, `xml`, `openssl`, `mailparse`, `json`, `session`, `hash`, `iconv`, `ctype`, `mysqli`, `mbstring`, `libxml`, `SimpleXML`, `curl`, `filter`, `fileinfo`, `posix`, `gd`, `bcmath`, `intl`, `readline`
+	- recommended: `Zend OPcache` / `apcu` / `memcached`, `shmop`, `igbinary`, `sockets`, `imap`, `zlib`
+	- recommended for development: `xdebug`, `dba`, `pcntl`, `tokenizer`, `ftp`, `xmlrpc`
 3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
 
 ## Installation
