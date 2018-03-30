@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\NonUniqueResultException;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -36,7 +35,6 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
-use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -47,16 +45,12 @@ use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
-use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
-use Mautic\LeadBundle\Model\Service\ContactTrackingService\ContactTrackingServiceInterface;
-use Mautic\LeadBundle\Model\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
-use Mautic\LeadBundle\Model\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
@@ -74,10 +68,6 @@ use Symfony\Component\Intl\Intl;
 class LeadModel extends FormModel
 {
     use DefaultValueTrait, OperatorListTrait, RequestTrait;
-
-    /** @var Lead */
-    private $currentLead       = null;
-    private $systemCurrentLead = null;
 
     const CHANNEL_FEATURE = 'contact_preference';
 
@@ -142,11 +132,6 @@ class LeadModel extends FormModel
     protected $channelListHelper;
 
     /**
-     * @var bool
-     */
-    protected $trackByIp = false;
-
-    /**
      * @var CoreParametersHelper
      */
     protected $coreParametersHelper;
@@ -176,39 +161,29 @@ class LeadModel extends FormModel
      */
     protected $emailValidator;
 
-    /** @var ContactTrackingServiceInterface */
-    private $contactTrackingService;
-
-    /** @var DeviceCreatorServiceInterface */
-    private $deviceCreatorService;
-
-    /** @var DeviceDetectorFactoryInterface */
-    private $deviceDetectorFactory;
-
-    /** @var DeviceTrackingServiceInterface */
-    private $deviceTrackingService;
+    /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
 
     /**
      * LeadModel constructor.
      *
-     * @param RequestStack                    $requestStack
-     * @param CookieHelper                    $cookieHelper
-     * @param IpLookupHelper                  $ipLookupHelper
-     * @param PathsHelper                     $pathsHelper
-     * @param IntegrationHelper               $integrationHelper
-     * @param FieldModel                      $leadFieldModel
-     * @param ListModel                       $leadListModel
-     * @param FormFactory                     $formFactory
-     * @param CompanyModel                    $companyModel
-     * @param CategoryModel                   $categoryModel
-     * @param ChannelListHelper               $channelListHelper
-     * @param                                 $trackByIp
-     * @param CoreParametersHelper            $coreParametersHelper
-     * @param UserProvider                    $userProvider
-     * @param ContactTrackingServiceInterface $contactTrackingService
-     * @param DeviceCreatorServiceInterface   $deviceCreatorService
-     * @param DeviceDetectorFactoryInterface  $deviceDetectorFactory
-     * @param DeviceTrackingServiceInterface  $deviceTrackingService
+     * @param RequestStack         $requestStack
+     * @param CookieHelper         $cookieHelper
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param PathsHelper          $pathsHelper
+     * @param IntegrationHelper    $integrationHelper
+     * @param FieldModel           $leadFieldModel
+     * @param ListModel            $leadListModel
+     * @param FormFactory          $formFactory
+     * @param CompanyModel         $companyModel
+     * @param CategoryModel        $categoryModel
+     * @param ChannelListHelper    $channelListHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param EmailValidator       $emailValidator
+     * @param UserProvider         $userProvider
+     * @param ContactTracker       $contactTracker
      */
     public function __construct(
         RequestStack $requestStack,
@@ -222,14 +197,10 @@ class LeadModel extends FormModel
         CompanyModel $companyModel,
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
-        $trackByIp,
         CoreParametersHelper $coreParametersHelper,
         EmailValidator $emailValidator,
         UserProvider $userProvider,
-        ContactTrackingServiceInterface $contactTrackingService,
-        DeviceCreatorServiceInterface $deviceCreatorService,
-        DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService
+        ContactTracker $contactTracker
     ) {
         $this->request                = $requestStack->getCurrentRequest();
         $this->cookieHelper           = $cookieHelper;
@@ -242,14 +213,10 @@ class LeadModel extends FormModel
         $this->formFactory            = $formFactory;
         $this->categoryModel          = $categoryModel;
         $this->channelListHelper      = $channelListHelper;
-        $this->trackByIp              = $trackByIp;
         $this->coreParametersHelper   = $coreParametersHelper;
         $this->emailValidator         = $emailValidator;
         $this->userProvider           = $userProvider;
-        $this->contactTrackingService = $contactTrackingService;
-        $this->deviceCreatorService   = $deviceCreatorService;
-        $this->deviceDetectorFactory  = $deviceDetectorFactory;
-        $this->deviceTrackingService  = $deviceTrackingService;
+        $this->contactTracker         = $contactTracker;
     }
 
     /**
@@ -876,96 +843,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get the current lead; if $returnTracking = true then array with lead, trackingId, and boolean of if trackingId
-     * was just generated or not.
-     *
-     * @param bool|false $returnTracking
-     *
-     * @return null|Lead|array
-     */
-    public function getCurrentLead($returnTracking = false)
-    {
-        if ($returnTracking) {
-            @trigger_error('Parameter $returnTracking is deprecated and will be removed in 3.0', E_USER_DEPRECATED);
-        }
-
-        $wasTrackedBefore = $this->deviceTrackingService->isTracked();
-        $isUser           = (!$this->security->isAnonymous());
-        if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
-            $this->logger->addDebug('LEAD: System lead is being used');
-            if (!$isUser && null === $this->systemCurrentLead) {
-                $this->systemCurrentLead = new Lead();
-            } elseif ($isUser) {
-                $this->logger->addDebug('LEAD: In a Mautic user session');
-            }
-
-            return ($returnTracking) ? [$this->systemCurrentLead, null, false] : $this->systemCurrentLead;
-        }
-
-        if ($this->request) {
-            $this->logger->addDebug('LEAD: Tracking session for '.$this->request->getMethod().' '.$this->request->getRequestUri());
-        }
-
-        if (empty($this->currentLead)) {
-            $ip   = $this->ipLookupHelper->getIpAddress();
-            $lead = $this->contactTrackingService->getTrackedLead();
-            if ($lead === null) {
-                $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-                if ($trackedDevice !== null) {
-                    $lead = $trackedDevice->getLead();
-                }
-            }
-            if ($lead !== null) {
-                $this->logger->addDebug("LEAD: Existing lead found with ID# {$lead->getId()}.");
-            } else { // if no trackingId cookie set the lead is not tracked yet so create a new one
-                if (!$ip->isTrackable()) {
-                    // Don't save leads that are from a non-trackable IP by default
-                    $lead = $this->createNewContact($ip, false);
-                } else {
-                    if ($this->trackByIp) {
-                        // Try looking up the contact by it's IP address
-                        $leads = $this->getLeadsByIp($ip->getIpAddress());
-
-                        if (count($leads)) {
-                            $lead = $leads[0];
-                            $this->logger->addDebug("LEAD: Existing lead found with ID# {$lead->getId()}.");
-                        }
-                    }
-
-                    if (!$lead) {
-                        //let's create a lead
-                        $lead = $this->createNewContact($ip);
-                    }
-                }
-            }
-            $this->currentLead = $lead;
-            if ($leadId = $lead->getId() && $this->request !== null) {
-                $deviceDetector = $this->deviceDetectorFactory->create($this->request->server->get('HTTP_USER_AGENT'));
-                $deviceDetector->parse();
-                $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
-                $trackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
-                $this->em->flush($trackedDevice);
-            }
-        }
-        $isTrackedNow    = $this->deviceTrackingService->isTracked();
-        $generated       = ($wasTrackedBefore === false && $isTrackedNow === true);
-        $trackedDevice   = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId      = null;
-        if ($trackedDevice !== null) {
-            $trackingId = $trackedDevice->getTrackingId();
-            $this->logger->addDebug("LEAD: Tracking ID for this device is {$trackingId}");
-        }
-
-        // Log last active
-        if (!defined('MAUTIC_LEAD_LASTACTIVE_LOGGED')) {
-            $this->getRepository()->updateLastActive($this->currentLead->getId());
-            define('MAUTIC_LEAD_LASTACTIVE_LOGGED', 1);
-        }
-
-        return ($returnTracking) ? [$this->currentLead, $trackingId, $generated] : $this->currentLead;
-    }
-
-    /**
      * Get the lead from request (ct/clickthrough) and handles auto merging of lead data from request parameters.
      *
      * @deprecated - here till all lead methods are converted to contact methods; preferably use getContactFromRequest instead
@@ -1091,87 +968,6 @@ class LeadModel extends FormModel
         }
 
         return $returnWithQueryFields ? [$lead, $inQuery] : $lead;
-    }
-
-    /**
-     * Sets current lead.
-     *
-     * @param Lead $lead
-     */
-    public function setCurrentLead(Lead $lead)
-    {
-        $this->logger->addDebug("LEAD: {$lead->getId()} set as current lead.");
-
-        $isUser = (!$this->security->isAnonymous());
-        if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
-            if ($isUser) {
-                $this->logger->addDebug('LEAD: In a Mautic user session');
-            }
-
-            // Overwrite system current lead
-            return $this->setSystemCurrentLead($lead);
-        }
-
-        $oldLead = (is_null($this->currentLead)) ? null : $this->currentLead;
-
-        $fields = $lead->getFields();
-        if (empty($fields)) {
-            $lead->setFields($this->getLeadDetails($lead));
-        }
-
-        $this->currentLead = $lead;
-
-        // Set last active
-        $this->currentLead->setLastActive(new \DateTime());
-
-        if ($lead->getId() && $this->request !== null) {
-            $deviceDetector = $this->deviceDetectorFactory->create($this->request->server->get('HTTP_USER_AGENT'));
-            $deviceDetector->parse();
-            $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
-            // Update tracking cookies if the lead is different
-            if ($oldLead !== null && $oldLead->getId() != $lead->getId()) {
-                $oldTrackedDevice = $this->deviceTrackingService->getTrackedDevice();
-                if ($oldTrackedDevice !== null) {
-                    $oldTrackingId = $oldTrackedDevice->getTrackingId();
-                } else {
-                    $oldTrackingId = $this->contactTrackingService->getTrackedIdentifier();
-                }
-                $newTrackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, true);
-                $this->em->flush($newTrackedDevice);
-                $newTrackingId    = ($newTrackedDevice === null ? null : $newTrackedDevice->getTrackingId());
-                $this->logger->addDebug(
-                    "LEAD: Tracking code changed from $oldTrackingId for contact ID# {$oldLead->getId()} to $newTrackingId for contact ID# {$lead->getId()}"
-                );
-
-                if ($oldTrackingId !== null) {
-                    if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
-                        $event = new LeadChangeEvent($oldLead, $oldTrackingId, $lead, $newTrackingId);
-                        $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
-                    }
-                }
-            } elseif (!$oldLead) {
-                // New lead, set the tracking cookie
-                $newTrackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
-                $this->em->flush($newTrackedDevice);
-            }
-        }
-    }
-
-    /**
-     * Used by system processes that hook into events that use getCurrentLead().
-     *
-     * @param Lead $lead
-     */
-    public function setSystemCurrentLead(Lead $lead = null)
-    {
-        $this->logger->addDebug("LEAD: {$lead->getId()} set as system lead.");
-
-        $fields = $lead->getFields();
-        if (empty($fields)) {
-            $lead->setFields($this->getLeadDetails($lead));
-        }
-
-        $this->systemCurrentLead = $lead;
     }
 
     /**
@@ -2854,13 +2650,9 @@ class LeadModel extends FormModel
      */
     public function getTrackingCookie($forceRegeneration = false)
     {
-        $trackedDevice   = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId      = null;
-        if ($trackedDevice !== null) {
-            $trackingId = $trackedDevice->getTrackingId();
-        }
+        @trigger_error('getTrackingCookie is deprecated and will be removed in 3.0; Use the ContactTracker::getTrackingId instead', E_USER_DEPRECATED);
 
-        return [$trackingId, false];
+        return [$this->contactTracker->getTrackingId(), false];
     }
 
     /**
@@ -2874,6 +2666,52 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Get the current lead; if $returnTracking = true then array with lead, trackingId, and boolean of if trackingId
+     * was just generated or not.
+     *
+     * @deprecated 2.13.0 to be removed in 3.0
+     *
+     * @param bool|false $returnTracking
+     *
+     * @return null|Lead|array
+     */
+    public function getCurrentLead($returnTracking = false)
+    {
+        @trigger_error('getCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::getTrackedContact instead', E_USER_DEPRECATED);
+
+        $trackedContact = $this->contactTracker->getContact();
+        $trackingId     = $this->contactTracker->getTrackingId();
+
+        return ($returnTracking) ? [$trackedContact, $trackingId, false] : $trackedContact;
+    }
+
+    /**
+     * Sets current lead.
+     *
+     * @param Lead $lead
+     */
+    public function setCurrentLead(Lead $lead)
+    {
+        @trigger_error('setCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::setTrackedContact instead', E_USER_DEPRECATED);
+
+        $this->contactTracker->setTrackedContact($lead);
+    }
+
+    /**
+     * Used by system processes that hook into events that use getCurrentLead().
+     *
+     * @param Lead $lead
+     */
+    public function setSystemCurrentLead(Lead $lead = null)
+    {
+        @trigger_error('setSystemCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::setSystemContac instead', E_USER_DEPRECATED);
+
+        $this->contactTracker->setSystemContact($lead);
+    }
+
+    /**
+     * @deprecated 2.13.0 to be removed in 3.0
+     *
      * @param IpAddress $ip
      * @param bool      $persist
      *
@@ -2881,6 +2719,8 @@ class LeadModel extends FormModel
      */
     protected function createNewContact(IpAddress $ip, $persist = true)
     {
+        @trigger_error('createNewContact is deprecated and will be removed in 3.0', E_USER_DEPRECATED);
+
         //let's create a lead
         $lead = new Lead();
         $lead->addIpAddress($ip);
@@ -2888,7 +2728,7 @@ class LeadModel extends FormModel
 
         if ($persist) {
             // Set to prevent loops
-            $this->currentLead = $lead;
+            $this->contactTracker->setTrackedContact($lead);
             $this->saveEntity($lead, false);
 
             $fields = $this->getLeadDetails($lead);

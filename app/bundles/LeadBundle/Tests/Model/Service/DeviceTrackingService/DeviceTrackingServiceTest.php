@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
-use Mautic\LeadBundle\Model\Service\DeviceTrackingService\DeviceTrackingService;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

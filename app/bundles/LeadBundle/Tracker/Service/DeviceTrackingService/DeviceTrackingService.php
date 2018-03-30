@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Model\Service\DeviceTrackingService;
+namespace Mautic\LeadBundle\Tracker\Service\DeviceTrackingService;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CookieHelper;
@@ -111,6 +111,8 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             $device->setTrackingId($this->getUniqueTrackingIdentifier());
         }
         $this->entityManager->persist($device);
+        $this->entityManager->flush();
+
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
 
         return $device;

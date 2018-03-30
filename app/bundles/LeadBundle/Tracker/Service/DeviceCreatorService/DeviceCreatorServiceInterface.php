@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Model\Service\DeviceCreatorService;
+namespace Mautic\LeadBundle\Tracker\Service\DeviceCreatorService;
 
 use DeviceDetector\DeviceDetector;
 use Mautic\LeadBundle\Entity\Lead;
