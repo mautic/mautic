@@ -89,6 +89,7 @@ class LeadEventLog
             ->addIndex(['lead_id'], 'lead_id_index')
             ->addIndex(['object', 'object_id'], 'lead_object_index')
             ->addIndex(['bundle', 'object', 'action', 'object_id'], 'lead_timeline_index')
+            ->addIndex(['action'], 'lead_timeline_action_index')
             ->addIndex(['date_added'], 'lead_date_added_index')
             ->addId()
             ->addNullableField('userId', Type::INTEGER, 'user_id')
