@@ -24,6 +24,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
      * @var ListModel
      */
     protected $listModel;
+
     /**
      * CampaignEventLeadCampaignsType constructor.
      *
