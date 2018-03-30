@@ -501,24 +501,7 @@ class LeadModel extends FormModel
             }
         }
 
-        if ($entity->isNewlyCreated() || $entity->wasAnonymous()) {
-            // Only store an entry once for created and once for identified, not every time the lead is saved
-            $manipulator = $entity->getManipulator();
-            if ($manipulator !== null) {
-                $manipulationLog = new LeadEventLog();
-                $manipulationLog->setLead($entity)
-                    ->setBundle($manipulator->getBundleName())
-                    ->setObject($manipulator->getObjectName())
-                    ->setObjectId($manipulator->getObjectId());
-                if ($entity->isNewlyCreated()) {
-                    $manipulationLog->setAction('create');
-                } else {
-                    $manipulationLog->setAction('identified');
-                }
-                $entity->addEventLog($manipulationLog);
-                $entity->setManipulator(null);
-            }
-        }
+        $this->processManipulator($entity);
 
         $this->setEntityDefaultValues($entity);
 
@@ -1933,7 +1916,8 @@ class LeadModel extends FormModel
             $lead->setManipulator(new LeadManipulator(
                 'lead',
                 'import',
-                $importId
+                $importId,
+                $this->userHelper->getUser()->getName()
             ));
             $this->saveEntity($lead);
 
@@ -2784,6 +2768,65 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @param Lead $lead
+     */
+    private function processManipulator(Lead $lead)
+    {
+        if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
+            // Only store an entry once for created and once for identified, not every time the lead is saved
+            $manipulator = $lead->getManipulator();
+            if ($manipulator !== null) {
+                $manipulationLog = new LeadEventLog();
+                $manipulationLog->setLead($lead)
+                    ->setBundle($manipulator->getBundleName())
+                    ->setObject($manipulator->getObjectName())
+                    ->setObjectId($manipulator->getObjectId());
+                if ($lead->isAnonymous()) {
+                    $manipulationLog->setAction('created_contact');
+                } else {
+                    $manipulationLog->setAction('identified_contact');
+                }
+                $description = $manipulator->getObjectDescription();
+                $manipulationLog->setProperties(['object_description' => $description]);
+
+                $lead->addEventLog($manipulationLog);
+                $lead->setManipulator(null);
+            }
+        }
+    }
+
+    /**
+     * @param IpAddress $ip
+     * @param bool      $persist
+     *
+     * @return Lead
+     */
+    protected function createNewContact(IpAddress $ip, $persist = true)
+    {
+        //let's create a lead
+        $lead = new Lead();
+        $lead->addIpAddress($ip);
+        $lead->setNewlyCreated(true);
+
+        if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
+            // Set to prevent loops
+            $this->currentLead = $lead;
+
+            // Note ignoring a lead manipulator object here on purpose to not falsely record entries
+            $this->saveEntity($lead, false);
+
+            $fields = $this->getLeadDetails($lead);
+            $lead->setFields($fields);
+        }
+
+        if ($leadId = $lead->getId()) {
+            $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
+        }
+
+        return $lead;
+    }
+
+    /**
      * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
      * @param Lead   $lead
@@ -2930,47 +2973,5 @@ class LeadModel extends FormModel
         }
 
         return false;
-    }
-
-    /**
-     * @param IpAddress $ip
-     * @param bool      $persist
-     *
-     * @return Lead
-     */
-    protected function createNewContact(IpAddress $ip, $persist = true)
-    {
-        //let's create a lead
-        $lead = new Lead();
-        $lead->addIpAddress($ip);
-        $lead->setNewlyCreated(true);
-
-        if ($persist) {
-            // Set to prevent loops
-            $this->currentLead = $lead;
-            $bundle            = $source            = 'lead';
-
-            if ($this->security->isAnonymous()) {
-                // Assume this is coming from some kind of web request
-                $bundle = 'page';
-                $source = 'tracking';
-            }
-
-            $lead->setManipulator(new LeadManipulator(
-                $bundle,
-                $source
-            ));
-
-            $this->saveEntity($lead, false);
-
-            $fields = $this->getLeadDetails($lead);
-            $lead->setFields($fields);
-        }
-
-        if ($leadId = $lead->getId()) {
-            $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
-        }
-
-        return $lead;
     }
 }
