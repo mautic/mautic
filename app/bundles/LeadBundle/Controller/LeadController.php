@@ -11,12 +11,9 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
-use Mautic\LeadBundle\Batches\LeadBatchesTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -27,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LeadController extends FormController
 {
-    use LeadDetailsTrait, FrequencyRuleTrait, LeadBatchesTrait;
+    use LeadDetailsTrait, FrequencyRuleTrait;
 
     /**
      * @param int $page
@@ -1427,115 +1424,6 @@ class LeadController extends FormController
                 ],
             ]
         );
-    }
-
-    /**
-     * Batch update of segments.
-     *
-     * @return mixed|JsonResponse
-     */
-    public function batchListsAction()
-    {
-        return $this->handleBatchRequest($this->get('mautic.lead.batch.action.segments'), function () {
-            /** @var \Mautic\LeadBundle\Model\ListModel $model */
-            $model = $this->getModel('lead.list');
-            $lists = $model->getUserLists();
-            $items = [];
-            foreach ($lists as $list) {
-                $items[$list['id']] = $list['name'];
-            }
-
-            $route = $this->generateUrl('mautic_contact_action', ['objectAction' => 'batchLists']);
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            'lead_batch',
-                            [],
-                            [
-                                'items'  => $items,
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
-        });
-    }
-
-    /**
-     * Batch update of categories.
-     *
-     * @return mixed|JsonResponse
-     */
-    public function batchCategoriesAction()
-    {
-        return $this->handleBatchRequest($this->get('mautic.lead.batch.action.categories'), function () {
-            /** @var CategoryModel $model */
-            $model = $this->getModel('category.category');
-            $entities = $model->getEntities()->getIterator();
-
-            /** @var Category $category */
-            foreach ($entities as $category) {
-                $items[$category->getId()] = $category->getTitle();
-            }
-
-            $route = $this->generateUrl('mautic_contact_action', ['objectAction' => 'batchCategories']);
-
-            return $this->delegateView([
-                'viewParameters' => [
-                    'form' => $this->createForm('lead_batch', [], [
-                        'action' => $route,
-                        'items'  => $items,
-                    ])->createView(),
-                ],
-                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
-                'passthroughVars' => [
-                    'activeLink'    => '#mautic_contact_index',
-                    'mauticContent' => 'leadBatch',
-                    'route'         => $route,
-                ],
-            ]);
-        });
-    }
-
-    /**
-     * Batch update of channels.
-     *
-     * @return mixed|JsonResponse
-     */
-    public function batchChannelsAction()
-    {
-        return $this->handleBatchRequest($this->get('mautic.lead.batch.action.channels'), function () {
-            /** @var LeadModel $model */
-            $model = $this->getModel('lead');
-
-            $route = $this->generateUrl('mautic_contact_action', ['objectAction' => 'batchChannels']);
-
-            return $this->delegateView([
-                'viewParameters' => [
-                    'form'         => $this->createForm('lead_contact_channels', [], [
-                        'action'        => $route,
-                        'channels'      => $model->getPreferenceChannels(),
-                        'public_view'   => false,
-                        'save_button'   => true,
-                    ])->createView(),
-                ],
-                'contentTemplate' => 'MauticLeadBundle:Batch:channel.html.php',
-                'passthroughVars' => [
-                    'activeLink'    => '#mautic_contact_index',
-                    'mauticContent' => 'leadBatch',
-                    'route'         => $route,
-                ],
-            ]);
-        });
     }
 
     /**

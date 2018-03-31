@@ -80,6 +80,10 @@ final class ChangeCategoriesAction implements ActionInterface
         ]);
 
         foreach ($leads as $lead) {
+            if (!$this->corePermissions->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+                continue;
+            }
+
             $leadCategories = $this->leadModel->getLeadCategories($lead); // id of categories
             $this->leadModel->addToCategory($lead, $this->categoriesIdsToAdd);
 

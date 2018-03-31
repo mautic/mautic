@@ -11,6 +11,9 @@
 
 namespace Mautic\LeadBundle\Batches\Lead\ChangeChannelsAction;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 
 final class ChangeChannelsActionFactory implements ChangeChannelsActionFactoryInterface
@@ -21,13 +24,34 @@ final class ChangeChannelsActionFactory implements ChangeChannelsActionFactoryIn
     private $leadModel;
 
     /**
+     * @var CorePermissions
+     */
+    private $corePermissions;
+
+    /**
+     * @var DoNotContact
+     */
+    private $doNotContact;
+
+    /**
+     * @var FrequencyRuleRepository
+     */
+    private $frequencyRuleRepository;
+
+    /**
      * ChangeChannelsActionFactory constructor.
      *
-     * @param LeadModel $leadModel
+     * @param LeadModel               $leadModel
+     * @param CorePermissions         $corePermissions
+     * @param DoNotContact            $doNotContact
+     * @param FrequencyRuleRepository $frequencyRuleRepository
      */
-    public function __construct(LeadModel $leadModel)
+    public function __construct(LeadModel $leadModel, CorePermissions $corePermissions, DoNotContact $doNotContact, FrequencyRuleRepository $frequencyRuleRepository)
     {
-        $this->leadModel = $leadModel;
+        $this->leadModel               = $leadModel;
+        $this->corePermissions         = $corePermissions;
+        $this->doNotContact            = $doNotContact;
+        $this->frequencyRuleRepository = $frequencyRuleRepository;
     }
 
     /**
@@ -37,11 +61,18 @@ final class ChangeChannelsActionFactory implements ChangeChannelsActionFactoryIn
     public function create(
         array $leadsIds,
         array $subscribedChannels,
-        array $frequencyNumberEmail,
-        array $frequencyTimeEmail,
-        \DateTime $contactPauseStartDateEmail,
-        \DateTime $contactPauseEndDateEmail
+        array $requestParameters,
+        $preferredChannel
     ) {
-        return new ChangeChannelsAction($leadsIds, $this->leadModel, $subscribedChannels, $frequencyNumberEmail, $frequencyTimeEmail, $contactPauseStartDateEmail, $contactPauseEndDateEmail);
+        return new ChangeChannelsAction(
+            $leadsIds,
+            $subscribedChannels,
+            $requestParameters,
+            $this->leadModel,
+            $this->corePermissions,
+            $this->doNotContact,
+            $this->frequencyRuleRepository,
+            $preferredChannel
+        );
     }
 }

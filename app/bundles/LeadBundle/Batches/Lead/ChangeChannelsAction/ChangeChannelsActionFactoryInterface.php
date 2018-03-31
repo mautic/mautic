@@ -18,21 +18,17 @@ interface ChangeChannelsActionFactoryInterface
     /**
      * Create action.
      *
-     * @param array     $leadsIds
-     * @param array     $subscribedChannels
-     * @param array     $frequencyNumberEmail
-     * @param array     $frequencyTimeEmail
-     * @param \DateTime $contactPauseStartDateEmail
-     * @param \DateTime $contactPauseEndDateEmail
+     * @param array  $leadsIds
+     * @param array  $subscribedChannels
+     * @param array  $requestParameters
+     * @param string $preferredChannel
      *
      * @return ActionInterface
      */
     public function create(
         array $leadsIds,
         array $subscribedChannels,
-        array $frequencyNumberEmail,
-        array $frequencyTimeEmail,
-        \DateTime $contactPauseStartDateEmail,
-        \DateTime $contactPauseEndDateEmail
+        array $requestParameters,
+        $preferredChannel
     );
 }

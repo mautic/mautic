@@ -43,8 +43,8 @@ final class ChangeSegmentsActionFactory implements ChangeCategoriesActionFactory
      * @see ChangeCategoriesActionFactoryInterface::create()
      * {@inheritdoc}
      */
-    public function create(array $leadsIds, array $categoriesIdsToAdd, array $categoriesIdsToRemove)
+    public function create(array $leadsIds, array $segmentsIdsToAdd, array $segmentsIdsToRemove)
     {
-        return new ChangeSegmentsAction($this->leadModel, $this->corePermissions, $leadsIds, $categoriesIdsToAdd, $categoriesIdsToRemove);
+        return new ChangeSegmentsAction($this->leadModel, $this->corePermissions, $leadsIds, $segmentsIdsToAdd, $segmentsIdsToRemove);
     }
 }

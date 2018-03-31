@@ -19,10 +19,10 @@ interface ChangeCategoriesActionFactoryInterface
      * Create action.
      *
      * @param int[] $leadsIds
-     * @param int[] $categoriesIdsToAdd
-     * @param int[] $categoriesIdsToRemove
+     * @param int[] $segmentsIdsToAdd
+     * @param int[] $segmentsIdsToRemove
      *
      * @return ActionInterface
      */
-    public function create(array $leadsIds, array $categoriesIdsToAdd, array $categoriesIdsToRemove);
+    public function create(array $leadsIds, array $segmentsIdsToAdd, array $segmentsIdsToRemove);
 }

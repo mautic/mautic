@@ -81,7 +81,7 @@ final class ChangeSegmentsAction implements ActionInterface
 
         foreach ($leads as $lead) {
             if (!$this->corePermissions->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                return;
+                continue;
             }
 
             if (!empty($this->segmentsIdsToAdd)) {
@@ -92,5 +92,7 @@ final class ChangeSegmentsAction implements ActionInterface
                 $this->leadModel->removeFromLists($lead, $this->segmentsIdsToRemove);
             }
         }
+
+        $this->leadModel->saveEntities($leads);
     }
 }
