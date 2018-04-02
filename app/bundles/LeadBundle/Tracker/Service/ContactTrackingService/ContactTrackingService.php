@@ -66,8 +66,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
         LeadRepository $leadRepository,
         MergeRecordRepository $mergeRecordRepository,
         RequestStack $requestStack
-    )
-    {
+    ) {
         $this->cookieHelper          = $cookieHelper;
         $this->leadDeviceRepository  = $leadDeviceRepository;
         $this->leadRepository        = $leadRepository;
