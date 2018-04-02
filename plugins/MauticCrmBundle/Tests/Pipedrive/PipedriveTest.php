@@ -30,6 +30,11 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     public function tearDown()
     {
         unset($GLOBALS['requests']);
+        $this->em->createQuery('DELETE FROM '.Plugin::class)->execute();
+        $this->em->createQuery('DELETE FROM '.Integration::class)->execute();
+        $this->em->createQuery('DELETE FROM '.Lead::class)->execute();
+        $this->em->createQuery('DELETE FROM '.User::class)->execute();
+        $this->em->flush();
 
         parent::tearDown();
     }
