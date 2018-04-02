@@ -180,7 +180,7 @@ class ListModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new LeadList();
         }
 
@@ -674,7 +674,7 @@ class ListModel extends FormModel
                     'type' => 'text',
                 ],
                 'operators' => $this->getOperatorsForFieldType('default'),
-                'object' => 'lead',
+                'object'    => 'lead',
             ],
             'utm_content' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.utmcontent'),
@@ -682,7 +682,7 @@ class ListModel extends FormModel
                     'type' => 'text',
                 ],
                 'operators' => $this->getOperatorsForFieldType('default'),
-                'object' => 'lead',
+                'object'    => 'lead',
             ],
             'utm_medium' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.utmmedium'),
@@ -690,7 +690,7 @@ class ListModel extends FormModel
                     'type' => 'text',
                 ],
                 'operators' => $this->getOperatorsForFieldType('default'),
-                'object' => 'lead',
+                'object'    => 'lead',
             ],
             'utm_source' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.utmsource'),
@@ -698,7 +698,7 @@ class ListModel extends FormModel
                     'type' => 'text',
                 ],
                 'operators' => $this->getOperatorsForFieldType('default'),
-                'object' => 'lead',
+                'object'    => 'lead',
             ],
             'utm_term' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.utmterm'),
@@ -706,7 +706,7 @@ class ListModel extends FormModel
                     'type' => 'text',
                 ],
                 'operators' => $this->getOperatorsForFieldType('default'),
-                'object' => 'lead',
+                'object'    => 'lead',
             ],
         ];
 
@@ -732,7 +732,7 @@ class ListModel extends FormModel
             $properties         = $field->getProperties();
             $properties['type'] = $type;
             if (in_array($type, ['lookup', 'multiselect', 'boolean'])) {
-                if ($type == 'boolean') {
+                if ('boolean' == $type) {
                     //create a lookup list with ID
                     $properties['list'] = [
                         0 => $properties['no'],
@@ -1040,7 +1040,7 @@ class ListModel extends FormModel
      */
     public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1, $dateManipulated = null)
     {
-        if ($dateManipulated == null) {
+        if (null == $dateManipulated) {
             $dateManipulated = new \DateTime();
         }
 
@@ -1117,7 +1117,7 @@ class ListModel extends FormModel
                 );
             }
 
-            if ($listLead != null) {
+            if (null != $listLead) {
                 if ($manuallyAdded && $listLead->wasManuallyRemoved()) {
                     $listLead->setManuallyRemoved(false);
                     $listLead->setManuallyAdded($manuallyAdded);
@@ -1243,7 +1243,7 @@ class ListModel extends FormModel
                     'list' => $listId,
                 ]);
 
-            if ($listLead == null) {
+            if (null == $listLead) {
                 // Lead is not part of this list
                 continue;
             }
@@ -1308,7 +1308,7 @@ class ListModel extends FormModel
     protected function batchSleep()
     {
         $leadSleepTime = $this->coreParametersHelper->getParameter('batch_lead_sleep_time', false);
-        if ($leadSleepTime === false) {
+        if (false === $leadSleepTime) {
             $leadSleepTime = $this->coreParametersHelper->getParameter('batch_sleep_time', 1);
         }
 
