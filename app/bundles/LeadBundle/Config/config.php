@@ -771,6 +771,7 @@ return [
                     'mautic.validator.email',
                     'mautic.user.provider',
                     'mautic.contact.tracker',
+                    'mautic.device.tracker',
                 ],
             ],
             'mautic.lead.model.field' => [
@@ -866,15 +867,22 @@ return [
                 'arguments' => [
                     'mautic.lead.repository.lead',
                     'mautic.lead.service.contact_tracking_service',
-                    'mautic.lead.service.device_creator_service',
-                    'mautic.lead.factory.device_detector_factory',
-                    'mautic.lead.service.device_tracking_service',
+                    'mautic.device.tracker',
                     'mautic.security',
                     'monolog.logger.mautic',
                     'mautic.helper.ip_lookup',
                     'request_stack',
                     'mautic.helper.core_parameters',
                     'event_dispatcher',
+                ],
+            ],
+            'mautic.device.tracker' => [
+                'class'     => \Mautic\LeadBundle\Tracker\DeviceTracker::class,
+                'arguments' => [
+                    'mautic.lead.service.device_creator_service',
+                    'mautic.lead.factory.device_detector_factory',
+                    'mautic.lead.service.device_tracking_service',
+                    'monolog.logger.mautic',
                 ],
             ],
         ],

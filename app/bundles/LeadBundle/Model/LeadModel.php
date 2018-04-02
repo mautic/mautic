@@ -51,6 +51,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
@@ -167,6 +168,11 @@ class LeadModel extends FormModel
     private $contactTracker;
 
     /**
+     * @var DeviceTracker
+     */
+    private $deviceTracker;
+
+    /**
      * LeadModel constructor.
      *
      * @param RequestStack         $requestStack
@@ -184,6 +190,7 @@ class LeadModel extends FormModel
      * @param EmailValidator       $emailValidator
      * @param UserProvider         $userProvider
      * @param ContactTracker       $contactTracker
+     * @param DeviceTracker        $deviceTracker
      */
     public function __construct(
         RequestStack $requestStack,
@@ -200,7 +207,8 @@ class LeadModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         EmailValidator $emailValidator,
         UserProvider $userProvider,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        DeviceTracker $deviceTracker
     ) {
         $this->request                = $requestStack->getCurrentRequest();
         $this->cookieHelper           = $cookieHelper;
@@ -217,6 +225,7 @@ class LeadModel extends FormModel
         $this->emailValidator         = $emailValidator;
         $this->userProvider           = $userProvider;
         $this->contactTracker         = $contactTracker;
+        $this->deviceTracker          = $deviceTracker;
     }
 
     /**
@@ -1795,15 +1804,8 @@ class LeadModel extends FormModel
         }
 
         // create device
-        if (key_exists('useragent', $params) && !empty($params['useragent'])) {
-            $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-            if ($trackedDevice === null) {
-                $deviceDetector = $this->deviceDetectorFactory->create($params['useragent']);
-                $deviceDetector->parse();
-                $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
-                $trackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
-                $this->em->flush($trackedDevice);
-            }
+        if (!empty($params['useragent'])) {
+            $this->deviceTracker->createDeviceFromUserAgent($lead, $params['useragent']);
         }
 
         // add the lead

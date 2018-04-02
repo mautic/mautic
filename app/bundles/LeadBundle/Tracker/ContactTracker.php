@@ -19,10 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
-use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
-use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,19 +38,9 @@ class ContactTracker
     private $contactTrackingService;
 
     /**
-     * @var DeviceCreatorServiceInterface
+     * @var DeviceTracker
      */
-    private $deviceCreatorService;
-
-    /**
-     * @var DeviceDetectorFactoryInterface
-     */
-    private $deviceDetectorFactory;
-
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
+    private $deviceTracker;
 
     /**
      * @var CorePermissions
@@ -100,9 +87,6 @@ class ContactTracker
      *
      * @param LeadRepository                  $leadRepository
      * @param ContactTrackingServiceInterface $contactTrackingService
-     * @param DeviceCreatorServiceInterface   $deviceCreatorService
-     * @param DeviceDetectorFactoryInterface  $deviceDetectorFactory
-     * @param DeviceTrackingServiceInterface  $deviceTrackingService
      * @param CorePermissions                 $security
      * @param Logger                          $logger
      * @param IpLookupHelper                  $ipLookupHelper
@@ -113,9 +97,7 @@ class ContactTracker
     public function __construct(
         LeadRepository $leadRepository,
         ContactTrackingServiceInterface $contactTrackingService,
-        DeviceCreatorServiceInterface $deviceCreatorService,
-        DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService,
+        DeviceTracker $deviceTracker,
         CorePermissions $security,
         Logger $logger,
         IpLookupHelper $ipLookupHelper,
@@ -125,9 +107,7 @@ class ContactTracker
     ) {
         $this->leadRepository         = $leadRepository;
         $this->contactTrackingService = $contactTrackingService;
-        $this->deviceCreatorService   = $deviceCreatorService;
-        $this->deviceDetectorFactory  = $deviceDetectorFactory;
-        $this->deviceTrackingService  = $deviceTrackingService;
+        $this->deviceTracker          = $deviceTracker;
         $this->security               = $security;
         $this->logger                 = $logger;
         $this->ipLookupHelper         = $ipLookupHelper;
@@ -227,7 +207,7 @@ class ContactTracker
     public function getTrackingId()
     {
         // Use the new method first
-        if ($trackedDevice = $this->deviceTrackingService->getTrackedDevice()) {
+        if ($trackedDevice = $this->deviceTracker->getTrackedDevice()) {
             return $trackedDevice->getTrackingId();
         }
 
@@ -278,7 +258,7 @@ class ContactTracker
         $lead = null;
 
         // Is there a device being tracked?
-        if ($trackedDevice = $this->deviceTrackingService->getTrackedDevice()) {
+        if ($trackedDevice = $this->deviceTracker->getTrackedDevice()) {
             $lead = $trackedDevice->getLead();
 
             // Lead associations are not hydrated with custom field values by default
@@ -347,21 +327,6 @@ class ContactTracker
         return $lead;
     }
 
-    private function generateTrackingCookies()
-    {
-        if ($leadId = $this->trackedContact->getId() && $this->request !== null) {
-            $deviceDetector = $this->deviceDetectorFactory->create($this->request->server->get('HTTP_USER_AGENT'));
-            $deviceDetector->parse();
-            $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $this->trackedContact);
-            $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
-        }
-
-        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        if ($trackedDevice !== null) {
-            $this->logger->addDebug("LEAD: Tracking ID for this device is {$trackedDevice->getTrackingId()}");
-        }
-    }
-
     /**
      * @param Lead $lead
      */
@@ -408,6 +373,13 @@ class ContactTracker
                 $event = new LeadChangeEvent($previouslyTrackedContact, $previouslyTrackedId, $this->trackedContact, $newTrackingId);
                 $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
             }
+        }
+    }
+
+    private function generateTrackingCookies()
+    {
+        if ($leadId = $this->trackedContact->getId() && $this->request !== null) {
+            $this->deviceTracker->createDeviceFromUserAgent($this->trackedContact, $this->request->server->get('HTTP_USER_AGENT'));
         }
     }
 }
