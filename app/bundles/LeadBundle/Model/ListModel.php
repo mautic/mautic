@@ -668,6 +668,46 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
+            'utm_campaign' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.utmcampaign'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object' => 'lead',
+            ],
+            'utm_content' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.utmcontent'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object' => 'lead',
+            ],
+            'utm_medium' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.utmmedium'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object' => 'lead',
+            ],
+            'utm_source' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.utmsource'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object' => 'lead',
+            ],
+            'utm_term' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.utmterm'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object' => 'lead',
+            ],
         ];
 
         // Add custom choices
