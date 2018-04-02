@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -52,18 +53,24 @@ class CampaignSubscriber extends CommonSubscriber
     protected $listModel;
 
     /**
+     * @var CampaignModel
+     */
+    protected $campaignModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param LeadModel      $leadModel
      * @param FieldModel     $leadFieldModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel, ListModel $listModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel, ListModel $listModel, CampaignModel $campaignModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->leadModel      = $leadModel;
         $this->leadFieldModel = $leadFieldModel;
         $this->listModel      = $listModel;
+        $this->campaignModel  = $campaignModel;
     }
 
     /**
@@ -209,6 +216,16 @@ class CampaignSubscriber extends CommonSubscriber
         ];
 
         $event->addCondition('lead.owner', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.campaigns',
+            'description' => 'mautic.lead.lead.events.campaigns_descr',
+            'formType'    => 'campaignevent_lead_campaigns',
+            'formTheme'   => 'MauticLeadBundle:FormTheme\ContactCampaignsCondition',
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.campaigns', $trigger);
     }
 
     /**
@@ -426,6 +443,8 @@ class CampaignSubscriber extends CommonSubscriber
             $result   = $listRepo->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
         } elseif ($event->checkContext('lead.owner')) {
             $result = $this->leadModel->getRepository()->checkLeadOwner($lead, $event->getConfig()['owner']);
+        } elseif ($event->checkContext('lead.campaigns')) {
+            $result = $this->campaignModel->getCampaignLeadRepository()->checkLeadInCampaigns($lead, $event->getConfig());
         } elseif ($event->checkContext('lead.field_value')) {
             if ($event->getConfig()['operator'] === 'date') {
                 // Set the date in system timezone since this is triggered by cron

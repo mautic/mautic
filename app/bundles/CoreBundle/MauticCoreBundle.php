@@ -31,5 +31,6 @@ class MauticCoreBundle extends Bundle
         $container->addCompilerPass(new Compiler\ModelPass());
         $container->addCompilerPass(new Compiler\EventPass());
         $container->addCompilerPass(new Compiler\IntegrationPass());
+        $container->addCompilerPass(new Compiler\SmsTransportPass());
     }
 }
