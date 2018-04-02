@@ -9,12 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Tests\Model\Service\ContactTrackingService;
+namespace Mautic\LeadBundle\Tests\Tracker\Service\ContactTrackingService;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -44,12 +45,18 @@ final class ContactTrackingServiceTest extends \PHPUnit_Framework_TestCase
      */
     private $requestStackMock;
 
+    /**
+     * @var MergeRecordRepository
+     */
+    private $mergeRecordRepository;
+
     protected function setUp()
     {
         $this->cookieHelperMock         = $this->createMock(CookieHelper::class);
         $this->leadDeviceRepositoryMock = $this->createMock(LeadDeviceRepository::class);
         $this->leadRepositoryMock       = $this->createMock(LeadRepository::class);
         $this->requestStackMock         = $this->createMock(RequestStack::class);
+        $this->mergeRecordRepository    = $this->createMock(MergeRecordRepository::class);
     }
 
     public function testGetTrackedIdentifier()
@@ -310,6 +317,7 @@ final class ContactTrackingServiceTest extends \PHPUnit_Framework_TestCase
             $this->cookieHelperMock,
             $this->leadDeviceRepositoryMock,
             $this->leadRepositoryMock,
+            $this->mergeRecordRepository,
             $this->requestStackMock
         );
     }

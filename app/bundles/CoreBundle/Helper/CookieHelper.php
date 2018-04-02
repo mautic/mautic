@@ -22,6 +22,7 @@ class CookieHelper
     private $domain   = null;
     private $secure   = false;
     private $httponly = false;
+    private $request  = null;
 
     /**
      * CookieHelper constructor.
