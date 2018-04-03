@@ -925,15 +925,29 @@ Mautic.toggleLeadList = function(toggleId, leadId, listId) {
 
 Mautic.togglePreferredChannel = function(channel) {
     if (channel == 'all') {
-        var status = mQuery('#lead_contact_frequency_rules_subscribed_channels_0')[0].checked;  //"select all" change
+        var status;
 
-       // "select all" checked status
-        mQuery('#channels input:checkbox').each(function(){ //iterate all listed checkbox items
-            if (this.checked != status) {
-                this.checked = status;
-                Mautic.setPreferredChannel(this.value);
-            }
-        });
+        if (mQuery('form[name="lead_contact_channels"]').find('#lead_contact_channels_subscribed_channels_0').length > 0) {
+            status = mQuery('#lead_contact_channels_subscribed_channels_0')[0].checked;
+
+            mQuery('form[name="lead_contact_channels"]').find('input:checkbox').each(function(){ //iterate all listed checkbox items
+                if (this.checked != status) {
+                    this.checked = status;
+                    Mautic.setPreferredChannel(this.value);
+                }
+            });
+
+        } else if (mQuery('form[name="lead_contact_frequency_rules"]').find('#lead_contact_frequency_rules_subscribed_channels_0').length > 0) {
+            status = mQuery('#lead_contact_frequency_rules_subscribed_channels_0')[0].checked;
+
+            mQuery('form[name="lead_contact_frequency_rules"]').find('input:checkbox').each(function(){ //iterate all listed checkbox items
+                if (this.checked != status) {
+                    this.checked = status;
+                    Mautic.setPreferredChannel(this.value);
+                }
+            });
+        }
+
     } else {
         Mautic.setPreferredChannel(channel);
     }
