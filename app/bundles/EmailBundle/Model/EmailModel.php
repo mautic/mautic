@@ -41,9 +41,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
-use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
-use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -117,41 +115,29 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     protected $emailSettings = [];
 
     /**
-     * @var Send
+     * @var SendEmailToContact
      */
     protected $sendModel;
 
     /**
-     * @var DeviceCreatorServiceInterface
+     * @var DeviceTracker
      */
-    private $deviceCreatorService;
-
-    /**
-     * @var DeviceDetectorFactoryInterface
-     */
-    private $deviceDetectorFactory;
-
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
+    private $deviceTracker;
 
     /**
      * EmailModel constructor.
      *
-     * @param IpLookupHelper                 $ipLookupHelper
-     * @param ThemeHelper                    $themeHelper
-     * @param Mailbox                        $mailboxHelper
-     * @param MailHelper                     $mailHelper
-     * @param LeadModel                      $leadModel
-     * @param CompanyModel                   $companyModel
-     * @param TrackableModel                 $pageTrackableModel
-     * @param UserModel                      $userModel
-     * @param MessageQueueModel              $messageQueueModel
-     * @param SendEmailToContact             $sendModel
-     * @param DeviceCreatorServiceInterface  $deviceCreatorService
-     * @param DeviceDetectorFactoryInterface $deviceDetectorFactory
-     * @param DeviceTrackingServiceInterface $deviceTrackingService
+     * @param IpLookupHelper     $ipLookupHelper
+     * @param ThemeHelper        $themeHelper
+     * @param Mailbox            $mailboxHelper
+     * @param MailHelper         $mailHelper
+     * @param LeadModel          $leadModel
+     * @param CompanyModel       $companyModel
+     * @param TrackableModel     $pageTrackableModel
+     * @param UserModel          $userModel
+     * @param MessageQueueModel  $messageQueueModel
+     * @param SendEmailToContact $sendModel
+     * @param DeviceTracker      $deviceTracker
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -164,9 +150,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         UserModel $userModel,
         MessageQueueModel $messageQueueModel,
         SendEmailToContact $sendModel,
-        DeviceCreatorServiceInterface $deviceCreatorService,
-        DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService
+        DeviceTracker $deviceTracker
     ) {
         $this->ipLookupHelper        = $ipLookupHelper;
         $this->themeHelper           = $themeHelper;
@@ -178,9 +162,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->userModel             = $userModel;
         $this->messageQueueModel     = $messageQueueModel;
         $this->sendModel             = $sendModel;
-        $this->deviceCreatorService  = $deviceCreatorService;
-        $this->deviceDetectorFactory = $deviceDetectorFactory;
-        $this->deviceTrackingService = $deviceTrackingService;
+        $this->deviceTracker         = $deviceTracker;
     }
 
     /**
@@ -506,13 +488,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $event = new EmailOpenEvent($stat, $request, $firstTime);
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
         }
-        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        if ($trackedDevice === null) {
-            $deviceDetector = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
-            $deviceDetector->parse();
-            $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
-            $trackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
-        }
+
+        $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
 
         if ($email) {
             $this->em->persist($email);

@@ -34,9 +34,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
-use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
-use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -230,9 +228,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
 
         $sendToContactModel = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
 
-        $deviceCreatorServiceMock  = $this->createMock(DeviceCreatorServiceInterface::class);
-        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
-        $deviceTrackingServiceMock = $this->createMock(DeviceTrackingServiceInterface::class);
+        $deviceTrackerMock  = $this->createMock(DeviceTracker::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -245,9 +241,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $userModel,
             $messageModel,
             $sendToContactModel,
-            $deviceCreatorServiceMock,
-            $deviceDetectorFactoryMock,
-            $deviceTrackingServiceMock
+            $deviceTrackerMock
         );
 
         $emailModel->setTranslator($translator);
@@ -474,9 +468,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
 
         $sendToContactModel = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
 
-        $deviceCreatorServiceMock  = $this->createMock(DeviceCreatorServiceInterface::class);
-        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
-        $deviceTrackingServiceMock = $this->createMock(DeviceTrackingServiceInterface::class);
+        $deviceTrackerMock  = $this->createMock(DeviceTracker::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -489,9 +481,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $userModel,
             $messageModel,
             $sendToContactModel,
-            $deviceCreatorServiceMock,
-            $deviceDetectorFactoryMock,
-            $deviceTrackingServiceMock
+            $deviceTrackerMock
         );
 
         $emailModel->setTranslator($translator);
@@ -641,9 +631,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $deviceCreatorServiceMock  = $this->createMock(DeviceCreatorServiceInterface::class);
-        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
-        $deviceTrackingServiceMock = $this->createMock(DeviceTrackingServiceInterface::class);
+        $deviceTrackerMock  = $this->createMock(DeviceTracker::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -656,9 +644,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $userModel,
             $messageModel,
             $sendToContactModel,
-            $deviceCreatorServiceMock,
-            $deviceDetectorFactoryMock,
-            $deviceTrackingServiceMock
+            $deviceTrackerMock
         );
 
         $emailModel->setTranslator($translator);
@@ -788,9 +774,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $deviceCreatorServiceMock  = $this->createMock(DeviceCreatorServiceInterface::class);
-        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
-        $deviceTrackingServiceMock = $this->createMock(DeviceTrackingServiceInterface::class);
+        $deviceTrackerMock  = $this->createMock(DeviceTracker::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -803,9 +787,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $userModel,
             $messageModel,
             $sendToContactModel,
-            $deviceCreatorServiceMock,
-            $deviceDetectorFactoryMock,
-            $deviceTrackingServiceMock
+            $deviceTrackerMock
         );
 
         $emailModel->setTranslator($translator);
@@ -913,9 +895,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $deviceCreatorServiceMock  = $this->createMock(DeviceCreatorServiceInterface::class);
-        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
-        $deviceTrackingServiceMock = $this->createMock(DeviceTrackingServiceInterface::class);
+        $deviceTrackerMock  = $this->createMock(DeviceTracker::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -928,9 +908,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $userModel,
             $messageModel,
             $sendToContactModel,
-            $deviceCreatorServiceMock,
-            $deviceDetectorFactoryMock,
-            $deviceTrackingServiceMock
+            $deviceTrackerMock
         );
 
         $emailModel->setTranslator($translator);
@@ -1056,9 +1034,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $deviceCreatorServiceMock  = $this->createMock(DeviceCreatorServiceInterface::class);
-        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
-        $deviceTrackingServiceMock = $this->createMock(DeviceTrackingServiceInterface::class);
+        $deviceTrackerMock  = $this->createMock(DeviceTracker::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -1071,9 +1047,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $userModel,
             $messageModel,
             $sendToContactModel,
-            $deviceCreatorServiceMock,
-            $deviceDetectorFactoryMock,
-            $deviceTrackingServiceMock
+            $deviceTrackerMock
         );
 
         $emailModel->setTranslator($translator);
