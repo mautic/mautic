@@ -44,8 +44,7 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * @var bool
-     *           Property is used to avoid Joining DNC table more times
+     * @var bool Property is used to avoid Joining DNC table more times
      */
     private $dncWasAddedToQb = false;
 
