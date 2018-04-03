@@ -73,9 +73,9 @@ class ContactTracker
     private $request;
 
     /**
-     * @var bool
+     * @var CoreParametersHelper
      */
-    private $trackByIp;
+    private $coreParametersHelper;
 
     /**
      * @var EventDispatcherInterface
@@ -112,7 +112,7 @@ class ContactTracker
         $this->logger                 = $logger;
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->request                = $requestStack->getCurrentRequest();
-        $this->trackByIp              = $coreParametersHelper->getParameter('track_contact_by_ip');
+        $this->coreParametersHelper   = $coreParametersHelper;
         $this->dispatcher             = $dispatcher;
     }
 
@@ -194,9 +194,9 @@ class ContactTracker
     /**
      * System contact bypasses cookie tracking.
      *
-     * @param Lead $lead
+     * @param Lead|null $lead
      */
-    public function setSystemContact(Lead $lead)
+    public function setSystemContact(Lead $lead = null)
     {
         $this->systemContact = $lead;
     }
@@ -284,12 +284,12 @@ class ContactTracker
     {
         $ip = $this->ipLookupHelper->getIpAddress();
         // if no trackingId cookie set the lead is not tracked yet so create a new one
-        if (!$ip->isTrackable()) {
+        if ($ip && !$ip->isTrackable()) {
             // Don't save leads that are from a non-trackable IP by default
             return $this->createNewContact($ip, false);
         }
 
-        if ($this->trackByIp) {
+        if ($this->coreParametersHelper->getParameter('track_contact_by_ip')) {
             /** @var Lead[] $leads */
             $leads = $this->leadRepository->getLeadsByIp($ip->getIpAddress());
             if (count($leads)) {
@@ -304,17 +304,20 @@ class ContactTracker
     }
 
     /**
-     * @param IpAddress $ip
-     * @param bool      $persist
+     * @param IpAddress|null $ip
+     * @param bool           $persist
      *
      * @return Lead
      */
-    private function createNewContact(IpAddress $ip, $persist = true)
+    private function createNewContact(IpAddress $ip = null, $persist = true)
     {
         //let's create a lead
         $lead = new Lead();
-        $lead->addIpAddress($ip);
         $lead->setNewlyCreated(true);
+
+        if ($ip) {
+            $lead->addIpAddress($ip);
+        }
 
         if ($persist) {
             // Purposively ignoring events for new visitors
