@@ -102,16 +102,22 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     public function trackCurrentDevice(LeadDevice $device, $replaceExistingTracking = false)
     {
         $trackedDevice = $this->getTrackedDevice();
-        if ($trackedDevice !== null && $replaceExistingTracking === false) {
+        if (null !== $trackedDevice && false === $replaceExistingTracking) {
             return $trackedDevice;
         }
 
-        if ($device->getTrackingId() === null) {
-            $device->setTrackingId($this->getUniqueTrackingIdentifier());
-        }
+        // Check for an existing device for this contact to prevent blowing up the devices table
+        $existingDevice = $this->leadDeviceRepository->getDevice($device->getLead(), $device->getDevice(), $device->getDeviceBrand(), $device->getDeviceModel());
+        if (null === $existingDevice) {
+            if (null === $device->getTrackingId()) {
+                $device->setTrackingId($this->getUniqueTrackingIdentifier());
+            }
 
-        $this->entityManager->persist($device);
-        $this->entityManager->flush();
+            $this->entityManager->persist($device);
+            $this->entityManager->flush();
+        } else {
+            $device = $existingDevice;
+        }
 
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
 
