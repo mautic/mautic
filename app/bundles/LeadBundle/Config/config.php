@@ -132,6 +132,31 @@ return [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
                 'controller' => 'MauticLeadBundle:List:contacts',
             ],
+
+            'mautic_contact_batch_segments_api' => [
+                'path'       => '/contact/batch_segments',
+                'controller' => 'MauticLeadBundle:BatchLeadSegments:batchApi',
+            ],
+            'mautic_contact_batch_segments_view' => [
+                'path'       => '/contact/batch_segments_view',
+                'controller' => 'MauticLeadBundle:BatchLeadSegments:batchView',
+            ],
+            'mautic_contact_batch_categories_api' => [
+                'path'       => '/contact/batch_categories',
+                'controller' => 'MauticLeadBundle:BatchLeadCategories:batchApi',
+            ],
+            'mautic_contact_batch_categories_view' => [
+                'path'       => '/contact/batch_categories_view',
+                'controller' => 'MauticLeadBundle:BatchLeadCategories:batchView',
+            ],
+            'mautic_contact_batch_channels_api' => [
+                'path'       => '/contact/batch_channels',
+                'controller' => 'MauticLeadBundle:BatchLeadChannels:batchApi',
+            ],
+            'mautic_contact_batch_channels_view' => [
+                'path'       => '/contact/batch_channels_view',
+                'controller' => 'MauticLeadBundle:BatchLeadChannels:batchView',
+            ],
         ],
         'api' => [
             'mautic_api_contactsstandard' => [
@@ -596,6 +621,13 @@ return [
                 ],
                 'alias' => 'lead_contact_frequency_rules',
             ],
+            'mautic.form.type.lead_contact_channels' => [
+                'class'     => \Mautic\LeadBundle\Form\Type\ContactChannelsType::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+                'alias'     => 'lead_contact_channels',
+            ],
             'mautic.form.type.campaignevent_lead_field_value' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
                 'arguments' => [
@@ -724,10 +756,42 @@ return [
                     \Mautic\LeadBundle\Entity\Lead::class,
                 ],
             ],
+            'mautic.lead.repository.frequency_rule' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\FrequencyRule::class,
+                ],
+            ],
             'mautic.lead.event.dispatcher' => [
                 'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
                 'arguments' => [
                     'event_dispatcher',
+                ],
+            ],
+        ],
+        'batches' => [
+            'mautic.lead.batch.change_categories_action_factory' => [
+                'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeCategoriesAction\ChangeCategoriesActionFactory::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.security',
+                ],
+            ],
+            'mautic.lead.batch.change_segments_action_factory' => [
+                'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeSegmentsAction\ChangeSegmentsActionFactory::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.security',
+                ],
+            ],
+            'mautic.lead.batch.change_channels_action_factory' => [
+                'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeChannelsAction\ChangeChannelsActionFactory::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.security',
+                    'mautic.lead.model.dnc',
+                    'mautic.lead.repository.frequency_rule',
                 ],
             ],
         ],
