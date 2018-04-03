@@ -16,7 +16,7 @@ use DeviceDetector\DeviceDetector;
 /**
  * Class DeviceDetectorFactory.
  */
-class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
+final class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
 {
     /**
      * @param string $userAgent
