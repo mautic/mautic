@@ -604,6 +604,7 @@ class LeadApiController extends CommonApiController
 
         // Merge existing duplicate contact based on unique fields if exist
         $existingContact = $this->model->checkForDuplicateContact($originalParams, $entity);
+
         if ($action === 'edit' && $existingContact->getId()) {
             $this->model->mergeLeads($existingContact, $entity, false);
         }
@@ -680,7 +681,8 @@ class LeadApiController extends CommonApiController
             unset($parameters['frequencyRules']);
         }
 
-        $this->setCustomFieldValues($entity, $form, $parameters);
+        $overwriteWithBlank = 'POST' !== $this->request->getMethod();
+        $this->setCustomFieldValues($entity, $form, $parameters, $overwriteWithBlank);
     }
 
     /**

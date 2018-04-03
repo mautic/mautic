@@ -104,8 +104,9 @@ trait CustomFieldsApiControllerTrait
      * @param   $entity
      * @param   $form
      * @param   $parameters
+     * @param   $overwriteWithBlank
      */
-    protected function setCustomFieldValues(&$entity, $form, $parameters)
+    protected function setCustomFieldValues($entity, $form, $parameters, $overwriteWithBlank = true)
     {
         //set the custom field values
 
@@ -114,6 +115,6 @@ trait CustomFieldsApiControllerTrait
             $parameters[$f->getName()] = $f->getData();
         }
 
-        $this->model->setFieldValues($entity, $parameters, true);
+        $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
     }
 }
