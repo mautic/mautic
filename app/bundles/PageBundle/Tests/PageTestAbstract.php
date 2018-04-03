@@ -20,15 +20,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
-use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
-use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\QueueBundle\Queue\QueueService;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -134,9 +131,7 @@ class PageTestAbstract extends WebTestCase
                 )
             );
 
-        $deviceCreatorServiceMock  = $this->createMock(DeviceCreatorServiceInterface::class);
-        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
-        $deviceTrackingServiceMock = $this->createMock(DeviceTrackingServiceInterface::class);
+        $deviceTrackerMock = $this->createMock(DeviceTracker::class);
 
         $pageModel = new PageModel(
             $cookieHelper,
@@ -147,9 +142,7 @@ class PageTestAbstract extends WebTestCase
             $trackableModel,
             $queueService,
             $companyModel,
-            $deviceCreatorServiceMock,
-            $deviceDetectorFactoryMock,
-            $deviceTrackingServiceMock
+            $deviceTrackerMock
         );
 
         $pageModel->setDispatcher($dispatcher);
