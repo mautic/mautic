@@ -151,38 +151,35 @@ final class ChangeChannelsAction implements ActionInterface
     private function updateFrequencyRules(Lead $lead)
     {
         $frequencyRules = $lead->getFrequencyRules()->toArray();
-        $entities       = [];
         $channels       = $this->leadModel->getPreferenceChannels();
 
-        foreach ($channels as $ch) {
+        foreach ($channels as $channel) {
             if (is_null($this->preferredChannel)) {
-                $this->preferredChannel = $ch;
+                $this->preferredChannel = $channel;
             }
 
-            $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
-            $frequencyRule->setChannel($ch);
+            $frequencyRule = (isset($frequencyRules[$channel])) ? $frequencyRules[$channel] : new FrequencyRule();
+            $frequencyRule->setChannel($channel);
             $frequencyRule->setLead($lead);
             $frequencyRule->setDateAdded(new \DateTime());
 
-            if (!empty($this->requestParameters['frequency_number_'.$ch]) && !empty($this->requestParameters['frequency_time_'.$ch])) {
-                $frequencyRule->setFrequencyNumber($this->requestParameters['frequency_number_'.$ch]);
-                $frequencyRule->setFrequencyTime($this->requestParameters['frequency_time_'.$ch]);
+            if (!empty($this->requestParameters['frequency_number_'.$channel]) && !empty($this->requestParameters['frequency_time_'.$channel])) {
+                $frequencyRule->setFrequencyNumber($this->requestParameters['frequency_number_'.$channel]);
+                $frequencyRule->setFrequencyTime($this->requestParameters['frequency_time_'.$channel]);
             } else {
                 $frequencyRule->setFrequencyNumber(null);
                 $frequencyRule->setFrequencyTime(null);
             }
 
-            $frequencyRule->setPauseFromDate(!empty($this->requestParameters['contact_pause_start_date_'.$ch]) ? $this->requestParameters['contact_pause_start_date_'.$ch] : null);
-            $frequencyRule->setPauseToDate(!empty($this->requestParameters['contact_pause_end_date_'.$ch]) ? $this->requestParameters['contact_pause_end_date_'.$ch] : null);
+            $frequencyRule->setPauseFromDate(!empty($this->requestParameters['contact_pause_start_date_'.$channel]) ? $this->requestParameters['contact_pause_start_date_'.$channel] : null);
+            $frequencyRule->setPauseToDate(!empty($this->requestParameters['contact_pause_end_date_'.$channel]) ? $this->requestParameters['contact_pause_end_date_'.$channel] : null);
 
             $frequencyRule->setLead($lead);
-            $frequencyRule->setPreferredChannel($this->preferredChannel === $ch);
+            $frequencyRule->setPreferredChannel($this->preferredChannel === $channel);
 
             $lead->addFrequencyRule($frequencyRule);
-        }
 
-        if (!empty($entities)) {
-            $this->frequencyRuleRepository->saveEntities($entities);
+            $this->frequencyRuleRepository->saveEntity($frequencyRule);
         }
     }
 }
