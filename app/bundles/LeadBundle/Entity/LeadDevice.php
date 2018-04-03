@@ -192,6 +192,14 @@ class LeadDevice
     }
 
     /**
+     * @return string
+     */
+    public function getSignature()
+    {
+        return md5(json_encode($this->clientInfo).$this->device.$this->deviceOsName.$this->deviceOsPlatform.$this->deviceBrand.$this->deviceModel);
+    }
+
+    /**
      * @return mixed
      */
     public function getClientInfo()
