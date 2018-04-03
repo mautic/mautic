@@ -16,12 +16,14 @@ use DeviceDetector\DeviceDetector;
 /**
  * Class DeviceDetectorFactory.
  */
-final class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
+class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
 {
     /**
      * @param string $userAgent
      *
      * @return DeviceDetector
+     *
+     * @throws \Exception
      */
     public function create($userAgent)
     {
