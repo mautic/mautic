@@ -14,7 +14,7 @@ namespace Mautic\CoreBundle\Batches;
 interface ActionInterface
 {
     /**
-     * Execute exception.
+     * Execute action.
      */
     public function execute();
 }

@@ -9,15 +9,17 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Tests\Batches\Lead\ChangeCategoriesAction;
+namespace Mautic\LeadBundle\Tests\Batches\Lead\ChangeChannelsAction;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\LeadBundle\Batches\Lead\ChangeCategoriesAction\ChangeCategoriesAction;
+use Mautic\LeadBundle\Batches\Lead\ChangeChannelsAction\ChangeChannelsAction;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 
-class ChangeCategoriesActionTest extends \PHPUnit_Framework_TestCase
+class ChangeChannelsActionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -42,6 +44,16 @@ class ChangeCategoriesActionTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    private $doNotContactMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $frequencyRuleRepositoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     private $userMock1;
 
     /**
@@ -57,8 +69,10 @@ class ChangeCategoriesActionTest extends \PHPUnit_Framework_TestCase
         $this->userMock1 = $this->createMock(User::class);
         $this->userMock2 = $this->createMock(User::class);
 
-        $this->leadModelMock      = $this->createMock(LeadModel::class);
-        $this->corePermissionMock = $this->createMock(CorePermissions::class);
+        $this->leadModelMock                 = $this->createMock(LeadModel::class);
+        $this->corePermissionMock            = $this->createMock(CorePermissions::class);
+        $this->doNotContactMock              = $this->createMock(DoNotContact::class);
+        $this->frequencyRuleRepositoryMock   = $this->createMock(FrequencyRuleRepository::class);
 
         $this->leadMock5->method('getPermissionUser')->willReturn($this->userMock1);
         $this->leadMock6->method('getPermissionUser')->willReturn($this->userMock2);
@@ -80,8 +94,6 @@ class ChangeCategoriesActionTest extends \PHPUnit_Framework_TestCase
     public function testExecuteEntityAccess()
     {
         $this->setUp();
-        $toAdd    = [4, 5];
-        $toRemove = [1, 2];
 
         $this->corePermissionMock->expects($this->at(0))->method('hasEntityAccess')
             ->with('lead:leads:editown', 'lead:leads:editother', $this->userMock1)
@@ -91,42 +103,28 @@ class ChangeCategoriesActionTest extends \PHPUnit_Framework_TestCase
             ->with('lead:leads:editown', 'lead:leads:editother', $this->userMock2)
             ->willReturn(true);
 
-        $this->leadModelMock->expects($this->any())->method('getLeadCategories')
+        $this->leadModelMock->expects($this->any())->method('getContactChannels')
             ->with($this->leadMock5)
-            ->willThrowException(new \Exception('Get categories has been called!'));
+            ->willThrowException(new \Exception('Get contact channels has been called!'));
 
-        $this->execute([5, 6], $toAdd, $toRemove);
+        $this->leadModelMock->expects($this->any())->method('getPreferenceChannels')
+            ->with($this->leadMock5)
+            ->willThrowException(new \Exception('Get preference channels has been called!'));
+
+        $this->execute([5, 6]);
     }
 
-    public function testExecuteRemoveCategories()
+    private function execute($leads = [])
     {
-        $this->setUp();
-        $toAdd    = [];
-        $toRemove = [1, 2];
-
-        $this->leadModelMock->expects($this->any())->method('getLeadCategories')
-            ->with($this->leadMock5)
-            ->willReturn([1, 2]);
-
-        $this->leadModelMock->expects($this->any())->method('getLeadCategories')
-            ->with($this->leadMock6)
-            ->willReturn([2, 3]);
-
-        $this->leadModelMock->expects($this->any())->method('removeFromCategories')
-            ->with($toRemove)
-            ->willThrowException(new \Exception('Nothing to remove!'));
-
-        $this->execute([5, 6], $toAdd, $toRemove);
-    }
-
-    private function execute($leads = [], $categoriesToAdd = [], $categoriesToRemove = [])
-    {
-        $action = new ChangeCategoriesAction(
+        $action = new ChangeChannelsAction(
+            $leads,
+            ['Email' => 'email'],
+            [],
             $this->leadModelMock,
             $this->corePermissionMock,
-            $leads,
-            $categoriesToAdd,
-            $categoriesToRemove
+            $this->doNotContactMock,
+            $this->frequencyRuleRepositoryMock,
+            null
         );
 
         $action->execute();

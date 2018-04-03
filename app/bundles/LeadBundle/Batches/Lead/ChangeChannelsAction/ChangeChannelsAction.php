@@ -114,6 +114,10 @@ final class ChangeChannelsAction implements ActionInterface
         ]);
 
         foreach ($leads as $lead) {
+            if (!$this->corePermissions->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+                continue;
+            }
+
             $this->updateChannels($lead);
         }
     }
