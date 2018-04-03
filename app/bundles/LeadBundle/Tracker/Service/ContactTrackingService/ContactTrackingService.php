@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  *
  * Used to ensure that contacts tracked under the old method are continued to be tracked under the new
  */
-final class ContactTrackingService implements ContactTrackingServiceInterface
+class ContactTrackingService implements ContactTrackingServiceInterface
 {
     /**
      * @var CookieHelper

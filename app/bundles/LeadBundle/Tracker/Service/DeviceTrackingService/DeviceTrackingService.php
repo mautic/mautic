@@ -107,9 +107,11 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         } elseif ($trackedDevice !== null && $replaceExistingTracking === true) {
             $device = $trackedDevice;
         }
+
         if ($device->getTrackingId() === null || $replaceExistingTracking === true) {
             $device->setTrackingId($this->getUniqueTrackingIdentifier());
         }
+
         $this->entityManager->persist($device);
         $this->entityManager->flush();
 
