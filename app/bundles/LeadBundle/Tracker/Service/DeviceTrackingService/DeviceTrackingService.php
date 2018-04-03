@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Class DeviceTrackingService.
  */
-final class DeviceTrackingService implements DeviceTrackingServiceInterface
+class DeviceTrackingService implements DeviceTrackingServiceInterface
 {
     /**
      * @var CookieHelper
