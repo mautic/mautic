@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Class DeviceTrackingService.
  */
-class DeviceTrackingService implements DeviceTrackingServiceInterface
+final class DeviceTrackingService implements DeviceTrackingServiceInterface
 {
     /**
      * @var CookieHelper
@@ -104,11 +104,9 @@ class DeviceTrackingService implements DeviceTrackingServiceInterface
         $trackedDevice = $this->getTrackedDevice();
         if ($trackedDevice !== null && $replaceExistingTracking === false) {
             return $trackedDevice;
-        } elseif ($trackedDevice !== null && $replaceExistingTracking === true) {
-            $device = $trackedDevice;
         }
 
-        if ($device->getTrackingId() === null || $replaceExistingTracking === true) {
+        if ($device->getTrackingId() === null) {
             $device->setTrackingId($this->getUniqueTrackingIdentifier());
         }
 
