@@ -872,7 +872,7 @@ class LeadModel extends FormModel
      *
      * @return array|Lead|null
      */
-    public function getContactFromRequest($queryFields = [], $trackByFingerprint = false)
+    public function getContactFromRequest($queryFields = [])
     {
         $lead = null;
 
@@ -893,7 +893,8 @@ class LeadModel extends FormModel
             }
             $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
         }
-        $lead = $this->getCurrentLead();
+
+        $lead = $this->contactTracker->getContact();
 
         list($lead, $inQuery) = $this->checkForDuplicateContact($queryFields, $lead, true, true);
 
@@ -2679,7 +2680,7 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
-        @trigger_error('getCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::getTrackedContact instead', E_USER_DEPRECATED);
+        @trigger_error('getCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::getContact instead', E_USER_DEPRECATED);
 
         $trackedContact = $this->contactTracker->getContact();
         $trackingId     = $this->contactTracker->getTrackingId();
@@ -2689,6 +2690,8 @@ class LeadModel extends FormModel
 
     /**
      * Sets current lead.
+     *
+     * @deprecated 2.13.0 to be removed in 3.0; use ContactTracker::getContact instead
      *
      * @param Lead $lead
      */

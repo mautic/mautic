@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Tracker;
 
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
@@ -39,6 +40,24 @@ class DeviceTracker
      */
     private $logger;
 
+    /**
+     * @var bool
+     */
+    private $deviceWasChanged = false;
+
+    /**
+     * @var LeadDevice[]
+     */
+    private $trackedDevice = [];
+
+    /**
+     * DeviceTracker constructor.
+     *
+     * @param DeviceCreatorServiceInterface  $deviceCreatorService
+     * @param DeviceDetectorFactoryInterface $deviceDetectorFactory
+     * @param DeviceTrackingServiceInterface $deviceTrackingService
+     * @param Logger                         $logger
+     */
     public function __construct(
         DeviceCreatorServiceInterface $deviceCreatorService,
         DeviceDetectorFactoryInterface $deviceDetectorFactory,
@@ -59,10 +78,27 @@ class DeviceTracker
      */
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
     {
+        $signature = $trackedContact->getId().$userAgent;
+        if (isset($this->trackedDevice[$signature])) {
+            // Prevent subsequent calls within the same session from creating multiple entries
+            return $this->trackedDevice[$signature];
+        }
+
+        $this->trackedDevice[$signature] = $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+
         $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
         $deviceDetector->parse();
         $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $trackedContact);
+
+        if ($trackedDevice && $trackedDevice->getId() && $trackedDevice->getSignature() === $currentDevice->getSignature()) {
+            // Devices are the same so do not create a new entry
+            return $trackedDevice;
+        }
+
+        // New device so record it and track it
+        $this->trackedDevice[$signature] = $currentDevice;
         $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
+        $this->deviceWasChanged = true;
 
         return $currentDevice;
     }
@@ -79,5 +115,13 @@ class DeviceTracker
         }
 
         return $trackedDevice;
+    }
+
+    /**
+     * @return bool
+     */
+    public function wasDeviceChanged()
+    {
+        return $this->deviceWasChanged;
     }
 }
