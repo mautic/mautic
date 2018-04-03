@@ -50,11 +50,6 @@ class ContactChannelsType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'ids',
-            'hidden'
-        );
-
         if (!$options['public_view'] || $showContactPreferredChannels) {
             $builder->add(
                 'preferred_channel',
@@ -168,6 +163,11 @@ class ContactChannelsType extends AbstractType
         }
 
         if (isset($options['save_button']) && $options['save_button'] === true) {
+            $builder->add(
+                'ids',
+                'hidden'
+            );
+
             $builder->add(
                 'buttons',
                 'form_buttons',

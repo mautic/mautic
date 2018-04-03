@@ -171,8 +171,13 @@ final class ChangeChannelsAction implements ActionInterface
                 $frequencyRule->setFrequencyTime(null);
             }
 
-            $frequencyRule->setPauseFromDate(!empty($this->requestParameters['contact_pause_start_date_'.$channel]) ? $this->requestParameters['contact_pause_start_date_'.$channel] : null);
-            $frequencyRule->setPauseToDate(!empty($this->requestParameters['contact_pause_end_date_'.$channel]) ? $this->requestParameters['contact_pause_end_date_'.$channel] : null);
+            if (!empty($this->requestParameters['contact_pause_start_date_'.$channel])) {
+                $frequencyRule->setPauseFromDate(new \DateTime($this->requestParameters['contact_pause_start_date_'.$channel]));
+            }
+
+            if (!empty($this->requestParameters['contact_pause_end_date_'.$channel])) {
+                $frequencyRule->setPauseToDate(new \DateTime($this->requestParameters['contact_pause_end_date_'.$channel]));
+            }
 
             $frequencyRule->setLead($lead);
             $frequencyRule->setPreferredChannel($this->preferredChannel === $channel);
