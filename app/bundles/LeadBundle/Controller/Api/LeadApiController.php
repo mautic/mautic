@@ -582,31 +582,9 @@ class LeadApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        if (isset($parameters['owner'])) {
-            $owner = $this->getModel('user.user')->getEntity((int) $parameters['owner']);
-            $entity->setOwner($owner);
-            unset($parameters['owner']);
-        }
-
-        if (isset($parameters['color'])) {
-            $entity->setColor($parameters['color']);
-            unset($parameters['color']);
-        }
-
-        if (isset($parameters['points'])) {
-            $entity->setPoints((int) $parameters['points']);
-            unset($parameters['points']);
-        }
-
+        // Unset the tags from params to avoid a validation error
         if (isset($parameters['tags'])) {
-            $this->model->modifyTags($entity, $parameters['tags']);
             unset($parameters['tags']);
-        }
-
-        if (isset($parameters['stage'])) {
-            $stage = $this->getModel('stage.stage')->getEntity((int) $parameters['stage']);
-            $entity->setStage($stage);
-            unset($parameters['stage']);
         }
 
         return $parameters;
@@ -633,6 +611,27 @@ class LeadApiController extends CommonApiController
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
             unset($parameters['companies']);
+        }
+
+        if (isset($parameters['owner'])) {
+            $owner = $this->getModel('user.user')->getEntity((int) $parameters['owner']);
+            $entity->setOwner($owner);
+            unset($parameters['owner']);
+        }
+
+        if (isset($parameters['stage'])) {
+            $stage = $this->getModel('stage.stage')->getEntity((int) $parameters['stage']);
+            $entity->setStage($stage);
+            unset($parameters['stage']);
+        }
+
+        if (isset($parameters['color'])) {
+            $entity->setColor($parameters['color']);
+            unset($parameters['color']);
+        }
+
+        if (isset($originalParams['tags'])) {
+            $this->model->modifyTags($entity, $originalParams['tags'], null, false);
         }
 
         //Since the request can be from 3rd party, check for an IP address if included
