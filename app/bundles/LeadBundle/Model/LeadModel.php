@@ -654,7 +654,7 @@ class LeadModel extends FormModel
                         $newValue = implode('|', $newValue);
                     }
 
-                    $isEmpty = (null === $newValue || '' === $newValue);
+                    $isEmpty = (null === $newValue || '' === $newValue || 0 === $newValue || 0.0 === $newValue);
                     if ($curValue !== $newValue && (!$isEmpty || ($isEmpty && $overwriteWithBlank))) {
                         $field['value'] = $newValue;
                         $lead->addUpdatedField($alias, $newValue, $curValue);
