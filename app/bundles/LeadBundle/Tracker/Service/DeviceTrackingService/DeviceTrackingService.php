@@ -127,9 +127,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             $device = $existingDevice;
         }
 
-        $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
-
-        $this->createBcTrackingCookies($device);
+        $this->createTrackingCookies($device);
 
         return $device;
     }
@@ -161,6 +159,21 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         } while ($device !== null);
 
         return $generatedIdentifier;
+    }
+
+    /**
+     * @param LeadDevice $device
+     */
+    private function createTrackingCookies(LeadDevice $device)
+    {
+        // Device cookie
+        $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
+
+        // Mainly for landing pages so that JS has the same access as 3rd party tracking code
+        $this->cookieHelper->setCookie('mtc_id', $device->getLead()->getId(), null);
+        $this->cookieHelper->setCookie('mtc_sid', $device->getTrackingId(), null);
+
+        $this->createBcTrackingCookies($device);
     }
 
     /**
