@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Tests\Tracker;
 
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
@@ -63,14 +64,22 @@ class DeviceTrackerTest extends \PHPUnit_Framework_TestCase
     public function testDeviceCreatedByUserAgent()
     {
         $lead    = new Lead();
+        $device  = new LeadDevice();
+        $device->setDeviceBrand('apple');
+
+        $this->deviceTrackingService->expects($this->once())
+            ->method('trackCurrentDevice')
+            ->willReturn($device);
+
         $tracker = new DeviceTracker($this->deviceCreatorService, $this->deviceDetectorFactory, $this->deviceTrackingService, $this->logger);
 
         $device = $tracker->createDeviceFromUserAgent($lead, $this->userAgent);
-        $this->assertEquals('d732b8950068a4a5908152c0eb049be5', $device->getSignature());
+        $this->assertEquals('3dfc9e6dff07948058df37455718cb98', $device->getSignature());
 
         // Subsequent calls should not create a new tracking ID
         $device2 = $tracker->createDeviceFromUserAgent($lead, $this->userAgent);
         $this->assertEquals($device->getTrackingId(), $device2->getTrackingId());
+        $this->assertEquals('apple', $device2->getDeviceBrand());
         $this->assertEquals($device->getSignature(), $device2->getSignature());
     }
 }

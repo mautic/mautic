@@ -92,20 +92,21 @@ class DeviceTracker
 
         if ( // Do not create a new device if
             // ... the device is new
-            $trackedDevice && $trackedDevice->getId() &&
-            // ... the device is the same
-            $trackedDevice->getSignature() === $currentDevice->getSignature() &&
-            // ... the contact given is the same as the owner of the device tracked
+            $trackedDevice && $trackedDevice->getId()
+            && // ... the device is the same
+            $trackedDevice->getSignature() === $currentDevice->getSignature()
+            && // ... the contact given is the same as the owner of the device tracked
             $trackedDevice->getLead()->getId() === $trackedContact->getId()
         ) {
             return $trackedDevice;
         }
 
         // New device so record it and track it
-        $this->trackedDevice[$signature] = $currentDevice;
-        $this->deviceWasChanged          = true;
+        $this->deviceWasChanged = true;
 
-        return $this->deviceTrackingService->trackCurrentDevice($currentDevice, true);
+        $this->trackedDevice[$signature] = $this->deviceTrackingService->trackCurrentDevice($currentDevice, true);
+
+        return $this->trackedDevice[$signature];
     }
 
     /**
