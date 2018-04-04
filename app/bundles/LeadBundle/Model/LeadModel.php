@@ -406,7 +406,11 @@ class LeadModel extends FormModel
 
         if (null === $entity) {
             // Check if this contact was merged into another and if so, return the new contact
-            $entity = $this->getMergeRecordRepository()->findMergedContact($id);
+            if ($entity = $this->getMergeRecordRepository()->findMergedContact($id)) {
+                // Hydrate fields with custom field data
+                $fields = $this->getRepository()->getFieldValues($entity->getId());
+                $entity->setFields($fields);
+            }
         }
 
         return $entity;

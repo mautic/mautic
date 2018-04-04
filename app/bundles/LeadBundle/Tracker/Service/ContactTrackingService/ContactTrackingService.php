@@ -104,6 +104,10 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
             if ($lead === null) {
                 return null;
             }
+
+            // Hydrate fields with custom field data
+            $fields = $this->leadRepository->getFieldValues($lead->getId());
+            $lead->setFields($fields);
         }
 
         $anotherDeviceAlreadyTracked = $this->leadDeviceRepository->isAnyLeadDeviceTracked($lead);
