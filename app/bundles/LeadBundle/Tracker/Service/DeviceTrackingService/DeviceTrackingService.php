@@ -129,6 +129,8 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
 
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
 
+        $this->createBcTrackingCookies($device);
+
         return $device;
     }
 
@@ -159,5 +161,16 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         } while ($device !== null);
 
         return $generatedIdentifier;
+    }
+
+    /**
+     * @deprecated 2.13.0 to be removed in 3.0
+     *
+     * @param LeadDevice $device
+     */
+    private function createBcTrackingCookies(LeadDevice $device)
+    {
+        $this->cookieHelper->setCookie('mautic_session_id', $device->getTrackingId(), 31536000);
+        $this->cookieHelper->setCookie($device->getTrackingId(), $device->getLead()->getId(), 31536000);
     }
 }
