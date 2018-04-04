@@ -52,18 +52,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Creates new entity from provided params.
-     *
-     * @param array $parameters
-     *
-     * @return Lead
-     */
-    public function getNewEntity(array $parameters)
-    {
-        return $this->getModel(self::MODEL_ID)->checkForDuplicateContact($parameters);
-    }
-
-    /**
      * Get existing duplicated contact based on unique fields and the request data.
      *
      * @param array $parameters
@@ -603,11 +591,7 @@ class LeadApiController extends CommonApiController
         $originalParams = $this->request->request->all();
 
         // Merge existing duplicate contact based on unique fields if exist
-        $existingContact = $this->model->checkForDuplicateContact($originalParams, $entity);
-
-        if ($action === 'edit' && $existingContact->getId()) {
-            $this->model->mergeLeads($existingContact, $entity, false);
-        }
+        $entity = $this->model->checkForDuplicateContact($originalParams, $entity);
 
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
@@ -683,6 +667,7 @@ class LeadApiController extends CommonApiController
 
         $overwriteWithBlank = 'POST' !== $this->request->getMethod();
         $this->setCustomFieldValues($entity, $form, $parameters, $overwriteWithBlank);
+        // var_dump($entity->getTags()->count());die;
     }
 
     /**
