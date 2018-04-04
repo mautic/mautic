@@ -298,7 +298,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
             ->addLifecycleEvent('checkAttributionDate', 'prePersist')
-            ->addIndex(['date_added'], 'lead_date_added');
+            ->addIndex(['date_added'], 'lead_date_added')
+            ->addIndex(['date_identified'], 'date_identified');
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()
