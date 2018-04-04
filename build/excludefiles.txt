@@ -19,6 +19,7 @@ index_dev.php
 modified_files.txt
 node_modules/*
 package.json
+package-lock.json
 README.md
 tests/*
 vendor/babdev/*
