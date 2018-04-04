@@ -128,10 +128,12 @@ class IdentifyCompanyHelper
     protected static function domainExists($email)
     {
         list($user, $domain) = explode('@', $email);
-        $arr                 = dns_get_record($domain, DNS_MX);
+        if (!empty($domain)) {
+            $arr = dns_get_record($domain, DNS_MX);
 
-        if ($arr && $arr[0]['host'] === $domain) {
-            return $domain;
+            if ($arr && $arr[0]['host'] === $domain) {
+                return $domain;
+            }
         }
 
         return false;

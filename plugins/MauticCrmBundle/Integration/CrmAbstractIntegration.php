@@ -311,7 +311,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         // Default to new company
         $company         = new Company();
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $this->companyModel);
-        if ($existingCompany[2]) {
+        if (!empty($existingCompany[2])) {
             $company = $existingCompany[2];
         }
 
@@ -322,7 +322,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             }
         }
 
-        if (!$company->isNew()) {
+        if (!empty($existingCompany[2])) {
             $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
             $fieldsToUpdate = array_intersect_key($config['companyFields'], $fieldsToUpdate);
             $matchedFields  = array_intersect_key($matchedFields, array_flip($fieldsToUpdate));
