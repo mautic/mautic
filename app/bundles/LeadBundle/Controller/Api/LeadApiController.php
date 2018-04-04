@@ -667,7 +667,6 @@ class LeadApiController extends CommonApiController
 
         $overwriteWithBlank = 'POST' !== $this->request->getMethod();
         $this->setCustomFieldValues($entity, $form, $parameters, $overwriteWithBlank);
-        // var_dump($entity->getTags()->count());die;
     }
 
     /**
