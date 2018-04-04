@@ -610,11 +610,6 @@ class LeadApiController extends CommonApiController
             unset($parameters['stage']);
         }
 
-        if (isset($parameters['color'])) {
-            $entity->setColor($parameters['color']);
-            unset($parameters['color']);
-        }
-
         if (isset($originalParams['tags'])) {
             $this->model->modifyTags($entity, $originalParams['tags'], null, false);
         }
