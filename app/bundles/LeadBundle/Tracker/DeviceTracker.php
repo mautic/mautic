@@ -98,7 +98,6 @@ class DeviceTracker
             // ... the contact given is the same as the owner of the device tracked
             $trackedDevice->getLead()->getId() === $trackedContact->getId()
         ) {
-            // Devices are the same so do not create a new entry
             return $trackedDevice;
         }
 

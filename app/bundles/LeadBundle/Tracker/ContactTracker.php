@@ -163,6 +163,7 @@ class ContactTracker
         $previouslyTrackedContact = (is_null($this->trackedContact)) ? null : $this->trackedContact;
         $previouslyTrackedId      = $this->getTrackingId();
 
+        // Set the newly tracked contact
         $this->trackedContact = $trackedContact;
 
         // Hydrate custom field data
