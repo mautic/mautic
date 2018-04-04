@@ -107,7 +107,15 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         }
 
         // Check for an existing device for this contact to prevent blowing up the devices table
-        $existingDevice = $this->leadDeviceRepository->getDevice($device->getLead(), $device->getDevice(), $device->getDeviceBrand(), $device->getDeviceModel());
+        $existingDevice = $this->leadDeviceRepository->findOneBy(
+            [
+                'lead'        => $device->getLead(),
+                'device'      => $device->getDevice(),
+                'deviceBrand' => $device->getDeviceBrand(),
+                'deviceModel' => $device->getDeviceModel(),
+            ]
+        );
+
         if (null === $existingDevice) {
             if (null === $device->getTrackingId()) {
                 $device->setTrackingId($this->getUniqueTrackingIdentifier());
