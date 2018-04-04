@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Tests\Tracker\Service\DeviceTrackingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService;
@@ -288,7 +289,9 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
         $leadDeviceMock->expects($this->at(6))
             ->method('getTrackingId')
             ->willReturn($uniqueTrackingIdentifier);
-
+        $leadDeviceMock->expects($this->exactly(3))
+            ->method('getLead')
+            ->willReturn(new Lead());
         $this->cookieHelperMock->expects($this->at(1))
             ->method('setCookie')
             ->with('mautic_device_id', $uniqueTrackingIdentifier, 31536000);
@@ -344,6 +347,9 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
         $leadDeviceMock->expects($this->at(6))
             ->method('getTrackingId')
             ->willReturn($uniqueTrackingIdentifier);
+        $leadDeviceMock->expects($this->exactly(3))
+            ->method('getLead')
+            ->willReturn(new Lead());
 
         $this->cookieHelperMock->expects($this->at(1))
             ->method('setCookie')
