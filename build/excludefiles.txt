@@ -21,7 +21,6 @@ node_modules/*
 package.json
 README.md
 tests/*
-upgrade.php
 vendor/babdev/*
 vendor/liip/*
 vendor/sensio/generator-bundle/*
