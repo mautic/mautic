@@ -103,10 +103,9 @@ class DeviceTracker
 
         // New device so record it and track it
         $this->trackedDevice[$signature] = $currentDevice;
-        $this->deviceTrackingService->trackCurrentDevice($currentDevice, true);
-        $this->deviceWasChanged = true;
+        $this->deviceWasChanged          = true;
 
-        return $currentDevice;
+        return $this->deviceTrackingService->trackCurrentDevice($currentDevice, true);
     }
 
     /**
