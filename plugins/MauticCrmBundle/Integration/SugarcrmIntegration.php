@@ -194,18 +194,41 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Get available fields for choices in the config UI.
+     *
      * @param array $settings
      *
-     * @return array|mixed
-     *
-     * @throws \Exception
+     * @return array
      */
     public function getFormLeadFields($settings = [])
     {
-        $leadFields    = $this->getFormFieldsByObject('Leads', $settings);
-        $contactFields = $this->getFormFieldsByObject('Contacts', $settings);
+        if (!$this->isAuthorized()) {
+            return [];
+        }
 
-        return array_merge($leadFields, $contactFields);
+        // combine keys with values
+        $settings['feature_settings']['objects'] = array_combine(array_values($settings['feature_settings']['objects']),
+            $settings['feature_settings']['objects']);
+
+        // unset company object
+        if (isset($settings['feature_settings']['objects']['company'])) {
+            unset($settings['feature_settings']['objects']['company']);
+        }
+
+        if (empty($settings['feature_settings']['objects'])) {
+            // BC force add Leads and Contacts from Integration
+            $settings['feature_settings']['objects']['Leads']    = 'Leads';
+            $settings['feature_settings']['objects']['Contacts'] = 'Contacts';
+        }
+
+        $fields = [];
+        // merge all arrays from level 1
+        $fieldsromObjects = $this->getAvailableLeadFields($settings);
+        foreach ($fieldsromObjects as $fieldsFromObject) {
+            $fields = array_merge($fields, $fieldsFromObject);
+        }
+
+        return $fields;
     }
 
     /**
@@ -221,10 +244,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         $sugarObjects      = [];
 
-        if (isset($settings['feature_settings']['objects'])) {
+        if (!empty($settings['feature_settings']['objects'])) {
             $sugarObjects = $settings['feature_settings']['objects'];
         } else {
-            $sugarObjects[] = 'Leads';
+            $sugarObjects['Leads']                   = 'Leads';
+            $sugarObjects['Contacts']                = 'Contacts';
+            $settings['feature_settings']['objects'] = $sugarObjects;
         }
 
         $isRequired = function (array $field, $object) {
