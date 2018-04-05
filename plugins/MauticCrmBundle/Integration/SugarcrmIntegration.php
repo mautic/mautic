@@ -293,6 +293,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                         if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'bool', 'link', 'relate'])
                                                 ||
                                                 ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
+                                                ||
+                                                ($fieldInfo['type'] == 'bool' && $fieldInfo['name'] == 'email_opt_out')
                                             )) {
                                             $type      = 'string';
                                             $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
@@ -888,7 +890,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     } elseif ($object == 'Accounts') {
-                        $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $entity                = $this->getMauticCompany($dataObject, null);
                         $detachClass           = Company::class;
                         $mauticObjectReference = 'company';
                     } else {
@@ -1481,14 +1483,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    // Check to see if Mautic Field contains Multi Select Values
-                    if (strpos($lead[$mauticField], '|') !== false) {
+                    if ($sugarField === 'email_opt_out') {
+                        // Transform boolean type
+                        $value = !empty($lead[$mauticField]) ? 1 : 0;
+                    } elseif (strpos($lead[$mauticField], '|') !== false) {
                         // Transform Mautic Multi Select into SugarCRM/SuiteCRM Multi Select format
-                        $sugarCrmMultiSelectString = $this->convertMauticToSuiteCrmMultiSelect($lead[$mauticField]);
-                        $body[]                    = ['name' => $sugarField, 'value' => $sugarCrmMultiSelectString];
+                        $value = $this->convertMauticToSuiteCrmMultiSelect($lead[$mauticField]);
                     } else {
-                        $body[]                    = ['name' => $sugarField, 'value' => $lead[$mauticField]];
+                        $value = $lead[$mauticField];
                     }
+                    $body[] = ['name' => $sugarField, 'value' =>  $value];
                 } elseif ($required) {
                     $value  = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
                     $body[] = ['name' => $sugarField, 'value' => $value];
