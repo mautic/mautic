@@ -2553,7 +2553,7 @@ class LeadModel extends FormModel
 
         if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
             // Set to prevent loops
-            $this->currentLead = $lead;
+            $this->setCurrentLead($lead);
             $this->contactTracker->setTrackedContact($lead);
 
             // Note ignoring a lead manipulator object here on purpose to not falsely record entries
