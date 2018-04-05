@@ -72,8 +72,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($event->getResult());
 
-        $lead           = $event->getLead();
-        $primaryCompany = $lead->getPrimaryCompany();
+        $primaryCompany = $event->getLead()->getPrimaryCompany();
         $this->assertSame($this->config['companyname'], $primaryCompany['companyname']);
     }
 }
