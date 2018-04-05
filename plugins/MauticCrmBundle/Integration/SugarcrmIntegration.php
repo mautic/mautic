@@ -32,6 +32,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         'Contacts',
         'Accounts',
     ];
+
+    private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
     private $authorzationError;
 
     /**
@@ -293,8 +295,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                         if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'bool', 'link', 'relate'])
                                                 ||
                                                 ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
-                                                ||
-                                                ($fieldInfo['type'] == 'bool' && $fieldInfo['name'] == 'email_opt_out')
                                             )) {
                                             $type      = 'string';
                                             $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
@@ -989,6 +989,25 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             );
 
             $builder->add(
+                'updateDnc',
+                'choice',
+                [
+                    'choices' => [
+                        'updateDnc' => 'mautic.sugarcrm.updateDnc',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.sugarcrm.form.updateDnc',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
+                    ],
+                ]
+            );
+
+            $builder->add(
                 'updateBlanks',
                 'choice',
                 [
@@ -1322,6 +1341,20 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return $this->processCompositeResponse($result);
     }
 
+    private function pushDnc()
+    {
+        $features = $this->settings->getFeatureSettings();
+        if (!empty($features['updateDnc'])) {
+        }
+    }
+
+    private function getDnc()
+    {
+        $features = $this->settings->getFeatureSettings();
+        if (!empty($features['updateDnc'])) {
+        }
+    }
+
     /**
      * @param $checkEmailsInSugar
      * @param $mauticData
@@ -1483,7 +1516,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    if ($sugarField === 'email_opt_out') {
+                    if (in_array($sugarField, $this->sugarDncKeys)) {
                         // Transform boolean type
                         $value = !empty($lead[$mauticField]) ? 1 : 0;
                     } elseif (strpos($lead[$mauticField], '|') !== false) {
@@ -1510,6 +1543,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 if (isset($onwerAssignedUserIdByEmail) && isset($lead['owner_email']) && isset($onwerAssignedUserIdByEmail[$lead['owner_email']])) {
                     $body[] = ['name' => 'assigned_user_id', 'value' => $onwerAssignedUserIdByEmail[$lead['owner_email']]];
                 }
+
+                $features = $this->settings->getFeatureSettings();
+                if (!empty($features['updateDnc'])) {
+                    foreach ($this->sugarDncKeys as $sugarDncKey) {
+                    }
+                }
+
                 $mauticData[$object][] = $body;
             }
         }
