@@ -376,6 +376,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.model.list',
                     'mautic.lead.model.company',
+                    'mautic.campaign.model.campaign',
                 ],
             ],
             'mautic.lead.reportbundle.subscriber' => [
@@ -622,6 +623,11 @@ return [
             'mautic.form.type.campaignevent_lead_segments' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadSegmentsType',
                 'alias' => 'campaignevent_lead_segments',
+            ],
+            'mautic.form.type.campaignevent_lead_campaigns' => [
+                'class'     => Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType::class,
+                'alias'     => 'campaignevent_lead_campaigns',
+                'arguments' => ['mautic.lead.model.list'],
             ],
             'mautic.form.type.campaignevent_lead_owner' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadOwnerType',

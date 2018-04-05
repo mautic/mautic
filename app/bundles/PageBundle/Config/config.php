@@ -273,6 +273,7 @@ return [
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
                     'mautic.queue.service',
+                    'mautic.lead.model.company',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [

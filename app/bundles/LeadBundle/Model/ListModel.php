@@ -701,7 +701,7 @@ class ListModel extends FormModel
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
                     $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
-                        FormFieldHelper::FORMAT_BAR,
+                        FormFieldHelper::FORMAT_ARRAY,
                         FormFieldHelper::parseList($properties['list'])
                     ) : '';
                 }
