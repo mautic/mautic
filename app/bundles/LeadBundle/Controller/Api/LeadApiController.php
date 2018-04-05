@@ -591,27 +591,7 @@ class LeadApiController extends CommonApiController
         $originalParams = $this->request->request->all();
 
         // Merge existing duplicate contact based on unique fields if exist
-        $check = $this->model->checkForDuplicateContact($originalParams, $entity);
-        if ($check !== $entity) {
-            $entity = $check;
-            if ('POST' === $this->request->getMethod()) {
-                // Don't overwrite the contacts accumulated points
-                unset($parameters['points']);
-
-                // When merging a contact because of a unique identifier match in POST /api/contacts//new, all 0 values must be unset because
-                // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setCustomFieldValues
-                $parameters = array_filter(
-                    $parameters,
-                    function ($value) {
-                        if (is_numeric($value)) {
-                            return 0 !== (int) $value;
-                        }
-
-                        return true;
-                    }
-                );
-            }
-        }
+        $entity = $this->model->checkForDuplicateContact($originalParams, $entity);
 
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
@@ -680,8 +660,7 @@ class LeadApiController extends CommonApiController
             unset($parameters['frequencyRules']);
         }
 
-        $overwriteWithBlank = 'POST' !== $this->request->getMethod();
-        $this->setCustomFieldValues($entity, $form, $parameters, $overwriteWithBlank);
+        $this->setCustomFieldValues($entity, $form, $parameters, 'POST' === $this->request->getMethod());
     }
 
     /**

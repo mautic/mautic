@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\Form\Form;
 
 trait CustomFieldsApiControllerTrait
 {
@@ -101,20 +102,39 @@ trait CustomFieldsApiControllerTrait
     }
 
     /**
-     * @param   $entity
-     * @param   $form
-     * @param   $parameters
-     * @param   $overwriteWithBlank
+     * @param Lead|Company $entity
+     * @param Form         $form
+     * @param array        $parameters
+     * @param bool         $isPost
      */
-    protected function setCustomFieldValues($entity, $form, $parameters, $overwriteWithBlank = true)
+    protected function setCustomFieldValues($entity, $form, $parameters, $isPost = false)
     {
         //set the custom field values
-
         //pull the data from the form in order to apply the form's formatting
         foreach ($form as $f) {
             $parameters[$f->getName()] = $f->getData();
         }
 
-        $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
+        if ($isPost) {
+            // Don't overwrite the contacts accumulated points
+            if (isset($parameters['points']) && empty($parameters['points'])) {
+                unset($parameters['points']);
+            }
+
+            // When merging a contact because of a unique identifier match in POST /api/contacts//new, all 0 values must be unset because
+            // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setCustomFieldValues
+            $parameters = array_filter(
+                $parameters,
+                function ($value) {
+                    if (is_numeric($value)) {
+                        return 0 !== (int) $value;
+                    }
+
+                    return true;
+                }
+            );
+        }
+
+        $this->model->setFieldValues($entity, $parameters, !$isPost);
     }
 }
