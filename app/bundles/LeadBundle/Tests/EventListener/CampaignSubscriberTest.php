@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\EmailBundle\EventListener\CampaignSubscriber;
+use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
