@@ -551,7 +551,7 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
+    public function setFieldValues(Lead $lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
     {
         if ($fetchSocialProfiles) {
             //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
@@ -1053,32 +1053,41 @@ class LeadModel extends FormModel
             );
         }
 
-        $uniqueLeadFields    = $this->leadFieldModel->getUniqueIdentifierFields();
-        $uniqueLeadFieldData = [];
-        $inQuery             = array_intersect_key($queryFields, $this->availableLeadFields);
+        if (is_null($lead)) {
+            $lead = new Lead();
+        }
+
+        // Run values through setFieldValues to clean them first
+        $this->setFieldValues($lead, $queryFields, false, false);
+        $cleanFields = $lead->getFields();
+
+        $uniqueFields    = $this->leadFieldModel->getUniqueIdentifierFields();
+        $uniqueFieldData = [];
+        $inQuery         = array_intersect_key($queryFields, $this->availableLeadFields);
+
         foreach ($inQuery as $k => $v) {
             if (empty($queryFields[$k])) {
                 unset($inQuery[$k]);
             }
+        }
 
-            if (array_key_exists($k, $uniqueLeadFields)) {
-                $uniqueLeadFieldData[$k] = $v;
+        foreach ($cleanFields as $group) {
+            foreach ($group as $key => $field) {
+                if (array_key_exists($key, $uniqueFields) && !empty($field['value'])) {
+                    $uniqueFieldData[$key] = $field['value'];
+                }
             }
         }
 
         // Check for leads using unique identifier
-        if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueLeadFieldData, ($lead) ? $lead->getId() : null);
+        if (count($uniqueFieldData)) {
+            $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData, ($lead) ? $lead->getId() : null);
 
             if (!empty($existingLeads)) {
                 $this->logger->addDebug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
                 // Merge with existing lead or use the one found
-                $lead = ($lead) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
+                $lead = ($lead->getId()) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
             }
-        }
-
-        if (null === $lead) {
-            $lead = new Lead();
         }
 
         return $returnWithQueryFields ? [$lead, $inQuery] : $lead;

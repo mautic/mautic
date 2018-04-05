@@ -33,7 +33,6 @@ $view['slots']->set('mauticContent', 'asset');
 		        <div class="col-md-6">
 					<div class="col-md-7 pl-0">
 						<?php echo $view['form']->row($form['storageLocation']); ?>
-						<?php echo $view['form']->row($form['disallow']); ?>
 					</div>
 			        <div class="col-md-5 text-left mt-lg<?php if ($startOnLocal) {
     echo ' hide';
@@ -101,6 +100,7 @@ $view['slots']->set('mauticContent', 'asset');
                 echo $view['form']->row($form['isPublished']);
                 echo $view['form']->row($form['publishUp']);
                 echo $view['form']->row($form['publishDown']);
+                echo $view['form']->row($form['disallow']);
             ?>
 		</div>
 	</div>

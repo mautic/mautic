@@ -16,7 +16,7 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
     {
         $mockFieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getFieldList', 'getUniqueIdentifierFields'])
+            ->setMethods(['getFieldList', 'getUniqueIdentifierFields', 'getEntities'])
             ->getMock();
 
         $mockFieldModel->expects($this->exactly(2))
@@ -36,6 +36,13 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
                 ['b' => 2],
                 ['b' => 4]
             ));
+
+        $mockFieldModel->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([
+                'b' => ['label' => 'b', 'alias' => 'b', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
+                'a' => ['label' => 'a', 'alias' => 'a', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
+            ]);
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
