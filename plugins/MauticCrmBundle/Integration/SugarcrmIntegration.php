@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -267,8 +268,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                         if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'bool', 'link', 'relate'])
                                                 ||
                                                 ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
-                                                ||
-                                                ($fieldInfo['type'] == 'bool' && $fieldInfo['name'] == 'email_opt_out')
                                             )) {
                                             $type      = 'string';
                                             $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
@@ -793,8 +792,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 if ($SUGAR_VERSION == '6') {
                     foreach ($record['name_value_list'] as $item) {
                         if ($object !== 'Activity') {
-                            $dataObject[$item['name'].$newName] = $item['value'];
-
+                            if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {
+                                $convertedMultiSelectString         = $this->convertSuiteCrmToMauticMultiSelect($item['value']);
+                                $dataObject[$item['name'].$newName] = $convertedMultiSelectString;
+                            } else {
+                                $dataObject[$item['name'].$newName] = $item['value'];
+                            }
                             if ($item['name'] == 'date_entered') {
                                 $itemDateEntered = new \DateTime($item['value']);
                             }
@@ -860,7 +863,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     } elseif ($object == 'Accounts') {
-                        $entity                = $this->getMauticCompany($dataObject, null);
+                        $entity                = $this->getMauticCompany($dataObject, true, null);
                         $detachClass           = Company::class;
                         $mauticObjectReference = 'company';
                     } else {
@@ -1097,6 +1100,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
         try {
             if ($this->isAuthorized()) {
+                if (!is_null($lead->getOwner())) {
+                    $sugarOwnerId = $this->getApiHelper()->getIdBySugarEmail(['emails' => [$lead->getOwner()->getEmail()]]);
+                    if (!empty($sugarOwnerId)) {
+                        $mappedData[$object]['assigned_user_id'] = array_values($sugarOwnerId)[0];
+                    }
+                }
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
                 if (isset($createdLeadData['id'])) {
                     if (empty($integrationId)) {
@@ -1330,7 +1339,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         }
                     }
                 }
-
                 $sugarLeadRecords[] = $sugarLeadRecord;
             }
         } elseif (isset($sugarLead['records'])) { //Sugar 7
@@ -1444,18 +1452,18 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {
             //update and create (one query) every 200 records
+
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    $value = '';
-                    if ($sugarField === 'email_opt_out') {
-                        if (is_bool($lead[$mauticField]) === true) {
-                            $value = 1;
-                        }
+                    // Check to see if Mautic Field contains Multi Select Values
+                    if (strpos($lead[$mauticField], '|') !== false) {
+                        // Transform Mautic Multi Select into SugarCRM/SuiteCRM Multi Select format
+                        $sugarCrmMultiSelectString = $this->convertMauticToSuiteCrmMultiSelect($lead[$mauticField]);
+                        $body[]                    = ['name' => $sugarField, 'value' => $sugarCrmMultiSelectString];
                     } else {
-                        $value = $lead[$mauticField];
+                        $body[]                    = ['name' => $sugarField, 'value' => $lead[$mauticField]];
                     }
-                    $body[] = ['name' => $sugarField, 'value' =>  $value];
                 } elseif ($required) {
                     $value  = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
                     $body[] = ['name' => $sugarField, 'value' => $value];
@@ -1653,5 +1661,65 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         return $fieldMappings;
+    }
+
+    /**
+     * Converts Mautic Multi-Select String into the format used to store Multi-Select values used by SuiteCRM / SugarCRM 6.x.
+     *
+     * @param  string
+     *
+     * @return string
+     */
+    public function convertMauticToSuiteCrmMultiSelect($mauticMultiSelectStringToConvert)
+    {
+        //$mauticMultiSelectStringToConvert = 'test|enhancedapi|dataservices';
+        $multiSelectArrayValues             = explode('|', $mauticMultiSelectStringToConvert);
+        $convertedSugarCrmMultiSelectString = '';
+        foreach ($multiSelectArrayValues as $item) {
+            $convertedSugarCrmMultiSelectString = $convertedSugarCrmMultiSelectString.'^'.$item.'^'.',';
+        }
+        $convertedSugarCrmMultiSelectString = substr($convertedSugarCrmMultiSelectString, 0, -1);
+
+        return $convertedSugarCrmMultiSelectString;
+    }
+
+    /**
+     * Checks if a string contains SuiteCRM / SugarCRM 6.x Multi-Select values.
+     *
+     * @param  string
+     *
+     * @return bool
+     */
+    public function checkIfSugarCrmMultiSelectString($stringToCheck)
+    {
+        // Regular Express to check SugarCRM/SuiteCRM Multi-Select format below
+        // example format: '^choice1^,^choice2^,^choice_3^'
+        $regex = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
+        if (preg_match($regex, $stringToCheck)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Converts a SuiteCRM / SugarCRM 6.x Multi-Select String into the format used to store Multi-Select values used by Mautic.
+     *
+     * @param  string
+     *
+     * @return string
+     */
+    public function convertSuiteCrmToMauticMultiSelect($suiteCrmMultiSelectStringToConvert)
+    {
+        // Mautic Multi Select format - 'choice1|choice2|choice_3'
+        $regexString            = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
+        preg_match_all($regexString, $suiteCrmMultiSelectStringToConvert, $matches, PREG_SET_ORDER, 0);
+        $convertedString        = '';
+        foreach ($matches as $row => $innerArray) {
+            $convertedString     = $convertedString.$innerArray[2].'|';
+        }
+        $convertedString        = substr($convertedString, 0, -1);
+
+        return $convertedString;
     }
 }
