@@ -32,6 +32,9 @@ class DynamicContentApiController extends CommonController
      */
     public function processAction($objectAlias)
     {
+        // Don't store a visitor with this request
+        defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
+
         $method = $this->request->getMethod();
         if (method_exists($this, $method.'Action')) {
             return $this->{$method.'Action'}($objectAlias);
@@ -42,6 +45,9 @@ class DynamicContentApiController extends CommonController
 
     public function getAction($objectAlias)
     {
+        // Don't store a visitor with this request
+        defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
+
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
         /** @var DynamicContentHelper $helper */

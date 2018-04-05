@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -494,7 +495,6 @@ class PageModel extends FormModel
             // Lead came from a non-trackable IP so ignore
             return;
         }
-        $this->leadModel->saveEntity($lead);
 
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
@@ -617,6 +617,9 @@ class PageModel extends FormModel
         if (isset($query['page_title'])) {
             $hit->setUrlTitle($query['page_title']);
         }
+
+        // Add entry to contact log table
+        $this->setLeadManipulator($page, $hit, $lead);
 
         // Store tracking ID
         $hit->setLead($lead);
@@ -986,7 +989,7 @@ class PageModel extends FormModel
         $filters['lead_id'] = [
             'expression' => 'isNull',
         ];
-        $returnQ = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+        $returnQ            = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($allQ);
@@ -1159,6 +1162,34 @@ class PageModel extends FormModel
     public function getVariants(Page $entity)
     {
         return $entity->getVariants();
+    }
+
+    /**
+     * @param null|Page|Redirect $page
+     * @param Lead               $lead
+     */
+    private function setLeadManipulator($page, Hit $hit, Lead $lead)
+    {
+        // Only save the lead and dispatch events if needed
+        if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
+            $source   = 'hit';
+            $sourceId = $hit->getId();
+            if ($page) {
+                $source   = $page instanceof Page ? 'page' : 'redirect';
+                $sourceId = $page->getId();
+            }
+
+            $lead->setManipulator(
+                new LeadManipulator(
+                    'page',
+                    $source,
+                    $sourceId,
+                    $hit->getUrl()
+                )
+            );
+
+            $this->leadModel->saveEntity($lead);
+        }
     }
 
     /**

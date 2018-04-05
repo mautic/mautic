@@ -28,6 +28,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\CompanyLead;
@@ -508,6 +509,8 @@ class LeadModel extends FormModel
                 $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
         }
+
+        $this->processManipulator($entity);
 
         $this->setEntityDefaultValues($entity);
 
@@ -1424,7 +1427,7 @@ class LeadModel extends FormModel
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null)
     {
         $fields    = array_flip($fields);
         $fieldData = [];
@@ -1671,6 +1674,12 @@ class LeadModel extends FormModel
         }
 
         if ($persist) {
+            $lead->setManipulator(new LeadManipulator(
+                'lead',
+                'import',
+                $importId,
+                $this->userHelper->getUser()->getName()
+            ));
             $this->saveEntity($lead);
 
             if ($list !== null) {
@@ -2502,6 +2511,66 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @param Lead $lead
+     */
+    private function processManipulator(Lead $lead)
+    {
+        if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
+            // Only store an entry once for created and once for identified, not every time the lead is saved
+            $manipulator = $lead->getManipulator();
+            if ($manipulator !== null) {
+                $manipulationLog = new LeadEventLog();
+                $manipulationLog->setLead($lead)
+                    ->setBundle($manipulator->getBundleName())
+                    ->setObject($manipulator->getObjectName())
+                    ->setObjectId($manipulator->getObjectId());
+                if ($lead->isAnonymous()) {
+                    $manipulationLog->setAction('created_contact');
+                } else {
+                    $manipulationLog->setAction('identified_contact');
+                }
+                $description = $manipulator->getObjectDescription();
+                $manipulationLog->setProperties(['object_description' => $description]);
+
+                $lead->addEventLog($manipulationLog);
+                $lead->setManipulator(null);
+            }
+        }
+    }
+
+    /**
+     * @param IpAddress $ip
+     * @param bool      $persist
+     *
+     * @return Lead
+     */
+    protected function createNewContact(IpAddress $ip, $persist = true)
+    {
+        //let's create a lead
+        $lead = new Lead();
+        $lead->addIpAddress($ip);
+        $lead->setNewlyCreated(true);
+
+        if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
+            // Set to prevent loops
+            $this->setCurrentLead($lead);
+            $this->contactTracker->setTrackedContact($lead);
+
+            // Note ignoring a lead manipulator object here on purpose to not falsely record entries
+            $this->saveEntity($lead, false);
+
+            $fields = $this->getLeadDetails($lead);
+            $lead->setFields($fields);
+        }
+
+        if ($leadId = $lead->getId()) {
+            $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
+        }
+
+        return $lead;
+    }
+
+    /**
      * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
      * @param Lead   $lead
@@ -2716,38 +2785,5 @@ class LeadModel extends FormModel
         @trigger_error('setSystemCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::setSystemContac instead', E_USER_DEPRECATED);
 
         $this->contactTracker->setSystemContact($lead);
-    }
-
-    /**
-     * @deprecated 2.13.0 to be removed in 3.0
-     *
-     * @param IpAddress $ip
-     * @param bool      $persist
-     *
-     * @return Lead
-     */
-    protected function createNewContact(IpAddress $ip, $persist = true)
-    {
-        @trigger_error('createNewContact is deprecated and will be removed in 3.0', E_USER_DEPRECATED);
-
-        //let's create a lead
-        $lead = new Lead();
-        $lead->addIpAddress($ip);
-        $lead->setNewlyCreated(true);
-
-        if ($persist) {
-            // Set to prevent loops
-            $this->contactTracker->setTrackedContact($lead);
-            $this->saveEntity($lead, false);
-
-            $fields = $this->getLeadDetails($lead);
-            $lead->setFields($fields);
-        }
-
-        if ($leadId = $lead->getId()) {
-            $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
-        }
-
-        return $lead;
     }
 }
