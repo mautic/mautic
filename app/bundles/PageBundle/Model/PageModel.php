@@ -11,7 +11,6 @@
 
 namespace Mautic\PageBundle\Model;
 
-use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -27,12 +26,12 @@ use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
@@ -106,9 +105,14 @@ class PageModel extends FormModel
     protected $queueService;
 
     /**
+     * @var DeviceTracker
+     */
+    private $deviceTracker;
+
+    /**
      * @var CompanyModel
      */
-    protected $companyModel;
+    private $companyModel;
 
     /**
      * PageModel constructor.
@@ -121,6 +125,7 @@ class PageModel extends FormModel
      * @param TrackableModel $pageTrackableModel
      * @param QueueService   $queueService
      * @param CompanyModel   $companyModel
+     * @param DeviceTracker  $deviceTracker
      */
     public function __construct(
         CookieHelper $cookieHelper,
@@ -130,7 +135,8 @@ class PageModel extends FormModel
         RedirectModel $pageRedirectModel,
         TrackableModel $pageTrackableModel,
         QueueService $queueService,
-        CompanyModel $companyModel
+        CompanyModel $companyModel,
+        DeviceTracker $deviceTracker
     ) {
         $this->cookieHelper       = $cookieHelper;
         $this->ipLookupHelper     = $ipLookupHelper;
@@ -141,6 +147,7 @@ class PageModel extends FormModel
         $this->dateTimeHelper     = new DateTimeHelper();
         $this->queueService       = $queueService;
         $this->companyModel       = $companyModel;
+        $this->deviceTracker      = $deviceTracker;
     }
 
     /**
@@ -149,14 +156,6 @@ class PageModel extends FormModel
     public function setCatInUrl($catInUrl)
     {
         $this->catInUrl = $catInUrl;
-    }
-
-    /**
-     * @param $trackByFingerprint
-     */
-    public function setTrackByFingerprint($trackByFingerprint)
-    {
-        $this->trackByFingerprint = $trackByFingerprint;
     }
 
     /**
@@ -474,7 +473,8 @@ class PageModel extends FormModel
 
         // Get lead if required
         if (null == $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
+            $lead = $this->leadModel->getContactFromRequest($query);
+
             // company
             list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
             if ($leadAdded) {
@@ -496,23 +496,25 @@ class PageModel extends FormModel
             return;
         }
 
-        $ipAddress                                 = $this->ipLookupHelper->getIpAddress();
-        list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
-
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
-        $hit->setTrackingId($trackingId);
-        // Check for existing IP
-        $hit->setIpAddress($ipAddress);
+        $hit->setIpAddress($this->ipLookupHelper->getIpAddress());
 
         // Set info from request
         $hit->setQuery($query);
         $hit->setCode($code);
 
+        $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
+        if (!empty($query['fingerprint']) && $trackedDevice->getDeviceFingerprint() !== $query['fingerprint']) {
+            $trackedDevice->setDeviceFingerprint($query['fingerprint']);
+        }
+        $hit->setTrackingId($trackedDevice->getTrackingId());
+        $hit->setDeviceStat($trackedDevice);
+
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($hit);
-            $this->em->flush($hit);
+            $this->em->flush();
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
@@ -535,11 +537,11 @@ class PageModel extends FormModel
                 'pageId'  => $page ? $page->getId() : null,
                 'request' => $request,
                 'leadId'  => $lead ? $lead->getId() : null,
-                'isNew'   => $trackingNewlyGenerated,
+                'isNew'   => $this->deviceTracker->wasDeviceChanged(),
             ];
             $this->queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
         } else {
-            $this->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated);
+            $this->processPageHit($hit, $page, $request, $lead, $this->deviceTracker->wasDeviceChanged());
         }
     }
 
@@ -754,44 +756,10 @@ class PageModel extends FormModel
             $hit->setBrowserLanguages($languages);
         }
 
-        //device granularity
-        $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
-        $dd->parse();
-
-        $deviceRepo = $this->leadModel->getDeviceRepository();
-        $device     = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
-        if (empty($device)) {
-            $device = new LeadDevice();
-            $device->setClientInfo($dd->getClient());
-            $device->setDevice($dd->getDeviceName());
-            $device->setDeviceBrand($dd->getBrand());
-            $device->setDeviceModel($dd->getModel());
-            $device->setDeviceOs($dd->getOs());
-            $device->setDateAdded($hit->getDateHit());
-            $device->setLead($lead);
-        } else {
-            $fingerprint = $device['device_fingerprint'];
-            /** @var LeadDevice $device */
-            $device = $this->em->getReference(LeadDevice::class, $device['id']);
-            $device->setDeviceFingerprint($fingerprint);
-        }
-
-        // Append the fingerprint string to this device
-        if (!empty($query['fingerprint']) && $query['fingerprint'] != $device->getDeviceFingerprint()) {
-            // The device fingerprint has changed, or it was not set previously.
-            $device->setDeviceFingerprint($query['fingerprint']);
-        }
-
-        $this->leadModel->saveEntity($lead);
-
-        $this->em->persist($device);
-        $this->em->flush($device);
-        $hit->setDeviceStat($device);
-
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($hit);
-            $this->em->flush($hit);
+            $this->em->flush();
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
@@ -1222,5 +1190,14 @@ class PageModel extends FormModel
 
             $this->leadModel->saveEntity($lead);
         }
+    }
+
+    /**
+     * @deprecated 2.13.0; no longer used
+     *
+     * @param $trackByFingerprint
+     */
+    public function setTrackByFingerprint($trackByFingerprint)
+    {
     }
 }

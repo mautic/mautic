@@ -42,6 +42,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -114,18 +115,22 @@ class SubmissionModel extends CommonFormModel
      */
     private $formUploader;
 
+    /** @var DeviceTrackingServiceInterface */
+    private $deviceTrackingService;
+
     /**
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param FormModel            $formModel
-     * @param PageModel            $pageModel
-     * @param LeadModel            $leadModel
-     * @param CampaignModel        $campaignModel
-     * @param LeadFieldModel       $leadFieldModel
-     * @param CompanyModel         $companyModel
-     * @param FormFieldHelper      $fieldHelper
-     * @param UploadFieldValidator $uploadFieldValidator
-     * @param FormUploader         $formUploader
+     * @param IpLookupHelper                 $ipLookupHelper
+     * @param TemplatingHelper               $templatingHelper
+     * @param FormModel                      $formModel
+     * @param PageModel                      $pageModel
+     * @param LeadModel                      $leadModel
+     * @param CampaignModel                  $campaignModel
+     * @param LeadFieldModel                 $leadFieldModel
+     * @param CompanyModel                   $companyModel
+     * @param FormFieldHelper                $fieldHelper
+     * @param UploadFieldValidator           $uploadFieldValidator
+     * @param FormUploader                   $formUploader
+     * @param DeviceTrackingServiceInterface $deviceTrackingService
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -138,19 +143,21 @@ class SubmissionModel extends CommonFormModel
         CompanyModel $companyModel,
         FormFieldHelper $fieldHelper,
         UploadFieldValidator $uploadFieldValidator,
-        FormUploader $formUploader
+        FormUploader $formUploader,
+        DeviceTrackingServiceInterface $deviceTrackingService
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->templatingHelper     = $templatingHelper;
-        $this->formModel            = $formModel;
-        $this->pageModel            = $pageModel;
-        $this->leadModel            = $leadModel;
-        $this->campaignModel        = $campaignModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->companyModel         = $companyModel;
-        $this->fieldHelper          = $fieldHelper;
-        $this->uploadFieldValidator = $uploadFieldValidator;
-        $this->formUploader         = $formUploader;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->templatingHelper       = $templatingHelper;
+        $this->formModel              = $formModel;
+        $this->pageModel              = $pageModel;
+        $this->leadModel              = $leadModel;
+        $this->campaignModel          = $campaignModel;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->companyModel           = $companyModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->uploadFieldValidator   = $uploadFieldValidator;
+        $this->formUploader           = $formUploader;
+        $this->deviceTrackingService  = $deviceTrackingService;
     }
 
     /**
@@ -362,8 +369,9 @@ class SubmissionModel extends CommonFormModel
 
         // Get updated lead if applicable with tracking ID
         /** @var Lead $lead */
-        list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
-
+        $lead          = $this->leadModel->getCurrentLead();
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
             ->setLead($lead);
