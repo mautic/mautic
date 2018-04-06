@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -42,6 +43,7 @@ class ListType extends AbstractType
     private $countryChoices      = [];
     private $regionChoices       = [];
     private $listChoices         = [];
+    private $campaignChoices     = [];
     private $emailChoices        = [];
     private $deviceTypesChoices  = [];
     private $deviceBrandsChoices = [];
@@ -62,8 +64,9 @@ class ListType extends AbstractType
      * @param StageModel          $stageModel
      * @param CategoryModel       $categoryModel
      * @param UserHelper          $userHelper
+     * @param CampaignModel       $campaignModel
      */
-    public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper)
+    public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel)
     {
         $this->translator = $translator;
 
@@ -79,6 +82,12 @@ class ListType extends AbstractType
         $lists = $listModel->getUserLists();
         foreach ($lists as $list) {
             $this->listChoices[$list['id']] = $list['name'];
+        }
+
+        // Campaigns
+        $campaigns = $campaignModel->getPublishedCampaigns();
+        foreach ($campaigns as $campaign) {
+            $this->campaignChoices[$campaign['id']] = $campaign['name'];
         }
 
         $viewOther   = $security->isGranted('email:emails:viewother');
@@ -183,6 +192,7 @@ class ListType extends AbstractType
                         'regions'        => $this->regionChoices,
                         'fields'         => $this->fieldChoices,
                         'lists'          => $this->listChoices,
+                        'campaign'       => $this->campaignChoices,
                         'emails'         => $this->emailChoices,
                         'deviceTypes'    => $this->deviceTypesChoices,
                         'deviceBrands'   => $this->deviceBrandsChoices,
@@ -230,6 +240,7 @@ class ListType extends AbstractType
         $view->vars['regions']        = $this->regionChoices;
         $view->vars['timezones']      = $this->timezoneChoices;
         $view->vars['lists']          = $this->listChoices;
+        $view->vars['campaign']       = $this->campaignChoices;
         $view->vars['emails']         = $this->emailChoices;
         $view->vars['deviceTypes']    = $this->deviceTypesChoices;
         $view->vars['deviceBrands']   = $this->deviceBrandsChoices;

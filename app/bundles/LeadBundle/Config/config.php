@@ -464,6 +464,7 @@ return [
                     'mautic.stage.model.stage',
                     'mautic.category.model.category',
                     'mautic.helper.user',
+                    'mautic.campaign.model.campaign',
                 ],
                 'alias' => 'leadlist',
             ],
