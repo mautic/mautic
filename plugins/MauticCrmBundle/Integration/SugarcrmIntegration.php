@@ -888,7 +888,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $detachClass           = Lead::class;
                         $company               = null;
                         if ($entity && isset($dataObject['account_id'.$newName]) && trim($dataObject['account_id'.$newName]) != '') {
-                            $this->getDnc($entity, $dataObject);
+                            $this->fetchDncToMautic($entity, $dataObject);
                             $integrationCompanyEntity = $integrationEntityRepo->findOneBy(
                                 [
                                     'integration'         => 'Sugarcrm',
@@ -1365,7 +1365,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * @param array $lead
      * @param array $body
      */
-    private function pushDnc(array $lead, array &$body)
+    private function pushDncToSugar(array $lead, array &$body)
     {
         $features = $this->settings->getFeatureSettings();
         // update DNC sync disabled
@@ -1407,7 +1407,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * @param Lead  $lead
      * @param array $dataObject
      */
-    private function getDnc(Lead $lead, array $dataObject)
+    private function fetchDncToMautic(Lead $lead, array $dataObject)
     {
         $features = $this->settings->getFeatureSettings();
         if (empty($features['updateDnc'])) {
@@ -1614,7 +1614,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
 
                 // pushd DNC to Sugar CRM
-                $this->pushDnc($lead, $body);
+                $this->pushDncToSugar($lead, $body);
 
                 $mauticData[$object][] = $body;
             }
