@@ -45,16 +45,22 @@ class DoNotContact
      * @param int       $contactId
      * @param string    $channel
      * @param bool|true $persist
+     * @param int|null  $reason
      *
      * @return bool
      */
-    public function removeDncForContact($contactId, $channel, $persist = true)
+    public function removeDncForContact($contactId, $channel, $persist = true, $reason = null)
     {
         $contact = $this->leadModel->getEntity($contactId);
 
         /** @var DNC $dnc */
         foreach ($contact->getDoNotContact() as $dnc) {
             if ($dnc->getChannel() === $channel) {
+                // Skip if reason doesn't match
+                // Some integrations (Sugar CRM) can use both reasons (unsubscribed, bounced)
+                if ($reason && $dnc->getReason() != $reason) {
+                    continue;
+                }
                 $contact->removeDoNotContactEntry($dnc);
 
                 if ($persist) {

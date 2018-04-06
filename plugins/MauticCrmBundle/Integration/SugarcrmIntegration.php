@@ -888,6 +888,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $detachClass           = Lead::class;
                         $company               = null;
                         if ($entity && isset($dataObject['account_id'.$newName]) && trim($dataObject['account_id'.$newName]) != '') {
+                            $this->getDnc($entity, $dataObject);
                             $integrationCompanyEntity = $integrationEntityRepo->findOneBy(
                                 [
                                     'integration'         => 'Sugarcrm',
@@ -1367,44 +1368,62 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     private function pushDnc(array $lead, array &$body)
     {
         $features = $this->settings->getFeatureSettings();
-        // update DNC sync enabled
-        if (!empty($features['updateDnc'])) {
-            $leadEntity = $this->leadModel->getEntity($lead['id']);
-            /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $dncEntries */
-            $dncEntries   = $this->doNotContactModel->getDncRepo()->getEntriesByLeadAndChannel($leadEntity, 'email');
-            $sugarDncKeys = array_combine(array_values($this->sugarDncKeys), $this->sugarDncKeys);
-            foreach ($dncEntries as $dncEntry) {
-                if (empty($sugarDncKeys)) {
-                    continue;
-                }
-                // If DNC exists set to 1
-                switch ($dncEntry->getReason()) {
-                    case 1:
-                    case 3:
-                        $body[] = ['name' => 'email_opt_out', 'value' => 1];
-                        unset($sugarDncKeys['email_opt_out']);
-                        break;
-                    case 2:
-                        $body[] = ['name' => 'invalid_email', 'value' => 1];
-                        unset($sugarDncKeys['invalid_email']);
-                        break;
-                }
+        // update DNC sync disabled
+        if (empty($features['updateDnc'])) {
+            return;
+        }
+        $leadEntity = $this->leadModel->getEntity($lead['id']);
+        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $dncEntries */
+        $dncEntries   = $this->doNotContactModel->getDncRepo()->getEntriesByLeadAndChannel($leadEntity, 'email');
+        $sugarDncKeys = array_combine(array_values($this->sugarDncKeys), $this->sugarDncKeys);
+        foreach ($dncEntries as $dncEntry) {
+            if (empty($sugarDncKeys)) {
+                continue;
             }
+            // If DNC exists set to 1
+            switch ($dncEntry->getReason()) {
+                case 1:
+                case 3:
+                    $body[] = ['name' => 'email_opt_out', 'value' => 1];
+                    unset($sugarDncKeys['email_opt_out']);
+                    break;
+                case 2:
+                    $body[] = ['name' => 'invalid_email', 'value' => 1];
+                    unset($sugarDncKeys['invalid_email']);
+                    break;
+            }
+        }
 
-            // uncheck
-            // If DNC doesn't exist set to 1
-            if (!empty($sugarDncKeys)) {
-                foreach ($sugarDncKeys as $sugarDncKey) {
-                    $body[] = ['name' => $sugarDncKey, 'value' => 0];
-                }
+        // uncheck
+        // If DNC doesn't exist set to 1
+        if (!empty($sugarDncKeys)) {
+            foreach ($sugarDncKeys as $sugarDncKey) {
+                $body[] = ['name' => $sugarDncKey, 'value' => 0];
             }
         }
     }
 
-    private function getDnc()
+    /**
+     * @param Lead  $lead
+     * @param array $dataObject
+     */
+    private function getDnc(Lead $lead, array $dataObject)
     {
         $features = $this->settings->getFeatureSettings();
-        if (!empty($features['updateDnc'])) {
+        if (empty($features['updateDnc'])) {
+            return;
+        }
+
+        foreach ($this->sugarDncKeys as $sugarDncKey) {
+            $reason = \Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED;
+            if ($sugarDncKey == 'invalid_email') {
+                $reason = \Mautic\LeadBundle\Entity\DoNotContact::BOUNCED;
+            }
+            if (!empty($dataObject[$sugarDncKey])) {
+                $this->doNotContactModel->addDncForContact($lead->getId(), 'email', $reason, $this->getName());
+            } else {
+                $this->doNotContactModel->removeDncForContact($lead->getId(), 'email', true, $reason);
+            }
         }
     }
 
