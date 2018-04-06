@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -2066,6 +2067,12 @@ abstract class AbstractIntegration
         if ($persist && !empty($lead->getChanges(true))) {
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
             try {
+                $lead->setManipulator(new LeadManipulator(
+                    'plugin',
+                    $this->getName(),
+                    null,
+                    $this->getDisplayName()
+                ));
                 $leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
                 $this->logger->addWarning($exception->getMessage());
