@@ -100,7 +100,7 @@ abstract class CommonStatsSubscriber extends CommonSubscriber
                     continue;
                 }
 
-                throw new AccessDeniedException(sprintf('You do not have the view permission to load data from %s table', $tableAlias));
+                throw new AccessDeniedException(sprintf('You do not have the view permission to load data from the %s table', $tableAlias));
             }
 
             $select = (isset($this->selects[$table])) ? $this->selects[$table] : null;
