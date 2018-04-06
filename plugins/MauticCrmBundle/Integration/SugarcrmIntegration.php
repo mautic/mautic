@@ -49,7 +49,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function __construct(DoNotContact $doNotContactModel)
     {
         $this->doNotContactModel = $doNotContactModel;
-
         parent::__construct();
     }
 
