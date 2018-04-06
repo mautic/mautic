@@ -55,7 +55,8 @@ abstract class CommonStatsSubscriber extends CommonSubscriber
         foreach ($this->repositories as $repoName => $repository) {
             $table = $repository->getTableName();
             if ($event->isLookingForTable($table, $repository)) {
-                $permissions = (isset($this->permissions[$table])) ? $this->permissions[$table] : [];
+                $permissions  = (isset($this->permissions[$table])) ? $this->permissions[$table] : [];
+                $allowedJoins = [];
                 foreach ($permissions as $tableAlias => $permBase) {
                     if ('admin' === $permBase) {
                         if (!$this->security->isAdmin()) {
@@ -66,10 +67,7 @@ abstract class CommonStatsSubscriber extends CommonSubscriber
                             continue;
                         }
 
-                        if ($this->security->checkPermissionExists($permBase.':viewother')
-                            && !$this->security->isGranted(
-                                $permBase.':viewother'
-                            )
+                        if ($this->security->checkPermissionExists($permBase.':viewother') && !$this->security->isGranted($permBase.':viewother')
                         ) {
                             $userId = $event->getUser()->getId();
                             $where  = [
@@ -88,13 +86,14 @@ abstract class CommonStatsSubscriber extends CommonSubscriber
                                 $where['value'] = "$tableAlias.created_by = $userId";
                             }
                             $event->addWhere($where);
+
+                            $allowedJoins[] = $tableAlias;
                         }
                     }
                 }
 
                 $select = (isset($this->selects[$table])) ? $this->selects[$table] : null;
-                $event->setSelect($select)
-                      ->setRepository($repository, array_keys($permissions));
+                $event->setSelect($select)->setRepository($repository, $allowedJoins);
             }
         }
     }
