@@ -1496,9 +1496,12 @@ class LeadListRepository extends CommonRepository
                             $column = 'category_id';
                             break;
                         case 'campaign':
-                            // @todo - Feed me a stray cat.
                             $table  = 'campaign_leads';
                             $column = 'campaign_id';
+
+                            $notRemovedParameter                         = $this->generateRandomParameterName();
+                            $subQueryFilters[$alias.'.manually_removed'] = $notRemovedParameter;
+                            $parameters[$notRemovedParameter]            = 0;
                             break;
                         case 'lead_email_received':
                             $table  = 'email_stats';
