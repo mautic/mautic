@@ -76,6 +76,7 @@ return [
             'mautic.integration.sugarcrm' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration::class,
                 'arguments' => [
+                    \Mautic\LeadBundle\Model\DoNotContact::class,
                 ],
             ],
             'mautic.integration.vtiger' => [

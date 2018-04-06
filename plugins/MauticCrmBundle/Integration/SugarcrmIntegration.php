@@ -13,10 +13,10 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -35,6 +35,23 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
     private $authorzationError;
+
+    /**
+     * @var DoNotContact
+     */
+    protected $doNotContactModel;
+
+    /**
+     * SugarcrmIntegration constructor.
+     *
+     * @param DoNotContact $doNotContactModel
+     */
+    public function __construct(DoNotContact $doNotContactModel)
+    {
+        $this->doNotContactModel = $doNotContactModel;
+
+        parent::__construct();
+    }
 
     /**
      * Returns the name of the social integration that must match the name of the file.
@@ -1341,10 +1358,46 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return $this->processCompositeResponse($result);
     }
 
-    private function pushDnc()
+    /**
+     * Update body to sync.
+     *
+     * @param array $lead
+     * @param array $body
+     */
+    private function pushDnc(array $lead, array &$body)
     {
         $features = $this->settings->getFeatureSettings();
+        // update DNC sync enabled
         if (!empty($features['updateDnc'])) {
+            $leadEntity = $this->leadModel->getEntity($lead['id']);
+            /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $dncEntries */
+            $dncEntries   = $this->doNotContactModel->getDncRepo()->getEntriesByLeadAndChannel($leadEntity, 'email');
+            $sugarDncKeys = array_combine(array_values($this->sugarDncKeys), $this->sugarDncKeys);
+            foreach ($dncEntries as $dncEntry) {
+                if (empty($sugarDncKeys)) {
+                    continue;
+                }
+                // If DNC exists set to 1
+                switch ($dncEntry->getReason()) {
+                    case 1:
+                    case 3:
+                        $body[] = ['name' => 'email_opt_out', 'value' => 1];
+                        unset($sugarDncKeys['email_opt_out']);
+                        break;
+                    case 2:
+                        $body[] = ['name' => 'invalid_email', 'value' => 1];
+                        unset($sugarDncKeys['invalid_email']);
+                        break;
+                }
+            }
+
+            // uncheck
+            // If DNC doesn't exist set to 1
+            if (!empty($sugarDncKeys)) {
+                foreach ($sugarDncKeys as $sugarDncKey) {
+                    $body[] = ['name' => $sugarDncKey, 'value' => 0];
+                }
+            }
         }
     }
 
@@ -1516,10 +1569,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    if (in_array($sugarField, $this->sugarDncKeys)) {
-                        // Transform boolean type
-                        $value = !empty($lead[$mauticField]) ? 1 : 0;
-                    } elseif (strpos($lead[$mauticField], '|') !== false) {
+                    if (strpos($lead[$mauticField], '|') !== false) {
                         // Transform Mautic Multi Select into SugarCRM/SuiteCRM Multi Select format
                         $value = $this->convertMauticToSuiteCrmMultiSelect($lead[$mauticField]);
                     } else {
@@ -1544,11 +1594,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     $body[] = ['name' => 'assigned_user_id', 'value' => $onwerAssignedUserIdByEmail[$lead['owner_email']]];
                 }
 
-                $features = $this->settings->getFeatureSettings();
-                if (!empty($features['updateDnc'])) {
-                    foreach ($this->sugarDncKeys as $sugarDncKey) {
-                    }
-                }
+                // pushd DNC to Sugar CRM
+                $this->pushDnc($lead, $body);
 
                 $mauticData[$object][] = $body;
             }

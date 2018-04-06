@@ -219,4 +219,12 @@ class DoNotContact
     {
         $this->dncRepo->clear();
     }
+
+    /**
+     * @return DoNotContactRepository
+     */
+    public function getDncRepo()
+    {
+        return $this->dncRepo;
+    }
 }
