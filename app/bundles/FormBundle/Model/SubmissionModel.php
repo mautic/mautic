@@ -1034,6 +1034,9 @@ class SubmissionModel extends CommonFormModel
             list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+            } elseif ($companyEntity instanceof Company) {
+                $this->companyModel->setFieldValues($companyEntity, $companyFieldMatches);
+                $this->companyModel->saveEntity($companyEntity);
             }
 
             if (!empty($company) and $companyEntity instanceof Company) {
