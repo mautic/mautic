@@ -151,23 +151,36 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'in':
                     $leadValMatched = false;
-                    foreach ($leadVal as $k => $v) {
-                        if (in_array($v, $filterVal)) {
+                    if (getType($leadVal) == 'array') {
+                        foreach ($leadVal as $k => $v) {
+                            if (in_array($v, $filterVal)) {
+                                $leadValMatched = true;
+                                // Break once we find a match
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        if (in_array($leadVal, $filterVal)) {
                             $leadValMatched = true;
-                            // Break once we find a match
-                            break;
                         }
                     }
                     $groups[$groupNum] = $leadValMatched;
                     break;
                 case '!in':
                     $leadValNotMatched = true;
-
-                    foreach ($leadVal as $k => $v) {
-                        if (in_array($v, $filterVal)) {
+                    if (getType($leadVal) == 'array') {
+                        foreach ($leadVal as $k => $v) {
+                            if (in_array($v, $filterVal)) {
+                                $leadValNotMatched = false;
+                                // Break once we find a match
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        if (in_array($leadVal, $filterVal)) {
                             $leadValNotMatched = false;
-                            // Break once we find a match
-                            break;
                         }
                     }
 
