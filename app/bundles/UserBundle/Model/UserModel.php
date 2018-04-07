@@ -262,7 +262,7 @@ class UserModel extends FormModel
     /**
      * @param User $user
      *
-     * @return string
+     * @return UserToken
      */
     protected function getResetToken(User $user)
     {
