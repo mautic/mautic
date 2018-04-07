@@ -14,6 +14,9 @@ namespace Mautic\UserBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserToken;
+use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
+use Mautic\UserBundle\Enum\UserTokensAuthorizator;
 use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
@@ -31,9 +34,23 @@ class UserModel extends FormModel
      */
     protected $mailHelper;
 
-    public function __construct(MailHelper $mailHelper)
-    {
-        $this->mailHelper = $mailHelper;
+    /**
+     * @var UserTokenRepositoryInterface
+     */
+    private $userTokenRepository;
+
+    /**
+     * UserModel constructor.
+     *
+     * @param MailHelper                   $mailHelper
+     * @param UserTokenRepositoryInterface $userTokenRepository
+     */
+    public function __construct(
+        MailHelper $mailHelper,
+        UserTokenRepositoryInterface $userTokenRepository
+    ) {
+        $this->mailHelper          = $mailHelper;
+        $this->userTokenRepository = $userTokenRepository;
     }
 
     /**
@@ -249,12 +266,12 @@ class UserModel extends FormModel
      */
     protected function getResetToken(User $user)
     {
-        /** @var \DateTime $lastLogin */
-        $lastLogin = $user->getLastLogin();
+        $userToken = new UserToken();
+        $userToken->setUser($user)
+            ->setAuthorizator(UserTokensAuthorizator::RESET_PASSWORD_AUTHORIZATOR);
+        $expiration = (new \DateTime())->add(new \DateInterval('PT24H'));
 
-        $dateTime = ($lastLogin instanceof \DateTime) ? $lastLogin->format('Y-m-d H:i:s') : null;
-
-        return hash('sha256', $user->getUsername().$user->getEmail().$dateTime);
+        return $this->userTokenRepository->sign($userToken, 64, $expiration, true);
     }
 
     /**
@@ -265,9 +282,12 @@ class UserModel extends FormModel
      */
     public function confirmResetToken(User $user, $token)
     {
-        $resetToken = $this->getResetToken($user);
+        $userToken = new UserToken();
+        $userToken->setUser($user)
+            ->setAuthorizator(UserTokensAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
+            ->sign($token);
 
-        return hash_equals($token, $resetToken);
+        return $this->userTokenRepository->verify($userToken);
     }
 
     /**

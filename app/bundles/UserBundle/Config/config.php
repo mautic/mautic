@@ -302,6 +302,16 @@ return [
                 'class'     => 'Mautic\UserBundle\Model\UserModel',
                 'arguments' => [
                     'mautic.helper.mailer',
+                    'mautic.user.repository.user_token',
+                ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.user.repository.user_token' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\UserBundle\Entity\UserToken::class,
                 ],
             ],
         ],
