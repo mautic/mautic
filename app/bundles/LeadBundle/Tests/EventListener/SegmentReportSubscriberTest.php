@@ -228,17 +228,17 @@ class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder->expects($this->at(0))
             ->method('from')
-            ->with('lead_lists_leads', 'lll')
+            ->with(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
             ->willReturn($queryBuilder);
 
         $queryBuilder->expects($this->at(1))
             ->method('leftJoin')
-            ->with('lll', 'leads', 'l', 'l.id = lll.lead_id')
+            ->with('lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lll.lead_id')
             ->willReturn($queryBuilder);
 
         $queryBuilder->expects($this->at(2))
             ->method('leftJoin')
-            ->with('lll', 'lead_lists', 's', 's.id = lll.leadlist_id')
+            ->with('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 's', 's.id = lll.leadlist_id')
             ->willReturn($queryBuilder);
 
         $reportGeneratorEvent = new ReportGeneratorEvent($reportMock, [], $queryBuilder, $channelListHelperMock);

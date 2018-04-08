@@ -50,7 +50,7 @@
                     </div>
                 </div>
             </footer>
-            <!--/ end: app-content -->
+            <!--/ end: app-footer -->
 
             <!-- start: app-content -->
             <section id="app-content">

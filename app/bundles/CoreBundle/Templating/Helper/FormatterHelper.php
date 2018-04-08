@@ -31,7 +31,9 @@ class FormatterHelper extends Helper
      */
     private $dateHelper;
 
-    /** @var TranslatorInterface */
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
 
     /**

@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -399,14 +400,20 @@ class PublicController extends CommonFormController
         $transportParam   = $this->get('mautic.helper.core_parameters')->getParameter(('mailer_transport'));
         $currentTransport = $this->get('swiftmailer.mailer.transport.'.$transportParam);
 
-        if ($currentTransport instanceof InterfaceCallbackTransport && $currentTransport->getCallbackPath() == $transport) {
-            $response = $currentTransport->handleCallbackResponse($this->request, $this->factory);
+        $isCallbackInterface = $currentTransport instanceof InterfaceCallbackTransport || $currentTransport instanceof CallbackTransportInterface;
+        if ($isCallbackInterface && $currentTransport->getCallbackPath() == $transport) {
+            // @deprecated support to be removed in 3.0
+            if ($currentTransport instanceof InterfaceCallbackTransport) {
+                $response = $currentTransport->handleCallbackResponse($this->request, $this->factory);
 
-            if (is_array($response)) {
-                /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-                $model = $this->getModel('email');
+                if (is_array($response)) {
+                    /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+                    $model = $this->getModel('email');
 
-                $model->processMailerCallback($response);
+                    $model->processMailerCallback($response);
+                }
+            } elseif ($currentTransport instanceof CallbackTransportInterface) {
+                $currentTransport->processCallbackRequest($this->request);
             }
 
             return new Response('success');
