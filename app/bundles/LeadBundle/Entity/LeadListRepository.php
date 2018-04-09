@@ -1680,30 +1680,30 @@ class LeadListRepository extends CommonRepository
                             if (is_string($details['filter'])) {
                                 // Expound the string to an array based on common string array notations.
                                 foreach ([',', ';', "\t", ' '] as $delimiter) {
-                                    if (strpos($details['filter'], $delimiter) !== false) {
+                                    if (false !== strpos($details['filter'], $delimiter)) {
                                         break;
                                     }
                                 }
                                 foreach (["'", '"'] as $enclosure) {
-                                    if (strpos($details['filter'], $enclosure) !== false) {
+                                    if (false !== strpos($details['filter'], $enclosure)) {
                                         break;
                                     }
                                 }
-                                foreach (['"', "\\"] as $escape) {
-                                    if ($escape !== $enclosure && strpos($details['filter'], $enclosure) !== false) {
+                                foreach (['"', '\\'] as $escape) {
+                                    if ($escape !== $enclosure && false !== strpos($details['filter'], $enclosure)) {
                                         break;
                                     }
                                 }
                                 foreach (["\r\n", "\n", "\r"] as $terminator) {
-                                    if (strpos($details['filter'], $terminator) !== false) {
+                                    if (false !== strpos($details['filter'], $terminator)) {
                                         break;
                                     }
                                 }
-                                $lines = explode($terminator, $details['filter']);
+                                $lines             = explode($terminator, $details['filter']);
                                 $details['filter'] = [];
                                 foreach ($lines as $line) {
                                     foreach (str_getcsv($line, $delimiter, $enclosure, $escape) as $value) {
-                                        if ($value && $value !== 'NULL') {
+                                        if ($value && 'NULL' !== $value) {
                                             $details['filter'][] = $value;
                                         }
                                     }
