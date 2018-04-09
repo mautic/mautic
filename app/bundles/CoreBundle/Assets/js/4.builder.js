@@ -890,6 +890,223 @@ Mautic.rgb2hex = function(orig) {
     ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
 };
 
+Mautic.initSlots = function(slotContainers) {
+    if (!slotContainers) {
+        slotContainers = Mautic.builderContents.find('[data-slot-container]');
+    }
+
+    Mautic.builderContents.find('a').on('click', function(e) {
+        e.preventDefault();
+    });
+
+    // Make slots sortable
+    var bodyOverflow = {};
+    Mautic.sortActive = false;
+    Mautic.parentDocument = parent.document;
+
+    slotContainers.sortable({
+        helper: function(e, ui) {
+            // Fix body overflow that messes sortable up
+            bodyOverflow.overflowX = mQuery('body').css('overflow-x');
+            bodyOverflow.overflowY = mQuery('body').css('overflow-y');
+            mQuery('body').css({
+                overflowX: 'visible',
+                overflowY: 'visible'
+            });
+
+            return ui;
+        },
+        items: '[data-slot]',
+        handle: '[data-slot-toolbar]',
+        placeholder: 'slot-placeholder',
+        connectWith: '[data-slot-container]',
+        start: function(event, ui) {
+            Mautic.sortActive = true;
+            ui.placeholder.height(ui.helper.outerHeight());
+
+            Mautic.builderContents.find('[data-slot-focus]').each( function() {
+                var focusedSlot = mQuery(this).closest('[data-slot]');
+                if (focusedSlot.attr('data-slot') === 'image') {
+                    // Deactivate froala toolbar
+                    focusedSlot.find('img').each( function() {
+                        mQuery(this).froalaEditor('popups.hideAll');
+                    });
+                    Mautic.builderContents.find('.fr-image-resizer.fr-active').removeClass('fr-active');
+                }
+            });
+
+            Mautic.builderContents.find('[data-slot-focus]').remove();
+        },
+        stop: function(event, ui) {
+            if (ui.item.hasClass('slot-type-handle')) {
+                // Restore original overflow
+                mQuery('body', parent.document).css(bodyOverflow);
+
+                var newSlot = mQuery('<div/>')
+                    .attr('data-slot', ui.item.attr('data-slot-type'))
+                    .html(ui.item.find('script').html())
+                ui.item.replaceWith(newSlot);
+
+                Mautic.builderContents.trigger('slot:init', newSlot);
+            } else {
+                // Restore original overflow
+                mQuery('body').css(bodyOverflow);
+            }
+
+            Mautic.sortActive = false;
+        }
+    });
+
+    // Allow to drag&drop new slots from the slot type menu
+    var iframe = mQuery('#builder-template-content', parent.document).contents();
+    mQuery('#slot-type-container .slot-type-handle', parent.document).draggable({
+        iframeFix: true,
+        connectToSortable: '[data-slot-container]',
+        revert: 'invalid',
+        iframeOffset: iframe.offset(),
+        helper: function(e, ui) {
+            // fix for Uncaught TypeError: Cannot read property 'document' of null
+            // Fix body overflow that messes sortable up
+            bodyOverflow.overflowX = mQuery('body', Mautic.parentDocument).css('overflow-x');
+            bodyOverflow.overflowY = mQuery('body', Mautic.parentDocument).css('overflow-y');
+            mQuery('body', Mautic.parentDocument).css({
+                overflowX: 'hidden',
+                overflowY: 'hidden'
+            });
+
+            return mQuery(this).clone()
+                .css('height', mQuery(this).height())
+                .css('width', mQuery(this).width());
+        },
+        zIndex: 8000,
+        cursorAt: {top: 15, left: 15},
+        start: function(event, ui) {
+            mQuery('#builder-template-content', Mautic.parentDocument).css('overflow', 'hidden');
+            mQuery('#builder-template-content', Mautic.parentDocument).attr('scrolling', 'no');
+            // check if it is initialized first to prevent error
+            if (slotContainers.data('sortable')) slotContainers.sortable('option', 'scroll', false);
+        },
+        stop: function(event, ui) {
+            // Restore original overflow
+            mQuery('body', Mautic.parentDocument).css(bodyOverflow);
+
+            mQuery('#builder-template-content', Mautic.parentDocument).css('overflow', 'visible');
+            mQuery('#builder-template-content', Mautic.parentDocument).attr('scrolling', 'yes');
+            // check if it is initialized first to prevent error
+            if (slotContainers.data('sortable')) slotContainers.sortable('option', 'scroll', true);
+            // this fixes an issue where after reopening the builder and trying to drag a slot, it leaves a clone behind
+            parent.mQuery('.ui-draggable-dragging').remove();
+        }
+    }).disableSelection();
+
+    iframe.on('scroll', function() {
+        mQuery('#slot-type-container .slot-type-handle', Mautic.parentDocument).draggable("option", "cursorAt", { top: -1 * iframe.scrollTop() + 15 });
+    });
+
+    // Initialize the slots
+    slotContainers.find('[data-slot]').each(function() {
+        mQuery(this).trigger('slot:init', this);
+    });
+};
+
+Mautic.getSlotToolbar = function(type) {
+    Mautic.builderContents.find('[data-slot-toolbar]').remove();
+
+    var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
+    var deleteLink  = Mautic.getSlotDeleteLink();
+    var cloneLink = Mautic.getSlotCloneLink();
+    if (typeof type !== 'undefined') {
+        mQuery('<span style="color:#fff;margin-left:10px;font-family:sans-serif;font-size:smaller">' + type.toUpperCase() + '</span>').appendTo(slotToolbar);
+    }
+    deleteLink.appendTo(slotToolbar);
+    cloneLink.appendTo(slotToolbar);
+
+    return slotToolbar;
+};
+
+Mautic.getSlotDeleteLink = function() {
+    if (typeof Mautic.deleteLink == 'undefined') {
+        Mautic.deleteLink = mQuery('<a><i class="fa fa-lg fa-times"></i></a>')
+            .attr('data-slot-action', 'delete')
+            .attr('alt', 'delete')
+            .addClass('btn btn-delete btn-default');
+    }
+
+    return Mautic.deleteLink;
+};
+
+Mautic.getSlotCloneLink = function() {
+    if (typeof Mautic.cloneLink == 'undefined') {
+        Mautic.cloneLink = mQuery('<a><i class="fa fa-lg fa-copy"></i></a>')
+            .attr('data-slot-action', 'clone')
+            .attr('alt', 'clone')
+            .addClass('btn btn-clone btn-clone');
+    }
+    return Mautic.cloneLink;
+};
+
+Mautic.getSlotFocus = function() {
+    Mautic.builderContents.find('[data-slot-focus]').remove();
+
+    return mQuery('<div/>').attr('data-slot-focus', true);
+};
+
+Mautic.cloneFocusForm = function(decId, removeFroala) {
+    Mautic.reattachDEC();
+
+    var focusForm = parent.mQuery('#emailform_dynamicContent_' + decId);
+    Mautic.activeDECParent = focusForm.parent();
+    // show if hidden
+    focusForm.removeClass('fade');
+    // remove delete default button
+    focusForm.find('.tab-pane:first').find('.remove-item').hide();
+    // hide add variant button
+    focusForm.find('.addNewDynamicContentFilter').hide();
+    var element =focusForm.detach();
+    Mautic.activeDEC = element;
+    return element;
+};
+
+Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
+    var decId = clickedSlot.attr('data-param-dec-id');
+
+    var focusForm;
+
+    if (decId || decId === 0) {
+        focusForm = Mautic.cloneFocusForm(decId);
+    }
+
+    var focusFormHeader = parent.mQuery('#customize-slot-panel').find('.panel-heading h4');
+    var newDynConButton = mQuery('<button/>')
+        .css('float', 'right')
+        .addClass('btn btn-success btn-xs');
+
+    newDynConButton.text('Add Variant');
+    newDynConButton.on('click', function(e) {
+        e.stopPropagation();
+        Mautic.createNewDynamicContentFilter('#dynamicContentFilterTabs_'+decId, parent.mQuery);
+        var focusForm = Mautic.cloneFocusForm(decId, false);
+        focusForm.insertAfter(parent.mQuery('#slot_dynamiccontent > div.has-error'));
+    });
+
+    focusFormHeader.append(newDynConButton);
+
+    return focusForm;
+};
+
+Mautic.removeAddVariantButton = function() {
+    // Remove the Add Variant button for dynamicContent slots
+    parent.mQuery('#customize-slot-panel').find('.panel-heading button').remove();
+    Mautic.reattachDEC();
+};
+
+Mautic.reattachDEC = function() {
+    if (typeof Mautic.activeDEC !== 'undefined') {
+        var element = Mautic.activeDEC.detach();
+        Mautic.activeDECParent.append(element);
+    }
+};
+
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
@@ -1395,223 +1612,6 @@ Mautic.initSlotListeners = function() {
         // Remove Symfony toolbar
         Mautic.builderContents.find('.sf-toolbar').remove();
     });
-};
-
-Mautic.initSlots = function(slotContainers) {
-    if (!slotContainers) {
-        slotContainers = Mautic.builderContents.find('[data-slot-container]');
-    }
-
-    Mautic.builderContents.find('a').on('click', function(e) {
-        e.preventDefault();
-    });
-
-    // Make slots sortable
-    var bodyOverflow = {};
-    Mautic.sortActive = false;
-    Mautic.parentDocument = parent.document;
-
-    slotContainers.sortable({
-        helper: function(e, ui) {
-            // Fix body overflow that messes sortable up
-            bodyOverflow.overflowX = mQuery('body').css('overflow-x');
-            bodyOverflow.overflowY = mQuery('body').css('overflow-y');
-            mQuery('body').css({
-                overflowX: 'visible',
-                overflowY: 'visible'
-            });
-
-            return ui;
-        },
-        items: '[data-slot]',
-        handle: '[data-slot-toolbar]',
-        placeholder: 'slot-placeholder',
-        connectWith: '[data-slot-container]',
-        start: function(event, ui) {
-            Mautic.sortActive = true;
-            ui.placeholder.height(ui.helper.outerHeight());
-
-            Mautic.builderContents.find('[data-slot-focus]').each( function() {
-                var focusedSlot = mQuery(this).closest('[data-slot]');
-                if (focusedSlot.attr('data-slot') === 'image') {
-                    // Deactivate froala toolbar
-                    focusedSlot.find('img').each( function() {
-                        mQuery(this).froalaEditor('popups.hideAll');
-                    });
-                    Mautic.builderContents.find('.fr-image-resizer.fr-active').removeClass('fr-active');
-                }
-            });
-
-            Mautic.builderContents.find('[data-slot-focus]').remove();
-        },
-        stop: function(event, ui) {
-            if (ui.item.hasClass('slot-type-handle')) {
-                // Restore original overflow
-                mQuery('body', parent.document).css(bodyOverflow);
-
-                var newSlot = mQuery('<div/>')
-                    .attr('data-slot', ui.item.attr('data-slot-type'))
-                    .html(ui.item.find('script').html())
-                ui.item.replaceWith(newSlot);
-
-                Mautic.builderContents.trigger('slot:init', newSlot);
-            } else {
-                // Restore original overflow
-                mQuery('body').css(bodyOverflow);
-            }
-
-            Mautic.sortActive = false;
-        }
-    });
-
-    // Allow to drag&drop new slots from the slot type menu
-    var iframe = mQuery('#builder-template-content', parent.document).contents();
-    mQuery('#slot-type-container .slot-type-handle', parent.document).draggable({
-        iframeFix: true,
-        connectToSortable: '[data-slot-container]',
-        revert: 'invalid',
-        iframeOffset: iframe.offset(),
-        helper: function(e, ui) {
-            // fix for Uncaught TypeError: Cannot read property 'document' of null
-            // Fix body overflow that messes sortable up
-            bodyOverflow.overflowX = mQuery('body', Mautic.parentDocument).css('overflow-x');
-            bodyOverflow.overflowY = mQuery('body', Mautic.parentDocument).css('overflow-y');
-            mQuery('body', Mautic.parentDocument).css({
-                overflowX: 'hidden',
-                overflowY: 'hidden'
-            });
-
-            return mQuery(this).clone()
-                .css('height', mQuery(this).height())
-                .css('width', mQuery(this).width());
-        },
-        zIndex: 8000,
-        cursorAt: {top: 15, left: 15},
-        start: function(event, ui) {
-            mQuery('#builder-template-content', Mautic.parentDocument).css('overflow', 'hidden');
-            mQuery('#builder-template-content', Mautic.parentDocument).attr('scrolling', 'no');
-            // check if it is initialized first to prevent error
-            if (slotContainers.data('sortable')) slotContainers.sortable('option', 'scroll', false);
-        },
-        stop: function(event, ui) {
-            // Restore original overflow
-            mQuery('body', Mautic.parentDocument).css(bodyOverflow);
-
-            mQuery('#builder-template-content', Mautic.parentDocument).css('overflow', 'visible');
-            mQuery('#builder-template-content', Mautic.parentDocument).attr('scrolling', 'yes');
-            // check if it is initialized first to prevent error
-            if (slotContainers.data('sortable')) slotContainers.sortable('option', 'scroll', true);
-            // this fixes an issue where after reopening the builder and trying to drag a slot, it leaves a clone behind
-            parent.mQuery('.ui-draggable-dragging').remove();
-        }
-    }).disableSelection();
-
-    iframe.on('scroll', function() {
-        mQuery('#slot-type-container .slot-type-handle', Mautic.parentDocument).draggable("option", "cursorAt", { top: -1 * iframe.scrollTop() + 15 });
-    });
-
-    // Initialize the slots
-    slotContainers.find('[data-slot]').each(function() {
-        mQuery(this).trigger('slot:init', this);
-    });
-};
-
-Mautic.getSlotToolbar = function(type) {
-    Mautic.builderContents.find('[data-slot-toolbar]').remove();
-
-    var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
-    var deleteLink  = Mautic.getSlotDeleteLink();
-    var cloneLink = Mautic.getSlotCloneLink();
-    if (typeof type !== 'undefined') {
-        mQuery('<span style="color:#fff;margin-left:10px;font-family:sans-serif;font-size:smaller">' + type.toUpperCase() + '</span>').appendTo(slotToolbar);
-    }
-    deleteLink.appendTo(slotToolbar);
-    cloneLink.appendTo(slotToolbar);
-
-    return slotToolbar;
-};
-
-Mautic.getSlotDeleteLink = function() {
-    if (typeof Mautic.deleteLink == 'undefined') {
-        Mautic.deleteLink = mQuery('<a><i class="fa fa-lg fa-times"></i></a>')
-            .attr('data-slot-action', 'delete')
-            .attr('alt', 'delete')
-            .addClass('btn btn-delete btn-default');
-    }
-
-    return Mautic.deleteLink;
-};
-
-Mautic.getSlotCloneLink = function() {
-    if (typeof Mautic.cloneLink == 'undefined') {
-        Mautic.cloneLink = mQuery('<a><i class="fa fa-lg fa-copy"></i></a>')
-            .attr('data-slot-action', 'clone')
-            .attr('alt', 'clone')
-            .addClass('btn btn-clone btn-clone');
-    }
-    return Mautic.cloneLink;
-};
-
-Mautic.getSlotFocus = function() {
-    Mautic.builderContents.find('[data-slot-focus]').remove();
-
-    return mQuery('<div/>').attr('data-slot-focus', true);
-};
-
-Mautic.cloneFocusForm = function(decId, removeFroala) {
-    Mautic.reattachDEC();
-
-    var focusForm = parent.mQuery('#emailform_dynamicContent_' + decId);
-    Mautic.activeDECParent = focusForm.parent();
-    // show if hidden
-    focusForm.removeClass('fade');
-    // remove delete default button
-    focusForm.find('.tab-pane:first').find('.remove-item').hide();
-    // hide add variant button
-    focusForm.find('.addNewDynamicContentFilter').hide();
-    var element =focusForm.detach();
-    Mautic.activeDEC = element;
-    return element;
-};
-
-Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
-    var decId = clickedSlot.attr('data-param-dec-id');
-
-    var focusForm;
-
-    if (decId || decId === 0) {
-        focusForm = Mautic.cloneFocusForm(decId);
-    }
-
-    var focusFormHeader = parent.mQuery('#customize-slot-panel').find('.panel-heading h4');
-    var newDynConButton = mQuery('<button/>')
-        .css('float', 'right')
-        .addClass('btn btn-success btn-xs');
-
-    newDynConButton.text('Add Variant');
-    newDynConButton.on('click', function(e) {
-        e.stopPropagation();
-        Mautic.createNewDynamicContentFilter('#dynamicContentFilterTabs_'+decId, parent.mQuery);
-        var focusForm = Mautic.cloneFocusForm(decId, false);
-        focusForm.insertAfter(parent.mQuery('#slot_dynamiccontent > div.has-error'));
-    });
-
-    focusFormHeader.append(newDynConButton);
-
-    return focusForm;
-};
-
-Mautic.removeAddVariantButton = function() {
-    // Remove the Add Variant button for dynamicContent slots
-    parent.mQuery('#customize-slot-panel').find('.panel-heading button').remove();
-    Mautic.reattachDEC();
-};
-
-Mautic.reattachDEC = function() {
-    if (typeof Mautic.activeDEC !== 'undefined') {
-        var element = Mautic.activeDEC.detach();
-        Mautic.activeDECParent.append(element);
-    }
 };
 
 Mautic.deleteCodeModeSlot = function() {
