@@ -80,7 +80,7 @@ if (!empty($inForm)) {
 
     if ($field['inputAttributes']) {
         $inputAttr .= ' '.htmlspecialchars_decode($field['inputAttributes']);
-    }
+        }
 
     $appendAttribute($inputAttr, 'class', $defaultInputClass);
 }
