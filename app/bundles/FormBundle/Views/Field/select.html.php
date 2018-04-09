@@ -13,6 +13,7 @@ $defaultInputClass     = 'selectbox';
 $containerType         = 'select';
 
 include __DIR__.'/field_helper.php';
+
 if (!empty($properties['multiple'])) {
     $inputAttr .= ' multiple="multiple"';
 }
