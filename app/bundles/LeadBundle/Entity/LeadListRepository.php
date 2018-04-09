@@ -1703,7 +1703,9 @@ class LeadListRepository extends CommonRepository
                                 $details['filter'] = [];
                                 foreach ($lines as $line) {
                                     foreach (str_getcsv($line, $delimiter, $enclosure, $escape) as $value) {
-                                        $details['filter'][] = $value;
+                                        if ($value && $value !== 'NULL') {
+                                            $details['filter'][] = $value;
+                                        }
                                     }
                                 }
                             }
