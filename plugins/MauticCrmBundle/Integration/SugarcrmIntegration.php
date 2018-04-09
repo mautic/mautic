@@ -308,12 +308,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                     //6.x/community
 
                                     foreach ($fields['module_fields'] as $fieldInfo) {
-                                        if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'bool', 'link', 'relate'])
-                                                ||
-                                                ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
-                                            )) {
+                                        if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'bool', 'link', 'relate']) || ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
+                                            )
+                                        ) {
                                             $type      = 'string';
-                                            $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
+                                            $fieldName = (strpos($fieldInfo['name'],
+                                                    'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_',
+                                                '', $fieldInfo['name']);
                                             // make these congruent as some come in with colons and some do not
                                             $label = str_replace(':', '', $fieldInfo['label']);
                                             if ($sObject !== 'company') {
