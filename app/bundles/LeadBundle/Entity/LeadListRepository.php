@@ -1692,6 +1692,7 @@ class LeadListRepository extends CommonRepository
                                     InputHelper::clean($value)
                                 );
                             }
+                            $details['filter'] = array_unique($details['filter']);
                             if ($details['type'] == 'multiselect') {
                                 foreach ($details['filter'] as $filter) {
                                     $filter = trim($filter, "'");
