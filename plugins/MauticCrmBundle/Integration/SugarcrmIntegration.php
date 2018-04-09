@@ -833,7 +833,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     $newName = '__'.$object;
                 }
                 if ($SUGAR_VERSION == '6') {
-                    foreach ($record['name_value_list'] as $item) {
+                    foreach ($record['name_value_list'] as $k=>$item) {
                         if ($object !== 'Activity') {
                             if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {
                                 $convertedMultiSelectString         = $this->convertSuiteCrmToMauticMultiSelect($item['value']);
@@ -886,8 +886,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
                         $detachClass           = Lead::class;
                         $company               = null;
+                        $this->fetchDncToMautic($entity, $data);
                         if ($entity && isset($dataObject['account_id'.$newName]) && trim($dataObject['account_id'.$newName]) != '') {
-                            $this->fetchDncToMautic($entity, $dataObject);
                             $integrationCompanyEntity = $integrationEntityRepo->findOneBy(
                                 [
                                     'integration'         => 'Sugarcrm',
@@ -1404,25 +1404,35 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * @param Lead  $lead
-     * @param array $dataObject
+     * @param array $data
      */
-    private function fetchDncToMautic(Lead $lead, array $dataObject)
+    private function fetchDncToMautic(Lead $lead, array $data)
     {
         $features = $this->settings->getFeatureSettings();
         if (empty($features['updateDnc'])) {
             return;
         }
 
-        foreach ($this->sugarDncKeys as $sugarDncKey) {
-            $reason = \Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED;
-            if ($sugarDncKey == 'invalid_email') {
-                $reason = \Mautic\LeadBundle\Entity\DoNotContact::BOUNCED;
+        // try find opt_out value for lead
+        $isContactable = true;
+        foreach ($data['relationship_list'] as $relationshipList) {
+            foreach ($relationshipList['link_list'] as $links) {
+                if ($links['name'] == 'email_addresses') {
+                    foreach ($links['records'] as $records) {
+                        if (!empty($records['link_value']['email_address']['value']) && $records['link_value']['email_address']['value'] == $lead->getEmail() && !empty($records['link_value']['opt_out']['value'])) {
+                            $isContactable = false;
+                            break 3;
+                        }
+                    }
+                }
             }
-            if (!empty($dataObject[$sugarDncKey])) {
-                $this->doNotContactModel->addDncForContact($lead->getId(), 'email', $reason, $this->getName());
-            } else {
-                $this->doNotContactModel->removeDncForContact($lead->getId(), 'email', true, $reason);
-            }
+        }
+
+        $reason = \Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED;
+        if (!$isContactable) {
+            $this->doNotContactModel->addDncForContact($lead->getId(), 'email', $reason, $this->getName());
+        } else {
+            $this->doNotContactModel->removeDncForContact($lead->getId(), 'email', true, $reason);
         }
     }
 
