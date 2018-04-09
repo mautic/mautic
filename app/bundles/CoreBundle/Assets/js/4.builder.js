@@ -1114,7 +1114,7 @@ Mautic.isSlotInitiated = function(slot) {
     }) !== 'undefined';
 };
 
-Mautic.initSlotListeners = function(slot) {
+Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
     Mautic.selectedSlot = null;
