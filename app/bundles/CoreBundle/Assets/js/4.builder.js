@@ -1107,7 +1107,14 @@ Mautic.reattachDEC = function() {
     }
 };
 
-Mautic.initSlotListeners = function() {
+Mautic.isSlotInitiated = function(slot) {
+    if (typeof Mautic.builderSlots === 'undefined' || Mautic.builderSlots.length === 0) return false;
+    return typeof Mautic.builderSlots.find(function(params) {
+        return slot.is(params.slot);
+    }) !== 'undefined';
+};
+
+Mautic.initSlotListeners = function(slot) {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
     Mautic.selectedSlot = null;
@@ -1121,6 +1128,9 @@ Mautic.initSlotListeners = function() {
     Mautic.builderContents.on('slot:init', function(event, slot) {
         slot = mQuery(slot);
         var type = slot.attr('data-slot');
+
+        // Avoid initialising one slot several times
+        if (Mautic.isSlotInitiated(slot)) return;
 
         // initialize the drag handle
         var slotToolbar = Mautic.getSlotToolbar(type);
@@ -1162,11 +1172,8 @@ Mautic.initSlotListeners = function() {
                 focus.remove();
             });
             cloneLink.click(function(e) {   
-                var cloneBtn = mQuery(this);
-                var clonedElem = cloneBtn.closest('[data-slot]');
-                clonedElem.clone().insertAfter(clonedElem);
-                Mautic.initSlotListeners();
-                Mautic.initSlots();
+                slot.clone().insertAfter(slot);
+                Mautic.initSlots(slot.closest('[data-slot-container="1"]'));
             });
 
             if (slot.offset().top < 25) {
