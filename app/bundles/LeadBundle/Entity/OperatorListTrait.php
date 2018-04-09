@@ -27,6 +27,8 @@ trait OperatorListTrait
                 'startsWith',
                 'endsWith',
                 'contains',
+                'in',
+                '!in',
             ],
         ],
         'select' => [

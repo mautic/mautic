@@ -1677,6 +1677,16 @@ class LeadListRepository extends CommonRepository
 
                         case 'in':
                         case 'notIn':
+                            if (is_string($details['filter'])) {
+                                // Support common formats received when pasting in from spreadsheets.
+                                foreach (["\n", ',', ' '] as $delimiter) {
+                                    if (strpos($details['filter'], $delimiter) !== false) {
+                                        break;
+                                    }
+                                }
+                                $details['filter'] = explode($delimiter, $details['filter']);
+                                $details['filter'] = array_map('trim', $details['filter']);
+                            }
                             foreach ($details['filter'] as &$value) {
                                 $value = $q->expr()->literal(
                                     InputHelper::clean($value)
