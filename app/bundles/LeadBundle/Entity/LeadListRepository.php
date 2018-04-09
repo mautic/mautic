@@ -1678,14 +1678,34 @@ class LeadListRepository extends CommonRepository
                         case 'in':
                         case 'notIn':
                             if (is_string($details['filter'])) {
-                                // Support common formats received when pasting in from spreadsheets.
-                                foreach (["\n", ',', ' '] as $delimiter) {
+                                // Expound the string to an array based on common string array notations.
+                                foreach ([',', ';', "\t", ' '] as $delimiter) {
                                     if (strpos($details['filter'], $delimiter) !== false) {
                                         break;
                                     }
                                 }
-                                $details['filter'] = explode($delimiter, $details['filter']);
-                                $details['filter'] = array_map('trim', $details['filter']);
+                                foreach (["'", '"'] as $enclosure) {
+                                    if (strpos($details['filter'], $enclosure) !== false) {
+                                        break;
+                                    }
+                                }
+                                foreach (['"', "\\"] as $escape) {
+                                    if ($escape !== $enclosure && strpos($details['filter'], $enclosure) !== false) {
+                                        break;
+                                    }
+                                }
+                                foreach (["\r\n", "\n", "\r"] as $terminator) {
+                                    if (strpos($details['filter'], $terminator) !== false) {
+                                        break;
+                                    }
+                                }
+                                $lines = explode($terminator, $details['filter']);
+                                $details['filter'] = [];
+                                foreach ($lines as $line) {
+                                    foreach (str_getcsv($line, $delimiter, $enclosure, $escape) as $value) {
+                                        $details['filter'][] = $value;
+                                    }
+                                }
                             }
                             foreach ($details['filter'] as &$value) {
                                 $value = $q->expr()->literal(
