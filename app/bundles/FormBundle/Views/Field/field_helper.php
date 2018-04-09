@@ -114,7 +114,6 @@ if (isset($field['isRequired']) && $field['isRequired']) {
 }
 
 $appendAttribute($containerAttr, 'class', $defaultContainerClass);
-
 // Setup list parsing
 if (isset($list) || isset($properties['syncList']) || isset($properties['list']) || isset($properties['optionlist'])) {
     $parseList           = [];
