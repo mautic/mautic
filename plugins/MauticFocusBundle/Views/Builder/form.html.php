@@ -25,7 +25,7 @@ $required   = [];
 <!-- START FOCUS FORM -->
 
 <?php
-if (!empty($preview)):
+if (empty($preview)):
     echo $view->render('MauticFormBundle:Builder:script.html.php', ['form' => $form, 'formName' => $formName]); ?>
 
     <script>
@@ -111,18 +111,17 @@ if (!empty($preview)):
         }
     </script>
 <?php endif; ?>
+
 <?php
 $formExtra = <<<EXTRA
 <input type="hidden" name="mauticform[focusId]" id="mauticform{$formName}_focus_id" value="$focusId"/>
 EXTRA;
 
 echo $view->render('MauticFormBundle:Builder:form.html.php', [
-        'form'          => $form,
-        'formExtra'     => $formExtra,
-        'action'        => ($preview) ? '#' : null,
-        'suffix'        => '_focus',
-        'contactFields' => $contactFields,
-        'companyFields' => $companyFields,
+        'form'      => $form,
+        'formExtra' => $formExtra,
+        'action'    => ($preview) ? '#' : null,
+        'suffix'    => '_focus',
     ]
 );
 ?>
