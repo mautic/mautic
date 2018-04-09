@@ -1379,7 +1379,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if (empty($features['updateDnc'])) {
             return;
         }
-        $leadEntity = $this->leadModel->getEntity($lead['id']);
+        $leadEntity = $this->leadModel->getEntity($lead['internal_entity_id']);
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $dncEntries */
         $dncEntries   = $this->doNotContactModel->getDncRepo()->getEntriesByLeadAndChannel($leadEntity, 'email');
         $sugarDncKeys = array_combine(array_values($this->sugarDncKeys), $this->sugarDncKeys);
