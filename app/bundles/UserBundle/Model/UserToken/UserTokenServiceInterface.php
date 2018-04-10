@@ -9,19 +9,22 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\UserBundle\Entity;
+namespace Mautic\UserBundle\Model\UserToken;
+
+use Mautic\UserBundle\Entity\UserToken;
 
 /**
- * Interface UserTokenRepositoryInterface.
+ * Interface UserTokenServiceInterface.
  */
-interface UserTokenRepositoryInterface
+interface UserTokenServiceInterface
 {
     /**
-     * @param string $signature
+     * @param UserToken $token
+     * @param int       $signatureLength
      *
      * @return UserToken
      */
-    public function isSignatureUnique($signature);
+    public function sign(UserToken $token, $signatureLength = 32);
 
     /**
      * @param UserToken $token

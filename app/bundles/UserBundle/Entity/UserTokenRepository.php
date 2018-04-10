@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * @copyright   2017 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\UserBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -10,25 +19,19 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 final class UserTokenRepository extends CommonRepository implements UserTokenRepositoryInterface
 {
     /**
-     * @param UserToken      $token
-     * @param int            $signatureLength
-     * @param \DateTime|null $expiration
-     * @param bool           $oneTimeOnly
+     * @param string $signature
      *
-     * @return UserToken
+     * @return bool
      */
-    public function sign(UserToken $token, $signatureLength = 32, \DateTime $expiration = null, $oneTimeOnly = true)
+    public function isSignatureUnique($signature)
     {
-        $signature = $this->_em->getConnection()
-            ->fetchColumn('SELECT signUserToken(:userId, :authorizator, :signatureLength, :expiration, :oneTimeOnly)', [
-                'userId'          => $token->getUser()->getId(),
-                'authorizator'    => $token->getAuthorizator(),
-                'signatureLength' => $signatureLength,
-                'expiration'      => $expiration->format('Y-m-d H:i:s'),
-                'oneTimeOnly'     => $oneTimeOnly,
-            ]);
+        $tokens = $this->createQueryBuilder('ut')
+            ->where('ut.signature = :signature')
+            ->setParameter('signature', $signature)
+            ->setMaxResults(1)
+            ->getQuery()->execute();
 
-        return $token->sign($signature);
+        return count($tokens) === 0;
     }
 
     /**
@@ -38,13 +41,24 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
      */
     public function verify(UserToken $token)
     {
-        $verification = $this->_em->getConnection()
-            ->fetchColumn('SELECT verifyUserToken(:userId, :authorizator, :signature)', [
-                'userId'       => $token->getUser()->getId(),
-                'authorizator' => $token->getAuthorizator(),
-                'signature'    => $token->getSignature(),
-            ]);
+        /** @var UserToken[] $userTokens */
+        $userTokens = $this->createQueryBuilder('ut')
+            ->where('ut.user = :user AND ut.authorizator = :authorizator AND ut.signature = :signature AND (ut.expiration IS NULL OR ut.expiration >= :now)')
+            ->setParameter('user', $token->getUser())
+            ->setParameter('authorizator', $token->getAuthorizator())
+            ->setParameter('signature', $token->getSignature())
+            ->setParameter('now', new \DateTime())
+            ->setMaxResults(1)
+            ->getQuery()->execute();
+        $verified = (count($userTokens) !== 0);
+        if ($verified === false) {
+            return false;
+        }
+        $userToken = reset($userTokens);
+        if ($userToken->isOneTimeOnly()) {
+            $this->deleteEntity($userToken);
+        }
 
-        return (bool) $verification;
+        return true;
     }
 }

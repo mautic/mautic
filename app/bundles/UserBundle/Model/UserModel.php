@@ -15,10 +15,10 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
-use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Mautic\UserBundle\Enum\UserTokensAuthorizator;
 use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
+use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -35,22 +35,22 @@ class UserModel extends FormModel
     protected $mailHelper;
 
     /**
-     * @var UserTokenRepositoryInterface
+     * @var UserTokenServiceInterface
      */
-    private $userTokenRepository;
+    private $userTokenService;
 
     /**
      * UserModel constructor.
      *
-     * @param MailHelper                   $mailHelper
-     * @param UserTokenRepositoryInterface $userTokenRepository
+     * @param MailHelper                $mailHelper
+     * @param UserTokenServiceInterface $userTokenService
      */
     public function __construct(
         MailHelper $mailHelper,
-        UserTokenRepositoryInterface $userTokenRepository
+        UserTokenServiceInterface $userTokenService
     ) {
         $this->mailHelper          = $mailHelper;
-        $this->userTokenRepository = $userTokenRepository;
+        $this->userTokenService    = $userTokenService;
     }
 
     /**
@@ -268,10 +268,11 @@ class UserModel extends FormModel
     {
         $userToken = new UserToken();
         $userToken->setUser($user)
-            ->setAuthorizator(UserTokensAuthorizator::RESET_PASSWORD_AUTHORIZATOR);
-        $expiration = (new \DateTime())->add(new \DateInterval('PT24H'));
+            ->setAuthorizator(UserTokensAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
+            ->setExpiration((new \DateTime())->add(new \DateInterval('PT24H')))
+            ->setOneTimeOnly();
 
-        return $this->userTokenRepository->sign($userToken, 64, $expiration, true);
+        return $this->userTokenService->sign($userToken, 64);
     }
 
     /**
@@ -287,17 +288,26 @@ class UserModel extends FormModel
             ->setAuthorizator(UserTokensAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
             ->sign($token);
 
-        return $this->userTokenRepository->verify($userToken);
+        return $this->userTokenService->verify($userToken);
     }
 
     /**
      * @param User $user
+     *
+     * @throws \RuntimeException
      */
     public function sendResetEmail(User $user)
     {
         $mailer = $this->mailHelper->getMailer();
 
         $resetToken = $this->getResetToken($user);
+        $this->em->persist($resetToken);
+        try {
+            $this->em->flush();
+        } catch (\Exception $exception) {
+            $this->logger->addError($exception->getMessage());
+            throw new \RuntimeException();
+        }
         $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken], true);
 
         $mailer->setTo([$user->getEmail() => $user->getName()]);

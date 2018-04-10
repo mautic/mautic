@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * @copyright   2017 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -62,6 +71,7 @@ class UserToken
 
         $builder->createField('signature', 'string')
             ->length(120)
+            ->unique()
             ->build();
 
         $builder->createField('expiration', 'datetime')
@@ -69,6 +79,7 @@ class UserToken
             ->build();
 
         $builder->createField('oneTimeOnly', 'boolean')
+            ->columnName('one_time_only')
             ->build();
     }
 

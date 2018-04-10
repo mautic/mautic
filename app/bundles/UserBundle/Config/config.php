@@ -302,6 +302,13 @@ return [
                 'class'     => 'Mautic\UserBundle\Model\UserModel',
                 'arguments' => [
                     'mautic.helper.mailer',
+                    'mautic.user.model.user_token_service',
+                ],
+            ],
+            'mautic.user.model.user_token_service' => [
+                'class'     => \Mautic\UserBundle\Model\UserToken\UserTokenService::class,
+                'arguments' => [
+                    'mautic.helper.random',
                     'mautic.user.repository.user_token',
                 ],
             ],

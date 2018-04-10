@@ -38,6 +38,7 @@ class Version20180406233027 extends AbstractMauticMigration
             `one_time_only` tinyint(4) NOT NULL,
             PRIMARY KEY (`id`),
             KEY `user_id` (`user_id`),
+            UNIQUE KEY `{$this->prefix}signature` (`signature`),
             CONSTRAINT `{$this->prefix}user_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `{$this->prefix}users` (`id`) ON DELETE CASCADE
             ) ENGINE=InnoDB
         ");
