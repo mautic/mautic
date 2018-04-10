@@ -292,6 +292,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             $sparkPostMessage['content']['attachments'] = $message['attachments'];
         }
 
+        $sparkPostMessage['options'] = [
+            'open_tracking'  => false,
+            'click_tracking' => false,
+        ];
+
         return $sparkPostMessage;
     }
 
