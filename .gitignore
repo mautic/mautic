@@ -70,7 +70,9 @@
 !/plugins/MauticOutlookBundle
 !/plugins/MauticSocialBundle
 !/plugins/RabbitMQBundle
+
 !/plugins/FCMNotificationBundle
+
 !/plugins/index.html
 
 /themes/*
