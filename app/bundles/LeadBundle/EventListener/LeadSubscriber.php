@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
+use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 
@@ -31,12 +32,17 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
+
+    /**
+     * @var LeadChangeEventDispatcher
+     */
+    private $leadEventDispatcher;
 
     /**
      * LeadSubscriber constructor.
@@ -44,10 +50,11 @@ class LeadSubscriber extends CommonSubscriber
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, LeadChangeEventDispatcher $eventDispatcher)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+        $this->ipLookupHelper      = $ipLookupHelper;
+        $this->auditLogModel       = $auditLogModel;
+        $this->leadEventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -58,6 +65,7 @@ class LeadSubscriber extends CommonSubscriber
         return [
             LeadEvents::LEAD_POST_SAVE       => ['onLeadPostSave', 0],
             LeadEvents::LEAD_POST_DELETE     => ['onLeadDelete', 0],
+            LeadEvents::LEAD_PRE_MERGE       => ['preLeadMerge', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
             LeadEvents::FIELD_POST_SAVE      => ['onFieldPostSave', 0],
             LeadEvents::FIELD_POST_DELETE    => ['onFieldDelete', 0],
@@ -91,6 +99,7 @@ class LeadSubscriber extends CommonSubscriber
             if (!in_array($check, $preventLoop)) {
                 $preventLoop[] = $check;
 
+                // Change entry
                 $log = [
                     'bundle'    => 'lead',
                     'object'    => 'lead',
@@ -101,7 +110,8 @@ class LeadSubscriber extends CommonSubscriber
                 ];
                 $this->auditLogModel->writeToLog($log);
 
-                if (isset($details['dateIdentified'])) {
+                // Date identified entry
+                if (isset($changes['dateIdentified'])) {
                     //log the day lead was identified
                     $log = [
                         'bundle'    => 'lead',
@@ -112,14 +122,9 @@ class LeadSubscriber extends CommonSubscriber
                         'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
                     ];
                     $this->auditLogModel->writeToLog($log);
-
-                    //trigger lead identified event
-                    if (!$lead->imported && $this->dispatcher->hasListeners(LeadEvents::LEAD_IDENTIFIED)) {
-                        $this->dispatcher->dispatch(LeadEvents::LEAD_IDENTIFIED, $event);
-                    }
                 }
 
-                //add if an ip was added
+                // IP added entry
                 if (isset($details['ipAddresses']) && !empty($details['ipAddresses'][1])) {
                     $log = [
                         'bundle'    => 'lead',
@@ -132,18 +137,7 @@ class LeadSubscriber extends CommonSubscriber
                     $this->auditLogModel->writeToLog($log);
                 }
 
-                //trigger the points change event
-                if (!$lead->imported && isset($details['points']) && (int) $details['points'][1] > 0) {
-                    if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_POINTS_CHANGE)) {
-                        $pointsEvent = new Events\PointsChangeEvent($lead, $details['points'][0], $details['points'][1]);
-                        $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
-                    }
-                }
-
-                if (!$lead->imported && isset($details['utmtags'])) {
-                    $utmTagsEvent = new Events\LeadUtmTagsEvent($lead, $details['utmtags']);
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_UTMTAGS_ADD, $utmTagsEvent);
-                }
+                $this->leadEventDispatcher->dispatchEvents($event, $details);
             }
         }
     }
@@ -245,6 +239,17 @@ class LeadSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * @param Events\LeadMergeEvent $event
+     */
+    public function preLeadMerge(Events\LeadMergeEvent $event)
+    {
+        $this->em->getRepository('MauticLeadBundle:LeadEventLog')->updateLead(
+            $event->getLoser()->getId(),
+            $event->getVictor()->getId()
+        );
     }
 
     /**

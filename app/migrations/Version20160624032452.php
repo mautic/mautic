@@ -35,7 +35,7 @@ class Version20160624032452 extends AbstractMauticMigration
         $statLeadIDX = $this->generatePropertyName('dynamic_content_stats', 'idx', ['lead_id']);
 
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}dynamic_content_stats (
+CREATE TABLE IF NOT EXISTS {$this->prefix}dynamic_content_stats (
 	id INT AUTO_INCREMENT NOT NULL,
 	dynamic_content_id INT DEFAULT NULL,
 	lead_id INT DEFAULT NULL,

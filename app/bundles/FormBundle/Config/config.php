@@ -175,6 +175,7 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.helper.mailer',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.form.pagebundle.subscriber' => [
@@ -285,7 +286,7 @@ return [
                 'class' => FormFieldCaptchaType::class,
                 'alias' => 'formfield_captcha',
             ],
-            'muatic.form.type.field_propertypagebreak' => [
+            'mautic.form.type.field_propertypagebreak' => [
                 'class'     => FormFieldPageBreakType::class,
                 'arguments' => [
                     'translator',
@@ -322,7 +323,10 @@ return [
             ],
             'mautic.form.type.form_submitaction_sendemail' => [
                 'class'       => SubmitActionEmailType::class,
-                'arguments'   => 'translator',
+                'arguments'   => [
+                    'translator',
+                    'mautic.helper.core_parameters',
+                ],
                 'alias'       => 'form_submitaction_sendemail',
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
@@ -377,6 +381,7 @@ return [
                     'mautic.helper.form.field_helper',
                     'mautic.form.validator.upload_field_validator',
                     'mautic.form.helper.form_uploader',
+                    'mautic.lead.service.device_tracking_service',
                 ],
             ],
             'mautic.form.model.submission_result_loader' => [

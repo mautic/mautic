@@ -10,7 +10,7 @@ use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
 class CompanyTest extends PipedriveTest
 {
     private $features = [
-        'objects' => [
+        'objects'       => [
             'company',
         ],
         'companyFields' => [
@@ -21,20 +21,26 @@ class CompanyTest extends PipedriveTest
 
     public function testCreateCompanyWhenFeatureIsDisabled()
     {
-        $this->loginUser();
-
-        $this->installPipedriveIntegration(true, [], [
+        $this->installPipedriveIntegration(
+            true,
+            [],
+            [
                 'url'   => 'Api/Post',
                 'token' => 'token',
             ]
         );
 
-        $this->client->request('POST', '/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=', [
-            'company' => [
-                'companyname'     => 'Test Name',
-                'companyaddress1' => 'Test Address',
-            ],
-        ]);
+        $this->client->request(
+            'POST',
+            '/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=',
+            [
+                'company' => [
+                    'companyname'     => 'Test Name',
+                    'companyaddress1' => 'Test Address',
+                    '_token'          => $this->getCsrfToken('company'),
+                ],
+            ]
+        );
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $company             = $this->em->getRepository(Company::class)->findOneById(1);
@@ -49,21 +55,29 @@ class CompanyTest extends PipedriveTest
 
     public function testCreateCompany()
     {
-        $this->loginUser();
         $testName     = 'Test Name';
         $testAddress1 = 'Test Adddress 123, Wrocław, Poland';
 
-        $this->installPipedriveIntegration(true, $this->features, [
-            'url'   => 'Api/Post',
-            'token' => 'token',
-        ]);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => 'Api/Post',
+                'token' => 'token',
+            ]
+        );
 
-        $this->client->request('POST', '/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=', [
-            'company' => [
-                'companyname'     => $testName,
-                'companyaddress1' => $testAddress1,
-            ],
-        ]);
+        $this->client->request(
+            'POST',
+            '/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=',
+            [
+                'company' => [
+                    'companyname'     => $testName,
+                    'companyaddress1' => $testAddress1,
+                    '_token'          => $this->getCsrfToken('company'),
+                ],
+            ]
+        );
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $company             = $this->em->getRepository(Company::class)->findOneById(1);
@@ -90,21 +104,28 @@ class CompanyTest extends PipedriveTest
         $testName     = 'New Test Name';
         $testAddress1 = 'New Test Adddress 123, Wrocław, Poland';
 
-        $this->loginUser();
-
-        $this->installPipedriveIntegration(true, [], [
-            'url'   => 'Api/Put',
-            'token' => 'token',
-        ]);
+        $this->installPipedriveIntegration(
+            true,
+            [],
+            [
+                'url'   => 'Api/Put',
+                'token' => 'token',
+            ]
+        );
 
         $company = $this->createCompany();
 
-        $this->client->request('POST', 's/companies/edit/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=', [
-            'company' => [
-                'companyname'     => $testName,
-                'companyaddress1' => $testAddress1,
-            ],
-        ]);
+        $this->client->request(
+            'POST',
+            's/companies/edit/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            [
+                'company' => [
+                    'companyname'     => $testName,
+                    'companyaddress1' => $testAddress1,
+                    '_token'          => $this->getCsrfToken('company'),
+                ],
+            ]
+        );
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();
@@ -125,22 +146,29 @@ class CompanyTest extends PipedriveTest
         $testName      = 'New Test Name';
         $testAddress1  = 'New Test Adddress 123, Wrocław, Poland';
 
-        $this->loginUser();
-
-        $this->installPipedriveIntegration(true, $this->features, [
-            'url'   => 'Api/Put',
-            'token' => 'token',
-        ]);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => 'Api/Put',
+                'token' => 'token',
+            ]
+        );
 
         $company = $this->createCompany();
         $this->createCompanyIntegrationEntity($integrationId, $company->getId());
 
-        $this->client->request('POST', 's/companies/edit/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=', [
-            'company' => [
-                'companyname'     => $testName,
-                'companyaddress1' => $testAddress1,
-            ],
-        ]);
+        $this->client->request(
+            'POST',
+            's/companies/edit/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            [
+                'company' => [
+                    'companyname'     => $testName,
+                    'companyaddress1' => $testAddress1,
+                    '_token'          => $this->getCsrfToken('company'),
+                ],
+            ]
+        );
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();
@@ -157,17 +185,23 @@ class CompanyTest extends PipedriveTest
 
     public function testDeleteCompanyWhenFeatureIsDisabled()
     {
-        $this->loginUser();
-
-        $this->installPipedriveIntegration(true, [], [
-            'url'   => 'Api/Delete',
-            'token' => 'token',
-        ]);
+        $this->installPipedriveIntegration(
+            true,
+            [],
+            [
+                'url'   => 'Api/Delete',
+                'token' => 'token',
+            ]
+        );
 
         $company = $this->createCompany();
         $this->createCompanyIntegrationEntity(567, $company->getId());
 
-        $this->client->request('POST', 's/companies/delete/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=', []);
+        $this->client->request(
+            'POST',
+            's/companies/delete/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            []
+        );
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();
@@ -183,17 +217,23 @@ class CompanyTest extends PipedriveTest
     {
         $integrationId = 66;
 
-        $this->loginUser();
-
-        $this->installPipedriveIntegration(true, $this->features, [
-            'url'   => 'Api/Delete',
-            'token' => 'token',
-        ]);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => 'Api/Delete',
+                'token' => 'token',
+            ]
+        );
 
         $company = $this->createCompany();
         $this->createCompanyIntegrationEntity($integrationId, $company->getId());
 
-        $this->client->request('POST', 's/companies/delete/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=', []);
+        $this->client->request(
+            'POST',
+            's/companies/delete/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            []
+        );
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();

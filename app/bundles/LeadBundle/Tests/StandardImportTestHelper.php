@@ -41,6 +41,25 @@ abstract class StandardImportTestHelper extends CommonMocks
     {
         parent::setUpBeforeClass();
 
+        static::generateSmallCSV();
+        static::generateLargeCSV();
+    }
+
+    public static function tearDownAfterClass()
+    {
+        if (file_exists(self::$csvPath)) {
+            unlink(self::$csvPath);
+        }
+
+        if (file_exists(self::$largeCsvPath)) {
+            unlink(self::$largeCsvPath);
+        }
+
+        parent::tearDownAfterClass();
+    }
+
+    public static function generateSmallCSV()
+    {
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_import_test_');
         $file    = fopen($tmpFile, 'w');
 
@@ -50,7 +69,10 @@ abstract class StandardImportTestHelper extends CommonMocks
 
         fclose($file);
         self::$csvPath = $tmpFile;
+    }
 
+    public static function generateLargeCSV()
+    {
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_import_large_test_');
         $file    = fopen($tmpFile, 'w');
         fputcsv($file, ['email', 'firstname', 'lastname']);
@@ -63,15 +85,6 @@ abstract class StandardImportTestHelper extends CommonMocks
 
         fclose($file);
         self::$largeCsvPath = $tmpFile;
-    }
-
-    public static function tearDownAfterClass()
-    {
-        if (file_exists(self::$csvPath)) {
-            unlink(self::$csvPath);
-        }
-
-        parent::tearDownAfterClass();
     }
 
     public function setup()

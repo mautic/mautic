@@ -119,7 +119,7 @@ class BuilderSubscriber extends CommonSubscriber
             $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
 
             // add only filter based dwc tokens
-            $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent');
+            $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent', 'dynamiccontent:dynamiccontents');
             $expr           = $this->factory->getDatabase()->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,

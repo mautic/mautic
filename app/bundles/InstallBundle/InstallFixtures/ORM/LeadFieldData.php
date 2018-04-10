@@ -88,7 +88,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                     // Schema already has this custom field; likely defined as a property in the entity class itself
                 }
 
-                $indexesToAdd[$object][] = $alias;
+                $indexesToAdd[$object][$alias] = $field;
 
                 $this->addReference('leadfield-'.$alias, $entity);
                 ++$order;
@@ -106,8 +106,8 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'leads');
             }
 
-            foreach ($indexes as $name) {
-                $type = (isset($fields[$name]['type'])) ? $fields[$name]['type'] : 'text';
+            foreach ($indexes as $name => $field) {
+                $type = (isset($field['type'])) ? $field['type'] : 'text';
                 if ('textarea' != $type) {
                     $indexHelper->addIndex([$name], $name.'_search');
                 }
