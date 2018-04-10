@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
-use Mautic\UserBundle\Enum\UserTokensAuthorizator;
+use Mautic\UserBundle\Enum\UserTokenAuthorizator;
 use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
@@ -268,7 +268,7 @@ class UserModel extends FormModel
     {
         $userToken = new UserToken();
         $userToken->setUser($user)
-            ->setAuthorizator(UserTokensAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
+            ->setAuthorizator(UserTokenAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
             ->setExpiration((new \DateTime())->add(new \DateInterval('PT24H')))
             ->setOneTimeOnly();
 
@@ -285,7 +285,7 @@ class UserModel extends FormModel
     {
         $userToken = new UserToken();
         $userToken->setUser($user)
-            ->setAuthorizator(UserTokensAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
+            ->setAuthorizator(UserTokenAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
             ->sign($token);
 
         return $this->userTokenService->verify($userToken);
