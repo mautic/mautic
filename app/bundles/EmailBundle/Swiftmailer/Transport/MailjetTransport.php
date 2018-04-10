@@ -62,7 +62,9 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
         // add leadIdHash to track this email
         if (isset($message->leadIdHash)) {
             // contact leadidHeash and email to be sure not applying email stat to bcc
-            $message->getHeaders()->remove('X-MJ-CUSTOMID');
+
+            $message->getHeaders()->removeAll('X-MJ-CUSTOMID');
+
             $message->getHeaders()->addTextHeader('X-MJ-CUSTOMID', $message->leadIdHash.'-'.key($message->getTo()));
         }
 
