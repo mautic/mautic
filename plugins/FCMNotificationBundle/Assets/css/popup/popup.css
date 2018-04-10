@@ -1,0 +1,359 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f6f6f6;
+    width: 100%;
+    height: 100%;
+}
+
+body,
+html {
+    height: 100%;
+    overflow: hidden;
+}
+
+.truncatable {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.truncatable.desktop.long {
+    width: 255px;
+}
+
+.truncatable.desktop.short, .truncatable.mobile {
+    width: 240px;
+}
+
+.truncatable.opt-out {
+    width: 300px;
+    margin: 12px auto;
+}
+
+.title {
+    margin: 0 auto;
+    text-align: center;
+    font-family: "Helvetica Neue", "Arial";
+    font-size: 24px;
+    font-weight: 500;
+    width: 90%;
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
+#black-wrapper {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    background-color: black;
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    transition: opacity .5s;
+}
+
+#white-wrapper {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    background-color: #f6f6f6;
+    position: absolute;
+    top: 0;
+    z-index: -1;
+}
+
+p {
+    font-family: "Helvetica Neue", "Arial";
+}
+
+/* Desktop  Notification */
+
+#desktop-notification {
+    width: 360px;
+    height: 85px;
+    margin: 0 auto;
+    padding: 0;
+    display: block;;
+    border: 1px solid #ddd;
+    background-color: white;
+    -webkit-box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.75);
+}
+
+#desktop-notification-icon {
+    margin: 0;
+    height: 85px;
+    width: 85px;
+    float: left;
+    padding: 0;
+}
+
+#desktop-notification-title {
+    font-size: 15px;
+    margin-top: 10px;
+    margin-bottom: 0px;
+    position: relative;
+    left: 10px;
+}
+
+#desktop-notification-message {
+    margin-top: 10px;
+    margin-bottom: 0px;
+    font-size: 13px;
+    position: relative;
+    left: 10px;
+}
+
+#desktop-notification-url {
+    color: #AAA;
+    font-size: 13px;
+    margin-top: 8px;
+    margin-bottom: 0px;
+    position: relative;
+    left: 10px;
+}
+
+#x {
+    float: right;
+    margin-right: 8px;
+    margin-top: 5px;
+    color: #999;
+}
+
+#mobile {
+    width: 100%;
+    height: 100%;
+}
+
+#mobile-top-section {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    bottom: 106px;
+    width: 100%;
+}
+
+#mobile-top-section-wrapper {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+#mobile-top-section-content {
+    display: table-cell;
+    vertical-align: middle;
+    width: 100%;
+}
+
+#mobile-directions {
+    font-size: 1.4em;
+    line-height: 1.6em;
+    padding: 0px 1em;
+    text-align: center;
+    color: #333;
+    font-weight: 200;
+    width: 310px;
+    margin: 0px auto;
+    margin-bottom: 20px;
+}
+
+/* Mobile Notification */
+
+#mobile-notification {
+    width: 90%;
+    max-width: 350px;
+    height: 65px;
+    margin: 0 auto;
+    padding: 0;
+    display: block;
+    border: 1px solid #ccc;
+    background-color: white;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.75);
+}
+
+#mobile-notification-icon {
+    margin: 0;
+    height: 50px;
+    margin-left: 9px;
+    margin-top: 7px;
+    width: 50px;
+    padding: 15px;
+    float: left;
+    padding: 0;
+}
+
+#mobile-notification-title {
+    font-size: 18px;
+    position: relative;
+    left: 10px;
+    margin-top: 3px;
+    margin-bottom: 0;
+}
+
+#mobile-notification-message {
+    position: relative;
+    left: 10px;
+    margin-top: 4px;
+    color: #777;
+    font-size: 13px;
+    margin-bottom: 0px;
+}
+
+#mobile-notification-url {
+    color: #AAA;
+    font-size: 12px;
+    margin-top: 3px;
+    margin-bottom: 0px;
+    position: relative;
+    left: 10px;
+}
+
+#mobile-opt-out {
+    font-style: italic;
+    color: #777;
+    font-size: 12px;
+    text-align: center;
+}
+
+hr {
+    width: 85%;
+    background-color: #ccc;
+    border: none;
+    height: 1px;
+    margin-top: 0;
+}
+
+#mobile-footer {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: block;
+}
+
+#mobile-button-container {
+    width: 100%;
+    display: table;
+    border-spacing: 10px;
+}
+
+.mobile-button-wrapper {
+    width: 50%;
+    display: table-cell;
+    text-align: center;
+}
+
+.mobile-button {
+    outline: none;
+    border: none;
+    padding: 15px 5px;
+    font-size: 14px;
+    text-align: center;
+    max-width: 150px;
+    width: 100%;
+    cursor: pointer;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+#show-prompt-button {
+    background-color: #4285f4;
+    color: white;
+    border: 1px solid #4278d2;
+}
+
+#show-prompt-button:hover {
+    background-color: #5392fc;
+}
+
+#show-prompt-button:active {
+    background-color: #3a7be7;
+}
+
+#close-button {
+    color: #555;
+    border: 1px solid #ccc;
+    background-color: #f6f6f6;
+}
+
+#close-button:hover {
+    background-color: #fafafa;
+}
+
+#close-button:active {
+    background-color: #eaeaea;
+}
+
+#mobile-footer-message {
+    text-align: center;
+    color: #aaa;
+    position: relative;
+    bottom: 5px;
+    font-size: 11px;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+a:not(.default-link) {
+    color: inherit;
+    text-decoration: none;
+}
+
+#intercom-container {
+    display: none;
+}
+
+#error-box {
+    display: none;
+    width: 80%;
+    left: 10%;
+    top: 60%;
+    z-index: 20;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #aaa;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.85);
+    -moz-box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.85);
+    box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.85);
+}
+
+#error-message-padding {
+    padding-top: 0px;
+    padding-right: 15px;
+    padding-bottom: 0px;
+    padding-left: 15px;
+}
+
+.error {
+    display: none;
+}
+
+.btn-close {
+    position: absolute;
+    right: 10px;
+    top: 0px;
+    z-index: 20;
+    font-size: 25px;
+    text-decoration: none;
+    font-family: 'Helvetica', arial;
+    color: #888;
+}
+
+.btn-close:hover {
+    color: #000;
+}
+#notification-preview {
+    padding:0 10px;
+}
