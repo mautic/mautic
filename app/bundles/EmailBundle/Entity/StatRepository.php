@@ -500,8 +500,21 @@ class StatRepository extends CommonRepository
      */
     public function deleteStat($id)
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', ['id' => (int) $id]);
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats_devices', ['stat_id' => (int) $id]);
+        $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', ['id' => (int) $id]);
+    }
+
+    /**
+     * @param array $ids
+     */
+    public function deleteStats(array $ids)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->delete(MAUTIC_TABLE_PREFIX.'email_stats')
+            ->where(
+                $qb->expr()->in('id', $ids)
+            )
+            ->execute();
     }
 
     /**

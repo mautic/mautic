@@ -13,9 +13,9 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
@@ -389,7 +389,10 @@ class PublicController extends CommonFormController
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
-        list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+        $lead = $leadModel->getCurrentLead();
+        /** @var DeviceTrackingServiceInterface $trackedDevice */
+        $trackedDevice = $this->get('mautic.lead.service.device_tracking_service')->getTrackedDevice();
+        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
 
         /** @var TrackingHelper $trackingHelper */
         $trackingHelper = $this->get('mautic.page.helper.tracking');
@@ -397,10 +400,11 @@ class PublicController extends CommonFormController
 
         return new JsonResponse(
             [
-                'success' => 1,
-                'id'      => ($lead) ? $lead->getId() : null,
-                'sid'     => $trackingId,
-                'events'  => $sessionValue,
+                'success'   => 1,
+                'id'        => ($lead) ? $lead->getId() : null,
+                'sid'       => $trackingId,
+                'device_id' => $trackingId,
+                'events'    => $sessionValue,
             ]
         );
     }
@@ -571,10 +575,14 @@ class PublicController extends CommonFormController
             /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
 
-            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
-            $data                                = [
-                'id'  => ($lead) ? $lead->getId() : null,
-                'sid' => $trackingId,
+            $lead = $leadModel->getCurrentLead();
+            /** @var DeviceTrackingServiceInterface $trackedDevice */
+            $trackedDevice = $this->get('mautic.lead.service.device_tracking_service')->getTrackedDevice();
+            $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+            $data          = [
+                'id'        => ($lead) ? $lead->getId() : null,
+                'sid'       => $trackingId,
+                'device_id' => $trackingId,
             ];
         }
 
