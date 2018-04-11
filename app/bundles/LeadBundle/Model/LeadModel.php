@@ -897,6 +897,16 @@ class LeadModel extends FormModel
 
             $this->setFieldValues($lead, $inQuery, false, true, true);
 
+            // Assume a web request as this is likely a tracking request from DWC or tracking code
+            $lead->setManipulator(
+                new LeadManipulator(
+                    'page',
+                    'hit',
+                    null,
+                    (isset($queryFields['page_url'])) ? $queryFields['page_url'] : ''
+                )
+            );
+
             if (isset($queryFields['tags'])) {
                 $this->modifyTags($lead, $queryFields['tags']);
             }
