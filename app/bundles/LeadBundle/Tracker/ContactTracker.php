@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
+use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
 use Monolog\Logger;
@@ -321,9 +322,14 @@ class ContactTracker
         }
 
         if ($persist) {
-            // Purposively ignoring events for new visitors
+            // Dispatch events for new lead to write create log, ip address change, etc
+            $event = new LeadEvent($lead, true);
+            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_SAVE, $event);
+
             $this->leadRepository->saveEntity($lead);
             $this->hydrateCustomFieldData($lead);
+
+            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
 
             $this->logger->addDebug("LEAD: New lead created with ID# {$lead->getId()}.");
         }
