@@ -50,7 +50,7 @@ class LeadTest extends PipedriveTest
         for ($i = 0; $i < $iterations; ++$i) {
             $this->client->request(
                 'POST',
-                $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/contacts/new?qf=1&mauticUserLastActive=1&mauticLastNotificationId=',
+                '/s/contacts/new?qf=1&mauticUserLastActive=1&mauticLastNotificationId=',
                 [
                     'lead' => [
                         'firstname' => 'Test'.$i,
@@ -91,7 +91,7 @@ class LeadTest extends PipedriveTest
 
         $this->client->request(
             'POST',
-            $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             [
                 'lead' => [
                     'firstname' => 'Test',
@@ -138,7 +138,7 @@ class LeadTest extends PipedriveTest
 
         $this->client->request(
             'POST',
-            $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             [
                 'lead' => [
                     'firstname' => 'Test',
@@ -183,7 +183,7 @@ class LeadTest extends PipedriveTest
 
         $this->client->request(
             'POST',
-            $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             [
                 'lead' => [
                     'firstname' => 'Test',
@@ -229,7 +229,7 @@ class LeadTest extends PipedriveTest
 
         $this->client->request(
             'POST',
-            $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/contacts/delete/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            '/s/contacts/delete/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             []
         );
 

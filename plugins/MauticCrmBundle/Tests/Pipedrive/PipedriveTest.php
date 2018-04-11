@@ -44,7 +44,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
             'PHP_AUTH_PW'   => self::WEBHOOK_PASSWORD,
         ];
 
-        $this->client->request($method, $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/plugin/pipedrive/webhook', [], [], $headers, $json);
+        $this->client->request($method, '/plugin/pipedrive/webhook', [], [], $headers, $json);
     }
 
     protected function installPipedriveIntegration($published = false, array $settings = [], array $apiKeys = [], array $features = ['push_lead'], $addCredential = true)

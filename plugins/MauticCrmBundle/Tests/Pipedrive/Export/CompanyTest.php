@@ -32,7 +32,7 @@ class CompanyTest extends PipedriveTest
 
         $this->client->request(
             'POST',
-            $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=',
+            '/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=',
             [
                 'company' => [
                     'companyname'     => 'Test Name',
@@ -69,7 +69,7 @@ class CompanyTest extends PipedriveTest
 
         $this->client->request(
             'POST',
-            $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=',
+            '/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=',
             [
                 'company' => [
                     'companyname'     => $testName,
