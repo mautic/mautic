@@ -224,12 +224,12 @@ return [
     'menu' => [
         'main' => [
             'items' => [
-                'mautic.notification.notifications' => [
+                'mautic.plugin.fcmnotification.notifications' => [
                     'route'  => 'mautic_notification_index',
                     'access' => ['notification:notifications:viewown', 'notification:notifications:viewother'],
                     'checks' => [
                         'integration' => [
-                            'OneSignal' => [
+                            'FCM' => [
                                 'enabled' => true,
                             ],
                         ],
@@ -237,6 +237,7 @@ return [
                     'parent'   => 'mautic.core.channels',
                     'priority' => 80,
                 ],
+/*
                 'mautic.notification.mobile_notifications' => [
                     'route'  => 'mautic_mobile_notification_index',
                     'access' => ['notification:mobile_notifications:viewown', 'notification:mobile_notifications:viewother'],
@@ -253,6 +254,7 @@ return [
                     'parent'   => 'mautic.core.channels',
                     'priority' => 65,
                 ],
+*/
             ],
         ],
     ],

@@ -9,13 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\NotificationBundle;
+namespace MauticPlugin\FCMNotificationBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
 /**
  * Class MauticNotificationBundle.
  */
-class MauticNotificationBundle extends Bundle
+class FCMNotificationBundle extends PluginBundleBase
 {
 }
