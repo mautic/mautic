@@ -63,8 +63,8 @@ class FCMIntegration extends AbstractIntegration
     public function getSupportedFeatureTooltips()
     {
         return [
-            'landing_page_enabled'  => 'mautic.integration.form.features.landing_page_enabled.tooltip',
-            'tracking_page_enabled' => 'mautic.integration.form.features.tracking_page_enabled.tooltip',
+            'landing_page_enabled'  => 'mautic.plugin.integration.form.features.landing_page_enabled.tooltip',
+            'tracking_page_enabled' => 'mautic.plugin.integration.form.features.tracking_page_enabled.tooltip',
         ];
     }
 
