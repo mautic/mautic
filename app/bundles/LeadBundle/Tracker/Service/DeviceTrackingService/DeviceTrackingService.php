@@ -166,6 +166,11 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     private function createTrackingCookies(LeadDevice $device)
     {
+        // Delete old cookies
+        if ($deviceTrackingId = $this->getTrackedIdentifier()) {
+            $this->cookieHelper->deleteCookie($deviceTrackingId);
+        }
+
         // Device cookie
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
 
