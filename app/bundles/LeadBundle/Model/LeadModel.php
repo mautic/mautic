@@ -27,6 +27,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -883,27 +884,10 @@ class LeadModel extends FormModel
     {
         $lead = null;
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
+        $ipAddress   = $this->ipLookupHelper->getIpAddress();
+        $trackedLead = $this->getContactFromClickthrough($this->contactTracker->getContact(), $queryFields);
 
-        // Check for a lead requested through clickthrough query parameter
-        if (isset($queryFields['ct'])) {
-            $clickthrough = $queryFields['ct'];
-        } elseif ($clickthrough = $this->request->get('ct', [])) {
-            $clickthrough = $this->decodeArrayFromUrl($clickthrough);
-        }
-
-        if (is_array($clickthrough) && !empty($clickthrough['lead'])) {
-            $lead = $this->getEntity($clickthrough['lead']);
-            // identify contact from link
-            if ($this->coreParametersHelper->getParameter('track_by_tracking_url') && !isset($queryFields['email']) && $lead && $email = $lead->getEmail()) {
-                $queryFields['email'] = $email;
-            }
-            $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
-        }
-
-        $lead = $this->contactTracker->getContact();
-
-        list($lead, $inQuery) = $this->checkForDuplicateContact($queryFields, $lead, true, true);
+        list($lead, $inQuery) = $this->checkForDuplicateContact($queryFields, $trackedLead, true, true);
 
         if ($lead) {
             $leadIpAddresses = $lead->getIpAddresses();
@@ -917,7 +901,7 @@ class LeadModel extends FormModel
                 $this->modifyTags($lead, $queryFields['tags']);
             }
 
-            $this->setCurrentLead($lead);
+            $this->contactTracker->setTrackedContact($lead);
         }
 
         return $lead;
@@ -2539,6 +2523,66 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @param Lead  $trackedLead
+     * @param array $queryFields
+     *
+     * @return Lead
+     */
+    private function getContactFromClickthrough(Lead $trackedLead, array &$queryFields)
+    {
+        // Check for a lead requested through clickthrough query parameter
+        if (isset($queryFields['ct'])) {
+            $clickthrough = $queryFields['ct'];
+        } elseif ($clickthrough = $this->request->get('ct', [])) {
+            $clickthrough = $this->decodeArrayFromUrl($clickthrough);
+        }
+
+        if (!is_array($clickthrough)) {
+            return $trackedLead;
+        }
+
+        if (!empty($clickthrough['channel']['email']) && !empty($clickthrough['stat'])) {
+            // Nothing left to identify by so stick to the tracked lead
+            /** @var Stat $stat */
+            $stat = $this->em->getRepository('MauticEmailBundle:Stat')->findOneBy(['trackingHash' => $clickthrough['stat']]);
+
+            if (!$stat) {
+                // Stat doesn't exist so use the tracked lead
+                return $trackedLead;
+            }
+
+            if ((int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
+                // Email ID mismatch - fishy so use tracked lead
+                return $trackedLead;
+            }
+
+            if ($statLead = $stat->getLead()) {
+                if (!$trackedLead->isAnonymous()) {
+                    return $statLead;
+                }
+
+                // Merge tracked visitor into the clickthrough contact
+                return $this->mergeLeads($trackedLead, $statLead, false);
+            }
+        }
+
+        if (!empty($clickthrough['lead']) && $foundLead = $this->getEntity($clickthrough['lead'])) {
+            if (!$this->coreParametersHelper->getParameter('track_by_tracking_url') || empty($queryFields['email'])) {
+                return $trackedLead;
+            }
+
+            // Identify contact from link if email field is set as publicly updateable
+            if ($email = $foundLead->getEmail()) {
+                // Add email to query for checkForDuplicateContact to pick up and merge
+                $queryFields['email'] = $email;
+                $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
+            }
+        }
+
+        return $trackedLead;
+    }
+
+    /**
      * @param IpAddress $ip
      * @param bool      $persist
      *
@@ -2553,7 +2597,6 @@ class LeadModel extends FormModel
 
         if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
             // Set to prevent loops
-            $this->setCurrentLead($lead);
             $this->contactTracker->setTrackedContact($lead);
 
             // Note ignoring a lead manipulator object here on purpose to not falsely record entries
