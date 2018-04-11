@@ -148,11 +148,13 @@ return [
                 ],
             ],
         ],
+*/
         'integrations' => [
-            'mautic.integration.onesignal' => [
-                'class' => \Mautic\NotificationBundle\Integration\OneSignalIntegration::class,
+            'mautic.integration.fcm' => [
+                'class' => \MauticPlugin\FCMNotificationBundle\Integration\FCMIntegration::class,
             ],
         ],
+/*
     ],
     'routes' => [
         'main' => [
