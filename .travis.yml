@@ -9,6 +9,7 @@ php:
   - 5.6.19
   - 7.0
   - 7.1
+  - 7.2
 
 before_install:
   # Create mautictest database
