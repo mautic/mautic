@@ -132,11 +132,6 @@ class SmsSubscriber extends CommonSubscriber
      */
     public function onTokenReplacement(TokenReplacementEvent $event)
     {
-        // Disable trackable urls
-        if ($this->smsHelper->getDisableTrackableUrls()) {
-            return;
-        }
-
         /** @var Lead $lead */
         $lead         = $event->getLead();
         $content      = $event->getContent();
@@ -149,19 +144,20 @@ class SmsSubscriber extends CommonSubscriber
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
             );
 
-            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
-                $content,
-                $tokens,
-                'sms',
-                $clickthrough['channel'][1]
-            );
-
-            /**
-             * @var string
-             * @var Trackable $trackable
-             */
-            foreach ($trackables as $token => $trackable) {
-                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, true);
+            // Disable trackable urls
+            if (!$this->smsHelper->getDisableTrackableUrls()) {
+                list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+                    $content,
+                    $tokens,
+                    'sms',
+                    $clickthrough['channel'][1]
+                );
+                /**
+                 * @var Trackable
+                 */
+                foreach ($trackables as $token => $trackable) {
+                    $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, true);
+                }
             }
 
             $content = str_replace(array_keys($tokens), array_values($tokens), $content);
