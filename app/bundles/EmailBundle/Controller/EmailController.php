@@ -1194,6 +1194,21 @@ class EmailController extends FormController
                     ]
                 )
             );
+        } elseif (!$entity->isPublished()) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.email.error.send.unpublished',
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
+                    ]
+                )
+            );
         } elseif ($entity->getEmailType() == 'template'
             || !$this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
