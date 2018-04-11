@@ -25,7 +25,7 @@ class FCMIntegration extends AbstractIntegration
     /**
      * @var bool
      */
-    protected $coreIntegration = true;
+    protected $coreIntegration = false;
 
     /**
      * {@inheritdoc}
@@ -34,12 +34,20 @@ class FCMIntegration extends AbstractIntegration
      */
     public function getName()
     {
+        return 'FCM';
+    }
+
+     /**
+     * {@inheritdoc}
+     */
+    public function getDisplayName()
+    {
         return 'Firebase Cloud Messaging';
     }
 
     public function getIcon()
     {
-        return 'app/plugins/FCMNotificationBundle//Assets/img/fcm_logo.png';
+        return 'plugins/FCMNotificationBundle/Assets/img/fcm_logo.png';
     }
 
     public function getSupportedFeatures()
