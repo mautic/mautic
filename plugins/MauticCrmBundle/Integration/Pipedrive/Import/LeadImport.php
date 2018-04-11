@@ -51,7 +51,8 @@ class LeadImport extends AbstractImport
         if ($integrationEntity) {
             throw new \Exception('Lead already have integration', Response::HTTP_CONFLICT);
         }
-        $data         = $this->convertPipedriveData($data);
+
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
         if (1 == 1 || defined('PHPUNIT_TESTSUITE') || !$lead =  $this->leadModel->getExistingLead($dataToUpdate)) {
@@ -103,7 +104,7 @@ class LeadImport extends AbstractImport
         // prevent listeners from exporting
         $lead->setEventData('pipedrive.webhook', 1);
 
-        $data         = $this->convertPipedriveData($data);
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
         $lastSyncDate      = $integrationEntity->getLastSyncDate();

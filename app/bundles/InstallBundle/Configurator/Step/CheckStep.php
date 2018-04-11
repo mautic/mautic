@@ -13,6 +13,7 @@ namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -34,6 +35,9 @@ class CheckStep implements StepInterface
      * @var string
      */
     private $kernelRoot;
+
+    /** @var OpenSSLCipher */
+    private $openSSLCipher;
 
     /**
      * Absolute path to cache directory.
@@ -66,17 +70,23 @@ class CheckStep implements StepInterface
     /**
      * Constructor.
      *
-     * @param Configurator $configurator Configurator service
-     * @param string       $kernelRoot   Kernel root path
-     * @param RequestStack $requestStack Request stack
+     * @param Configurator  $configurator  Configurator service
+     * @param string        $kernelRoot    Kernel root path
+     * @param RequestStack  $requestStack  Request stack
+     * @param OpenSSLCipher $openSSLCipher
      */
-    public function __construct(Configurator $configurator, $kernelRoot, RequestStack $requestStack)
-    {
+    public function __construct(
+        Configurator $configurator,
+        $kernelRoot,
+        RequestStack $requestStack,
+        OpenSSLCipher $openSSLCipher
+    ) {
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
         $this->kernelRoot       = $kernelRoot;
         $this->site_url         = $request->getSchemeAndHttpHost().$request->getBasePath();
+        $this->openSSLCipher    = $openSSLCipher;
     }
 
     /**
@@ -160,8 +170,8 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.simplexml';
         }
 
-        if (!extension_loaded('mcrypt')) {
-            $messages[] = 'mautic.install.extension.mcrypt';
+        if ($this->openSSLCipher->isSupported() === false) {
+            $messages[] = 'mautic.install.extension.openssl';
         }
 
         if (!function_exists('finfo_open')) {
