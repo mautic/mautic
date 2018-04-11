@@ -14,7 +14,7 @@ namespace MauticPlugin\FCMNotificationBundle;
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
 /**
- * Class MauticNotificationBundle.
+ * Class FCMNotificationBundle.
  */
 class FCMNotificationBundle extends PluginBundleBase
 {

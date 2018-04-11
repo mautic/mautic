@@ -10,6 +10,7 @@
  */
 
 return [
+/*    
     'services' => [
         'events' => [
             'mautic.notification.campaignbundle.subscriber' => [
@@ -221,6 +222,7 @@ return [
             ],
         ],
     ],
+*/
     'menu' => [
         'main' => [
             'items' => [
