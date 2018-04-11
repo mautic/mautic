@@ -50,7 +50,7 @@ class LeadTest extends PipedriveTest
         for ($i = 0; $i < $iterations; ++$i) {
             $this->client->request(
                 'POST',
-                '/s/contacts/new?qf=1&mauticUserLastActive=1&mauticLastNotificationId=',
+                $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/contacts/new?qf=1&mauticUserLastActive=1&mauticLastNotificationId=',
                 [
                     'lead' => [
                         'firstname' => 'Test'.$i,
@@ -86,13 +86,12 @@ class LeadTest extends PipedriveTest
                 'token' => 'token',
             ]
         );
-
         $lead = $this->createLead();
         $this->createLeadIntegrationEntity($integrationId, $lead->getId());
 
         $this->client->request(
             'POST',
-            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             [
                 'lead' => [
                     'firstname' => 'Test',
@@ -104,7 +103,6 @@ class LeadTest extends PipedriveTest
                 ],
             ]
         );
-
         $requests = $GLOBALS['requests'];
         $request  = $requests['PUT/Api/Put/persons/'.$integrationId][0];
 
@@ -140,7 +138,7 @@ class LeadTest extends PipedriveTest
 
         $this->client->request(
             'POST',
-            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             [
                 'lead' => [
                     'firstname' => 'Test',
@@ -185,7 +183,7 @@ class LeadTest extends PipedriveTest
 
         $this->client->request(
             'POST',
-            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             [
                 'lead' => [
                     'firstname' => 'Test',
@@ -231,7 +229,7 @@ class LeadTest extends PipedriveTest
 
         $this->client->request(
             'POST',
-            '/s/contacts/delete/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
+            $this->container->get('mautic.helper.core_parameters')->getParameter('site_url').'/s/contacts/delete/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             []
         );
 
