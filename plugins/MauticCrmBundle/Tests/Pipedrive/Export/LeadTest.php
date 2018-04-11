@@ -87,7 +87,6 @@ class LeadTest extends PipedriveTest
             ]
         );
         $lead = $this->createLead();
-        $this->createLeadIntegrationEntity($integrationId, $lead->getId());
 
         $this->client->request(
             'POST',
@@ -104,13 +103,13 @@ class LeadTest extends PipedriveTest
             ]
         );
         $requests = $GLOBALS['requests'];
-        $request  = $requests['PUT/Api/Put/persons/'.$integrationId][0];
+        $request  = $requests['POST/Api/Put/persons'];
 
-        $this->assertSame(count($requests), 1);
-        $this->assertEquals($request['form_params']['first_name'], 'Test');
-        $this->assertEquals($request['form_params']['last_name'], 'User');
-        $this->assertEquals($request['form_params']['email'], 'test@test.pl');
-        $this->assertEquals($request['form_params']['phone'], '123456789');
+        $this->assertSame(count($request), 1);
+        $this->assertEquals($request[0]['form_params']['first_name'], 'Test');
+        $this->assertEquals($request[0]['form_params']['last_name'], 'User');
+        $this->assertEquals($request[0]['form_params']['email'], 'test@test.pl');
+        $this->assertEquals($request[0]['form_params']['phone'], '123456789');
     }
 
     public function testUpdatePersonWithCompanyWhenFeatureIsDisabled()
