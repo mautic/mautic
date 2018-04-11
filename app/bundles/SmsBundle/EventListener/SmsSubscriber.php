@@ -153,7 +153,8 @@ class SmsSubscriber extends CommonSubscriber
                     $clickthrough['channel'][1]
                 );
                 /**
-                 * @var Trackable
+                 * @var string
+                 * @var Trackable $trackable
                  */
                 foreach ($trackables as $token => $trackable) {
                     $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, true);
