@@ -50,6 +50,11 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     private $request;
 
     /**
+     * @var LeadDevice
+     */
+    private $trackedDevice;
+
+    /**
      * DeviceTrackingService constructor.
      *
      * @param CookieHelper           $cookieHelper
@@ -85,6 +90,10 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     public function getTrackedDevice()
     {
+        if ($this->trackedDevice) {
+            return $this->trackedDevice;
+        }
+
         $trackingId = $this->getTrackedIdentifier();
         if ($trackingId === null) {
             return null;
@@ -129,6 +138,9 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
 
         $this->createTrackingCookies($device);
 
+        // Store the device in case a service uses this within the same session
+        $this->trackedDevice = $device;
+
         return $device;
     }
 
@@ -140,6 +152,12 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         if ($this->request === null) {
             return null;
         }
+
+        if ($this->trackedDevice) {
+            // Use the device tracked in case the cookies were just created
+            return $this->trackedDevice->getTrackingId();
+        }
+
         $deviceTrackingId = $this->cookieHelper->getCookie('mautic_device_id', null);
         if ($deviceTrackingId === null) {
             $deviceTrackingId = $this->request->get('mautic_device_id', null);
@@ -166,6 +184,11 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     private function createTrackingCookies(LeadDevice $device)
     {
+        // Delete old cookies
+        if ($deviceTrackingId = $this->getTrackedIdentifier()) {
+            $this->cookieHelper->deleteCookie($deviceTrackingId);
+        }
+
         // Device cookie
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
 
