@@ -76,9 +76,9 @@ class FCMIntegration extends AbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'apiKey'        => 'mautic.plugin.fcmnotification.config.form.notification.apiKey',            
-            'projectId'  => 'mautic.plugin.fcmnotification.config.form.notification.projectId',
-            'messagingSenderId' => 'mautic.plugin.fcmnotification.config.form.notification.messagingSenderId',
+            'apiKey'        => 'mautic.plugin.fcmnotification.config.form.notification.apikey',            
+            'projectId'  => 'mautic.plugin.fcmnotification.config.form.notification.projectid',
+            'messagingSenderId' => 'mautic.plugin.fcmnotification.config.form.notification.messagingsenderid',
         ];
     }
 
