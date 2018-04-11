@@ -48,7 +48,7 @@ class IdStore implements IdStoreInterface
                 ->setId($id)
                 ->setExpiryTime($expiryTime);
         $this->manager->persist($idEntry);
-        $this->manager->flush($idEntry);
+        $this->manager->flush();
     }
 
     /**
