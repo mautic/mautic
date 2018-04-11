@@ -9,13 +9,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\NotificationBundle\Entity;
-
-use Mautic\CoreBundle\Entity\CommonRepository;
+namespace MauticPlugin\FCMNotificationBundle;
 
 /**
- * PushIDRepository.
+ * Class NotificationEvents
+ * Events available for NotificationBundle.
  */
-class PushIDRepository extends CommonRepository
+final class NotificationEvents extends \Mautic\NotificationBundle\NotificationEvents\PluginBundleBase
 {
 }
