@@ -42,9 +42,9 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $transportCallback;
 
     /**
-     * SparkpostTransport constructor.
-     *
-     * @param $apiKey
+     * @param string              $apiKey
+     * @param TranslatorInterface $translator
+     * @param TransportCallback   $transportCallback
      */
     public function __construct($apiKey, TranslatorInterface $translator, TransportCallback $transportCallback)
     {
@@ -56,8 +56,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * @param string $apiKey
-     *
-     * @return $this
      */
     public function setApiKey($apiKey)
     {
@@ -100,6 +98,8 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      * @param null                $failedRecipients
      *
      * @return int Number of messages sent
+     *
+     * @throws \Exception
      */
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
@@ -145,6 +145,8 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      * @param \Swift_Mime_Message $message
      *
      * @return array SparkPost Send Message
+     *
+     * @throws \Exception
      */
     public function getSparkPostMessage(\Swift_Mime_Message $message)
     {
@@ -208,10 +210,37 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             }
 
             $recipients[] = $recipient;
+
+            $substitution_data = $recipient['substitution_data'];
+            if (!empty($message['recipients']['cc'])) {
+                foreach ($message['recipients']['cc'] as $cc => $content) {
+                    $recipient    = [
+                        'address'           => [
+                            'email' => $cc,
+                        ],
+                        'header_to'         => $to['email'],
+                        'substitution_data' => $substitution_data,
+                    ];
+                    $recipients[] = $recipient;
+                }
+            }
+
+            if (!empty($message['recipients']['bcc'])) {
+                foreach ($message['recipients']['bcc'] as $bcc => $content) {
+                    $recipient    = [
+                        'address'           => [
+                            'email' => $bcc,
+                        ],
+                        'header_to'         => $to['email'],
+                        'substitution_data' => $substitution_data,
+                    ];
+                    $recipients[] = $recipient;
+                }
+            }
         }
 
         if (isset($message['replyTo'])) {
-            $headers['Reply-To'] = (!empty($message['replyTo']['name']))
+            $headers['Reply-To'] = !empty($message['replyTo']['name'])
                 ?
                 sprintf('%s <%s>', $message['replyTo']['email'], $message['replyTo']['name'])
                 :
@@ -251,22 +280,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             'inline_css' => $inlineCss,
             'tags'       => $tags,
         ];
-
-        if (!empty($message['recipients']['cc'])) {
-            foreach ($message['recipients']['cc'] as $cc) {
-                $sparkPostMessage['cc'][] = [
-                    'address' => $cc,
-                ];
-            }
-        }
-
-        if (!empty($message['recipients']['bcc'])) {
-            foreach ($message['recipients']['bcc'] as $bcc) {
-                $sparkPostMessage['bcc'][] = [
-                    'address' => $bcc,
-                ];
-            }
-        }
 
         if (!empty($message['attachments'])) {
             foreach ($message['attachments'] as $key => $attachment) {
