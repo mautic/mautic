@@ -276,6 +276,11 @@ class DashboardController extends FormController
      */
     public function saveAction()
     {
+        // Accept only AJAX POST requests because those are check for CSRF tokens
+        if ($this->request->getMethod() !== 'POST' || !$this->request->isXmlHttpRequest()) {
+            return $this->accessDenied();
+        }
+
         $name = $this->getNameFromRequest();
         try {
             $this->getModel('dashboard')->saveSnapshot($name);
