@@ -125,15 +125,16 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             ]
         );
 
-        if (null === $existingDevice) {
-            if (null === $device->getTrackingId()) {
-                $device->setTrackingId($this->getUniqueTrackingIdentifier());
-            }
+        if (null !== $existingDevice) {
+            $device = $existingDevice;
+        }
+
+        if (null === $device->getTrackingId()) {
+            // Ensure all devices have a tracking ID (new devices will not and pre 2.13.0 devices may not)
+            $device->setTrackingId($this->getUniqueTrackingIdentifier());
 
             $this->entityManager->persist($device);
             $this->entityManager->flush();
-        } else {
-            $device = $existingDevice;
         }
 
         $this->createTrackingCookies($device);
@@ -142,6 +143,15 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         $this->trackedDevice = $device;
 
         return $device;
+    }
+
+    public function clearTrackingCookies()
+    {
+        $this->cookieHelper->deleteCookie('mautic_device_id');
+        $this->cookieHelper->deleteCookie('mtc_id');
+        $this->cookieHelper->deleteCookie('mtc_sid');
+
+        $this->clearBcTrackingCookies();
     }
 
     /**
@@ -184,10 +194,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     private function createTrackingCookies(LeadDevice $device)
     {
-        // Delete old cookies
-        if ($deviceTrackingId = $this->getTrackedIdentifier()) {
-            $this->cookieHelper->deleteCookie($deviceTrackingId);
-        }
+        $this->clearBcTrackingCookies();
 
         // Device cookie
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
@@ -208,5 +215,15 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     {
         $this->cookieHelper->setCookie('mautic_session_id', $device->getTrackingId(), 31536000);
         $this->cookieHelper->setCookie($device->getTrackingId(), $device->getLead()->getId(), 31536000);
+    }
+
+    private function clearBcTrackingCookies()
+    {
+        // Delete old cookies
+        if ($deviceTrackingId = $this->getTrackedIdentifier()) {
+            $this->cookieHelper->deleteCookie($deviceTrackingId);
+        }
+
+        $this->cookieHelper->deleteCookie('mautic_session_id');
     }
 }
