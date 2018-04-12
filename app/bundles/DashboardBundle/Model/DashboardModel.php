@@ -11,14 +11,18 @@
 
 namespace Mautic\DashboardBundle\Model;
 
+use Doctrine\ORM\Query;
+use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\DashboardEvents;
+use Symfony\Component\Filesystem\Filesystem;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\FormModel;
-use Mautic\DashboardBundle\DashboardEvents;
-use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -101,12 +105,14 @@ class DashboardModel extends FormModel
 
     /**
      * Load widgets for the current user from database.
+     * 
+     * @param bool $ignorePaginator
      *
      * @return array
      */
-    public function getWidgets()
+    public function getWidgets($ignorePaginator = false)
     {
-        $widgets = $this->getEntities([
+        return $this->getEntities([
             'orderBy' => 'w.ordering',
             'filter'  => [
                 'force' => [
@@ -117,9 +123,74 @@ class DashboardModel extends FormModel
                     ],
                 ],
             ],
+            'ignore_paginator' => $ignorePaginator,
         ]);
+    }
 
-        return $widgets;
+    /**
+     * Creates an array that represents the dashboard and all its widgets.
+     * Useful for dashboard exports.
+     *
+     * @param string $name
+     * 
+     * @return array
+     */
+    public function toArray($name)
+    {
+        return [
+            'name'        => $name,
+            'description' => $this->generateDescription(),
+            'widgets'     => array_map(
+                function($widget) {
+                    return $widget->toArray();
+                },
+                $this->getWidgets(true)
+            ),
+        ];
+    }
+
+    /**
+     * Sanitize a string to format safe for a file name
+     *
+     * @param string $name
+     * 
+     * @return string
+     */
+    public function sanitizeNameForFileName($name, $ext = 'json')
+    {
+        return sprintf('%s.%s', InputHelper::alphanum($name, false, '_'), $ext);
+    }
+
+    /**
+     * Saves the dashboard snapshot to the user folder
+     *
+     * @param string $name
+     * 
+     * @throws IOException
+     */
+    public function saveSnapshot($name)
+    {
+        $dir        = $this->pathsHelper->getSystemPath('dashboard.user');
+        $filename   = $this->sanitizeNameForFileName($name);
+        $path       = $dir.'/'.$filename;
+        $fileSystem = new Filesystem();
+        $fileSystem->dumpFile($path, json_encode($this->toArray($name)));
+    }
+
+    /**
+     * Generates a translatable description for a dashboard.
+     *
+     * @return string
+     */
+    public function generateDescription()
+    {
+        return $this->translator->trans(
+            'mautic.dashboard.generated_by',
+            [
+                '%name%' => $this->userHelper->getUser()->getName(),
+                '%date%' => (new \DateTime())->format('Y-m-d H:i:s'),
+            ]
+        );
     }
 
     /**
@@ -147,7 +218,7 @@ class DashboardModel extends FormModel
      *
      * @return Widget
      */
-    public function populateWidgetEntity($data)
+    public function populateWidgetEntity(array $data)
     {
         $entity = new Widget();
 
@@ -249,6 +320,8 @@ class DashboardModel extends FormModel
         if (!$entity->getName()) {
             $entity->setName($this->translator->trans('mautic.widget.'.$entity->getType()));
         }
+
+        $entity->setDateModified(new \DateTime);
 
         parent::saveEntity($entity, $unlock);
     }
