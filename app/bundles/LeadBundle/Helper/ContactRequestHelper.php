@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2017 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://mautic.org
@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Exception\ContactNotFoundException;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
@@ -123,9 +124,11 @@ class ContactRequestHelper
         $this->trackedContact = $this->contactTracker->getContact();
         $this->queryFields    = $queryFields;
 
-        if ($foundContact = $this->getContactFromUrl()) {
+        try {
+            $foundContact         = $this->getContactFromUrl();
             $this->trackedContact = $foundContact;
             $this->contactTracker->setTrackedContact($this->trackedContact);
+        } catch (ContactNotFoundException $exception) {
         }
 
         $this->prepareContactFromRequest();
@@ -134,7 +137,9 @@ class ContactRequestHelper
     }
 
     /**
-     * @return Lead|null
+     * @return Lead
+     *
+     * @throws ContactNotFoundException
      */
     private function getContactFromUrl()
     {
@@ -146,11 +151,14 @@ class ContactRequestHelper
         }
 
         if (!is_array($clickthrough)) {
-            return null;
+            throw new ContactNotFoundException();
         }
 
-        if ($contact = $this->getContactFromEmailClickthrough()) {
+        try {
+            $contact = $this->getContactFromEmailClickthrough($clickthrough);
+
             return $contact;
+        } catch (ContactNotFoundException $exception) {
         }
 
         $this->setEmailFromClickthroughIdentification();
@@ -167,36 +175,36 @@ class ContactRequestHelper
             return $foundContact;
         }
 
-        if ($contact = $this->getContactByFingerprint()) {
-            return $contact;
-        }
-
-        return null;
+        return $this->getContactByFingerprint();
     }
 
     /**
      * Identify a contact through a clickthrough URL in an email.
      *
-     * @return Lead|null
+     * @param array $clickthrough
+     *
+     * @return Lead
+     *
+     * @throws ContactNotFoundException
      */
-    private function getContactFromEmailClickthrough()
+    private function getContactFromEmailClickthrough(array $clickthrough)
     {
+        // Nothing left to identify by so stick to the tracked lead
         if (empty($clickthrough['channel']['email']) && empty($clickthrough['stat'])) {
-            return null;
+            throw new ContactNotFoundException();
         }
 
-        // Nothing left to identify by so stick to the tracked lead
         /** @var Stat $stat */
         $stat = $this->emailStatRepository->findOneBy(['trackingHash' => $clickthrough['stat']]);
 
         if (!$stat) {
             // Stat doesn't exist so use the tracked lead
-            return null;
+            throw new ContactNotFoundException();
         }
 
         if ((int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
             // Email ID mismatch - fishy so use tracked lead
-            return null;
+            throw new ContactNotFoundException();
         }
 
         if ($statLead = $stat->getLead()) {
@@ -206,7 +214,7 @@ class ContactRequestHelper
             return $this->mergeWithTrackedContact($statLead);
         }
 
-        return null;
+        throw new ContactNotFoundException();
     }
 
     private function setEmailFromClickthroughIdentification()
@@ -230,18 +238,20 @@ class ContactRequestHelper
     }
 
     /**
-     * @return Lead|null
+     * @return Lead
+     *
+     * @throws ContactNotFoundException
      */
     private function getContactByFingerprint()
     {
         if (!$this->coreParametersHelper->getParameter('track_by_fingerprint')) {
             // Track by fingerprint is disabled so just use tracked lead
-            return null;
+            throw new ContactNotFoundException();
         }
 
         if (!$this->trackedContact->isAnonymous() || empty($this->queryFields['fingerprint'])) {
             // We already know who this is or fingerprint is not available so just use tracked lead
-            return null;
+            throw new ContactNotFoundException();
         }
 
         if ($device = $this->leadDeviceRepository->getDeviceByFingerprint($this->queryFields['fingerprint'])) {
@@ -253,7 +263,7 @@ class ContactRequestHelper
             return $this->mergeWithTrackedContact($deviceLead);
         }
 
-        return null;
+        throw new ContactNotFoundException();
     }
 
     private function prepareContactFromRequest()
