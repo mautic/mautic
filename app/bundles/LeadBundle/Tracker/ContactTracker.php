@@ -178,17 +178,16 @@ class ContactTracker
 
         // If for whatever reason this contact has not been saved yet, don't generate tracking cookies
         if (!$trackedContact->getId()) {
-            return;
-        }
-
-        if (!$previouslyTrackedContact) {
-            // New lead, set the tracking cookie
-            $this->generateTrackingCookies();
+            // Delete existing cookies to prevent tracking as someone else
+            $this->deviceTracker->clearTrackingCookies();
 
             return;
         }
 
-        if ($previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
+        // Generate cookies for the newly tracked contact
+        $this->generateTrackingCookies();
+
+        if ($previouslyTrackedContact && $previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
             $this->dispatchContactChangeEvent($previouslyTrackedContact, $previouslyTrackedId);
         }
     }
