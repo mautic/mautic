@@ -204,6 +204,7 @@ class EventScheduler
 
         switch ($event->getTriggerMode()) {
             case Event::TRIGGER_MODE_IMMEDIATE:
+            case null: // decision
                 $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
 
                 return $compareFromDateTime;

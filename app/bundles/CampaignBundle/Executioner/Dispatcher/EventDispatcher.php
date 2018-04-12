@@ -111,7 +111,7 @@ class EventDispatcher
 
         // Execute BC eventName or callback. Or support case where the listener has been converted to batchEventName but still wants to execute
         // eventName for BC support for plugins that could be listening to it's own custom event.
-        $this->legacyDispatcher->dispatchCustomEvent($config, $event, $logs, ($customEvent), $pendingEvent);
+        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, ($customEvent), $pendingEvent);
 
         return $pendingEvent;
     }

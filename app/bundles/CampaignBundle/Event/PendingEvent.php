@@ -111,6 +111,29 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
+     * Fail all that have not passed yet.
+     */
+    public function failRemaining($reason)
+    {
+        foreach ($this->logs as $log) {
+            if (!$this->successful->contains($log)) {
+                $this->fail($log, $reason);
+            }
+        }
+    }
+
+    /**
+     * @param ArrayCollection $logs
+     * @param                 $reason
+     */
+    public function failLogs(ArrayCollection $logs, $reason)
+    {
+        foreach ($logs as $log) {
+            $this->fail($log, $reason);
+        }
+    }
+
+    /**
      * @param LeadEventLog $log
      */
     public function pass(LeadEventLog $log)
@@ -153,6 +176,28 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
+     * @param ArrayCollection $logs
+     */
+    public function passLogs(ArrayCollection $logs)
+    {
+        foreach ($logs as $log) {
+            $this->pass($log);
+        }
+    }
+
+    /**
+     * Pass all that have not failed yet.
+     */
+    public function passRemaining()
+    {
+        foreach ($this->logs as $log) {
+            if (!$this->failures->contains($log)) {
+                $this->pass($log);
+            }
+        }
+    }
+
+    /**
      * @return ArrayCollection
      */
     public function getFailures()
@@ -181,17 +226,6 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @param LeadEventLog $log
      */
-    private function logChannel(LeadEventLog $log)
-    {
-        if ($this->channel) {
-            $log->setChannel($this->channel)
-                ->setChannelId($this->channelId);
-        }
-    }
-
-    /**
-     * @param LeadEventLog $log
-     */
     private function passLog(LeadEventLog $log)
     {
         if ($failedLog = $log->getFailedLog()) {
@@ -204,5 +238,16 @@ class PendingEvent extends AbstractLogCollectionEvent
             ->setDateTriggered($this->now);
 
         $this->successful->add($log);
+    }
+
+    /**
+     * @param LeadEventLog $log
+     */
+    private function logChannel(LeadEventLog $log)
+    {
+        if ($this->channel) {
+            $log->setChannel($this->channel)
+                ->setChannelId($this->channelId);
+        }
     }
 }

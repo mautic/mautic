@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFound;
 use Mautic\LeadBundle\Entity\Lead;
 
 abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispatcher\Event
@@ -98,12 +99,18 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
     }
 
     /**
-     * @param int $id
+     * @param $id
      *
      * @return mixed|null
+     *
+     * @throws NoContactsFound
      */
     public function findLogByContactId($id)
     {
+        if (!isset($this->logContactXref[$id])) {
+            throw new NoContactsFound();
+        }
+
         return $this->logs->get($this->logContactXref[$id]);
     }
 

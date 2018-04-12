@@ -88,7 +88,6 @@ class LegacyEventDispatcher
 
     /**
      * @param AbstractEventAccessor $config
-     * @param Event                 $event
      * @param ArrayCollection       $logs
      * @param                       $wasBatchProcessed
      * @param PendingEvent          $pendingEvent
@@ -97,7 +96,6 @@ class LegacyEventDispatcher
      */
     public function dispatchCustomEvent(
         AbstractEventAccessor $config,
-        Event $event,
         ArrayCollection $logs,
         $wasBatchProcessed,
         PendingEvent $pendingEvent
@@ -131,6 +129,10 @@ class LegacyEventDispatcher
             if (!$wasBatchProcessed) {
                 $this->dispatchExecutionEvent($config, $log, $result);
 
+                if (is_array($result)) {
+                    $log->appendToMetadata($result);
+                }
+
                 // Dispatch new events for legacy processed logs
                 if ($this->isFailed($result)) {
                     $this->processFailedLog($result, $log, $pendingEvent);
@@ -142,7 +144,12 @@ class LegacyEventDispatcher
                     continue;
                 }
 
-                $pendingEvent->pass($log);
+                if (is_array($result) && !empty($result['failed']) && isset($result['reason'])) {
+                    $pendingEvent->passWithError($log, (string) $result['reason']);
+                } else {
+                    $pendingEvent->pass($log);
+                }
+
                 $this->dispatchExecutedEvent($config, $log);
             }
         }
@@ -221,10 +228,12 @@ class LegacyEventDispatcher
 
         $this->dispatcher->dispatch($eventName, $campaignEvent);
 
-        $result = $campaignEvent->getResult();
+        if ($channel = $campaignEvent->getChannel()) {
+            $log->setChannel($channel)
+                ->setChannelId($campaignEvent->getChannelId());
+        }
 
-        $log->setChannel($campaignEvent->getChannel())
-            ->setChannelId($campaignEvent->getChannelId());
+        $result = $campaignEvent->getResult();
 
         return $result;
     }

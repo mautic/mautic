@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
 use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 
@@ -34,18 +35,19 @@ class Action implements EventInterface
      */
     public function __construct(EventDispatcher $dispatcher)
     {
-        $this->dispatcher  = $dispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
+     * @param ActionAccessor  $config
+     * @param ArrayCollection $logs
      *
      * @return mixed|void
      *
      * @throws CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \ReflectionException
      */
     public function executeLogs(AbstractEventAccessor $config, ArrayCollection $logs)
     {

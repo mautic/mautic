@@ -152,7 +152,6 @@ class Event implements ChannelInterface
      */
     public function __clone()
     {
-        $this->id        = null;
         $this->tempId    = null;
         $this->campaign  = null;
         $this->channel   = null;
@@ -384,6 +383,11 @@ class Event implements ChannelInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    public function nullId()
+    {
+        $this->id = null;
     }
 
     /**
