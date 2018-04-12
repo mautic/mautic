@@ -216,6 +216,7 @@ return [
                     'mautic.lead.model.list',
                     'mautic.form.model.form',
                     'mautic.campaign.event_collector',
+                    'mautic.campaign.helper.removed_contact_tracker',
                 ],
             ],
             'mautic.campaign.model.event'     => [
@@ -375,6 +376,7 @@ return [
                     'mautic.campaign.executioner.decision',
                     'monolog.logger.mautic',
                     'mautic.campaign.scheduler',
+                    'mautic.campaign.helper.removed_contact_tracker',
                 ],
             ],
             'mautic.campaign.executioner.kickoff'     => [
@@ -430,6 +432,9 @@ return [
                     'mautic.campaign.repository.event',
                     'monolog.logger.mautic',
                 ],
+            ],
+            'mautic.campaign.helper.removed_contact_tracker' => [
+                'class' => \Mautic\CampaignBundle\Helper\RemovedContactTracker::class,
             ],
             // @deprecated 2.13.0 for BC support; to be removed in 3.0
             'mautic.campaign.legacy_event_dispatcher' => [

@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\TypeNotFoundException;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -24,6 +25,7 @@ use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
@@ -75,6 +77,11 @@ class EventExecutioner
     private $responses;
 
     /**
+     * @var RemovedContactTracker
+     */
+    private $removedContactTracker;
+
+    /**
      * EventExecutioner constructor.
      *
      * @param EventCollector  $eventCollector
@@ -92,16 +99,18 @@ class EventExecutioner
         Condition $conditionExecutioner,
         Decision $decisionExecutioner,
         LoggerInterface $logger,
-        EventScheduler $scheduler
+        EventScheduler $scheduler,
+        RemovedContactTracker $removedContactTracker
     ) {
-        $this->actionExecutioner    = $actionExecutioner;
-        $this->conditionExecutioner = $conditionExecutioner;
-        $this->decisionExecutioner  = $decisionExecutioner;
-        $this->collector            = $eventCollector;
-        $this->eventLogger          = $eventLogger;
-        $this->logger               = $logger;
-        $this->scheduler            = $scheduler;
-        $this->now                  = new \DateTime();
+        $this->actionExecutioner     = $actionExecutioner;
+        $this->conditionExecutioner  = $conditionExecutioner;
+        $this->decisionExecutioner   = $decisionExecutioner;
+        $this->collector             = $eventCollector;
+        $this->eventLogger           = $eventLogger;
+        $this->logger                = $logger;
+        $this->scheduler             = $scheduler;
+        $this->removedContactTracker = $removedContactTracker;
+        $this->now                   = new \DateTime();
     }
 
     /**
@@ -178,6 +187,8 @@ class EventExecutioner
         }
 
         $config = $this->collector->getEventConfig($event);
+
+        $this->checkForRemovedContacts($logs);
 
         if ($counter) {
             $counter->advanceExecuted($logs->count());
@@ -439,5 +450,25 @@ class EventExecutioner
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
             ->clear();
+    }
+
+    /**
+     * @param ArrayCollection $logs
+     */
+    private function checkForRemovedContacts(ArrayCollection $logs)
+    {
+        /**
+         * @var int
+         * @var LeadEventLog $log
+         */
+        foreach ($logs as $key => $log) {
+            $contactId  = $log->getLead()->getId();
+            $campaignId = $log->getCampaign()->getId();
+
+            if ($this->removedContactTracker->wasContactRemoved($campaignId, $contactId)) {
+                $this->logger->debug("CAMPAIGN: Contact ID# $contactId has been removed from campaign ID $campaignId");
+                $logs->remove($key);
+            }
+        }
     }
 }

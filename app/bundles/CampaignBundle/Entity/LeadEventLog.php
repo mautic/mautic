@@ -365,7 +365,7 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @return mixed
+     * @return Campaign
      */
     public function getCampaign()
     {

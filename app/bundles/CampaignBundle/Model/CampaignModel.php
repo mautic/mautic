@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -69,24 +70,27 @@ class CampaignModel extends CommonFormModel
     private $eventCollector;
 
     /**
-     * @var array
+     * @var RemovedContactTracker
      */
-    private $removedLeads = [];
+    private $removedContactTracker;
 
     /**
      * CampaignModel constructor.
      *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param LeadModel            $leadModel
-     * @param ListModel            $leadListModel
-     * @param FormModel            $formModel
+     * @param CoreParametersHelper  $coreParametersHelper
+     * @param LeadModel             $leadModel
+     * @param ListModel             $leadListModel
+     * @param FormModel             $formModel
+     * @param EventCollector        $eventCollector
+     * @param RemovedContactTracker $removedContactTracker
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         LeadModel $leadModel,
         ListModel $leadListModel,
         FormModel $formModel,
-        EventCollector $eventCollector
+        EventCollector $eventCollector,
+        RemovedContactTracker $removedContactTracker
     ) {
         $this->leadModel              = $leadModel;
         $this->leadListModel          = $leadListModel;
@@ -94,6 +98,7 @@ class CampaignModel extends CommonFormModel
         $this->batchSleepTime         = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
         $this->batchCampaignSleepTime = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
         $this->eventCollector         = $eventCollector;
+        $this->removedContactTracker  = $removedContactTracker;
     }
 
     /**
@@ -782,7 +787,7 @@ class CampaignModel extends CommonFormModel
                 $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             }
 
-            $this->removedLeads[$campaign->getId()][$leadId] = $leadId;
+            $this->removedContactTracker->addRemovedContact($campaign->getId(), $leadId);
             $campaignLead = (!$skipFindOne)
                 ?
                 $this->getCampaignLeadRepository()->findOneBy(
@@ -844,14 +849,6 @@ class CampaignModel extends CommonFormModel
 
             unset($campaignLead, $lead);
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function getRemovedLeads()
-    {
-        return  $this->removedLeads;
     }
 
     /**
@@ -1305,5 +1302,15 @@ class CampaignModel extends CommonFormModel
         }
 
         return $channelSet;
+    }
+
+    /**
+     * @return array
+     *
+     * @deprecated 2.14.0 to be removed in 3.0
+     */
+    public function getRemovedLeads()
+    {
+        return  $this->removedContactTracker->getRemovedContacts();
     }
 }
