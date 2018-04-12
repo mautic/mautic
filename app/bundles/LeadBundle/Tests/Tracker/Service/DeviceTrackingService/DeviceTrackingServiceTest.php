@@ -293,7 +293,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
         $leadDeviceMock->expects($this->exactly(3))
             ->method('getLead')
             ->willReturn(new Lead());
-        $this->cookieHelperMock->expects($this->at(2))
+        $this->cookieHelperMock->expects($this->at(3))
             ->method('setCookie')
             ->with('mautic_device_id', $uniqueTrackingIdentifier, 31536000);
 
@@ -353,7 +353,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getLead')
             ->willReturn(new Lead());
 
-        $this->cookieHelperMock->expects($this->at(2))
+        $this->cookieHelperMock->expects($this->at(3))
             ->method('setCookie')
             ->with('mautic_device_id', $uniqueTrackingIdentifier, 31536000);
 
