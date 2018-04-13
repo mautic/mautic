@@ -84,13 +84,16 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->em->flush();
     }
 
-    protected function createLead($companies = [], User $owner = null)
+    protected function createLead($companies = [], User $owner = null, $data = [])
     {
         $lead = new Lead();
         $lead->setFirstname('Firstname');
         $lead->setLastname('Lastname');
         $lead->setEmail('test@test.com');
         $lead->setPhone('555-666-777');
+        foreach ($data as $alias => $value) {
+            $lead->addUpdatedField($alias, $value);
+        }
 
         if ($owner) {
             $lead->setOwner($owner);
@@ -109,6 +112,10 @@ abstract class PipedriveTest extends MauticMysqlTestCase
             $companyModel->addLeadToCompany($company, $lead);
             $lead->setCompany($company->getName());
         }
+        // need modified date due import data to Pipedrive
+        $lead->setDateModified(new \DateTime('2099-01-01T15:03:01.012345Z'));
+        $this->em->persist($lead);
+        $this->em->flush();
 
         return $lead;
     }

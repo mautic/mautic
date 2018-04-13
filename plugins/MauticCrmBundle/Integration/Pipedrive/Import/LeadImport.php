@@ -132,7 +132,7 @@ class LeadImport extends AbstractImport
             return;
         }
 
-        if (!isset($data['org_id']) && $lead->getCompany()) {
+        if (empty($data['org_id']) && $lead->getCompany()) {
             $this->removeLeadFromCompany($lead->getCompany(), $lead);
         } elseif (isset($data['org_id'])) {
             $this->addLeadToCompany($data['org_id'], $lead);
