@@ -12,7 +12,6 @@
 namespace Mautic\DashboardBundle\Tests\Entity;
 
 use Mautic\DashboardBundle\Entity\Widget;
-use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
 class WidgetTest extends \PHPUnit_Framework_TestCase
 {

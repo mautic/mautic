@@ -272,7 +272,7 @@ class DashboardController extends FormController
     /**
      * Saves the widgets of current user into a json and stores it for later as a file.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function saveAction()
     {
@@ -285,7 +285,7 @@ class DashboardController extends FormController
         try {
             $this->getModel('dashboard')->saveSnapshot($name);
             $type = 'notice';
-            $msg = $this->get('translator')->trans('mautic.dashboard.notice.save', [
+            $msg = $this->translator->trans('mautic.dashboard.notice.save', [
                 '%name%'    => $name,
                 '%viewUrl%' => $this->generateUrl(
                     'mautic_dashboard_action',
@@ -296,7 +296,7 @@ class DashboardController extends FormController
             ], 'flashes');
         } catch (IOException $e) {
             $type = 'error';
-            $this->get('translator')->trans('mautic.dashboard.error.save', [
+            $msg = $this->translator->trans('mautic.dashboard.error.save', [
                 '%msg%' => $e->getMessage(),
             ], 'flashes');
         }
@@ -439,14 +439,14 @@ class DashboardController extends FormController
                         } else {
                             $form->addError(
                                 new FormError(
-                                    $this->get('translator')->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
+                                    $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
                                 )
                             );
                         }
                     } else {
                         $form->addError(
                             new FormError(
-                                $this->get('translator')->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
+                                $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
                             )
                         );
                     }
