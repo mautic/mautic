@@ -114,9 +114,10 @@ return [
                 'alias' => 'mobilenotification_list',
             ],
         ],
+*/
         'helpers' => [
             'mautic.helper.notification' => [
-                'class'     => 'Mautic\NotificationBundle\Helper\NotificationHelper',
+                'class'     => 'MauticPlugin\FCMNotificationBundle\Helper\NotificationHelper',
                 'alias'     => 'notification_helper',
                 'arguments' => [
                     'mautic.factory',
@@ -128,6 +129,7 @@ return [
                 ],
             ],
         ],
+/*
         'other' => [
             'mautic.notification.api' => [
                 'class'     => 'Mautic\NotificationBundle\Api\OneSignalApi',

@@ -156,7 +156,7 @@ var config = {
 
 var postUserIdToMautic = function(userId) {
     var data = [];
-    data['osid'] = userId;
+    data['fcm_id'] = userId;
     MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}', data);
 };
     
@@ -207,7 +207,7 @@ JS;
         $server      = $this->request->getCurrentRequest()->server;
         $cookies     = $this->request->getCurrentRequest()->cookies;
         // already exist
-        if ($cookies->get('mtc_osid')) {
+        if ($cookies->get('mtc_fcm_id')) {
             return false;
         }
 
