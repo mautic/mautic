@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -47,19 +48,64 @@ class LeadDeviceRepository extends CommonRepository
     }
 
     /**
-     * @param      $lead
-     * @param null $deviceNames
-     * @param null $deviceBrands
-     * @param null $deviceModels
-     * @param null $deviceId
+     * @param $lead
+     * @param null   $deviceNames
+     * @param null   $deviceBrands
+     * @param null   $deviceModels
+     * @param null   $deviceOss
+     * @param null   $deviceId
+     * @param string $sort
+     * @param string $order
      *
      * @return array
      */
-    public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)
+    public function getDevices($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null, $sort = 'date_added', $order = 'DESC')
+    {
+        //get totals
+        $sq = $this->getDeviceQuery($lead, $deviceNames, $deviceBrands, $deviceModels, $deviceOss, $deviceId)
+            ->select('*')
+            ->orderBy($sort, $order);
+        $devices = $sq->execute()->fetchAll();
+
+        return (!empty($devices)) ? $devices : [];
+    }
+
+    /**
+     * @param $lead
+     * @param null   $deviceNames
+     * @param null   $deviceBrands
+     * @param null   $deviceModels
+     * @param null   $deviceOss
+     * @param null   $deviceId
+     * @param string $sort
+     * @param string $order
+     *
+     * @return array|mixed
+     */
+    public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null, $sort = 'date_added', $order = 'DESC')
+    {
+        $sq = $this->getDeviceQuery($lead, $deviceNames, $deviceBrands, $deviceModels, $deviceOss, $deviceId)
+            ->select('es.id as id, es.device as device, es.device_fingerprint')
+            ->orderBy($sort, $order);
+        $device = $sq->execute()->fetch();
+
+        return (!empty($device)) ? $device : [];
+    }
+
+    /**
+     * @param $lead
+     * @param null $deviceNames
+     * @param null $deviceBrands
+     * @param null $deviceModels
+     * @param null $deviceOss
+     * @param null $deviceId
+     *
+     * @return QueryBuilder
+     */
+    public function getDeviceQuery($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id, es.device as device, es.device_fingerprint')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
+        $sq->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
         if (!empty($statIds)) {
             $inIds = (!is_array($statIds)) ? [(int) $statIds] : $statIds;
 
@@ -126,10 +172,7 @@ class LeadDeviceRepository extends CommonRepository
             );
         }
 
-        //get totals
-        $device = $sq->execute()->fetchAll();
-
-        return (!empty($device)) ? $device[0] : [];
+        return $sq;
     }
 
     /**

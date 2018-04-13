@@ -321,12 +321,11 @@ class LeadController extends FormController
         ) {
             return $this->accessDenied();
         }
-
         $fields            = $lead->getFields();
         $integrationHelper = $this->get('mautic.helper.integration');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-        /* @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        /* @var \Mautic\LeadBundle\Model\CompanyModel $companyModel */
 
         $companyModel = $this->getModel('lead.company');
 
@@ -348,6 +347,10 @@ class LeadController extends FormController
             }
         }
 
+        // If lead has subscribed on multiple devices, get all of them.
+        /** @var \Mautic\NotificationBundle\Entity\PushID[] $pushIDs */
+        $pushIDs = $lead->getPushIDs();
+
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo       = $this->getModel('email')->getRepository();
@@ -363,6 +366,8 @@ class LeadController extends FormController
                     'socialProfiles'    => $socialProfiles,
                     'socialProfileUrls' => $socialProfileUrls,
                     'places'            => $this->getPlaces($lead),
+                    'devices'           => $model->getDeviceRepository()->getDevices($lead),
+                    'pushIds'           => $pushIDs,
                     'permissions'       => $permissions,
                     'events'            => $this->getEngagements($lead),
                     'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),

@@ -317,6 +317,28 @@ $view['slots']->set(
                         </a>
                     </li>
                 <?php endif; ?>
+
+                <?php if (!empty($devices)): ?>
+                    <li class="">
+                        <a href="#device-container" role="tab" data-toggle="tab">
+                        <span class="label label-primary mr-sm" id="DeviceCount">
+                            <?php echo count($devices); ?>
+                        </span>
+                            <?php echo $view['translator']->trans('mautic.lead.lead.tab.devices'); ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <?php if (!empty($pushIds)): ?>
+                    <li class="">
+                        <a href="#pushids-container" role="tab" data-toggle="tab">
+                        <span class="label label-primary mr-sm" id="PushIdsCount">
+                            <?php echo count($pushIds); ?>
+                        </span>
+                            <?php echo $view['translator']->trans('mautic.notification.notifications.devices'); ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
                 
                 <?php echo $view['content']->getCustomContent('tabs', $mauticTemplateVars); ?>
             </ul>
@@ -395,6 +417,29 @@ $view['slots']->set(
                 </div>
             <?php endif; ?>
             <!--/ #place-container -->
+            <!-- #device-container -->
+            <?php if (!empty($devices)): ?>
+                <div class="tab-pane fade bdr-w-0" id="device-container">
+                    <?php
+                    echo $view->render('MauticLeadBundle:Device:list.html.php',
+                        [
+                            'devices' => $devices,
+                        ]); ?>
+                </div>
+            <?php endif; ?>
+            <!--/ #device-container -->
+
+            <!-- #pushids-container -->
+            <?php if (!empty($pushIds)): ?>
+                <div class="tab-pane fade bdr-w-0" id="pushids-container">
+                    <?php
+                    echo $view->render('MauticLeadBundle:Push:list.html.php',
+                        [
+                            'pushIds' => $pushIds,
+                        ]); ?>
+                </div>
+            <?php endif; ?>
+            <!--/ #pushids-container -->
         </div>
         <!--/ end: tab-content -->
     </div>
