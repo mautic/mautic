@@ -79,6 +79,7 @@ class FCMIntegration extends AbstractIntegration
             'apiKey'        => 'mautic.plugin.fcmnotification.config.form.notification.apikey',            
             'projectId'  => 'mautic.plugin.fcmnotification.config.form.notification.projectid',
             'messagingSenderId' => 'mautic.plugin.fcmnotification.config.form.notification.messagingsenderid',
+            'publicVapidKey' => 'mautic.plugin.fcmnotification.config.form.notification.vapid',
         ];
     }
 

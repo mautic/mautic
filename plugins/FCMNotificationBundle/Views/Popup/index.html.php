@@ -116,6 +116,22 @@
 
     </div>
 </div>
+<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "{TODO: ADD API KEY HERE!!!}",
+    authDomain: "{projectId}.firebaseapp.com",
+    databaseURL: "https://{projectId}.firebaseio.com",
+    projectId: "{projectId}",
+    storageBucket: "",
+    messagingSenderId: "{messagingSenderId}"
+  };
+  firebase.initializeApp(config);
+
+  const messaging = firebase.messaging();
+  messaging.usePublicVapidKey("{TODO: ADD API KEY HERE!!!}");
+</script>
 <script>
     /* returns true if device is mobile or tablet */
     function detectmob() {
@@ -144,8 +160,7 @@
     var os = result.os.name;
     var engine = result.engine.name;
 
-    const messaging = firebase.messaging();
-    messaging.usePublicVapidKey("{TODO: ADD API KEY HERE!!!}");
+    
 
 
 
