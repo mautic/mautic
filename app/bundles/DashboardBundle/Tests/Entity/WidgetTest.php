@@ -49,4 +49,41 @@ class WidgetTest extends \PHPUnit_Framework_TestCase
         $widget->setType('map.of.leads<script>console.log(\'yellow\');</script>');
         $this->assertEquals('map.of.leadsconsole.log(\'yellow\');', $widget->getType());
     }
+
+    public function testToArrayEmpty()
+    {
+        $widget = new Widget;
+        $expected = [
+            'name' => null,
+            'width' => null,
+            'height' => null,
+            'ordering' => null,
+            'type' => null,
+            'params' => [],
+            'template' => null,
+        ];
+        $this->assertEquals($expected, $widget->toArray());
+    }
+
+    public function testToArrayFilled()
+    {
+        $widget = new Widget;
+        $widget->setName('The itsy bitsy spider');
+        $widget->setWidth(4);
+        $widget->setHeight(5);
+        $widget->setOrdering(6);
+        $widget->setType('climed up');
+        $widget->setParams([]);
+        $widget->setTemplate('the water spout');
+        $expected = [
+            'name' => 'The itsy bitsy spider',
+            'width' => 4,
+            'height' => 5,
+            'ordering' => 6,
+            'type' => 'climed up',
+            'params' => [],
+            'template' => 'the water spout',
+        ];
+        $this->assertEquals($expected, $widget->toArray());
+    }
 }
