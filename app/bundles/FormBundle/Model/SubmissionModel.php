@@ -362,16 +362,14 @@ class SubmissionModel extends CommonFormModel
         $this->validateActionCallbacks($submissionEvent, $validationErrors, $alias);
 
         // Create/update lead
-        $lead = null;
         if (!empty($leadFieldMatches)) {
             $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
         }
 
         // Get updated lead if applicable with tracking ID
-        /** @var Lead $lead */
-        $lead          = $this->leadModel->getCurrentLead();
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
         $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+        $lead          = ($trackedDevice === null ? null : $trackedDevice->getLead());
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
             ->setLead($lead);
