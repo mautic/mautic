@@ -84,6 +84,7 @@ class MAConsumerCommand extends ModeratedCommand
                 'cafile'=>getenv("RABBITMQ_SSL_CACERT_FILE"),
                 'local_cert'=>getenv("RABBITMQ_SSL_CERT_FILE"),
                 'local_pk'=>getenv("RABBITMQ_SSL_KEY_FILE"),
+                'verify_peer_name'=>false,
             ]);
         $channel = $connection->channel();
 
