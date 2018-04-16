@@ -604,25 +604,11 @@ class ReportModel extends FormModel
                     $start = 0;
                 }
 
-                // Must make two queries here, one to get count and one to select data
-                $select = $parts['select'];
-
-                // Get the count
-                $query->select('COUNT(*) as count');
-                $countQuery = clone $query;
-                $countQuery->resetQueryPart('groupBy');
-
-                $result       = $countQuery->execute()->fetchAll();
-                $totalResults = (!empty($result[0]['count'])) ? $result[0]['count'] : 0;
-                unset($countQuery);
-
-                // Set the limit and get the results
+                $totalResults = $query->execute()->rowCount();
                 if ($limit > 0) {
                     $query->setFirstResult($start)
                         ->setMaxResults($limit);
                 }
-
-                $query->select($select);
             }
 
             $query->add('orderBy', $order);
