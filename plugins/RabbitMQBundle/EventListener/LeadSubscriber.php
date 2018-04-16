@@ -144,10 +144,8 @@ class LeadSubscriber extends CommonSubscriber
         $channel->exchange_declare('kiazaki', 'topic', false, true, false);
 
         $msg = new AMQPMessage($data);
-        for ($i=0; $i < 1; $i++) { 
-            $channel->basic_publish($msg, 'kiazaki', 'stest');
-        }
-        //$channel->basic_publish($msg, 'kiazaki', 'stest');
+        
+        $channel->basic_publish($msg, 'kiazaki', 'mautic.contact');
 
         $channel->close();
         $connection->close();
