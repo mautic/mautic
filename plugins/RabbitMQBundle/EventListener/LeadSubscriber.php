@@ -136,6 +136,7 @@ class LeadSubscriber extends CommonSubscriber
                 'cafile'=>getenv("RABBITMQ_SSL_CACERT_FILE"),
                 'local_cert'=>getenv("RABBITMQ_SSL_CERT_FILE"),
                 'local_pk'=>getenv("RABBITMQ_SSL_KEY_FILE"),
+                'verify_peer_name'=>false,
             ]);
         $channel = $connection->channel();
 
@@ -143,8 +144,10 @@ class LeadSubscriber extends CommonSubscriber
         $channel->exchange_declare('kiazaki', 'topic', false, true, false);
 
         $msg = new AMQPMessage($data);
-
-        $channel->basic_publish($msg, 'kiazaki', 'mautic.contact');
+        for ($i=0; $i < 1; $i++) { 
+            $channel->basic_publish($msg, 'kiazaki', 'stest');
+        }
+        //$channel->basic_publish($msg, 'kiazaki', 'stest');
 
         $channel->close();
         $connection->close();
