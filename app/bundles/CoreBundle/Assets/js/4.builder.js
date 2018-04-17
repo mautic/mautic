@@ -751,20 +751,20 @@ Mautic.initSectionListeners = function () {
             }
 
             // Prefill The Backgrounf Image
-            if (bgImage = section.css('background-image')) {
-                sectionForm.find('#builder_section_content-background-image').val(bgImage.replace(/url\((?:'|")(.+)(?:'|")\)/g, '$1'))
+            if (bgImage = sectionWrapper.css('background-image')) {
+                sectionForm.find('#builder_section_wrapper-background-image').val(bgImage.replace(/url\((?:'|")(.+)(?:'|")\)/g, '$1'))
             }
 
             // Prefill The Background Size
-            if (bgSize = section.css('background-size')) {
+            if (bgSize = sectionWrapper.css('background-size')) {
                 bgSize = bgSize.split(' ')
-                sectionForm.find('#builder_section_content-background-size-width').val(bgSize[0] || 'auto')
-                sectionForm.find('#builder_section_content-background-size-height').val(bgSize[1] || 'auto')
+                sectionForm.find('#builder_section_wrapper-background-size-width').val(bgSize[0] || 'auto')
+                sectionForm.find('#builder_section_wrapper-background-size-height').val(bgSize[1] || 'auto')
             }
 
             // Prefill The Background Repeat
-            if (bgRepeat = section.css('background-repeat')) {
-                sectionForm.find('#builder_section_content-background-repeat').val(bgRepeat);
+            if (bgRepeat = sectionWrapper.css('background-repeat')) {
+                sectionForm.find('#builder_section_wrapper-background-repeat').val(bgRepeat);
             }
 
 
@@ -776,6 +776,7 @@ Mautic.initSectionListeners = function () {
             // Handle color change events
             sectionForm.on('keyup paste change touchmove', function (e) {
                 var field = mQuery(e.target);
+
                 switch (field.attr('id')) {
                     case 'builder_section_content-background-color':
                         Mautic.sectionBackgroundChanged(section, field.val());
@@ -783,28 +784,24 @@ Mautic.initSectionListeners = function () {
                     case 'builder_section_wrapper-background-color':
                         Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
                         break;
-                    case 'builder_section_content-background-image':
-                        if (field.val().match(/url\(.+\)/g)) {
-                            section.css('background-image', field.val());
-                            return
-                        }
-                        section.css('background-image', "url(" + field.val() + ")");
+                    case 'builder_section_wrapper-background-image':
+                        Mautic.sectionBackgroundImageChanged(sectionWrapper, field.val());
                         break;
-                    case 'builder_section_content-background-repeat':
-                        section.css('background-repeat', field.val());
+                    case 'builder_section_wrapper-background-repeat':
+                        sectionWrapper.css('background-repeat', field.val());
                         break;
-                    case 'builder_section_content-background-size-height':
+                    case 'builder_section_wrapper-background-size-height':
                         Mautic.sectionBackgroundSize(
-                            section,
-                            window.parent.document.getElementById('builder_section_content-background-size-width').value,
+                            sectionWrapper,
+                            document.querySelector('builder_section_wrapper-background-size-width').value,
                             field.val()
                         );
                         break;
-                    case 'builder_section_content-background-size-width':
+                    case 'builder_section_wrapper-background-size-width':
                         Mautic.sectionBackgroundSize(
                             section,
                             field.val(),
-                            window.parent.document.getElementById('builder_section_content-background-size-height').value
+                            document.querySelector('builder_section_wrapper-background-size-height').value
                         );
                         break;
                 }
@@ -935,6 +932,21 @@ Mautic.sectionBackgroundChanged = function (element, color) {
             Mautic.setTextSlotEditorStyle(parent.mQuery('#slot_text_content'), focusedSlot);
         }
     });
+};
+
+Mautic.sectionBackgroundImageChanged = function (element, imageUrl) {
+    var regWrappedInUrl = /url\(.+\)/g
+    var match = regWrappedInUrl.exec(imageUrl)
+
+    if (!imageUrl || imageUrl === 'none') {
+        return element.css('background-image', imageUrl);
+    }
+
+    if (match) {
+        return element.css('background-image', imageUrl);
+    }
+
+    return element.css('background-image', "url(" + imageUrl + ")");
 };
 
 Mautic.sectionBackgroundSize = function (element, width, height) {

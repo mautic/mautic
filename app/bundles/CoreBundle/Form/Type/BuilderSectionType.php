@@ -38,9 +38,21 @@ class BuilderSectionType extends AbstractType
             ],
         ]);
 
+        // Wrapper - background-color
+        $builder->add('wrapper-background-color', 'text', [
+            'label'      => 'mautic.core.wrapper.background.color',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'background-color',
+                'data-toggle'     => 'color',
+            ],
+        ]);
+
         // Content - Background Image
-        $builder->add('content-background-image', 'url', [
-            'label'      => 'background-image',
+        $builder->add('wrapper-background-image', 'url', [
+            'label'      => 'mautic.core.wrapper.background.image',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
@@ -52,7 +64,7 @@ class BuilderSectionType extends AbstractType
 
         // Content - Background Repeat
         $builder->add(
-            'content-background-repeat',
+            'wrapper-background-repeat',
             ChoiceType::class,
         [
             'choices' => [
@@ -65,7 +77,7 @@ class BuilderSectionType extends AbstractType
                 'repeat-space'  => 'repeat-space',
                 'space-round'   => 'space-round',
             ],
-            'label'      => 'Content Background Repeat',
+            'label'      => 'mautic.core.wrapper.background.repeat',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
@@ -77,8 +89,8 @@ class BuilderSectionType extends AbstractType
         );
 
         // Content - Background Size Width
-        $builder->add('content-background-size-width', 'text', [
-            'label'      => 'Content Background Size Width',
+        $builder->add('wrapper-background-size-width', 'text', [
+            'label'      => 'mautic.core.wrapper.background.size.width',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
@@ -89,26 +101,14 @@ class BuilderSectionType extends AbstractType
         ]);
 
         // Content - Background Size Height
-        $builder->add('content-background-size-height', 'text', [
-            'label'      => 'Content Background Size Height',
+        $builder->add('wrapper-background-size-height', 'text', [
+            'label'      => 'mautic.core.wrapper.background.size.height',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
                 'class'           => 'form-control',
                 'data-slot-param' => 'background-size',
                 'data-toggle'     => 'background-size',
-            ],
-        ]);
-
-        // Wrapper - background-color
-        $builder->add('wrapper-background-color', 'text', [
-            'label'      => 'mautic.core.wrapper.background.color',
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-            'attr'       => [
-                'class'           => 'form-control',
-                'data-slot-param' => 'background-color',
-                'data-toggle'     => 'color',
             ],
         ]);
     }
