@@ -57,8 +57,7 @@ class BuilderSectionType extends AbstractType
             'required'   => false,
             'attr'       => [
                 'class'           => 'form-control',
-                'value'           => 'none',
-                'data-slot-param' => 'background-image',
+                'value'           => 'none'
             ],
         ]);
 
@@ -81,9 +80,7 @@ class BuilderSectionType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
-                'class'           => 'form-control',
-                'data-slot-param' => 'background-repeat',
-                'data-toggle'     => 'background-repeat',
+                'class'           => 'form-control'
             ],
         ]
         );
@@ -94,9 +91,7 @@ class BuilderSectionType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
-                'class'           => 'form-control',
-                'data-slot-param' => 'background-size',
-                'data-toggle'     => 'background-size',
+                'class'           => 'form-control'
             ],
         ]);
 
@@ -106,9 +101,7 @@ class BuilderSectionType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
-                'class'           => 'form-control',
-                'data-slot-param' => 'background-size',
-                'data-toggle'     => 'background-size',
+                'class'           => 'form-control'
             ],
         ]);
     }

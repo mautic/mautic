@@ -793,15 +793,15 @@ Mautic.initSectionListeners = function () {
                     case 'builder_section_wrapper-background-size-height':
                         Mautic.sectionBackgroundSize(
                             sectionWrapper,
-                            document.querySelector('builder_section_wrapper-background-size-width').value,
+                            window.parent.document.getElementById('builder_section_wrapper-background-size-width').value,
                             field.val()
                         );
                         break;
                     case 'builder_section_wrapper-background-size-width':
                         Mautic.sectionBackgroundSize(
-                            section,
+                            sectionWrapper,
                             field.val(),
-                            document.querySelector('builder_section_wrapper-background-size-height').value
+                            window.parent.document.getElementById('builder_section_wrapper-background-size-height').value
                         );
                         break;
                 }
