@@ -58,6 +58,9 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.button.subscriber' => [
+                'class' => \Mautic\CategoryBundle\EventListener\ButtonSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.category' => [
