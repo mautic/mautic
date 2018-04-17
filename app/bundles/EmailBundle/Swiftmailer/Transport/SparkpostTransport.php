@@ -242,14 +242,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             }
         }
 
-        if (isset($message['replyTo'])) {
-            $headers['Reply-To'] = !empty($message['replyTo']['name'])
-                ?
-                sprintf('%s <%s>', $message['replyTo']['email'], $message['replyTo']['name'])
-                :
-                $message['replyTo']['email'];
-        }
-
         $content = [
             'from'    => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
                 : $message['from']['email'],
@@ -263,6 +255,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
         if (!empty($message['text'])) {
             $content['text'] = $message['text'];
+        }
+
+        // Add Reply To
+        if (isset($message['replyTo'])) {
+            $content['reply_to'] = $message['replyTo']['email'];
         }
 
         $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
@@ -291,6 +288,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             }
             $sparkPostMessage['content']['attachments'] = $message['attachments'];
         }
+
+        $sparkPostMessage['options'] = [
+            'open_tracking'  => false,
+            'click_tracking' => false,
+        ];
 
         return $sparkPostMessage;
     }
