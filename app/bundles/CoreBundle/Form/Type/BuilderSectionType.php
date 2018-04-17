@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 /**
  * Class BuilderSectionType.
@@ -50,7 +51,9 @@ class BuilderSectionType extends AbstractType
         ]);
 
         // Content - Background Repeat
-        $builder->add('content-background-repeat', ChoiceType::class,
+        $builder->add(
+            'content-background-repeat',
+            ChoiceType::class,
         [
             'choices' => [
                 'no-repeat'     => 'no-repeat',
@@ -70,7 +73,8 @@ class BuilderSectionType extends AbstractType
                 'data-slot-param' => 'background-repeat',
                 'data-toggle'     => 'background-repeat',
             ],
-        ]);
+        ]
+        );
 
         // Content - Background Size Width
         $builder->add('content-background-size-width', 'text', [
