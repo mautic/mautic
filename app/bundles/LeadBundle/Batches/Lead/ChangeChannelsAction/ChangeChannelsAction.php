@@ -135,7 +135,7 @@ final class ChangeChannelsAction implements ActionInterface
         foreach ($this->subscribedChannels as $subscribedChannel) {
             if (!array_key_exists($subscribedChannel, $leadChannels)) {
                 $contactable = $this->doNotContact->isContactable($lead, $subscribedChannel);
-                if ($contactable == DNC::UNSUBSCRIBED) {
+                if ($contactable === DNC::UNSUBSCRIBED) {
                     // Only resubscribe if the contact did not opt out themselves
                     $this->doNotContact->removeDncForContact($lead->getId(), $subscribedChannel);
                 }
@@ -145,7 +145,7 @@ final class ChangeChannelsAction implements ActionInterface
         $dncChannels = array_diff($allChannels, $this->subscribedChannels);
         if (!empty($dncChannels)) {
             foreach ($dncChannels as $channel) {
-                $this->doNotContact->addDncForContact($lead->getId(), $channel, 'user', DNC::UNSUBSCRIBED);
+                $this->doNotContact->addDncForContact($lead->getId(), $channel, DNC::MANUAL, 'updated manually by user');
             }
         }
 
