@@ -22,8 +22,8 @@ use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
 use Mautic\NotificationBundle\Form\Type\NotificationSendType;
-use Mautic\NotificationBundle\Model\NotificationModel;
-use Mautic\NotificationBundle\NotificationEvents;
+use MauticPlugin\FCMNotificationBundle\Model\NotificationModel;
+use MauticPlugin\FCMNotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**

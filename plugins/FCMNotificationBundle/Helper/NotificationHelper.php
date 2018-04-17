@@ -94,7 +94,8 @@ class NotificationHelper
     public function getHeaderScript()
     {
         if ($this->hasScript()) {            
-            return 'MauticJS.insertScript(\'https://www.gstatic.com/firebasejs/4.12.1/firebase.js\');
+            return 'MauticJS.insertScript(\'https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js\');
+                    MauticJS.insertScript(\'https://www.gstatic.com/firebasejs/4.12.1/firebase-messaging.js\');
                     var _fbaq = _fbaq || [];';
         }
     }
@@ -154,6 +155,8 @@ var config = {
   const messaging = firebase.messaging();
   messaging.usePublicVapidKey("{$$publicVapidKey}");
 
+
+
 var postUserIdToMautic = function(userId) {
     var data = [];
     data['fcm_id'] = userId;
@@ -195,6 +198,11 @@ var postUserIdToMautic = function(userId) {
             console.log('Unable to retrieve refreshed token ', err);            
         });
     });
+
+    messaging.onMessage(function(payload){
+        console.log('message arrived to open site', payload);
+    });
+
 JS;
                 
             return $fcmInit;

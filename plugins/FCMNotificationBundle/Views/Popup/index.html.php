@@ -131,6 +131,10 @@
 
   const messaging = firebase.messaging();
   messaging.usePublicVapidKey("{TODO: ADD API KEY HERE!!!}");
+
+  messaging.onMessage(function(payload){
+    console.log('message arrived to service worker', payload);
+  });
 </script>
 <script>
     /* returns true if device is mobile or tablet */

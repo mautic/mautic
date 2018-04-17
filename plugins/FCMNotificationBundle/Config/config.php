@@ -10,11 +10,11 @@
  */
 
 return [
-/*    
+
     'services' => [
         'events' => [
             'mautic.notification.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\NotificationBundle\EventListener\CampaignSubscriber',
+                'class'     => 'MauticPlugin\FCMNotificationBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.lead.model.lead',
@@ -23,21 +23,21 @@ return [
                 ],
             ],
             'mautic.notification.pagebundle.subscriber' => [
-                'class'     => 'Mautic\NotificationBundle\EventListener\PageSubscriber',
+                'class'     => 'MauticPlugin\FCMNotificationBundle\EventListener\PageSubscriber',
                 'arguments' => [
                     'templating.helper.assets',
                     'mautic.helper.integration',
                 ],
             ],
             'mautic.core.js.subscriber' => [
-                'class'     => 'Mautic\NotificationBundle\EventListener\BuildJsSubscriber',
+                'class'     => 'MauticPlugin\FCMNotificationBundle\EventListener\BuildJsSubscriber',
                 'arguments' => [
                     'mautic.helper.notification',
                     'mautic.helper.integration',
                 ],
             ],
             'mautic.notification.notificationbundle.subscriber' => [
-                'class'     => 'Mautic\NotificationBundle\EventListener\NotificationSubscriber',
+                'class'     => 'MauticPlugin\FCMNotificationBundle\EventListener\NotificationSubscriber',
                 'arguments' => [
                     'mautic.core.model.auditlog',
                     'mautic.page.model.trackable',
@@ -47,7 +47,7 @@ return [
             ],
 //            Left out until 2.9
 //            'mautic.notification.subscriber.form' => [
-//                'class'     => \Mautic\NotificationBundle\EventListener\FormSubscriber::class,
+//                'class'     => \MauticPlugin\FCMNotificationBundle\EventListener\FormSubscriber::class,
 //                'arguments' => [
 //                    'mautic.helper.integration',
 //                    'mautic.lead.model.lead',
@@ -56,19 +56,19 @@ return [
 //                ],
 //            ],
             'mautic.notification.subscriber.channel' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\ChannelSubscriber::class,
+                'class'     => \MauticPlugin\FCMNotificationBundle\EventListener\ChannelSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
                 ],
             ],
             'mautic.notification.stats.subscriber' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\StatsSubscriber::class,
+                'class'     => \MauticPlugin\FCMNotificationBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.notification.mobile_notification.report.subscriber' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\ReportSubscriber::class,
+                'class'     => \MauticPlugin\FCMNotificationBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                     'mautic.lead.model.company_report_data',
@@ -114,7 +114,6 @@ return [
                 'alias' => 'mobilenotification_list',
             ],
         ],
-*/
         'helpers' => [
             'mautic.helper.notification' => [
                 'class'     => 'MauticPlugin\FCMNotificationBundle\Helper\NotificationHelper',
@@ -129,10 +128,9 @@ return [
                 ],
             ],
         ],
-/*
         'other' => [
             'mautic.notification.api' => [
-                'class'     => 'Mautic\NotificationBundle\Api\OneSignalApi',
+                'class'     => 'MauticPlugin\FCMNotificationBundle\Api\FCMApi',
                 'arguments' => [
                     'mautic.factory',
                     'mautic.http.connector',
@@ -144,77 +142,71 @@ return [
         ],
         'models' => [
             'mautic.notification.model.notification' => [
-                'class'     => 'Mautic\NotificationBundle\Model\NotificationModel',
+                'class'     => 'MauticPlugin\FCMNotificationBundle\Model\NotificationModel',
                 'arguments' => [
                     'mautic.page.model.trackable',
                 ],
             ],
         ],
-*/
         'integrations' => [
             'mautic.integration.fcm' => [
                 'class' => \MauticPlugin\FCMNotificationBundle\Integration\FCMIntegration::class,
             ],
         ],
-/*
     ],
     'routes' => [
         'main' => [
             'mautic_notification_index' => [
                 'path'       => '/notifications/{page}',
-                'controller' => 'MauticNotificationBundle:Notification:index',
+                'controller' => 'FCMNotificationBundle:Notification:index',
             ],
             'mautic_notification_action' => [
                 'path'       => '/notifications/{objectAction}/{objectId}',
-                'controller' => 'MauticNotificationBundle:Notification:execute',
+                'controller' => 'FCMNotificationBundle:Notification:execute',
             ],
             'mautic_notification_contacts' => [
                 'path'       => '/notifications/view/{objectId}/contact/{page}',
-                'controller' => 'MauticNotificationBundle:Notification:contacts',
+                'controller' => 'FCMNotificationBundle:Notification:contacts',
             ],
             'mautic_mobile_notification_index' => [
                 'path'       => '/mobile_notifications/{page}',
-                'controller' => 'MauticNotificationBundle:MobileNotification:index',
+                'controller' => 'FCMNotificationBundle:MobileNotification:index',
             ],
             'mautic_mobile_notification_action' => [
                 'path'       => '/mobile_notifications/{objectAction}/{objectId}',
-                'controller' => 'MauticNotificationBundle:MobileNotification:execute',
+                'controller' => 'FCMNotificationBundle:MobileNotification:execute',
             ],
             'mautic_mobile_notification_contacts' => [
                 'path'       => '/mobile_notifications/view/{objectId}/contact/{page}',
-                'controller' => 'MauticNotificationBundle:MobileNotification:contacts',
+                'controller' => 'FCMNotificationBundle:MobileNotification:contacts',
             ],
         ],
         'public' => [
             'mautic_receive_notification' => [
                 'path'       => '/notification/receive',
-                'controller' => 'MauticNotificationBundle:Api\NotificationApi:receive',
+                'controller' => 'FCMNotificationBundle:Api\NotificationApi:receive',
             ],
             'mautic_subscribe_notification' => [
                 'path'       => '/notification/subscribe',
-                'controller' => 'MauticNotificationBundle:Api\NotificationApi:subscribe',
+                'controller' => 'FCMNotificationBundle:Api\NotificationApi:subscribe',
             ],
             'mautic_notification_popup' => [
                 'path'       => '/notification',
-                'controller' => 'MauticNotificationBundle:Popup:index',
+                'controller' => 'FCMNotificationBundle:Popup:index',
             ],
 
             // JS / Manifest URL's
-            'mautic_onesignal_worker' => [
-                'path'       => '/OneSignalSDKWorker.js',
-                'controller' => 'MauticNotificationBundle:Js:worker',
-            ],
-            'mautic_onesignal_updater' => [
-                'path'       => '/OneSignalSDKUpdaterWorker.js',
-                'controller' => 'MauticNotificationBundle:Js:updater',
-            ],
-            'mautic_onesignal_manifest' => [
+            'mautic_fcm_worker' => [
+                'path'       => '/firebase-messaging-sw.js',
+                'controller' => 'FCMNotificationBundle:Js:worker',
+            ],            
+            'mautic_fcm_manifest' => [
                 'path'       => '/manifest.json',
-                'controller' => 'MauticNotificationBundle:Js:manifest',
+                'controller' => 'FCMNotificationBundle:Js:manifest',
             ],
             'mautic_app_notification' => [
                 'path'       => '/notification/appcallback',
-                'controller' => 'MauticNotificationBundle:AppCallback:index',
+                'controller' => 'FCMNotificationBundle:AppCallback:index',
             ],
         ],
         'api' => [
@@ -222,11 +214,10 @@ return [
                 'standard_entity' => true,
                 'name'            => 'notifications',
                 'path'            => '/notifications',
-                'controller'      => 'MauticNotificationBundle:Api\NotificationApi',
+                'controller'      => 'FCMNotificationBundle:Api\NotificationApi',
             ],
         ],
     ],
-*/
     'menu' => [
         'main' => [
             'items' => [
@@ -243,24 +234,6 @@ return [
                     'parent'   => 'mautic.core.channels',
                     'priority' => 80,
                 ],
-/*
-                'mautic.notification.mobile_notifications' => [
-                    'route'  => 'mautic_mobile_notification_index',
-                    'access' => ['notification:mobile_notifications:viewown', 'notification:mobile_notifications:viewother'],
-                    'checks' => [
-                        'integration' => [
-                            'OneSignal' => [
-                                'enabled'  => true,
-                                'features' => [
-                                    'mobile',
-                                ],
-                            ],
-                        ],
-                    ],
-                    'parent'   => 'mautic.core.channels',
-                    'priority' => 65,
-                ],
-*/
             ],
         ],
     ],
@@ -274,7 +247,7 @@ return [
         'notification_app_id'                => null,
         'notification_rest_api_key'          => null,
         'notification_safari_web_id'         => null,
-        'gcm_sender_id'                      => '482941778795',
+        'gcm_sender_id'                      => '103953800507',
         'notification_subdomain_name'        => null,
         'welcomenotification_enabled'        => true,
     ],
