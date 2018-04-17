@@ -46,7 +46,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
             ->where('ut.user = :user AND ut.authorizator = :authorizator AND ut.signature = :signature AND (ut.expiration IS NULL OR ut.expiration >= :now)')
             ->setParameter('user', $token->getUser())
             ->setParameter('authorizator', $token->getAuthorizator())
-            ->setParameter('signature', $token->getSignature())
+            ->setParameter('signature', $token->getSecret())
             ->setParameter('now', new \DateTime())
             ->setMaxResults(1)
             ->getQuery()->execute();

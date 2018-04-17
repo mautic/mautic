@@ -37,7 +37,7 @@ class UserToken
     /**
      * @var string
      */
-    private $signature;
+    private $secret;
 
     /**
      * @var \DateTime|null
@@ -69,7 +69,7 @@ class UserToken
             ->length(32)
             ->build();
 
-        $builder->createField('signature', 'string')
+        $builder->createField('secret', 'string')
             ->length(120)
             ->unique()
             ->build();
@@ -126,21 +126,21 @@ class UserToken
     /**
      * @return string
      */
-    public function getSignature()
+    public function getSecret()
     {
-        return $this->signature;
+        return $this->secret;
     }
 
     /**
      * Use \Mautic\UserBundle\Entity\UserTokenRepositoryInterface::sign to sign token.
      *
-     * @param string $signature
+     * @param string $secret
      *
      * @return UserToken
      */
-    public function sign($signature)
+    public function setSecret($secret)
     {
-        $this->signature = $signature;
+        $this->secret = $secret;
 
         return $this;
     }

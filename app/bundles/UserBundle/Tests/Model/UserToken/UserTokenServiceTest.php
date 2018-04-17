@@ -68,8 +68,8 @@ class UserTokenServiceTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true); // Ok now
         $userTokenService = $this->getUserTokenService();
         $signedToken      = $userTokenService->sign($token, $signatureLength);
-        $this->assertSame($signatureLength, strlen($signedToken->getSignature()));
-        $this->assertStringMatchesFormat('^A-Za-z0-9', $signedToken->getSignature());
+        $this->assertSame($signatureLength, strlen($signedToken->getSecret()));
+        $this->assertStringMatchesFormat('^A-Za-z0-9', $signedToken->getSecret());
         $this->assertFalse($signedToken->isOneTimeOnly());
         $this->assertNull($signedToken->getExpiration());
     }
