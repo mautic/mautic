@@ -52,18 +52,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Creates new entity from provided params.
-     *
-     * @param array $parameters
-     *
-     * @return Lead
-     */
-    public function getNewEntity(array $parameters)
-    {
-        return $this->getModel(self::MODEL_ID)->checkForDuplicateContact($parameters);
-    }
-
-    /**
      * Get existing duplicated contact based on unique fields and the request data.
      *
      * @param array $parameters
@@ -582,31 +570,9 @@ class LeadApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        if (isset($parameters['owner'])) {
-            $owner = $this->getModel('user.user')->getEntity((int) $parameters['owner']);
-            $entity->setOwner($owner);
-            unset($parameters['owner']);
-        }
-
-        if (isset($parameters['color'])) {
-            $entity->setColor($parameters['color']);
-            unset($parameters['color']);
-        }
-
-        if (isset($parameters['points'])) {
-            $entity->setPoints((int) $parameters['points']);
-            unset($parameters['points']);
-        }
-
+        // Unset the tags from params to avoid a validation error
         if (isset($parameters['tags'])) {
-            $this->model->modifyTags($entity, $parameters['tags']);
             unset($parameters['tags']);
-        }
-
-        if (isset($parameters['stage'])) {
-            $stage = $this->getModel('stage.stage')->getEntity((int) $parameters['stage']);
-            $entity->setStage($stage);
-            unset($parameters['stage']);
         }
 
         return $parameters;
@@ -625,14 +591,27 @@ class LeadApiController extends CommonApiController
         $originalParams = $this->request->request->all();
 
         // Merge existing duplicate contact based on unique fields if exist
-        $existingContact = $this->model->checkForDuplicateContact($originalParams, $entity);
-        if ($action === 'edit' && $existingContact->getId()) {
-            $this->model->mergeLeads($existingContact, $entity, false);
-        }
+        $entity = $this->model->checkForDuplicateContact($originalParams, $entity);
 
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
             unset($parameters['companies']);
+        }
+
+        if (isset($parameters['owner'])) {
+            $owner = $this->getModel('user.user')->getEntity((int) $parameters['owner']);
+            $entity->setOwner($owner);
+            unset($parameters['owner']);
+        }
+
+        if (isset($parameters['stage'])) {
+            $stage = $this->getModel('stage.stage')->getEntity((int) $parameters['stage']);
+            $entity->setStage($stage);
+            unset($parameters['stage']);
+        }
+
+        if (isset($originalParams['tags'])) {
+            $this->model->modifyTags($entity, $originalParams['tags'], null, false);
         }
 
         //Since the request can be from 3rd party, check for an IP address if included
@@ -681,7 +660,7 @@ class LeadApiController extends CommonApiController
             unset($parameters['frequencyRules']);
         }
 
-        $this->setCustomFieldValues($entity, $form, $parameters);
+        $this->setCustomFieldValues($entity, $form, $parameters, 'POST' === $this->request->getMethod());
     }
 
     /**

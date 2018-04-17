@@ -2,11 +2,13 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Entity\User;
 
 class LeadModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -76,6 +78,15 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['saveEntity', 'checkForDuplicateContact'])
             ->getMock();
 
+        $mockUserModel = $this->getMockBuilder(UserHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockUserModel->method('getUser')
+            ->willReturn(new User());
+
+        $mockLeadModel->setUserHelper($mockUserModel);
+
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
             ->setMethods(['extractCompanyDataFromImport'])
@@ -107,6 +118,15 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(['saveEntity', 'checkForDuplicateContact'])
             ->getMock();
+
+        $mockUserModel = $this->getMockBuilder(UserHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockUserModel->method('getUser')
+            ->willReturn(new User());
+
+        $mockLeadModel->setUserHelper($mockUserModel);
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()

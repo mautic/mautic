@@ -394,7 +394,8 @@ class ImportModel extends FormModel
                         $import->getDefault('list'),
                         $import->getDefault('tags'),
                         true,
-                        $eventLog
+                        $eventLog,
+                        $import->getId()
                     );
 
                     if ($merged) {

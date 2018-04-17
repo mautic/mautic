@@ -22,6 +22,7 @@ class CookieHelper
     private $domain   = null;
     private $secure   = false;
     private $httponly = false;
+    private $request  = null;
 
     /**
      * CookieHelper constructor.
@@ -43,6 +44,21 @@ class CookieHelper
         if (('' === $this->secure || null === $this->secure) && $this->request) {
             $this->secure = filter_var($requestStack->getCurrentRequest()->server->get('HTTPS', false), FILTER_VALIDATE_BOOLEAN);
         }
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getCookie($key, $default = null)
+    {
+        if ($this->request === null) {
+            return $default;
+        }
+
+        return $this->request->cookies->get($key, $default);
     }
 
     /**

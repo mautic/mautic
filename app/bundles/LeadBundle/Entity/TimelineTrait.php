@@ -20,8 +20,8 @@ trait TimelineTrait
     /**
      * @param QueryBuilder $query                 DBAL QueryBuilder
      * @param array        $options               Query optons from LeadTimelineEvent
-     * @param              $eventNameColumn       Name of column to sort event name by
-     * @param              $timestampColumn       Name of column to sort timestamp by
+     * @param string       $eventNameColumn       Name of column to sort event name by
+     * @param string       $timestampColumn       Name of column to sort timestamp by
      * @param array        $serializedColumns     Array of columns to unserialize
      * @param array        $dateTimeColumns       Array of columns to be converted to \DateTime
      * @param null         $resultsParserCallback Callback to custom parse results
