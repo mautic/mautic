@@ -13,7 +13,7 @@ return [
 
     'services' => [
         'events' => [
-            'mautic.notification.campaignbundle.subscriber' => [
+            'mauticplugin.fcmnotification.campaignbundle.subscriber' => [
                 'class'     => 'MauticPlugin\FCMNotificationBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
                     'mautic.helper.integration',
