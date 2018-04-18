@@ -121,7 +121,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
             $pipedriveObjects = $settings['feature_settings']['objects'];
         } else {
             $settings                                = $this->settings->getFeatureSettings();
-            $settings['feature_settings']['objects'] = $pipedriveObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+            $settings['feature_settings']['objects'] = $pipedriveObjects = isset($settings['objects']) ? $settings['objects'] : [];
         }
 
         try {
@@ -263,5 +263,17 @@ class PipedriveIntegration extends CrmAbstractIntegration
         $supportedFeatures = $this->getIntegrationSettings()->getFeatureSettings();
 
         return isset($supportedFeatures['objects']) && in_array('company', $supportedFeatures['objects']);
+    }
+
+    /**
+     * Get available company fields for choices in the config UI.
+     *
+     * @param array $settings
+     *
+     * @return array
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
     }
 }
