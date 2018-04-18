@@ -116,7 +116,8 @@
 
     </div>
 </div>
-<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-messaging.js"></script>
 <script>
   // Initialize Firebase
   var config = {
@@ -219,10 +220,9 @@
                 } else {
                   
                 }
-              }).catch(function(err) {
+            }).catch(function(err) {
                 console.log('An error occurred while retrieving token. ', err);                            
-              });
-            }
+            });            
         }
     } else {
         if (isPermissionBlocked) // Check if the Notification permission is disabled.

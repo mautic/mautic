@@ -63,6 +63,8 @@ class PageSubscriber extends CommonSubscriber
         $settings          = $integrationObject->getIntegrationSettings();
         $features          = $settings->getSupportedFeatures();
 
+        var_dump($features);
+
         $script = '';
         if (!in_array('landing_page_enabled', $features)) {
             $script = 'disable_notification = true;';
