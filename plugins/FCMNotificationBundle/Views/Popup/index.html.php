@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png') ?>" />
 
     <?php echo $view['assets']->outputStyles(); ?>
-    <script src="/plugin/FCMNotificationBundle/Assets/js/popup/usparser.min.js" type="text/javascript"></script>
+    <script src="/plugins/FCMNotificationBundle/Assets/js/popup/usparser.min.js" type="text/javascript"></script>
 </head>
 
 <body>
