@@ -32,7 +32,7 @@ return [
             'mauticplugin.fcmnotification.core.js.subscriber' => [
                 'class'     => 'MauticPlugin\FCMNotificationBundle\EventListener\BuildJsSubscriber',
                 'arguments' => [
-                    'mautic.helper.notification',
+                    'mauticplugin.fcmnotification.helper.notification',
                     'mautic.helper.integration',
                 ],
             ],

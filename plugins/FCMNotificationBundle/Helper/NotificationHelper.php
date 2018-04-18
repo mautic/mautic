@@ -168,7 +168,7 @@ var postUserIdToMautic = function(userId) {
             postUserIdToMautic(currentToken);          
         } else {
             messaging.requestPermission().then(function() {
-                messaging.getToken().then(function(currentToken)){
+                messaging.getToken().then(function(currentToken){
                     if (currentToken) {
                         postUserIdToMautic(currentToken);          
                     }
@@ -184,7 +184,7 @@ var postUserIdToMautic = function(userId) {
     
     // Just to be sure we've grabbed the ID
     window.onbeforeunload = function() {
-        messaging.getToken().then(function(currentToken)){
+        messaging.getToken().then(function(currentToken){
             if (currentToken) {
                 postUserIdToMautic(currentToken);          
             } 
