@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -456,6 +457,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         if ($persist && !empty($lead->getChanges(true))) {
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
+            $lead->setManipulator(new LeadManipulator(
+                'plugin',
+                $this->getName(),
+                null,
+                $this->getDisplayName()
+            ));
             $leadModel->saveEntity($lead, false);
         }
 

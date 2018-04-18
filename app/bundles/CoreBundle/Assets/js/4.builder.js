@@ -1014,10 +1014,12 @@ Mautic.getSlotToolbar = function(type) {
 
     var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
     var deleteLink  = Mautic.getSlotDeleteLink();
+    var cloneLink = Mautic.getSlotCloneLink();
     if (typeof type !== 'undefined') {
         mQuery('<span style="color:#fff;margin-left:10px;font-family:sans-serif;font-size:smaller">' + type.toUpperCase() + '</span>').appendTo(slotToolbar);
     }
     deleteLink.appendTo(slotToolbar);
+    cloneLink.appendTo(slotToolbar);
 
     return slotToolbar;
 };
@@ -1031,6 +1033,16 @@ Mautic.getSlotDeleteLink = function() {
     }
 
     return Mautic.deleteLink;
+};
+
+Mautic.getSlotCloneLink = function() {
+    if (typeof Mautic.cloneLink == 'undefined') {
+        Mautic.cloneLink = mQuery('<a><i class="fa fa-lg fa-copy"></i></a>')
+            .attr('data-slot-action', 'clone')
+            .attr('alt', 'clone')
+            .addClass('btn btn-clone btn-clone');
+    }
+    return Mautic.cloneLink;
 };
 
 Mautic.getSlotFocus = function() {
@@ -1095,6 +1107,13 @@ Mautic.reattachDEC = function() {
     }
 };
 
+Mautic.isSlotInitiated = function(slot) {
+    if (typeof Mautic.builderSlots === 'undefined' || Mautic.builderSlots.length === 0) return false;
+    return typeof Mautic.builderSlots.find(function(params) {
+        return slot.is(params.slot);
+    }) !== 'undefined';
+};
+
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
@@ -1110,9 +1129,13 @@ Mautic.initSlotListeners = function() {
         slot = mQuery(slot);
         var type = slot.attr('data-slot');
 
+        // Avoid initialising one slot several times
+        if (Mautic.isSlotInitiated(slot)) return;
+
         // initialize the drag handle
         var slotToolbar = Mautic.getSlotToolbar(type);
         var deleteLink  = Mautic.getSlotDeleteLink();
+        var cloneLink   = Mautic.getSlotCloneLink();
         var focus       = Mautic.getSlotFocus();
 
         slot.hover(function(e) {
@@ -1147,6 +1170,10 @@ Mautic.initSlotListeners = function() {
                 });
                 slot.remove();
                 focus.remove();
+            });
+            cloneLink.click(function(e) {   
+                slot.clone().insertAfter(slot);
+                Mautic.initSlots(slot.closest('[data-slot-container="1"]'));
             });
 
             if (slot.offset().top < 25) {

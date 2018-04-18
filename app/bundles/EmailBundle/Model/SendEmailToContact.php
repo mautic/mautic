@@ -16,6 +16,9 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
+use Mautic\EmailBundle\Stat\Reference;
+use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -29,14 +32,9 @@ class SendEmailToContact
     private $mailer;
 
     /**
-     * @var MailHelper
+     * @var StatHelper
      */
-    private $temporaryMailer = null;
-
-    /**
-     * @var StatRepository
-     */
-    private $statRepo;
+    private $statHelper;
 
     /**
      * @var DoNotContact
@@ -114,6 +112,11 @@ class SendEmailToContact
     private $contact = [];
 
     /**
+     * @var MailHelper
+     */
+    private $temporaryMailer = null;
+
+    /**
      * SendEmailToContact constructor.
      *
      * @param MailHelper          $mailer
@@ -121,14 +124,10 @@ class SendEmailToContact
      * @param DoNotContact        $dncModel
      * @param TranslatorInterface $translator
      */
-    public function __construct(
-        MailHelper $mailer,
-        StatRepository $statRepository,
-        DoNotContact $dncModel,
-        TranslatorInterface $translator
-    ) {
+    public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
+    {
         $this->mailer     = $mailer;
-        $this->statRepo   = $statRepository;
+        $this->statHelper = $statHelper;
         $this->dncModel   = $dncModel;
         $this->translator = $translator;
     }
@@ -165,16 +164,8 @@ class SendEmailToContact
     public function finalFlush()
     {
         $this->flush();
-
-        // Persist left over stats
-        if (count($this->saveEntities)) {
-            $this->statRepo->saveEntities($this->saveEntities);
-        }
-
-        // Delete stats that failed after the queue was flushed
-        if (count($this->deleteEntities)) {
-            $this->statRepo->deleteEntities($this->deleteEntities);
-        }
+        $this->statHelper->deletePending();
+        $this->statHelper->reset();
 
         $this->processBadEmails();
     }
@@ -189,13 +180,8 @@ class SendEmailToContact
      *
      * @return $this
      */
-    public function setEmail(
-        Email $email,
-        array $channel = [],
-        array $customHeaders = [],
-        array $assetAttachments = [],
-        array $slots = []
-    ) {
+    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], array $slots = [])
+    {
         // Flush anything that's pending from a previous email
         $this->flush();
 
@@ -271,14 +257,17 @@ class SendEmailToContact
      */
     public function send()
     {
-        //queue or send the message
-        list($queued, $queueErrors) = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
-        if (!$queued) {
-            unset($queueErrors['failures']);
-            $this->failContact(true, implode('; ', (array) $queueErrors));
+        if ($this->mailer->inTokenizationMode()) {
+            list($success, $errors) = $this->queueTokenizedEmail();
+        } else {
+            list($success, $errors) = $this->sendStandardEmail();
         }
 
-        $this->createContactStatEntry($this->contact['email']);
+        //queue or send the message
+        if (!$success) {
+            unset($errors['failures']);
+            $this->failContact(false, implode('; ', (array) $errors));
+        }
     }
 
     /**
@@ -300,15 +289,19 @@ class SendEmailToContact
         $this->statBatchCounter  = 0;
         $this->contact           = [];
 
-        $this->statRepo->clear();
         $this->dncModel->clearEntities();
 
         if ($this->temporaryMailer != null) {
-            $this->mailer = clone $this->temporaryMailer;
+            $this->mailer          = clone $this->temporaryMailer;
+            $this->temporaryMailer = null;
         }
+
         $this->mailer->reset();
     }
 
+    /**
+     * Set Sample Mailer for immediately sending.
+     */
     public function setSampleMailer()
     {
         if ($this->temporaryMailer == null) {
@@ -357,6 +350,13 @@ class SendEmailToContact
         $this->errorMessages[$this->contact['id']]  = $errorMessages;
         $this->failedContacts[$this->contact['id']] = $this->contact['email'];
 
+        try {
+            $stat = $this->statHelper->getStat($this->contact['email']);
+            $this->downEmailSentCount($stat->getEmailId());
+            $this->statHelper->markForDeletion($stat);
+        } catch (StatNotFoundException $exception) {
+        }
+
         if ($hasBadEmail) {
             $this->badEmails[$this->contact['id']] = $this->contact['email'];
         }
@@ -373,26 +373,23 @@ class SendEmailToContact
         unset($sendFailures['failures']);
         $error = implode('; ', $sendFailures);
 
-        // Prevent the stat from saving
+        // Delete the stat
         foreach ($failedEmailAddresses as $failedEmail) {
-            if (!isset($this->statEntities[$failedEmail])) {
+            try {
+                /** @var Reference $stat */
+                $stat = $this->statHelper->getStat($failedEmail);
+            } catch (StatNotFoundException $exception) {
                 continue;
             }
 
-            /** @var Stat $stat */
-            $stat = $this->statEntities[$failedEmail];
             // Add lead ID to list of failures
-            $this->failedContacts[$stat->getLead()->getId()] = $failedEmail;
-            $this->errorMessages[$stat->getLead()->getId()]  = $error;
+            $this->failedContacts[$stat->getEmailId()] = $failedEmail;
+            $this->errorMessages[$stat->getLeadId()]   = $error;
+
+            $this->statHelper->markForDeletion($stat);
 
             // Down sent counts
-            $emailId = $stat->getEmail()->getId();
-            $this->downEmailSentCount($emailId);
-
-            if ($stat->getId()) {
-                $this->deleteEntities[] = $stat;
-            }
-            unset($this->statEntities[$failedEmail], $this->saveEntities[$failedEmail]);
+            $this->downEmailSentCount($stat->getEmailId());
         }
     }
 
@@ -424,21 +421,12 @@ class SendEmailToContact
         ++$this->statBatchCounter;
 
         $stat = $this->mailer->createEmailStat(false, null, $this->listId);
-        // Store it in the saveEntities array so that every 20 are persisted to prevent mass duplciation resends if
-        // something goes wrong
-        $this->saveEntities[$email] = $stat;
+
         // Store it in the statEntities array so that the stat can be deleted if the transport fails the
         // send for whatever reason after flushing the queue
-        $this->statEntities[$email] = $stat;
+        $this->statHelper->storeStat($stat, $email);
 
         $this->upEmailSentCount($stat->getEmail()->getId());
-
-        if (20 === $this->statBatchCounter) {
-            // Save in batches of 20 to prevent email loops if the there are issuses with persisting a large number of stats at once
-            $this->statRepo->saveEntities($this->saveEntities);
-            $this->statBatchCounter = 0;
-            $this->saveEntities     = [];
-        }
     }
 
     /**
@@ -460,5 +448,35 @@ class SendEmailToContact
     protected function downEmailSentCount($emailId)
     {
         --$this->emailSentCounts[$emailId];
+    }
+
+    /**
+     * @return array
+     */
+    protected function queueTokenizedEmail()
+    {
+        list($queued, $queueErrors) = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
+
+        if ($queued) {
+            // Create stat first to ensure it is available for emails sent immediately
+            $this->createContactStatEntry($this->contact['email']);
+        }
+
+        return [$queued, $queueErrors];
+    }
+
+    /**
+     * @return array
+     */
+    protected function sendStandardEmail()
+    {
+        // Dispatch the event to generate the tokens
+        $this->mailer->dispatchSendEvent();
+
+        // Create the stat to ensure it is availble for emails sent
+        $this->createContactStatEntry($this->contact['email']);
+
+        // Now send but don't redispatch the event
+        return $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
     }
 }

@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -31,6 +33,9 @@ class DynamicContentApiController extends CommonController
      */
     public function processAction($objectAlias)
     {
+        // Don't store a visitor with this request
+        defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
+
         $method = $this->request->getMethod();
         if (method_exists($this, $method.'Action')) {
             return $this->{$method.'Action'}($objectAlias);
@@ -45,20 +50,31 @@ class DynamicContentApiController extends CommonController
         $model = $this->getModel('lead');
         /** @var DynamicContentHelper $helper */
         $helper = $this->get('mautic.helper.dynamicContent');
+        /** @var DeviceTrackingServiceInterface $deviceTrackingService */
+        $deviceTrackingService = $this->get('mautic.lead.service.device_tracking_service');
+        /** @var PageModel $pageModel */
+        $pageModel = $this->getModel('page');
+
         /** @var Lead $lead */
-        $lead    = $model->getContactFromRequest();
+        $lead    = $model->getContactFromRequest($pageModel->getHitQuery($this->request));
         $content = $helper->getDynamicContentForLead($objectAlias, $lead);
 
         if (empty($content)) {
             $content = $helper->getDynamicContentSlotForLead($objectAlias, $lead);
         }
 
+        $trackedDevice = $deviceTrackingService->getTrackedDevice();
+        $deviceId      = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+
         return empty($content)
             ? new Response('', Response::HTTP_NO_CONTENT)
-            : new JsonResponse([
-                'content' => $content,
-                'id'      => $lead->getId(),
-                'sid'     => $model->getTrackingCookie()[0],
-            ]);
+            : new JsonResponse(
+                [
+                    'content'   => $content,
+                    'id'        => $lead->getId(),
+                    'sid'       => $deviceId,
+                    'device_id' => $deviceId,
+                ]
+            );
     }
 }

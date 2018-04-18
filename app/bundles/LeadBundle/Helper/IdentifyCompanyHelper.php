@@ -29,10 +29,9 @@ class IdentifyCompanyHelper
     public static function identifyLeadsCompany($parameters, $lead, CompanyModel $companyModel)
     {
         list($company, $companyEntities) = self::findCompany($parameters, $companyModel);
-
         if (!empty($company)) {
             $leadAdded = false;
-            if (!empty($companyEntities)) {
+            if (count($companyEntities)) {
                 foreach ($companyEntities as $entity) {
                     $companyEntity   = $entity;
                     $companyLeadRepo = $companyModel->getCompanyLeadRepository();
@@ -74,12 +73,11 @@ class IdentifyCompanyHelper
 
         if (isset($parameters['company'])) {
             $companyName = filter_var($parameters['company']);
-        } elseif (isset($parameters['email']) || isset($parameters['companyemail'])) {
-            $companyName = isset($parameters['email']) ? self::domainExists($parameters['email']) : self::domainExists($parameters['companyemail']);
         } elseif (isset($parameters['companyname'])) {
             $companyName = filter_var($parameters['companyname']);
+        } elseif (isset($parameters['email']) || isset($parameters['companyemail'])) {
+            $companyName = isset($parameters['email']) ? self::domainExists($parameters['email']) : self::domainExists($parameters['companyemail']);
         }
-
         if (empty($parameters['companywebsite']) && !empty($parameters['companyemail'])) {
             $companyDomain = self::domainExists($parameters['companyemail']);
         }
