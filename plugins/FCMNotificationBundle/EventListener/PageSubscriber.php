@@ -67,7 +67,7 @@ class PageSubscriber extends CommonSubscriber
 
         $script = '';
         if (!in_array('landing_page_enabled', $features)) {
-            $script = 'disable_notification = true;';
+            $script = 'var disable_notification = true;';
         }
 
         $this->assetsHelper->addScriptDeclaration($script, 'onPageDisplay_headClose');

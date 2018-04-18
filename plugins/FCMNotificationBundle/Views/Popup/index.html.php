@@ -116,6 +116,7 @@
 
     </div>
 </div>
+<? /*
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-messaging.js"></script>
 <script>
@@ -136,6 +137,13 @@
   messaging.onMessage(function(payload){
     console.log('message arrived to service worker', payload);
   });
+</script>
+*/ ?>
+<script>
+    (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
+        w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
+        m=d.getElementsByTagName(t)[0];a.src=u;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','/mtc.js','mt');    
 </script>
 <script>
     /* returns true if device is mobile or tablet */
