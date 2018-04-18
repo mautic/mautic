@@ -1119,6 +1119,11 @@ class LeadModel extends FormModel
         $mergeFromFields = $mergeFrom->getFields();
         foreach ($mergeFromFields as $group => $groupFields) {
             foreach ($groupFields as $alias => $details) {
+                if ('points' === $alias) {
+                    // We have to ignore this as it's a special field and it will reset the points for the contact
+                    continue;
+                }
+
                 //overwrite old lead's data with new lead's if new lead's is not empty
                 if (!empty($details['value'])) {
                     $mergeWith->addUpdatedField($alias, $details['value']);
@@ -1138,11 +1143,11 @@ class LeadModel extends FormModel
             $this->logger->debug('LEAD: New owner is '.$newOwner->getId());
         }
 
-        //sum points
-        $mergeWithPoints = $mergeWith->getPoints();
+        // Sum points
         $mergeFromPoints = $mergeFrom->getPoints();
-        $mergeWith->setPoints($mergeWithPoints + $mergeFromPoints);
-        $this->logger->debug('LEAD: Adding '.$mergeFromPoints.' points to lead');
+        $mergeWithPoints = $mergeWith->getPoints();
+        $mergeWith->adjustPoints($mergeFromPoints);
+        $this->logger->debug('LEAD: Adding '.$mergeFromPoints.' points from lead ID #'.$mergeFrom->getId().' to lead ID #'.$mergeWith->getId().' with '.$mergeWithPoints.' points');
 
         //merge tags
         $mergeFromTags = $mergeFrom->getTags();
@@ -1856,6 +1861,10 @@ class LeadModel extends FormModel
 
         if (!is_array($tags)) {
             $tags = explode(',', $tags);
+        }
+
+        if (empty($tags)) {
+            return false;
         }
 
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
