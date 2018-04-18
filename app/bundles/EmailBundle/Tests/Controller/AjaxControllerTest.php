@@ -18,11 +18,9 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class AjaxControllerTest extends \PHPUnit_Framework_TestCase
 {
-    private $translatorMock;
     private $sessionMock;
     private $modelFactoryMock;
     private $containerMock;
@@ -34,7 +32,6 @@ class AjaxControllerTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->translatorMock   = $this->createMock(TranslatorInterface::class);
         $this->sessionMock      = $this->createMock(Session::class);
         $this->modelFactoryMock = $this->createMock(ModelFactory::class);
         $this->containerMock    = $this->createMock(Container::class);
@@ -42,19 +39,16 @@ class AjaxControllerTest extends \PHPUnit_Framework_TestCase
         $this->emailMock        = $this->createMock(Email::class);
         $this->controller       = new AjaxController();
         $this->controller->setContainer($this->containerMock);
-        $this->controller->setTranslator($this->translatorMock);
     }
 
     public function testSendBatchActionWhenNoIdProvided()
     {
-        $this->containerMock
-            ->expects($this->at(0))
+        $this->containerMock->expects($this->at(0))
             ->method('get')
             ->with('mautic.model.factory')
             ->willReturn($this->modelFactoryMock);
 
-        $this->modelFactoryMock
-            ->expects($this->at(0))
+        $this->modelFactoryMock->expects($this->at(0))
             ->method('getModel')
             ->with('email')
             ->willReturn($this->modelMock);
