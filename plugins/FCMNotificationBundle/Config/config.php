@@ -22,21 +22,21 @@ return [
                     'mautic.notification.api',
                 ],
             ],
-            'mautic.notification.pagebundle.subscriber' => [
+            'mauticplugin.fcmnotification.pagebundle.subscriber' => [
                 'class'     => 'MauticPlugin\FCMNotificationBundle\EventListener\PageSubscriber',
                 'arguments' => [
                     'templating.helper.assets',
                     'mautic.helper.integration',
                 ],
             ],
-            'mautic.core.js.subscriber' => [
+            'mauticplugin.fcmnotification.core.js.subscriber' => [
                 'class'     => 'MauticPlugin\FCMNotificationBundle\EventListener\BuildJsSubscriber',
                 'arguments' => [
                     'mautic.helper.notification',
                     'mautic.helper.integration',
                 ],
             ],
-            'mautic.notification.notificationbundle.subscriber' => [
+            'mauticplugin.fcmnotification.notificationbundle.subscriber' => [
                 'class'     => 'MauticPlugin\FCMNotificationBundle\EventListener\NotificationSubscriber',
                 'arguments' => [
                     'mautic.core.model.auditlog',
@@ -46,7 +46,7 @@ return [
                 ],
             ],
 //            Left out until 2.9
-//            'mautic.notification.subscriber.form' => [
+//            'mauticplugin.fcmnotification.notification.subscriber.form' => [
 //                'class'     => \MauticPlugin\FCMNotificationBundle\EventListener\FormSubscriber::class,
 //                'arguments' => [
 //                    'mautic.helper.integration',
@@ -55,19 +55,19 @@ return [
 //                    'mautic.notification.api',
 //                ],
 //            ],
-            'mautic.notification.subscriber.channel' => [
+            'mauticplugin.fcmnotification.subscriber.channel' => [
                 'class'     => \MauticPlugin\FCMNotificationBundle\EventListener\ChannelSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
                 ],
             ],
-            'mautic.notification.stats.subscriber' => [
+            'mauticplugin.fcmnotification.stats.subscriber' => [
                 'class'     => \MauticPlugin\FCMNotificationBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],
             ],
-            'mautic.notification.mobile_notification.report.subscriber' => [
+            'mauticplugin.fcmnotification.mobile_notification.report.subscriber' => [
                 'class'     => \MauticPlugin\FCMNotificationBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
@@ -76,46 +76,46 @@ return [
             ],
         ],
         'forms' => [
-            'mautic.form.type.notification' => [
+            'mauticplugin.fcmnotification.form.type.notification' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\NotificationType',
                 'alias' => 'notification',
             ],
-            'mautic.form.type.mobile.notification' => [
+            'mauticplugin.fcmnotification.form.type.mobile.notification' => [
                 'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationType::class,
                 'alias' => 'mobile_notification',
             ],
-            'mautic.form.type.mobile.notification_details' => [
+            'mauticplugin.fcmnotification.form.type.mobile.notification_details' => [
                 'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationDetailsType::class,
                 'arguments' => [
-                    'mautic.helper.integration',
+                    'mauticplugin.fcmnotification.helper.notification',
                 ],
                 'alias' => 'mobile_notification_details',
             ],
-            'mautic.form.type.notificationconfig' => [
+            'mauticplugin.fcmnotification.form.type.notificationconfig' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\ConfigType',
                 'alias' => 'notificationconfig',
             ],
-            'mautic.form.type.notificationsend_list' => [
+            'mauticplugin.fcmnotification.form.type.notificationsend_list' => [
                 'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationSendType',
                 'arguments' => 'router',
                 'alias'     => 'notificationsend_list',
             ],
-            'mautic.form.type.notification_list' => [
+            'mauticplugin.fcmnotification.form.type.notification_list' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
                 'alias' => 'notification_list',
             ],
-            'mautic.form.type.mobilenotificationsend_list' => [
+            'mauticplugin.fcmnotification.form.type.mobilenotificationsend_list' => [
                 'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationSendType::class,
                 'arguments' => 'router',
                 'alias'     => 'mobilenotificationsend_list',
             ],
-            'mautic.form.type.mobilenotification_list' => [
+            'mauticplugin.fcmnotification.form.type.mobilenotification_list' => [
                 'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationListType::class,
                 'alias' => 'mobilenotification_list',
             ],
         ],
         'helpers' => [
-            'mautic.helper.notification' => [
+            'mauticplugin.fcmnotification.helper.notification' => [
                 'class'     => 'MauticPlugin\FCMNotificationBundle\Helper\NotificationHelper',
                 'alias'     => 'notification_helper',
                 'arguments' => [
@@ -129,7 +129,7 @@ return [
             ],
         ],
         'other' => [
-            'mautic.notification.api' => [
+            'mauticplugin.fcmnotification.notification.api' => [
                 'class'     => 'MauticPlugin\FCMNotificationBundle\Api\FCMApi',
                 'arguments' => [
                     'mautic.factory',
@@ -141,7 +141,7 @@ return [
             ],
         ],
         'models' => [
-            'mautic.notification.model.notification' => [
+            'mauticplugin.fcmnotification.notification.model.notification' => [
                 'class'     => 'MauticPlugin\FCMNotificationBundle\Model\NotificationModel',
                 'arguments' => [
                     'mautic.page.model.trackable',
@@ -149,7 +149,7 @@ return [
             ],
         ],
         'integrations' => [
-            'mautic.integration.fcm' => [
+            'mauticplugin.fcmnotification.integration.fcm' => [
                 'class' => \MauticPlugin\FCMNotificationBundle\Integration\FCMIntegration::class,
             ],
         ],
