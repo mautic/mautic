@@ -800,6 +800,22 @@ class CommonController extends Controller implements MauticController
         $writer      = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
         $contentType = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
         $filename    = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
+        if ($writer instanceof CsvWriter) {
+            $securedData = [];
+            foreach ($sourceIterator as $row) {
+                $securedRow = [];
+                foreach ($row as $cell) {
+                    if (in_array($cell[0], ['+', '-', '=', '@'])) {
+                        $securedCell = ' '.$cell;
+                    } else {
+                        $securedCell = $cell;
+                    }
+                    $securedRow[] = $securedCell;
+                }
+                $securedData[] = $securedRow;
+            }
+            $sourceIterator = new ArraySourceIterator($securedData);
+        }
         $handler     = Handler::create($sourceIterator, $writer);
 
         return new StreamedResponse(function () use ($handler, $sourceIterator, $writer) {
