@@ -46,7 +46,7 @@ class UserTokenServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerateSecret()
     {
-        $secretLength    = 32;
+        $secretLength    = 6;
         $randomSecret    = 'secret';
         $token           = new UserToken();
         $token->setAuthorizator('test-secret');
