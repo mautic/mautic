@@ -69,7 +69,7 @@ class TableSchemaHelper
         $this->prefix       = $prefix;
         $this->columnHelper = $columnHelper;
         if ($db instanceof \Doctrine\DBAL\Connections\MasterSlaveConnection) {
-            $params = $db->getParams();
+            $params       = $db->getParams();
             $schemaConfig = new \Doctrine\DBAL\Schema\SchemaConfig();
             $schemaConfig->setName($params['master']['dbname']);
             $this->schema = new Schema([], [], $schemaConfig);
