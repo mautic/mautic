@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\FCNNotificationBundle\Controller;
+namespace MauticPlugin\FCMNotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\PageBundle\Entity\Page;
