@@ -265,8 +265,9 @@ class MergeModel
 
         $winnerPoints = (int) $this->winner->getPoints();
         $loserPoints  = (int) $this->loser->getPoints();
-        $this->winner->setPoints($winnerPoints + $loserPoints);
-        $this->logger->debug("CONTACT: Adding {$loserPoints} points to {$this->winner->getId()}");
+        $this->winner->adjustPoints($loserPoints);
+
+        $this->logger->debug('CONTACT: Adding '.$loserPoints.' points from contact ID #'.$this->loser->getId().' to contact ID #'.$this->winner->getId().' with '.$winnerPoints.' points');
 
         return $this;
     }
