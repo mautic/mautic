@@ -2448,7 +2448,7 @@ abstract class AbstractIntegration
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settingsG
+     * @param array $settings
      *
      * @return array
      */
