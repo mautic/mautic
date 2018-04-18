@@ -21,6 +21,6 @@ class ValueNotMergeable extends \Exception
      */
     public function __construct($newerValue, $olderValue)
     {
-        parent::__construct(var_export($newerValue, true). ' / '.var_export($olderValue, true));
+        parent::__construct(var_export($newerValue, true).' / '.var_export($olderValue, true));
     }
 }

@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Helper;
 
-
 use Mautic\LeadBundle\Exception\ValueNotMergeable;
 
 class MergeValueHelper
@@ -20,7 +19,6 @@ class MergeValueHelper
      * @param $newerValue
      * @param $olderValue
      *
-     * @return null
      * @throws ValueNotMergeable
      */
     public static function getMergeValue($newerValue, $olderValue)
@@ -47,7 +45,6 @@ class MergeValueHelper
      */
     public static function isNotEmpty($value)
     {
-        return (null !== $value && '' !== $value);
+        return null !== $value && '' !== $value;
     }
-
 }

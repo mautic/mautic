@@ -11,8 +11,6 @@
 
 namespace Mautic\LeadBundle\Exception;
 
-
 class SameContactException extends \Exception
 {
-
 }
