@@ -177,10 +177,10 @@ var postUserIdToMautic = function(userId) {
                 console.log('Unable to get permission to notify.', err);
             });          
         }
-      }).catch(function(err) {
+    }).catch(function(err) {
         console.log('An error occurred while retrieving token. ', err);        
-      });
-    }
+    });
+    
     
     // Just to be sure we've grabbed the ID
     window.onbeforeunload = function() {
