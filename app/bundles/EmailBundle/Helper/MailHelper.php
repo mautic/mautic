@@ -17,8 +17,11 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailHeader\EmailHeader;
+use Mautic\EmailBundle\Entity\EmailHeader\EmailHeaderValidatorInterface;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Exception\EmailHeaderValidationException;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
@@ -68,6 +71,11 @@ class MailHelper
      * @var bool|MauticMessage
      */
     public $message;
+
+    /**
+     * @var EmailHeaderValidatorInterface
+     */
+    private $emailHeaderValidator;
 
     /**
      * @var null
@@ -248,12 +256,17 @@ class MailHelper
     private $copies = [];
 
     /**
-     * @param MauticFactory $factory
-     * @param               $mailer
-     * @param null          $from
+     * @param MauticFactory                 $factory
+     * @param                               $mailer
+     * @param EmailHeaderValidatorInterface $emailHeaderValidator
+     * @param null                          $from
      */
-    public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
-    {
+    public function __construct(
+        MauticFactory $factory,
+        \Swift_Mailer $mailer,
+        EmailHeaderValidatorInterface $emailHeaderValidator,
+        $from = null
+    ) {
         $this->factory   = $factory;
         $this->mailer    = $mailer;
         $this->transport = $mailer->getTransport();
@@ -1336,15 +1349,16 @@ class MailHelper
     }
 
     /**
-     * @param Email $email
-     * @param bool  $allowBcc            Honor BCC if set in email
-     * @param array $slots               Slots configured in theme
-     * @param array $assetAttachments    Assets to send
-     * @param bool  $ignoreTrackingPixel Do not append tracking pixel HTML
+     * @param Email         $email
+     * @param bool          $allowBcc            Honor BCC if set in email
+     * @param array         $slots               Slots configured in theme
+     * @param array         $assetAttachments    Assets to send
+     * @param bool          $ignoreTrackingPixel Do not append tracking pixel HTML
+     * @param EmailHeader[] $headers
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false)
+    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false, array $headers = [])
     {
         $this->email = $email;
 
@@ -1423,6 +1437,14 @@ class MailHelper
         $customHtml = EmojiHelper::toEmoji($customHtml, 'short');
 
         $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
+        foreach ($headers as $header) {
+            try {
+                $this->emailHeaderValidator->validate($header);
+            } catch (EmailHeaderValidationException $emailHeaderValidationException) {
+                $this->logError($emailHeaderValidationException);
+            }
+            $this->addCustomHeader($header->getName(), $header->getValue());
+        }
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];

@@ -25,6 +25,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\EmailBundle\Entity\EmailHeader\EmailHeader;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
@@ -185,6 +186,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $sessionId;
 
+    /**
+     * @var ArrayCollection
+     */
+    private $headers;
+
     public function __clone()
     {
         $this->id               = null;
@@ -211,6 +217,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->stats            = new ArrayCollection();
         $this->variantChildren  = new ArrayCollection();
         $this->assetAttachments = new ArrayCollection();
+        $this->headers          = new ArrayCollection();
     }
 
     /**
@@ -339,6 +346,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->setJoinTable('email_assets_xref')
             ->addInverseJoinColumn('asset_id', 'id', false, false, 'CASCADE')
             ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('headers', EmailHeader::class)
+            ->setIndexBy('id')
+            ->mappedBy('email')
+            ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
     }
