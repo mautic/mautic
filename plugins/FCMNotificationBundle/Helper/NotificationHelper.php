@@ -94,8 +94,7 @@ class NotificationHelper
     public function getHeaderScript()
     {
         if ($this->hasScript()) {            
-            return 'MauticJS.insertScript(\'https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js\');
-                    MauticJS.insertScript(\'https://www.gstatic.com/firebasejs/4.12.1/firebase-messaging.js\');
+            return 'MauticJS.insertScript(\'https://www.gstatic.com/firebasejs/4.12.1/firebase.js\');                    
                     var _fbaq = _fbaq || [];';
         }
     }
