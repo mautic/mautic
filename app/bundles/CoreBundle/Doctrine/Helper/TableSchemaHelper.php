@@ -68,7 +68,14 @@ class TableSchemaHelper
         $this->sm           = $db->getSchemaManager();
         $this->prefix       = $prefix;
         $this->columnHelper = $columnHelper;
-        $this->schema       = new Schema([], [], $this->sm->createSchemaConfig());
+        if ($db instanceof \Doctrine\DBAL\Connections\MasterSlaveConnection) {
+            $params = $db->getParams();
+            $schemaConfig = new \Doctrine\DBAL\Schema\SchemaConfig();
+            $schemaConfig->setName($params['master']['dbname']);
+            $this->schema = new Schema([], [], $schemaConfig);
+        } else {
+            $this->schema = new Schema([], [], $this->sm->createSchemaConfig());
+        }
     }
 
     /**
