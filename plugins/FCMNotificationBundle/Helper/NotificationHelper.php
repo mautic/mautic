@@ -153,7 +153,7 @@ var config = {
   firebase.initializeApp(config);
 
   const messaging = firebase.messaging();
-  messaging.usePublicVapidKey("{$$publicVapidKey}");
+  messaging.usePublicVapidKey("{$publicVapidKey}");
 
 
 
@@ -163,7 +163,7 @@ var postUserIdToMautic = function(userId) {
     MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}', data);
 };
     
-    messaging.getToken().then(function(currentToken)){
+    messaging.getToken().then(function(currentToken){
         if (currentToken) {
             postUserIdToMautic(currentToken);          
         } else {

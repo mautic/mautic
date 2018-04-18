@@ -62,12 +62,10 @@ class PageSubscriber extends CommonSubscriber
         $integrationObject = $this->integrationHelper->getIntegrationObject('FCM');
         $settings          = $integrationObject->getIntegrationSettings();
         $features          = $settings->getSupportedFeatures();
-
-        var_dump($features, in_array('landing_page_enabled', $features));
-
+    
         $script = '';
         if (!in_array('landing_page_enabled', $features)) {
-            $script = 'var disable_notification = true;';
+            $script = 'var disable_fcm_notification = true;';
         }
 
         $this->assetsHelper->addScriptDeclaration($script, 'onPageDisplay_headClose');
