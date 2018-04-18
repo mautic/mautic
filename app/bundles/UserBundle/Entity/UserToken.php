@@ -132,7 +132,7 @@ class UserToken
     }
 
     /**
-     * Use \Mautic\UserBundle\Entity\UserTokenRepositoryInterface::sign to sign token.
+     * Use \Mautic\UserBundle\Entity\UserTokenRepositoryInterface::generateSecret to get valid secret.
      *
      * @param string $secret
      *

@@ -17,11 +17,11 @@ namespace Mautic\UserBundle\Entity;
 interface UserTokenRepositoryInterface
 {
     /**
-     * @param string $signature
+     * @param string $secret
      *
      * @return UserToken
      */
-    public function isSignatureUnique($signature);
+    public function isSecretUnique($secret);
 
     /**
      * @param UserToken $token

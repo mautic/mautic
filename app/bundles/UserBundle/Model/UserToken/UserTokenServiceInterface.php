@@ -20,11 +20,11 @@ interface UserTokenServiceInterface
 {
     /**
      * @param UserToken $token
-     * @param int       $signatureLength
+     * @param int       $secretLength
      *
      * @return UserToken
      */
-    public function sign(UserToken $token, $signatureLength = 32);
+    public function generateSecret(UserToken $token, $secretLength = 32);
 
     /**
      * @param UserToken $token

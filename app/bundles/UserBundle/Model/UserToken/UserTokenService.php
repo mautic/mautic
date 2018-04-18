@@ -46,18 +46,18 @@ final class UserTokenService implements UserTokenServiceInterface
 
     /**
      * @param UserToken $token
-     * @param int       $signatureLength
+     * @param int       $secretLength
      *
      * @return UserToken
      */
-    public function sign(UserToken $token, $signatureLength = 32)
+    public function generateSecret(UserToken $token, $secretLength = 32)
     {
         do {
-            $randomSignature   = $this->randomHelper->generate($signatureLength);
-            $isSignatureUnique = $this->userTokenRepository->isSignatureUnique($randomSignature);
-        } while ($isSignatureUnique === false);
+            $randomSecret   = $this->randomHelper->generate($secretLength);
+            $isSecretUnique = $this->userTokenRepository->isSecretUnique($randomSecret);
+        } while ($isSecretUnique === false);
 
-        return $token->sign($randomSignature);
+        return $token->setSecret($randomSecret);
     }
 
     /**

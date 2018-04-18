@@ -19,15 +19,15 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 final class UserTokenRepository extends CommonRepository implements UserTokenRepositoryInterface
 {
     /**
-     * @param string $signature
+     * @param string $secret
      *
      * @return bool
      */
-    public function isSignatureUnique($signature)
+    public function isSecretUnique($secret)
     {
         $tokens = $this->createQueryBuilder('ut')
-            ->where('ut.signature = :signature')
-            ->setParameter('signature', $signature)
+            ->where('ut.secret = :secret')
+            ->setParameter('secret', $secret)
             ->setMaxResults(1)
             ->getQuery()->execute();
 
@@ -43,10 +43,10 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
     {
         /** @var UserToken[] $userTokens */
         $userTokens = $this->createQueryBuilder('ut')
-            ->where('ut.user = :user AND ut.authorizator = :authorizator AND ut.signature = :signature AND (ut.expiration IS NULL OR ut.expiration >= :now)')
+            ->where('ut.user = :user AND ut.authorizator = :authorizator AND ut.secret = :secret AND (ut.expiration IS NULL OR ut.expiration >= :now)')
             ->setParameter('user', $token->getUser())
             ->setParameter('authorizator', $token->getAuthorizator())
-            ->setParameter('signature', $token->getSecret())
+            ->setParameter('secret', $token->getSecret())
             ->setParameter('now', new \DateTime())
             ->setMaxResults(1)
             ->getQuery()->execute();

@@ -272,7 +272,7 @@ class UserModel extends FormModel
             ->setExpiration((new \DateTime())->add(new \DateInterval('PT24H')))
             ->setOneTimeOnly();
 
-        return $this->userTokenService->sign($userToken, 64);
+        return $this->userTokenService->generateSecret($userToken, 64);
     }
 
     /**
@@ -286,7 +286,7 @@ class UserModel extends FormModel
         $userToken = new UserToken();
         $userToken->setUser($user)
             ->setAuthorizator(UserTokenAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
-            ->sign($token);
+            ->setSecret($token);
 
         return $this->userTokenService->verify($userToken);
     }

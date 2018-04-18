@@ -39,39 +39,39 @@ class UserTokenServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test UserToken sign.
+     * Test UserToken generateSecret.
      *
      * Extra:
-     * Tests second attempt for generating signature if not unique signature was generated first time
+     * Tests second attempt for generating secret if not unique secret was generated first time
      */
-    public function testSign()
+    public function testGenerateSecret()
     {
-        $signatureLength = 32;
-        $randomSignature = 'signature';
+        $secretLength    = 32;
+        $randomSecret    = 'secret';
         $token           = new UserToken();
-        $token->setAuthorizator('test-sign');
+        $token->setAuthorizator('test-secret');
         $this->randomHelperMock->expects($this->at(0))
             ->method('generate')
-            ->with($signatureLength)
-            ->willReturn($randomSignature);
+            ->with($secretLength)
+            ->willReturn($randomSecret);
         $this->userTokenRepositoryMock->expects($this->at(0))
-            ->method('isSignatureUnique')
-            ->with($randomSignature)
-            ->willReturn(false); // Test second attempt to get unique signature
+            ->method('isSecretUnique')
+            ->with($randomSecret)
+            ->willReturn(false); // Test second attempt to get unique secret
         $this->randomHelperMock->expects($this->at(1))
             ->method('generate')
-            ->with($signatureLength)
-            ->willReturn($randomSignature);
+            ->with($secretLength)
+            ->willReturn($randomSecret);
         $this->userTokenRepositoryMock->expects($this->at(1))
-            ->method('isSignatureUnique')
-            ->with($randomSignature)
+            ->method('isSecretUnique')
+            ->with($randomSecret)
             ->willReturn(true); // Ok now
         $userTokenService = $this->getUserTokenService();
-        $signedToken      = $userTokenService->sign($token, $signatureLength);
-        $this->assertSame($signatureLength, strlen($signedToken->getSecret()));
-        $this->assertStringMatchesFormat('^A-Za-z0-9', $signedToken->getSecret());
-        $this->assertFalse($signedToken->isOneTimeOnly());
-        $this->assertNull($signedToken->getExpiration());
+        $secretToken      = $userTokenService->generateSecret($token, $secretLength);
+        $this->assertSame($secretLength, strlen($secretToken->getSecret()));
+        $this->assertStringMatchesFormat('^A-Za-z0-9', $secretToken->getSecret());
+        $this->assertFalse($secretToken->isOneTimeOnly());
+        $this->assertNull($secretToken->getExpiration());
     }
 
     /**
