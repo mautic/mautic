@@ -25,7 +25,7 @@ class PopupController extends CommonController
         $assetsHelper->addStylesheet('/plugins/FCMNotificationBundle/Assets/css/popup/popup.css');
 
         $response = $this->render(
-            'MauticPlugin:FCMNotificationBundle:Popup:index.html.php',
+            'MauticPluginFCMNotificationBundle:Popup:index.html.php',
             [
                 'siteUrl' => $this->coreParametersHelper->getParameter('site_url'),
             ]
