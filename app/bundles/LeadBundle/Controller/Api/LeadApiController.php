@@ -588,8 +588,6 @@ class LeadApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        $originalParams = $this->request->request->all();
-
         // Merge existing duplicate contact based on unique fields if exist
         $entity = $this->model->checkForDuplicateContact($parameters, $entity);
 
@@ -611,25 +609,25 @@ class LeadApiController extends CommonApiController
         }
 
         if (isset($originalParams['tags'])) {
-            $this->model->modifyTags($entity, $originalParams['tags'], null, false);
+            $this->model->modifyTags($entity, $this->entityRequestParameters['tags'], null, false);
         }
 
         //Since the request can be from 3rd party, check for an IP address if included
-        if (isset($originalParams['ipAddress'])) {
-            $ipAddress = $this->factory->getIpAddress($originalParams['ipAddress']);
+        if (isset($this->entityRequestParameters['ipAddress'])) {
+            $ipAddress = $this->get('mautic.helper.ip_lookup')->getIpAddress($this->entityRequestParameters['ipAddress']);
 
             if (!$entity->getIpAddresses()->contains($ipAddress)) {
                 $entity->addIpAddress($ipAddress);
             }
 
-            unset($originalParams['ipAddress']);
+            unset($this->entityRequestParameters['ipAddress']);
         }
 
         // Check for lastActive date
         if (isset($originalParams['lastActive'])) {
-            $lastActive = new DateTimeHelper($originalParams['lastActive']);
+            $lastActive = new DateTimeHelper($this->entityRequestParameters['lastActive']);
             $entity->setLastActive($lastActive->getDateTime());
-            unset($originalParams['lastActive']);
+            unset($this->entityRequestParameters['lastActive']);
         }
 
         if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {
