@@ -85,7 +85,7 @@ class ListType extends AbstractType
         }
 
         // Campaigns
-        $campaigns = $campaignModel->getPublishedCampaigns();
+        $campaigns = $campaignModel->getPublishedCampaigns(true);
         foreach ($campaigns as $campaign) {
             $this->campaignChoices[$campaign['id']] = $campaign['name'];
         }
