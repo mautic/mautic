@@ -68,7 +68,7 @@ class DataExporterHelper
     private function secureAgainstCsvInjection(array $row)
     {
         foreach ($row as $colNum => $colVal) {
-            if ($colVal && in_array(str_split($colVal)[0], ['+', '-', '=', '@'])) {
+            if ($colVal && in_array(substr($colVal, 0, 1), ['+', '-', '=', '@'])) {
                 $row[$colNum] = ' '.$colVal;
             }
         }
