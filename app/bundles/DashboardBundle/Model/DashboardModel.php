@@ -46,15 +46,25 @@ class DashboardModel extends FormModel
     protected $pathsHelper;
 
     /**
+     * @var Filesystem
+     */
+    protected $filesystem;
+
+    /**
      * DashboardModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
      * @param PathsHelper          $pathsHelper
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, PathsHelper $pathsHelper)
+    public function __construct(
+        CoreParametersHelper $coreParametersHelper,
+        PathsHelper $pathsHelper,
+        Filesystem $filesystem
+        )
     {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->pathsHelper          = $pathsHelper;
+        $this->filesystem           = $filesystem;
     }
 
     /**
@@ -158,11 +168,10 @@ class DashboardModel extends FormModel
      */
     public function saveSnapshot($name)
     {
-        $dir        = $this->pathsHelper->getSystemPath('dashboard.user');
-        $filename   = InputHelper::filename($name, 'json');
-        $path       = $dir.'/'.$filename;
-        $fileSystem = new Filesystem();
-        $fileSystem->dumpFile($path, json_encode($this->toArray($name)));
+        $dir      = $this->pathsHelper->getSystemPath('dashboard.user');
+        $filename = InputHelper::filename($name, 'json');
+        $path     = $dir.'/'.$filename;
+        $this->filesystem->dumpFile($path, json_encode($this->toArray($name)));
     }
 
     /**
