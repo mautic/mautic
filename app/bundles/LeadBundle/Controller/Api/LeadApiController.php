@@ -566,6 +566,18 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Creates new entity from provided params.
+     *
+     * @param array $params
+     *
+     * @return object
+     */
+    public function getNewEntity(array $params)
+    {
+        return $this->model->checkForDuplicateContact($params);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
@@ -588,8 +600,11 @@ class LeadApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        // Merge existing duplicate contact based on unique fields if exist
-        $entity = $this->model->checkForDuplicateContact($parameters, $entity);
+        if ('edit' === $action) {
+            // Merge existing duplicate contact based on unique fields if exist
+            // new endpoints will leverage getNewEntity in order to return the correct status codes
+            $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
+        }
 
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
