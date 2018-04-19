@@ -123,7 +123,7 @@ MauticJS.asyncQueue = MauticJS.asyncQueue || function(){ (MauticJS.asyncQueue.q=
 
 setInterval(function(){                         
     console.log("jiaq queue processor running");
-    if (!MauticJS.asyncQueue.queueRunning){
+    if (MauticJS.asyncQueue && MauticJS.asyncQueue.q && !MauticJS.asyncQueue.queueRunning){
         MauticJS.asyncQueue.queueRunning = true;
         while (MauticJS.asyncQueue.q.length > 0){
             console.log("queue", MauticJS.asyncQueue.q);
