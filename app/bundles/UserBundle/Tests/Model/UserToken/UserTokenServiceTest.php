@@ -68,9 +68,8 @@ class UserTokenServiceTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true); // Ok now
         $userTokenService = $this->getUserTokenService();
         $secretToken      = $userTokenService->generateSecret($token, $secretLength);
-        $this->assertSame($secretLength, strlen($secretToken->getSecret()));
-        $this->assertStringMatchesFormat('^A-Za-z0-9', $secretToken->getSecret());
-        $this->assertFalse($secretToken->isOneTimeOnly());
+        $this->assertSame($randomSecret, $secretToken->getSecret());
+        $this->assertTrue($secretToken->isOneTimeOnly());
         $this->assertNull($secretToken->getExpiration());
     }
 

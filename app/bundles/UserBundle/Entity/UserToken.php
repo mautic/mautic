@@ -47,7 +47,7 @@ class UserToken
     /**
      * @var bool
      */
-    private $oneTimeOnly;
+    private $oneTimeOnly = true;
 
     /**
      * @param ORM\ClassMetadata $metadata
