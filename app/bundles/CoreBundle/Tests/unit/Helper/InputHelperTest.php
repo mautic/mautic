@@ -123,8 +123,8 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
     {
 
         $this->assertSame(
-            '29nidji__dsfjhro85t784_f',
-            InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěí_áčýžěé+ěšéřářf')
+            '29nidji__dsfjhro85t784_fffr',
+            InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěí_áčýžěé+ěšéřářf/ff/../r')
         );
     }
 
