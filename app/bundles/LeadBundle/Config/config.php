@@ -723,6 +723,23 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.lead.merger' => [
+                'class'     => \Mautic\LeadBundle\Deduplicate\ContactMerger::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.repository.merged_records',
+                    'event_dispatcher',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.lead.deduper' => [
+                'class'     => \Mautic\LeadBundle\Deduplicate\ContactDeduper::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.merger',
+                    'mautic.lead.repository.lead',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.dnc' => [
@@ -832,24 +849,6 @@ return [
                     'mautic.core.model.notification',
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.company',
-                ],
-            ],
-            'mautic.lead.model.dedup' => [
-                'class'     => Mautic\LeadBundle\Model\DedupModel::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.lead.model.merge',
-                    'mautic.lead.repository.lead',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.lead.model.merge' => [
-                'class'     => Mautic\LeadBundle\Model\MergeModel::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.lead.repository.merged_records',
-                    'event_dispatcher',
-                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.lead.model.tag' => [

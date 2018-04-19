@@ -9,21 +9,27 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Helper;
+namespace Mautic\LeadBundle\Deduplicate\Helper;
 
 use Mautic\LeadBundle\Exception\ValueNotMergeable;
 
 class MergeValueHelper
 {
     /**
-     * @param $newerValue
-     * @param $olderValue
+     * @param mixed $newerValue
+     * @param mixed $olderValue
+     * @param null  $currentValue
      *
+     * @return mixed
      * @throws ValueNotMergeable
      */
-    public static function getMergeValue($newerValue, $olderValue)
+    public static function getMergeValue($newerValue, $olderValue, $currentValue = null)
     {
         if ($newerValue === $olderValue) {
+            throw new ValueNotMergeable($newerValue, $olderValue);
+        }
+
+        if (null !== $currentValue && $newerValue === $currentValue) {
             throw new ValueNotMergeable($newerValue, $olderValue);
         }
 

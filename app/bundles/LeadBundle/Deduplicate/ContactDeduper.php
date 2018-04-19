@@ -9,17 +9,17 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Model;
+namespace Mautic\LeadBundle\Deduplicate;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Exception\MissingMergeSubjectException;
-use Mautic\LeadBundle\Exception\SameContactException;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DedupModel
+class ContactDeduper
 {
     /**
      * @var FieldModel
@@ -27,19 +27,14 @@ class DedupModel
     private $fieldModel;
 
     /**
-     * @var MergeModel
+     * @var ContactMerger
      */
-    private $mergeModel;
+    private $merger;
 
     /**
      * @var LeadRepository
      */
     private $repository;
-
-    /**
-     * @var EntityManager
-     */
-    private $em;
 
     /**
      * @var array
@@ -55,16 +50,14 @@ class DedupModel
      * DedupModel constructor.
      *
      * @param FieldModel     $fieldModel
-     * @param MergeModel     $mergeModel
+     * @param ContactMerger  $merger
      * @param LeadRepository $repository
-     * @param EntityManager  $entityManager
      */
-    public function __construct(FieldModel $fieldModel, MergeModel $mergeModel, LeadRepository $repository, EntityManager $entityManager)
+    public function __construct(FieldModel $fieldModel, ContactMerger $merger, LeadRepository $repository)
     {
         $this->fieldModel = $fieldModel;
-        $this->mergeModel = $mergeModel;
+        $this->merger     = $merger;
         $this->repository = $repository;
-        $this->em         = $entityManager;
     }
 
     /**
@@ -72,8 +65,6 @@ class DedupModel
      * @param OutputInterface|null $output
      *
      * @return int
-     *
-     * @throws MissingMergeSubjectException
      */
     public function dedup($mergeNewerIntoOlder = false, OutputInterface $output = null)
     {
@@ -101,10 +92,7 @@ class DedupModel
                 $loser = reset($duplicates);
                 while ($winner = next($duplicates)) {
                     try {
-                        $this->mergeModel
-                            ->setLoser($loser)
-                            ->setWinner($winner)
-                            ->merge();
+                        $this->merger->merge($winner, $loser);
 
                         ++$dupCount;
 
@@ -120,7 +108,7 @@ class DedupModel
             }
 
             // Clear all entities in memory for RAM control
-            $this->em->clear();
+            $this->repository->clear();
             gc_collect_cycles();
         }
 
@@ -140,7 +128,7 @@ class DedupModel
 
             // By default, duplicates are ordered by newest first
             if (!$this->mergeNewerIntoOlder) {
-                // Reverse the array so that oldeset are on "top" in order to merge oldest into the next until they all have been merged into the
+                // Reverse the array so that oldest are on "top" in order to merge oldest into the next until they all have been merged into the
                 // the newest record
                 $duplicates = array_reverse($duplicates);
             }
