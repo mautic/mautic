@@ -123,8 +123,22 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
     {
 
         $this->assertSame(
-            '29nidji__dsfjhro85t784_fffr',
-            InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěí_áčýžěé+ěšéřářf/ff/../r')
+            '29nidji__dsfjhro85t784_fff.r.txt',
+            InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěí_áčýžěé+ěšéřářf/ff/./r.txt')
+        );
+    }
+
+    /**
+     * @testdox Test that filename handles some UTF8 chars
+     *
+     * @covers \Mautic\CoreBundle\Helper\InputHelper::filename
+     */
+    public function testFilenameWithChangingDir()
+    {
+
+        $this->assertSame(
+            '29nidji__dsfjhro85t784_fff..r',
+            InputHelper::filename('../29NIDJi  dsfjh(#*RO85T784šěí_áčýžěé+ěšéřářf/ff/../r')
         );
     }
 

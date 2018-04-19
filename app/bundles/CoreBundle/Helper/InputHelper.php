@@ -245,7 +245,8 @@ class InputHelper
     {
         $value = str_replace(' ', '_', $value);
 
-        $sanitized = preg_replace("/[^a-z0-9\_-]/", '', strtolower($value));
+        $sanitized = preg_replace("/[^a-z0-9\.\_-]/", '', strtolower($value));
+        $sanitized = preg_replace("/^\.\./", '', strtolower($sanitized));
 
         if (null === $extension) {
             return $sanitized;
