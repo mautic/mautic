@@ -27,6 +27,14 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class DashboardControllerTest extends \PHPUnit_Framework_TestCase
 {
     private $requestMock;
+    private $securityMock;
+    private $translatorMock;
+    private $modelFactoryMock;
+    private $dashboardModelMock;
+    private $routerMock;
+    private $sessionMock;
+    private $flashBagMock;
+    private $containerMock;
 
     protected function setUp()
     {
@@ -50,37 +58,101 @@ class DashboardControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testSaveWithGetWillCallAccessDenied()
     {
-        $this->requestMock->expects($this->once())->method('getMethod')->willReturn('GET');
-        $this->containerMock->expects($this->at(0))->method('get')->with('mautic.security')->willReturn($this->securityMock);
-        $this->translatorMock->expects($this->at(0))->method('trans')->with('mautic.core.url.error.401');
+        $this->requestMock->expects($this->once())
+            ->method('getMethod')
+            ->willReturn('GET');
+
+        $this->containerMock->expects($this->at(0))
+            ->method('get')
+            ->with('mautic.security')
+            ->willReturn($this->securityMock);
+
+        $this->translatorMock->expects($this->at(0))
+            ->method('trans')
+            ->with('mautic.core.url.error.401');
+
         $this->expectException(AccessDeniedHttpException::class);
         $this->controller->saveAction();
     }
 
     public function testSaveWithPostNotAjaxWillCallAccessDenied()
     {
-        $this->requestMock->expects($this->once())->method('getMethod')->willReturn('POST');
-        $this->requestMock->method('isXmlHttpRequest')->willReturn(false);
-        $this->containerMock->expects($this->at(0))->method('get')->with('mautic.security')->willReturn($this->securityMock);
-        $this->translatorMock->expects($this->at(0))->method('trans')->with('mautic.core.url.error.401');
+        $this->requestMock->expects($this->once())
+            ->method('getMethod')
+            ->willReturn('POST');
+
+        $this->requestMock->method('isXmlHttpRequest')
+            ->willReturn(false);
+
+        $this->containerMock->expects($this->at(0))
+            ->method('get')
+            ->with('mautic.security')
+            ->willReturn($this->securityMock);
+
+        $this->translatorMock->expects($this->at(0))
+            ->method('trans')
+            ->with('mautic.core.url.error.401');
+        
         $this->expectException(AccessDeniedHttpException::class);
         $this->controller->saveAction();
     }
 
     public function testSaveWithPostAjaxWillSave()
     {
-        $this->requestMock->expects($this->once())->method('getMethod')->willReturn('POST');
-        $this->requestMock->method('isXmlHttpRequest')->willReturn(true);
-        $this->requestMock->expects($this->at(2))->method('get')->with('name')->willReturn('mockName');
-        $this->containerMock->expects($this->at(0))->method('get')->with('mautic.model.factory')->willReturn($this->modelFactoryMock);
-        $this->containerMock->expects($this->at(1))->method('get')->with('router')->willReturn($this->routerMock);
-        $this->containerMock->expects($this->at(2))->method('get')->with('router')->willReturn($this->routerMock);
-        $this->containerMock->expects($this->at(3))->method('get')->with('translator')->willReturn($this->translatorMock);
-        $this->containerMock->expects($this->at(4))->method('get')->with('session')->willReturn($this->sessionMock);
-        $this->routerMock->expects($this->any(0))->method('generate')->willReturn('https://some.url');
-        $this->modelFactoryMock->expects($this->at(0))->method('getModel')->with('dashboard')->willReturn($this->dashboardModelMock);
-        $this->dashboardModelMock->expects($this->at(0))->method('saveSnapshot')->with('mockName');
-        $this->translatorMock->expects($this->at(0))->method('trans')->with('mautic.dashboard.notice.save');
+        $this->requestMock->expects($this->once())
+            ->method('getMethod')
+            ->willReturn('POST');
+
+        $this->requestMock->method('isXmlHttpRequest')
+            ->willReturn(true);
+
+        $this->requestMock->expects($this->at(2))
+            ->method('get')
+            ->with('name')
+            ->willReturn('mockName');
+
+        $this->containerMock->expects($this->at(0))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($this->modelFactoryMock);
+
+        $this->containerMock->expects($this->at(1))
+            ->method('get')
+            ->with('router')
+            ->willReturn($this->routerMock);
+
+        $this->containerMock->expects($this->at(2))
+            ->method('get')
+            ->with('router')
+            ->willReturn($this->routerMock);
+
+        $this->containerMock->expects($this->at(3))
+            ->method('get')
+            ->with('translator')
+            ->willReturn($this->translatorMock);
+
+        $this->containerMock->expects($this->at(4))
+            ->method('get')
+            ->with('session')
+            ->willReturn($this->sessionMock);
+
+        $this->routerMock->expects($this->any(0))
+            ->method('generate')
+            ->willReturn('https://some.url');
+
+        $this->modelFactoryMock->expects($this->at(0))
+            ->method('getModel')
+            ->with('dashboard')
+            ->willReturn($this->dashboardModelMock);
+
+        $this->dashboardModelMock->expects($this->at(0))
+            ->method('saveSnapshot')
+            ->with('mockName');
+
+        $this->translatorMock->expects($this->at(0))
+            ->method('trans')
+            ->with('mautic.dashboard.notice.save');
+        
         // This exception is thrown if templating is not set. Let's take it as success to avoid further mocking.
         $this->expectException(\LogicException::class);
         $this->controller->saveAction();
@@ -88,16 +160,51 @@ class DashboardControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testSaveWithPostAjaxWillNotBeAbleToSave()
     {
-        $this->requestMock->expects($this->once())->method('getMethod')->willReturn('POST');
-        $this->requestMock->method('isXmlHttpRequest')->willReturn(true);
-        $this->requestMock->expects($this->at(2))->method('get')->with('name')->willReturn('mockName');
-        $this->containerMock->expects($this->at(0))->method('get')->with('mautic.model.factory')->willReturn($this->modelFactoryMock);
-        $this->containerMock->expects($this->at(1))->method('get')->with('router')->willReturn($this->routerMock);
-        $this->containerMock->expects($this->at(2))->method('get')->with('translator')->willReturn($this->translatorMock);
-        $this->containerMock->expects($this->at(3))->method('get')->with('session')->willReturn($this->sessionMock);
-        $this->modelFactoryMock->expects($this->at(0))->method('getModel')->with('dashboard')->willReturn($this->dashboardModelMock);
-        $this->dashboardModelMock->expects($this->at(0))->method('saveSnapshot')->will($this->throwException(new IOException('some error message')));
-        $this->translatorMock->expects($this->at(0))->method('trans')->with('mautic.dashboard.error.save');
+        $this->requestMock->expects($this->once())
+            ->method('getMethod')
+            ->willReturn('POST');
+
+        $this->requestMock->method('isXmlHttpRequest')
+            ->willReturn(true);
+
+        $this->requestMock->expects($this->at(2))
+            ->method('get')
+            ->with('name')
+            ->willReturn('mockName');
+
+        $this->containerMock->expects($this->at(0))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($this->modelFactoryMock);
+
+        $this->containerMock->expects($this->at(1))
+            ->method('get')
+            ->with('router')
+            ->willReturn($this->routerMock);
+
+        $this->containerMock->expects($this->at(2))
+            ->method('get')
+            ->with('translator')
+            ->willReturn($this->translatorMock);
+
+        $this->containerMock->expects($this->at(3))
+            ->method('get')
+            ->with('session')
+            ->willReturn($this->sessionMock);
+
+        $this->modelFactoryMock->expects($this->at(0))
+            ->method('getModel')
+            ->with('dashboard')
+            ->willReturn($this->dashboardModelMock);
+
+        $this->dashboardModelMock->expects($this->at(0))
+            ->method('saveSnapshot')
+            ->will($this->throwException(new IOException('some error message')));
+
+        $this->translatorMock->expects($this->at(0))
+            ->method('trans')
+            ->with('mautic.dashboard.error.save');
+
         // This exception is thrown if templating is not set. Let's take it as success to avoid further mocking.
         $this->expectException(\LogicException::class);
         $this->controller->saveAction();
