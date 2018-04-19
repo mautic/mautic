@@ -113,4 +113,32 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
             InputHelper::cleanArray(['<script>console.log("log me");</script>'])
         );
     }
+
+    /**
+     * @testdox Test that filename handles some UTF8 chars
+     *
+     * @covers \Mautic\CoreBundle\Helper\InputHelper::filename
+     */
+    public function testFilename()
+    {
+
+        $this->assertSame(
+            '29nidji__dsfjhro85t784_f',
+            InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěí_áčýžěé+ěšéřářf')
+        );
+    }
+
+    /**
+     * @testdox Test filename with extension
+     *
+     * @covers \Mautic\CoreBundle\Helper\InputHelper::filename
+     */
+    public function testFilenameWithExtension()
+    {
+
+        $this->assertSame(
+            '29nidji__dsfjhro85t784.txt',
+            InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěíáčýžěé+ěšéřář', 'txt')
+        );
+    }
 }

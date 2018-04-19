@@ -234,16 +234,24 @@ class InputHelper
 
     /**
      * Returns a satnitized string which can be used in a file system.
+     * Attaches the file extension if provided
      *
-     * @param  $value
+     * @param  string $value
+     * @param  string $extension
      *
      * @return string
      */
-    public static function filename($value)
+    public static function filename($value, $extension = null)
     {
         $value = str_replace(' ', '_', $value);
 
-        return preg_replace("/[^a-z0-9\.\_-]/", '', strtolower($value));
+        $sanitized = preg_replace("/[^a-z0-9\.\_-]/", '', strtolower($value));
+
+        if (null === $extension) {
+            return $sanitized;
+        }
+
+        return sprintf('%s.%s', $sanitized, $extension);
     }
 
     /**

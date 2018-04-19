@@ -150,18 +150,6 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Sanitize a string to format safe for a file name
-     *
-     * @param string $name
-     * 
-     * @return string
-     */
-    public function sanitizeNameForFileName($name, $ext = 'json')
-    {
-        return sprintf('%s.%s', InputHelper::alphanum($name, false, '_'), $ext);
-    }
-
-    /**
      * Saves the dashboard snapshot to the user folder
      *
      * @param string $name
@@ -171,7 +159,7 @@ class DashboardModel extends FormModel
     public function saveSnapshot($name)
     {
         $dir        = $this->pathsHelper->getSystemPath('dashboard.user');
-        $filename   = $this->sanitizeNameForFileName($name);
+        $filename   = InputHelper::filename($name, 'json');
         $path       = $dir.'/'.$filename;
         $fileSystem = new Filesystem();
         $fileSystem->dumpFile($path, json_encode($this->toArray($name)));

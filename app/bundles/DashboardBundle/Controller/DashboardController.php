@@ -320,8 +320,7 @@ class DashboardController extends FormController
      */
     public function exportAction()
     {
-        $name     = $this->getNameFromRequest();
-        $filename = $this->getModel('dashboard')->sanitizeNameForFileName($name);
+        $filename = InputHelper::filename($this->getNameFromRequest(), 'json');
         $response = new JsonResponse($this->getModel('dashboard')->toArray($name));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
         $response->headers->set('Content-Type', 'application/force-download');
