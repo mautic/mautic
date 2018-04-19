@@ -119,7 +119,7 @@ MauticJS.notification = {
 
 MauticJS.documentReady(MauticJS.notification.init);
 
-MauticJS.asyncQueue = MauticJS.asyncQueue || function(){ (this.q=this.q || [] ).push(arguments)};;
+MauticJS.asyncQueue = MauticJS.asyncQueue || function(){ (MauticJS.asyncQueue.q=MauticJS.asyncQueue.q || [] ).push(arguments)};;
 
 setInterval(function(){                         
     console.log("jiaq queue processor running");
