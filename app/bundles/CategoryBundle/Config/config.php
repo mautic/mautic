@@ -12,6 +12,14 @@
 return [
     'routes' => [
         'main' => [
+            'mautic_category_batch_contact_set' => [
+                'path'       => '/categories/batch/contact/set',
+                'controller' => 'MauticCategoryBundle:BatchContact:exec',
+            ],
+            'mautic_category_batch_contact_view' => [
+                'path'       => '/categories/batch/contact/view',
+                'controller' => 'MauticCategoryBundle:BatchContact:index',
+            ],
             'mautic_category_index' => [
                 'path'       => '/categories/{bundle}/{page}',
                 'controller' => 'MauticCategoryBundle:Category:index',
@@ -94,6 +102,13 @@ return [
                 'class'     => 'Mautic\CategoryBundle\Model\CategoryModel',
                 'arguments' => [
                     'request_stack',
+                ],
+            ],
+            'mautic.category.model.contact.action' => [
+                'class'     => \Mautic\CategoryBundle\Model\ContactActionModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.security',
                 ],
             ],
         ],

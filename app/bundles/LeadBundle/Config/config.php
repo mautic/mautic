@@ -141,14 +141,6 @@ return [
                 'path'       => '/contact/batch_segments_view',
                 'controller' => 'MauticLeadBundle:BatchLeadSegments:batchView',
             ],
-            'mautic_contact_batch_categories_api' => [
-                'path'       => '/contact/batch_categories',
-                'controller' => 'MauticLeadBundle:BatchLeadCategories:batchApi',
-            ],
-            'mautic_contact_batch_categories_view' => [
-                'path'       => '/contact/batch_categories_view',
-                'controller' => 'MauticLeadBundle:BatchLeadCategories:batchView',
-            ],
             'mautic_contact_batch_channels_api' => [
                 'path'       => '/contact/batch_channels',
                 'controller' => 'MauticLeadBundle:BatchLeadChannels:batchApi',
@@ -757,13 +749,6 @@ return [
             ],
         ],
         'batches' => [
-            'mautic.lead.batch.change_categories_action_factory' => [
-                'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeCategoriesAction\ChangeCategoriesActionFactory::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.security',
-                ],
-            ],
             'mautic.lead.batch.change_segments_action_factory' => [
                 'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeSegmentsAction\ChangeSegmentsActionFactory::class,
                 'arguments' => [

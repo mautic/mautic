@@ -37,7 +37,7 @@ class ButtonSubscriber extends CommonSubscriber
                         'class'       => 'btn btn-default btn-sm btn-nospin',
                         'data-toggle' => 'ajaxmodal',
                         'data-target' => '#MauticSharedModal',
-                        'href'        => $this->router->generate('mautic_contact_batch_categories_view'),
+                        'href'        => $this->router->generate('mautic_category_batch_contact_view'),
                         'data-header' => $this->translator->trans('mautic.lead.batch.categories'),
                     ],
                     'btnText'   => $this->translator->trans('mautic.lead.batch.categories'),

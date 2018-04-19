@@ -249,6 +249,16 @@ abstract class AbstractCommonModel
     }
 
     /**
+     * Detaches a specific entity from entity manager.
+     *
+     * @param object id
+     */
+    public function detachEntity($entity)
+    {
+        $this->em->detach($entity);
+    }
+
+    /**
      * Encode an array to append to a URL.
      *
      * @param $array
