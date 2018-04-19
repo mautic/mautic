@@ -20,7 +20,7 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                 'class'       => 'btn btn-default btn-sm btn-nospin',
                 'data-toggle' => 'ajaxmodal',
                 'data-target' => '#MauticSharedModal',
-                'href'        => $view['router']->path('mautic_contact_batch_segments_view'),
+                'href'        => $view['router']->path('mautic_segment_batch_contact_view'),
                 'data-header' => $view['translator']->trans('mautic.lead.batch.lists'),
             ],
             'btnText'   => $view['translator']->trans('mautic.lead.batch.lists'),

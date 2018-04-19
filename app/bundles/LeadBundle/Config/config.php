@@ -27,6 +27,14 @@ return [
                     'leadId'      => '\d+',
                 ],
             ],
+            'mautic_segment_batch_contact_set' => [
+                'path'       => '/segments/batch/contact/set',
+                'controller' => 'MauticLeadBundle:BatchSegment:set',
+            ],
+            'mautic_segment_batch_contact_view' => [
+                'path'       => '/segments/batch/contact/view',
+                'controller' => 'MauticLeadBundle:BatchSegment:index',
+            ],
             'mautic_segment_index' => [
                 'path'       => '/segments/{page}',
                 'controller' => 'MauticLeadBundle:List:index',
@@ -131,15 +139,6 @@ return [
             'mautic_segment_contacts' => [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
                 'controller' => 'MauticLeadBundle:List:contacts',
-            ],
-
-            'mautic_contact_batch_segments_api' => [
-                'path'       => '/contact/batch_segments',
-                'controller' => 'MauticLeadBundle:BatchLeadSegments:batchApi',
-            ],
-            'mautic_contact_batch_segments_view' => [
-                'path'       => '/contact/batch_segments_view',
-                'controller' => 'MauticLeadBundle:BatchLeadSegments:batchView',
             ],
             'mautic_contact_batch_channels_api' => [
                 'path'       => '/contact/batch_channels',
@@ -749,13 +748,6 @@ return [
             ],
         ],
         'batches' => [
-            'mautic.lead.batch.change_segments_action_factory' => [
-                'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeSegmentsAction\ChangeSegmentsActionFactory::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.security',
-                ],
-            ],
             'mautic.lead.batch.change_channels_action_factory' => [
                 'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeChannelsAction\ChangeChannelsActionFactory::class,
                 'arguments' => [
@@ -853,6 +845,13 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.dnc',
+                ],
+            ],
+            'mautic.lead.model.segment.action' => [
+                'class'     => \Mautic\LeadBundle\Model\ContactActionModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.security',
                 ],
             ],
         ],
