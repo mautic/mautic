@@ -125,6 +125,7 @@ setInterval(function(){
     console.log("jiaq queue processor running");
     if (MauticJS.asyncQueue && MauticJS.asyncQueue.q && !MauticJS.asyncQueue.queueRunning){
         MauticJS.asyncQueue.queueRunning = true;
+        var remainingItems = [];
         while (MauticJS.asyncQueue.q.length > 0){
             console.log("queue", MauticJS.asyncQueue.q);
             var queueItem = Array.prototype.shift.call(MauticJS.asyncQueue.q);
@@ -137,10 +138,11 @@ setInterval(function(){
             if (condition && eval(condition)){
                 method.apply(method,queueItem);
             }else{
-                MauticJS.asyncQueue(method, condition);
-            }
-            
+                remainingItems.push([method, condition])                
+            }            
         }
+        console.log(remainingItems);
+        MauticJS.asyncQueue.q = remainingItems;
         MauticJS.asyncQueue.queueRunning = false;
     }
 }, 1000);    
