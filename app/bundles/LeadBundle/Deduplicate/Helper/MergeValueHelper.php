@@ -21,6 +21,7 @@ class MergeValueHelper
      * @param null  $currentValue
      *
      * @return mixed
+     *
      * @throws ValueNotMergeable
      */
     public static function getMergeValue($newerValue, $olderValue, $currentValue = null)
