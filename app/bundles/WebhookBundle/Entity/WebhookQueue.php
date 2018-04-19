@@ -11,6 +11,7 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -23,18 +24,22 @@ class WebhookQueue
      * @var int
      */
     private $id;
+
     /**
      * @var Webhook
      */
     private $webhook;
+
     /**
      * @var \DateTime
      */
     private $dateAdded;
+
     /**
      * @var string
      */
     private $payload;
+
     /**
      * @var Event
      **/
@@ -47,23 +52,14 @@ class WebhookQueue
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_queue')
-            ->setCustomRepositoryClass('Mautic\WebhookBundle\Entity\WebhookQueueRepository');
+            ->setCustomRepositoryClass(WebhookQueueRepository::class);
         $builder->addId();
-        // M:1 for webhook
         $builder->createManyToOne('webhook', 'Webhook')
             ->inversedBy('queues')
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
-        // date added
-        $builder->createField('dateAdded', 'datetime')
-            ->columnName('date_added')
-            ->nullable()
-            ->build();
-        // payload
-        $builder->createField('payload', 'text')
-            ->columnName('payload')
-            ->build();
-        // M:1 for event
+        $builder->addNullableField('dateAdded', Type::DATETIME, 'date_added');
+        $builder->addField('payload', Type::INTEGER);
         $builder->createManyToOne('event', 'Event')
             ->inversedBy('queues')
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
