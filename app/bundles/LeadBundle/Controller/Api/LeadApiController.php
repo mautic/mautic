@@ -623,7 +623,7 @@ class LeadApiController extends CommonApiController
             unset($parameters['stage']);
         }
 
-        if (isset($originalParams['tags'])) {
+        if (isset($this->entityRequestParameters['tags'])) {
             $this->model->modifyTags($entity, $this->entityRequestParameters['tags'], null, false);
         }
 
@@ -639,7 +639,7 @@ class LeadApiController extends CommonApiController
         }
 
         // Check for lastActive date
-        if (isset($originalParams['lastActive'])) {
+        if (isset($this->entityRequestParameters['lastActive'])) {
             $lastActive = new DateTimeHelper($this->entityRequestParameters['lastActive']);
             $entity->setLastActive($lastActive->getDateTime());
             unset($this->entityRequestParameters['lastActive']);
