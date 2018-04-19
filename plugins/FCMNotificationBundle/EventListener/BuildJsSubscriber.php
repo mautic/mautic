@@ -134,7 +134,7 @@ setInterval(function(){
             var method = Array.prototype.shift.call(queueItem);
             var condition = Array.prototype.shift.call(queueItem);
             console.log("method", method, 'arguments', queueItem);
-            if (eval(condition)){
+            if (condition && eval(condition)){
                 method.apply(method,queueItem);
             }else{
                 MauticJS.asyncQueue(method, condition);
