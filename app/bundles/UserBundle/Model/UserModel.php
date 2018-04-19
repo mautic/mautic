@@ -308,7 +308,7 @@ class UserModel extends FormModel
             $this->logger->addError($exception->getMessage());
             throw new \RuntimeException();
         }
-        $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken], true);
+        $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], true);
 
         $mailer->setTo([$user->getEmail() => $user->getName()]);
         $mailer->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
