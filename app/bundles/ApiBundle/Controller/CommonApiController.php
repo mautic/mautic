@@ -170,6 +170,11 @@ class CommonApiController extends FOSRestController implements MauticController
     protected $user;
 
     /**
+     * @var array
+     */
+    protected $entityRequestParameters = [];
+
+    /**
      * Delete a batch of entities.
      *
      * @return array|Response
@@ -1100,6 +1105,9 @@ class CommonApiController extends FOSRestController implements MauticController
             //get from request
             $parameters = $this->request->request->all();
         }
+
+        // Store the original parameters from the request so that callbacks can have access to them as needed
+        $this->entityRequestParameters = $parameters;
 
         //unset the ID in the parameters if set as this will cause the form to fail
         if (isset($parameters['id'])) {
