@@ -139,68 +139,71 @@ head.appendChild(scrpt);
 
 
 //using queue might be necessary
+MauticJS.asyncQueue(function(){
+    var config = {
+        apiKey: "{$apiKey}",
+        authDomain: "{$projectId}.firebaseapp.com",
+        databaseURL: "https://{$projectId}.firebaseio.com",
+        projectId: "{$projectId}",
+        storageBucket: "",
+        messagingSenderId: "{$messagingSenderId}"
+      };
+      firebase.initializeApp(config);
 
-var config = {
-    apiKey: "{$apiKey}",
-    authDomain: "{$projectId}.firebaseapp.com",
-    databaseURL: "https://{$projectId}.firebaseio.com",
-    projectId: "{$projectId}",
-    storageBucket: "",
-    messagingSenderId: "{$messagingSenderId}"
-  };
-  firebase.initializeApp(config);
-
-  const messaging = firebase.messaging();
-  messaging.usePublicVapidKey("{$publicVapidKey}");
+      const messaging = firebase.messaging();
+      messaging.usePublicVapidKey("{$publicVapidKey}");
 
 
 
-var postUserIdToMautic = function(userId) {
-    var data = [];
-    data['fcm_id'] = userId;
-    MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}', data);
-};
-    
-    messaging.getToken().then(function(currentToken){
-        if (currentToken) {
-            postUserIdToMautic(currentToken);          
-        } else {
-            messaging.requestPermission().then(function() {
-                messaging.getToken().then(function(currentToken){
-                    if (currentToken) {
-                        postUserIdToMautic(currentToken);          
-                    }
-                });
-            }).catch(function(err) {
-                console.log('Unable to get permission to notify.', err);
-            });          
-        }
-    }).catch(function(err) {
-        console.log('An error occurred while retrieving token. ', err);        
-    });
-    
-    
-    // Just to be sure we've grabbed the ID
-    window.onbeforeunload = function() {
+    var postUserIdToMautic = function(userId) {
+        var data = [];
+        data['fcm_id'] = userId;
+        MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}', data);
+    };
+        
         messaging.getToken().then(function(currentToken){
             if (currentToken) {
                 postUserIdToMautic(currentToken);          
-            } 
-        });        
-    };
-    
-    messaging.onTokenRefresh(function() {
-        messaging.getToken().then(function(refreshedToken) {
-            postUserIdToMautic(refreshedToken);         
+            } else {
+                messaging.requestPermission().then(function() {
+                    messaging.getToken().then(function(currentToken){
+                        if (currentToken) {
+                            postUserIdToMautic(currentToken);          
+                        }
+                    });
+                }).catch(function(err) {
+                    console.log('Unable to get permission to notify.', err);
+                });          
+            }
         }).catch(function(err) {
-            console.log('Unable to retrieve refreshed token ', err);            
+            console.log('An error occurred while retrieving token. ', err);        
         });
-    });
+        
+        
+        // Just to be sure we've grabbed the ID
+        window.onbeforeunload = function() {
+            messaging.getToken().then(function(currentToken){
+                if (currentToken) {
+                    postUserIdToMautic(currentToken);          
+                } 
+            });        
+        };
+        
+        messaging.onTokenRefresh(function() {
+            messaging.getToken().then(function(refreshedToken) {
+                postUserIdToMautic(refreshedToken);         
+            }).catch(function(err) {
+                console.log('Unable to retrieve refreshed token ', err);            
+            });
+        });
 
-    messaging.onMessage(function(payload){
-        console.log('message arrived to open site', payload);
-    });
-
+        messaging.onMessage(function(payload){
+            console.log('message arrived to open site', payload);
+        });
+}, function(){
+    return firebase?true:false
+})
+);    
 JS;
                 
             return $fcmInit;
