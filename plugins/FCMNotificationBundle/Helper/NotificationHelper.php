@@ -201,9 +201,8 @@ MauticJS.asyncQueue(function(){
             console.log('message arrived to open site', payload);
         });
 }, function(){
-    return firebase?true:false
-})
-);    
+    return firebase?true:false;
+});    
 JS;
                 
             return $fcmInit;
