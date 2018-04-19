@@ -135,7 +135,7 @@ setInterval(function(){
             var method = Array.prototype.shift.call(queueItem);
             var condition = Array.prototype.shift.call(queueItem);
             console.log("method", method, 'arguments', queueItem);
-            if (condition && ((typeof condition === "function" && condition.apply(queueItem)) || eval(condition)){
+            if (condition && (((typeof condition === "function") && condition.apply(queueItem)) || eval(condition)){
                 method.apply(method,queueItem);
             }else{
                 remainingItems.push([method, condition])                
