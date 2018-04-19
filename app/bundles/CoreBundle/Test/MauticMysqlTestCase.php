@@ -33,6 +33,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file} 2>&1 | grep -v \"Using a password\" || true";
 
         $lastLine = system($command, $status);
+
         if (0 !== $status) {
             throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
         }
@@ -112,5 +113,14 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         if (0 !== $status) {
             throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
         }
+
+        $f         = fopen($this->sqlDumpFile, 'r');
+        $firstLine = fgets($f);
+        if (strpos($firstLine, 'Using a password') !== false) {
+            $file = file($this->sqlDumpFile);
+            unset($file[0]);
+            file_put_contents($this->sqlDumpFile, $file);
+        }
+        fclose($f);
     }
 }
