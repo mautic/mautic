@@ -94,10 +94,8 @@ class WidgetType extends AbstractType
             'required'   => false,
         ]);
 
-        $ff = $builder->getFormFactory();
-
         // function to add a form for specific widget type dynamically
-        $func = function (FormEvent $e) use ($ff, $dispatcher) {
+        $func = function (FormEvent $e) use ($dispatcher) {
             $data   = $e->getData();
             $form   = $e->getForm();
             $event  = new WidgetFormEvent();
