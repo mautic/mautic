@@ -95,6 +95,7 @@ class NotificationHelper
     {
         if ($this->hasScript()) {            
             return 'MauticJS.insertScript(\'https://www.gstatic.com/firebasejs/4.12.1/firebase.js\');                    
+                    MauticJS.mauticInsertedScripts.firebase = true;
                     var _fbaq = _fbaq || [];';
         }
     }

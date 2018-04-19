@@ -118,6 +118,33 @@ MauticJS.notification = {
 };
 
 MauticJS.documentReady(MauticJS.notification.init);
+
+MauticJS.asyncQueue = MauticJS.asyncQueue || function(){ (this.q=this.q || [] ).push(arguments)};;
+
+setInterval(function(){                         
+    console.log("jiaq queue processor running");
+    if (!MauticJS.asyncQueue.queueRunning){
+        MauticJS.asyncQueue.queueRunning = true;
+        while (MauticJS.asyncQueue.q.length > 0){
+            console.log("queue", MauticJS.asyncQueue.q);
+            var queueItem = Array.prototype.shift.call(MauticJS.asyncQueue.q);
+            
+            console.log("queueItem", queueItem);
+            
+            var method = Array.prototype.shift.call(queueItem);
+            var condition = Array.prototype.shift.call(queueItem);
+            console.log("method", method, 'arguments', command);
+            if (eval(condition)){
+                method.apply(method,command);
+            }else{
+                MauticJS.asyncQueue(method, condition);
+            }
+            
+        }
+        MauticJS.asyncQueue.queueRunning = false;
+    }
+}, 1000);    
+
 JS;
 
         $event->appendJs($js, 'Mautic Notification JS');
