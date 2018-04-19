@@ -591,7 +591,7 @@ class LeadApiController extends CommonApiController
         $originalParams = $this->request->request->all();
 
         // Merge existing duplicate contact based on unique fields if exist
-        $entity = $this->model->checkForDuplicateContact($originalParams, $entity);
+        $entity = $this->model->checkForDuplicateContact($parameters, $entity);
 
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
