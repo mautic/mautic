@@ -47,7 +47,7 @@ class JsController extends CommonController
     public function workerAction()
     {
         //$this->integrationHelper = new IntegrationHelper();
-        $this->integrationHelper = $this->get('mauticplugin.fcmnotification.helper.notification');       
+        $this->integrationHelper = $this->get('mautic.helper.integration');       
         $integration = $this->integrationHelper->getIntegrationObject('FCM');
 
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
