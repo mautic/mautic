@@ -186,7 +186,7 @@ class ContactMerger
                 $newValue = MergeValueHelper::getMergeValue($newestFields[$field], $oldestFields[$field], $winner->getFieldValue($field));
                 $winner->addUpdatedField($field, $newValue);
 
-                $fromValue = empty($winnerFields[$field]) ? 'empty' : $winnerFields[$field];
+                $fromValue = empty($oldestFields[$field]) ? 'empty' : $oldestFields[$field];
                 $this->logger->debug("CONTACT: Updated $field from $fromValue to $newValue for {$winner->getId()}");
             } catch (ValueNotMergeable $exception) {
                 $this->logger->info("CONTACT: $field is not mergeable for {$winner->getId()} - ".$exception->getMessage());
