@@ -1072,7 +1072,7 @@ class CommonApiController extends FOSRestController implements MauticController
                     $entity
                 );
             }
-        } elseif ($formResponse === $entity) {
+        } elseif (get_class($formResponse) === get_class($entity)) {
             // Success
             $entities[$key] = $formResponse;
         } elseif (is_array($formResponse) && isset($formResponse['code'], $formResponse['message'])) {
