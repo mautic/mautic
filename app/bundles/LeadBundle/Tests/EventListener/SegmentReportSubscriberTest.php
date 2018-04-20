@@ -184,7 +184,7 @@ class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $reportBuilderEvent->getTables()); //Different order of keys on PHP 5.6.
+        $this->assertSame($expected, $reportBuilderEvent->getTables()); //Different order of keys on PHP 5.6.
     }
 
     public function testReportGenerate()
