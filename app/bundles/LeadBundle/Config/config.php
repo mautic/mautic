@@ -399,6 +399,7 @@ return [
                 'class'     => \Mautic\LeadBundle\EventListener\ReportUtmTagSubscriber::class,
                 'arguments' => [
                     'mautic.lead.reportbundle.fields_builder',
+                    'mautic.lead.model.company_report_data',
                 ],
             ],
             'mautic.lead.calendarbundle.subscriber' => [
