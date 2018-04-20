@@ -85,7 +85,11 @@ class MAConsumerCommand extends ModeratedCommand
                 'local_cert'=>getenv("RABBITMQ_SSL_CERT_FILE"),
                 'local_pk'=>getenv("RABBITMQ_SSL_KEY_FILE"),
                 'verify_peer_name'=>false,
+            ],
+            [
+                "heartbeat"=>1
             ]);
+        
         $channel = $connection->channel();
 
         // exchange, type, passive, durable, auto_delete
