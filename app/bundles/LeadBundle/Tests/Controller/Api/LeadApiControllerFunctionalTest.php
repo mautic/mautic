@@ -115,4 +115,35 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(4, count($response['contacts'][1]['tags']));
         $this->assertEquals(0, count($response['contacts'][2]['tags']));
     }
+
+    public function testSingleNewEndpointCreateAndUpdate()
+    {
+        $payload = [
+            'email'     => 'apiemail1@email.com',
+            'firstname' => 'API Update',
+            'points'    => 4,
+            'tags'      => ['apitest', 'testapi'],
+        ];
+
+        $this->client->request('POST', '/api/contacts/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $contactId      = $response['contact']['id'];
+
+        $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEquals(4, $response['contact']['points']);
+        $this->assertEquals(2, count($response['contact']['tags']));
+
+        // Lets try to create the same contact to see that the values are not re-setted
+        $this->client->request('POST', '/api/contacts/new', ['email' => 'apiemail1@email.com']);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contact']['id']);
+        $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEquals(4, $response['contact']['points']);
+        $this->assertEquals(2, count($response['contact']['tags']));
+    }
 }
