@@ -587,6 +587,12 @@ class LeadApiController extends CommonApiController
             unset($parameters['tags']);
         }
 
+        if (count($entity->getTags()) > 0) {
+            foreach ($entity->getTags() as $tag) {
+                $parameters['tags'][] = $tag->getId();
+            }
+        }
+
         return $parameters;
     }
 
