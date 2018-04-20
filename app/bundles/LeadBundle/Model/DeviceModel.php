@@ -13,13 +13,11 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Event\LeadDeviceEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -44,28 +42,20 @@ class DeviceModel extends FormModel
     private $leadModel;
 
     /**
-     * @var Request
-     */
-    private $request;
-
-    /**
      * DeviceModel constructor.
      *
      * @param CookieHelper         $cookieHelper
      * @param LeadDeviceRepository $leadDeviceRepository
      * @param LeadModel            $leadModel
-     * @param Request              $request
      */
     public function __construct(
         CookieHelper $cookieHelper,
         LeadDeviceRepository $leadDeviceRepository,
-        LeadModel $leadModel,
-        Request $request
+        LeadModel $leadModel
     ) {
         $this->cookieHelper         = $cookieHelper;
         $this->leadDeviceRepository = $leadDeviceRepository;
         $this->leadModel            = $leadModel;
-        $this->request              = $request;
     }
 
     /**
