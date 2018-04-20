@@ -83,7 +83,7 @@ class OneSignalApi extends AbstractNotificationApi
 
         $actionButtonUrl1  = $sendNotification->getActionButtonUrl1();
         $actionButtonIcon1 = $this->notificationUploader->getFullUrl($notification, 'actionButtonIcon1');
-        $button            = $actionButtonId1                  = $sendNotification->getButton();
+        $button            = $actionButtonId1 = $sendNotification->getButton();
 
         $actionButtonUrl2  = $sendNotification->getActionButtonUrl2();
         $actionButtonIcon2 = $this->notificationUploader->getFullUrl($notification, 'actionButtonIcon2');
@@ -123,7 +123,7 @@ class OneSignalApi extends AbstractNotificationApi
             // action button 1
             if ($button && $actionButtonUrl1) {
                 $data['web_buttons'][] = [
-                    'id'   => $actionButtonId2,
+                    'id'   => $actionButtonId1,
                     'text' => $button,
                     'url'  => $actionButtonUrl1,
                     'icon' => $actionButtonIcon1,

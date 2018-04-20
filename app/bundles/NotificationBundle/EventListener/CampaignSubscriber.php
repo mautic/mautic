@@ -181,8 +181,8 @@ class CampaignSubscriber extends CommonSubscriber
         // trackable links and update Notification entity
         $convertedLinks = ['url', 'actionButtonUrl1', 'actionButtonUrl2'];
         foreach ($convertedLinks as $key) {
-            $getVar = 'get'.$key;
-            $setVar = 'set'.$key;
+            $getVar = 'get'.ucfirst($key);
+            $setVar = 'set'.ucfirst($key);
             if ($url = $notification->$getVar()) {
                 $url = $this->notificationApi->convertToTrackedUrl(
                     $url,
