@@ -688,9 +688,9 @@ class LeadListRepository extends CommonRepository
                 $object = $details['object'];
             }
 
-            if ('lead' == $object) {
+            if ($object == 'lead') {
                 $column = isset($this->leadTableSchema[$details['field']]) ? $this->leadTableSchema[$details['field']] : false;
-            } elseif ('company' == $object) {
+            } elseif ($object == 'company') {
                 $column = isset($this->companyTableSchema[$details['field']]) ? $this->companyTableSchema[$details['field']] : false;
             }
 
@@ -698,9 +698,9 @@ class LeadListRepository extends CommonRepository
             $operatorDetails = $options[$details['operator']];
             $func            = $isNot ? $operatorDetails['negate_expr'] : $operatorDetails['expr'];
 
-            if ('lead' === $object) {
+            if ($object === 'lead') {
                 $field = "l.{$details['field']}";
-            } elseif ('company' === $object) {
+            } elseif ($object === 'company') {
                 $field = "comp.{$details['field']}";
             }
 
@@ -735,7 +735,7 @@ class LeadListRepository extends CommonRepository
             }
 
             //the next one will determine the group
-            if ('or' == $details['glue']) {
+            if ($details['glue'] == 'or') {
                 // Create a new group of andX expressions
                 if ($groupExpr->count()) {
                     $groups[]  = $groupExpr;
@@ -748,10 +748,10 @@ class LeadListRepository extends CommonRepository
             $ignoreAutoFilter = false;
 
             // Special handling of relative date strings
-            if ('datetime' === $details['type'] || 'date' === $details['type']) {
+            if ($details['type'] === 'datetime' || $details['type'] === 'date') {
                 $relativeDateStrings = $this->getRelativeDateStrings();
                 // Check if the column type is a date/time stamp
-                $isTimestamp = ('datetime' === $details['type'] || $columnType instanceof UTCDateTimeType);
+                $isTimestamp = ($details['type'] === 'datetime' || $columnType instanceof UTCDateTimeType);
                 $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func) {
                     $key             = array_search($string, $relativeDateStrings);
                     $dtHelper        = new DateTimeHelper('midnight today', null, 'local');
@@ -771,9 +771,9 @@ class LeadListRepository extends CommonRepository
                         case 'today':
                         case 'tomorrow':
                         case 'yesterday':
-                            if ('yesterday' === $timeframe) {
+                            if ($timeframe === 'yesterday') {
                                 $dtHelper->modify('-1 day');
-                            } elseif ('tomorrow' === $timeframe) {
+                            } elseif ($timeframe === 'tomorrow') {
                                 $dtHelper->modify('+1 day');
                             }
 
@@ -902,7 +902,7 @@ class LeadListRepository extends CommonRepository
                     }
 
                     // check does this match php date params pattern?
-                    if ('anniversary' !== $timeframe &&
+                    if ($timeframe !== 'anniversary' &&
                         (stristr($string[0], '-') || stristr($string[0], '+'))) {
                         $date = new \DateTime('now');
                         $date->modify($string);
@@ -921,7 +921,7 @@ class LeadListRepository extends CommonRepository
                             $endWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
 
                             // Use a between statement
-                            $func              = ('neq' == $func) ? 'notBetween' : 'between';
+                            $func              = ($func == 'neq') ? 'notBetween' : 'between';
                             $details['filter'] = [$startWith, $endWith];
                         } else {
                             if ($modifier) {
@@ -967,7 +967,7 @@ class LeadListRepository extends CommonRepository
                     $ignoreAutoFilter = true;
                     $column           = $details['field'];
 
-                    if ('hit_url' == $column) {
+                    if ($column == 'hit_url') {
                         $column = 'url';
                     }
 
@@ -990,7 +990,7 @@ class LeadListRepository extends CommonRepository
                         case 'regexp':
                         case 'notRegexp':
                             $parameters[$parameter] = $this->prepareRegex($details['filter']);
-                            $not                    = ('notRegexp' === $func) ? ' NOT' : '';
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
                             $subqb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.lead_id', 'l.id'),
@@ -1068,7 +1068,7 @@ class LeadListRepository extends CommonRepository
                         case 'regexp':
                         case 'notRegexp':
                             $parameters[$parameter] = $this->prepareRegex($details['filter']);
-                            $not                    = ('notRegexp' === $func) ? ' NOT' : '';
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
                             $subqb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.lead_id', 'l.id'),
@@ -1092,7 +1092,7 @@ class LeadListRepository extends CommonRepository
                     $table   = 'page_hits';
                     $column  = 'date_hit';
 
-                    if ('lead_email_read_date' == $details['field']) {
+                    if ($details['field'] == 'lead_email_read_date') {
                         $column = 'date_read';
                         $table  = 'email_stats';
                     }
@@ -1127,7 +1127,7 @@ class LeadListRepository extends CommonRepository
                             $ignoreAutoFilter        = true;
                             $field                   = $column;
 
-                            if ('between' == $func) {
+                            if ($func == 'between') {
                                 $subqb->where(
                                     $q->expr()
                                         ->andX(
@@ -1177,12 +1177,12 @@ class LeadListRepository extends CommonRepository
                 case 'email_id':
                 case 'redirect_id':
                 case 'notification':
-                    $operand = ('eq' == $func) ? 'EXISTS' : 'NOT EXISTS';
+                    $operand = ($func == 'eq') ? 'EXISTS' : 'NOT EXISTS';
                     $column  = $details['field'];
                     $table   = 'page_hits';
                     $select  = 'id';
 
-                    if ('notification' == $details['field']) {
+                    if ($details['field'] == 'notification') {
                         $table  = 'push_ids';
                         $column = 'id';
                     }
@@ -1192,7 +1192,7 @@ class LeadListRepository extends CommonRepository
                         ->select($select)
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
-                    if (1 == $details['filter']) {
+                    if ($details['filter'] == 1) {
                         $subqb->where(
                             $q->expr()
                                 ->andX(
@@ -1293,7 +1293,7 @@ class LeadListRepository extends CommonRepository
                     $column  = $details['field'];
                     $table   = 'page_hits';
                     $select  = 'COUNT(id)';
-                    if ('lead_email_read_count' == $details['field']) {
+                    if ($details['field'] == 'lead_email_read_count') {
                         $table  = 'email_stats';
                         $select = 'COALESCE(SUM(open_count),0)';
                     }
@@ -1343,12 +1343,12 @@ class LeadListRepository extends CommonRepository
                 case 'dnc_bounced_sms':
                 case 'dnc_unsubscribed_sms':
                     // Special handling of do not contact
-                    $func = (('eq' == $func && $details['filter']) || ('neq' == $func && !$details['filter'])) ? 'EXISTS' : 'NOT EXISTS';
+                    $func = (($func == 'eq' && $details['filter']) || ($func == 'neq' && !$details['filter'])) ? 'EXISTS' : 'NOT EXISTS';
 
                     $parts   = explode('_', $details['field']);
                     $channel = 'email';
 
-                    if (3 === count($parts)) {
+                    if (count($parts) === 3) {
                         $channel = $parts[2];
                     }
 
@@ -1380,7 +1380,7 @@ class LeadListRepository extends CommonRepository
 
                     $ignoreAutoFilter = true;
 
-                    $parameters[$parameter]        = ('bounced' === $parts[1]) ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+                    $parameters[$parameter]        = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
                     $parameters[$channelParameter] = $channel;
 
                     break;
@@ -1594,7 +1594,7 @@ class LeadListRepository extends CommonRepository
                     switch ($func) {
                         case 'eq':
                         case 'neq':
-                            if (false !== strpos($details['filter'], '::')) {
+                            if (strpos($details['filter'], '::') !== false) {
                                 list($integrationName, $campaignId) = explode('::', $details['filter']);
                             } else {
                                 // Assuming this is a Salesforce integration for BC with pre 2.11.0
@@ -1668,7 +1668,7 @@ class LeadListRepository extends CommonRepository
                             $exprParameter2          = ":$parameter2";
                             $ignoreAutoFilter        = true;
 
-                            if ('between' == $func) {
+                            if ($func == 'between') {
                                 $groupExpr->add(
                                     $q->expr()->andX(
                                         $q->expr()->gte($field, $exprParameter),
@@ -1709,11 +1709,11 @@ class LeadListRepository extends CommonRepository
                                     InputHelper::clean($value)
                                 );
                             }
-                            if ('multiselect' == $details['type']) {
+                            if ($details['type'] == 'multiselect') {
                                 foreach ($details['filter'] as $filter) {
                                     $filter = trim($filter, "'");
 
-                                    if ('not' === substr($func, 0, 3)) {
+                                    if (substr($func, 0, 3) === 'not') {
                                         $operator = 'NOT REGEXP';
                                     } else {
                                         $operator = 'REGEXP';
@@ -1747,7 +1747,7 @@ class LeadListRepository extends CommonRepository
                             switch ($func) {
                                 case 'like':
                                 case 'notLike':
-                                    $parameters[$parameter] = (false === strpos($details['filter'], '%')) ? '%'.$details['filter'].'%'
+                                    $parameters[$parameter] = (strpos($details['filter'], '%') === false) ? '%'.$details['filter'].'%'
                                         : $details['filter'];
                                     break;
                                 case 'startsWith':
@@ -1772,7 +1772,7 @@ class LeadListRepository extends CommonRepository
                         case 'notRegexp':
                             $ignoreAutoFilter       = true;
                             $parameters[$parameter] = $this->prepareRegex($details['filter']);
-                            $not                    = ('notRegexp' === $func) ? ' NOT' : '';
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
                             $groupExpr->add(
                             // Escape single quotes while accounting for those that may already be escaped
                                 $field.$not.' REGEXP '.$exprParameter
@@ -1812,7 +1812,7 @@ class LeadListRepository extends CommonRepository
         if ($groupExpr->count()) {
             $groups[] = $groupExpr;
         }
-        if (1 === count($groups)) {
+        if (count($groups) === 1) {
             // Only one andX expression
             $expr = $groups[0];
         } elseif (count($groups) > 1) {
