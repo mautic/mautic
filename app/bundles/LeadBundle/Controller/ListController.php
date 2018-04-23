@@ -424,15 +424,14 @@ class ListController extends FormController
      */
     private function getPostActionVars($objectId = null)
     {
-        //set the page we came from
-        $page = $this->get('session')->get('mautic.segment.page', 1);
-
         //set the return URL
         if ($objectId != null) {
             $returnUrl       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
             $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
             $contentTemplate = 'MauticLeadBundle:List:view';
         } else {
+            //set the page we came from
+            $page            = $this->get('session')->get('mautic.segment.page', 1);
             $returnUrl       = $this->generateUrl('mautic_segment_index', ['page' => $page]);
             $viewParameters  = ['page' => $page];
             $contentTemplate = 'MauticLeadBundle:List:index';
