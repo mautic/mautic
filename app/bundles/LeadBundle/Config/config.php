@@ -848,7 +848,7 @@ return [
                 ],
             ],
             'mautic.lead.model.segment.action' => [
-                'class'     => \Mautic\LeadBundle\Model\ContactActionModel::class,
+                'class'     => \Mautic\LeadBundle\Model\SegmentActionModel::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.security',

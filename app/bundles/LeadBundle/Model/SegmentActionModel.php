@@ -13,8 +13,9 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\LeadBundle\Entity\Lead;
 
-class SegmentsActionModel
+class SegmentActionModel
 {
     /**
      * @var int[]
@@ -59,7 +60,7 @@ class SegmentsActionModel
      * @param array $contactIds
      * @param array $segmentIds
      */
-    public function remmoveContacts(array $contactIds, array $segmentIds)
+    public function removeContacts(array $contactIds, array $segmentIds)
     {
         $contacts = $this->getContacts($contactIds);
 
@@ -97,7 +98,7 @@ class SegmentsActionModel
                     [
                         'column' => 'l.id',
                         'expr'   => 'in',
-                        'value'  => $this->leadsIds,
+                        'value'  => $ids,
                     ],
                 ],
             ],

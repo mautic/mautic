@@ -13,25 +13,38 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-class BatchLeadSegmentsController extends AbstractFormController
+class BatchSegmentController extends AbstractFormController
 {
+    /**
+     * Initialize object props here to simulate constructor
+     * and make the future controller refactoring easier.
+     *
+     * @param FilterControllerEvent $event
+     */
+    public function initialize(FilterControllerEvent $event)
+    {
+        $this->actionModel  = $this->container->get('mautic.lead.model.segment.action');
+        $this->segmentModel = $this->container->get('mautic.lead.model.list');
+    }
+
     /**
      * API for batch action.
      *
      * @return JsonResponse
      */
-    public function batchApiAction()
+    public function setAction()
     {
-        $actionFactory     = $this->get('mautic.lead.batch.change_segments_action_factory');
         $requestParameters = $this->request->get('lead_batch', []);
 
-        if (array_key_exists('ids', $requestParameters)) {
-            $segmentsToAdd    = array_key_exists('add', $requestParameters) ? $requestParameters['add'] : [];
-            $segmentsToRemove = array_key_exists('remove', $requestParameters) ? $requestParameters['remove'] : [];
+        if (isset($requestParameters['ids'])) {
+            $segmentsToAdd    = isset($requestParameters['add']) ? $requestParameters['add'] : [];
+            $segmentsToRemove = isset($requestParameters['remove']) ? $requestParameters['remove'] : [];
+            $contactIds       = json_decode($requestParameters['ids']);
 
-            $action = $actionFactory->create(json_decode($requestParameters['ids']), $segmentsToAdd, $segmentsToRemove);
-            $action->execute();
+            $this->actionModel->addContacts($contactIds, $segmentsToAdd);
+            $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
 
             $this->addFlash('mautic.lead.batch_leads_affected', [
                 'pluralCount' => count($requestParameters['ids']),
@@ -50,13 +63,12 @@ class BatchLeadSegmentsController extends AbstractFormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function batchViewAction()
+    public function indexAction()
     {
-        $listModel = $this->get('mautic.lead.model.list');
-        $route     = $this->generateUrl('mautic_contact_batch_segments_api');
-
-        $lists = $listModel->getUserLists();
+        $route = $this->generateUrl('mautic_segment_batch_contact_set');
+        $lists = $this->segmentModel->getUserLists();
         $items = [];
+
         foreach ($lists as $list) {
             $items[$list['id']] = $list['name'];
         }

@@ -18,6 +18,12 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class BatchContactController extends AbstractFormController
 {
+    /**
+     * Initialize object props here to simulate constructor
+     * and make the future controller refactoring easier.
+     *
+     * @param FilterControllerEvent $event
+     */
     public function initialize(FilterControllerEvent $event)
     {
         $this->actionModel   = $this->container->get('mautic.category.model.contact.action');
