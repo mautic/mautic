@@ -813,9 +813,7 @@ return [
             'mautic.lead.model.device' => [
                 'class'     => Mautic\LeadBundle\Model\DeviceModel::class,
                 'arguments' => [
-                    'mautic.helper.cookie',
                     'mautic.lead.repository.lead_device',
-                    'mautic.lead.model.lead',
                 ],
             ],
             'mautic.lead.model.company' => [
