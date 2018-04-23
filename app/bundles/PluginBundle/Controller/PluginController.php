@@ -389,6 +389,8 @@ class PluginController extends FormController
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
 
+        $bundle->splitDescriptions();
+
         return $this->delegateView(
             [
                 'viewParameters' => [

@@ -681,8 +681,18 @@ class ListModel extends FormModel
         $fields = $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities(
             [
                 'filter' => [
-                    'isListable'  => true,
-                    'isPublished' => true,
+                    'where'         => [
+                        [
+                            'expr' => 'eq',
+                            'col'  => 'f.isListable',
+                            'val'  => true,
+                        ],
+                        [
+                            'expr' => 'eq',
+                            'col'  => 'f.isPublished',
+                            'val'  => true,
+                        ],
+                    ],
                 ],
                 'orderBy' => 'f.object',
             ]
@@ -701,7 +711,7 @@ class ListModel extends FormModel
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
                     $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
-                        FormFieldHelper::FORMAT_BAR,
+                        FormFieldHelper::FORMAT_ARRAY,
                         FormFieldHelper::parseList($properties['list'])
                     ) : '';
                 }

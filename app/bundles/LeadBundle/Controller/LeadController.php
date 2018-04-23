@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -441,6 +442,12 @@ class LeadController extends FormController
                     $model->setFieldValues($lead, $data, true);
 
                     //form is valid so process the data
+                    $lead->setManipulator(new LeadManipulator(
+                        'lead',
+                        'lead',
+                        null,
+                        $this->get('mautic.helper.user')->getUser()->getName()
+                    ));
                     $model->saveEntity($lead);
 
                     if (!empty($companies)) {
@@ -622,6 +629,12 @@ class LeadController extends FormController
                     $model->setFieldValues($lead, $data, true);
 
                     //form is valid so process the data
+                    $lead->setManipulator(new LeadManipulator(
+                        'lead',
+                        'lead',
+                        $objectId,
+                        $this->get('mautic.helper.user')->getUser()->getName()
+                    ));
                     $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
                     $model->modifyCompanies($lead, $companies);
 
