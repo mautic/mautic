@@ -21,6 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ContactFrequencyType extends AbstractType
 {
+    /**
+     * @var CoreParametersHelper
+     */
     protected $coreParametersHelper;
 
     /**
@@ -39,45 +42,32 @@ class ContactFrequencyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $showContactCategories        = $this->coreParametersHelper->getParameter('show_contact_categories');
-        $showContactSegments          = $this->coreParametersHelper->getParameter('show_contact_segments');
-
-        if (isset($options['channels']) && $options['channels']) {
+        $showContactCategories = $this->coreParametersHelper->getParameter('show_contact_categories');
+        $showContactSegments   = $this->coreParametersHelper->getParameter('show_contact_segments');
+        // var_dump($options['data'], $options['channels']);die;
+        if (!empty($options['channels'])) {
             $builder->add(
                 'lead_channels',
                 'lead_contact_channels',
                 [
                     'channels' => $options['channels'],
+                    'data'     => $options['data']['lead_channels'],
                 ]
             );
         }
 
-        if (!$options['public_view']) {
-            $builder->add(
-                'lead_lists',
-                'leadlist_choices',
-                [
-                    'label'      => 'mautic.lead.form.list',
-                    'label_attr' => ['class' => 'control-label'],
-                    'multiple'   => true,
-                    'expanded'   => $options['public_view'],
-                    'required'   => false,
-                ]
-            );
-        } elseif ($showContactSegments) {
-            $builder->add(
-                'lead_lists',
-                'leadlist_choices',
-                [
-                    'global_only' => true,
-                    'label'       => 'mautic.lead.form.list',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'multiple'    => true,
-                    'expanded'    => $options['public_view'],
-                    'required'    => false,
-                ]
-            );
-        }
+        $builder->add(
+            'lead_lists',
+            'leadlist_choices',
+            [
+                'global_only' => $options['public_view'],
+                'label'       => 'mautic.lead.form.list',
+                'label_attr'  => ['class' => 'control-label'],
+                'multiple'    => true,
+                'expanded'    => $options['public_view'],
+                'required'    => false,
+            ]
+        );
 
         if (!$options['public_view'] || $showContactCategories) {
             $builder->add(
