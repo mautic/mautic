@@ -112,9 +112,7 @@ return [
                     'monolog.logger.mautic',
                 ],
                 'alias' => 'mautic.sms.transport.twilio',
-                'tags'  => [
-                    'name' => 'mautic.sms_transport', 'Twilio',
-                ],
+                'tag'   => 'mautic.sms_transport',
             ],
         ],
         'models' => [
