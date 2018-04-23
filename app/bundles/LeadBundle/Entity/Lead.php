@@ -1889,7 +1889,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function setEmail($email)
     {
         $this->isChanged('email', $email);
-        $this->email = $email;
+        $this->email = strtolower($email);
 
         return $this;
     }

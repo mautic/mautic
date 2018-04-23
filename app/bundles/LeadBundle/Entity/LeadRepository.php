@@ -110,7 +110,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if ($field == 'email') {
             // Prevent emails from being case sensitive
-            $col   = "LOWER($col)";
             $value = (is_array($value)) ? array_map(
                 function ($v) use ($q) {
                     return $q->expr()->literal(strtolower(InputHelper::email($v)));
@@ -279,7 +278,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->where('LOWER(email) = :search')
+            ->where('email = :search')
             ->setParameter('search', strtolower($email));
 
         $result = $q->execute()->fetchAll();
