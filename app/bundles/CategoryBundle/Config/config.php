@@ -66,7 +66,7 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
-            'mautic.button.subscriber' => [
+            'mautic.category.button.subscriber' => [
                 'class' => \Mautic\CategoryBundle\EventListener\ButtonSubscriber::class,
             ],
         ],

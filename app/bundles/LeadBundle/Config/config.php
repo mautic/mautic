@@ -140,14 +140,6 @@ return [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
                 'controller' => 'MauticLeadBundle:List:contacts',
             ],
-            'mautic_contact_batch_channels_api' => [
-                'path'       => '/contact/batch_channels',
-                'controller' => 'MauticLeadBundle:BatchLeadChannels:batchApi',
-            ],
-            'mautic_contact_batch_channels_view' => [
-                'path'       => '/contact/batch_channels_view',
-                'controller' => 'MauticLeadBundle:BatchLeadChannels:batchView',
-            ],
         ],
         'api' => [
             'mautic_api_contactsstandard' => [
@@ -744,17 +736,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
                 'arguments' => [
                     'event_dispatcher',
-                ],
-            ],
-        ],
-        'batches' => [
-            'mautic.lead.batch.change_channels_action_factory' => [
-                'class'     => \Mautic\LeadBundle\Batches\Lead\ChangeChannelsAction\ChangeChannelsActionFactory::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.security',
-                    'mautic.lead.model.dnc',
-                    'mautic.lead.repository.frequency_rule',
                 ],
             ],
         ],
