@@ -425,7 +425,7 @@ class ListController extends FormController
     private function getPostActionVars($objectId = null)
     {
         //set the return URL
-        if ($objectId != null) {
+        if ($objectId) {
             $returnUrl       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
             $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
             $contentTemplate = 'MauticLeadBundle:List:view';
