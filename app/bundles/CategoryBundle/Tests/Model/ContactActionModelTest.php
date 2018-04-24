@@ -12,7 +12,6 @@
 namespace Mautic\CategoryBundle\Tests\Model;
 
 use Mautic\CategoryBundle\Model\ContactActionModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
@@ -37,11 +36,6 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $corePermissionMock;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     private $userMock1;
 
     /**
@@ -49,80 +43,137 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
      */
     private $userMock2;
 
+    /**
+     * @var ContactActionModel
+     */
+    private $actionModel;
+
     protected function setUp()
     {
-        $this->userMock1 = $this->createMock(User::class);
-        $this->userMock2 = $this->createMock(User::class);
-        $this->leadMock5 = $this->createMock(Lead::class);
-        $this->leadMock6 = $this->createMock(Lead::class);
-
-        $this->contactModelMock   = $this->createMock(LeadModel::class);
-        $this->corePermissionMock = $this->createMock(CorePermissions::class);
-
-        $this->leadMock5->method('getPermissionUser')->willReturn($this->userMock1);
-        $this->leadMock6->method('getPermissionUser')->willReturn($this->userMock2);
-
-        $this->contactModelMock->expects($this->any())
-            ->method('getEntities')->with([
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'l.id',
-                            'expr'   => 'in',
-                            'value'  => [5, 6],
-                        ],
-                    ],
-                ],
-            ])->willReturn([$this->leadMock5, $this->leadMock6]);
-
-        $this->model = new ContactActionModel(
-            $this->contactModelMock,
-            $this->corePermissionMock
-        );
+        $this->userMock1        = $this->createMock(User::class);
+        $this->userMock2        = $this->createMock(User::class);
+        $this->leadMock5        = $this->createMock(Lead::class);
+        $this->leadMock6        = $this->createMock(Lead::class);
+        $this->contactModelMock = $this->createMock(LeadModel::class);
+        $this->actionModel      = new ContactActionModel($this->contactModelMock);
     }
 
     public function testAddContactsToCategoriesEntityAccess()
     {
-        $toAdd = [4, 5];
+        $contacts   = [5, 6];
+        $categories = [4, 5];
 
-        $this->corePermissionMock->expects($this->at(0))
-            ->method('hasEntityAccess')
-            ->with('lead:leads:editown', 'lead:leads:editother', $this->userMock1)
+        $this->contactModelMock->expects($this->at(0))
+            ->method('getLeadsByIds')
+            ->with($contacts)
+            ->willReturn([$this->leadMock5, $this->leadMock6]);
+
+        $this->contactModelMock->expects($this->at(1))
+            ->method('canEditContact')
+            ->with($this->leadMock5)
             ->willReturn(false);
 
-        $this->corePermissionMock->expects($this->at(0))
-            ->method('hasEntityAccess')
-            ->with('lead:leads:editown', 'lead:leads:editother', $this->userMock2)
+        $this->contactModelMock->expects($this->at(2))
+            ->method('canEditContact')
+            ->with($this->leadMock6)
             ->willReturn(true);
 
-        $this->contactModelMock->expects($this->any())
-            ->method('getLeadCategories')
-            ->with($this->leadMock5)
-            ->willThrowException(new \Exception('Get categories has been called!'));
+        $this->contactModelMock->expects($this->at(3))
+            ->method('addToCategory')
+            ->with($this->leadMock6);
 
-        $this->model->addContactsToCategories([5, 6], $toAdd);
+        $this->contactModelMock->expects($this->at(4))
+            ->method('detachEntity')
+            ->with($this->leadMock6);
+
+        $this->actionModel->addContactsToCategories($contacts, $categories);
     }
 
     public function testRemoveContactsFromCategoriesEntityAccess()
     {
-        $toRemove = [1, 2];
+        $contacts   = [5, 6];
+        $categories = [1, 2];
 
-        $this->corePermissionMock->expects($this->at(0))
-            ->method('hasEntityAccess')
-            ->with('lead:leads:editown', 'lead:leads:editother', $this->userMock1)
+        $this->contactModelMock->expects($this->at(0))
+            ->method('getLeadsByIds')
+            ->with($contacts)
+            ->willReturn([$this->leadMock5, $this->leadMock6]);
+
+        $this->contactModelMock->expects($this->at(1))
+            ->method('canEditContact')
+            ->with($this->leadMock5)
             ->willReturn(false);
 
-        $this->corePermissionMock->expects($this->at(0))
-            ->method('hasEntityAccess')
-            ->with('lead:leads:editown', 'lead:leads:editother', $this->userMock2)
+        $this->contactModelMock->expects($this->at(2))
+            ->method('canEditContact')
+            ->with($this->leadMock6)
             ->willReturn(true);
 
-        $this->contactModelMock->expects($this->any())
+        $this->contactModelMock->expects($this->at(3))
+            ->method('getLeadCategories')
+            ->with($this->leadMock6)
+            ->willReturn([45, 65]);
+
+        $this->contactModelMock->expects($this->at(4))
+            ->method('removeFromCategories')
+            ->with([]);
+
+        $this->contactModelMock->expects($this->at(5))
+            ->method('detachEntity')
+            ->with($this->leadMock6);
+
+        $this->actionModel->removeContactsFromCategories($contacts, $categories);
+    }
+
+    public function testAddContactsToCategories()
+    {
+        $contacts   = [5, 6];
+        $categories = [1, 2];
+
+        $this->contactModelMock->expects($this->at(0))
+            ->method('getLeadsByIds')
+            ->with($contacts)
+            ->willReturn([$this->leadMock5, $this->leadMock6]);
+
+        // Loop 1
+        $this->contactModelMock->expects($this->at(1))
+            ->method('canEditContact')
+            ->with($this->leadMock5)
+            ->willReturn(true);
+
+        $this->contactModelMock->expects($this->at(2))
             ->method('getLeadCategories')
             ->with($this->leadMock5)
-            ->willThrowException(new \Exception('Get categories has been called!'));
+            ->willReturn($categories);
 
-        $this->model->removeContactsFromCategories([5, 6], $toRemove);
+        $this->contactModelMock->expects($this->at(3))
+            ->method('removeFromCategories')
+            ->with($categories);
+
+        $this->contactModelMock->expects($this->at(4))
+            ->method('detachEntity')
+            ->with($this->leadMock5);
+
+        // Loop 2
+        $this->contactModelMock->expects($this->at(5))
+            ->method('canEditContact')
+            ->with($this->leadMock6)
+            ->willReturn(true);
+
+        $this->contactModelMock->expects($this->at(6))
+            ->method('getLeadCategories')
+            ->with($this->leadMock6)
+            ->willReturn([2, 3]);
+
+        $this->contactModelMock->expects($this->at(7))
+            ->method('removeFromCategories')
+            ->with([2]);
+
+        $this->contactModelMock->expects($this->at(8))
+            ->method('detachEntity')
+            ->with($this->leadMock5);
+
+        $this->actionModel->removeContactsFromCategories($contacts, $categories);
     }
 
     public function testRemoveContactsFromCategories()
@@ -130,44 +181,49 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
         $contacts   = [5, 6];
         $categories = [1, 2];
 
+        $this->contactModelMock->expects($this->at(0))
+            ->method('getLeadsByIds')
+            ->with($contacts)
+            ->willReturn([$this->leadMock5, $this->leadMock6]);
+
         // Loop 1
         $this->contactModelMock->expects($this->at(1))
+            ->method('canEditContact')
+            ->with($this->leadMock5)
+            ->willReturn(true);
+
+        $this->contactModelMock->expects($this->at(2))
             ->method('getLeadCategories')
             ->with($this->leadMock5)
             ->willReturn([1, 2]);
 
-        $this->corePermissionMock->expects($this->at(0))
-            ->method('hasEntityAccess')
-            ->with('lead:leads:editown', 'lead:leads:editother', $this->userMock1)
-            ->willReturn(true);
-
-        $this->contactModelMock->expects($this->at(2))
+        $this->contactModelMock->expects($this->at(3))
             ->method('removeFromCategories')
             ->with($categories);
 
-        $this->contactModelMock->expects($this->at(3))
+        $this->contactModelMock->expects($this->at(4))
             ->method('detachEntity')
             ->with($this->leadMock5);
 
         // Loop 2
-        $this->contactModelMock->expects($this->at(4))
+        $this->contactModelMock->expects($this->at(5))
+            ->method('canEditContact')
+            ->with($this->leadMock6)
+            ->willReturn(true);
+
+        $this->contactModelMock->expects($this->at(6))
             ->method('getLeadCategories')
             ->with($this->leadMock6)
             ->willReturn([2, 3]);
 
-        $this->corePermissionMock->expects($this->at(1))
-            ->method('hasEntityAccess')
-            ->with('lead:leads:editown', 'lead:leads:editother', $this->userMock2)
-            ->willReturn(true);
-
-        $this->contactModelMock->expects($this->at(5))
+        $this->contactModelMock->expects($this->at(7))
             ->method('removeFromCategories')
             ->with([2]);
 
-        $this->contactModelMock->expects($this->at(6))
+        $this->contactModelMock->expects($this->at(8))
             ->method('detachEntity')
             ->with($this->leadMock5);
 
-        $this->model->removeContactsFromCategories($contacts, $categories);
+        $this->actionModel->removeContactsFromCategories($contacts, $categories);
     }
 }
