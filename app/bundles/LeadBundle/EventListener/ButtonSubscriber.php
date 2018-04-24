@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -30,10 +31,16 @@ class ButtonSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    public function __construct(TranslatorInterface $translator, RouterInterface $router)
+    /**
+     * @var CorePermissions
+     */
+    protected $security;
+
+    public function __construct(TranslatorInterface $translator, RouterInterface $router, CorePermissions $security)
     {
         $this->translator = $translator;
         $this->router     = $router;
+        $this->security   = $security;
     }
 
     public static function getSubscribedEvents()
@@ -45,7 +52,7 @@ class ButtonSubscriber implements EventSubscriberInterface
 
     public function injectViewButtons(CustomButtonEvent $event)
     {
-        if (0 === strpos($event->getRoute(), 'mautic_contact_index')) {
+        if (0 === strpos($event->getRoute(), 'mautic_contact_index') && ($this->security->isAdmin() || !$this->security->isGranted('lead:export:disable', 'MATCH_ONE'))) {
             $exportRoute = $this->router->generate(
                 'mautic_contact_action',
                 ['objectAction' => 'batchExport']
