@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -267,7 +268,7 @@ abstract class AbstractCommonModel
      */
     public function encodeArrayForUrl($array)
     {
-        return urlencode(base64_encode(serialize($array)));
+        return ClickthroughHelper::encodeArrayForUrl((array) $array);
     }
 
     /**
@@ -280,14 +281,7 @@ abstract class AbstractCommonModel
      */
     public function decodeArrayFromUrl($string, $urlDecode = true)
     {
-        $raw     = $urlDecode ? urldecode($string) : $string;
-        $decoded = base64_decode($raw);
-
-        if (strpos(strtolower($decoded), 'a') !== 0) {
-            throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array.', $decoded));
-        }
-
-        return unserialize($decoded);
+        return ClickthroughHelper::decodeArrayFromUrl($string, $urlDecode);
     }
 
     /**

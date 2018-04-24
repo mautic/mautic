@@ -86,7 +86,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $new         = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
+        $new         = (!empty($options['data']) && $options['data']->getId()) ? false : true;
         $type        = $options['data']->getType();
         $default     = (empty($type)) ? 'text' : $type;
         $fieldHelper = new FormFieldHelper();

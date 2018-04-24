@@ -204,6 +204,10 @@ $view['slots']->set(
                                                     <?php else: ?>
                                                         <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
                                                             <?php echo implode(', ', $field['value']); ?>
+                                                        <?php elseif (is_string($field['value']) && 'url' === $field['type']): ?>
+                                                            <a href="<?php echo $field['value']; ?>" target="_blank">
+                                                                <?php echo $field['value']; ?>
+                                                            </a>
                                                         <?php else: ?>
                                                             <?php echo $field['value']; ?>
                                                         <?php endif; ?>

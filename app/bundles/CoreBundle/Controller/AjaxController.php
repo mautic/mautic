@@ -43,7 +43,7 @@ class AjaxController extends CommonController
     {
         $response = new JsonResponse();
 
-        if ($this->factory->getEnvironment() == 'dev' && $addIgnoreWdt) {
+        if ($this->container->getParameter('kernel.environment') == 'dev' && $addIgnoreWdt) {
             $dataArray['ignore_wdt'] = 1;
         }
 

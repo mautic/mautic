@@ -49,7 +49,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function sendBatchAction(Request $request)
+    public function sendBatchAction(Request $request)
     {
         $dataArray = ['success' => 0];
 
@@ -61,11 +61,12 @@ class AjaxController extends CommonAjaxController
 
         if ($objectId && $entity = $model->getEntity($objectId)) {
             $dataArray['success'] = 1;
-            $session              = $this->get('session');
+            $session              = $this->container->get('session');
             $progress             = $session->get('mautic.email.send.progress', [0, (int) $pending]);
             $stats                = $session->get('mautic.email.send.stats', ['sent' => 0, 'failed' => 0, 'failedRecipients' => []]);
+            $inProgress           = $session->get('mautic.email.send.active', false);
 
-            if ($pending && !$inProgress = $session->get('mautic.email.send.active', false)) {
+            if ($pending && !$inProgress && $entity->isPublished()) {
                 $session->set('mautic.email.send.active', true);
                 list($batchSentCount, $batchFailedCount, $batchFailedRecipients) = $model->sendEmailToLists($entity, null, $limit);
 
@@ -82,8 +83,7 @@ class AjaxController extends CommonAjaxController
                 $session->set('mautic.email.send.active', false);
             }
 
-            $dataArray['percent'] = ($progress[1]) ? ceil(($progress[0] / $progress[1]) * 100) : 100;
-
+            $dataArray['percent']  = ($progress[1]) ? ceil(($progress[0] / $progress[1]) * 100) : 100;
             $dataArray['progress'] = $progress;
             $dataArray['stats']    = $stats;
         }
