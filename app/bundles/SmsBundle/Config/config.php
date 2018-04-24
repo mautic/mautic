@@ -100,19 +100,25 @@ return [
                 'alias' => 'sms_api',
             ],
             'mautic.sms.transport_chain' => [
-                'class'     => '\Mautic\SmsBundle\Sms\TransportChain',
-                'arguments' => ['%mautic.sms_transport%', 'mautic.helper.integration', 'monolog.logger.mautic'],
+                'class'     => \Mautic\SmsBundle\Sms\TransportChain::class,
+                'arguments' => [
+                    '%mautic.sms_transport%',
+                    'mautic.helper.integration',
+                    'monolog.logger.mautic',
+                ],
             ],
             'mautic.sms.transport.twilio' => [
-                'class'     => 'Mautic\SmsBundle\Api\TwilioApi',
-                'arguments' => [
+                'class'        => \Mautic\SmsBundle\Api\TwilioApi::class,
+                'arguments'    => [
                     'mautic.page.model.trackable',
                     'mautic.helper.phone_number',
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
-                'alias' => 'mautic.sms.transport.twilio',
-                'tag'   => 'mautic.sms_transport',
+                'tag'          => 'mautic.sms_transport',
+                'tagArguments' => [
+                    'integrationAlias' => 'Twilio',
+                ],
             ],
         ],
         'models' => [
