@@ -34,7 +34,7 @@ class LeadPermissions extends AbstractPermissions
             ],
         ];
         $this->addExtendedPermissions('leads', false, [
-            'disableexports' => 768,
+            'disableexports' => 1024,
         ]);
         $this->addStandardPermissions('imports');
     }

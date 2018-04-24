@@ -26,7 +26,7 @@ class FormPermissions extends AbstractPermissions
     {
         parent::__construct($params);
         $this->addExtendedPermissions('forms', true, [
-            'disableexports' => 768,
+            'disableexports' => 1024,
         ]);
         $this->addStandardPermissions('categories');
     }

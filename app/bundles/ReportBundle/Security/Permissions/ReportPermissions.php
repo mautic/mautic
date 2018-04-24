@@ -25,7 +25,9 @@ class ReportPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-        $this->addExtendedPermissions('reports');
+        $this->addExtendedPermissions('reports', true, [
+            'disableexports' => 1024,
+        ]);
     }
 
     /**
@@ -41,6 +43,8 @@ class ReportPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addExtendedFormFields('report', 'reports', $builder, $data);
+        $this->addExtendedFormFields('report', 'reports', $builder, $data, true, [
+            'disableexports' => 'mautic.core.permissions.disableexport',
+        ]);
     }
 }
