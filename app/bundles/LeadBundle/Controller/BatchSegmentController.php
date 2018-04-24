@@ -12,11 +12,23 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Model\SegmentActionModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class BatchSegmentController extends AbstractFormController
 {
+    /**
+     * @var SegmentActionModel;
+     */
+    private $actionModel;
+
+    /**
+     * @var ListModel;
+     */
+    private $segmentModel;
+
     /**
      * Initialize object props here to simulate constructor
      * and make the future controller refactoring easier.
