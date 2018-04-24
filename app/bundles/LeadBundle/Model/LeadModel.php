@@ -747,6 +747,38 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Obtains a list of leads based a list of IDs.
+     *
+     * @param array $ids
+     *
+     * @return Paginator
+     */
+    public function getLeadsByIds(array $ids)
+    {
+        return $this->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => 'l.id',
+                        'expr'   => 'in',
+                        'value'  => $ids,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @param Lead $contact
+     *
+     * @return bool
+     */
+    public function canEditContact(Lead $contact)
+    {
+        return $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser());
+    }
+
+    /**
      * Gets the details of a lead if not already set.
      *
      * @param $lead

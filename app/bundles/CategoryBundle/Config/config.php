@@ -108,7 +108,6 @@ return [
                 'class'     => \Mautic\CategoryBundle\Model\ContactActionModel::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
-                    'mautic.security',
                 ],
             ],
         ],

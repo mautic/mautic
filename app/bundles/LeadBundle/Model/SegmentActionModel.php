@@ -11,30 +11,19 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\LeadBundle\Entity\Lead;
-
 class SegmentActionModel
 {
-    /**
-     * @var int[]
-     */
-    private $leadsIds;
-
     /**
      * @var LeadModel
      */
     private $leadModel;
 
     /**
-     * @param LeadModel       $leadModel
-     * @param CorePermissions $permissions
+     * @param LeadModel $leadModel
      */
-    public function __construct(LeadModel $leadModel, CorePermissions $permissions)
+    public function __construct(LeadModel $leadModel)
     {
-        $this->leadModel   = $leadModel;
-        $this->permissions = $permissions;
+        $this->leadModel = $leadModel;
     }
 
     /**
@@ -43,10 +32,10 @@ class SegmentActionModel
      */
     public function addContacts(array $contactIds, array $segmentIds)
     {
-        $contacts = $this->getContacts($contactIds);
+        $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
         foreach ($contacts as $contact) {
-            if (!$this->canEdit($contact)) {
+            if (!$this->contactModel->canEditContact($contact)) {
                 continue;
             }
 
@@ -62,10 +51,10 @@ class SegmentActionModel
      */
     public function removeContacts(array $contactIds, array $segmentIds)
     {
-        $contacts = $this->getContacts($contactIds);
+        $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
         foreach ($contacts as $contact) {
-            if (!$this->canEdit($contact)) {
+            if (!$this->contactModel->canEditContact($contact)) {
                 continue;
             }
 
@@ -73,35 +62,5 @@ class SegmentActionModel
         }
 
         $this->leadModel->saveEntities($contacts);
-    }
-
-    /**
-     * @param Lead $contact
-     *
-     * @return bool
-     */
-    private function canEdit(Lead $contact)
-    {
-        return $this->permissions->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser());
-    }
-
-    /**
-     * @param array $ids
-     *
-     * @return Paginator
-     */
-    private function getContacts(array $ids)
-    {
-        return $this->leadModel->getEntities([
-            'filter' => [
-                'force' => [
-                    [
-                        'column' => 'l.id',
-                        'expr'   => 'in',
-                        'value'  => $ids,
-                    ],
-                ],
-            ],
-        ]);
     }
 }

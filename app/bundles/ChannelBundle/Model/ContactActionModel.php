@@ -11,7 +11,6 @@
 
 namespace Mautic\ChannelBundle\Model;
 
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
@@ -24,12 +23,7 @@ class ContactActionModel
     /**
      * @var LeadModel
      */
-    private $leadModel;
-
-    /**
-     * @var CorePermissions
-     */
-    private $permissions;
+    private $contactModel;
 
     /**
      * @var DoNotContact
@@ -44,29 +38,34 @@ class ContactActionModel
     /**
      * ChangeChannelsAction constructor.
      *
-     * @param LeadModel               $leadModel
-     * @param CorePermissions         $permissions
+     * @param LeadModel               $contactModel
      * @param DoNotContact            $doNotContact
      * @param FrequencyRuleRepository $frequencyRuleRepository
      */
     public function __construct(
-        LeadModel $leadModel,
-        CorePermissions $permissions,
+        LeadModel $contactModel,
         DoNotContact $doNotContact,
         FrequencyRuleRepository $frequencyRuleRepository
     ) {
-        $this->leadModel               = $leadModel;
-        $this->permissions             = $permissions;
+        $this->contactModel            = $contactModel;
         $this->doNotContact            = $doNotContact;
         $this->frequencyRuleRepository = $frequencyRuleRepository;
     }
 
+    /**
+     * Update channels and frequency rules.
+     *
+     * @param array  $contactIds
+     * @param array  $subscribedChannels
+     * @param array  $params
+     * @param string $preferredChannel
+     */
     public function update(array $contactIds, array $subscribedChannels, array $params, $preferredChannel)
     {
-        $contacts = $this->getContacts($contactIds);
+        $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
         foreach ($contacts as $contact) {
-            if (!$this->canEdit($contact)) {
+            if (!$this->contactModel->canEditContact($contact)) {
                 continue;
             }
 
@@ -82,8 +81,8 @@ class ContactActionModel
      */
     private function updateChannels(Lead $contact, array $subscribedChannels)
     {
-        $leadChannels = $this->leadModel->getContactChannels($contact);
-        $allChannels  = $this->leadModel->getPreferenceChannels();
+        $leadChannels = $this->contactModel->getContactChannels($contact);
+        $allChannels  = $this->contactModel->getPreferenceChannels();
 
         foreach ($subscribedChannels as $subscribedChannel) {
             if (!array_key_exists($subscribedChannel, $leadChannels)) {
@@ -103,10 +102,15 @@ class ContactActionModel
         }
     }
 
+    /**
+     * @param Lead   $contact
+     * @param array  $params
+     * @param string $preferredChannel
+     */
     private function updateFrequencyRules(Lead $contact, array $params, $preferredChannel)
     {
         $frequencyRules = $contact->getFrequencyRules()->toArray();
-        $channels       = $this->leadModel->getPreferenceChannels();
+        $channels       = $this->contactModel->getPreferenceChannels();
 
         foreach ($channels as $channel) {
             if (is_null($preferredChannel)) {
@@ -141,35 +145,5 @@ class ContactActionModel
 
             $this->frequencyRuleRepository->saveEntity($frequencyRule);
         }
-    }
-
-    /**
-     * @param Lead $contact
-     *
-     * @return bool
-     */
-    private function canEdit(Lead $contact)
-    {
-        return $this->permissions->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser());
-    }
-
-    /**
-     * @param array $ids
-     *
-     * @return Paginator
-     */
-    private function getContacts(array $ids)
-    {
-        return $this->leadModel->getEntities([
-            'filter' => [
-                'force' => [
-                    [
-                        'column' => 'l.id',
-                        'expr'   => 'in',
-                        'value'  => $ids,
-                    ],
-                ],
-            ],
-        ]);
     }
 }

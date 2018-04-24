@@ -832,7 +832,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Model\SegmentActionModel::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
-                    'mautic.security',
                 ],
             ],
         ],

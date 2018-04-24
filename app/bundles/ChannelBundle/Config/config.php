@@ -145,7 +145,6 @@ return [
                 'class'     => \Mautic\ChannelBundle\Model\ContactActionModel::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
-                    'mautic.security',
                     'mautic.lead.model.dnc',
                     'mautic.lead.repository.frequency_rule',
                 ],

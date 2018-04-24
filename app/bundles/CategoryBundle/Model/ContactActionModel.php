@@ -11,9 +11,6 @@
 
 namespace Mautic\CategoryBundle\Model;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactActionModel
@@ -24,18 +21,11 @@ class ContactActionModel
     private $contactModel;
 
     /**
-     * @var CorePermissions
+     * @param LeadModel $contactModel
      */
-    private $permissions;
-
-    /**
-     * @param LeadModel       $contactModel
-     * @param CorePermissions $permissions
-     */
-    public function __construct(LeadModel $contactModel, CorePermissions $permissions)
+    public function __construct(LeadModel $contactModel)
     {
         $this->contactModel = $contactModel;
-        $this->permissions  = $permissions;
     }
 
     /**
@@ -44,10 +34,10 @@ class ContactActionModel
      */
     public function addContactsToCategories(array $contactIds, array $categoryIds)
     {
-        $contacts = $this->loadLeads($contactIds);
+        $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
         foreach ($contacts as $contact) {
-            if (!$this->canEdit($contact)) {
+            if (!$this->contactModel->canEditContact($contact)) {
                 continue;
             }
 
@@ -62,10 +52,10 @@ class ContactActionModel
      */
     public function removeContactsFromCategories(array $contactIds, array $categoryIds)
     {
-        $contacts = $this->loadLeads($contactIds);
+        $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
         foreach ($contacts as $contact) {
-            if (!$this->canEdit($contact)) {
+            if (!$this->contactModel->canEditContact($contact)) {
                 continue;
             }
 
@@ -74,35 +64,5 @@ class ContactActionModel
             $this->contactModel->removeFromCategories($relationsToDelete);
             $this->contactModel->detachEntity($contact);
         }
-    }
-
-    /**
-     * @param Lead $contact
-     *
-     * @return bool
-     */
-    private function canEdit(Lead $contact)
-    {
-        return $this->permissions->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser());
-    }
-
-    /**
-     * @param array $ids
-     *
-     * @return Paginator
-     */
-    private function loadLeads($ids)
-    {
-        return $this->contactModel->getEntities([
-            'filter' => [
-                'force' => [
-                    [
-                        'column' => 'l.id',
-                        'expr'   => 'in',
-                        'value'  => $ids,
-                    ],
-                ],
-            ],
-        ]);
     }
 }
