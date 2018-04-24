@@ -167,6 +167,7 @@ class ResultController extends CommonFormController
                         'form:forms:editother',
                         $form->getCreatedBy()
                     ),
+                    'exportPermissions'=> $this->get('mautic.security')->isGranted('form:exports:full', 'MATCH_ONE'),
                 ],
                 'contentTemplate' => 'MauticFormBundle:Result:list.html.php',
                 'passthroughVars' => [
@@ -251,6 +252,10 @@ class ResultController extends CommonFormController
         $session   = $this->get('session');
         $formPage  = $session->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
+
+        if (!$this->get('mautic.security')->isGranted('form:exports:full', 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
 
         if (null === $form) {
             //redirect back to form list

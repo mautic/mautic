@@ -1,3 +1,4 @@
+
 <?php
 
 /*
@@ -53,6 +54,11 @@ if (class_exists(Spreadsheet::class)) {
         'iconClass' => 'fa fa-file-excel-o',
         'primary'   => true,
     ];
+}
+
+// Remove buttons if disable export permission exists
+if (!empty($disableExportPermission)) {
+    $buttons = [];
 }
 
 $buttons[] =
