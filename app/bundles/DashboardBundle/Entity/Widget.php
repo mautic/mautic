@@ -13,12 +13,11 @@ namespace Mautic\DashboardBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\DashboardBundle\Entity\WidgetRepository;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Class Widget.
