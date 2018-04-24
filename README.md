@@ -61,6 +61,8 @@ Installing from source is only recommended if you are comfortable using the comm
 	- recommended for development: `xdebug`, `dba`, `pcntl`, `tokenizer`, `ftp`, `xmlrpc`
 3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
 
+_Note: Mautic used to require `mcrypt` up till version 2.12.0, but it [was replaced](https://github.com/mautic/mautic/pull/5300) with `openssl`. The reasons are that Mcrypt was not developed for years and is not supported for PHP 7.2._
+
 ## Installation
 
 1. Open a Terminal/Console window.
