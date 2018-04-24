@@ -11,12 +11,12 @@
 
 namespace Mautic\DashboardBundle\Controller;
 
-use Symfony\Component\Form\FormError;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\Entity\Widget;
-use Mautic\CoreBundle\Controller\FormController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class DashboardController.
@@ -285,30 +285,30 @@ class DashboardController extends FormController
         try {
             $this->getModel('dashboard')->saveSnapshot($name);
             $type = 'notice';
-            $msg = $this->translator->trans('mautic.dashboard.notice.save', [
+            $msg  = $this->translator->trans('mautic.dashboard.notice.save', [
                 '%name%'    => $name,
                 '%viewUrl%' => $this->generateUrl(
                     'mautic_dashboard_action',
                     [
                         'objectAction' => 'import',
                     ]
-                )
+                ),
             ], 'flashes');
         } catch (IOException $e) {
             $type = 'error';
-            $msg = $this->translator->trans('mautic.dashboard.error.save', [
+            $msg  = $this->translator->trans('mautic.dashboard.error.save', [
                 '%msg%' => $e->getMessage(),
             ], 'flashes');
         }
-        
+
         return $this->postActionRedirect(
             [
                 'flashes' => [
                     [
                         'type' => $type,
                         'msg'  => $msg,
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
     }
@@ -528,7 +528,7 @@ class DashboardController extends FormController
     }
 
     /**
-     * Gets name from request and defaults it to the timestamp if not provided
+     * Gets name from request and defaults it to the timestamp if not provided.
      *
      * @return string
      */

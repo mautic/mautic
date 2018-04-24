@@ -234,10 +234,10 @@ class InputHelper
 
     /**
      * Returns a satnitized string which can be used in a file system.
-     * Attaches the file extension if provided
+     * Attaches the file extension if provided.
      *
-     * @param  string $value
-     * @param  string $extension
+     * @param string $value
+     * @param string $extension
      *
      * @return string
      */

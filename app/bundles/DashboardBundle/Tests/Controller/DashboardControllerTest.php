@@ -12,17 +12,17 @@
 namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RouterInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\DashboardBundle\Controller\DashboardController;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Mautic\DashboardBundle\Controller\DashboardController;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DashboardControllerTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,16 +40,16 @@ class DashboardControllerTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->requestMock = $this->createMock(Request::class);
-        $this->securityMock = $this->createMock(CorePermissions::class);
-        $this->translatorMock = $this->createMock(TranslatorInterface::class);
-        $this->modelFactoryMock = $this->createMock(ModelFactory::class);
+        $this->requestMock        = $this->createMock(Request::class);
+        $this->securityMock       = $this->createMock(CorePermissions::class);
+        $this->translatorMock     = $this->createMock(TranslatorInterface::class);
+        $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
-        $this->routerMock = $this->createMock(RouterInterface::class);
-        $this->sessionMock = $this->createMock(Session::class);
-        $this->flashBagMock = $this->createMock(FlashBagInterface::class);
-        $this->containerMock = $this->createMock(Container::class);
-        $this->controller = new DashboardController;
+        $this->routerMock         = $this->createMock(RouterInterface::class);
+        $this->sessionMock        = $this->createMock(Session::class);
+        $this->flashBagMock       = $this->createMock(FlashBagInterface::class);
+        $this->containerMock      = $this->createMock(Container::class);
+        $this->controller         = new DashboardController();
         $this->controller->setRequest($this->requestMock);
         $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);
@@ -92,7 +92,7 @@ class DashboardControllerTest extends \PHPUnit_Framework_TestCase
         $this->translatorMock->expects($this->at(0))
             ->method('trans')
             ->with('mautic.core.url.error.401');
-        
+
         $this->expectException(AccessDeniedHttpException::class);
         $this->controller->saveAction();
     }
@@ -152,7 +152,7 @@ class DashboardControllerTest extends \PHPUnit_Framework_TestCase
         $this->translatorMock->expects($this->at(0))
             ->method('trans')
             ->with('mautic.dashboard.notice.save');
-        
+
         // This exception is thrown if templating is not set. Let's take it as success to avoid further mocking.
         $this->expectException(\LogicException::class);
         $this->controller->saveAction();

@@ -121,7 +121,6 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilename()
     {
-
         $this->assertSame(
             '29nidji__dsfjhro85t784_fff.r.txt',
             InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěí_áčýžěé+ěšéřářf/ff/./r.txt')
@@ -135,7 +134,6 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilenameWithChangingDir()
     {
-
         $this->assertSame(
             '29nidji__dsfjhro85t784_fff..r',
             InputHelper::filename('../29NIDJi  dsfjh(#*RO85T784šěí_áčýžěé+ěšéřářf/ff/../r')
@@ -149,7 +147,6 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilenameWithExtension()
     {
-
         $this->assertSame(
             '29nidji__dsfjhro85t784.txt',
             InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěíáčýžěé+ěšéřář', 'txt')
