@@ -9,13 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CategoryBundle\Tests\Model;
+namespace Mautic\LeadBundle\Tests\Model;
 
-use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\SegmentActionModel;
 
-class ContactActionModelTest extends \PHPUnit_Framework_TestCase
+class SegmentActionModelTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -33,7 +33,7 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
     private $contactModelMock;
 
     /**
-     * @var ContactActionModel
+     * @var SegmentActionModel
      */
     private $actionModel;
 
@@ -42,13 +42,13 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
         $this->leadMock5        = $this->createMock(Lead::class);
         $this->leadMock6        = $this->createMock(Lead::class);
         $this->contactModelMock = $this->createMock(LeadModel::class);
-        $this->actionModel      = new ContactActionModel($this->contactModelMock);
+        $this->actionModel      = new SegmentActionModel($this->contactModelMock);
     }
 
-    public function testAddContactsToCategoriesEntityAccess()
+    public function testAddContactsToSegmentsEntityAccess()
     {
-        $contacts   = [5, 6];
-        $categories = [4, 5];
+        $contacts = [5, 6];
+        $segments = [4, 5];
 
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
@@ -66,20 +66,20 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(3))
-            ->method('addToCategory')
-            ->with($this->leadMock6);
+            ->method('addToLists')
+            ->with($this->leadMock6, $segments);
 
         $this->contactModelMock->expects($this->at(4))
-            ->method('detachEntity')
-            ->with($this->leadMock6);
+            ->method('saveEntities')
+            ->with([$this->leadMock5, $this->leadMock6]);
 
-        $this->actionModel->addContactsToCategories($contacts, $categories);
+        $this->actionModel->addContacts($contacts, $segments);
     }
 
-    public function testRemoveContactsFromCategoriesEntityAccess()
+    public function testRemoveContactsFromSementsEntityAccess()
     {
-        $contacts   = [5, 6];
-        $categories = [1, 2];
+        $contacts = [5, 6];
+        $segments = [1, 2];
 
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
@@ -97,25 +97,20 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(3))
-            ->method('getLeadCategories')
-            ->with($this->leadMock6)
-            ->willReturn([45, 2]);
+            ->method('removeFromLists')
+            ->with($this->leadMock6, $segments);
 
         $this->contactModelMock->expects($this->at(4))
-            ->method('removeFromCategories')
-            ->with([1 => 2]);
+            ->method('saveEntities')
+            ->with([$this->leadMock5, $this->leadMock6]);
 
-        $this->contactModelMock->expects($this->at(5))
-            ->method('detachEntity')
-            ->with($this->leadMock6);
-
-        $this->actionModel->removeContactsFromCategories($contacts, $categories);
+        $this->actionModel->removeContacts($contacts, $segments);
     }
 
-    public function testAddContactsToCategories()
+    public function testAddContactsToSegments()
     {
-        $contacts   = [5, 6];
-        $categories = [1, 2];
+        $contacts = [5, 6];
+        $segments = [1, 2];
 
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
@@ -129,34 +124,30 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(2))
-            ->method('addToCategory')
-            ->with($this->leadMock5, $categories);
-
-        $this->contactModelMock->expects($this->at(3))
-            ->method('detachEntity')
-            ->with($this->leadMock5);
+            ->method('addToLists')
+            ->with($this->leadMock5, $segments);
 
         // Loop 2
-        $this->contactModelMock->expects($this->at(4))
+        $this->contactModelMock->expects($this->at(3))
             ->method('canEditContact')
             ->with($this->leadMock6)
             ->willReturn(true);
 
+        $this->contactModelMock->expects($this->at(4))
+            ->method('addToLists')
+            ->with($this->leadMock6, $segments);
+
         $this->contactModelMock->expects($this->at(5))
-            ->method('addToCategory')
-            ->with($this->leadMock6, $categories);
+            ->method('saveEntities')
+            ->with([$this->leadMock5, $this->leadMock6]);
 
-        $this->contactModelMock->expects($this->at(6))
-            ->method('detachEntity')
-            ->with($this->leadMock6);
-
-        $this->actionModel->addContactsToCategories($contacts, $categories);
+        $this->actionModel->addContacts($contacts, $segments);
     }
 
     public function testRemoveContactsFromCategories()
     {
-        $contacts   = [5, 6];
-        $categories = [1, 2];
+        $contacts = [5, 6];
+        $segments = [1, 2];
 
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
@@ -170,37 +161,24 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(2))
-            ->method('getLeadCategories')
-            ->with($this->leadMock5)
-            ->willReturn([1, 2]);
-
-        $this->contactModelMock->expects($this->at(3))
-            ->method('removeFromCategories')
-            ->with($categories);
-
-        $this->contactModelMock->expects($this->at(4))
-            ->method('detachEntity')
-            ->with($this->leadMock5);
+            ->method('removeFromLists')
+            ->with($this->leadMock5, $segments);
 
         // Loop 2
-        $this->contactModelMock->expects($this->at(5))
+        $this->contactModelMock->expects($this->at(3))
             ->method('canEditContact')
             ->with($this->leadMock6)
             ->willReturn(true);
 
-        $this->contactModelMock->expects($this->at(6))
-            ->method('getLeadCategories')
+        $this->contactModelMock->expects($this->at(4))
+            ->method('removeFromLists')
             ->with($this->leadMock6)
-            ->willReturn([2, 3]);
+            ->willReturn($this->leadMock6, $segments);
 
-        $this->contactModelMock->expects($this->at(7))
-            ->method('removeFromCategories')
-            ->with([2]);
+        $this->contactModelMock->expects($this->at(5))
+            ->method('saveEntities')
+            ->with([$this->leadMock5, $this->leadMock6]);
 
-        $this->contactModelMock->expects($this->at(8))
-            ->method('detachEntity')
-            ->with($this->leadMock5);
-
-        $this->actionModel->removeContactsFromCategories($contacts, $categories);
+        $this->actionModel->removeContacts($contacts, $segments);
     }
 }

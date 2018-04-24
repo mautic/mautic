@@ -16,14 +16,14 @@ class SegmentActionModel
     /**
      * @var LeadModel
      */
-    private $leadModel;
+    private $contactModel;
 
     /**
-     * @param LeadModel $leadModel
+     * @param LeadModel $contactModel
      */
-    public function __construct(LeadModel $leadModel)
+    public function __construct(LeadModel $contactModel)
     {
-        $this->leadModel = $leadModel;
+        $this->contactModel = $contactModel;
     }
 
     /**
@@ -39,10 +39,10 @@ class SegmentActionModel
                 continue;
             }
 
-            $this->leadModel->addToLists($contact, $segmentIds);
+            $this->contactModel->addToLists($contact, $segmentIds);
         }
 
-        $this->leadModel->saveEntities($contacts);
+        $this->contactModel->saveEntities($contacts);
     }
 
     /**
@@ -58,9 +58,9 @@ class SegmentActionModel
                 continue;
             }
 
-            $this->leadModel->removeFromLists($contact, $segmentIds);
+            $this->contactModel->removeFromLists($contact, $segmentIds);
         }
 
-        $this->leadModel->saveEntities($contacts);
+        $this->contactModel->saveEntities($contacts);
     }
 }
