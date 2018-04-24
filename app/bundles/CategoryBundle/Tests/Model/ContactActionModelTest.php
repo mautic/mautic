@@ -14,7 +14,6 @@ namespace Mautic\CategoryBundle\Tests\Model;
 use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\UserBundle\Entity\User;
 
 class ContactActionModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,24 +33,12 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
     private $contactModelMock;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $userMock1;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $userMock2;
-
-    /**
      * @var ContactActionModel
      */
     private $actionModel;
 
     protected function setUp()
     {
-        $this->userMock1        = $this->createMock(User::class);
-        $this->userMock2        = $this->createMock(User::class);
         $this->leadMock5        = $this->createMock(Lead::class);
         $this->leadMock6        = $this->createMock(Lead::class);
         $this->contactModelMock = $this->createMock(LeadModel::class);
