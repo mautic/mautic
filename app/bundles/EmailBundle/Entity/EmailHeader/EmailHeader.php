@@ -53,7 +53,7 @@ class EmailHeader
 
         $builder->addId();
 
-        $builder->createManyToOne('email', 'Email')
+        $builder->createManyToOne('email', Email::class)
             ->inversedBy('headers')
             ->addJoinColumn('email_id', 'id', true, false, 'CASCADE')
             ->build();
