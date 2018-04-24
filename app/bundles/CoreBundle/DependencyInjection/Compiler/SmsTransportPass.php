@@ -37,17 +37,12 @@ class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
 
         $definition     = $container->getDefinition('mautic.sms.transport_chain');
         $taggedServices = $container->findTaggedServiceIds('mautic.sms_transport');
-
         foreach ($taggedServices as $id => $tags) {
-            $serviceTags   = $container->findDefinition($id)->getTags();
-            $serviceTags   = array_keys($serviceTags);
-            $integrationId = array_pop($serviceTags);
-
             $definition->addMethodCall('addTransport', [
                 $id,
                 new Reference($id),
-                $tags[0]['alias'],
-                $integrationId,
+                !empty($tags[0]['alias']) ? $tags[0]['alias'] : $id,
+                !empty($tags[0]['integrationAlias']) ? $tags[0]['integrationAlias'] : $id,
             ]);
         }
     }
