@@ -192,6 +192,31 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'type' => SessionsFilterQueryBuilder::getServiceId(),
         ];
 
+        $this->translations['utm_campaign'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_utmtags',
+        ];
+
+        $this->translations['utm_content'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_utmtags',
+        ];
+
+        $this->translations['utm_medium'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_utmtags',
+        ];
+
+        $this->translations['utm_source'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_utmtags',
+        ];
+
+        $this->translations['utm_term'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_utmtags',
+        ];
+
         parent::__construct($this->translations);
     }
 }
