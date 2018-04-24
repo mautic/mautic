@@ -11,14 +11,17 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ListController extends FormController
 {
@@ -218,36 +221,29 @@ class ListController extends FormController
     }
 
     /**
-     * Generate's edit form and processes post data.
+     * Generate's clone form and processes post data.
      *
-     * @param            $objectId
-     * @param bool|false $ignorePost
+     * @param int  $objectId
+     * @param bool $ignorePost
      *
-     * @return array | JsonResponse | RedirectResponse | Response
+     * @return Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function cloneAction($objectId, $ignorePost = false)
     {
-        /** @var ListModel $model */
-        $model = $this->getModel('lead.list');
-        $list  = $model->getEntity($objectId);
+        $postActionVars = $this->getPostActionVars();
 
-        //set the page we came from
-        $page = $this->get('session')->get('mautic.segment.page', 1);
+        try {
+            $segment = $this->getSegment($objectId);
 
-        //set the return URL
-        $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
-
-        $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:List:index',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_segment_index',
-                'mauticContent' => 'leadlist',
-            ],
-        ];
-        //list not found
-        if ($list === null) {
+            return $this->createSegmentModifyResponse(
+                clone $segment,
+                $postActionVars,
+                $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
+                $ignorePost
+            );
+        } catch (AccessDeniedException $exception) {
+            return $this->accessDenied();
+        } catch (EntityNotFoundException $exception) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -259,52 +255,127 @@ class ListController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
-            true, 'lead:lists:editother', $list->getCreatedBy()
-        )) {
+        }
+    }
+
+    /**
+     * Generate's edit form and processes post data.
+     *
+     * @param int  $objectId
+     * @param bool $ignorePost
+     *
+     * @return Response
+     */
+    public function editAction($objectId, $ignorePost = false)
+    {
+        $postActionVars = $this->getPostActionVars();
+
+        try {
+            $segment = $this->getSegment($objectId);
+
+            return $this->createSegmentModifyResponse(
+                $segment,
+                $postActionVars,
+                $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
+                $ignorePost
+            );
+        } catch (AccessDeniedException $exception) {
             return $this->accessDenied();
-        } elseif ($model->isLocked($list)) {
-            //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $list, 'lead.list');
+        } catch (EntityNotFoundException $exception) {
+            return $this->postActionRedirect(
+                array_merge($postActionVars, [
+                    'flashes' => [
+                        [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.lead.list.error.notfound',
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ])
+            );
+        }
+    }
+
+    /**
+     * Create modifying response for segments - edit/clone.
+     *
+     * @param LeadList $segment
+     * @param array    $postActionVars
+     * @param string   $action
+     * @param bool     $ignorePost
+     *
+     * @return Response
+     */
+    private function createSegmentModifyResponse(LeadList $segment, array $postActionVars, $action, $ignorePost)
+    {
+        /** @var ListModel $segmentModel */
+        $segmentModel = $this->getModel('lead.list');
+
+        if ($segmentModel->isLocked($segment)) {
+            return $this->isLocked($postActionVars, $segment, 'lead.list');
         }
 
-        $action = $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $model->createForm($list, $this->get('form.factory'), $action);
+        /** @var FormInterface $form */
+        $form = $segmentModel->createForm($segment, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
-            $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                if ($this->isFormValid($form)) {
                     //form is valid so process the data
-                    $model->saveEntity($list, $form->get('buttons')->get('save')->isClicked());
+                    $segmentModel->saveEntity($segment, $form->get('buttons')->get('save')->isClicked());
 
                     $this->addFlash('mautic.core.notice.updated', [
-                        '%name%'      => $list->getName().' ('.$list->getAlias().')',
+                        '%name%'      => $segment->getName().' ('.$segment->getAlias().')',
                         '%menu_link%' => 'mautic_segment_index',
                         '%url%'       => $this->generateUrl('mautic_segment_action', [
                             'objectAction' => 'edit',
-                            'objectId'     => $list->getId(),
+                            'objectId'     => $segment->getId(),
                         ]),
                     ]);
+
+                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                        $contentTemplate                     = 'MauticLeadBundle:List:form.html.php';
+                        $postActionVars['contentTemplate']   = $contentTemplate;
+                        $postActionVars['forwardController'] = false;
+                        $postActionVars['returnUrl']         = $this->generateUrl('mautic_segment_action', [
+                            'objectAction' => 'edit',
+                            'objectId'     => $segment->getId(),
+                        ]);
+
+                        // Re-create the form once more with the fresh segment and action.
+                        // The alias was empty on redirect after cloning.
+                        $editAction = $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $segment->getId()]);
+                        $form       = $segmentModel->createForm($segment, $this->get('form.factory'), $editAction);
+
+                        $postActionVars['viewParameters'] = [
+                            'objectAction' => 'edit',
+                            'objectId'     => $segment->getId(),
+                            'form'         => $this->setFormTheme($form, $contentTemplate, 'MauticLeadBundle:FormTheme\Filter'),
+                        ];
+
+                        return $this->postActionRedirect($postActionVars);
+                    } else {
+                        return $this->viewAction($segment->getId());
+                    }
                 }
             } else {
                 //unlock the entity
-                $model->unlockEntity($list);
+                $segmentModel->unlockEntity($segment);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled) {
                 return $this->postActionRedirect($postActionVars);
             }
         } else {
             //lock the entity
-            $model->lockEntity($list);
+            $segmentModel->lockEntity($segment);
         }
 
         return $this->delegateView([
             'viewParameters' => [
                 'form'          => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.php', 'MauticLeadBundle:FormTheme\Filter'),
-                'currentListId' => $objectId,
+                'currentListId' => $segment->getId(),
             ],
             'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
             'passthroughVars' => [
@@ -313,6 +384,59 @@ class ListController extends FormController
                 'mauticContent' => 'leadlist',
             ],
         ]);
+    }
+
+    /**
+     * Return segment if exists and user has access.
+     *
+     * @param int $segmentId
+     *
+     * @return LeadList
+     *
+     * @throws EntityNotFoundException
+     * @throws AccessDeniedException
+     */
+    private function getSegment($segmentId)
+    {
+        /** @var LeadList $segment */
+        $segment = $this->getModel('lead.list')->getEntity($segmentId);
+
+        // Check if exists
+        if (!$segment instanceof LeadList) {
+            throw new EntityNotFoundException(sprintf('Segment with id %d not found.', $segmentId));
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
+            true, 'lead:lists:editother', $segment->getCreatedBy()
+        )) {
+            throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
+        }
+
+        return $segment;
+    }
+
+    /**
+     * Get variables for POST action.
+     *
+     * @return array
+     */
+    private function getPostActionVars()
+    {
+        //set the page we came from
+        $page = $this->get('session')->get('mautic.segment.page', 1);
+
+        //set the return URL
+        $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
+
+        return [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'MauticLeadBundle:List:index',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_segment_index',
+                'mauticContent' => 'leadlist',
+            ],
+        ];
     }
 
     /**

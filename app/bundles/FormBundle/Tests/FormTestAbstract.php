@@ -33,6 +33,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
@@ -235,10 +236,6 @@ class FormTestAbstract extends WebTestCase
             ->getMock();
 
         $leadModel->expects($this
-            ->any())->method('getTrackingCookie')
-            ->willReturn([$this->mockTrackingId, true]);
-
-        $leadModel->expects($this
             ->any())
             ->method('getCurrentLead')
             ->with($this->logicalOr(
@@ -325,6 +322,8 @@ class FormTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
+
         $submissionModel = new SubmissionModel(
             $ipLookupHelper,
             $templatingHelperMock,
@@ -336,7 +335,8 @@ class FormTestAbstract extends WebTestCase
             $companyModel,
             $fieldHelper,
             $uploadFieldValidatorMock,
-            $formUploaderMock
+            $formUploaderMock,
+            $deviceTrackingService
         );
 
         $submissionModel->setDispatcher($dispatcher);
