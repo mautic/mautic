@@ -125,7 +125,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testQueuedEmailFromOverride()
     {
-        $mockFactory = $this->getMockFactory(false);
+        $mockFactory = $this->getMockFactory(true);
 
         $transport   = new BatchTransport();
         $swiftMailer = new \Swift_Mailer($transport);
@@ -160,7 +160,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mailer->flushQueue();
         $from = $mailer->message->getFrom();
 
-        $this->assertTrue(array_key_exists('nobody@nowhere.com', $from));
+        $this->assertTrue(array_key_exists('owner1@owner.com', $from));
         $this->assertTrue(count($from) === 1);
     }
 
@@ -310,6 +310,33 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['override@owner.com'], array_unique($fromAddresses));
     }
 
+    public function testStandardEmailFrom()
+    {
+        $mockFactory = $this->getMockFactory(true);
+
+        $transport   = new BatchTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        $email = new Email();
+        $email->setFromAddress('override@nowhere.com');
+        $email->setFromName('Test');
+
+        $mailer->setEmail($email);
+
+        foreach ($this->contacts as $key => $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->setBody('{signature}');
+            $mailer->send();
+
+            $from = key($mailer->message->getFrom());
+
+            $this->assertEquals('override@nowhere.com', $from);
+        }
+    }
+
     public function testStandardOwnerAsMailer()
     {
         $mockFactory = $this->getMockFactory();
@@ -318,15 +345,17 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
-        $mailer->setBody('{signature}');
 
         foreach ($this->contacts as $key => $contact) {
             $mailer->addTo($contact['email']);
             $mailer->setLead($contact);
+            $mailer->setBody('{signature}');
             $mailer->send();
 
             $body = $mailer->message->getBody();
             $from = key($mailer->message->getFrom());
+
+            $mailer->reset(true);
 
             if ($contact['owner_id']) {
                 $this->assertEquals('owner'.$contact['owner_id'].'@owner.com', $from);
