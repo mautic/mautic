@@ -11,8 +11,8 @@
 
 namespace Mautic\ChannelBundle\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class BatchContactController extends AbstractFormController
@@ -28,7 +28,7 @@ class BatchContactController extends AbstractFormController
         $this->actionModel  = $this->container->get('mautic.lead.model.channel.action');
         $this->contactModel = $this->container->get('mautic.lead.model.lead');
     }
-    
+
     /**
      * Execute the batch action.
      *
