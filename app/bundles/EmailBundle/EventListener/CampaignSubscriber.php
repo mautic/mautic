@@ -367,10 +367,8 @@ class CampaignSubscriber implements EventSubscriberInterface
      * Triggers the action which sends email to user, contact owner or specified email addresses.
      *
      * @param CampaignExecutionEvent $event
-     *
-     * @return CampaignExecutionEvent|null
      */
-    public function onCampaignTriggerActionSendEmailToUser(PendingEvent $event)
+    public function onCampaignTriggerActionSendEmailToUser(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('email.send.to.user')) {
             return;
@@ -385,7 +383,5 @@ class CampaignSubscriber implements EventSubscriberInterface
         } catch (EmailCouldNotBeSentException $e) {
             $event->setFailed($e->getMessage());
         }
-
-        return $event;
     }
 }
