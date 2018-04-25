@@ -342,18 +342,26 @@ class MailHelper
 
         // Set from email
         $ownerSignature = false;
+
         if (!$isQueueFlush) {
-            if ($useOwnerAsMailer) {
-                if ($owner = $this->getContactOwner($this->lead)) {
-                    $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name'], null);
-                    $ownerSignature = $this->getContactOwnerSignature($owner);
-                } else {
-                    $this->setFrom($this->from, null, null);
-                }
-            } elseif (!$from = $this->message->getFrom()) {
-                $this->setFrom($this->from, null, null);
+            $emailFrom = $this->message->getFrom();
+            if (!empty($emailFrom)) {
+                $this->setFrom($emailFrom, null, null);
             }
-        } // from is set in flushQueue
+            else {
+                if ($useOwnerAsMailer) {
+                    if ($owner = $this->getContactOwner($this->lead)) {
+                        $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name'], null);
+                        $ownerSignature = $this->getContactOwnerSignature($owner);
+                    } else {
+                        $this->setFrom($this->from, null, true);
+                    }
+                }
+                else {
+                    $this->setFrom($this->from, null, true);
+                }
+            }
+        }
 
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
@@ -611,10 +619,15 @@ class MailHelper
 
                 $this->errors = [];
 
-                if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
+                $mailFrom = $this->message->getFrom();
+
+                if (!empty($mailFrom)) {
+                    $this->setFrom($mailFrom, null, null);
+                }
+                elseif ($useOwnerAsMailer) {
                     $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
                 } else {
-                    $this->setFrom($this->from, null, null);
+                    $this->setFrom($this->from, null, true);
                 }
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
