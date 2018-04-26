@@ -42,7 +42,6 @@ class ContactActionModel
             }
 
             $this->contactModel->addToCategory($contact, $categoryIds);
-            $this->contactModel->detachEntity($contact);
         }
     }
 
@@ -62,7 +61,6 @@ class ContactActionModel
             $contactCategoryRelations = $this->contactModel->getLeadCategories($contact);
             $relationsToDelete        = array_intersect($contactCategoryRelations, $categoryIds);
             $this->contactModel->removeFromCategories($relationsToDelete);
-            $this->contactModel->detachEntity($contact);
         }
     }
 }
