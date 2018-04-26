@@ -108,6 +108,7 @@ if ('index' == $tmpl) {
     );
 }
 ?>
+
 <!-- report detail header -->
 <?php if ($report->getDescription()): ?>
 <div class="pr-md pl-md pt-lg pb-lg">
