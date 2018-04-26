@@ -9,7 +9,7 @@ echo $view['form']->start($form, ['attr' => $attr]);
     <thead >
     <tr >
         <th>
-            <input type="checkbox" id="lead_contact_channels_subscribed_channels_0" name="check_all"
+            <input type="checkbox" id="contact_channels_subscribed_channels_0" name="check_all"
                    onclick="Mautic.togglePreferredChannel('all');" value="all">
         </th>
         <th>
@@ -32,7 +32,7 @@ echo $view['form']->start($form, ['attr' => $attr]);
         <tr>
             <th style="vertical-align: top" class="col-md-1">
                 <input type="checkbox" id="<?php echo $channel->value ?>"
-                       name="lead_contact_channels[subscribed_channels][]" class="control-label"
+                       name="contact_channels[subscribed_channels][]" class="control-label"
                        onclick="Mautic.togglePreferredChannel(this.value);"
                        value="<?php echo $view->escape($channel->value) ?>" <?php echo $checked; ?>>
             </th>
@@ -56,7 +56,7 @@ echo $view['form']->start($form, ['attr' => $attr]);
             </td>
             <td class="col-md-1" style="vertical-align: top;" align="center">
                 <input type="radio" id="preferred_<?php echo $channel->value ?>"
-                       name="lead_contact_channels[preferred_channel]" class="contact"
+                       name="contact_channels[preferred_channel]" class="contact"
                        value="<?php echo $view->escape($channel->value) ?>" <?php if ($form['preferred_channel']->vars['value'] == $channel->value) {
                             echo $checked;
                         } ?> <?php echo $disabled; ?>>

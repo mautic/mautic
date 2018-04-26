@@ -48,7 +48,7 @@ class ContactFrequencyType extends AbstractType
         if (!empty($options['channels'])) {
             $builder->add(
                 'lead_channels',
-                'lead_contact_channels',
+                ContactChannelsType::class,
                 [
                     'channels' => $options['channels'],
                     'data'     => $options['data']['lead_channels'],

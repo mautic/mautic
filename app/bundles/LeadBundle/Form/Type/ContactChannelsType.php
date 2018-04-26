@@ -201,13 +201,4 @@ class ContactChannelsType extends AbstractType
             ]
         );
     }
-
-    /**
-     * @see AbstractType::getName()
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'lead_contact_channels';
-    }
 }
