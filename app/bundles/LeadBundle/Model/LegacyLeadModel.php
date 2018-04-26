@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Container;
 /**
  * Class LegacyLeadModel.
  *
- * @deprecated Used temporarily to get around circular depdenency for LeadModel
+ * @deprecated 2.14.0 to be removed in 3.0; Used temporarily to get around circular depdenency for LeadModel
  */
 class LegacyLeadModel
 {
