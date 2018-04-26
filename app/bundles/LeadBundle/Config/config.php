@@ -740,6 +740,13 @@ return [
                     'mautic.lead.repository.lead',
                 ],
             ],
+            // Deprecated support for circular dependency
+            'mautic.lead.legacy_merger' => [
+                'class'     => \Mautic\LeadBundle\Deduplicate\LegacyContactMerger::class,
+                'arguments' => [
+                    'service_container',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.dnc' => [
@@ -809,6 +816,7 @@ return [
                     'mautic.user.provider',
                     'mautic.tracker.contact',
                     'mautic.tracker.device',
+                    'mautic.lead.legacy_merger',
                 ],
             ],
             'mautic.lead.model.field' => [
