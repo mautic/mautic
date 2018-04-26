@@ -145,11 +145,18 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.lead.model.channel.action' => [
-                'class'     => \Mautic\ChannelBundle\Model\ContactActionModel::class,
+            'mautic.channel.model.channel.action' => [
+                'class'     => \Mautic\ChannelBundle\Model\ChannelActionModel::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.dnc',
+                    'translator',
+                ],
+            ],
+            'mautic.channel.model.frequency.action' => [
+                'class'     => \Mautic\ChannelBundle\Model\FrequencyActionModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
                     'mautic.lead.repository.frequency_rule',
                 ],
             ],

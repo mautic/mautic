@@ -11,14 +11,12 @@
 
 namespace Mautic\ChannelBundle\Model;
 
-use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class ContactActionModel
+class FrequencyActionModel
 {
     /**
      * @var LeadModel
@@ -26,41 +24,30 @@ class ContactActionModel
     private $contactModel;
 
     /**
-     * @var DoNotContact
-     */
-    private $doNotContact;
-
-    /**
      * @var FrequencyRuleRepository
      */
     private $frequencyRuleRepository;
 
     /**
-     * ChangeChannelsAction constructor.
-     *
      * @param LeadModel               $contactModel
-     * @param DoNotContact            $doNotContact
      * @param FrequencyRuleRepository $frequencyRuleRepository
      */
     public function __construct(
         LeadModel $contactModel,
-        DoNotContact $doNotContact,
         FrequencyRuleRepository $frequencyRuleRepository
     ) {
         $this->contactModel            = $contactModel;
-        $this->doNotContact            = $doNotContact;
         $this->frequencyRuleRepository = $frequencyRuleRepository;
     }
 
     /**
-     * Update channels and frequency rules.
+     * Update channels.
      *
      * @param array  $contactIds
-     * @param array  $subscribedChannels
      * @param array  $params
      * @param string $preferredChannel
      */
-    public function update(array $contactIds, array $subscribedChannels, array $params, $preferredChannel)
+    public function update(array $contactIds, array $params, $preferredChannel)
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
@@ -69,36 +56,7 @@ class ContactActionModel
                 continue;
             }
 
-            $this->updateChannels($contact, $subscribedChannels);
             $this->updateFrequencyRules($contact, $params, $preferredChannel);
-        }
-    }
-
-    /**
-     * Update contact's channels.
-     *
-     * @param Lead $contact
-     */
-    private function updateChannels(Lead $contact, array $subscribedChannels)
-    {
-        $leadChannels = $this->contactModel->getContactChannels($contact);
-        $allChannels  = $this->contactModel->getPreferenceChannels();
-
-        foreach ($subscribedChannels as $subscribedChannel) {
-            if (!array_key_exists($subscribedChannel, $leadChannels)) {
-                $contactable = $this->doNotContact->isContactable($contact, $subscribedChannel);
-                // Only resubscribe if the contact did not opt out themselves
-                if ($contactable === DNC::UNSUBSCRIBED) {
-                    $this->doNotContact->removeDncForContact($contact->getId(), $subscribedChannel);
-                }
-            }
-        }
-
-        $dncChannels = array_diff($allChannels, $subscribedChannels);
-        if (!empty($dncChannels)) {
-            foreach ($dncChannels as $channel) {
-                $this->doNotContact->addDncForContact($contact->getId(), $channel, DNC::MANUAL, 'updated manually by user');
-            }
         }
     }
 

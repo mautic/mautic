@@ -11,7 +11,8 @@
 
 namespace Mautic\ChannelBundle\Controller;
 
-use Mautic\ChannelBundle\Model\ContactActionModel;
+use Mautic\ChannelBundle\Model\ChannelActionModel;
+use Mautic\ChannelBundle\Model\FrequencyActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Form\Type\ContactChannelsType;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -21,9 +22,14 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 class BatchContactController extends AbstractFormController
 {
     /**
-     * @var ContactActionModel
+     * @var ChannelActionModel
      */
-    private $actionModel;
+    private $channelActionModel;
+
+    /**
+     * @var FrequencyActionModel
+     */
+    private $frequencyActionModel;
 
     /**
      * @var LeadModel
@@ -38,8 +44,9 @@ class BatchContactController extends AbstractFormController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        $this->actionModel  = $this->container->get('mautic.lead.model.channel.action');
-        $this->contactModel = $this->container->get('mautic.lead.model.lead');
+        $this->channelActionModel   = $this->container->get('mautic.channel.model.channel.action');
+        $this->frequencyActionModel = $this->container->get('mautic.channel.model.frequency.action');
+        $this->contactModel         = $this->container->get('mautic.lead.model.lead');
     }
 
     /**
@@ -53,12 +60,11 @@ class BatchContactController extends AbstractFormController
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {
-            $this->actionModel->update(
-                $ids,
-                isset($params['subscribed_channels']) ? $params['subscribed_channels'] : [],
-                $params,
-                isset($params['preferred_channel']) ? $params['preferred_channel'] : null
-            );
+            $subscribedChannels = isset($params['subscribed_channels']) ? $params['subscribed_channels'] : [];
+            $preferredChannel   = isset($params['preferred_channel']) ? $params['preferred_channel'] : null;
+
+            $this->channelActionModel->update($ids, $subscribedChannels);
+            $this->frequencyActionModel->update($ids, $params, $preferredChannel);
 
             $this->addFlash('mautic.lead.batch_leads_affected', [
                 'pluralCount' => count($ids),
