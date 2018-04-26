@@ -8,6 +8,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 namespace Mautic\EmailBundle\Helper;
+
 use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -20,6 +21,7 @@ use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
+
 /**
  * Class MailHelper.
  */
@@ -290,8 +292,7 @@ class MailHelper
             $emailFrom = $this->message->getFrom();
             if (!empty($emailFrom)) {
                 $this->setFrom($emailFrom, null, null);
-            }
-            else {
+            } else {
                 if ($useOwnerAsMailer) {
                     if ($owner = $this->getContactOwner($this->lead)) {
                         $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name'], null);
@@ -299,8 +300,7 @@ class MailHelper
                     } else {
                         $this->setFrom($this->from, null, true);
                     }
-                }
-                else {
+                } else {
                     $this->setFrom($this->from, null, true);
                 }
             }
@@ -535,10 +535,8 @@ class MailHelper
 
                     $emailFromName = $queuedEmail->getFromName();
                     $this->setFrom($emailFromAddress, $emailFromName, null);
-                }
-                elseif ($useOwnerAsMailer && 'default' !== $fromKey) {
+                } elseif ($useOwnerAsMailer && 'default' !== $fromKey) {
                     $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
-
                 } else {
                     $this->setFrom($this->systemFrom, null, true);
                 }

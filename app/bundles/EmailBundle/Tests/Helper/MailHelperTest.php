@@ -8,6 +8,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 namespace Mautic\EmailBundle\Tests\Helper;
+
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -19,6 +20,7 @@ use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+
 class MailHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected $contacts = [
