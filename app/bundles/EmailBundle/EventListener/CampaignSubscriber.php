@@ -100,6 +100,8 @@ class CampaignSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_OPEN              => ['onEmailOpen', 0],
             EmailEvents::ON_CAMPAIGN_BATCH_ACTION   => [
                 ['onCampaignTriggerActionSendEmailToContact', 0],
+            ],
+            EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION => [
                 ['onCampaignTriggerActionSendEmailToUser', 1],
             ],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
