@@ -28,12 +28,12 @@ class ContactDeduper
     /**
      * @var ContactMerger
      */
-    private $merger;
+    private $contactMerger;
 
     /**
      * @var LeadRepository
      */
-    private $repository;
+    private $leadRepository;
 
     /**
      * @var array
@@ -49,14 +49,14 @@ class ContactDeduper
      * DedupModel constructor.
      *
      * @param FieldModel     $fieldModel
-     * @param ContactMerger  $merger
-     * @param LeadRepository $repository
+     * @param ContactMerger  $contactMerger
+     * @param LeadRepository $leadRepository
      */
-    public function __construct(FieldModel $fieldModel, ContactMerger $merger, LeadRepository $repository)
+    public function __construct(FieldModel $fieldModel, ContactMerger $contactMerger, LeadRepository $leadRepository)
     {
-        $this->fieldModel = $fieldModel;
-        $this->merger     = $merger;
-        $this->repository = $repository;
+        $this->fieldModel     = $fieldModel;
+        $this->contactMerger  = $contactMerger;
+        $this->leadRepository = $leadRepository;
     }
 
     /**
@@ -69,7 +69,7 @@ class ContactDeduper
     {
         $this->mergeNewerIntoOlder = $mergeNewerIntoOlder;
         $lastContactId             = 0;
-        $totalContacts             = $this->repository->getIdentifiedContactCount();
+        $totalContacts             = $this->leadRepository->getIdentifiedContactCount();
         $progress                  = null;
 
         if ($output) {
@@ -77,7 +77,7 @@ class ContactDeduper
         }
 
         $dupCount = 0;
-        while ($contact = $this->repository->getNextIdentifiedContact($lastContactId)) {
+        while ($contact = $this->leadRepository->getNextIdentifiedContact($lastContactId)) {
             $lastContactId = $contact->getId();
             $fields        = $contact->getProfileFields();
             $duplicates    = $this->checkForDuplicateContacts($fields);
@@ -91,7 +91,7 @@ class ContactDeduper
                 $loser = reset($duplicates);
                 while ($winner = next($duplicates)) {
                     try {
-                        $this->merger->merge($winner, $loser);
+                        $this->contactMerger->merge($winner, $loser);
 
                         ++$dupCount;
 
@@ -107,7 +107,7 @@ class ContactDeduper
             }
 
             // Clear all entities in memory for RAM control
-            $this->repository->clear();
+            $this->leadRepository->clear();
             gc_collect_cycles();
         }
 
@@ -123,7 +123,7 @@ class ContactDeduper
     {
         $duplicates = [];
         if ($uniqueData = $this->getUniqueData($queryFields)) {
-            $duplicates = $this->repository->getLeadsByUniqueFields($uniqueData);
+            $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
 
             // By default, duplicates are ordered by newest first
             if (!$this->mergeNewerIntoOlder) {
