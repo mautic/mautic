@@ -30,8 +30,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ScheduledExecutioner implements ExecutionerInterface
 {
-    use ContactRangeTrait;
-
     /**
      * @var LeadEventLogRepository
      */

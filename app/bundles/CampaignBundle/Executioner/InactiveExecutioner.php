@@ -30,8 +30,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class InactiveExecutioner implements ExecutionerInterface
 {
-    use ContactRangeTrait;
-
     /**
      * @var Campaign
      */

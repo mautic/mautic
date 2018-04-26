@@ -30,8 +30,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class KickoffExecutioner implements ExecutionerInterface
 {
-    use ContactRangeTrait;
-
     /**
      * @var ContactLimiter
      */
