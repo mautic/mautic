@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Deduplicate\Helper;
 
-use Mautic\LeadBundle\Exception\ValueNotMergeable;
+use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
 
 class MergeValueHelper
 {
@@ -22,16 +22,16 @@ class MergeValueHelper
      *
      * @return mixed
      *
-     * @throws ValueNotMergeable
+     * @throws ValueNotMergeableException
      */
     public static function getMergeValue($newerValue, $olderValue, $currentValue = null)
     {
         if ($newerValue === $olderValue) {
-            throw new ValueNotMergeable($newerValue, $olderValue);
+            throw new ValueNotMergeableException($newerValue, $olderValue);
         }
 
         if (null !== $currentValue && $newerValue === $currentValue) {
-            throw new ValueNotMergeable($newerValue, $olderValue);
+            throw new ValueNotMergeableException($newerValue, $olderValue);
         }
 
         if (self::isNotEmpty($newerValue)) {
@@ -42,7 +42,7 @@ class MergeValueHelper
             return $olderValue;
         }
 
-        throw new ValueNotMergeable($newerValue, $olderValue);
+        throw new ValueNotMergeableException($newerValue, $olderValue);
     }
 
     /**

@@ -12,12 +12,12 @@
 namespace Mautic\LeadBundle\Deduplicate;
 
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
+use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
 use Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\MergeRecord;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
-use Mautic\LeadBundle\Exception\ValueNotMergeable;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
@@ -188,7 +188,7 @@ class ContactMerger
 
                 $fromValue = empty($oldestFields[$field]) ? 'empty' : $oldestFields[$field];
                 $this->logger->debug("CONTACT: Updated $field from $fromValue to $newValue for {$winner->getId()}");
-            } catch (ValueNotMergeable $exception) {
+            } catch (ValueNotMergeableException $exception) {
                 $this->logger->info("CONTACT: $field is not mergeable for {$winner->getId()} - ".$exception->getMessage());
             }
         }
