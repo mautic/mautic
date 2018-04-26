@@ -12,12 +12,24 @@
 namespace Mautic\CategoryBundle\Controller;
 
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class BatchContactController extends AbstractFormController
 {
+    /**
+     * @var ContactActionModel
+     */
+    private $actionModel;
+
+    /**
+     * @var CategoryModel
+     */
+    private $categoryModel;
+
     /**
      * Initialize object props here to simulate constructor
      * and make the future controller refactoring easier.
