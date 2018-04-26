@@ -65,7 +65,7 @@ class ContactDeduper
      *
      * @return int
      */
-    public function dedup($mergeNewerIntoOlder = false, OutputInterface $output = null)
+    public function deduplicate($mergeNewerIntoOlder = false, OutputInterface $output = null)
     {
         $this->mergeNewerIntoOlder = $mergeNewerIntoOlder;
         $lastContactId             = 0;

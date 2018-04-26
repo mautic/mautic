@@ -16,14 +16,39 @@ use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class DedupCommand extends ModeratedCommand
+class DeduplicateCommand extends ModeratedCommand
 {
+    /**
+     * @var ContactDeduper
+     */
+    private $contactDeduper;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * DeduplicateCommand constructor.
+     *
+     * @param ContactDeduper      $contactDeduper
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(ContactDeduper $contactDeduper, TranslatorInterface $translator)
+    {
+        parent::__construct();
+
+        $this->contactDeduper = $contactDeduper;
+        $this->translator     = $translator;
+    }
+
     public function configure()
     {
         parent::configure();
 
-        $this->setName('mautic:contacts:dedup')
+        $this->setName('mautic:contacts:deduplicate')
             ->setDescription('Merge contacts based on same unique identifiers')
             ->addOption(
                 '--newer-into-older',
@@ -46,14 +71,12 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var ContactDeduper $deduper */
-        $deduper        = $this->getContainer()->get('mautic.lead.deduper');
         $newerIntoOlder = (bool) $input->getOption('newer-into-older');
-        $count          = $deduper->dedup($newerIntoOlder, $output);
+        $count          = $this->contactDeduper->deduplicate($newerIntoOlder, $output);
 
         $output->writeln('');
         $output->writeln(
-            $this->getContainer()->get('translator')->trans(
+            $this->translator->trans(
                 'mautic.lead.merge.count',
                 [
                     '%count%' => $count,

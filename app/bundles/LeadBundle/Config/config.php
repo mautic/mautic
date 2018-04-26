@@ -926,6 +926,16 @@ return [
                 ],
             ],
         ],
+        'command' => [
+            'mautic.lead.command.deduplicate' => [
+                'class'     => \Mautic\LeadBundle\Command\DeduplicateCommand::class,
+                'arguments' => [
+                    'mautic.lead.deduper',
+                    'translator',
+                ],
+                'tag' => 'console.command',
+            ],
+        ],
     ],
     'parameters' => [
         'parallel_import_limit'               => 1,

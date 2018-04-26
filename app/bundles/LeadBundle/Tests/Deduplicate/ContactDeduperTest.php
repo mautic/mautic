@@ -83,7 +83,7 @@ class ContactDeduperTest extends \PHPUnit_Framework_TestCase
             ->method('merge')
             ->with($lead4, $lead1);
 
-        $this->getDeduper()->dedup();
+        $this->getDeduper()->deduplicate();
     }
 
     public function testDuplicatesAreMergedWithMergeNewerIntoOlder()
@@ -120,7 +120,7 @@ class ContactDeduperTest extends \PHPUnit_Framework_TestCase
             ->method('merge')
             ->with($lead1, $lead4);
 
-        $this->getDeduper()->dedup();
+        $this->getDeduper()->deduplicate();
     }
 
     /**
