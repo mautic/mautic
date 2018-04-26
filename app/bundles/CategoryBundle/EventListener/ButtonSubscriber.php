@@ -15,9 +15,10 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ButtonSubscriber
+class ButtonSubscriber implements EventSubscriberInterface
 {
     /**
      * @var Router
