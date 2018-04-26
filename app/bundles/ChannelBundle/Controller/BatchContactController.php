@@ -50,7 +50,7 @@ class BatchContactController extends AbstractFormController
     {
         $params = $this->request->get('lead_contact_channels', []);
 
-        if (isset($params['ids'])) {
+        if (isset($params['ids']) && is_array($params['ids'])) {
             $this->actionModel->update(
                 json_decode($params['ids']),
                 isset($params['subscribed_channels']) ? $params['subscribed_channels'] : [],
@@ -62,12 +62,14 @@ class BatchContactController extends AbstractFormController
                 'pluralCount' => count($params['ids']),
                 '%count%'     => count($params['ids']),
             ]);
-
-            return new JsonResponse([
-                'closeModal' => true,
-                'flashes'    => $this->getFlashContent(),
-            ]);
+        } else {
+            $this->addFlash('mautic.core.error.ids.missing');
         }
+
+        return new JsonResponse([
+            'closeModal' => true,
+            'flashes'    => $this->getFlashContent(),
+        ]);
     }
 
     /**

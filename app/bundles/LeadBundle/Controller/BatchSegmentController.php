@@ -48,26 +48,28 @@ class BatchSegmentController extends AbstractFormController
      */
     public function setAction()
     {
-        $requestParameters = $this->request->get('lead_batch', []);
+        $params = $this->request->get('lead_batch', []);
 
-        if (isset($requestParameters['ids'])) {
-            $segmentsToAdd    = isset($requestParameters['add']) ? $requestParameters['add'] : [];
-            $segmentsToRemove = isset($requestParameters['remove']) ? $requestParameters['remove'] : [];
-            $contactIds       = json_decode($requestParameters['ids']);
+        if (isset($params['ids']) && is_array($params['ids'])) {
+            $segmentsToAdd    = isset($params['add']) ? $params['add'] : [];
+            $segmentsToRemove = isset($params['remove']) ? $params['remove'] : [];
+            $contactIds       = json_decode($params['ids']);
 
             $this->actionModel->addContacts($contactIds, $segmentsToAdd);
             $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
 
             $this->addFlash('mautic.lead.batch_leads_affected', [
-                'pluralCount' => count($requestParameters['ids']),
-                '%count%'     => count($requestParameters['ids']),
+                'pluralCount' => count($params['ids']),
+                '%count%'     => count($params['ids']),
             ]);
-
-            return new JsonResponse([
-                'closeModal' => true,
-                'flashes'    => $this->getFlashContent(),
-            ]);
+        } else {
+            $this->addFlash('mautic.core.error.ids.missing');
         }
+
+        return new JsonResponse([
+            'closeModal' => true,
+            'flashes'    => $this->getFlashContent(),
+        ]);
     }
 
     /**
