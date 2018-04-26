@@ -24,7 +24,7 @@ class ValueNotMergeableException extends \Exception
     private $olderValue;
 
     /**
-     * ValueNotMergeable constructor.
+     * ValueNotMergeableException constructor.
      *
      * @param mixed $newerValue
      * @param mixed $olderValue
