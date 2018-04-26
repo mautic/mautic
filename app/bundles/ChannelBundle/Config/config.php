@@ -92,7 +92,11 @@ return [
                 ],
             ],
             'mautic.channel.button.subscriber' => [
-                'class' => \Mautic\ChannelBundle\EventListener\ButtonSubscriber::class,
+                'class'     => \Mautic\ChannelBundle\EventListener\ButtonSubscriber::class,
+                'arguments' => [
+                    'router',
+                    'translator',
+                ],
             ],
         ],
         'forms' => [

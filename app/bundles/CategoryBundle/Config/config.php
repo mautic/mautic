@@ -67,7 +67,11 @@ return [
                 ],
             ],
             'mautic.category.button.subscriber' => [
-                'class' => \Mautic\CategoryBundle\EventListener\ButtonSubscriber::class,
+                'class'     => \Mautic\CategoryBundle\EventListener\ButtonSubscriber::class,
+                'arguments' => [
+                    'router',
+                    'translator',
+                ],
             ],
         ],
         'forms' => [
