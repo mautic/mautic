@@ -33,10 +33,9 @@ class LeadPermissions extends AbstractPermissions
                 'view' => 1,
             ],
         ];
-        $this->addExtendedPermissions('leads', false, [
-            'disableexports' => 1024,
-        ]);
+        $this->addExtendedPermissions('leads', false);
         $this->addStandardPermissions('imports');
+        $this->addCustomPermission('export', ['disable' => 1024]);
     }
 
     /**
@@ -49,9 +48,7 @@ class LeadPermissions extends AbstractPermissions
 
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addExtendedFormFields('lead', 'leads', $builder, $data, false, [
-            'disableexports' => 'mautic.core.permissions.disableexport',
-        ]);
+        $this->addExtendedFormFields($this->getName(), 'leads', $builder, $data, false);
 
         $builder->add(
             'lead:lists',
@@ -84,6 +81,8 @@ class LeadPermissions extends AbstractPermissions
                 'level'             => 'fields',
             ]
         );
+
+        $this->addCustomFormFields($this->getName(), 'export', $builder, 'mautic.core.permissions.export', ['disable' => 'mautic.core.permissions.disable'], $data);
 
         $this->addStandardFormFields($this->getName(), 'imports', $builder, $data);
     }
