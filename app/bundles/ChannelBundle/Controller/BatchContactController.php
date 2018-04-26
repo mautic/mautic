@@ -13,6 +13,7 @@ namespace Mautic\ChannelBundle\Controller;
 
 use Mautic\ChannelBundle\Model\ContactActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\LeadBundle\Form\Type\ContactChannelsType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -48,19 +49,20 @@ class BatchContactController extends AbstractFormController
      */
     public function setAction()
     {
-        $params = $this->request->get('lead_contact_channels', []);
+        $params = $this->request->get('contact_channels', []);
+        $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
-        if (isset($params['ids']) && is_array($params['ids'])) {
+        if ($ids && is_array($ids)) {
             $this->actionModel->update(
-                json_decode($params['ids']),
+                $ids,
                 isset($params['subscribed_channels']) ? $params['subscribed_channels'] : [],
                 $params,
                 isset($params['preferred_channel']) ? $params['preferred_channel'] : null
             );
 
             $this->addFlash('mautic.lead.batch_leads_affected', [
-                'pluralCount' => count($params['ids']),
-                '%count%'     => count($params['ids']),
+                'pluralCount' => count($ids),
+                '%count%'     => count($ids),
             ]);
         } else {
             $this->addFlash('mautic.core.error.ids.missing');
@@ -83,7 +85,7 @@ class BatchContactController extends AbstractFormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'         => $this->createForm('lead_contact_channels', [], [
+                'form'         => $this->createForm(ContactChannelsType::class, [], [
                     'action'        => $route,
                     'channels'      => $this->contactModel->getPreferenceChannels(),
                     'public_view'   => false,

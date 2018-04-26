@@ -50,8 +50,9 @@ class BatchContactController extends AbstractFormController
     public function execAction()
     {
         $params = $this->request->get('lead_batch');
+        $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
-        if (isset($params['ids']) && is_array($params['ids'])) {
+        if ($ids && is_array($ids)) {
             $categoriesToAdd    = isset($params['add']) ? $params['add'] : [];
             $categoriesToRemove = isset($params['remove']) ? $params['remove'] : [];
             $contactIds         = json_decode($params['ids']);
@@ -60,8 +61,8 @@ class BatchContactController extends AbstractFormController
             $this->actionModel->removeContactsFromCategories($contactIds, $categoriesToRemove);
 
             $this->addFlash('mautic.lead.batch_leads_affected', [
-                'pluralCount' => count($params['ids']),
-                '%count%'     => count($params['ids']),
+                'pluralCount' => count($ids),
+                '%count%'     => count($ids),
             ]);
         } else {
             $this->addFlash('mautic.core.error.ids.missing');
