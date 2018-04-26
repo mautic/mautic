@@ -58,7 +58,7 @@ class ContactFrequencyType extends AbstractType
 
         $builder->add(
             'lead_lists',
-            'leadlist_choices',
+            LeadListType::class,
             [
                 'global_only' => $options['public_view'],
                 'label'       => 'mautic.lead.form.list',
