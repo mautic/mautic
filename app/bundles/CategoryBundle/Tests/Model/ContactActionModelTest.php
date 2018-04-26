@@ -69,10 +69,6 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
             ->method('addToCategory')
             ->with($this->leadMock6);
 
-        $this->contactModelMock->expects($this->at(4))
-            ->method('detachEntity')
-            ->with($this->leadMock6);
-
         $this->actionModel->addContactsToCategories($contacts, $categories);
     }
 
