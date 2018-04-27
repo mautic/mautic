@@ -64,24 +64,24 @@ class ChannelActionModel
                 continue;
             }
 
-            $this->removeChannels($contact, $subscribedChannels);
             $this->addChannels($contact, $subscribedChannels);
+            $this->removeChannels($contact, $subscribedChannels);
         }
     }
 
     /**
-     * Remove contact's channels.
+     * Add contact's channels.
      * Only resubscribe if the contact did not opt out themselves.
      *
      * @param Lead  $contact
      * @param array $subscribedChannels
      */
-    private function removeChannels(Lead $contact, array $subscribedChannels)
+    private function addChannels(Lead $contact, array $subscribedChannels)
     {
-        $leadChannels = $this->contactModel->getContactChannels($contact);
+        $contactChannels = $this->contactModel->getContactChannels($contact);
 
         foreach ($subscribedChannels as $subscribedChannel) {
-            if (!array_key_exists($subscribedChannel, $leadChannels)) {
+            if (!array_key_exists($subscribedChannel, $contactChannels)) {
                 $contactable = $this->doNotContact->isContactable($contact, $subscribedChannel);
                 if ($contactable !== DNC::UNSUBSCRIBED) {
                     $this->doNotContact->removeDncForContact($contact->getId(), $subscribedChannel);
@@ -91,15 +91,16 @@ class ChannelActionModel
     }
 
     /**
-     * Add contact's channels.
+     * Remove contact's channels.
      *
      * @param Lead  $contact
      * @param array $subscribedChannels
      */
-    private function addChannels(Lead $contact, array $subscribedChannels)
+    private function removeChannels(Lead $contact, array $subscribedChannels)
     {
         $allChannels = $this->contactModel->getPreferenceChannels();
         $dncChannels = array_diff($allChannels, $subscribedChannels);
+
         if (empty($dncChannels)) {
             return;
         }
