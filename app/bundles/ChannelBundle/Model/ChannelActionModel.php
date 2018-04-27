@@ -110,7 +110,7 @@ class ChannelActionModel
                 $contact->getId(),
                 $channel,
                 DNC::MANUAL,
-                $this->translator->trans('updated manually by user')
+                $this->translator->trans('mautic.lead.event.donotcontact_manual')
             );
         }
     }
