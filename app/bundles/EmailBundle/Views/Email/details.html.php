@@ -226,6 +226,8 @@ if (!$isEmbedded) {
                 ]
             ); ?>
 
+            <?php echo $view['content']->getCustomContent('email.stats.graph', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">

@@ -153,6 +153,8 @@ switch (true) {
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('campaign.stats.graph', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <?php if ($preview): ?>
