@@ -274,6 +274,7 @@ class MailHelper
         if (method_exists($this->transport, 'setMauticFactory')) {
             $this->transport->setMauticFactory($factory);
         }
+
         $this->message = $this->getMessageInstance();
     }
 
@@ -750,6 +751,7 @@ class MailHelper
     {
         try {
             $message = ($this->tokenizationEnabled) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
+
             return $message;
         } catch (\Exception $e) {
             $this->logError($e);

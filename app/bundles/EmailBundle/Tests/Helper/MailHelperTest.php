@@ -427,7 +427,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockFactory();
         $transport   = ($useSmtp) ? new SmtpTransport() : new BatchTransport();
         $swiftMailer = new \Swift_Mailer($transport);
-        
+
         return new MailHelper($mockFactory, $swiftMailer);
     }
 
