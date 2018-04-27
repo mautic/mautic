@@ -332,6 +332,7 @@ class MailHelper
             if ($result = $this->queue($dispatchSendEvent)) {
                 $result = $this->flushQueue(['To', 'Cc', 'Bcc'], $useOwnerAsMailer);
             }
+            
             return $result;
         }
         // Set from email
