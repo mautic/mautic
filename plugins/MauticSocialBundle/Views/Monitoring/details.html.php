@@ -86,6 +86,8 @@ echo $view['assets']->includeScript('plugins/MauticSocialBundle/Assets/js/social
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('campaign.stats.graph', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">

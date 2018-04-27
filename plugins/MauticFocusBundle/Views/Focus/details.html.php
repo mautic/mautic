@@ -116,6 +116,7 @@ $view['slots']->set(
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('focus.stats.graph', $mauticTemplateVars); ?>
 
             <!-- tabs controls -->
             <?php if (!empty($trackables)): ?>
