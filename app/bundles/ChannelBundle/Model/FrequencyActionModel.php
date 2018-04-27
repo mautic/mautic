@@ -75,7 +75,7 @@ class FrequencyActionModel
                 $preferredChannel = $channel;
             }
 
-            $frequencyRule = (isset($frequencyRules[$channel])) ? $frequencyRules[$channel] : new FrequencyRule();
+            $frequencyRule = isset($frequencyRules[$channel]) ? $frequencyRules[$channel] : new FrequencyRule();
             $frequencyRule->setChannel($channel);
             $frequencyRule->setLead($contact);
             $frequencyRule->setDateAdded(new \DateTime());
@@ -96,7 +96,6 @@ class FrequencyActionModel
                 $frequencyRule->setPauseToDate(new \DateTime($params['contact_pause_end_date_'.$channel]));
             }
 
-            $frequencyRule->setLead($contact);
             $frequencyRule->setPreferredChannel($preferredChannel === $channel);
 
             $contact->addFrequencyRule($frequencyRule);
