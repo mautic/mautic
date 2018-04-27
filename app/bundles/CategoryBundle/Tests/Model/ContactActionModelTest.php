@@ -20,12 +20,12 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $leadMock5;
+    private $contactMock5;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $leadMock6;
+    private $contactMock6;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -39,8 +39,8 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->leadMock5        = $this->createMock(Lead::class);
-        $this->leadMock6        = $this->createMock(Lead::class);
+        $this->contactMock5     = $this->createMock(Lead::class);
+        $this->contactMock6     = $this->createMock(Lead::class);
         $this->contactModelMock = $this->createMock(LeadModel::class);
         $this->actionModel      = new ContactActionModel($this->contactModelMock);
     }
@@ -53,21 +53,21 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
             ->with($contacts)
-            ->willReturn([$this->leadMock5, $this->leadMock6]);
+            ->willReturn([$this->contactMock5, $this->contactMock6]);
 
         $this->contactModelMock->expects($this->at(1))
             ->method('canEditContact')
-            ->with($this->leadMock5)
+            ->with($this->contactMock5)
             ->willReturn(false);
 
         $this->contactModelMock->expects($this->at(2))
             ->method('canEditContact')
-            ->with($this->leadMock6)
+            ->with($this->contactMock6)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(3))
             ->method('addToCategory')
-            ->with($this->leadMock6);
+            ->with($this->contactMock6);
 
         $this->actionModel->addContactsToCategories($contacts, $categories);
     }
@@ -80,21 +80,21 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
             ->with($contacts)
-            ->willReturn([$this->leadMock5, $this->leadMock6]);
+            ->willReturn([$this->contactMock5, $this->contactMock6]);
 
         $this->contactModelMock->expects($this->at(1))
             ->method('canEditContact')
-            ->with($this->leadMock5)
+            ->with($this->contactMock5)
             ->willReturn(false);
 
         $this->contactModelMock->expects($this->at(2))
             ->method('canEditContact')
-            ->with($this->leadMock6)
+            ->with($this->contactMock6)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(3))
             ->method('getLeadCategories')
-            ->with($this->leadMock6)
+            ->with($this->contactMock6)
             ->willReturn([45, 2]);
 
         $this->contactModelMock->expects($this->at(4))
@@ -112,27 +112,27 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
             ->with($contacts)
-            ->willReturn([$this->leadMock5, $this->leadMock6]);
+            ->willReturn([$this->contactMock5, $this->contactMock6]);
 
         // Loop 1
         $this->contactModelMock->expects($this->at(1))
             ->method('canEditContact')
-            ->with($this->leadMock5)
+            ->with($this->contactMock5)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(2))
             ->method('addToCategory')
-            ->with($this->leadMock5, $categories);
+            ->with($this->contactMock5, $categories);
 
         // Loop 2
         $this->contactModelMock->expects($this->at(3))
             ->method('canEditContact')
-            ->with($this->leadMock6)
+            ->with($this->contactMock6)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(4))
             ->method('addToCategory')
-            ->with($this->leadMock6, $categories);
+            ->with($this->contactMock6, $categories);
 
         $this->actionModel->addContactsToCategories($contacts, $categories);
     }
@@ -145,17 +145,17 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
             ->with($contacts)
-            ->willReturn([$this->leadMock5, $this->leadMock6]);
+            ->willReturn([$this->contactMock5, $this->contactMock6]);
 
         // Loop 1
         $this->contactModelMock->expects($this->at(1))
             ->method('canEditContact')
-            ->with($this->leadMock5)
+            ->with($this->contactMock5)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(2))
             ->method('getLeadCategories')
-            ->with($this->leadMock5)
+            ->with($this->contactMock5)
             ->willReturn([1, 2]);
 
         $this->contactModelMock->expects($this->at(3))
@@ -165,12 +165,12 @@ class ContactActionModelTest extends \PHPUnit_Framework_TestCase
         // Loop 2
         $this->contactModelMock->expects($this->at(4))
             ->method('canEditContact')
-            ->with($this->leadMock6)
+            ->with($this->contactMock6)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(5))
             ->method('getLeadCategories')
-            ->with($this->leadMock6)
+            ->with($this->contactMock6)
             ->willReturn([2, 3]);
 
         $this->contactModelMock->expects($this->at(6))

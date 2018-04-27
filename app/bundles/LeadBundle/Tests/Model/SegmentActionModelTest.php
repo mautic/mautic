@@ -20,12 +20,12 @@ class SegmentActionModelTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $leadMock5;
+    private $contactMock5;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $leadMock6;
+    private $contactMock6;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -39,10 +39,10 @@ class SegmentActionModelTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->leadMock5        = $this->createMock(Lead::class);
-        $this->leadMock6        = $this->createMock(Lead::class);
-        $this->contactModelMock = $this->createMock(LeadModel::class);
-        $this->actionModel      = new SegmentActionModel($this->contactModelMock);
+        $this->contactMock5        = $this->createMock(Lead::class);
+        $this->contactMock6        = $this->createMock(Lead::class);
+        $this->contactModelMock    = $this->createMock(LeadModel::class);
+        $this->actionModel         = new SegmentActionModel($this->contactModelMock);
     }
 
     public function testAddContactsToSegmentsEntityAccess()
@@ -53,25 +53,25 @@ class SegmentActionModelTest extends \PHPUnit_Framework_TestCase
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
             ->with($contacts)
-            ->willReturn([$this->leadMock5, $this->leadMock6]);
+            ->willReturn([$this->contactMock5, $this->contactMock6]);
 
         $this->contactModelMock->expects($this->at(1))
             ->method('canEditContact')
-            ->with($this->leadMock5)
+            ->with($this->contactMock5)
             ->willReturn(false);
 
         $this->contactModelMock->expects($this->at(2))
             ->method('canEditContact')
-            ->with($this->leadMock6)
+            ->with($this->contactMock6)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(3))
             ->method('addToLists')
-            ->with($this->leadMock6, $segments);
+            ->with($this->contactMock6, $segments);
 
         $this->contactModelMock->expects($this->at(4))
             ->method('saveEntities')
-            ->with([$this->leadMock5, $this->leadMock6]);
+            ->with([$this->contactMock5, $this->contactMock6]);
 
         $this->actionModel->addContacts($contacts, $segments);
     }
@@ -84,25 +84,25 @@ class SegmentActionModelTest extends \PHPUnit_Framework_TestCase
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
             ->with($contacts)
-            ->willReturn([$this->leadMock5, $this->leadMock6]);
+            ->willReturn([$this->contactMock5, $this->contactMock6]);
 
         $this->contactModelMock->expects($this->at(1))
             ->method('canEditContact')
-            ->with($this->leadMock5)
+            ->with($this->contactMock5)
             ->willReturn(false);
 
         $this->contactModelMock->expects($this->at(2))
             ->method('canEditContact')
-            ->with($this->leadMock6)
+            ->with($this->contactMock6)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(3))
             ->method('removeFromLists')
-            ->with($this->leadMock6, $segments);
+            ->with($this->contactMock6, $segments);
 
         $this->contactModelMock->expects($this->at(4))
             ->method('saveEntities')
-            ->with([$this->leadMock5, $this->leadMock6]);
+            ->with([$this->contactMock5, $this->contactMock6]);
 
         $this->actionModel->removeContacts($contacts, $segments);
     }
@@ -115,31 +115,31 @@ class SegmentActionModelTest extends \PHPUnit_Framework_TestCase
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
             ->with($contacts)
-            ->willReturn([$this->leadMock5, $this->leadMock6]);
+            ->willReturn([$this->contactMock5, $this->contactMock6]);
 
         // Loop 1
         $this->contactModelMock->expects($this->at(1))
             ->method('canEditContact')
-            ->with($this->leadMock5)
+            ->with($this->contactMock5)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(2))
             ->method('addToLists')
-            ->with($this->leadMock5, $segments);
+            ->with($this->contactMock5, $segments);
 
         // Loop 2
         $this->contactModelMock->expects($this->at(3))
             ->method('canEditContact')
-            ->with($this->leadMock6)
+            ->with($this->contactMock6)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(4))
             ->method('addToLists')
-            ->with($this->leadMock6, $segments);
+            ->with($this->contactMock6, $segments);
 
         $this->contactModelMock->expects($this->at(5))
             ->method('saveEntities')
-            ->with([$this->leadMock5, $this->leadMock6]);
+            ->with([$this->contactMock5, $this->contactMock6]);
 
         $this->actionModel->addContacts($contacts, $segments);
     }
@@ -152,32 +152,32 @@ class SegmentActionModelTest extends \PHPUnit_Framework_TestCase
         $this->contactModelMock->expects($this->at(0))
             ->method('getLeadsByIds')
             ->with($contacts)
-            ->willReturn([$this->leadMock5, $this->leadMock6]);
+            ->willReturn([$this->contactMock5, $this->contactMock6]);
 
         // Loop 1
         $this->contactModelMock->expects($this->at(1))
             ->method('canEditContact')
-            ->with($this->leadMock5)
+            ->with($this->contactMock5)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(2))
             ->method('removeFromLists')
-            ->with($this->leadMock5, $segments);
+            ->with($this->contactMock5, $segments);
 
         // Loop 2
         $this->contactModelMock->expects($this->at(3))
             ->method('canEditContact')
-            ->with($this->leadMock6)
+            ->with($this->contactMock6)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->at(4))
             ->method('removeFromLists')
-            ->with($this->leadMock6)
-            ->willReturn($this->leadMock6, $segments);
+            ->with($this->contactMock6)
+            ->willReturn($this->contactMock6, $segments);
 
         $this->contactModelMock->expects($this->at(5))
             ->method('saveEntities')
-            ->with([$this->leadMock5, $this->leadMock6]);
+            ->with([$this->contactMock5, $this->contactMock6]);
 
         $this->actionModel->removeContacts($contacts, $segments);
     }
