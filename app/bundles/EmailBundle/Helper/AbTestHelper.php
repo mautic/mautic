@@ -43,6 +43,9 @@ class AbTestHelper
 
                 $parentId = $parent->getId();
                 foreach ($counts as $id => $stats) {
+                    if ($id !== $parentId && !array_key_exists($id, $children)) {
+                        continue;
+                    }
                     $name = ($parentId === $id) ? $parent->getName()
                         : $children[$id]->getName();
                     $support['labels'][]                                            = $name.' ('.$stats['readRate'].'%)';
