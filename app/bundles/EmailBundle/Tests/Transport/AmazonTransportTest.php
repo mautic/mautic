@@ -65,7 +65,7 @@ class AmazonTransportTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         // Mock a successful response
-        $mockResponse       = $this->getMockBuilder('Joomla\Http\Response')
+        $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
             ->getMock();
         $mockResponse->code = 200;
 
@@ -91,7 +91,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', $mockHttp, $this->logger, $this->translator, $transportCallback);
+        $transport = new AmazonTransport($mockHttp, $this->logger, $this->translator, $transportCallback);
         $transport->processJsonPayload($jsonPayload);
     }
 
@@ -125,7 +125,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
+        $transport = new AmazonTransport(new Http(), $this->logger, $this->translator, $transportCallback);
         $transport->processJsonPayload($jsonPayload);
     }
 
@@ -159,7 +159,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
+        $transport = new AmazonTransport(new Http(), $this->logger, $this->translator, $transportCallback);
         $transport->processJsonPayload($jsonPayload);
     }
 
@@ -193,7 +193,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
+        $transport = new AmazonTransport(new Http(), $this->logger, $this->translator, $transportCallback);
         $transport->processJsonPayload($jsonPayload);
     }
 }

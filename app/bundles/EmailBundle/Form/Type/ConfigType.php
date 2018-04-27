@@ -302,9 +302,9 @@ class ConfigType extends AbstractType
             'choice',
             [
                 'choices' => [
-                    'email-smtp.eu-west-1.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.eu_west_1',
-                    'email-smtp.us-east-1.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.us_east_1',
-                    'email-smtp.us-west-2.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.eu_west_2',
+                    'eu-west-1' => 'mautic.email.config.mailer.amazon_host.eu_west_1',
+                    'us-east-1' => 'mautic.email.config.mailer.amazon_host.us_east_1',
+                    'us-west-2' => 'mautic.email.config.mailer.amazon_host.us_west_2',
                 ],
                 'label'    => 'mautic.email.config.mailer.amazon_host',
                 'required' => false,
