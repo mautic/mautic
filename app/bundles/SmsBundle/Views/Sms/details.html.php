@@ -121,6 +121,8 @@ if (!$isEmbedded) {
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('sms.stats.graph', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">
