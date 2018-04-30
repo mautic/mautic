@@ -126,7 +126,7 @@ $view['slots']->set(
                 </div>
             </div>
 
-            <?php echo $view['content']->getCustomContent('segment.stats.graph', $mauticTemplateVars); ?>
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
 
             <!-- tabs controls -->
             <!-- search bar-->

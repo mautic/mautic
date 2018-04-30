@@ -151,7 +151,7 @@ $view['slots']->set(
             <!--/ stats -->
         </div>
 
-        <?php echo $view['content']->getCustomContent('asset.stats.graph', $mauticTemplateVars); ?>
+        <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md preview-detail">
