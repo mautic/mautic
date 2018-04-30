@@ -535,8 +535,19 @@ class CampaignRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [])
+    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], $dateRangeValues = null)
     {
+        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
+            $fromDate = $dateRangeValues['date_from'];
+            $fromDate->setTimeZone(new \DateTimeZone('UTC'));
+            $fromDate = $fromDate->format('Y-m-d H:i:s');
+            $toDate = $dateRangeValues['date_to'];
+            $toDate->add(new \DateInterval('P1D'))
+                ->sub(new \DateINterval('PT1S'))
+                ->setTimeZone(new \DateTimeZone('UTC'));
+            $toDate = $toDate->format('Y-m-d H:i:s');
+        }
+
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(cl.lead_id) as lead_count')
@@ -553,6 +564,14 @@ class CampaignRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('cl.lead_id', (int) $leadId)
             );
+        }
+        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
+            $q->andWhere(
+                $q->expr()->gte('cl.date_added', ':fromDate'),
+                $q->expr()->lte('cl.date_added', ':toDate')
+            )
+                ->setParameter(':fromDate', $fromDate)
+                ->setParameter(':toDate', $toDate);
         }
 
         if (count($pendingEvents) > 0) {

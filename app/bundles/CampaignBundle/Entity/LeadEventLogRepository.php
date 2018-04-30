@@ -217,7 +217,7 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true)
+    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $dateRangeValues = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
@@ -227,6 +227,17 @@ class LeadEventLogRepository extends CommonRepository
                            'l',
                            'l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0 and o.lead_id = l.lead_id and l.rotation = o.rotation'
                        );
+
+        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
+            $fromDate = $dateRangeValues['date_from'];
+            $fromDate->setTimeZone(new \DateTimeZone('UTC'));
+            $fromDate = $fromDate->format('Y-m-d H:i:s');
+            $toDate = $dateRangeValues['date_to'];
+            $toDate->add(new \DateInterval('P1D'))
+                ->sub(new \DateINterval('PT1S'))
+                ->setTimeZone(new \DateTimeZone('UTC'));
+            $toDate = $toDate->format('Y-m-d H:i:s');
+        }
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId)
@@ -259,6 +270,14 @@ class LeadEventLogRepository extends CommonRepository
             ->where(
                 $failedSq->expr()->eq('fe.log_id', 'o.id')
             );
+        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
+            $failedSq->andWhere(
+                $failedSq->expr()->gte('fe.date_added', ':fromDate'),
+                $failedSq->expr()->lte('fe.date_added', ':toDate')
+            )
+                ->setParameter(':fromDate', $fromDate)
+                ->setParameter(':toDate', $toDate);
+        }
         $expr->add(
             sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
         );
@@ -266,6 +285,15 @@ class LeadEventLogRepository extends CommonRepository
         $q->where($expr)
           ->setParameter('false', false, 'boolean')
           ->groupBy($groupBy);
+
+        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
+            $q->andWhere(
+                $q->expr()->gte('o.date_triggered', ':fromDate'),
+                $q->expr()->lte('o.date_triggered', ':toDate')
+            )
+                ->setParameter(':fromDate', $fromDate)
+                ->setParameter(':toDate', $toDate);
+        }
 
         $results = $q->execute()->fetchAll();
 

@@ -164,21 +164,21 @@ switch (true) {
                 <?php endif; ?>
                 <?php if ($decisions): ?>
                     <li class="<?php if ('decision' == $firstTab): echo 'active'; endif; ?>">
-                        <a href="#decisions-container" role="tab" data-toggle="tab">
+                        <a href="#decisions-container" role="tab" data-toggle="tab" data-eventtype="decision">
                             <?php echo $view['translator']->trans('mautic.campaign.event.decisions.header'); ?>
                         </a>
                     </li>
                 <?php endif; ?>
                 <?php if ($actions): ?>
                     <li class="<?php if ('action' == $firstTab): echo 'active'; endif; ?>">
-                        <a href="#actions-container" role="tab" data-toggle="tab">
+                        <a href="#actions-container" role="tab" data-toggle="tab" data-eventtype="action">
                             <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
                         </a>
                     </li>
                 <?php endif; ?>
                 <?php if ($conditions): ?>
                     <li class="<?php if ('condition' == $firstTab): echo 'active'; endif; ?>">
-                        <a href="#conditions-container" role="tab" data-toggle="tab">
+                        <a href="#conditions-container" role="tab" data-toggle="tab" data-eventtype="condition">
                             <?php echo $view['translator']->trans('mautic.campaign.event.conditions.header'); ?>
                         </a>
                     </li>
@@ -196,9 +196,39 @@ switch (true) {
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <!-- #events-container -->
+            <!-- BEGIN toggle view type -->
+            <?php
+               $hideDataToggle = '';
+                if(!in_array($firstTab, ['action', 'condition', 'decision']))
+                {
+                    $hideDataToggle = " style='display:none; '";
+                }
+            ?>
+            <div id="campaignTabDataToggle" class="form-group" <?php echo $hideDataToggle; ?>>
+                <label class="control-label">Show Results As</label>
+                <div class="choice-wrapper">
+                    <div class="btn-group btn-block" data-toggle="buttons">
+                        <label class="btn btn-default  btn-yes <?php echo $tabDataMode['byDate']['class']; ?>">
+                            <input type="radio" name="tabDataMode"
+                                   data-mode="byDate"
+                                   data-campaignid = "<?php echo $campaignId; ?>"
+                                   style="width: 1px; height: 1px; top: 0; left: 0; margin-top: 0;" autocomplete="false"
+                                   value="0" <?php echo $tabDataMode['byDate']['checked']; ?>> <span><?php echo $view['translator']->trans('mautic.campaign.tabcontenttoggle.bydate');?></span>
+                        </label>
+                        <label class="btn btn-default active btn-yes <?php echo $tabDataMode['toDate']['class']; ?>">
+                            <input type="radio" name="tabDataMode"
+                                   data-mode="toDate"
+                                   data-campaignid = "<?php echo $campaignId; ?>"
+                                   style="width: 1px; height: 1px; top: 0; left: 0; margin-top: 0;" autocomplete="false"
+                                   value="1" <?php echo $tabDataMode['toDate']['checked']; ?>> <span><?php echo $view['translator']->trans('mautic.campaign.tabcontenttoggle.todate');?></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- END toggle view type -->
             <?php if ($preview): ?>
                 <div class="<?php if ('preview' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="preview-container">
-                   <?php echo $preview; ?>
+                    <?php echo $preview; ?>
                 </div>
             <?php endif; ?>
             <?php if ($decisions): ?>
@@ -207,11 +237,13 @@ switch (true) {
                 </div>
             <?php endif; ?>
             <?php if ($actions): ?>
+                <!-- END toggle view type -->
                 <div class="<?php if ('action' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="actions-container">
                     <?php echo $actions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($conditions): ?>
+                <!-- END toggle view type -->
                 <div class="<?php if ('condition' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="conditions-container">
                     <?php echo $conditions; ?>
                 </div>

@@ -138,4 +138,70 @@ class AjaxController extends CommonAjaxController
 
         return null;
     }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function toggleCampaignTabDataAction(Request $request)
+    {
+        $events          = [];
+        $mode            = $request->request->get('mode');
+        $eventType       = $mode = $request->request->get('eventType');
+        $campaignId      = $request->request->get('campaignId');
+        $fromDate        = $request->request->get('fromDate');
+        $toDate          = $request->request->get('toDate');
+
+        if ($mode === 'byDate') {
+            // prepare date values to pass in to event query
+            $dateFrom = empty($fromDate) ?
+                new \DateTime('-30 days midnight')
+                :
+                new \DateTime($fromDate);
+
+            $dateTo                       = empty($toDate)
+                ?
+                new \DateTime('midnight')
+                :
+                new \DateTime($toDate);
+            $dateRangeValues['date_from'] = $dateFrom;
+            $dateRangeValues['date_to']   = $dateTo;
+        } else {
+            $dateRangeValues = [];
+        }
+
+        /** @var LeadEventLogRepository $eventLogRepo */
+        $eventLogRepo = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $campaignModel = $this->container->get('mautic.model.factory')->getModel('campaign');
+        $events = $campaignModel->getEventRepository()->getCampaignEvents((int) $campaignId);
+        $leadCount = $campaignModel->getRepository()->getCampaignLeadCount((int) $campaignId, null, [], $dateRangeValues);
+        $campaignLogCounts = $eventLogRepo->getCampaignLogCounts((int) $campaignId, false, false, $dateRangeValues);
+        $sortedEvents = [
+            'decision' => [],
+            'action' => [],
+            'condition' => [],
+        ];
+
+        foreach ($events as $event) {
+            $event['logCount'] =
+            $event['percent'] =
+            $event['yesPercent'] =
+            $event['noPercent'] = 0;
+            $event['leadCount'] = $leadCount;
+
+            if (isset($campaignLogCounts[$event['id']])) {
+                $event['logCount'] = array_sum($campaignLogCounts[$event['id']]);
+
+                if ($leadCount) {
+                    $event['percent'] = round(($event['logCount'] / $leadCount) * 100, 1);
+                    $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / $leadCount) * 100, 1);
+                    $event['noPercent'] = round(($campaignLogCounts[$event['id']][0] / $leadCount) * 100, 1);
+                }
+            }
+
+            $sortedEvents[$event['eventType']][] = $event;
+        }
+        return $this->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events]);
+    }
 }

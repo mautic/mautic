@@ -28,13 +28,13 @@ class EventRepository extends CommonRepository
     public function getEntities(array $args = [])
     {
         $select = 'e';
-        $q      = $this
+        $q = $this
             ->createQueryBuilder('e')
             ->join('e.campaign', 'c');
 
         if (!empty($args['campaign_id'])) {
             $q->andWhere(
-                $q->expr()->eq('IDENTITY(e.campaign)', (int) $args['campaign_id'])
+                $q->expr()->eq('IDENTITY(e.campaign)', (int)$args['campaign_id'])
             );
         }
 
@@ -56,8 +56,8 @@ class EventRepository extends CommonRepository
      *
      * @param       $type
      * @param array $campaigns
-     * @param null  $leadId           If included, only events that have not been triggered by the lead yet will be included
-     * @param bool  $positivePathOnly If negative, all events including those with a negative path will be returned
+     * @param null $leadId If included, only events that have not been triggered by the lead yet will be included
+     * @param bool $positivePathOnly If negative, all events including those with a negative path will be returned
      *
      * @return array
      */
@@ -98,7 +98,7 @@ class EventRepository extends CommonRepository
                     $dq->expr()->eq('el.id', ':leadId')
                 );
 
-            $q->andWhere('e.id NOT IN('.$dq->getDQL().')')
+            $q->andWhere('e.id NOT IN(' . $dq->getDQL() . ')')
                 ->setParameter('leadId', $leadId);
         }
 
@@ -141,7 +141,7 @@ class EventRepository extends CommonRepository
         $q->select('e')
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
             ->where(
-                $q->expr()->eq('IDENTITY(e.parent)', (int) $parentId)
+                $q->expr()->eq('IDENTITY(e.parent)', (int)$parentId)
             );
 
         if (null !== $decisionPath) {
@@ -155,7 +155,7 @@ class EventRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('e.eventType', ':eventType')
             )
-              ->setParameter('eventType', $eventType);
+                ->setParameter('eventType', $eventType);
         }
 
         return $q->getQuery()->getArrayResult();
@@ -177,7 +177,7 @@ class EventRepository extends CommonRepository
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
             ->where(
                 $q->expr()->andX(
-                    $q->expr()->eq('IDENTITY(e.campaign)', (int) $id),
+                    $q->expr()->eq('IDENTITY(e.campaign)', (int)$id),
                     $q->expr()->isNull('e.parent')
                 )
             );
@@ -206,7 +206,7 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('distinct(e.lead_id)')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
+            ->from(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'e')
             ->where(
                 $q->expr()->in('e.event_id', $events)
             )
@@ -214,7 +214,7 @@ class EventRepository extends CommonRepository
 
         if ($leadId) {
             $q->andWhere(
-                $q->expr()->eq('e.lead_id', (int) $leadId)
+                $q->expr()->eq('e.lead_id', (int)$leadId)
             );
         }
 
@@ -246,7 +246,7 @@ class EventRepository extends CommonRepository
             ->join('e.log', 'l');
 
         //make sure the published up and down dates are good
-        $q->where($q->expr()->eq('IDENTITY(l.lead)', (int) $leadId));
+        $q->where($q->expr()->eq('IDENTITY(l.lead)', (int)$leadId));
 
         $results = $q->getQuery()->getArrayResult();
 
@@ -263,7 +263,7 @@ class EventRepository extends CommonRepository
      *
      * @param      $campaignId
      * @param bool $count
-     * @param int  $limit
+     * @param int $limit
      *
      * @return array|bool
      */
@@ -276,7 +276,7 @@ class EventRepository extends CommonRepository
 
         $q->where(
             $q->expr()->andX(
-                $q->expr()->eq('IDENTITY(o.campaign)', (int) $campaignId),
+                $q->expr()->eq('IDENTITY(o.campaign)', (int)$campaignId),
                 $q->expr()->eq('o.isScheduled', ':true'),
                 $q->expr()->lte('o.triggerDate', ':now')
             )
@@ -288,7 +288,7 @@ class EventRepository extends CommonRepository
             $q->select('COUNT(o) as event_count');
 
             $results = $results = $q->getQuery()->getArrayResult();
-            $count   = $results[0]['event_count'];
+            $count = $results[0]['event_count'];
 
             return $count;
         }
@@ -324,9 +324,9 @@ class EventRepository extends CommonRepository
         $q->select('e, IDENTITY(e.parent)')
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
             ->where(
-                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
-            )
-            ->orderBy('e.order', 'ASC');
+                $q->expr()->eq('IDENTITY(e.campaign)', (int)$campaignId)
+            );
+        $q->orderBy('e.order', 'ASC');
 
         $results = $q->getQuery()->getArrayResult();
 
@@ -334,7 +334,7 @@ class EventRepository extends CommonRepository
         $events = [];
         foreach ($results as $id => $r) {
             $r[0]['parent_id'] = $r[1];
-            $events[$id]       = $r[0];
+            $events[$id] = $r[0];
         }
         unset($results);
 
@@ -389,7 +389,7 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e')
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
-            ->where($q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId))
+            ->where($q->expr()->eq('IDENTITY(e.campaign)', (int)$campaignId))
             ->andWhere($q->expr()->in('e.eventType', ['action', 'condition']));
 
         $events = $q->getQuery()->getArrayResult();
@@ -401,9 +401,9 @@ class EventRepository extends CommonRepository
      * Get the non-action log.
      *
      * @param            $campaignId
-     * @param array      $leads
-     * @param array      $havingEvents
-     * @param array      $excludeEvents
+     * @param array $leads
+     * @param array $havingEvents
+     * @param array $excludeEvents
      * @param bool|false $excludeScheduledFromHavingEvents
      *
      * @return array
@@ -413,9 +413,9 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
+            ->from(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'e')
             ->where(
-                $q->expr()->eq('e.campaign_id', (int) $campaignId)
+                $q->expr()->eq('e.campaign_id', (int)$campaignId)
             )
             ->groupBy('e.lead_id, e.event_id, e.date_triggered, e.is_scheduled');
 
@@ -423,7 +423,7 @@ class EventRepository extends CommonRepository
             $leadsQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $leadsQb->select('null')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'include_leads')
+                ->from(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'include_leads')
                 ->where(
                     $leadsQb->expr()->eq('include_leads.lead_id', 'e.lead_id'),
                     $leadsQb->expr()->in('include_leads.lead_id', $leads)
@@ -438,7 +438,7 @@ class EventRepository extends CommonRepository
             $eventsQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $eventsQb->select('null')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'include_events')
+                ->from(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'include_events')
                 ->where(
                     $eventsQb->expr()->eq('include_events.lead_id', 'e.lead_id'),
                     $eventsQb->expr()->in('include_events.event_id', $havingEvents)
@@ -460,7 +460,7 @@ class EventRepository extends CommonRepository
             $eventsQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $eventsQb->select('null')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'exclude_events')
+                ->from(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'exclude_events')
                 ->where(
                     $eventsQb->expr()->eq('exclude_events.lead_id', 'e.lead_id'),
                     $eventsQb->expr()->in('exclude_events.event_id', $excludeEvents)
@@ -475,7 +475,7 @@ class EventRepository extends CommonRepository
 
         $log = [];
         foreach ($results as $r) {
-            $leadId  = $r['lead_id'];
+            $leadId = $r['lead_id'];
             $eventId = $r['event_id'];
 
             unset($r['lead_id']);
@@ -497,9 +497,9 @@ class EventRepository extends CommonRepository
     public function nullEventParents($campaignId)
     {
         $this->getEntityManager()->getConnection()->update(
-            MAUTIC_TABLE_PREFIX.'campaign_events',
-            ['parent_id'   => null],
-            ['campaign_id' => (int) $campaignId]
+            MAUTIC_TABLE_PREFIX . 'campaign_events',
+            ['parent_id' => null],
+            ['campaign_id' => (int)$campaignId]
         );
     }
 
@@ -511,7 +511,7 @@ class EventRepository extends CommonRepository
     public function nullEventRelationships($events)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+        $qb->update(MAUTIC_TABLE_PREFIX . 'campaign_events')
             ->set('parent_id', ':null')
             ->setParameter('null', null)
             ->where(
@@ -540,7 +540,7 @@ class EventRepository extends CommonRepository
 
     /**
      * @param        $channel
-     * @param null   $campaignId
+     * @param null $campaignId
      * @param string $eventType
      */
     public function getEventsByChannel($channel, $campaignId = null, $eventType = 'action')
@@ -553,7 +553,7 @@ class EventRepository extends CommonRepository
         $expr = $q->expr()->andX();
         if ($campaignId) {
             $expr->add(
-                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
+                $q->expr()->eq('IDENTITY(e.campaign)', (int)$campaignId)
             );
 
             $q->orderBy('e.order');
@@ -589,7 +589,7 @@ class EventRepository extends CommonRepository
             $q,
             $filter,
             [
-                $this->getTableAlias().'.name',
+                $this->getTableAlias() . '.name',
             ]
         );
     }
