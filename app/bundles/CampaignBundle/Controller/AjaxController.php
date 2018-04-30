@@ -142,7 +142,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
     protected function toggleCampaignTabDataAction(Request $request)
     {
