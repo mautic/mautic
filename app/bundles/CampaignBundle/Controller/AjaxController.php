@@ -15,8 +15,8 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AjaxController.
@@ -117,18 +117,22 @@ class AjaxController extends CommonAjaxController
     {
         $contact = $this->getModel('lead')->getEntity($contactId);
         if ($contact) {
-            if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
+            if ($this->get('mautic.security')->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $contact->getPermissionUser()
+            )) {
                 /** @var EventLogModel $logModel */
                 $logModel = $this->getModel('campaign.event_log');
 
                 /** @var LeadEventLog $log */
                 $log = $logModel->getRepository()
-                                ->findOneBy(
-                                    [
-                                        'lead'  => $contactId,
-                                        'event' => $eventId,
-                                    ]
-                                );
+                    ->findOneBy(
+                        [
+                            'lead'  => $contactId,
+                            'event' => $eventId,
+                        ]
+                    );
 
                 if ($log && ($log->getTriggerDate() > new \DateTime())) {
                     return $log;
@@ -146,14 +150,13 @@ class AjaxController extends CommonAjaxController
      */
     protected function toggleCampaignTabDataAction(Request $request)
     {
-        $events          = [];
-        $mode            = $request->request->get('mode');
-        $eventType       = $mode = $request->request->get('eventType');
-        $campaignId      = $request->request->get('campaignId');
-        $fromDate        = $request->request->get('fromDate');
-        $toDate          = $request->request->get('toDate');
+        $events     = [];
+        $mode       = $request->request->get('mode');
+        $campaignId = $request->request->get('campaignId');
+        $fromDate   = $request->request->get('fromDate');
+        $toDate     = $request->request->get('toDate');
 
-        if ($mode === 'byDate') {
+        if ('byDate' === $mode) {
             // prepare date values to pass in to event query
             $dateFrom = empty($fromDate) ?
                 new \DateTime('-30 days midnight')
@@ -172,36 +175,57 @@ class AjaxController extends CommonAjaxController
         }
 
         /** @var LeadEventLogRepository $eventLogRepo */
-        $eventLogRepo = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-        $campaignModel = $this->container->get('mautic.model.factory')->getModel('campaign');
-        $events = $campaignModel->getEventRepository()->getCampaignEvents((int) $campaignId);
-        $leadCount = $campaignModel->getRepository()->getCampaignLeadCount((int) $campaignId, null, [], $dateRangeValues);
+        $eventLogRepo      = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $campaignModel     = $this->container->get('mautic.model.factory')->getModel('campaign');
+        $events            = $campaignModel->getEventRepository()->getCampaignEvents((int) $campaignId);
+        $leadCount         = $campaignModel->getRepository()->getCampaignLeadCount(
+            (int) $campaignId,
+            null,
+            [],
+            $dateRangeValues
+        );
         $campaignLogCounts = $eventLogRepo->getCampaignLogCounts((int) $campaignId, false, false, $dateRangeValues);
-        $sortedEvents = [
-            'decision' => [],
-            'action' => [],
+        $sortedEvents      = [
+            'decision'  => [],
+            'action'    => [],
             'condition' => [],
         ];
 
         foreach ($events as $event) {
-            $event['logCount'] =
-            $event['percent'] =
+            $event['logCount']   =
+            $event['percent']    =
             $event['yesPercent'] =
-            $event['noPercent'] = 0;
-            $event['leadCount'] = $leadCount;
+            $event['noPercent']  = 0;
+            $event['leadCount']  = $leadCount;
 
             if (isset($campaignLogCounts[$event['id']])) {
                 $event['logCount'] = array_sum($campaignLogCounts[$event['id']]);
 
                 if ($leadCount) {
-                    $event['percent'] = round(($event['logCount'] / $leadCount) * 100, 1);
+                    $event['percent']    = round(($event['logCount'] / $leadCount) * 100, 1);
                     $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / $leadCount) * 100, 1);
-                    $event['noPercent'] = round(($campaignLogCounts[$event['id']][0] / $leadCount) * 100, 1);
+                    $event['noPercent']  = round(($campaignLogCounts[$event['id']][0] / $leadCount) * 100, 1);
                 }
             }
 
             $sortedEvents[$event['eventType']][] = $event;
         }
-        return $this->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events]);
+        //return $this->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events]);
+
+        $decisions  = trim(
+            $this->renderView('MauticCampaignBundle:Campaign:events.html.php', ['events' => $sortedEvents['decision']])
+        );
+        $actions    = trim(
+            $this->renderView('MauticCampaignBundle:Campaign:events.html.php', ['events' => $sortedEvents['action']])
+        );
+        $conditions = trim(
+            $this->renderView('MauticCampaignBundle:Campaign:events.html.php', ['events' => $sortedEvents['condition']])
+        );
+
+        $finalHTML = ['decisions' => $decisions, 'actions' => $actions, 'conditions' => $conditions];
+
+        $response =  new Response(json_encode($finalHTML));
+
+        return $response;
     }
 }

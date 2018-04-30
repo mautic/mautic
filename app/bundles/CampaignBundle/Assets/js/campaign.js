@@ -1944,8 +1944,6 @@ Mautic.toggleCampaignTabData = function (elem) {
     $elem.parent('label').siblings('label.btn-success').removeClass('btn-success');
     $elem.parent('label').addClass('btn-success');
     var mode = $elem.data('mode');
-    var container = mQuery('ul.nav-tabs>li.active>a').attr('href');
-    var eventType = mQuery('ul.nav-tabs>li.active>a').data('eventtype');
     var cid = $elem.data('campaignid');
     var daterangeForm = '';
 
@@ -1961,10 +1959,13 @@ Mautic.toggleCampaignTabData = function (elem) {
     mQuery.ajax({
         url: mauticAjaxUrl,
         type: 'POST',
-        data: 'action=campaign:toggleCampaignTabData&mode=' + mode + '&campaignId=' + cid + '&eventType=' + eventType + daterangeForm,
-        dataType: 'html',
+        data: 'action=campaign:toggleCampaignTabData&mode=' + mode + '&campaignId=' + cid + daterangeForm,
+        dataType: 'json',
         success: function (response) {
-            mQuery(container).html(response.html);
+            console.log(response);
+            if(mQuery('#decisions-container').length>0) { mQuery('#decisions-container').html(response.decisions); }
+            if(mQuery('#actions-container').length>0) { mQuery('#actions-container').html(response.actions); }
+            if(mQuery('#conditions-container').length>0) { mQuery('#conditions-container').html(response.conditions); }
             mQuery('#mautic-backdrop').hide();
         },
         error: function (request, textStatus, errorThrown) {
