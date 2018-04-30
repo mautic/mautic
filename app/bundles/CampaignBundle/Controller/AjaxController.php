@@ -192,11 +192,11 @@ class AjaxController extends CommonAjaxController
         ];
 
         foreach ($events as $event) {
-            $event['logCount']   =
-            $event['percent']    =
+            $event['logCount']  =
+            $event['percent'] =
             $event['yesPercent'] =
-            $event['noPercent']  = 0;
-            $event['leadCount']  = $leadCount;
+            $event['noPercent'] = 0;
+            $event['leadCount'] = $leadCount;
 
             if (isset($campaignLogCounts[$event['id']])) {
                 $event['logCount'] = array_sum($campaignLogCounts[$event['id']]);
@@ -224,7 +224,7 @@ class AjaxController extends CommonAjaxController
 
         $finalHTML = ['decisions' => $decisions, 'actions' => $actions, 'conditions' => $conditions];
 
-        $response =  new Response(json_encode($finalHTML));
+        $response = new Response(json_encode($finalHTML));
 
         return $response;
     }

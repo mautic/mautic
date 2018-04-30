@@ -10,17 +10,18 @@ Mautic.campaignOnLoad = function (container, response) {
     }
 
     // hide or show data toggle selector on tab content
-    mQuery('ul.nav-tabs>li>a').on('click', function(){
-        var showTabs = ['#actions-container', '#decisions-container', '#conditions-container']
-        if (showTabs.indexOf(this.hash) != -1){
-            mQuery('#campaignTabDataToggle').show()
-        } else {
-            mQuery('#campaignTabDataToggle').hide()
+    mQuery('ul.nav-tabs>li>a').on('click', function () {
+        var showTabs = ['#actions-container', '#decisions-container', '#conditions-container'];
+        if (showTabs.indexOf(this.hash) != -1) {
+            mQuery('#campaignTabDataToggle').show();
+        }
+        else {
+            mQuery('#campaignTabDataToggle').hide();
         }
     });
 
     // register click event to reload tab data using ajax
-    mQuery("input[name=tabDataMode]").change(function(){
+    mQuery('input[name=tabDataMode]').change(function () {
         Mautic.toggleCampaignTabData(this);
     });
 
@@ -1963,9 +1964,9 @@ Mautic.toggleCampaignTabData = function (elem) {
         dataType: 'json',
         success: function (response) {
             console.log(response);
-            if(mQuery('#decisions-container').length>0) { mQuery('#decisions-container').html(response.decisions); }
-            if(mQuery('#actions-container').length>0) { mQuery('#actions-container').html(response.actions); }
-            if(mQuery('#conditions-container').length>0) { mQuery('#conditions-container').html(response.conditions); }
+            if (mQuery('#decisions-container').length > 0) { mQuery('#decisions-container').html(response.decisions); }
+            if (mQuery('#actions-container').length > 0) { mQuery('#actions-container').html(response.actions); }
+            if (mQuery('#conditions-container').length > 0) { mQuery('#conditions-container').html(response.conditions); }
             mQuery('#mautic-backdrop').hide();
         },
         error: function (request, textStatus, errorThrown) {
