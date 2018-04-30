@@ -117,11 +117,7 @@ class AjaxController extends CommonAjaxController
     {
         $contact = $this->getModel('lead')->getEntity($contactId);
         if ($contact) {
-            if ($this->get('mautic.security')->hasEntityAccess(
-                'lead:leads:editown',
-                'lead:leads:editother',
-                $contact->getPermissionUser()
-            )) {
+            if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
                 /** @var EventLogModel $logModel */
                 $logModel = $this->getModel('campaign.event_log');
 
@@ -192,11 +188,11 @@ class AjaxController extends CommonAjaxController
         ];
 
         foreach ($events as $event) {
-            $event['logCount']  =
-            $event['percent'] =
+            $event['logCount']   =
+            $event['percent']    =
             $event['yesPercent'] =
-            $event['noPercent'] = 0;
-            $event['leadCount'] = $leadCount;
+            $event['noPercent']  = 0;
+            $event['leadCount']  = $leadCount;
 
             if (isset($campaignLogCounts[$event['id']])) {
                 $event['logCount'] = array_sum($campaignLogCounts[$event['id']]);
@@ -224,7 +220,7 @@ class AjaxController extends CommonAjaxController
 
         $finalHTML = ['decisions' => $decisions, 'actions' => $actions, 'conditions' => $conditions];
 
-        $response = new Response(json_encode($finalHTML));
+        $response =  new Response(json_encode($finalHTML));
 
         return $response;
     }
