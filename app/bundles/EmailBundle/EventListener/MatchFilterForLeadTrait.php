@@ -151,7 +151,7 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'in':
                     $leadValMatched = false;
-                    if (getType($leadVal) == 'array') {
+                    if (is_array($leadVal)) {
                         foreach ($leadVal as $k => $v) {
                             if (in_array($v, $filterVal)) {
                                 $leadValMatched = true;
@@ -169,7 +169,7 @@ trait MatchFilterForLeadTrait
                     break;
                 case '!in':
                     $leadValNotMatched = true;
-                    if (getType($leadVal) == 'array') {
+                    if (is_array($leadVal)) {
                         foreach ($leadVal as $k => $v) {
                             if (in_array($v, $filterVal)) {
                                 $leadValNotMatched = false;
