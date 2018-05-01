@@ -35,6 +35,7 @@ class DashboardControllerTest extends \PHPUnit_Framework_TestCase
     private $sessionMock;
     private $flashBagMock;
     private $containerMock;
+    private $controller;
 
     protected function setUp()
     {
