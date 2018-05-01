@@ -22,9 +22,9 @@
                 <div class="box-layout">
                     <div class="visible-sm visible-md visible-lg col-stats">
                         <span class="mt-xs label label-<?php echo $yesClass; ?>" data-toggle="tooltip"
-                              title="<?php echo $view['translator']->trans('mautic.report.campaign.yes.percent'); ?>"><?php echo $event['yesPercent'] . '%'; ?></span> <?php if ('action' !== $event['eventType']): ?>
+                              title="<?php echo $view['translator']->trans('mautic.report.campaign.yes.percent'); ?>"><?php echo $event['yesPercent'].'%'; ?></span> <?php if ('action' !== $event['eventType']): ?>
                             <span class="label label-danger" data-toggle="tooltip"
-                                  title="<?php echo $view['translator']->trans('mautic.report.campaign.no.percent'); ?>"><?php echo $event['noPercent'] . '%'; ?></span>
+                                  title="<?php echo $view['translator']->trans('mautic.report.campaign.no.percent'); ?>"><?php echo $event['noPercent'].'%'; ?></span>
                         <?php endif; ?>
                         <span class="mt-xs label label-warning" data-toggle="tooltip"
                               title="<?php echo $view['translator']->trans('mautic.report.campaign.completed.actions'); ?>"><?= $event['logCount']; ?></span>
@@ -42,7 +42,7 @@
                         <h6 class="text-white dark-sm"><?php echo $event['description']; ?></h6>
                     </div>
                     <div class="col-md-3 va-m text-right">
-                        <em class="text-white dark-sm"><?php echo $view['translator']->trans('mautic.campaign.' . $event['type']); ?></em>
+                        <em class="text-white dark-sm"><?php echo $view['translator']->trans('mautic.campaign.'.$event['type']); ?></em>
                     </div>
                 </div>
             </li>

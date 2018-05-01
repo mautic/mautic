@@ -232,7 +232,7 @@ class LeadEventLogRepository extends CommonRepository
             $fromDate = $dateRangeValues['date_from'];
             $fromDate->setTimeZone(new \DateTimeZone('UTC'));
             $fromDate = $fromDate->format('Y-m-d H:i:s');
-            $toDate = $dateRangeValues['date_to'];
+            $toDate   = $dateRangeValues['date_to'];
             $toDate->add(new \DateInterval('P1D'))
                 ->sub(new \DateINterval('PT1S'))
                 ->setTimeZone(new \DateTimeZone('UTC'));

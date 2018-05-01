@@ -199,8 +199,7 @@ switch (true) {
             <!-- BEGIN toggle view type -->
             <?php
                $hideDataToggle = '';
-                if(!in_array($firstTab, ['action', 'condition', 'decision']))
-                {
+                if(!in_array($firstTab, ['action', 'condition', 'decision'])) {
                     $hideDataToggle = " style='display:none; '";
                 }
             ?>
@@ -213,14 +212,14 @@ switch (true) {
                                    data-mode="byDate"
                                    data-campaignid = "<?php echo $campaignId; ?>"
                                    style="width: 1px; height: 1px; top: 0; left: 0; margin-top: 0;" autocomplete="false"
-                                   value="0" <?php echo $tabDataMode['byDate']['checked']; ?>> <span><?php echo $view['translator']->trans('mautic.campaign.tabcontenttoggle.bydate');?></span>
+                                   value="0" <?php echo $tabDataMode['byDate']['checked']; ?>> <span><?php echo $view['translator']->trans('mautic.campaign.tabcontenttoggle.bydate'); ?></span>
                         </label>
                         <label class="btn btn-default active btn-yes <?php echo $tabDataMode['toDate']['class']; ?>">
                             <input type="radio" name="tabDataMode"
                                    data-mode="toDate"
                                    data-campaignid = "<?php echo $campaignId; ?>"
                                    style="width: 1px; height: 1px; top: 0; left: 0; margin-top: 0;" autocomplete="false"
-                                   value="1" <?php echo $tabDataMode['toDate']['checked']; ?>> <span><?php echo $view['translator']->trans('mautic.campaign.tabcontenttoggle.todate');?></span>
+                                   value="1" <?php echo $tabDataMode['toDate']['checked']; ?>> <span><?php echo $view['translator']->trans('mautic.campaign.tabcontenttoggle.todate'); ?></span>
                         </label>
                     </div>
                 </div>
