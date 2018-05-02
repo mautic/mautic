@@ -49,7 +49,7 @@ class EventBuilderTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $converted = EventBuilder::buildconditions($array);
+        $converted = EventBuilder::buildConditions($array);
 
         $this->assertCount(2, $converted);
         $this->assertInstanceOf(ConditionAccessor::class, $converted['some.condition']);
@@ -69,7 +69,7 @@ class EventBuilderTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $converted = EventBuilder::builddecisions($array);
+        $converted = EventBuilder::buildDecisions($array);
 
         $this->assertCount(2, $converted);
         $this->assertInstanceOf(DecisionAccessor::class, $converted['some.decision']);
