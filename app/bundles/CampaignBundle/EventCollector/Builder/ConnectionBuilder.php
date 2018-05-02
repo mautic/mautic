@@ -34,6 +34,10 @@ class ConnectionBuilder
      */
     public static function buildRestrictionsArray(array $events)
     {
+        // Reset restrictions
+        self::$connectionRestrictions = ['anchor' => []];
+
+        // Build the restrictions
         self::$eventTypes = array_fill_keys(array_keys($events), []);
         foreach ($events as $eventType => $typeEvents) {
             foreach ($typeEvents as $key => $event) {

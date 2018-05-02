@@ -138,7 +138,7 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->inactiveHelper->expects($this->exactly(2))
-            ->method('removeContactsThatAreNotApplicable')
+            ->method('getEarliestInactiveDateTime')
             ->willReturn(new \DateTime());
 
         $this->getExecutioner()->execute($campaign, $limiter);
@@ -205,7 +205,7 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->inactiveHelper->expects($this->exactly(2))
-            ->method('removeContactsThatAreNotApplicable')
+            ->method('getEarliestInactiveDateTime')
             ->willReturn(new \DateTime());
 
         $this->getExecutioner()->validate(1, $limiter);
