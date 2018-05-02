@@ -20,9 +20,9 @@ class ActionAccessor extends AbstractEventAccessor
      */
     public function __construct(array $config)
     {
-        parent::__construct($config);
-
         $this->systemProperties[] = 'batchEventName';
+
+        parent::__construct($config);
     }
 
     /**
