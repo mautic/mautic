@@ -16,7 +16,7 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
-use Mautic\CampaignBundle\Executioner\Exception\NoContactsFound;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 
@@ -71,7 +71,7 @@ class InactiveContacts
      *
      * @return ArrayCollection
      *
-     * @throws NoContactsFound
+     * @throws NoContactsFoundException
      */
     public function getContacts($campaignId, Event $decisionEvent, $startAtContactId, ContactLimiter $limiter)
     {
@@ -87,7 +87,7 @@ class InactiveContacts
 
         if (empty($this->campaignMemberDatesAdded)) {
             // No new contacts found in the campaign
-            throw new NoContactsFound();
+            throw new NoContactsFoundException();
         }
 
         $campaignContacts = array_keys($this->campaignMemberDatesAdded);
@@ -100,7 +100,7 @@ class InactiveContacts
             // Just a precaution in case non-existent contacts are lingering in the campaign leads table
             $this->logger->debug('CAMPAIGN: No contact entities found.');
 
-            throw new NoContactsFound();
+            throw new NoContactsFoundException();
         }
 
         return $contacts;
