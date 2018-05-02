@@ -158,7 +158,6 @@ return [
                 'class'     => 'Mautic\PluginBundle\Model\PluginModel',
                 'arguments' => [
                     'mautic.lead.model.field',
-                    'translator',
                 ],
             ],
 

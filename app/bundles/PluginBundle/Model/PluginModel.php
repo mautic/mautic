@@ -13,7 +13,6 @@ namespace Mautic\PluginBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class PluginModel.
@@ -26,20 +25,13 @@ class PluginModel extends FormModel
     protected $leadFieldModel;
 
     /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
      * PluginModel constructor.
      *
-     * @param FieldModel          $leadFieldModel
-     * @param TranslatorInterface $translator
+     * @param FieldModel $leadFieldModel
      */
-    public function __construct(FieldModel $leadFieldModel, TranslatorInterface $translator)
+    public function __construct(FieldModel $leadFieldModel)
     {
         $this->leadFieldModel = $leadFieldModel;
-        $this->translator     = $translator;
     }
 
     /**
@@ -70,10 +62,7 @@ class PluginModel extends FormModel
      */
     public function getLeadFields()
     {
-        $leadFields                                                                 =  $this->leadFieldModel->getFieldList();
-        $leadFields[$this->translator->trans('mautic.lead.field.group.core')]['id'] = $this->translator->trans('mautic.lead.report.contact_id');
-
-        return $leadFields;
+        return $this->leadFieldModel->getFieldList();
     }
 
     /**
