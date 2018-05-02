@@ -159,8 +159,7 @@ trait MatchFilterForLeadTrait
                                 break;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         if (in_array($leadVal, $filterVal)) {
                             $leadValMatched = true;
                         }
@@ -177,8 +176,7 @@ trait MatchFilterForLeadTrait
                                 break;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         if (in_array($leadVal, $filterVal)) {
                             $leadValNotMatched = false;
                         }
