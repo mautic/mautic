@@ -105,12 +105,12 @@ class ConnectionBuilder
     private static function addDeprecatedAnchorRestrictions($eventType, $key, array $event)
     {
         switch ($eventType) {
-            case Event::TYPE_ACTION:
+            case Event::TYPE_DECISION:
                 if (isset($event['associatedActions'])) {
                     self::$connectionRestrictions[$key]['target']['action'] += $event['associatedActions'];
                 }
                 break;
-            case Event::TYPE_DECISION:
+            case Event::TYPE_ACTION:
                 if (isset($event['associatedDecisions'])) {
                     self::$connectionRestrictions[$key]['source']['decision'] += $event['associatedDecisions'];
                 }
