@@ -16,8 +16,8 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContacts;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
-use Mautic\CampaignBundle\Executioner\Exception\NoContactsFound;
-use Mautic\CampaignBundle\Executioner\Exception\NoEventsFound;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
+use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
@@ -135,9 +135,9 @@ class KickoffExecutioner implements ExecutionerInterface
         try {
             $this->prepareForExecution();
             $this->executeOrScheduleEvent();
-        } catch (NoContactsFound $exception) {
+        } catch (NoContactsFoundException $exception) {
             $this->logger->debug('CAMPAIGN: No more contacts to process');
-        } catch (NoEventsFound $exception) {
+        } catch (NoEventsFoundException $exception) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -150,7 +150,7 @@ class KickoffExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws NoEventsFound
+     * @throws NoEventsFoundException
      */
     private function prepareForExecution()
     {
@@ -177,7 +177,7 @@ class KickoffExecutioner implements ExecutionerInterface
         );
 
         if (!$totalKickoffEvents) {
-            throw new NoEventsFound();
+            throw new NoEventsFoundException();
         }
 
         $this->progressBar = ProgressBarHelper::init($this->output, $totalKickoffEvents);
@@ -188,7 +188,7 @@ class KickoffExecutioner implements ExecutionerInterface
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws NoContactsFound
+     * @throws NoContactsFoundException
      * @throws NotSchedulableException
      */
     private function executeOrScheduleEvent()

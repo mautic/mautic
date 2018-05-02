@@ -28,6 +28,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -102,8 +103,14 @@ class EventDispatcher
             $failed  = $pendingEvent->getFailures();
 
             $this->validateProcessedLogs($logs, $success, $failed);
-            $this->dispatchExecutedEvent($config, $event, $success);
-            $this->dispatchedFailedEvent($config, $failed);
+
+            if ($success) {
+                $this->dispatchExecutedEvent($config, $event, $success);
+            }
+
+            if ($failed) {
+                $this->dispatchedFailedEvent($config, $failed);
+            }
 
             // Dispatch legacy ON_EVENT_EXECUTION event for BC
             $this->legacyDispatcher->dispatchExecutionEvents($config, $success, $failed);
@@ -135,11 +142,11 @@ class EventDispatcher
     }
 
     /**
-     * @param $config
-     * @param $logs
-     * @param $evaluatedContacts
+     * @param DecisionAccessor  $config
+     * @param ArrayCollection   $logs
+     * @param EvaluatedContacts $evaluatedContacts
      */
-    public function dispatchDecisionResultsEvent($config, $logs, $evaluatedContacts)
+    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
     {
         $this->dispatcher->dispatch(
             CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS,
@@ -167,7 +174,7 @@ class EventDispatcher
      * @param Event                 $event
      * @param ArrayCollection       $logs
      */
-    public function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
         foreach ($logs as $log) {
             $this->dispatcher->dispatch(
@@ -186,7 +193,7 @@ class EventDispatcher
      * @param AbstractEventAccessor $config
      * @param ArrayCollection       $logs
      */
-    public function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
+    private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
     {
         foreach ($logs as $log) {
             $this->logger->debug(

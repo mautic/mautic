@@ -103,7 +103,7 @@ class LegacyEventDispatcher
         $settings = $config->getConfig();
 
         if (!isset($settings['eventName']) && !isset($settings['callback'])) {
-            // Bad plugin
+            // Bad plugin but only fail if the new event didn't already process the log
             if (!$wasBatchProcessed) {
                 $pendingEvent->failAll('Invalid event configuration');
             }
@@ -126,6 +126,7 @@ class LegacyEventDispatcher
                 $result = $this->dispatchCallback($settings, $log);
             }
 
+            // If the new batch event was handled, the $log was already processed so only process legacy logs if false
             if (!$wasBatchProcessed) {
                 $this->dispatchExecutionEvent($config, $log, $result);
 
@@ -362,14 +363,7 @@ class LegacyEventDispatcher
             'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
         );
 
-        if (is_array($result)) {
-            $log->setMetadata($result);
-        }
-
         $metadata = $log->getMetadata();
-        if (is_array($result)) {
-            $metadata = array_merge($metadata, $result);
-        }
 
         $reason = null;
         if (isset($metadata['errors'])) {

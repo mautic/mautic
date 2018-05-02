@@ -91,6 +91,14 @@ class Responses
     }
 
     /**
+     * @return int
+     */
+    public function containsResponses()
+    {
+        return count($this->actionResponses) + count($this->conditionResponses);
+    }
+
+    /**
      * @deprecated 2.13.0 to be removed in 3.0; used for BC EventModel::triggerEvent()
      *
      * @return array

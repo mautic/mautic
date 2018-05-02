@@ -13,12 +13,11 @@ namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContacts;
-use Mautic\CampaignBundle\Executioner\Exception\NoEventsFound;
+use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
@@ -146,7 +145,7 @@ class ScheduledExecutioner implements ExecutionerInterface
         try {
             $this->prepareForExecution();
             $this->executeOrRecheduleEvent();
-        } catch (NoEventsFound $exception) {
+        } catch (NoEventsFoundException $exception) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -222,7 +221,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws NoEventsFound
+     * @throws NoEventsFoundException
      */
     private function prepareForExecution()
     {
@@ -246,7 +245,7 @@ class ScheduledExecutioner implements ExecutionerInterface
         );
 
         if (!$totalScheduledCount) {
-            throw new NoEventsFound();
+            throw new NoEventsFoundException();
         }
 
         $this->progressBar = ProgressBarHelper::init($this->output, $totalScheduledCount);
