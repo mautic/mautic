@@ -20,9 +20,9 @@ use Mautic\ReportBundle\Entity\Report;
 class ReportQueryEvent extends AbstractReportEvent
 {
     /**
-     * @var array
+     * @var QueryBuilder
      */
-    private $query = [];
+    private $query;
 
     /**
      * @var array
