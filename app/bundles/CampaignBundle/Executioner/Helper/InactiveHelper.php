@@ -47,6 +47,11 @@ class InactiveHelper
     private $logger;
 
     /**
+     * @var \DateTime
+     */
+    private $earliestInactiveDate;
+
+    /**
      * InactiveHelper constructor.
      *
      * @param EventScheduler         $scheduler
@@ -88,26 +93,20 @@ class InactiveHelper
     /**
      * @param \DateTime       $now
      * @param ArrayCollection $contacts
-     * @param                 $eventId
+     * @param int             $lastActiveEventId
      * @param ArrayCollection $negativeChildren
-     *
-     * @return \DateTime
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function removeContactsThatAreNotApplicable(\DateTime $now, ArrayCollection $contacts, $eventId, ArrayCollection $negativeChildren)
-    {
-        $contactIds = $contacts->getKeys();
-
-        // If there is a parent ID, get last active dates based on when that event was executed for the given contact
-        // Otherwise, use when the contact was added to the campaign for comparison
-        if ($eventId) {
-            $lastActiveDates = $this->eventLogRepository->getDatesExecuted($eventId, $contactIds);
-        } else {
-            $lastActiveDates = $this->inactiveContacts->getDatesAdded();
-        }
-
-        $earliestInactiveDate = $now;
+    public function removeContactsThatAreNotApplicable(
+        \DateTime $now,
+        ArrayCollection $contacts,
+        $lastActiveEventId,
+        ArrayCollection $negativeChildren
+    ) {
+        $contactIds                 = $contacts->getKeys();
+        $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);
+        $this->earliestInactiveDate = $now;
 
         /* @var Event $event */
         foreach ($contactIds as $contactId) {
@@ -115,7 +114,7 @@ class InactiveHelper
                 // This contact does not have a last active date so likely the event is scheduled
                 $contacts->remove($contactId);
 
-                $this->logger->debug('CAMPAIGN: Contact ID# '.$contactId.' does not have a last active date');
+                $this->logger->debug('CAMPAIGN: Contact ID# '.$contactId.' does not have a last active date ('.$lastActiveEventId.')');
 
                 continue;
             }
@@ -127,8 +126,8 @@ class InactiveHelper
                 $lastActiveDates[$contactId]->format('Y-m-d H:i:s T')
             );
 
-            if ($earliestInactiveDate < $earliestContactInactiveDate) {
-                $earliestInactiveDate = $earliestContactInactiveDate;
+            if ($this->earliestInactiveDate < $earliestContactInactiveDate) {
+                $this->earliestInactiveDate = $earliestContactInactiveDate;
             }
 
             // If any are found to be inactive, we process or schedule all the events associated with the inactive path of a decision
@@ -141,8 +140,14 @@ class InactiveHelper
 
             $this->logger->debug('CAMPAIGN: Contact ID# '.$contactId.' has not been active');
         }
+    }
 
-        return $earliestInactiveDate;
+    /**
+     * @return \DateTime
+     */
+    public function getEarliestInactiveDateTime()
+    {
+        return $this->earliestInactiveDate;
     }
 
     /**
@@ -181,5 +186,22 @@ class InactiveHelper
         }
 
         return $earliestDate;
+    }
+
+    /**
+     * @param       $lastActiveEventId
+     * @param array $contactIds
+     *
+     * @return array|ArrayCollection
+     */
+    private function getLastActiveDates($lastActiveEventId, array $contactIds)
+    {
+        // If there is a parent ID, get last active dates based on when that event was executed for the given contact
+        // Otherwise, use when the contact was added to the campaign for comparison
+        if ($lastActiveEventId) {
+            return $this->eventLogRepository->getDatesExecuted($lastActiveEventId, $contactIds);
+        }
+
+        return $this->inactiveContacts->getDatesAdded();
     }
 }
