@@ -567,6 +567,12 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.email.helper.stat' => [
+                'class'     => \Mautic\EmailBundle\Stat\StatHelper::class,
+                'arguments' => [
+                    'mautic.email.repository.stat',
+                ],
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
@@ -582,6 +588,7 @@ return [
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_contacts',
+                    'mautic.tracker.device',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
@@ -594,7 +601,7 @@ return [
                 'class'     => \Mautic\EmailBundle\Model\SendEmailToContact::class,
                 'arguments' => [
                     'mautic.helper.mailer',
-                    'mautic.email.repository.stat',
+                    'mautic.email.helper.stat',
                     'mautic.lead.model.dnc',
                     'translator',
                 ],

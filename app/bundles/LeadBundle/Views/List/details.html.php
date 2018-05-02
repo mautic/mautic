@@ -37,6 +37,11 @@ $view['slots']->set(
                     $permissions['lead:lists:viewother'],
                     $list->getCreatedBy()
                 ),
+                'clone' => $view['security']->hasEntityAccess(
+                    $permissions['lead:leads:editown'],
+                    $permissions['lead:lists:viewother'],
+                    $list->getCreatedBy()
+                ),
             ],
             'routeBase' => 'segment',
         ]

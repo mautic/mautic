@@ -200,6 +200,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 <?php endif; ?>
                 <div class="row">
                     <?php
+                    $i = 0;
                     foreach ($properties as $name => $property):
                     if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') {
                         continue;
@@ -213,7 +214,16 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                     <div class="col-md-<?php echo $col; ?>">
                         <?php echo $view['form']->row($form['properties'][$name]); ?>
                     </div>
-                    <?php endif; ?>
+                    <?php
+                        if (6 == $col) :
+                            $i++;
+                          if (0 == $i % 2) :
+                              ?>
+                            <div class="clearfix"></div>
+                              <?php
+                          endif;
+                        endif;
+                    endif; ?>
                     <?php endforeach; ?>
                 </div>
             </div>
