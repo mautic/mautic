@@ -199,7 +199,7 @@ switch (true) {
             <!-- BEGIN toggle view type -->
             <?php
                $hideDataToggle = '';
-                if(!in_array($firstTab, ['action', 'condition', 'decision'])) {
+                if (!in_array($firstTab, ['action', 'condition', 'decision'])) {
                     $hideDataToggle = " style='display:none; '";
                 }
             ?>
