@@ -262,7 +262,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             // Remove those successfully executed from being processed again for lower priorities
             $channelPreferences->removeLogFromAllChannels($log);
 
-            // Find the Marketin Message log and pass it
+            // Find the Marketing Message log and pass it
             $mmLog = $this->pendingEvent->findLogByContactId($log->getLead()->getId());
 
             // Pass these for the MM campaign event

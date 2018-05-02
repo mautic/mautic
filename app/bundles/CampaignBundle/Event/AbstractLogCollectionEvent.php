@@ -36,9 +36,9 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
     protected $logs;
 
     /**
-     * @var array
+     * @var ArrayCollection|Lead[]
      */
-    private $contacts = [];
+    private $contacts;
 
     /**
      * @var array
@@ -54,9 +54,11 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
      */
     public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
-        $this->config = $config;
-        $this->event  = $event;
-        $this->logs   = $logs;
+        $this->config   = $config;
+        $this->event    = $event;
+        $this->logs     = $logs;
+        $this->contacts = new ArrayCollection();
+
         $this->extractContacts();
     }
 
@@ -108,7 +110,11 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
     public function findLogByContactId($id)
     {
         if (!isset($this->logContactXref[$id])) {
-            throw new NoContactsFoundException();
+            throw new NoContactsFoundException("$id not found");
+        }
+
+        if (!$this->logs->offsetExists($this->logContactXref[$id])) {
+            throw new NoContactsFoundException("$id was found in the xref table but no log was found");
         }
 
         return $this->logs->get($this->logContactXref[$id]);
@@ -119,8 +125,9 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
         /** @var LeadEventLog $log */
         foreach ($this->logs as $log) {
             $contact                                 = $log->getLead();
-            $this->contacts[$log->getId()]           = $contact;
             $this->logContactXref[$contact->getId()] = $log->getId();
+
+            $this->contacts->set($log->getId(), $contact);
         }
     }
 }

@@ -97,7 +97,7 @@ class PendingEvent extends AbstractLogCollectionEvent
 
         $this->logChannel($log);
 
-        $this->failures->add($log);
+        $this->failures->set($log->getId(), $log);
     }
 
     /**
@@ -237,7 +237,7 @@ class PendingEvent extends AbstractLogCollectionEvent
         $log->setIsScheduled(false)
             ->setDateTriggered($this->now);
 
-        $this->successful->add($log);
+        $this->successful->set($log->getId(), $log);
     }
 
     /**
