@@ -23,6 +23,7 @@ use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 
 class DecisionExecutioner
@@ -73,6 +74,11 @@ class DecisionExecutioner
     private $scheduler;
 
     /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * @var Responses
      */
     private $responses;
@@ -87,6 +93,7 @@ class DecisionExecutioner
      * @param Decision         $decisionExecutioner
      * @param EventCollector   $collector
      * @param EventScheduler   $scheduler
+     * @param ContactTracker   $contactTracker
      */
     public function __construct(
         LoggerInterface $logger,
@@ -95,7 +102,8 @@ class DecisionExecutioner
         EventExecutioner $executioner,
         Decision $decisionExecutioner,
         EventCollector $collector,
-        EventScheduler $scheduler
+        EventScheduler $scheduler,
+        ContactTracker $contactTracker
     ) {
         $this->logger              = $logger;
         $this->leadModel           = $leadModel;
@@ -104,6 +112,7 @@ class DecisionExecutioner
         $this->decisionExecutioner = $decisionExecutioner;
         $this->collector           = $collector;
         $this->scheduler           = $scheduler;
+        $this->contactTracker      = $contactTracker;
     }
 
     /**
@@ -233,7 +242,7 @@ class DecisionExecutioner
      */
     private function fetchCurrentContact()
     {
-        $this->contact = $this->leadModel->getCurrentLead();
+        $this->contact = $this->contactTracker->getContact();
         if (!$this->contact instanceof Lead || !$this->contact->getId()) {
             throw new CampaignNotExecutableException('Unidentifiable contact');
         }

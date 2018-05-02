@@ -410,6 +410,7 @@ return [
                     'mautic.campaign.executioner.decision',
                     'mautic.campaign.event_collector',
                     'mautic.campaign.scheduler',
+                    'mautic.tracker.contact',
                 ],
             ],
             'mautic.campaign.executioner.inactive'     => [
