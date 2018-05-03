@@ -17,7 +17,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
-use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
@@ -47,7 +47,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
     private $scheduler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ScheduledContacts
+     * @var \PHPUnit_Framework_MockObject_MockObject|ScheduledContactFinder
      */
     private $contactFinder;
 
@@ -69,7 +69,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->contactFinder = $this->getMockBuilder(ScheduledContacts::class)
+        $this->contactFinder = $this->getMockBuilder(ScheduledContactFinder::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

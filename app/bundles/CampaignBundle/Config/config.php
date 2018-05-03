@@ -285,7 +285,7 @@ return [
                 ],
             ],
             'mautic.campaign.contact_finder.scheduled'  => [
-                'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContacts::class,
+                'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder::class,
                 'arguments' => [
                     'mautic.lead.repository.lead',
                 ],

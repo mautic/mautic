@@ -15,7 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-class ScheduledContacts
+class ScheduledContactFinder
 {
     /**
      * @var LeadRepository
@@ -23,7 +23,7 @@ class ScheduledContacts
     private $leadRepository;
 
     /**
-     * ScheduledContacts constructor.
+     * ScheduledContactFinder constructor.
      *
      * @param LeadRepository $leadRepository
      */

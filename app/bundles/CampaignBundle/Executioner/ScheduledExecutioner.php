@@ -16,7 +16,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
-use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
@@ -55,7 +55,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     private $scheduler;
 
     /**
-     * @var ScheduledContacts
+     * @var ScheduledContactFinder
      */
     private $scheduledContacts;
 
@@ -102,7 +102,7 @@ class ScheduledExecutioner implements ExecutionerInterface
      * @param TranslatorInterface    $translator
      * @param EventExecutioner       $executioner
      * @param EventScheduler         $scheduler
-     * @param ScheduledContacts      $scheduledContacts
+     * @param ScheduledContactFinder $scheduledContacts
      */
     public function __construct(
         LeadEventLogRepository $repository,
@@ -110,7 +110,7 @@ class ScheduledExecutioner implements ExecutionerInterface
         TranslatorInterface $translator,
         EventExecutioner $executioner,
         EventScheduler $scheduler,
-        ScheduledContacts $scheduledContacts
+        ScheduledContactFinder $scheduledContacts
     ) {
         $this->repo              = $repository;
         $this->logger            = $logger;

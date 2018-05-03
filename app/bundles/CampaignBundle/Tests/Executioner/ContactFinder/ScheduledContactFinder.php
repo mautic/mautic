@@ -13,11 +13,11 @@ namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-class ScheduledContactsTest extends \PHPUnit_Framework_TestCase
+class ScheduledContactFinderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LeadRepository
@@ -83,11 +83,11 @@ class ScheduledContactsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ScheduledContacts
+     * @return ScheduledContactFinder
      */
     private function getContactFinder()
     {
-        return new ScheduledContacts(
+        return new ScheduledContactFinder(
             $this->leadRepository
         );
     }
