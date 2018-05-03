@@ -78,7 +78,7 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * @var InactiveContactFinder
      */
-    private $inactiveContacts;
+    private $inactiveContactFinder;
 
     /**
      * @var ArrayCollection
@@ -98,7 +98,7 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * InactiveExecutioner constructor.
      *
-     * @param InactiveContactFinder $inactiveContacts
+     * @param InactiveContactFinder $inactiveContactFinder
      * @param LoggerInterface       $logger
      * @param TranslatorInterface   $translator
      * @param EventScheduler        $scheduler
@@ -106,19 +106,19 @@ class InactiveExecutioner implements ExecutionerInterface
      * @param EventExecutioner      $executioner
      */
     public function __construct(
-        InactiveContactFinder $inactiveContacts,
+        InactiveContactFinder $inactiveContactFinder,
         LoggerInterface $logger,
         TranslatorInterface $translator,
         EventScheduler $scheduler,
         InactiveHelper $helper,
         EventExecutioner $executioner
     ) {
-        $this->inactiveContacts = $inactiveContacts;
-        $this->logger           = $logger;
-        $this->translator       = $translator;
-        $this->scheduler        = $scheduler;
-        $this->helper           = $helper;
-        $this->executioner      = $executioner;
+        $this->inactiveContactFinder = $inactiveContactFinder;
+        $this->logger                = $logger;
+        $this->translator            = $translator;
+        $this->scheduler             = $scheduler;
+        $this->helper                = $helper;
+        $this->executioner           = $executioner;
     }
 
     /**
@@ -227,7 +227,7 @@ class InactiveExecutioner implements ExecutionerInterface
             throw new NoEventsFoundException();
         }
 
-        $totalContacts = $this->inactiveContacts->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
+        $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
         $this->output->writeln(
             $this->translator->trans(
                 'mautic.campaign.trigger.decision_count_analyzed',
@@ -271,7 +271,7 @@ class InactiveExecutioner implements ExecutionerInterface
             $this->startAtContactId = $this->limiter->getMinContactId() ?: 0;
 
             // Ge the first batch of contacts
-            $contacts = $this->inactiveContacts->getContacts($this->campaign->getId(), $decisionEvent, $this->startAtContactId, $this->limiter);
+            $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->startAtContactId, $this->limiter);
 
             // Loop over all contacts till we've processed all those applicable for this decision
             while ($contacts->count()) {
@@ -298,7 +298,7 @@ class InactiveExecutioner implements ExecutionerInterface
                 }
 
                 // Clear contacts from memory
-                $this->inactiveContacts->clear();
+                $this->inactiveContactFinder->clear();
 
                 if ($this->limiter->getContactId()) {
                     // No use making another call
@@ -308,7 +308,7 @@ class InactiveExecutioner implements ExecutionerInterface
                 $this->logger->debug('CAMPAIGN: Fetching the next batch of inactive contacts after contact ID '.$startAtContactId);
 
                 // Get the next batch, starting with the max contact ID
-                $contacts = $this->inactiveContacts->getContacts($this->campaign->getId(), $decisionEvent, $startAtContactId, $this->limiter);
+                $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $startAtContactId, $this->limiter);
             }
         }
     }

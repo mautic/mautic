@@ -29,7 +29,7 @@ class InactiveHelper
     /**
      * @var InactiveContactFinder
      */
-    private $inactiveContacts;
+    private $inactiveContactFinder;
 
     /**
      * @var LeadEventLogRepository
@@ -55,22 +55,22 @@ class InactiveHelper
      * InactiveHelper constructor.
      *
      * @param EventScheduler         $scheduler
-     * @param InactiveContactFinder  $inactiveContacts
+     * @param InactiveContactFinder  $inactiveContactFinder
      * @param LeadEventLogRepository $eventLogRepository
      * @param LoggerInterface        $logger
      */
     public function __construct(
         EventScheduler $scheduler,
-        InactiveContactFinder $inactiveContacts,
+        InactiveContactFinder $inactiveContactFinder,
         LeadEventLogRepository $eventLogRepository,
         EventRepository $eventRepository,
         LoggerInterface $logger
     ) {
-        $this->scheduler          = $scheduler;
-        $this->inactiveContacts   = $inactiveContacts;
-        $this->eventLogRepository = $eventLogRepository;
-        $this->eventRepository    = $eventRepository;
-        $this->logger             = $logger;
+        $this->scheduler               = $scheduler;
+        $this->inactiveContactFinder   = $inactiveContactFinder;
+        $this->eventLogRepository      = $eventLogRepository;
+        $this->eventRepository         = $eventRepository;
+        $this->logger                  = $logger;
     }
 
     /**
@@ -202,6 +202,6 @@ class InactiveHelper
             return $this->eventLogRepository->getDatesExecuted($lastActiveEventId, $contactIds);
         }
 
-        return $this->inactiveContacts->getDatesAdded();
+        return $this->inactiveContactFinder->getDatesAdded();
     }
 }
