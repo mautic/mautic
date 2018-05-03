@@ -14,7 +14,7 @@ namespace Mautic\CampaignBundle\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
@@ -76,7 +76,7 @@ class InactiveExecutioner implements ExecutionerInterface
     private $counter;
 
     /**
-     * @var InactiveContacts
+     * @var InactiveContactFinder
      */
     private $inactiveContacts;
 
@@ -98,15 +98,15 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * InactiveExecutioner constructor.
      *
-     * @param InactiveContacts    $inactiveContacts
-     * @param LoggerInterface     $logger
-     * @param TranslatorInterface $translator
-     * @param EventScheduler      $scheduler
-     * @param InactiveHelper      $helper
-     * @param EventExecutioner    $executioner
+     * @param InactiveContactFinder $inactiveContacts
+     * @param LoggerInterface       $logger
+     * @param TranslatorInterface   $translator
+     * @param EventScheduler        $scheduler
+     * @param InactiveHelper        $helper
+     * @param EventExecutioner      $executioner
      */
     public function __construct(
-        InactiveContacts $inactiveContacts,
+        InactiveContactFinder $inactiveContacts,
         LoggerInterface $logger,
         TranslatorInterface $translator,
         EventScheduler $scheduler,

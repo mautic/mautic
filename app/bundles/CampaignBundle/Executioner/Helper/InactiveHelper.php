@@ -15,7 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 
@@ -27,7 +27,7 @@ class InactiveHelper
     private $scheduler;
 
     /**
-     * @var InactiveContacts
+     * @var InactiveContactFinder
      */
     private $inactiveContacts;
 
@@ -55,13 +55,13 @@ class InactiveHelper
      * InactiveHelper constructor.
      *
      * @param EventScheduler         $scheduler
-     * @param InactiveContacts       $inactiveContacts
+     * @param InactiveContactFinder  $inactiveContacts
      * @param LeadEventLogRepository $eventLogRepository
      * @param LoggerInterface        $logger
      */
     public function __construct(
         EventScheduler $scheduler,
-        InactiveContacts $inactiveContacts,
+        InactiveContactFinder $inactiveContacts,
         LeadEventLogRepository $eventLogRepository,
         EventRepository $eventRepository,
         LoggerInterface $logger

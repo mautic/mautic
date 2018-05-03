@@ -20,7 +20,7 @@ use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 
-class InactiveContacts
+class InactiveContactFinder
 {
     /**
      * @var LeadRepository
@@ -48,7 +48,7 @@ class InactiveContacts
     private $campaignMemberDatesAdded;
 
     /**
-     * InactiveContacts constructor.
+     * InactiveContactFinder constructor.
      *
      * @param LeadRepository         $leadRepository
      * @param CampaignRepository     $campaignRepository

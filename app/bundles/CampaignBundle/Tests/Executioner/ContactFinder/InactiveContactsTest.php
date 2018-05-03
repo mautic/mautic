@@ -15,14 +15,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
-use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\NullLogger;
 
-class InactiveContactsTest extends \PHPUnit_Framework_TestCase
+class InactiveContactFinderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LeadRepository
@@ -110,11 +110,11 @@ class InactiveContactsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return InactiveContacts
+     * @return InactiveContactFinder
      */
     private function getContactFinder()
     {
-        return new InactiveContacts(
+        return new InactiveContactFinder(
             $this->leadRepository,
             $this->campaignRepository,
             $this->campaignLeadRepository,

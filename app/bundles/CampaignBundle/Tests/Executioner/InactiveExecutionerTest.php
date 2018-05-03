@@ -14,7 +14,7 @@ namespace Mautic\CampaignBundle\Tests\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
@@ -27,7 +27,7 @@ use Psr\Log\NullLogger;
 class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|InactiveContacts
+     * @var \PHPUnit_Framework_MockObject_MockObject|InactiveContactFinder
      */
     private $inactiveContactFinder;
 
@@ -53,7 +53,7 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->inactiveContactFinder = $this->getMockBuilder(InactiveContacts::class)
+        $this->inactiveContactFinder = $this->getMockBuilder(InactiveContactFinder::class)
             ->disableOriginalConstructor()
             ->getMock();
 

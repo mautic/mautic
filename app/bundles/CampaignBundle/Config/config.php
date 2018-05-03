@@ -291,7 +291,7 @@ return [
                 ],
             ],
             'mautic.campaign.contact_finder.inactive'     => [
-                'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContacts::class,
+                'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder::class,
                 'arguments' => [
                     'mautic.lead.repository.lead',
                     'mautic.campaign.repository.campaign',
