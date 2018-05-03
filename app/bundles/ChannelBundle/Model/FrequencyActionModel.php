@@ -78,7 +78,10 @@ class FrequencyActionModel
             $frequencyRule = isset($frequencyRules[$channel]) ? $frequencyRules[$channel] : new FrequencyRule();
             $frequencyRule->setChannel($channel);
             $frequencyRule->setLead($contact);
-            $frequencyRule->setDateAdded(new \DateTime());
+
+            if (!$frequencyRule->getDateAdded()) {
+                $frequencyRule->setDateAdded(new \DateTime());
+            }
 
             if (!empty($params['frequency_number_'.$channel]) && !empty($params['frequency_time_'.$channel])) {
                 $frequencyRule->setFrequencyNumber($params['frequency_number_'.$channel]);
