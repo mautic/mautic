@@ -160,6 +160,7 @@
 
     /* ERROR MESSAGES */
 
+
     /* instantiate parser */
     var parser = new UAParser();
     var isHttpsPrompt = false;

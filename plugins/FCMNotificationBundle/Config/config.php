@@ -19,7 +19,7 @@ return [
                     'mautic.helper.integration',
                     'mautic.lead.model.lead',
                     'mautic.notification.model.notification',
-                    'mautic.notification.api',
+                    'mauticplugin.fcmnotification.notification.api',
                 ],
             ],
             'mauticplugin.fcmnotification.pagebundle.subscriber' => [
@@ -52,7 +52,7 @@ return [
 //                    'mautic.helper.integration',
 //                    'mautic.lead.model.lead',
 //                    'mautic.notification.model.notification',
-//                    'mautic.notification.api',
+//                    'mauticplugin.fcmnotification.notification.api',
 //                ],
 //            ],
             'mauticplugin.fcmnotification.subscriber.channel' => [
@@ -137,7 +137,7 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.helper.integration',
                 ],
-                'alias' => 'notification_api',
+                'alias' => 'fcmnotification_api',
             ],
         ],
         'models' => [

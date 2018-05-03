@@ -18,7 +18,7 @@ use Mautic\NotificationBundle\Exception\MissingProjectIDException;
 use Mautic\NotificationBundle\Exception\MissingMessagingSenderIdException;
 use Mautic\NotificationBundle\Exception\MissingPublicVapidKeyException;
 
-class OneSignalApi extends AbstractNotificationApi
+class FCMApi extends AbstractNotificationApi
 {
     /**
      * @var string
