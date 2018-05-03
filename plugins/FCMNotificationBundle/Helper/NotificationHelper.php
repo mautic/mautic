@@ -151,7 +151,7 @@ MauticJS.asyncQueue(function(){
       firebase.initializeApp(config);
 
       const messaging = firebase.messaging();
-      messaging.usePublicVapidKey("{$publicVapidKey}");
+      //messaging.usePublicVapidKey("{$publicVapidKey}");
 
 
 
