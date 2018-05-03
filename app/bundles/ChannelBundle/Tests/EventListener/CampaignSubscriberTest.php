@@ -21,6 +21,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher as CampaignEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
+use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\EventListener\CampaignSubscriber;
@@ -136,11 +137,16 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $notificationHelper = $this->getMockBuilder(NotificationHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->legacyDispatcher = new LegacyEventDispatcher(
             $this->dispatcher,
             $this->scheduler,
             new NullLogger(),
             $leadModel,
+            $notificationHelper,
             $factory
         );
 
@@ -148,6 +154,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->dispatcher,
             new NullLogger(),
             $this->scheduler,
+            $notificationHelper,
             $this->legacyDispatcher
         );
 
