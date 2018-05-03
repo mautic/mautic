@@ -179,7 +179,7 @@
 
 
 
-
+/*
     if ((browser == "Chrome" && parseInt(browser_version.substring(0, 2)) >= 50) || (browser == "Firefox" && parseInt(browser_version.substring(0, 2)) >= 44) || (browser == "Opera" && parseInt(browser_version.substring(0, 2)) >= 37));
     else if (os == "iOS")
         showError("ios");
@@ -250,5 +250,7 @@
         document.getElementById("error-box").style.display = "block";
         document.getElementById(error).style.display = "block";
     }
+
+*/
 </script>
 </body></html>
