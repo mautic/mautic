@@ -14,7 +14,7 @@ namespace Mautic\CampaignBundle\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
@@ -51,7 +51,7 @@ class KickoffExecutioner implements ExecutionerInterface
     private $logger;
 
     /**
-     * @var KickoffContacts
+     * @var KickoffContactFinder
      */
     private $kickoffContacts;
 
@@ -93,15 +93,15 @@ class KickoffExecutioner implements ExecutionerInterface
     /**
      * KickoffExecutioner constructor.
      *
-     * @param LoggerInterface     $logger
-     * @param KickoffContacts     $kickoffContacts
-     * @param TranslatorInterface $translator
-     * @param EventExecutioner    $executioner
-     * @param EventScheduler      $scheduler
+     * @param LoggerInterface      $logger
+     * @param KickoffContactFinder $kickoffContacts
+     * @param TranslatorInterface  $translator
+     * @param EventExecutioner     $executioner
+     * @param EventScheduler       $scheduler
      */
     public function __construct(
         LoggerInterface $logger,
-        KickoffContacts $kickoffContacts,
+        KickoffContactFinder $kickoffContacts,
         TranslatorInterface $translator,
         EventExecutioner $executioner,
         EventScheduler $scheduler

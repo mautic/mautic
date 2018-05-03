@@ -19,7 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 
-class KickoffContacts
+class KickoffContactFinder
 {
     /**
      * @var LeadRepository
@@ -37,7 +37,7 @@ class KickoffContacts
     private $logger;
 
     /**
-     * KickoffContacts constructor.
+     * KickoffContactFinder constructor.
      *
      * @param LeadRepository     $leadRepository
      * @param CampaignRepository $campaignRepository

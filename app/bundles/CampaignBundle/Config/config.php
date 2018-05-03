@@ -277,7 +277,7 @@ return [
         ],
         'execution'    => [
             'mautic.campaign.contact_finder.kickoff'  => [
-                'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContacts::class,
+                'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder::class,
                 'arguments' => [
                     'mautic.lead.repository.lead',
                     'mautic.campaign.repository.campaign',

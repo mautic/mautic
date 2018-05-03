@@ -14,7 +14,7 @@ namespace Mautic\CampaignBundle\Tests\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
@@ -26,7 +26,7 @@ use Psr\Log\NullLogger;
 class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|KickoffContacts
+     * @var \PHPUnit_Framework_MockObject_MockObject|KickoffContactFinder
      */
     private $kickoffContacts;
 
@@ -47,7 +47,7 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->kickoffContacts = $this->getMockBuilder(KickoffContacts::class)
+        $this->kickoffContacts = $this->getMockBuilder(KickoffContactFinder::class)
             ->disableOriginalConstructor()
             ->getMock();
 

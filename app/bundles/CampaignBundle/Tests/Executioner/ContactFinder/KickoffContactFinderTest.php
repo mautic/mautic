@@ -13,14 +13,14 @@ namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
-use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContacts;
+use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\NullLogger;
 
-class KickoffContactsTest extends \PHPUnit_Framework_TestCase
+class KickoffContactFinderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LeadRepository
@@ -91,11 +91,11 @@ class KickoffContactsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return KickoffContacts
+     * @return KickoffContactFinder
      */
     private function getContactFinder()
     {
-        return new KickoffContacts(
+        return new KickoffContactFinder(
             $this->leadRepository,
             $this->campaignRepository,
             new NullLogger()
