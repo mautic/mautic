@@ -13,6 +13,7 @@ namespace Mautic\DashboardBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
@@ -65,7 +66,14 @@ class WidgetApiController extends CommonApiController
         $from       = InputHelper::clean($this->request->get('dateFrom', null));
         $to         = InputHelper::clean($this->request->get('dateTo', null));
         $dataFormat = InputHelper::clean($this->request->get('dataFormat', null));
+        $unit       = InputHelper::clean($this->request->get('timeUnit', 'Y'));
         $response   = ['success' => 0];
+
+        try {
+            DateTimeHelper::validateMysqlDateTimeUnit($unit);
+        } catch (\InvalidArgumentException $e) {
+            return $this->returnError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+        }
 
         if ($timezone) {
             $fromDate = new \DateTime($from, new \DateTimeZone($timezone));

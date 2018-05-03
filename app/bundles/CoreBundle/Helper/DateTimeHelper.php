@@ -388,4 +388,22 @@ class DateTimeHelper
 
         return $timezone;
     }
+
+    /**
+     * @param string $unit
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function validateMysqlDateTimeUnit($unit)
+    {
+        $possibleUnits   = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
+        $timeUnitInArray = array_filter($possibleUnits, function ($possibleUnit) use ($unit) {
+            return $unit === $possibleUnit;
+        });
+
+        if (!$timeUnitInArray) {
+            $possibleUnitsString = implode(', ', $possibleUnits);
+            throw new \InvalidArgumentException("Unit '$unit' is not supported. Use one of these: $possibleUnitsString");
+        }
+    }
 }
