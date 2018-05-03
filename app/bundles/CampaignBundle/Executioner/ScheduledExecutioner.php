@@ -57,7 +57,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     /**
      * @var ScheduledContactFinder
      */
-    private $scheduledContacts;
+    private $scheduledContactFinder;
 
     /**
      * @var Campaign
@@ -102,7 +102,7 @@ class ScheduledExecutioner implements ExecutionerInterface
      * @param TranslatorInterface    $translator
      * @param EventExecutioner       $executioner
      * @param EventScheduler         $scheduler
-     * @param ScheduledContactFinder $scheduledContacts
+     * @param ScheduledContactFinder $scheduledContactFinder
      */
     public function __construct(
         LeadEventLogRepository $repository,
@@ -110,14 +110,14 @@ class ScheduledExecutioner implements ExecutionerInterface
         TranslatorInterface $translator,
         EventExecutioner $executioner,
         EventScheduler $scheduler,
-        ScheduledContactFinder $scheduledContacts
+        ScheduledContactFinder $scheduledContactFinder
     ) {
-        $this->repo              = $repository;
-        $this->logger            = $logger;
-        $this->translator        = $translator;
-        $this->executioner       = $executioner;
-        $this->scheduler         = $scheduler;
-        $this->scheduledContacts = $scheduledContacts;
+        $this->repo                   = $repository;
+        $this->logger                 = $logger;
+        $this->translator             = $translator;
+        $this->executioner            = $executioner;
+        $this->scheduler              = $scheduler;
+        $this->scheduledContactFinder = $scheduledContactFinder;
     }
 
     /**
@@ -286,7 +286,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     {
         $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         while ($logs->count()) {
-            $this->scheduledContacts->hydrateContacts($logs);
+            $this->scheduledContactFinder->hydrateContacts($logs);
 
             $event = $logs->first()->getEvent();
             $this->progressBar->advance($logs->count());
@@ -299,7 +299,7 @@ class ScheduledExecutioner implements ExecutionerInterface
             $this->executioner->executeLogs($event, $logs, $this->counter);
 
             // Get next batch
-            $this->scheduledContacts->clear();
+            $this->scheduledContactFinder->clear();
             $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         }
     }
