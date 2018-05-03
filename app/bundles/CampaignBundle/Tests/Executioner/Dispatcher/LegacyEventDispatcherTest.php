@@ -21,6 +21,7 @@ use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
+use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
@@ -46,6 +47,11 @@ class LegacyEventDispatcherTest extends \PHPUnit_Framework_TestCase
     private $leadModel;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockBuilder|NotificationHelper
+     */
+    private $notificationHelper;
+
+    /**
      * @var \PHPUnit_Framework_MockObject_MockBuilder|MauticFactory
      */
     private $mauticFactory;
@@ -61,6 +67,10 @@ class LegacyEventDispatcherTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->leadModel = $this->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->notificationHelper = $this->getMockBuilder(NotificationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -226,12 +236,13 @@ class LegacyEventDispatcherTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
+        $lead     = new Lead();
         $event    = new Event();
         $campaign = new Campaign();
         $event->setCampaign($campaign);
         $leadEventLog = new LeadEventLog();
         $leadEventLog->setEvent($event);
-        $leadEventLog->setLead(new Lead());
+        $leadEventLog->setLead($lead);
         $leadEventLog->setMetadata(['bar' => 'foo']);
 
         $logs = new ArrayCollection([$leadEventLog]);
@@ -261,6 +272,10 @@ class LegacyEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->scheduler->expects($this->once())
             ->method('rescheduleFailure');
+
+        $this->notificationHelper->expects($this->once())
+            ->method('notifyOfFailure')
+            ->with($lead, $event);
 
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent);
     }
@@ -454,6 +469,7 @@ class LegacyEventDispatcherTest extends \PHPUnit_Framework_TestCase
             $this->scheduler,
             new NullLogger(),
             $this->leadModel,
+            $this->notificationHelper,
             $this->mauticFactory
         );
     }

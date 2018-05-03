@@ -24,6 +24,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\DecisionExecutioner;
 use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
+use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
@@ -32,8 +33,10 @@ use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -77,6 +80,11 @@ class LegacyEventModel extends CommonFormModel
     private $eventCollector;
 
     /**
+     * @var NotificationHelper
+     */
+    private $notificationHelper;
+
+    /**
      * @var
      */
     protected $triggeredEvents;
@@ -97,15 +105,33 @@ class LegacyEventModel extends CommonFormModel
     protected $ipLookupHelper;
 
     /**
-     * LegacyEventModel constructor.
+     * @var UserModel
+     */
+    protected $userModel;
+
+    /**
+     * @var NotificationModel
+     */
+    protected $notificationModel;
+
+    /**
+     * EventModel constructor.
      *
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param LeadModel            $leadModel
+     * @param UserModel            $userModel
+     * @param NotificationModel    $notificationModel
+     * @param CampaignModel        $campaignModel
      * @param DecisionExecutioner  $decisionExecutioner
      * @param KickoffExecutioner   $kickoffExecutioner
      * @param ScheduledExecutioner $scheduledExecutioner
      * @param InactiveExecutioner  $inactiveExecutioner
      * @param EventExecutioner     $eventExecutioner
+     * @param EventDispatcher      $eventDispatcher
      */
     public function __construct(
+        UserModel $userModel,
+        NotificationModel $notificationModel,
         CampaignModel $campaignModel,
         LeadModel $leadModel,
         IpLookupHelper $ipLookupHelper,
@@ -117,6 +143,8 @@ class LegacyEventModel extends CommonFormModel
         EventDispatcher $eventDispatcher,
         EventCollector $eventCollector
     ) {
+        $this->userModel            = $userModel;
+        $this->notificationModel    = $notificationModel;
         $this->campaignModel        = $campaignModel;
         $this->leadModel            = $leadModel;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -735,6 +763,42 @@ class LegacyEventModel extends CommonFormModel
         unset($event, $campaign, $lead);
 
         return $log;
+    }
+
+    /**
+     * @deprecated 2.13.0 to be removed in 3.0
+     *
+     * @param Lead $lead
+     * @param      $campaignCreatedBy
+     * @param      $header
+     */
+    public function notifyOfFailure(Lead $lead, $campaignCreatedBy, $header)
+    {
+        // Notify the lead owner if there is one otherwise campaign creator that there was a failure
+        if (!$owner = $lead->getOwner()) {
+            $ownerId = (int) $campaignCreatedBy;
+            $owner   = $this->userModel->getEntity($ownerId);
+        }
+
+        if ($owner && $owner->getId()) {
+            $this->notificationModel->addNotification(
+                $header,
+                'error',
+                false,
+                $this->translator->trans(
+                    'mautic.campaign.event.failed',
+                    [
+                        '%contact%' => '<a href="'.$this->router->generate(
+                                'mautic_contact_action',
+                                ['objectAction' => 'view', 'objectId' => $lead->getId()]
+                            ).'" data-toggle="ajax">'.$lead->getPrimaryIdentifier().'</a>',
+                    ]
+                ),
+                null,
+                null,
+                $owner
+            );
+        }
     }
 
     /**

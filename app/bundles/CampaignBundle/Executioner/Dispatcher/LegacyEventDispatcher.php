@@ -24,6 +24,7 @@ use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -60,6 +61,11 @@ class LegacyEventDispatcher
     private $leadModel;
 
     /**
+     * @var NotificationHelper
+     */
+    private $notificationHelper;
+
+    /**
      * @var MauticFactory
      */
     private $factory;
@@ -77,13 +83,15 @@ class LegacyEventDispatcher
         EventScheduler $scheduler,
         LoggerInterface $logger,
         LeadModel $leadModel,
+        NotificationHelper $notificationHelper,
         MauticFactory $factory
     ) {
-        $this->dispatcher = $dispatcher;
-        $this->scheduler  = $scheduler;
-        $this->logger     = $logger;
-        $this->leadModel  = $leadModel;
-        $this->factory    = $factory;
+        $this->dispatcher         = $dispatcher;
+        $this->scheduler          = $scheduler;
+        $this->logger             = $logger;
+        $this->leadModel          = $leadModel;
+        $this->notificationHelper = $notificationHelper;
+        $this->factory            = $factory;
     }
 
     /**
@@ -339,6 +347,8 @@ class LegacyEventDispatcher
             CampaignEvents::ON_EVENT_FAILED,
             new FailedEvent($config, $log)
         );
+
+        $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());
     }
 
     /**

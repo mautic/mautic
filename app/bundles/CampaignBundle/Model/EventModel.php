@@ -13,83 +13,14 @@ namespace Mautic\CampaignBundle\Model;
 
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Executioner\DecisionExecutioner;
-use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
-use Mautic\CampaignBundle\Executioner\EventExecutioner;
-use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
-use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
-use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Model\NotificationModel;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\UserBundle\Model\UserModel;
 
 /**
- * Class EventModel
- * {@inheritdoc}
+ * Class EventModel.
  */
 class EventModel extends LegacyEventModel
 {
-    /**
-     * @var UserModel
-     */
-    protected $userModel;
-
-    /**
-     * @var NotificationModel
-     */
-    protected $notificationModel;
-
-    /**
-     * EventModel constructor.
-     *
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param LeadModel            $leadModel
-     * @param UserModel            $userModel
-     * @param NotificationModel    $notificationModel
-     * @param CampaignModel        $campaignModel
-     * @param DecisionExecutioner  $decisionExecutioner
-     * @param KickoffExecutioner   $kickoffExecutioner
-     * @param ScheduledExecutioner $scheduledExecutioner
-     * @param InactiveExecutioner  $inactiveExecutioner
-     * @param EventExecutioner     $eventExecutioner
-     * @param EventDispatcher      $eventDispatcher
-     */
-    public function __construct(
-        UserModel $userModel,
-        NotificationModel $notificationModel,
-        CampaignModel $campaignModel,
-        LeadModel $leadModel,
-        IpLookupHelper $ipLookupHelper,
-        DecisionExecutioner $decisionExecutioner,
-        KickoffExecutioner $kickoffExecutioner,
-        ScheduledExecutioner $scheduledExecutioner,
-        InactiveExecutioner $inactiveExecutioner,
-        EventExecutioner $eventExecutioner,
-        EventDispatcher $eventDispatcher,
-        EventCollector $eventCollector
-    ) {
-        $this->userModel         = $userModel;
-        $this->notificationModel = $notificationModel;
-
-        parent::__construct(
-            $campaignModel,
-            $leadModel,
-            $ipLookupHelper,
-            $decisionExecutioner,
-            $kickoffExecutioner,
-            $scheduledExecutioner,
-            $inactiveExecutioner,
-            $eventExecutioner,
-            $eventDispatcher,
-            $eventCollector
-        );
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -210,39 +141,5 @@ class EventModel extends LegacyEventModel
         $chart->setDataset($this->translator->trans('mautic.campaign.triggered.events'), $data);
 
         return $chart->render();
-    }
-
-    /**
-     * @param Lead $lead
-     * @param      $campaignCreatedBy
-     * @param      $header
-     */
-    public function notifyOfFailure(Lead $lead, $campaignCreatedBy, $header)
-    {
-        // Notify the lead owner if there is one otherwise campaign creator that there was a failure
-        if (!$owner = $lead->getOwner()) {
-            $ownerId = (int) $campaignCreatedBy;
-            $owner   = $this->userModel->getEntity($ownerId);
-        }
-
-        if ($owner && $owner->getId()) {
-            $this->notificationModel->addNotification(
-                $header,
-                'error',
-                false,
-                $this->translator->trans(
-                    'mautic.campaign.event.failed',
-                    [
-                        '%contact%' => '<a href="'.$this->router->generate(
-                                'mautic_contact_action',
-                                ['objectAction' => 'view', 'objectId' => $lead->getId()]
-                            ).'" data-toggle="ajax">'.$lead->getPrimaryIdentifier().'</a>',
-                    ]
-                ),
-                null,
-                null,
-                $owner
-            );
-        }
     }
 }

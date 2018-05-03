@@ -28,6 +28,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
@@ -54,6 +55,11 @@ class EventDispatcher
     private $scheduler;
 
     /**
+     * @var NotificationHelper
+     */
+    private $notificationHelper;
+
+    /**
      * @var LegacyEventDispatcher
      */
     private $legacyDispatcher;
@@ -63,18 +69,22 @@ class EventDispatcher
      *
      * @param EventDispatcherInterface $dispatcher
      * @param LoggerInterface          $logger
+     * @param EventScheduler           $scheduler
+     * @param NotificationHelper       $notificationHelper
      * @param LegacyEventDispatcher    $legacyDispatcher
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         LoggerInterface $logger,
         EventScheduler $scheduler,
+        NotificationHelper $notificationHelper,
         LegacyEventDispatcher $legacyDispatcher
     ) {
-        $this->dispatcher       = $dispatcher;
-        $this->logger           = $logger;
-        $this->scheduler        = $scheduler;
-        $this->legacyDispatcher = $legacyDispatcher;
+        $this->dispatcher         = $dispatcher;
+        $this->logger             = $logger;
+        $this->scheduler          = $scheduler;
+        $this->notificationHelper = $notificationHelper;
+        $this->legacyDispatcher   = $legacyDispatcher;
     }
 
     /**
@@ -195,6 +205,7 @@ class EventDispatcher
      */
     private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
     {
+        /** @var LeadEventLog $log */
         foreach ($logs as $log) {
             $this->logger->debug(
                 'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
@@ -206,6 +217,8 @@ class EventDispatcher
                 CampaignEvents::ON_EVENT_FAILED,
                 new FailedEvent($config, $log)
             );
+
+            $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());
         }
     }
 

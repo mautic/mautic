@@ -28,6 +28,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
+use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
@@ -51,6 +52,11 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
      */
     private $legacyDispatcher;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockBuilder|NotificationHelper
+     */
+    private $notificationHelper;
+
     protected function setUp()
     {
         $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
@@ -58,6 +64,10 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->scheduler = $this->getMockBuilder(EventScheduler::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->notificationHelper = $this->getMockBuilder(NotificationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -94,7 +104,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $log2 = $this->getMockBuilder(LeadEventLog::class)
             ->getMock();
-        $log2->expects($this->exactly(2))
+        $log2->expects($this->exactly(3))
             ->method('getLead')
             ->willReturn($lead2);
         $log2->method('getMetadata')
@@ -141,6 +151,10 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->scheduler->expects($this->once())
             ->method('rescheduleFailure')
             ->with($logs->get(2));
+
+        $this->notificationHelper->expects($this->once())
+            ->method('notifyOfFailure')
+            ->with($lead2, $event);
 
         $this->legacyDispatcher->expects($this->once())
             ->method('dispatchExecutionEvents');
@@ -368,6 +382,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
             $this->dispatcher,
             new NullLogger(),
             $this->scheduler,
+            $this->notificationHelper,
             $this->legacyDispatcher
         );
     }

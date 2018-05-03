@@ -305,6 +305,7 @@ return [
                     'event_dispatcher',
                     'monolog.logger.mautic',
                     'mautic.campaign.scheduler',
+                    'mautic.campaign.helper.notification',
                     'mautic.campaign.legacy_event_dispatcher',
                 ],
             ],
@@ -437,6 +438,15 @@ return [
             'mautic.campaign.helper.removed_contact_tracker' => [
                 'class' => \Mautic\CampaignBundle\Helper\RemovedContactTracker::class,
             ],
+            'mautic.campaign.helper.notification' => [
+                'class'     => \Mautic\CampaignBundle\Executioner\Helper\NotificationHelper::class,
+                'arguments' => [
+                    'mautic.user.model.user',
+                    'mautic.core.model.notification',
+                    'translator',
+                    'router',
+                ],
+            ],
             // @deprecated 2.13.0 for BC support; to be removed in 3.0
             'mautic.campaign.legacy_event_dispatcher' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher::class,
@@ -445,6 +455,7 @@ return [
                     'mautic.campaign.scheduler',
                     'monolog.logger.mautic',
                     'mautic.lead.model.lead',
+                    'mautic.campaign.helper.notification',
                     'mautic.factory',
                 ],
             ],
