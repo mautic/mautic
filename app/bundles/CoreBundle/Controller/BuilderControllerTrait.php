@@ -26,7 +26,6 @@ trait BuilderControllerTrait
         /** @var \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper */
         $routerHelper = $this->get('templating.helper.router');
         $translator   = $this->get('templating.helper.translator');
-
         $assetsHelper
             ->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->addScriptDeclaration("var mauticBasePath    = '".$this->request->getBasePath()."';")
