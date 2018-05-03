@@ -12,7 +12,7 @@
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Callback;
 
 use Mautic\EmailBundle\Model\TransportCallback;
-use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\SendGridApiCallback;
+use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\MomentumCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -24,7 +24,7 @@ class SendGridApiCallbackTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridApiCallback = new SendGridApiCallback($transportCallback);
+        $sendGridApiCallback = new MomentumCallback($transportCallback);
 
         $payload = [
             [

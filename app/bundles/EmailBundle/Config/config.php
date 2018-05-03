@@ -363,6 +363,62 @@ return [
                     'setPassword' => ['%mautic.mailer_password%'],
                 ],
             ],
+            'mautic.transport.momentum' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Transport\MomentumTransport::class,
+                'arguments' => [
+                    'mautic.transport.momentum.callback',
+                    'mautic.transport.momentum.facade',
+                ],
+            ],
+            'mautic.transport.momentum.adapter' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\Adapter::class,
+                'arguments' => [
+                    'mautic.transport.momentum.sparkpost',
+                ],
+            ],
+            'mautic.transport.momentum.service.swift_message' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageService::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.transport.momentum.validator.swift_message' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator\SwiftMessageValidator::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.transport.momentum.callback' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallback::class,
+                'arguments' => [
+                    'mautic.email.model.transport_callback',
+                ],
+            ],
+            'mautic.transport.momentum.facade' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Facade\MomentumFacade::class,
+                'arguments' => [
+                    'mautic.transport.momentum.adapter',
+                    'mautic.transport.momentum.service.swift_message',
+                    'mautic.transport.momentum.validator.swift_message',
+                ],
+            ],
+            'mautic.transport.momentum.sparkpost' => [
+                'class'     => \SparkPost\SparkPost::class,
+                'factory'   => ['@mautic.sparkpost.factory', 'create'],
+                'arguments' => [
+                    '%mautic.momentum_api_key%',
+                ],
+                'methodCalls' => [
+                    'setOptions' => [
+                        'host'     => '%mautic.momentum_host%',
+                        'protocol' => '%mautic.momentum_protocol%',
+                        'port'     => '%mautic.momentum_port%',
+                        'key'      => '%mautic.momentum_api_key%',
+                        'version'  => '%mautic.momentum_version%',
+                        'async'    => '%mautic.momentum_async%',
+                    ],
+                ],
+            ],
             'mautic.transport.sendgrid' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
@@ -468,6 +524,19 @@ return [
                     'translator',
                     'mautic.email.model.transport_callback',
                 ],
+            ],
+            'mautic.sparkpost.factory' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactory::class,
+                'arguments' => [
+                    'mautic.guzzle.client',
+                ],
+            ],
+            'mautic.guzzle.client.factory' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\Guzzle\ClientFactory::class,
+            ],
+            'mautic.guzzle.client' => [
+                'class'     => \Http\Adapter\Guzzle6\Client::class,
+                'factory'   => ['@mautic.guzzle.client.factory', 'create'],
             ],
             'mautic.helper.mailbox' => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',

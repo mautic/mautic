@@ -19,6 +19,7 @@ class TransportType
             'mautic.transport.sendgrid_api' => 'mautic.email.config.mailer_transport.sendgrid_api',
             'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
             'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
+            'mautic.transport.momentum'     => 'mautic.email.config.mailer_transport.momentum',
         ];
     }
 

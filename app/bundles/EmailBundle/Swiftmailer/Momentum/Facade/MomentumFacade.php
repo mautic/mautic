@@ -2,9 +2,12 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Facade;
 
-use Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\MomentumAdapterInterface;
-use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\MomentumSwiftMessageValidationException;
-use Mautic\EmailBundle\Swiftmailer\Momentum\Service\MomentumSwiftMessageService;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\AdapterInterface;
+use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Facade\MomentumSendException;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Validator\SwiftMessageValidator\SwiftMessageValidationException;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageServiceInterface;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator\SwiftMessageValidatorInterface;
 
 /**
  * Class MomentumApiFacade.
@@ -12,58 +15,71 @@ use Mautic\EmailBundle\Swiftmailer\Momentum\Service\MomentumSwiftMessageService;
 final class MomentumFacade implements MomentumFacadeInterface
 {
     /**
-     * @var MomentumAdapterInterface
+     * @var AdapterInterface
      */
-    private $momentumAdapter;
+    private $adapter;
 
     /**
-     * @var MomentumSwiftMessageService
+     * @var SwiftMessageServiceInterface
      */
-    private $momentumSwiftMessageService;
+    private $swiftMessageService;
+
+    /**
+     * @var SwiftMessageValidatorInterface
+     */
+    private $swiftMessageValidator;
 
     /**
      * MomentumFacade constructor.
      *
-     * @param MomentumAdapterInterface    $momentumAdapter
-     * @param MomentumSwiftMessageService $momentumSwiftMessageService
+     * @param AdapterInterface               $adapter
+     * @param SwiftMessageServiceInterface   $swiftMessageService
+     * @param SwiftMessageValidatorInterface $swiftMessageValidator
      */
     public function __construct(
-        MomentumAdapterInterface $momentumAdapter,
-        MomentumSwiftMessageService $momentumSwiftMessageService
+        AdapterInterface $adapter,
+        SwiftMessageServiceInterface $swiftMessageService,
+        SwiftMessageValidatorInterface $swiftMessageValidator
     ) {
-        $this->momentumAdapter             = $momentumAdapter;
-        $this->momentumSwiftMessageService = $momentumSwiftMessageService;
+        $this->adapter               = $adapter;
+        $this->swiftMessageService   = $swiftMessageService;
+        $this->swiftMessageValidator = $swiftMessageValidator;
     }
 
     /**
      * @param \Swift_Mime_Message $message
      *
-     * @throws MomentumSwiftMessageValidationException
+     * @throws SwiftMessageValidationException
+     * @throws MomentumSendException
      */
     public function send(\Swift_Mime_Message $message)
     {
         try {
-            $this->momentumSwiftMessageService->validate($message);
-            $momentumMessage = $this->momentumSwiftMessageService->getMomentumMessage($message);
-
-            $response = $this->momentumAdapter->send($momentumMessage);
-            $response = $response->wait();
+            $this->swiftMessageValidator->validate($message);
+            $transmission = $this->swiftMessageService->transformToTransmission($message);
+            $response     = $this->adapter->createTransmission($transmission);
+            $response     = $response->wait();
             if (200 == (int) $response->getStatusCode()) {
                 $results = $response->getBody();
                 if (!$sendCount = $results['results']['total_accepted_recipients']) {
-                    $this->processResponseErrors($momentumMessage, $results);
+                    $this->processResponseErrors($transmission, $results);
                 }
             }
         } catch (\Exception $exception) {
+            if ($exception instanceof SwiftMessageValidationException) {
+                throw $exception;
+            }
+            throw new MomentumSendException();
         }
     }
 
     /**
-     * @param array $momentumMessage
-     * @param array $results
+     * @param TransmissionDTO $transmissionDTO
+     * @param array           $results
      */
-    private function processResponseErrors(array $momentumMessage, array $results)
+    private function processResponseErrors(TransmissionDTO $transmissionDTO, array $results)
     {
+        /*
         if (!empty($response['errors'][0]['code']) && 1902 == (int) $response['errors'][0]['code']) {
             $comments     = $response['errors'][0]['description'];
             $emailAddress = $momentumMessage['recipients']['to'][0]['email'];
@@ -73,6 +89,6 @@ final class MomentumFacade implements MomentumFacadeInterface
                 $emailId = (!empty($metadata[$emailAddress]['emailId'])) ? $metadata[$emailAddress]['emailId'] : null;
                 $this->transportCallback->addFailureByContactId($metadata[$emailAddress]['leadId'], $comments, DoNotContact::BOUNCED, $emailId);
             }
-        }
+        }*/
     }
 }

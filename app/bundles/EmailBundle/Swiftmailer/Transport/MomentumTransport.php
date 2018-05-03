@@ -11,18 +11,18 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Mautic\EmailBundle\Swiftmailer\Momentum\MomentumFacadeInterface;
-use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\SendGridApiCallback;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallback;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Facade\MomentumFacadeInterface;
 use Swift_Events_EventListener;
 use Swift_Mime_Message;
 use Symfony\Component\HttpFoundation\Request;
 
-class MomentumApiTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
+class MomentumTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
     /**
      * @var MomentumFacadeInterface
      */
-    private $momentumApiFacade;
+    private $momentumFacade;
 
     /**
      * @var \Swift_Events_SimpleEventDispatcher
@@ -35,22 +35,23 @@ class MomentumApiTransport implements \Swift_Transport, TokenTransportInterface,
     private $started = false;
 
     /**
-     * @var SendGridApiCallback
+     * @var MomentumCallback
      */
-    private $sendGridApiCallback;
+    private $momentumCallback;
 
     /**
-     * MomentumApiTransport constructor.
+     * MomentumTransport constructor.
      *
-     * @param MomentumFacadeInterface $momentumApiFacade
-     * @param SendGridApiCallback     $sendGridApiCallback
+     * @param MomentumCallback        $momentumCallback
+     * @param MomentumFacadeInterface $momentumFacade
      */
     public function __construct(
-        MomentumFacadeInterface $momentumApiFacade,
-        SendGridApiCallback $sendGridApiCallback)
+        MomentumCallback $momentumCallback,
+        MomentumFacadeInterface $momentumFacade
+    )
     {
-        $this->momentumApiFacade   = $momentumApiFacade;
-        $this->sendGridApiCallback = $sendGridApiCallback;
+        $this->momentumCallback = $momentumCallback;
+        $this->momentumFacade   = $momentumFacade;
     }
 
     /**
@@ -95,7 +96,7 @@ class MomentumApiTransport implements \Swift_Transport, TokenTransportInterface,
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
-        $this->momentumApiFacade->send($message);
+        $this->momentumFacade->send($message);
 
         return count($message->getTo());
     }
@@ -176,6 +177,6 @@ class MomentumApiTransport implements \Swift_Transport, TokenTransportInterface,
      */
     public function processCallbackRequest(Request $request)
     {
-        $this->sendGridApiCallback->processCallbackRequest($request);
+        $this->momentumCallback->processCallbackRequest($request);
     }
 }
