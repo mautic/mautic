@@ -28,7 +28,7 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|KickoffContactFinder
      */
-    private $kickoffContacts;
+    private $kickoffContactFinder;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|Translator
@@ -47,7 +47,7 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->kickoffContacts = $this->getMockBuilder(KickoffContactFinder::class)
+        $this->kickoffContactFinder = $this->getMockBuilder(KickoffContactFinder::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -66,7 +66,7 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
     public function testNoContactsResultInEmptyResults()
     {
-        $this->kickoffContacts->expects($this->once())
+        $this->kickoffContactFinder->expects($this->once())
             ->method('getContactCount')
             ->willReturn(0);
 
@@ -85,11 +85,11 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
     public function testEventsAreScheduledAndExecuted()
     {
-        $this->kickoffContacts->expects($this->once())
+        $this->kickoffContactFinder->expects($this->once())
             ->method('getContactCount')
             ->willReturn(2);
 
-        $this->kickoffContacts->expects($this->exactly(3))
+        $this->kickoffContactFinder->expects($this->exactly(3))
             ->method('getContacts')
             ->willReturnOnConsecutiveCalls(
                 new ArrayCollection([3 => new Lead()]),
@@ -137,7 +137,7 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
     {
         return new KickoffExecutioner(
             new NullLogger(),
-            $this->kickoffContacts,
+            $this->kickoffContactFinder,
             $this->translator,
             $this->executioner,
             $this->scheduler

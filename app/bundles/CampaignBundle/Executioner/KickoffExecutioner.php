@@ -53,7 +53,7 @@ class KickoffExecutioner implements ExecutionerInterface
     /**
      * @var KickoffContactFinder
      */
-    private $kickoffContacts;
+    private $kickoffContactFinder;
 
     /**
      * @var TranslatorInterface
@@ -94,23 +94,23 @@ class KickoffExecutioner implements ExecutionerInterface
      * KickoffExecutioner constructor.
      *
      * @param LoggerInterface      $logger
-     * @param KickoffContactFinder $kickoffContacts
+     * @param KickoffContactFinder $kickoffContactFinder
      * @param TranslatorInterface  $translator
      * @param EventExecutioner     $executioner
      * @param EventScheduler       $scheduler
      */
     public function __construct(
         LoggerInterface $logger,
-        KickoffContactFinder $kickoffContacts,
+        KickoffContactFinder $kickoffContactFinder,
         TranslatorInterface $translator,
         EventExecutioner $executioner,
         EventScheduler $scheduler
     ) {
-        $this->logger          = $logger;
-        $this->kickoffContacts = $kickoffContacts;
-        $this->translator      = $translator;
-        $this->executioner     = $executioner;
-        $this->scheduler       = $scheduler;
+        $this->logger               = $logger;
+        $this->kickoffContactFinder = $kickoffContactFinder;
+        $this->translator           = $translator;
+        $this->executioner          = $executioner;
+        $this->scheduler            = $scheduler;
     }
 
     /**
@@ -163,7 +163,7 @@ class KickoffExecutioner implements ExecutionerInterface
         $totalRootEvents  = $this->rootEvents->count();
         $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
 
-        $totalContacts      = $this->kickoffContacts->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
+        $totalContacts      = $this->kickoffContactFinder->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
         $totalKickoffEvents = $totalRootEvents * $totalContacts;
 
         $this->output->writeln(
@@ -198,7 +198,7 @@ class KickoffExecutioner implements ExecutionerInterface
         $this->counter->advanceEventCount($this->rootEvents->count());
 
         // Loop over contacts until the entire campaign is executed
-        $contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->limiter);
+        $contacts = $this->kickoffContactFinder->getContacts($this->campaign->getId(), $this->limiter);
         while ($contacts->count()) {
             /** @var Event $event */
             foreach ($this->rootEvents as $event) {
@@ -223,7 +223,7 @@ class KickoffExecutioner implements ExecutionerInterface
                 $this->executioner->executeForContacts($event, $contacts, $this->counter);
             }
 
-            $this->kickoffContacts->clear();
+            $this->kickoffContactFinder->clear();
 
             if ($this->limiter->getContactId()) {
                 // No use making another call
@@ -231,7 +231,7 @@ class KickoffExecutioner implements ExecutionerInterface
             }
 
             // Get the next batch
-            $contacts = $this->kickoffContacts->getContacts($this->campaign->getId(), $this->limiter);
+            $contacts = $this->kickoffContactFinder->getContacts($this->campaign->getId(), $this->limiter);
         }
     }
 }
