@@ -175,11 +175,7 @@
     var engine = result.engine.name;
 
     
-
-
-
-
-/*
+MauticJS.asyncQueue(function(){
     if ((browser == "Chrome" && parseInt(browser_version.substring(0, 2)) >= 50) || (browser == "Firefox" && parseInt(browser_version.substring(0, 2)) >= 44) || (browser == "Opera" && parseInt(browser_version.substring(0, 2)) >= 37));
     else if (os == "iOS")
         showError("ios");
@@ -204,7 +200,7 @@
             else if (Notification.permission == "granted") {
                 navigator.serviceWorker.ready.then(function (event) {
                     if (event) {
-                        messaging.getToken().then(function(currentToken) {
+                        this.messaging.getToken().then(function(currentToken) {
                             if (currentToken) {
                               showError("notifications-already-enabled");
                             } else {
@@ -223,7 +219,7 @@
         if (Notification.permission == "denied") // Check if the Notification permission is disabled.
             showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
         else if (Notification.permission == "granted") {
-            messaging.getToken().then(function(currentToken) {
+            this.messaging.getToken().then(function(currentToken) {
                 if (currentToken) {
                   showError("notifications-already-enabled");
                 } else {
@@ -250,7 +246,7 @@
         document.getElementById("error-box").style.display = "block";
         document.getElementById(error).style.display = "block";
     }
+});
 
-*/
 </script>
 </body></html>
