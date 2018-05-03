@@ -152,7 +152,7 @@ MauticJS.asyncQueue(function(){
 
       const messaging = firebase.messaging();
       //messaging.usePublicVapidKey("{$publicVapidKey}");
-
+      console.log(this);
 
 
     var postUserIdToMautic = function(userId) {
