@@ -150,25 +150,24 @@ MauticJS.asyncQueue(function(){
       };
       firebase.initializeApp(config);
 
-      const messaging = firebase.messaging();
-      //messaging.usePublicVapidKey("{$publicVapidKey}");
-      console.log(this);
+      this.messaging = firebase.messaging();
+      //this.messaging.usePublicVapidKey("{$publicVapidKey}");      
 
 
-    var postUserIdToMautic = function(userId) {
+    MauticJS.postUserIdToMautic = function(userId) {
         var data = [];
         data['fcm_id'] = userId;
         MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}', data);
     };
         
-        messaging.getToken().then(function(currentToken){
+        this.messaging.getToken().then(function(currentToken){
             if (currentToken) {
                 postUserIdToMautic(currentToken);          
             } else {
-                messaging.requestPermission().then(function() {
-                    messaging.getToken().then(function(currentToken){
+                this.messaging.requestPermission().then(function() {
+                    this.messaging.getToken().then(function(currentToken){
                         if (currentToken) {
-                            postUserIdToMautic(currentToken);          
+                            MauticJS.postUserIdToMautic(currentToken);          
                         }
                     });
                 }).catch(function(err) {
@@ -182,16 +181,16 @@ MauticJS.asyncQueue(function(){
         
         // Just to be sure we've grabbed the ID
         window.onbeforeunload = function() {
-            messaging.getToken().then(function(currentToken){
+            this.messaging.getToken().then(function(currentToken){
                 if (currentToken) {
-                    postUserIdToMautic(currentToken);          
+                    MauticJS.postUserIdToMautic(currentToken);          
                 } 
             });        
         };
         
-        messaging.onTokenRefresh(function() {
-            messaging.getToken().then(function(refreshedToken) {
-                postUserIdToMautic(refreshedToken);         
+        this.messaging.onTokenRefresh(function() {
+            this.messaging.getToken().then(function(refreshedToken) {
+                MauticJS.postUserIdToMautic(refreshedToken);         
             }).catch(function(err) {
                 console.log('Unable to retrieve refreshed token ', err);            
             });

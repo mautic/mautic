@@ -75,7 +75,7 @@ class JsController extends CommonController
                 databaseURL: 'https://{$projectId}.firebaseio.com',
                 projectId: '{$projectId}',
                 storageBucket: '',
-                messagingSenderId: '{$messagingSenderId}''
+                messagingSenderId: '{$messagingSenderId}'
               };
               firebase.initializeApp(config);
 
