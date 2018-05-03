@@ -162,7 +162,7 @@ MauticJS.asyncQueue(function(){
         
         this.messaging.getToken().then(function(currentToken){
             if (currentToken) {
-                postUserIdToMautic(currentToken);          
+                MauticJS.postUserIdToMautic(currentToken);          
             } else {
                 this.messaging.requestPermission().then(function() {
                     this.messaging.getToken().then(function(currentToken){
