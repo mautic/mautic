@@ -81,10 +81,6 @@ class JsController extends CommonController
               firebase.initializeApp(config);
 
               const messaging = firebase.messaging();
-
-              messaging.onMessage(function(payload){
-                console.log('message arrived to service worker', payload);
-              });
              ",
             200,
             [
