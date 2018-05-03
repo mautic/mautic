@@ -65,8 +65,9 @@ class JsController extends CommonController
         $publicVapidKey     = $keys['publicVapidKey'];
 
         return new Response(
-            "importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js');
-             importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase-messaging.js');
+            "//importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js');
+             //importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase-messaging.js');
+            importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase.js');
 
                // Initialize Firebase
               var config = {
