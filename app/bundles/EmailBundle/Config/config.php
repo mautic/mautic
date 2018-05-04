@@ -369,12 +369,18 @@ return [
                     'mautic.transport.momentum.callback',
                     'mautic.transport.momentum.facade',
                 ],
+                'tag'          => 'mautic.email_transport',
+                'tagArguments' => [
+                    \Mautic\EmailBundle\Model\TransportType::TRANSPORT_ALIAS => 'mautic.email.config.mailer_transport.momentum',
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_HOST      => true,
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_API_KEY   => true,
+                ],
             ],
             'mautic.transport.momentum.adapter' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\Adapter::class,
                 'arguments' => [
-                    '%mautic.momentum_host%',
-                    '%mautic.momentum_api_key%',
+                    '%mautic.mailer_host%',
+                    '%mautic.mailer_api_key%',
                 ],
             ],
             'mautic.transport.momentum.service.swift_message' => [
@@ -407,17 +413,17 @@ return [
                 'class'     => \SparkPost\SparkPost::class,
                 'factory'   => ['@mautic.sparkpost.factory', 'create'],
                 'arguments' => [
-                    '%mautic.momentum_api_key%',
+                    '%mautic.mailer_api_key%',
                 ],
                 'methodCalls' => [
                     'setOptions' => [
                         [
-                            'host'     => '%mautic.momentum_host%',
-                            'protocol' => '%mautic.momentum_protocol%',
-                            'port'     => '%mautic.momentum_port%',
-                            'key'      => '%mautic.momentum_api_key%',
-                            'version'  => '%mautic.momentum_version%',
-                            'async'    => '%mautic.momentum_async%',
+                            'host'     => '%mautic.mailer_host%',
+                            //'protocol' => '%mautic.momentum_protocol%',
+                            //'port'     => '%mautic.momentum_port%',
+                            'key'      => '%mautic.mailer_api_key%',
+                            //'version'  => '%mautic.momentum_version%',
+                            //'async'    => '%mautic.momentum_async%',
                         ],
                     ],
                 ],

@@ -284,9 +284,6 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $smtpServiceShowConditions  = '{"config_emailconfig_mailer_transport":['.$this->transportType->getSmtpService().']}';
-        $amazonRegionShowConditions = '{"config_emailconfig_mailer_transport":['.$this->transportType->getAmazonService().']}';
-
         $builder->add(
             'mailer_host',
             'text',
@@ -295,7 +292,7 @@ class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-show-on' => $smtpServiceShowConditions,
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresHost().']}',
                     'tooltip'      => 'mautic.email.config.mailer.host.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
@@ -316,7 +313,7 @@ class ConfigType extends AbstractType
                 'required'    => false,
                 'attr'        => [
                     'class'        => 'form-control',
-                    'data-show-on' => $amazonRegionShowConditions,
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getAmazonService().']}',
                     'tooltip'      => 'mautic.email.config.mailer.amazon_host.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
@@ -332,7 +329,7 @@ class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-show-on' => $smtpServiceShowConditions,
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresPort().']}',
                     'tooltip'      => 'mautic.email.config.mailer.port.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
@@ -340,6 +337,7 @@ class ConfigType extends AbstractType
             ]
         );
 
+        $smtpServiceShowConditions = '{"config_emailconfig_mailer_transport":['.$this->transportType->getSmtpService().']}';
         $builder->add(
             'mailer_auth_mode',
             'choice',
@@ -362,30 +360,6 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $mailerLoginUserShowConditions = '{
-            "config_emailconfig_mailer_auth_mode":[
-                "plain",
-                "login",
-                "cram-md5"
-            ], "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresLogin().']
-        }';
-
-        $mailerLoginPasswordShowConditions = '{
-            "config_emailconfig_mailer_auth_mode":[
-                "plain",
-                "login",
-                "cram-md5"
-            ], "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresPassword().']
-        }';
-
-        $mailerLoginUserHideConditions = '{
-         "config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedLogin().']
-        }';
-
-        $mailerLoginPasswordHideConditions = '{
-         "config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedPassword().']
-        }';
-
         $builder->add(
             'mailer_user',
             'text',
@@ -394,8 +368,15 @@ class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-show-on' => $mailerLoginUserShowConditions,
-                    'data-hide-on' => $mailerLoginUserHideConditions,
+                    'data-show-on' => '{
+                        "config_emailconfig_mailer_auth_mode":[
+                            "plain",
+                            "login",
+                            "cram-md5"
+                        ], 
+                        "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresUser().']
+                    }',
+                    'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedUser().']}',
                     'tooltip'      => 'mautic.email.config.mailer.user.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                     'autocomplete' => 'off',
@@ -414,8 +395,15 @@ class ConfigType extends AbstractType
                     'class'        => 'form-control',
                     'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
                     'preaddon'     => 'fa fa-lock',
-                    'data-show-on' => $mailerLoginPasswordShowConditions,
-                    'data-hide-on' => $mailerLoginPasswordHideConditions,
+                    'data-show-on' => '{
+                        "config_emailconfig_mailer_auth_mode":[
+                            "plain",
+                            "login",
+                            "cram-md5"
+                        ], 
+                        "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresPassword().']
+                    }',
+                    'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedPassword().']}',
                     'tooltip'      => 'mautic.email.config.mailer.password.tooltip',
                     'autocomplete' => 'off',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
@@ -424,7 +412,6 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $apiKeyShowConditions = '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresApiKey().']}';
         $builder->add(
             'mailer_api_key',
             'password',
@@ -433,7 +420,7 @@ class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-show-on' => $apiKeyShowConditions,
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresApiKey().']}',
                     'tooltip'      => 'mautic.email.config.mailer.apikey.tooltop',
                     'autocomplete' => 'off',
                     'placeholder'  => 'mautic.email.config.mailer.apikey.placeholder',
