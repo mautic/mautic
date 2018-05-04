@@ -117,9 +117,9 @@ class NotificationHelper
             $messagingSenderId  = $keys['messagingSenderId'];
             $publicVapidKey     = $keys['publicVapidKey'];
             
-            $welcomenotificationEnabled = in_array('welcome_notification_enabled', $supported);
-            $landingPageEnabled = in_array('landing_page_enabled', $supported);
-            $trackingPageEnabled = in_array('tracking_page_enabled', $supported);
+            $welcomenotificationEnabled = intval(in_array('welcome_notification_enabled', $supported));
+            $landingPageEnabled = intval(in_array('landing_page_enabled', $supported));
+            $trackingPageEnabled = intval(in_array('tracking_page_enabled', $supported));
 
 
             

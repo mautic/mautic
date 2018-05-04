@@ -56,8 +56,7 @@ class FCMIntegration extends AbstractIntegration
             //'mobile',
             'landing_page_enabled',
             'welcome_notification_enabled',
-            'tracking_page_enabled',
-            ''
+            'tracking_page_enabled',            
         ];
     }
 
