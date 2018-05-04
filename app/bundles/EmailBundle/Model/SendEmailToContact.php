@@ -291,7 +291,7 @@ class SendEmailToContact
 
         $this->dncModel->clearEntities();
 
-        if ($this->temporaryMailer != null) {
+        if (null !== $this->temporaryMailer) {
             $this->mailer          = clone $this->temporaryMailer;
             $this->temporaryMailer = null;
         }
@@ -304,7 +304,7 @@ class SendEmailToContact
      */
     public function setSampleMailer()
     {
-        if ($this->temporaryMailer == null) {
+        if (null === $this->temporaryMailer) {
             $this->temporaryMailer = clone $this->mailer;
         }
         $this->mailer = $this->mailer->getSampleMailer();

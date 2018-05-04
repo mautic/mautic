@@ -278,7 +278,7 @@ return [
             'mautic.form.type.emailsend_list' => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\EmailSendType',
                 'arguments' => [
-                    'mautic.factory',
+                    'router',
                     'mautic.helper.core_parameters',
                 ],
                 'alias'     => 'emailsend_list',
