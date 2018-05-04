@@ -174,8 +174,9 @@
     var os = result.os.name;
     var engine = result.engine.name;
 
-
+console.log('start mt asyncFunc');
 mt('asyncFunc', function(){
+    console.log('mt asyncFunc');
     MauticJS.conditionalAsyncQueue(function(){
         console.log('setup');
         if ((browser == "Chrome" && parseInt(browser_version.substring(0, 2)) >= 50) || (browser == "Firefox" && parseInt(browser_version.substring(0, 2)) >= 44) || (browser == "Opera" && parseInt(browser_version.substring(0, 2)) >= 37));
