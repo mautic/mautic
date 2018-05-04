@@ -135,11 +135,11 @@ setInterval(function(){
             var method = Array.prototype.shift.call(queueItem);
             var condition = Array.prototype.shift.call(queueItem);
             console.log("method", method, 'arguments', queueItem);
-            if (condition && (((typeof condition === "function") && condition.apply(queueItem)) || ((typeof condition !== "function") && eval(condition))){
-                console.log("condition ok");
+            if (condition && (((typeof condition === "function") && condition.apply(queueItem)) || ((typeof condition !== "function") && eval(condition)))) {
+                console.log('condition ok');
                 method.apply(window,queueItem);
             }else{
-                console.log("condition false");
+                console.log('condition false');
                 remainingItems.push([method, condition])                
             }            
         }
