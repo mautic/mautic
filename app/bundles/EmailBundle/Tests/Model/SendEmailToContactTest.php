@@ -725,4 +725,109 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $errorMessages = $model->getErrors();
         $this->assertCount(1, $errorMessages);
     }
+
+    public function testSetSampleMailerByTemporaryMailer()
+    {
+        // Use our test token transport limiting to 1 recipient per queue
+        $transport = new BatchTransport(true, 1);
+        $mailer    = new \Swift_Mailer($transport);
+
+        // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
+        $factoryMock = $this->getMockBuilder(MauticFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $factoryMock->method('getParameter')
+            ->willReturnCallback(
+                function ($param) {
+                    switch ($param) {
+                        case 'mailer_spool_type':
+                            return 'memory';
+                        default:
+                            return '';
+                    }
+                }
+            );
+        $factoryMock->method('getLogger')
+            ->willReturn(
+                new NullLogger()
+            );
+
+        $mockEm = $this->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $factoryMock->method('getEntityManager')
+            ->willReturn($mockEm);
+
+        $mockDispatcher = $this->getMockBuilder(EventDispatcher::class)
+            ->getMock();
+        $mockDispatcher->method('dispatch')
+            ->willReturnCallback(
+                function ($eventName, EmailSendEvent $event) {
+                    $lead = $event->getLead();
+
+                    $tokens = [];
+                    foreach ($lead as $field => $value) {
+                        $tokens["{contactfield=$field}"] = $value;
+                    }
+                    $tokens['{hash}'] = $event->getIdHash();
+
+                    $event->addTokens($tokens);
+                }
+            );
+        $factoryMock->method('getDispatcher')
+            ->willReturn($mockDispatcher);
+        $routerMock = $this->getMockBuilder(Router::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $factoryMock->method('getRouter')
+            ->willReturn($routerMock);
+
+        $copyRepoMock = $this->getMockBuilder(CopyRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailModelMock = $this->getMockBuilder(EmailModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailModelMock->method('getCopyRepository')
+            ->willReturn($copyRepoMock);
+
+        $factoryMock->method('getModel')
+            ->willReturn($emailModelMock);
+
+        $mailHelper = $this->getMockBuilder(MailHelper::class)
+            ->setConstructorArgs([$factoryMock, $mailer])
+            ->setMethods(null)
+            ->getMock();
+
+        // Enable queueing
+        $mailHelper->enableQueue();
+
+        $statRepository = $this->getMockBuilder(StatRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $statRepository->method('saveEntity')
+            ->willReturnCallback(
+                function (Stat $stat) {
+                    $tokens = $stat->getTokens();
+                    $this->assertGreaterThan(1, count($tokens));
+                    $this->assertEquals($stat->getTrackingHash(), $tokens['{hash}']);
+                }
+            );
+
+        $dncModel = $this->getMockBuilder(DoNotContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $statHelper = new StatHelper($statRepository);
+
+        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
+        $model->setSampleMailer();
+        $this->assertNotNull($model->getTemporaryMailer());
+        $model->reset();
+        $this->assertNull($model->getTemporaryMailer());
+    }
 }
