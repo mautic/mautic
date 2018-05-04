@@ -24,10 +24,14 @@ class PopupController extends CommonController
         $assetsHelper = $this->factory->getHelper('template.assets');
         $assetsHelper->addStylesheet('/plugins/FCMNotificationBundle/Assets/css/popup/popup.css');
 
+        $this->integrationHelper = $this->get('mautic.helper.integration');       
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+
         $response = $this->render(
             'FCMNotificationBundle:Popup:index.html.php',
             [
                 'siteUrl' => $this->coreParametersHelper->getParameter('site_url'),
+                'icon'  => $integration->getIcon()
             ]
         );
 

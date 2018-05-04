@@ -27,10 +27,10 @@
         <div id="mobile-top-section-wrapper">
             <div id="mobile-top-section-content">
                 <div class="title domainName"><?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.title'); ?></div>
-                <p id="mobile-directions">wants to show notifications:</p>
+                <p id="mobile-directions"><?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.subtitle'); ?></p>
 
                 <div style="display: none;" id="mobile-notification">
-                    <img id="mobile-notification-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDY3IDc5LjE1Nzc0NywgMjAxNS8wMy8zMC0yMzo0MDo0MiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RDdBOEVEMjU3RTgwMTFFNUIzMjFCOUQ0QjUzN0Q0NDYiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RDdBOEVEMjY3RTgwMTFFNUIzMjFCOUQ0QjUzN0Q0NDYiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpDODdGODRDMDdEMTMxMUU1QjMyMUI5RDRCNTM3RDQ0NiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpEN0E4RUQyNDdFODAxMUU1QjMyMUI5RDRCNTM3RDQ0NiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pttyb1cAAACySURBVHja7N2xDUMhDEBBO0rJ33++SNkAJKqET1YwTYp7hUV9smtyzvmKiCtUqecG/OzHg0Wp7w9ucCg3bN5hAAECBAhQAAECBCiAAAECFECAAAEKIECAAAUQIECAAggQIEABBAgQoAACBAhQZ4CZSe4EcK1FzgkDBAhQAAECBAhQAAECBCiAAAECFECAAAEKIECAAAUQIECAAggQIEABBPivgA1Dufbc4x2+w6jWbwEGAJZEES0DZiYyAAAAAElFTkSuQmCC">
+                    <img id="mobile-notification-icon" src="<?php echo $siteUrl; ?>" width="80" height="80">
 
                     <p id="mobile-notification-title" class="truncatable long desktop message">Example Notification</p>
 
@@ -40,7 +40,7 @@
                 </div>
 
                 <div id="desktop-notification">
-                    <img id="desktop-notification-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDY3IDc5LjE1Nzc0NywgMjAxNS8wMy8zMC0yMzo0MDo0MiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RDdBOEVEMjU3RTgwMTFFNUIzMjFCOUQ0QjUzN0Q0NDYiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RDdBOEVEMjY3RTgwMTFFNUIzMjFCOUQ0QjUzN0Q0NDYiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpDODdGODRDMDdEMTMxMUU1QjMyMUI5RDRCNTM3RDQ0NiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpEN0E4RUQyNDdFODAxMUU1QjMyMUI5RDRCNTM3RDQ0NiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pttyb1cAAACySURBVHja7N2xDUMhDEBBO0rJ33++SNkAJKqET1YwTYp7hUV9smtyzvmKiCtUqecG/OzHg0Wp7w9ucCg3bN5hAAECBAhQAAECBCiAAAECFECAAAEKIECAAAUQIECAAggQIEABBAgQoAACBAhQZ4CZSe4EcK1FzgkDBAhQAAECBAhQAAECBCiAAAECFECAAAEKIECAAAUQIECAAggQIEABBPivgA1Dufbc4x2+w6jWbwEGAJZEES0DZiYyAAAAAElFTkSuQmCC">
+                    <img id="desktop-notification-icon" src="<?php echo $siteUrl; ?>" width="80" height="80">
 
                     <p id="x">x</p>
 

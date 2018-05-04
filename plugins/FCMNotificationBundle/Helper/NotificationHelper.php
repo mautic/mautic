@@ -176,9 +176,9 @@ MauticJS.conditionalAsyncQueue(function(){
         
         var fcmLandingPageEnabled = {$landingPageEnabled};
         var fcmTrackingPageEnabled = {$trackingPageEnabled};
-        if ((MauticJS.MauticDomain.replace(/https?:\/\//,'') == location.host && (fcmLandingPageEnabled || location == '{$notificationPopupUrl}'))
+        if ((MauticDomain.replace(/https?:\/\//,'') == location.host && (fcmLandingPageEnabled || location == '{$notificationPopupUrl}'))
             ||
-            (MauticJS.MauticDomain.replace(/https?:\/\//,'') != location.host && fcmTrackingPageEnabled) ){
+            (MauticDomain.replace(/https?:\/\//,'') != location.host && fcmTrackingPageEnabled) ){
 
             this.messaging.getToken().then(function(currentToken){
                 if (currentToken) {
