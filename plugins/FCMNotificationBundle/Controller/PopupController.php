@@ -27,11 +27,19 @@ class PopupController extends CommonController
         $this->integrationHelper = $this->get('mautic.helper.integration');       
         $integration = $this->integrationHelper->getIntegrationObject('FCM');
 
+        $settings          = $integration->getIntegrationSettings();
+        $features          = $settings->getSupportedFeatures();
+
+        var_dump($settings);
+        var_dump($features);
+
         $response = $this->render(
             'FCMNotificationBundle:Popup:index.html.php',
             [
                 'siteUrl' => $this->coreParametersHelper->getParameter('site_url'),
-                'icon'  => $integration->getIcon()
+                'icon'  => $integration->getIcon(),
+                'sampleNotificationTitle'  => $integration->getIcon(),
+                'sampleNotificationText'  => $integration->getIcon()
             ]
         );
 
