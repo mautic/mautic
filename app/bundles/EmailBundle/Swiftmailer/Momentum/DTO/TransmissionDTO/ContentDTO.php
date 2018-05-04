@@ -83,6 +83,13 @@ final class ContentDTO implements \JsonSerializable
      */
     public function addHeader($key, $value)
     {
+        if (in_array($key, [
+            'Content-Transfer-Encoding',
+            'MIME-Version',
+            'Subject',
+        ])) {
+            return $this;
+        }
         $this->headers[$key] = $value;
 
         return $this;
