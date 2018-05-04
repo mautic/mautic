@@ -177,7 +177,7 @@
 
     var timedStart = window.setInterval(function(){ 
         console.log('timedStart');
-        if (MauticJS){
+        if (typeof MauticJS != 'undefined'){
             console.log('timedStart ok');
             window.clearInterval(timedStart);
             MauticJS.conditionalAsyncQueue(function(){

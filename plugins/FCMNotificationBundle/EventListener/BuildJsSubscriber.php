@@ -127,14 +127,14 @@ setInterval(function(){
         MauticJS.conditionalAsyncQueue.queueRunning = true;
         var remainingItems = [];
         while (MauticJS.conditionalAsyncQueue.q.length > 0){
-            console.log("queue", MauticJS.conditionalAsyncQueue.q);
+            //console.log("queue", MauticJS.conditionalAsyncQueue.q);
             var queueItem = Array.prototype.shift.call(MauticJS.conditionalAsyncQueue.q);
             
-            console.log("queueItem", queueItem);
+            //console.log("queueItem", queueItem);
             
             var method = Array.prototype.shift.call(queueItem);
             var condition = Array.prototype.shift.call(queueItem);
-            console.log("method", method, 'arguments', queueItem);
+            //console.log("method", method, 'arguments', queueItem);
             if (condition && (((typeof condition === "function") && condition.apply(queueItem)) || eval(condition))){
                 method.apply(window,queueItem);
             }else{
