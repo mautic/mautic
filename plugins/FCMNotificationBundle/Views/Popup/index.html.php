@@ -26,7 +26,7 @@
     <div id="mobile-top-section">
         <div id="mobile-top-section-wrapper">
             <div id="mobile-top-section-content">
-                <div class="title domainName"><?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.this_website'); ?></div>
+                <div class="title domainName"><?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.title'); ?></div>
                 <p id="mobile-directions">wants to show notifications:</p>
 
                 <div style="display: none;" id="mobile-notification">
