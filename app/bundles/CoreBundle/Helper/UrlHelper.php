@@ -146,4 +146,75 @@ class UrlHelper
         /* absolute URL is ready! */
         return $scheme.'://'.$abs;
     }
+
+    /**
+     * Sanitize parts of the URL to make sure the URL query values are HTTP encoded.
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    public static function sanitizeAbsoluteUrl($url)
+    {
+        if (!$url) {
+            return $url;
+        }
+
+        $url = self::sanitizeUrlScheme($url);
+        $url = self::sanitizeUrlQuery($url);
+
+        return $url;
+    }
+
+    /**
+     * Make sure the URL has a scheme. Defaults to HTTP if not provided.
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    private static function sanitizeUrlScheme($url)
+    {
+        $isRelative = strpos($url, '//') === 0;
+
+        if ($isRelative) {
+            return $url;
+        }
+
+        $containSlashes = strpos($url, '://') !== false;
+
+        if (!$containSlashes) {
+            $url = sprintf('://%s', $url);
+        }
+
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+
+        // Set default scheme to http if missing
+        if (empty($scheme)) {
+            $url = sprintf('http%s', $url);
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private static function sanitizeUrlQuery($url)
+    {
+        $query = parse_url($url, PHP_URL_QUERY);
+
+        if (!empty($query)) {
+            parse_str($query, $parsedQuery);
+
+            if ($parsedQuery) {
+                $encodedQuery = http_build_query($parsedQuery);
+                $url          = str_replace($query, $encodedQuery, $url);
+            }
+        }
+
+        return $url;
+    }
 }

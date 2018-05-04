@@ -409,10 +409,7 @@ class TrackableModel extends AbstractCommonModel
                 continue;
             }
 
-            if ($preparedUrl = $this->prepareUrlForTracking($url)) {
-                list($urlKey, $urlValue) = $preparedUrl;
-                $trackableUrls[$urlKey]  = $urlValue;
-            }
+            $trackableUrls[$url] = $url;
         }
 
         return $trackableUrls;
@@ -588,13 +585,6 @@ class TrackableModel extends AbstractCommonModel
      */
     protected function validateTokenIsTrackable($token, $tokenizedHost = null)
     {
-        // Token as URL
-        if ($tokenizedHost && !preg_match('/^(\{\S+?\})$/', $tokenizedHost)) {
-            // Currently this does not apply to something like "{leadfield=firstname}.com" since that could result in URL per lead
-
-            return false;
-        }
-
         // Validate if this token is listed as not to be tracked
         if ($this->isInDoNotTrack($token)) {
             return false;
