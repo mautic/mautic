@@ -30,7 +30,7 @@
                 <p id="mobile-directions"><?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.subtitle'); ?></p>
 
                 <div style="display: none;" id="mobile-notification">
-                    <img id="mobile-notification-icon" src="<?php echo $siteUrl; ?>" width="80" height="80">
+                    <img id="mobile-notification-icon" src="<?php echo $icon; ?>" width="80" height="80">
 
                     <p id="mobile-notification-title" class="truncatable long desktop message"><?php echo $sampleNotificationTitle; ?></p>
 
@@ -40,7 +40,7 @@
                 </div>
 
                 <div id="desktop-notification">
-                    <img id="desktop-notification-icon" src="<?php echo $siteUrl; ?>" width="80" height="80">
+                    <img id="desktop-notification-icon" src="<?php echo $icon; ?>" width="80" height="80">
 
                     <p id="x">x</p>
 
