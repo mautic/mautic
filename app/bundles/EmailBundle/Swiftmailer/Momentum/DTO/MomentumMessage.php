@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO;
 
 use Mautic\EmailBundle\Helper\PlainTextMassageHelper;
+use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientDTO;
 
 /**
  * Class MomentumMessage.
@@ -105,20 +106,7 @@ final class MomentumMessage implements \JsonSerializable
     private function setRecipients(\Swift_Mime_Message $message)
     {
         foreach ($message->getTo() as $email => $name) {
-            $recipient = [
-                'address'           => $email,
-                'substitution_data' => [],
-                'metadata'          => [],
-            ];
-
-            // Apparently Sparkpost (legacy from Sparkpost implementation) doesn't like empty substitution_data or metadata
-            if (empty($recipient['substitution_data'])) {
-                unset($recipient['substitution_data']);
-            }
-            if (empty($recipient['metadata'])) {
-                unset($recipient['metadata']);
-            }
-
+            $recipient          = new RecipientDTO($email);
             $this->recipients[] = $recipient;
         }
     }

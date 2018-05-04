@@ -34,11 +34,6 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
      */
     public function transformToTransmission(\Swift_Mime_Message $message)
     {
-        $recipients = new TransmissionDTO\RecipientsDTO();
-        foreach ($message->getTo() as $email => $name) {
-            $address = new TransmissionDTO\RecipientsDTO\AddressDTO($email);
-            $recipients->addAddress($address);
-        }
         $messageFrom      = $message->getFrom();
         $messageFromEmail = current(array_keys($messageFrom));
         $from             = new TransmissionDTO\ContentDTO\FromDTO($messageFromEmail);
@@ -60,7 +55,10 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         if (!empty($messageText)) {
             $content->setText($messageText);
         }
-        $transmission = new TransmissionDTO($recipients, $content);
+        $transmission = new TransmissionDTO($content, 'noreply@mautic.com');
+        foreach ($message->getTo() as $email => $name) {
+            $transmission->addRecipient(new TransmissionDTO\RecipientDTO($email));
+        }
 
         return $transmission;
     }

@@ -66,6 +66,8 @@ final class MomentumFacade implements MomentumFacadeInterface
                 }
             }
         } catch (\Exception $exception) {
+            dump($exception);
+            exit;
             if ($exception instanceof SwiftMessageValidationException) {
                 throw $exception;
             }

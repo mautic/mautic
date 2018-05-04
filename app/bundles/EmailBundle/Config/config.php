@@ -373,7 +373,8 @@ return [
             'mautic.transport.momentum.adapter' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\Adapter::class,
                 'arguments' => [
-                    'mautic.transport.momentum.sparkpost',
+                    '%mautic.momentum_host%',
+                    '%mautic.momentum_api_key%',
                 ],
             ],
             'mautic.transport.momentum.service.swift_message' => [
@@ -410,12 +411,14 @@ return [
                 ],
                 'methodCalls' => [
                     'setOptions' => [
-                        'host'     => '%mautic.momentum_host%',
-                        'protocol' => '%mautic.momentum_protocol%',
-                        'port'     => '%mautic.momentum_port%',
-                        'key'      => '%mautic.momentum_api_key%',
-                        'version'  => '%mautic.momentum_version%',
-                        'async'    => '%mautic.momentum_async%',
+                        [
+                            'host'     => '%mautic.momentum_host%',
+                            'protocol' => '%mautic.momentum_protocol%',
+                            'port'     => '%mautic.momentum_port%',
+                            'key'      => '%mautic.momentum_api_key%',
+                            'version'  => '%mautic.momentum_version%',
+                            'async'    => '%mautic.momentum_async%',
+                        ],
                     ],
                 ],
             ],

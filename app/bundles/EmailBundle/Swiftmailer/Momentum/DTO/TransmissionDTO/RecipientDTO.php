@@ -2,12 +2,10 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 
-use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientsDTO\AddressDTO;
-
 /**
- * Class RecipientsDTO.
+ * Class RecipientDTO.
  */
-final class RecipientsDTO implements \JsonSerializable
+final class RecipientDTO implements \JsonSerializable
 {
     /**
      * @var string|null
@@ -15,9 +13,9 @@ final class RecipientsDTO implements \JsonSerializable
     private $returnPath = null;
 
     /**
-     * @var array
+     * @var string
      */
-    private $addresses = [];
+    private $address;
 
     /**
      * @var array
@@ -35,9 +33,19 @@ final class RecipientsDTO implements \JsonSerializable
     private $substitutionData = [];
 
     /**
+     * RecipientsDTO constructor.
+     *
+     * @param $address
+     */
+    public function __construct($address)
+    {
+        $this->address = $address;
+    }
+
+    /**
      * @param null|string $returnPath
      *
-     * @return RecipientsDTO
+     * @return RecipientDTO
      */
     public function setReturnPath($returnPath)
     {
@@ -47,22 +55,10 @@ final class RecipientsDTO implements \JsonSerializable
     }
 
     /**
-     * @param AddressDTO $address
-     *
-     * @return RecipientsDTO
-     */
-    public function addAddress(AddressDTO $address)
-    {
-        $this->addresses[] = $address;
-
-        return $this;
-    }
-
-    /**
      * @param string $key
      * @param string $value
      *
-     * @return RecipientsDTO
+     * @return RecipientDTO
      */
     public function addTag($key, $value)
     {
@@ -75,7 +71,7 @@ final class RecipientsDTO implements \JsonSerializable
      * @param string $key
      * @param mixed  $value
      *
-     * @return RecipientsDTO
+     * @return RecipientDTO
      */
     public function addMetadata($key, $value)
     {
@@ -103,7 +99,7 @@ final class RecipientsDTO implements \JsonSerializable
     public function jsonSerialize()
     {
         $json = [
-            'address' => $this->addresses,
+            'address' => $this->address,
         ];
         if (count($this->tags) !== 0) {
             $json['tags'] = $this->tags;

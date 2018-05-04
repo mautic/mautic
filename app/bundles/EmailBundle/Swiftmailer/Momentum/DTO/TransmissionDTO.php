@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\OptionsDTO;
-use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientsDTO;
+use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientDTO;
 
 /**
  * Class Mail.
@@ -17,9 +17,9 @@ final class TransmissionDTO implements \JsonSerializable
     private $options = null;
 
     /**
-     * @var RecipientsDTO
+     * @var RecipientDTO[]
      */
-    private $recipients;
+    private $recipients = [];
 
     /**
      * @var string|null
@@ -54,15 +54,27 @@ final class TransmissionDTO implements \JsonSerializable
     /**
      * TransmissionDTO constructor.
      *
-     * @param RecipientsDTO   $recipients
      * @param ContentDTO      $content
+     * @param string          $returnPath
      * @param OptionsDTO|null $options
      */
-    public function __construct(RecipientsDTO $recipients, ContentDTO $content, OptionsDTO $options = null)
+    public function __construct(ContentDTO $content, $returnPath, OptionsDTO $options = null)
     {
-        $this->recipients = $recipients;
         $this->content    = $content;
+        $this->returnPath = $returnPath;
         $this->options    = $options;
+    }
+
+    /**
+     * @param RecipientDTO $recipientDTO
+     *
+     * @return TransmissionDTO
+     */
+    public function addRecipient(RecipientDTO $recipientDTO)
+    {
+        $this->recipients[] = $recipientDTO;
+
+        return $this;
     }
 
     /**
@@ -72,11 +84,11 @@ final class TransmissionDTO implements \JsonSerializable
     {
         $json = [
             'return_path' => $this->returnPath,
-            'recipients'  => json_encode($this->recipients),
-            'content'     => json_encode($this->content),
+            'recipients'  => $this->recipients,
+            'content'     => $this->content,
         ];
         if ($this->options !== null) {
-            $json['options'] = json_encode($this->options);
+            $json['options'] = $this->options;
         }
         if ($this->campaignId !== null) {
             $json['campaign_id'] = $this->campaignId;

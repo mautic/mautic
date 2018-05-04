@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Adapter;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
-use SparkPost\SparkPost;
 use SparkPost\SparkPostPromise;
 
 /**
@@ -12,18 +11,25 @@ use SparkPost\SparkPostPromise;
 final class Adapter implements AdapterInterface
 {
     /**
-     * @var SparkPost
+     * @var string
      */
-    private $sparkpost;
+    private $host;
 
     /**
-     * MomentumAdapter constructor.
-     *
-     * @param SparkPost $momentumSparkpost
+     * @var string
      */
-    public function __construct(Sparkpost $momentumSparkpost)
+    private $apiKey;
+
+    /**
+     * Adapter constructor.
+     *
+     * @param string $host
+     * @param string $apiKey
+     */
+    public function __construct($host, $apiKey)
     {
-        $this->sparkpost = $momentumSparkpost;
+        $this->host   = $host;
+        $this->apiKey = $apiKey;
     }
 
     /**
@@ -33,9 +39,18 @@ final class Adapter implements AdapterInterface
      */
     public function createTransmission(TransmissionDTO $transmissionDTO)
     {
-        dump($this->sparkpost);
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($transmissionDTO));
+        curl_setopt($curl, CURLOPT_URL, 'http://'.$this->host.'/v1/transmissions');
+        $headers = [
+            'Content-Type'  => 'application/json',
+            'Authorization' => $this->apiKey,
+        ];
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        $result = curl_exec($curl);
+        curl_close($curl);
+        echo $result;
         exit;
-
-        return $this->sparkpost->transmissions->post(json_encode($transmissionDTO));
     }
 }
