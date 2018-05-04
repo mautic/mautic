@@ -200,7 +200,7 @@ MauticJS.conditionalAsyncQueue(function(){
             console.log('message arrived to open site', payload);
         });
 }, function(){
-    return firebase?true:false;
+    return (typeof firebase !== 'undefined' && firebase)?true:false;
 });    
 JS;
                 
