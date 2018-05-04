@@ -47,7 +47,12 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         $headers = $message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
-            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT) {
+            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT &&
+                !in_array($header->getFieldType(), [
+                'Content-Transfer-Encoding',
+                'MIME-Version',
+                'Subject',
+            ])) {
                 $content->addHeader($header->getFieldName(), $header->getFieldBodyModel());
             }
         }
