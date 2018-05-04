@@ -133,8 +133,7 @@ class FCMIntegration extends AbstractIntegration
                 'sample_notification_text',
                 TextType::class,
                 [
-                    'label'    => 'mautic.plugin.integration.form.features.sample_notification_text',
-                    'tooltip'  => '',
+                    'label'    => 'mautic.plugin.integration.form.features.sample_notification_text',                    
                     'required' => false,
                     'attr'     => [
                         'class' => 'form-control',
@@ -148,8 +147,7 @@ class FCMIntegration extends AbstractIntegration
                 'welcome_notification_title',
                 TextType::class,
                 [
-                    'label'    => 'mautic.plugin.integration.form.features.welcome_notification_title',
-                    'tooltip'  => '',
+                    'label'    => 'mautic.plugin.integration.form.features.welcome_notification_title',                    
                     'required' => false,
                     'attr'     => [
                         'class' => 'form-control',
