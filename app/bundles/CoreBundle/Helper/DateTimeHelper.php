@@ -397,11 +397,8 @@ class DateTimeHelper
     public static function validateMysqlDateTimeUnit($unit)
     {
         $possibleUnits   = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
-        $timeUnitInArray = array_filter($possibleUnits, function ($possibleUnit) use ($unit) {
-            return $unit === $possibleUnit;
-        });
 
-        if (!$timeUnitInArray) {
+        if (!in_array($unit, $possibleUnits, true)) {
             $possibleUnitsString = implode(', ', $possibleUnits);
             throw new \InvalidArgumentException("Unit '$unit' is not supported. Use one of these: $possibleUnitsString");
         }
