@@ -118,17 +118,22 @@ class NotificationHelper
             $publicVapidKey     = $keys['publicVapidKey'];
             
             $welcomenotificationEnabled = in_array('welcome_notification_enabled', $supported);
+            $landingPageEnabled = in_array('landing_page_enabled', $supported);
+            $trackingPageEnabled = in_array('tracking_page_enabled', $supported);
+
+
             
+
             $leadAssociationUrl         = $this->router->generate(
                 'mautic_subscribe_notification',
                 [],
                 UrlGeneratorInterface::ABSOLUTE_URL
             );
-
-            $welcomenotificationText = '';
-        
+               
             $server        = $this->request->getCurrentRequest()->server;
             $https         = (parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME) == 'https') ? true : false;                        
+
+
 
             $fcmInit = <<<JS
 var scrpt = document.createElement('link');
@@ -162,42 +167,48 @@ MauticJS.conditionalAsyncQueue(function(){
         MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}', data);
     };
         
-        this.messaging.getToken().then(function(currentToken){
-            if (currentToken) {
-                MauticJS.postUserIdToMautic(currentToken);          
-            } else {
-                this.messaging.requestPermission().then(function() {
-                    this.messaging.getToken().then(function(currentToken){
-                        if (currentToken) {
-                            MauticJS.postUserIdToMautic(currentToken);          
-                        }
-                    });
-                }).catch(function(err) {
-                    console.log('Unable to get permission to notify.', err);
-                });          
-            }
-        }).catch(function(err) {
-            console.log('An error occurred while retrieving token. ', err);        
-        });
-        
-        
-        // Just to be sure we've grabbed the ID
-        window.onbeforeunload = function() {
+        var fcmLandingPageEnabled = {$landingPageEnabled};
+        var fcmTrackingPageEnabled = {$trackingPageEnabled};
+        if ((MauticJS.MauticDomain.replace(/https?:\/\//,'') == location.host && fcmLandingPageEnabled)
+            ||
+            (MauticJS.MauticDomain.replace(/https?:\/\//,'') != location.host && fcmTrackingPageEnabled) ){
+
             this.messaging.getToken().then(function(currentToken){
                 if (currentToken) {
                     MauticJS.postUserIdToMautic(currentToken);          
-                } 
-            });        
-        };
-        
-        this.messaging.onTokenRefresh(function() {
-            this.messaging.getToken().then(function(refreshedToken) {
-                MauticJS.postUserIdToMautic(refreshedToken);         
+                } else {
+                    this.messaging.requestPermission().then(function() {
+                        this.messaging.getToken().then(function(currentToken){
+                            if (currentToken) {
+                                MauticJS.postUserIdToMautic(currentToken);          
+                            }
+                        });
+                    }).catch(function(err) {
+                        console.log('Unable to get permission to notify.', err);
+                    });          
+                }
             }).catch(function(err) {
-                console.log('Unable to retrieve refreshed token ', err);            
+                console.log('An error occurred while retrieving token. ', err);        
             });
-        });
-
+        
+            // Just to be sure we've grabbed the ID
+            window.onbeforeunload = function() {
+                this.messaging.getToken().then(function(currentToken){
+                    if (currentToken) {
+                        MauticJS.postUserIdToMautic(currentToken);          
+                    } 
+                });        
+            };
+            
+            this.messaging.onTokenRefresh(function() {
+                this.messaging.getToken().then(function(refreshedToken) {
+                    MauticJS.postUserIdToMautic(refreshedToken);         
+                }).catch(function(err) {
+                    console.log('Unable to retrieve refreshed token ', err);            
+                });
+            });
+        }
+          
         messaging.onMessage(function(payload){
             console.log('message arrived to open site', payload);
         });

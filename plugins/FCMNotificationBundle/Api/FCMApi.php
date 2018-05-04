@@ -17,6 +17,7 @@ use Mautic\NotificationBundle\Exception\MissingApiKeyException;
 use Mautic\NotificationBundle\Exception\MissingProjectIDException;
 use Mautic\NotificationBundle\Exception\MissingMessagingSenderIdException;
 use Mautic\NotificationBundle\Exception\MissingPublicVapidKeyException;
+use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 
 class FCMApi extends AbstractNotificationApi
 {

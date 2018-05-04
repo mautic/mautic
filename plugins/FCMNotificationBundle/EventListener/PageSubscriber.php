@@ -63,6 +63,10 @@ class PageSubscriber extends CommonSubscriber
         $settings          = $integrationObject->getIntegrationSettings();
         $features          = $settings->getSupportedFeatures();
     
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+    
         $script = '';
         if (!in_array('landing_page_enabled', $features)) {
             $script = 'var disable_fcm_notification = true;';

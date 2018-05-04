@@ -116,29 +116,6 @@
 
     </div>
 </div>
-<? /*
-<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-messaging.js"></script>
-<script>
-  // Initialize Firebase
-  var config = {
-    apiKey: "{TODO: ADD API KEY HERE!!!}",
-    authDomain: "{projectId}.firebaseapp.com",
-    databaseURL: "https://{projectId}.firebaseio.com",
-    projectId: "{projectId}",
-    storageBucket: "",
-    messagingSenderId: "{messagingSenderId}"
-  };
-  firebase.initializeApp(config);
-
-  const messaging = firebase.messaging();
-  messaging.usePublicVapidKey("{TODO: ADD API KEY HERE!!!}");
-
-  messaging.onMessage(function(payload){
-    console.log('message arrived to service worker', payload);
-  });
-</script>
-*/ ?>
 <script>
     (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
         w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
@@ -175,13 +152,10 @@
     var engine = result.engine.name;
 
 
-    var timedStart = window.setInterval(function(){ 
-        console.log('timedStart');
+    var timedStart = window.setInterval(function(){         
         if (typeof MauticJS != 'undefined'){
-            console.log('timedStart ok');
             window.clearInterval(timedStart);
-            MauticJS.conditionalAsyncQueue(function(){
-                console.log('setup');
+            MauticJS.conditionalAsyncQueue(function(){                
                 if ((browser == "Chrome" && parseInt(browser_version.substring(0, 2)) >= 50) || (browser == "Firefox" && parseInt(browser_version.substring(0, 2)) >= 44) || (browser == "Opera" && parseInt(browser_version.substring(0, 2)) >= 37));
                 else if (os == "iOS")
                     showError("ios");
@@ -243,8 +217,7 @@
                     }
                 }
 
-                function showError(error) {
-                    console.log('showerror', error);
+                function showError(error) {                    
                     // put a white overlay over all existing content
                     // this also disables all functionality
                     document.getElementById("white-wrapper").style.zIndex = "10";
@@ -253,8 +226,7 @@
                     document.getElementById("error-box").style.display = "block";
                     document.getElementById(error).style.display = "block";
                 }
-            }, function(){
-                console.log(typeof firebase, typeof messaging, ((typeof firebase !== 'undefined' && firebase) && (typeof messaging !== 'undefined' && messaging)));
+            }, function(){                
                 return ((typeof firebase !== 'undefined' && firebase) && (typeof messaging !== 'undefined' && messaging))?true:false;
             });
         }    
