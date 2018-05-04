@@ -254,7 +254,7 @@
                     document.getElementById(error).style.display = "block";
                 }
             }, function(){
-                console.log(firebase, messaging);
+                console.log((typeof firebase, typeof messaging);
                 return ((typeof firebase !== 'undefined' && firebase) && (typeof messaging !== 'undefined' && messaging))?true:false;
             });
         }    
