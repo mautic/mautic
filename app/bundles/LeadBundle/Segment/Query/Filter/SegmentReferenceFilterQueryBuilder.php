@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 
@@ -84,6 +85,8 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             $segmentIds = [intval($segmentIds)];
         }
 
+        $orLogic = [];
+
         foreach ($segmentIds as $segmentId) {
             $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
 
@@ -120,11 +123,15 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addSelect($segmentAlias.'.id as '.$segmentAlias.'_id');
 
                 if (!$exclusion && count($segmentIds) > 1) {
-                    $queryBuilder->addLogic($expression, 'or');
+                    $orLogic[] = $expression;
                 } else {
                     $queryBuilder->addLogic($expression, $filter->getGlue());
                 }
             }
+        }
+
+        if (count($orLogic)) {
+            $queryBuilder->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $orLogic));
         }
 
         return $queryBuilder;
