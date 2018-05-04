@@ -129,7 +129,14 @@ class NotificationHelper
                 [],
                 UrlGeneratorInterface::ABSOLUTE_URL
             );
-               
+              
+            $notificationPopupUrl         = $this->router->generate(
+                'mautic_notification_popup',
+                [],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ); 
+            
+
             $server        = $this->request->getCurrentRequest()->server;
             $https         = (parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME) == 'https') ? true : false;                        
 
@@ -169,7 +176,7 @@ MauticJS.conditionalAsyncQueue(function(){
         
         var fcmLandingPageEnabled = {$landingPageEnabled};
         var fcmTrackingPageEnabled = {$trackingPageEnabled};
-        if ((MauticJS.MauticDomain.replace(/https?:\/\//,'') == location.host && fcmLandingPageEnabled)
+        if ((MauticJS.MauticDomain.replace(/https?:\/\//,'') == location.host && (fcmLandingPageEnabled || location == '{$notificationPopupUrl}')
             ||
             (MauticJS.MauticDomain.replace(/https?:\/\//,'') != location.host && fcmTrackingPageEnabled) ){
 
