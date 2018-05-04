@@ -141,7 +141,7 @@ setInterval(function(){
                 remainingItems.push([method, condition])                
             }            
         }
-        console.log(remainingItems);
+        //console.log(remainingItems);
         MauticJS.conditionalAsyncQueue.q = remainingItems;
         MauticJS.conditionalAsyncQueue.queueRunning = false;
     }
