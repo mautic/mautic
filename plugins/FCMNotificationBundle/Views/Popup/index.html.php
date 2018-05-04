@@ -96,7 +96,7 @@
 
         <!-- if notifications are already enabled -->
         <div class="error" id="notifications-already-enabled">
-            <p> <?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.error_already_enabled', array("siteUrl" => $siteUrl)); ?> </p>
+            <p style="font-size: 12px"> <?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.error_already_enabled', array("%siteUrl%" => $siteUrl)); ?> </p>
         </div>
 
     </div>
