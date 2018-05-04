@@ -115,6 +115,10 @@ $container->loadFromExtension('liip_functional_test', [
     'cache_sqlite_db' => true,
 ]);
 
+// Enable api by default
+$container->setParameter('mautic.api_enabled', true);
+$container->setParameter('mautic.api_enable_basic_auth', true);
+
 $loader->import('security_test.php');
 
 // Allow overriding config without a requiring a full bundle or hacks

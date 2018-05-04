@@ -884,6 +884,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             return [0, 0, []];
         }
 
+        // Doesn't make sense to send unpublished emails. Probably a user error.
+        // @todo throw an exception in Mautic 3 here.
+        if (!$email->isPublished()) {
+            return [0, 0, []];
+        }
+
         $options = [
             'source'        => ['email', $email->getId()],
             'allowResends'  => false,
