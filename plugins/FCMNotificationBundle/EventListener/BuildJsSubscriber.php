@@ -149,6 +149,7 @@ setInterval(function(){
 
 // Process pageviews after new are added
 document.addEventListener('eventAddedToMauticQueue', function(e) {
+    console.log('eventAddedToMauticQueue',e);
     if (e.detail[0] == 'fcmAsyncFunc' && typeof e.detail[1] === 'function'){
         e.detail[1].apply(window);
     }
