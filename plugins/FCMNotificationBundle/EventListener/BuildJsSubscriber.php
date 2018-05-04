@@ -119,16 +119,16 @@ MauticJS.notification = {
 
 MauticJS.documentReady(MauticJS.notification.init);
 
-MauticJS.asyncQueue = MauticJS.asyncQueue || function(){ (MauticJS.asyncQueue.q=MauticJS.asyncQueue.q || [] ).push(arguments)};;
+MauticJS.conditionalAsyncQueue = MauticJS.conditionalAsyncQueue || function(){ (MauticJS.conditionalAsyncQueue.q=MauticJS.conditionalAsyncQueue.q || [] ).push(arguments)};;
 
 setInterval(function(){                         
-    console.log("jiaq queue processor running");
-    if (MauticJS.asyncQueue && MauticJS.asyncQueue.q && !MauticJS.asyncQueue.queueRunning){
-        MauticJS.asyncQueue.queueRunning = true;
+    //console.log("jiaq queue processor running");
+    if (MauticJS.conditionalAsyncQueue && MauticJS.conditionalAsyncQueue.q && !MauticJS.conditionalAsyncQueue.queueRunning){
+        MauticJS.conditionalAsyncQueue.queueRunning = true;
         var remainingItems = [];
-        while (MauticJS.asyncQueue.q.length > 0){
-            console.log("queue", MauticJS.asyncQueue.q);
-            var queueItem = Array.prototype.shift.call(MauticJS.asyncQueue.q);
+        while (MauticJS.conditionalAsyncQueue.q.length > 0){
+            console.log("queue", MauticJS.conditionalAsyncQueue.q);
+            var queueItem = Array.prototype.shift.call(MauticJS.conditionalAsyncQueue.q);
             
             console.log("queueItem", queueItem);
             
@@ -142,10 +142,17 @@ setInterval(function(){
             }            
         }
         console.log(remainingItems);
-        MauticJS.asyncQueue.q = remainingItems;
-        MauticJS.asyncQueue.queueRunning = false;
+        MauticJS.conditionalAsyncQueue.q = remainingItems;
+        MauticJS.conditionalAsyncQueue.queueRunning = false;
     }
 }, 1000);    
+
+// Process pageviews after new are added
+document.addEventListener('eventAddedToMauticQueue', function(e) {
+    if (e.detail[0] == 'fcmAsyncFunc' && typeof e.detail[1] === 'function'){
+        e.detail[1].apply(window);
+    }
+});
 
 JS;
 

@@ -139,7 +139,7 @@ head.appendChild(scrpt);
 
 
 //using queue might be necessary
-MauticJS.asyncQueue(function(){
+MauticJS.conditionalAsyncQueue(function(){
     var config = {
         apiKey: "{$apiKey}",
         authDomain: "{$projectId}.firebaseapp.com",

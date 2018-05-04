@@ -174,78 +174,82 @@
     var os = result.os.name;
     var engine = result.engine.name;
 
-    
-MauticJS.asyncQueue(function(){
-    if ((browser == "Chrome" && parseInt(browser_version.substring(0, 2)) >= 50) || (browser == "Firefox" && parseInt(browser_version.substring(0, 2)) >= 44) || (browser == "Opera" && parseInt(browser_version.substring(0, 2)) >= 37));
-    else if (os == "iOS")
-        showError("ios");
-    else if (browser != "Chrome") {
-        if (os == "Android")
-            showError("not-chrome-Android");
-        else
-            showError("not-chrome-desktop");
-    } // TODO: Show generic error if SDK reports push notifications not supported.
-    else { // They are on Chrome
-        if (parseInt(browser_version.substring(0, 2)) < 42) // Check Chrome version
-            showError(detectmob() ? "outdated-chrome-mobile" : "outdated-chrome-desktop");
-        else if (isHttpsPrompt) {
-            if (!isPushEnabled) {
-                if (isPermissionBlocked)
+
+mt('asyncFunc', function(){
+    MauticJS.conditionalAsyncQueue(function(){
+        if ((browser == "Chrome" && parseInt(browser_version.substring(0, 2)) >= 50) || (browser == "Firefox" && parseInt(browser_version.substring(0, 2)) >= 44) || (browser == "Opera" && parseInt(browser_version.substring(0, 2)) >= 37));
+        else if (os == "iOS")
+            showError("ios");
+        else if (browser != "Chrome") {
+            if (os == "Android")
+                showError("not-chrome-Android");
+            else
+                showError("not-chrome-desktop");
+        } // TODO: Show generic error if SDK reports push notifications not supported.
+        else { // They are on Chrome
+            if (parseInt(browser_version.substring(0, 2)) < 42) // Check Chrome version
+                showError(detectmob() ? "outdated-chrome-mobile" : "outdated-chrome-desktop");
+            else if (isHttpsPrompt) {
+                if (!isPushEnabled) {
+                    if (isPermissionBlocked)
+                        showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
+                } else
+                    showError("notifications-already-enabled");
+            } else { // HTTP
+                if (Notification.permission == "denied") // Check if the Notification permission is disabled.
                     showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-            } else
-                showError("notifications-already-enabled");
-        } else { // HTTP
+                else if (Notification.permission == "granted") {
+                    navigator.serviceWorker.ready.then(function (event) {
+                        if (event) {
+                            this.messaging.getToken().then(function(currentToken) {
+                                if (currentToken) {
+                                  showError("notifications-already-enabled");
+                                } else {
+                                  
+                                }
+                            }).catch(function(err) {
+                                console.log('An error occurred while retrieving token. ', err);                            
+                            });
+                        }
+                    });
+                }
+            }
+        }
+
+        if (!isHttpsPrompt) {
             if (Notification.permission == "denied") // Check if the Notification permission is disabled.
                 showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
             else if (Notification.permission == "granted") {
-                navigator.serviceWorker.ready.then(function (event) {
-                    if (event) {
-                        this.messaging.getToken().then(function(currentToken) {
-                            if (currentToken) {
-                              showError("notifications-already-enabled");
-                            } else {
-                              
-                            }
-                        }).catch(function(err) {
-                            console.log('An error occurred while retrieving token. ', err);                            
-                        });
+                this.messaging.getToken().then(function(currentToken) {
+                    if (currentToken) {
+                      showError("notifications-already-enabled");
+                    } else {
+                      
                     }
-                });
+                }).catch(function(err) {
+                    console.log('An error occurred while retrieving token. ', err);                            
+                });            
+            }
+        } else {
+            if (isPermissionBlocked) // Check if the Notification permission is disabled.
+                showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
+            else if (isPushEnabled) {
+                showError("notifications-already-enabled");
             }
         }
-    }
 
-    if (!isHttpsPrompt) {
-        if (Notification.permission == "denied") // Check if the Notification permission is disabled.
-            showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-        else if (Notification.permission == "granted") {
-            this.messaging.getToken().then(function(currentToken) {
-                if (currentToken) {
-                  showError("notifications-already-enabled");
-                } else {
-                  
-                }
-            }).catch(function(err) {
-                console.log('An error occurred while retrieving token. ', err);                            
-            });            
+        function showError(error) {
+            // put a white overlay over all existing content
+            // this also disables all functionality
+            document.getElementById("white-wrapper").style.zIndex = "10";
+            document.getElementById("white-wrapper").style.opacity = ".75";
+            document.getElementById("error-box").style.opacity = "1";
+            document.getElementById("error-box").style.display = "block";
+            document.getElementById(error).style.display = "block";
         }
-    } else {
-        if (isPermissionBlocked) // Check if the Notification permission is disabled.
-            showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-        else if (isPushEnabled) {
-            showError("notifications-already-enabled");
-        }
-    }
-
-    function showError(error) {
-        // put a white overlay over all existing content
-        // this also disables all functionality
-        document.getElementById("white-wrapper").style.zIndex = "10";
-        document.getElementById("white-wrapper").style.opacity = ".75";
-        document.getElementById("error-box").style.opacity = "1";
-        document.getElementById("error-box").style.display = "block";
-        document.getElementById(error).style.display = "block";
-    }
+    }, function(){
+        return firebase?true:false;
+    });
 });
 
 </script>
