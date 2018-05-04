@@ -174,86 +174,90 @@
     var os = result.os.name;
     var engine = result.engine.name;
 
-console.log('start mt asyncFunc');
-mt('asyncFunc', function(){
-    console.log('mt asyncFunc');
-    MauticJS.conditionalAsyncQueue(function(){
-        console.log('setup');
-        if ((browser == "Chrome" && parseInt(browser_version.substring(0, 2)) >= 50) || (browser == "Firefox" && parseInt(browser_version.substring(0, 2)) >= 44) || (browser == "Opera" && parseInt(browser_version.substring(0, 2)) >= 37));
-        else if (os == "iOS")
-            showError("ios");
-        else if (browser != "Chrome") {
-            if (os == "Android")
-                showError("not-chrome-Android");
-            else
-                showError("not-chrome-desktop");
-        } // TODO: Show generic error if SDK reports push notifications not supported.
-        else { // They are on Chrome
-            if (parseInt(browser_version.substring(0, 2)) < 42) // Check Chrome version
-                showError(detectmob() ? "outdated-chrome-mobile" : "outdated-chrome-desktop");
-            else if (isHttpsPrompt) {
-                if (!isPushEnabled) {
-                    if (isPermissionBlocked)
-                        showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-                } else
-                    showError("notifications-already-enabled");
-            } else { // HTTP
-                if (Notification.permission == "denied") // Check if the Notification permission is disabled.
-                    showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-                else if (Notification.permission == "granted") {
-                    navigator.serviceWorker.ready.then(function (event) {
-                        if (event) {
-                            this.messaging.getToken().then(function(currentToken) {
-                                if (currentToken) {
-                                  showError("notifications-already-enabled");
-                                } else {
-                                  
+
+    var timedStart = window.setInterval(function(){ 
+        console.log('timedStart');
+        if (MauticJS){
+            console.log('timedStart ok');
+            window.clearInterval(timedStart);
+            MauticJS.conditionalAsyncQueue(function(){
+                console.log('setup');
+                if ((browser == "Chrome" && parseInt(browser_version.substring(0, 2)) >= 50) || (browser == "Firefox" && parseInt(browser_version.substring(0, 2)) >= 44) || (browser == "Opera" && parseInt(browser_version.substring(0, 2)) >= 37));
+                else if (os == "iOS")
+                    showError("ios");
+                else if (browser != "Chrome") {
+                    if (os == "Android")
+                        showError("not-chrome-Android");
+                    else
+                        showError("not-chrome-desktop");
+                } // TODO: Show generic error if SDK reports push notifications not supported.
+                else { // They are on Chrome
+                    if (parseInt(browser_version.substring(0, 2)) < 42) // Check Chrome version
+                        showError(detectmob() ? "outdated-chrome-mobile" : "outdated-chrome-desktop");
+                    else if (isHttpsPrompt) {
+                        if (!isPushEnabled) {
+                            if (isPermissionBlocked)
+                                showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
+                        } else
+                            showError("notifications-already-enabled");
+                    } else { // HTTP
+                        if (Notification.permission == "denied") // Check if the Notification permission is disabled.
+                            showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
+                        else if (Notification.permission == "granted") {
+                            navigator.serviceWorker.ready.then(function (event) {
+                                if (event) {
+                                    this.messaging.getToken().then(function(currentToken) {
+                                        if (currentToken) {
+                                          showError("notifications-already-enabled");
+                                        } else {
+                                          
+                                        }
+                                    }).catch(function(err) {
+                                        console.log('An error occurred while retrieving token. ', err);                            
+                                    });
                                 }
-                            }).catch(function(err) {
-                                console.log('An error occurred while retrieving token. ', err);                            
                             });
                         }
-                    });
-                }
-            }
-        }
-
-        if (!isHttpsPrompt) {
-            if (Notification.permission == "denied") // Check if the Notification permission is disabled.
-                showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-            else if (Notification.permission == "granted") {
-                this.messaging.getToken().then(function(currentToken) {
-                    if (currentToken) {
-                      showError("notifications-already-enabled");
-                    } else {
-                      
                     }
-                }).catch(function(err) {
-                    console.log('An error occurred while retrieving token. ', err);                            
-                });            
-            }
-        } else {
-            if (isPermissionBlocked) // Check if the Notification permission is disabled.
-                showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-            else if (isPushEnabled) {
-                showError("notifications-already-enabled");
-            }
-        }
+                }
 
-        function showError(error) {
-            console.log('showerror', error);
-            // put a white overlay over all existing content
-            // this also disables all functionality
-            document.getElementById("white-wrapper").style.zIndex = "10";
-            document.getElementById("white-wrapper").style.opacity = ".75";
-            document.getElementById("error-box").style.opacity = "1";
-            document.getElementById("error-box").style.display = "block";
-            document.getElementById(error).style.display = "block";
-        }
-    }, function(){
-        return firebase?true:false;
-    });
-});
+                if (!isHttpsPrompt) {
+                    if (Notification.permission == "denied") // Check if the Notification permission is disabled.
+                        showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
+                    else if (Notification.permission == "granted") {
+                        this.messaging.getToken().then(function(currentToken) {
+                            if (currentToken) {
+                              showError("notifications-already-enabled");
+                            } else {
+                              
+                            }
+                        }).catch(function(err) {
+                            console.log('An error occurred while retrieving token. ', err);                            
+                        });            
+                    }
+                } else {
+                    if (isPermissionBlocked) // Check if the Notification permission is disabled.
+                        showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
+                    else if (isPushEnabled) {
+                        showError("notifications-already-enabled");
+                    }
+                }
+
+                function showError(error) {
+                    console.log('showerror', error);
+                    // put a white overlay over all existing content
+                    // this also disables all functionality
+                    document.getElementById("white-wrapper").style.zIndex = "10";
+                    document.getElementById("white-wrapper").style.opacity = ".75";
+                    document.getElementById("error-box").style.opacity = "1";
+                    document.getElementById("error-box").style.display = "block";
+                    document.getElementById(error).style.display = "block";
+                }
+            }, function(){
+                return firebase?true:false;
+            });
+        }    
+    },1000);
 
 </script>
 </body></html>
