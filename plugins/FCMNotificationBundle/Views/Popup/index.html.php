@@ -32,9 +32,9 @@
                 <div style="display: none;" id="mobile-notification">
                     <img id="mobile-notification-icon" src="<?php echo $siteUrl; ?>" width="80" height="80">
 
-                    <p id="mobile-notification-title" class="truncatable long desktop message">Example Notification</p>
+                    <p id="mobile-notification-title" class="truncatable long desktop message"><?php echo $sampleNotificationTitle; ?></p>
 
-                    <p id="mobile-notification-message" class="truncatable short desktop message">Notifications will appear on your device</p>
+                    <p id="mobile-notification-message" class="truncatable short desktop message"><?php echo $sampleNotificationText; ?><</p>
 
                     <p id="mobile-notification-url" class="truncatable short desktop message"><?php echo $siteUrl; ?></p>
                 </div>
@@ -44,14 +44,14 @@
 
                     <p id="x">x</p>
 
-                    <p id="desktop-notification-title" class="truncatable mobile message">This is an example notification</p>
+                    <p id="desktop-notification-title" class="truncatable mobile message"><?php echo $sampleNotificationTitle; ?><</p>
 
-                    <p id="desktop-notification-message" class="truncatable mobile message">Notifications will appear on your desktop</p>
+                    <p id="desktop-notification-message" class="truncatable mobile message"><?php echo $sampleNotificationText; ?><</p>
 
                     <p id="desktop-notification-url" class="truncatable mobile message"><?php echo $siteUrl; ?></p>
                 </div>
 
-                <p id="mobile-opt-out" class="truncatable opt-out message">(you can unsubscribe anytime in your browser settings)</p>
+                <p id="mobile-opt-out" class="truncatable opt-out message">(<?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.unsubscribetext'); ?>)</p>
             </div>
         </div>
     </div>
@@ -61,57 +61,42 @@
 
         <!-- if on ios -->
         <div class="error" id="ios">
-            <p> Web Push Notifications are not supported by iOS. </p>
+            <p> <?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.error_ios'); ?> </p>
         </div>
 
         <!-- if not on chrome (Desktop) -->
         <div class="error" id="not-chrome-desktop">
-            <p> Web Push Notifications are not supported by your browser. Please install
-                <a class="default-link" href="https://www.google.com/chrome/browser/desktop" target="_blank">Chrome</a> to get
-                notifications. </p>
+            <p> <?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.error_notsupported'); ?> </p>
         </div>
 
         <!-- if not on chrome (Android) -->
         <div class="error" id="not-chrome-Android">
-            <p> Please install Chrome web browser to get notifications. </p>
-
-            <p><a class="default-link" href="https://play.google.com/store/apps/details?id=com.android.chrome">Tap here</a> to
-                download from the Google Play Store.</p>
+            <p> <?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.error_install_chrome'); ?></p>
         </div>
 
         <!-- not have latest version of chrome (desktop) -->
         <div class="error" id="outdated-chrome-desktop">
-            <p> Please update your Chrome web browser to get notifications. </p>
+            <p> <?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.error_update'); ?> </p>
         </div>
 
         <!-- not have latest version of chrome (mobile) -->
         <div class="error" id="outdated-chrome-mobile">
-            <p> Please update your Chrome web browser to get notifications. </p>
-
-            <p><a class="default-link" href="https://play.google.com/store/apps/details?id=com.android.chrome">Tap here</a> to
-                download from the Google Play Store.</p>
+           <?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.error_update'); ?>
         </div>
 
         <!-- if notifications are disabled (desktop)-->
         <div class="error" id="disabled-notifications-desktop">
-            <p> Notifications are currently disabled.</p>
-
-            <p>Please re-enable them by clicking on the lock icon in the top left of this window. </p>
+            <p> <?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.error_disabled_desktop'); ?> </p>
         </div>
 
         <!-- if notifications are disabled (mobile) -->
         <div class="error" id="disabled-notifications-mobile">
-            <p> Notifications are currently disabled.</p>
-
-            <p>Please re-enable them by tapping on the lock icon on the top left. </p>
+            <p> <?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.error_disabled_mobile'); ?> </p>
         </div>
 
         <!-- if notifications are already enabled -->
         <div class="error" id="notifications-already-enabled">
-            <p> Notifications are already enabled, you may close this window. </p>
-
-            <p style="font-size: 12px">If you would like to unsubscribe from all notifications from
-                <span class="domainName"><?php echo $siteUrl; ?></span> click on the lock icon to the left of the address. </p>
+            <p> <?php echo $view['translator']->trans('mautic.plugin.fcmnotification.popup.error_already_enabled', array("siteUrl" => $siteUrl)); ?> </p>
         </div>
 
     </div>

@@ -57,6 +57,7 @@ class FCMIntegration extends AbstractIntegration
             'landing_page_enabled',
             'welcome_notification_enabled',
             'tracking_page_enabled',
+            ''
         ];
     }
 
@@ -113,19 +114,67 @@ class FCMIntegration extends AbstractIntegration
     {
         if ($formArea == 'features') {
             /* @var FormBuilder $builder */
-            /*                    
-            $builder->add(
-                'subdomain_name',
+            
+             $builder->add(
+                'sample_notification_title',
                 TextType::class,
                 [
-                    'label'    => 'mautic.notification.form.subdomain_name.label',
+                    'label'    => 'mautic.plugin.integration.form.features.sample_notification_title',                    
                     'required' => false,
                     'attr'     => [
                         'class' => 'form-control',
+                        'tooltip'      => 'mautic.plugin.integration.form.features.sample_notification_title.toolip',
+                        'data-show-on' => '{"integration_details_supportedFeatures_2":"checked"}',
                     ],
                 ]
             );
 
+            $builder->add(
+                'sample_notification_text',
+                TextType::class,
+                [
+                    'label'    => 'mautic.plugin.integration.form.features.sample_notification_text',
+                    'tooltip'  => '',
+                    'required' => false,
+                    'attr'     => [
+                        'class' => 'form-control',
+                        'tooltip'      => 'mautic.plugin.integration.form.features.sample_notification_text.toolip',
+                        'data-show-on' => '{"integration_details_supportedFeatures_2":"checked"}',
+                    ],
+                ]
+            );
+
+            $builder->add(
+                'welcome_notification_title',
+                TextType::class,
+                [
+                    'label'    => 'mautic.plugin.integration.form.features.welcome_notification_title',
+                    'tooltip'  => '',
+                    'required' => false,
+                    'attr'     => [
+                        'class' => 'form-control',
+                        'tooltip'      => 'mautic.plugin.integration.form.features.welcome_notification_title.toolip',
+                        'data-show-on' => '{"integration_details_supportedFeatures_1":"checked"}',
+                    ],
+                ]
+            );
+
+            $builder->add(
+                'welcome_notification_text',
+                TextType::class,
+                [
+                    'label'    => 'mautic.plugin.integration.form.features.welcome_notification_text',                    
+                    'required' => false,
+                    'attr'     => [
+                        'class' => 'form-control',
+                        'tooltip'      => 'mautic.plugin.integration.form.features.welcome_notification_text.toolip',
+                        'data-show-on' => '{"integration_details_supportedFeatures_1":"checked"}',
+                    ],
+                ]
+            );
+
+            
+            /*
             $builder->add(
                 'platforms',
                 ChoiceType::class,
