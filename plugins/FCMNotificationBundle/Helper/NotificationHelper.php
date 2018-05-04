@@ -148,9 +148,11 @@ MauticJS.conditionalAsyncQueue(function(){
         storageBucket: "",
         messagingSenderId: "{$messagingSenderId}"
       };
+      console.log('firebase.initializeApp');
       firebase.initializeApp(config);
-
+      
       this.messaging = firebase.messaging();
+      console.log('messaging');
       //this.messaging.usePublicVapidKey("{$publicVapidKey}");      
 
 
