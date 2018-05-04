@@ -1211,9 +1211,9 @@ class PageModel extends FormModel
     {
         foreach ($query as $key => $value) {
             if (filter_var($value, FILTER_VALIDATE_URL)) {
-                $query[$value] = InputHelper::url($value);
+                $query[$key] = InputHelper::url($value);
             } else {
-                $query[$value] = InputHelper::clean($value);
+                $query[$key] = InputHelper::clean($value);
             }
         }
 
