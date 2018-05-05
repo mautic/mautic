@@ -110,7 +110,7 @@ $formId = $form->getId();
                     <?php echo $view['date']->toFull($item['dateSubmitted']); ?>
                     <?php endif; ?>
                 </td>
-                <td><?php echo $item['ipAddress']['ipAddress']; ?></td>
+                <td><?php echo $item['ipAddress']; ?></td>
                 <?php foreach ($item['results'] as $key => $r): ?>
                     <?php $isTextarea = $r['type'] === 'textarea'; ?>
                     <td <?php echo $isTextarea ? 'class="long-text"' : ''; ?>>
