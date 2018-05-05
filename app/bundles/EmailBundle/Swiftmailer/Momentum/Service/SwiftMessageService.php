@@ -66,7 +66,7 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
             $content->setText($messageText);
         }
 
-        $returnPath   = $message->getReplyTo() ? $message->getReplyTo() : $messageFromEmail;
+        $returnPath   = $message->getReturnPath() ? $message->getReturnPath() : $messageFromEmail;
         $transmission = new TransmissionDTO($content, $returnPath);
 
         foreach ($message->getTo() as $email => $name) {
