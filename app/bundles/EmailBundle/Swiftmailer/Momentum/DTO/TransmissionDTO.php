@@ -32,16 +32,6 @@ final class TransmissionDTO implements \JsonSerializable
     private $description = null;
 
     /**
-     * @var array
-     */
-    private $metadata = [];
-
-    /**
-     * @var array
-     */
-    private $substitutionData = [];
-
-    /**
      * @var string
      */
     private $returnPath;
@@ -95,12 +85,6 @@ final class TransmissionDTO implements \JsonSerializable
         }
         if ($this->description !== null) {
             $json['description'] = $this->description;
-        }
-        if (count($this->metadata) !== 0) {
-            $json['metadata'] = $this->metadata;
-        }
-        if (count($this->substitutionData) !== 0) {
-            $json['substitution_data'] = $this->substitutionData;
         }
 
         return $json;

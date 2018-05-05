@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Swiftmailer\Momentum\Service;
 
 use Mautic\EmailBundle\Helper\PlainTextMassageHelper;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Metadata\MetadataProcessor;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -41,11 +42,14 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
             $from->setName($messageFrom[$messageFromEmail]);
         }
         $content = new TransmissionDTO\ContentDTO($message->getSubject(), $from);
-        if (!empty($message->getBody())) {
-            $content->setHtml($message->getBody());
-        }
-        $headers = $message->getHeaders()->getAll();
 
+        $metadataProcessor = new MetadataProcessor($message);
+
+        if ($body = $message->getBody()) {
+            $content->setHtml($body);
+        }
+
+        $headers = $message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
             if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT &&
@@ -57,13 +61,22 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
                 $content->addHeader($header->getFieldName(), $header->getFieldBodyModel());
             }
         }
-        $messageText = PlainTextMassageHelper::getPlainTextFromMessage($message);
-        if (!empty($messageText)) {
+
+        if ($messageText = PlainTextMassageHelper::getPlainTextFromMessage($message)) {
             $content->setText($messageText);
         }
-        $transmission = new TransmissionDTO($content, 'noreply@mautic.com');
+
+        $returnPath   = $message->getReplyTo() ? $message->getReplyTo() : $messageFromEmail;
+        $transmission = new TransmissionDTO($content, $returnPath);
+
         foreach ($message->getTo() as $email => $name) {
-            $transmission->addRecipient(new TransmissionDTO\RecipientDTO($email));
+            $recipientDTO = new TransmissionDTO\RecipientDTO(
+                $email,
+                $metadataProcessor->getMetadata($email),
+                $metadataProcessor->getSubstitutionData($email)
+            );
+
+            $transmission->addRecipient($recipientDTO);
         }
 
         return $transmission;

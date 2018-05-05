@@ -33,13 +33,17 @@ final class RecipientDTO implements \JsonSerializable
     private $substitutionData = [];
 
     /**
-     * RecipientsDTO constructor.
+     * RecipientDTO constructor.
      *
-     * @param $address
+     * @param       $address
+     * @param array $metadata
+     * @param array $substitutionData
      */
-    public function __construct($address)
+    public function __construct($address, $metadata = [], $substitutionData = [])
     {
-        $this->address = $address;
+        $this->address          = $address;
+        $this->metadata         = $metadata;
+        $this->substitutionData = $substitutionData;
     }
 
     /**
