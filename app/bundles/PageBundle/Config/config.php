@@ -280,9 +280,6 @@ return [
                     'setCatInUrl' => [
                         '%mautic.cat_in_page_url%',
                     ],
-                    'setTrackByFingerprint' => [
-                        '%mautic.track_by_fingerprint%',
-                    ],
                 ],
             ],
             'mautic.page.model.redirect' => [
@@ -327,7 +324,7 @@ return [
         'google_analytics'      => false,
         'track_contact_by_ip'   => false,
         'track_by_fingerprint'  => false,
-        'track_by_tracking_url' => true,
+        'track_by_tracking_url' => false,
         'redirect_list_types'   => [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',

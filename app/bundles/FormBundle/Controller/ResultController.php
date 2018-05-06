@@ -124,6 +124,7 @@ class ResultController extends CommonFormController
                 'form'           => $form,
                 'withTotalCount' => true,
                 'viewOnlyFields' => $viewOnlyFields,
+                'simpleResults'  => true,
             ]
         );
 
