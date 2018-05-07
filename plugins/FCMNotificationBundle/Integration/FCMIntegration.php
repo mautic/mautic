@@ -117,21 +117,14 @@ class FCMIntegration extends AbstractIntegration
         if ($formArea == 'keys') {
             $builder->add(
                 'service_account_json',
-                FileType::class,
+                TextAreaType::class,
                 [
                     'label' => 'mautic.plugin.fcmnotification.config.form.notification.service_account',
                     'attr'  => [
                         'tooltip' => 'mautic.plugin.fcmnotification.config.form.notification.service_account.tooltip',
+                        'rows'    => 10,
                     ],
-                    'required' => true,
-                    'constraints' => [
-                        new File(
-                            [
-                                'mimeTypes'        => ['application/json','text/plain'],
-                                'mimeTypesMessage' => 'mautic.core.invalid_file_type',
-                            ]
-                        ),
-                    ],
+                    'required' => true                    
                 ]
             );            
         }
