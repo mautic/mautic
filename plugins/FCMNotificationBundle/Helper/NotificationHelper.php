@@ -243,6 +243,8 @@ JS;
             $landingPage = false;
         }
 
+        var_dump($landingPage);
+
         $integration = $this->integrationHelper->getIntegrationObject('FCM');
 
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
@@ -250,6 +252,7 @@ JS;
         }
 
         $supportedFeatures = $integration->getIntegrationSettings()->getSupportedFeatures();
+        var_dump($supportedFeatures);
 
         // disable on Landing pages
         if ($landingPage === true && !in_array('landing_page_enabled', $supportedFeatures)) {
