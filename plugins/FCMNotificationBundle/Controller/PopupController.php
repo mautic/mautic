@@ -29,9 +29,9 @@ class PopupController extends CommonController
 
         $settings          = $integration->getIntegrationSettings();
         $features          = $settings->getSupportedFeatures();
-        $data           = $integration->getFormSettings();
+        $featureSettings   = $integration->getFeatureSettings();
         
-        var_dump($features,$data);
+        var_dump($features,featureSettings);
 
         $response = $this->render(
             'FCMNotificationBundle:Popup:index.html.php',
