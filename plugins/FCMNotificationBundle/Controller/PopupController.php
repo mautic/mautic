@@ -91,9 +91,9 @@ class PopupController extends CommonController
         $rq = new Request($serviceAccount,$validate_only,$client);
         try{
             //Use the request to submit the message
-            //$message->send($rq);
+            $message->send($rq);
             //You can force the validate_only flag via the validate method, the request will be left intact
-            $message->validate($rq);
+            //$message->validate($rq);
         }
         /** Catch all the exceptions @see https://firebase.google.com/docs/reference/fcm/rest/v1/ErrorCode **/
         //Like this
