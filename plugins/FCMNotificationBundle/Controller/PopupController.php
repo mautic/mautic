@@ -84,9 +84,9 @@ class PopupController extends CommonController
 
         $message->setTarget(new Token('dj_BwvWGX2Y:APA91bF2QavspU0jW6-0FiLwloqIQXm6gnnsTo30U9tgSEsTw1Qdu9P0GW8qCaIAT7CyQ_3byyM7NBNLQjl038T_p94Q2iSR4QTko-W4sGwtcfnEzXu08UyvgeDZpamGuvlbM4QYhGFm'));
 
-        $client = new Client(['debug'=>true]);
+        $client = new Client(['debug'=>false]);
         //If true the validate_only is set to true the message will not be submitted but just checked with FCM
-        $validate_only = true;
+        $validate_only = false;
         //Create a request
         $rq = new Request($serviceAccount,$validate_only,$client);
         try{
