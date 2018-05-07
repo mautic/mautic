@@ -547,6 +547,7 @@ return [
                 'arguments' => [
                     'mautic.factory',
                     'mailer',
+                    'mautic.email.entity.email_header.validator',
                 ],
             ],
             'mautic.helper.plain_text_message' => [
@@ -636,6 +637,9 @@ return [
                     'mautic.validator.email',
                 ],
                 'tag' => 'validator.constraint_validator',
+            ],
+            'mautic.email.entity.email_header.validator' => [
+                'class' => \Mautic\EmailBundle\Entity\EmailHeader\EmailHeaderValidator::class,
             ],
         ],
     ],
