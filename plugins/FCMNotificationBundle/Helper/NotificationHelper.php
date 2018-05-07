@@ -159,12 +159,10 @@ MauticJS.conditionalAsyncQueue(function(){
         projectId: "{$projectId}",
         storageBucket: "",
         messagingSenderId: "{$messagingSenderId}"
-      };
-      console.log('firebase.initializeApp');
+      };      
       firebase.initializeApp(config);
       
-      this.messaging = firebase.messaging();
-      console.log('messaging');
+      this.messaging = firebase.messaging();      
       //this.messaging.usePublicVapidKey("{$publicVapidKey}");      
 
 
@@ -175,12 +173,11 @@ MauticJS.conditionalAsyncQueue(function(){
     };
         
         var fcmLandingPageEnabled = {$landingPageEnabled};
-        var fcmTrackingPageEnabled = {$trackingPageEnabled};
-        console.log('fcmLandingPageEnabled',fcmLandingPageEnabled, 'fcmTrackingPageEnabled',fcmTrackingPageEnabled, MauticDomain.replace(/https?:\/\//,''), location.host, location, '{$notificationPopupUrl}')
+        var fcmTrackingPageEnabled = {$trackingPageEnabled};        
         if ((MauticDomain.replace(/https?:\/\//,'') == location.host && (fcmLandingPageEnabled || location == '{$notificationPopupUrl}'))
             ||
             (MauticDomain.replace(/https?:\/\//,'') != location.host && fcmTrackingPageEnabled) ){
-            console.log('IGEN');
+            
             this.messaging.getToken().then(function(currentToken){
                 if (currentToken) {
                     MauticJS.postUserIdToMautic(currentToken);          

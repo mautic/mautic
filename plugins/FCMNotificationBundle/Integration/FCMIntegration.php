@@ -111,6 +111,45 @@ class FCMIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
+        /*
+        if ($formArea == 'integration') {
+            $builder->add(
+                'ios_media',
+                FileType::class,
+                [
+                    'label' => 'mautic.notification.form.mobile.ios_media',
+                    'attr'  => [
+                        'tooltip' => 'mautic.notification.form.mobile.ios_media.tooltip',
+                    ],
+                    'required' => false,
+                ]
+            );
+
+            $builder->add(
+                'saml_idp_metadata',
+                ConfigFileType::class,
+                [
+                    'label'      => 'mautic.user.config.form.saml.idp.metadata',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.user.config.form.saml.idp.metadata.tooltip',
+                        'rows'    => 10,
+                    ],
+                    'required'    => false,
+                    'constraints' => [
+                        new File(
+                            [
+                                'mimeTypes'        => ['text/plain', 'text/xml', 'application/xml'],
+                                'mimeTypesMessage' => 'mautic.core.invalid_file_type',
+                            ]
+                        ),
+                    ],
+                ]
+            );
+        }
+        */
+
         if ($formArea == 'features') {
             /* @var FormBuilder $builder */
             
