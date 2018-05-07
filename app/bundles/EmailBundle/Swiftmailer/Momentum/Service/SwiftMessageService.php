@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Service;
 
 use Mautic\EmailBundle\Helper\PlainTextMassageHelper;
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Metadata\MetadataProcessor;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -66,17 +67,70 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
             $content->setText($messageText);
         }
 
+        if ($message instanceof MauticMessage) {
+            foreach ($message->getAttachments() as $attachment) {
+                if (file_exists($attachment['filePath']) && is_readable($attachment['filePath'])) {
+                    try {
+                        $swiftAttachment = \Swift_Attachment::fromPath($attachment['filePath']);
+
+                        if (!empty($attachment['fileName'])) {
+                            $swiftAttachment->setFilename($attachment['fileName']);
+                        }
+
+                        if (!empty($attachment['contentType'])) {
+                            $swiftAttachment->setContentType($attachment['contentType']);
+                        }
+
+                        if (!empty($attachment['inline'])) {
+                            $swiftAttachment->setDisposition('inline');
+                        }
+                        $attachmentContent = $swiftAttachment->getEncoder()->encodeString($swiftAttachment->getBody());
+                        $attachment        = new TransmissionDTO\ContentDTO\AttachementDTO(
+                            $swiftAttachment->getContentType(),
+                            $swiftAttachment->getFilename(),
+                            $attachmentContent
+                        );
+                        $content->addAttachment($attachment);
+                    } catch (\Exception $e) {
+                        error_log($e);
+                    }
+                }
+            }
+        }
+
         $returnPath   = $message->getReturnPath() ? $message->getReturnPath() : $messageFromEmail;
         $transmission = new TransmissionDTO($content, $returnPath);
 
+        $ccRecipients = [];
         foreach ($message->getTo() as $email => $name) {
-            $recipientDTO = new TransmissionDTO\RecipientDTO(
-                $email,
-                $metadataProcessor->getMetadata($email),
-                $metadataProcessor->getSubstitutionData($email)
-            );
+            $ccRecipients[$email] = $name;
+        }
+        if ($message->getCc() !== null) {
+            foreach ($message->getCc() as $email => $name) {
+                $ccRecipients[$email] = $name;
+            }
+        }
+        $bccRecipients = [];
+        if ($message->getBcc() !== null) {
+            $bccRecipients = $message->getBcc();
+        }
 
-            $transmission->addRecipient($recipientDTO);
+        $recipientsGrouped = [
+            'cc'  => $ccRecipients,
+            'bcc' => $bccRecipients,
+        ];
+        foreach ($recipientsGrouped as $group => $recipients) {
+            $isBcc = ($group === 'bcc');
+            foreach ($recipients as $email => $name) {
+                $addressDTO   = new TransmissionDTO\RecipientDTO\AddressDTO($email, $name, $isBcc);
+                $recipientDTO = new TransmissionDTO\RecipientDTO(
+                    $addressDTO,
+                    $metadataProcessor->getMetadata($email),
+                    $metadataProcessor->getSubstitutionData($email)
+                );
+
+                $transmission->addRecipient($recipientDTO);
+            }
         }
 
         return $transmission;

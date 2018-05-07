@@ -2,6 +2,8 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 
+use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientDTO\AddressDTO;
+
 /**
  * Class RecipientDTO.
  */
@@ -13,7 +15,7 @@ final class RecipientDTO implements \JsonSerializable
     private $returnPath = null;
 
     /**
-     * @var string
+     * @var AddressDTO
      */
     private $address;
 
@@ -35,13 +37,13 @@ final class RecipientDTO implements \JsonSerializable
     /**
      * RecipientDTO constructor.
      *
-     * @param       $address
-     * @param array $metadata
-     * @param array $substitutionData
+     * @param AddressDTO $addressDTO
+     * @param array      $metadata
+     * @param array      $substitutionData
      */
-    public function __construct($address, $metadata = [], $substitutionData = [])
+    public function __construct(AddressDTO $addressDTO, $metadata = [], $substitutionData = [])
     {
-        $this->address          = $address;
+        $this->address          = $addressDTO;
         $this->metadata         = $metadata;
         $this->substitutionData = $substitutionData;
     }

@@ -33,7 +33,9 @@ final class Adapter implements AdapterInterface
      */
     public function createTransmission(TransmissionDTO $transmissionDTO)
     {
-        return $this->momentumSparkpost->transmissions->post(json_decode(json_encode($transmissionDTO), true));
+        $payload = json_decode(json_encode($transmissionDTO), true);
+
+        return $this->momentumSparkpost->transmissions->post($payload);
         /*$curl = curl_init();
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($transmissionDTO));

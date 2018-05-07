@@ -26,12 +26,26 @@ final class SparkpostFactory implements SparkpostFactoryInterface
     }
 
     /**
+     * @param string $host
      * @param string $apiKey
      *
      * @return SparkPost
      */
-    public function create($apiKey)
+    public function create($host, $apiKey)
     {
-        return new SparkPost($this->client, ['key' => $apiKey]);
+        if ((strpos($host, '://') === false && substr($host, 0, 1) != '/')) {
+            $host = 'https://'.$host;
+        }
+        $hostInfo = parse_url($host);
+        if ($hostInfo) {
+            return new SparkPost($this->client, [
+                'host'     => $hostInfo['host'].$hostInfo['path'],
+                'protocol' => $hostInfo['scheme'],
+                'port'     => $hostInfo['scheme'] === 'https' ? 443 : 80,
+                'key'      => $apiKey,
+            ]);
+        } else {
+            // problem :/
+        }
     }
 }

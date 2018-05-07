@@ -10,9 +10,10 @@ use SparkPost\SparkPost;
 interface SparkpostFactoryInterface
 {
     /**
+     * @param string $host
      * @param string $apiKey
      *
      * @return SparkPost
      */
-    public function create($apiKey);
+    public function create($host, $apiKey);
 }

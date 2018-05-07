@@ -413,19 +413,8 @@ return [
                 'class'     => \SparkPost\SparkPost::class,
                 'factory'   => ['@mautic.sparkpost.factory', 'create'],
                 'arguments' => [
+                    '%mautic.mailer_host%',
                     '%mautic.mailer_api_key%',
-                ],
-                'methodCalls' => [
-                    'setOptions' => [
-                        [
-                            'host'     => '%mautic.mailer_host%',
-                            //'protocol' => '%mautic.momentum_protocol%',
-                            //'port'     => '%mautic.momentum_port%',
-                            'key'      => '%mautic.mailer_api_key%',
-                            //'version'  => '%mautic.momentum_version%',
-                            //'async'    => '%mautic.momentum_async%',
-                        ],
-                    ],
                 ],
             ],
             'mautic.transport.sendgrid' => [
