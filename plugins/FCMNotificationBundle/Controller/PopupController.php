@@ -66,9 +66,8 @@ class PopupController extends CommonController
         $keys        = $integration->getDecryptedApiKeys();
 
 
-        //-- Init the service account --//
-        var_dump($keys['service_account_json']);
-        $sa = new ServiceAccount($keys['service_account_json']);
+        //-- Init the service account --//        
+        $serviceAccount = new ServiceAccount($keys['service_account_json']);
 
         $message = new Message();
 
@@ -89,7 +88,7 @@ class PopupController extends CommonController
         //If true the validate_only is set to true the message will not be submitted but just checked with FCM
         $validate_only = true;
         //Create a request
-        $rq = new Request($sa,$validate_only,$client);
+        $rq = new Request($serviceAccount,$validate_only,$client);
         try{
             //Use the request to submit the message
             $message->send($rq);
@@ -116,6 +115,7 @@ class PopupController extends CommonController
             //HTTP response error
             $response = $e->getResponse();
             echo 'Got an http response error:',$response->getStatusCode(),':',$response->getReasonPhrase();
+            var_dump($response);
         }
         catch(GuzzleException $e){
             //GuzzleHttp generic error
