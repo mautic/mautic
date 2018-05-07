@@ -29,8 +29,7 @@ class PopupController extends CommonController
 
         $settings          = $integration->getIntegrationSettings();
         $features          = $settings->getSupportedFeatures();
-
-        var_dump($settings);
+        
         var_dump($features);
 
         $response = $this->render(
