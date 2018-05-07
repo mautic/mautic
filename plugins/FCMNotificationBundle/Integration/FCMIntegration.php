@@ -111,44 +111,29 @@ class FCMIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        /*
+        
         if ($formArea == 'integration') {
             $builder->add(
-                'ios_media',
+                'service_account_json',
                 FileType::class,
                 [
-                    'label' => 'mautic.notification.form.mobile.ios_media',
+                    'label' => 'mautic.plugin.fcmnotification.config.form.notification.service_account',
                     'attr'  => [
-                        'tooltip' => 'mautic.notification.form.mobile.ios_media.tooltip',
+                        'tooltip' => 'mautic.plugin.fcmnotification.config.form.notification.service_account.tooltip',
                     ],
-                    'required' => false,
-                ]
-            );
-
-            $builder->add(
-                'saml_idp_metadata',
-                ConfigFileType::class,
-                [
-                    'label'      => 'mautic.user.config.form.saml.idp.metadata',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.user.config.form.saml.idp.metadata.tooltip',
-                        'rows'    => 10,
-                    ],
-                    'required'    => false,
+                    'required' => true,
                     'constraints' => [
                         new File(
                             [
-                                'mimeTypes'        => ['text/plain', 'text/xml', 'application/xml'],
+                                'mimeTypes'        => ['application/json'],
                                 'mimeTypesMessage' => 'mautic.core.invalid_file_type',
                             ]
                         ),
                     ],
                 ]
-            );
+            );            
         }
-        */
+        
 
         if ($formArea == 'features') {
             /* @var FormBuilder $builder */
