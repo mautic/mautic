@@ -29,17 +29,15 @@ class PopupController extends CommonController
 
         $settings          = $integration->getIntegrationSettings();
         $features          = $settings->getSupportedFeatures();
-        $featureSettings   = $settings->getFeatureSettings();
-        
-        var_dump($features,$featureSettings);
+        $featureSettings   = $settings->getFeatureSettings();        
 
         $response = $this->render(
             'FCMNotificationBundle:Popup:index.html.php',
             [
                 'siteUrl' => $this->coreParametersHelper->getParameter('site_url'),
                 'icon'  => $integration->getIcon(),
-                'sampleNotificationTitle'  => $integration->getIcon(),
-                'sampleNotificationText'  => $integration->getIcon()
+                'sampleNotificationTitle'  => $featureSettings['sample_notification_title'],
+                'sampleNotificationText'  => $featureSettings['sample_notification_text']
             ]
         );
 
