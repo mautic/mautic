@@ -121,7 +121,8 @@ class FCMIntegration extends AbstractIntegration
                     'label' => 'mautic.plugin.fcmnotification.config.form.notification.service_account',
                     'attr'  => [
                         'tooltip' => 'mautic.plugin.fcmnotification.config.form.notification.service_account.tooltip',
-                        'rows'    => 10,
+                        'class' => 'form-control editor editor-basic',
+                        'rows'    => 15,
                     ],
                     'required' => true                    
                 ]
