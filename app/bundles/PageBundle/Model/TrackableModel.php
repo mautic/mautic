@@ -409,7 +409,10 @@ class TrackableModel extends AbstractCommonModel
                 continue;
             }
 
-            $trackableUrls[$url] = $url;
+            if ($preparedUrl = $this->prepareUrlForTracking($url)) {
+                list($urlKey, $urlValue) = $preparedUrl;
+                $trackableUrls[$urlKey]  = $urlValue;
+            }
         }
 
         return $trackableUrls;
@@ -438,7 +441,7 @@ class TrackableModel extends AbstractCommonModel
             }
         }
 
-        // Any tokens could potentially be a URL so extract and send through  prepareUrlForTracking() which will determine
+        // Any tokens could potentially be a URL so extract and send through prepareUrlForTracking() which will determine
         // if it's a valid URL or not
         if (preg_match_all('/{.*?}/i', $text, $matches)) {
             foreach ($matches[0] as $url) {
@@ -505,28 +508,15 @@ class TrackableModel extends AbstractCommonModel
             return false;
         }
 
-        // Extract any tokens that are part of the query
-        $tokenizedParams = $this->extractTokensFromQuery($urlParts);
-
         // Check if URL is trackable
         $tokenizedHost = (!isset($urlParts['host']) && isset($urlParts['path'])) ? $urlParts['path'] : $urlParts['host'];
         if (preg_match('/^(\{\S+?\})/', $tokenizedHost, $match)) {
             $token = $match[1];
 
-            // Tokenized hosts shouldn't use a scheme since the token value should contain it
-            if ($scheme = (!empty($urlParts['scheme'])) ? $urlParts['scheme'] : false) {
-                // Token has a schema so let's get rid of it before replacing tokens
-                $this->contentReplacements['first_pass'][$scheme.'://'.$tokenizedHost] = $tokenizedHost;
-                unset($urlParts['scheme']);
-            }
-
             // Validate that the token is something that can be trackable
             if (!$this->validateTokenIsTrackable($token, $tokenizedHost)) {
                 return false;
             }
-
-            $trackableUrl = (!empty($urlParts['query'])) ? $this->contentTokens[$token].'?'.$urlParts['query'] : $this->contentTokens[$token];
-            $trackableKey = $trackableUrl;
 
             // Replace the URL token with the actual URL
             $this->contentReplacements['first_pass'][$url] = $trackableUrl;
@@ -536,20 +526,6 @@ class TrackableModel extends AbstractCommonModel
 
             if ($this->isInDoNotTrack($trackableUrl)) {
                 return false;
-            }
-        }
-
-        // Append tokenized params to the end of the URL as these will not be part of the stored redirect URL
-        // They'll be passed through as regular parameters outside the trackable token
-        // For example, {trackable=123}?foo={bar}
-        if ($tokenizedParams) {
-            // The URL to be tokenized is without the tokenized parameters
-            $trackableKey = $trackableUrl.($this->usingClickthrough || (strpos($trackableUrl, '?') !== false) ? '&' : '?').
-                $this->httpBuildQuery($tokenizedParams);
-
-            // Replace the original URL with the updated URL before replacing with tokens
-            if ($trackableKey !== $url) {
-                $this->contentReplacements['first_pass'][$url] = $trackableKey;
             }
         }
 
@@ -591,7 +567,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Validate that the token is available and is a URL
-        if (!isset($this->contentTokens[$token]) || !$this->isValidUrl($this->contentTokens[$token])) {
+        if (!isset($this->contentTokens[$token])) {
             return false;
         }
 
