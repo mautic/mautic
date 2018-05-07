@@ -255,7 +255,9 @@ JS;
             [],
             UrlGeneratorInterface::ABSOLUTE_URL
         ); 
-                
+        
+        var_dump($landingPage, $supportedFeatures, $notificationPopupUrl, $server->get('HTTP_REFERER'), strpos($server->get('HTTP_REFERER'), $notificationPopupUrl));
+
         // disable on Landing pages
         if ($landingPage === true && !in_array('landing_page_enabled', $supportedFeatures)) {
             return false;
