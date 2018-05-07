@@ -61,10 +61,13 @@ class PopupController extends CommonController
     }
 
     public function testAction(){
+        $this->integrationHelper = $this->get('mautic.helper.integration');       
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+        $keys        = $integration->getDecryptedApiKeys();
+
+
         //-- Init the service account --//
-        $sa = new ServiceAccount('');
-
-
+        $sa = new ServiceAccount($keys['service_account_json']);
 
         $message = new Message();
 
