@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\FCMNotificationBundle\Exception;
 
-class MissingPublicVapidKeyException extends \Exception
+class MissingServiceAccountJsonException extends \Exception
 {
-    protected $message = 'Missing FireBase Cloud Messaging public Vapid Key';
+    protected $message = 'Missing FireBase Cloud Messaging Service Account json';
 }

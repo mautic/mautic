@@ -16,7 +16,7 @@ use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Exception\MissingApiKeyException;
 use Mautic\NotificationBundle\Exception\MissingProjectIDException;
 use Mautic\NotificationBundle\Exception\MissingMessagingSenderIdException;
-use Mautic\NotificationBundle\Exception\MissingPublicVapidKeyException;
+use Mautic\NotificationBundle\Exception\MissingServiceAccountJsonException;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 
 class FCMApi extends AbstractNotificationApi
@@ -28,7 +28,7 @@ class FCMApi extends AbstractNotificationApi
     protected $apiKey = '';
     protected $projectId = '';
     protected $messagingSenderId = '';
-    protected $publicVapidKey = '';
+    protected $serviceAccount = '';
 
     public function __construct() {
         $this->apiKeys    = $this->integrationHelper->getIntegrationObject('FCM')->getKeys();
@@ -51,10 +51,10 @@ class FCMApi extends AbstractNotificationApi
             throw new MissingMessagingSenderIdException();   
         }
 
-        if (!empty($this->apiKeys['publicVapidKey'])){
-            $this->publicVapidKey      = $this->apiKeys['publicVapidKey'];    
+        if (!empty($this->apiKeys['service_account_json'])){
+            $this->serviceAccount      = $this->apiKeys['service_account_json'];    
         }else{
-            throw new MissingPublicVapidKeyException();   
+            throw new MissingServiceAccountJsonException();   
         }
 
         $this->apiUrlBase = "https://fcm.googleapis.com/v1/projects/{$this->projectId}/messages";

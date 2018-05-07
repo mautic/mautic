@@ -62,7 +62,6 @@ class JsController extends CommonController
         $apiKey             = $keys['apiKey'];
         $projectId          = $keys['projectId'];
         $messagingSenderId  = $keys['messagingSenderId'];
-        $publicVapidKey     = $keys['publicVapidKey'];
 
         return new Response(
             "//importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js');

@@ -115,7 +115,6 @@ class NotificationHelper
             $apiKey             = $keys['apiKey'];
             $projectId          = $keys['projectId'];
             $messagingSenderId  = $keys['messagingSenderId'];
-            $publicVapidKey     = $keys['publicVapidKey'];
             
             $welcomenotificationEnabled = intval(in_array('welcome_notification_enabled', $supported));
             $landingPageEnabled = intval(in_array('landing_page_enabled', $supported));
@@ -162,8 +161,7 @@ MauticJS.conditionalAsyncQueue(function(){
       };      
       firebase.initializeApp(config);
       
-      this.messaging = firebase.messaging();      
-      //this.messaging.usePublicVapidKey("{$publicVapidKey}");      
+      this.messaging = firebase.messaging();            
 
 
     MauticJS.postUserIdToMautic = function(userId) {
