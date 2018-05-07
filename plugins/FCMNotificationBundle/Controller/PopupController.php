@@ -67,6 +67,7 @@ class PopupController extends CommonController
 
 
         //-- Init the service account --//
+        var_dump($keys['service_account_json']);
         $sa = new ServiceAccount($keys['service_account_json']);
 
         $message = new Message();
