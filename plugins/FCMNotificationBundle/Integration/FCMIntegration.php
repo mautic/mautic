@@ -127,7 +127,7 @@ class FCMIntegration extends AbstractIntegration
                     'constraints' => [
                         new File(
                             [
-                                'mimeTypes'        => ['application/json'],
+                                'mimeTypes'        => ['application/json','text/plain'],
                                 'mimeTypesMessage' => 'mautic.core.invalid_file_type',
                             ]
                         ),
