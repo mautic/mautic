@@ -57,7 +57,7 @@ class ReportGraphEvent extends AbstractReportEvent
      * Set the graph array.
      *
      * @param string $graph
-     * @param array  $data  prepared for this chart
+     * @param array  $data prepared for this chart
      */
     public function setGraph($graph, $data)
     {
