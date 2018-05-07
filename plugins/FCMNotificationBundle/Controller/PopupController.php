@@ -129,5 +129,9 @@ class PopupController extends CommonController
             echo 'Got an http error:',$e->getMessage();
         }
 
+        $response = $this->render(
+            'FCMNotificationBundle:Popup:index.html.php'
+        );
+        return $response->setContent($content);
     }
 }

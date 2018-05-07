@@ -197,7 +197,7 @@ return [
             'mautic_notification_test' => [
                 'path'       => '/notificationTest',
                 'controller' => 'FCMNotificationBundle:Popup:test',
-            ],
+            ], 
 
             // JS / Manifest URL's
             'mautic_fcm_worker' => [
