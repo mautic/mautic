@@ -241,9 +241,7 @@ JS;
 
         if (strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->getParameter('site_url')) === false) {
             $landingPage = false;
-        }
-
-        var_dump($landingPage);
+        }        
 
         $integration = $this->integrationHelper->getIntegrationObject('FCM');        
 
