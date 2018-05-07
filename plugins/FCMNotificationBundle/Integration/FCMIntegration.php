@@ -112,7 +112,7 @@ class FCMIntegration extends AbstractIntegration
     public function appendToForm(&$builder, $data, $formArea)
     {
         
-        if ($formArea == 'integration') {
+        if ($formArea == 'keys') {
             $builder->add(
                 'service_account_json',
                 FileType::class,
