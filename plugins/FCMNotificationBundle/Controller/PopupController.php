@@ -31,7 +31,7 @@ class PopupController extends CommonController
         $features          = $settings->getSupportedFeatures();
         $featureSettings   = $settings->getFeatureSettings();
         
-        var_dump($features,featureSettings);
+        var_dump($features,$featureSettings);
 
         $response = $this->render(
             'FCMNotificationBundle:Popup:index.html.php',
