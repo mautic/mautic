@@ -82,7 +82,7 @@ class PopupController extends CommonController
         $message->data->set('x','value');
         $message->data->y='Same as above';
 
-        $message->setTarget(new Token('daRUoffCzO8:APA91bHxxtT9rE2pmDhNzv8IDwEbcPH8qQ4P1ryNlmVKSntuyUWuEygbT3vwJBztuqiZZ823tFEauM1_YZKwO24SemNDG7zP0g3FDFfR0mqoS_BhM54UcxUn4F3d0F2Zp4b8Q1b1A6tQ'));
+        $message->setTarget(new Token('dj_BwvWGX2Y:APA91bF2QavspU0jW6-0FiLwloqIQXm6gnnsTo30U9tgSEsTw1Qdu9P0GW8qCaIAT7CyQ_3byyM7NBNLQjl038T_p94Q2iSR4QTko-W4sGwtcfnEzXu08UyvgeDZpamGuvlbM4QYhGFm'));
 
         $client = new Client(['debug'=>true]);
         //If true the validate_only is set to true the message will not be submitted but just checked with FCM
