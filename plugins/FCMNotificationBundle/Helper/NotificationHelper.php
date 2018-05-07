@@ -245,17 +245,21 @@ JS;
 
         var_dump($landingPage);
 
-        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');        
 
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return false;
         }
 
         $supportedFeatures = $integration->getIntegrationSettings()->getSupportedFeatures();
-        var_dump($supportedFeatures);
-
+        $notificationPopupUrl         = $this->router->generate(
+            'mautic_notification_popup',
+            [],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        ); 
+        
         // disable on Landing pages
-        if ($landingPage === true && !in_array('landing_page_enabled', $supportedFeatures)) {
+        if ($landingPage === true && !in_array('landing_page_enabled', $supportedFeatures) && strpos($server->get('HTTP_REFERER'), $notificationPopupUrl) !== false) {
             return false;
         }
 
