@@ -379,8 +379,7 @@ return [
             'mautic.transport.momentum.adapter' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\Adapter::class,
                 'arguments' => [
-                    '%mautic.mailer_host%',
-                    '%mautic.mailer_api_key%',
+                    'mautic.transport.momentum.sparkpost',
                 ],
             ],
             'mautic.transport.momentum.service.swift_message' => [
@@ -407,6 +406,7 @@ return [
                     'mautic.transport.momentum.adapter',
                     'mautic.transport.momentum.service.swift_message',
                     'mautic.transport.momentum.validator.swift_message',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.transport.momentum.sparkpost' => [

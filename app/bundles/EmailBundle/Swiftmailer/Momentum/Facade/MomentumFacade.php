@@ -3,11 +3,11 @@
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Facade;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\AdapterInterface;
-use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Facade\MomentumSendException;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Validator\SwiftMessageValidator\SwiftMessageValidationException;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageServiceInterface;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator\SwiftMessageValidatorInterface;
+use Monolog\Logger;
 
 /**
  * Class MomentumApiFacade.
@@ -29,21 +29,27 @@ final class MomentumFacade implements MomentumFacadeInterface
      */
     private $swiftMessageValidator;
 
+    /** @var Logger */
+    private $logger;
+
     /**
      * MomentumFacade constructor.
      *
      * @param AdapterInterface               $adapter
      * @param SwiftMessageServiceInterface   $swiftMessageService
      * @param SwiftMessageValidatorInterface $swiftMessageValidator
+     * @param Logger                         $logger
      */
     public function __construct(
         AdapterInterface $adapter,
         SwiftMessageServiceInterface $swiftMessageService,
-        SwiftMessageValidatorInterface $swiftMessageValidator
+        SwiftMessageValidatorInterface $swiftMessageValidator,
+        Logger $logger
     ) {
         $this->adapter               = $adapter;
         $this->swiftMessageService   = $swiftMessageService;
         $this->swiftMessageValidator = $swiftMessageValidator;
+        $this->logger                = $logger;
     }
 
     /**
@@ -59,38 +65,24 @@ final class MomentumFacade implements MomentumFacadeInterface
             $transmission = $this->swiftMessageService->transformToTransmission($message);
             $response     = $this->adapter->createTransmission($transmission);
             $response     = $response->wait();
-            if (200 == (int) $response->getStatusCode()) {
-                $results = $response->getBody();
-                if (!$sendCount = $results['results']['total_accepted_recipients']) {
-                    $this->processResponseErrors($transmission, $results);
-                }
+            if (200 !== (int) $response->getStatusCode()) {
+                $this->logger->addError(
+                    'Momentum send: '.$response->getStatusCode(),
+                    [
+                        'response' => $response->getBody(),
+                    ]
+                );
             }
         } catch (\Exception $exception) {
-            dump($exception);
-            exit;
+            $this->logger->addError(
+                'Momentum send exception',
+                [
+                    'message' => $exception->getMessage(),
+                ]);
             if ($exception instanceof SwiftMessageValidationException) {
                 throw $exception;
             }
             throw new MomentumSendException();
         }
-    }
-
-    /**
-     * @param TransmissionDTO $transmissionDTO
-     * @param array           $results
-     */
-    private function processResponseErrors(TransmissionDTO $transmissionDTO, array $results)
-    {
-        /*
-        if (!empty($response['errors'][0]['code']) && 1902 == (int) $response['errors'][0]['code']) {
-            $comments     = $response['errors'][0]['description'];
-            $emailAddress = $momentumMessage['recipients']['to'][0]['email'];
-            $metadata     = $this->getMetadata();
-
-            if (isset($metadata[$emailAddress]) && isset($metadata[$emailAddress]['leadId'])) {
-                $emailId = (!empty($metadata[$emailAddress]['emailId'])) ? $metadata[$emailAddress]['emailId'] : null;
-                $this->transportCallback->addFailureByContactId($metadata[$emailAddress]['leadId'], $comments, DoNotContact::BOUNCED, $emailId);
-            }
-        }*/
     }
 }
