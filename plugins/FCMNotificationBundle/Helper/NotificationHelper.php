@@ -239,9 +239,18 @@ JS;
             return false;
         }
 
+        $notificationPopupUrl         = $this->router->generate(
+            'mautic_notification_popup',
+            [],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        ); 
+
         if (strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->getParameter('site_url')) === false) {
             $landingPage = false;
-        }        
+        }  
+        if ($landingPage && strpos($server->get('HTTP_REFERER'), $notificationPopupUrl) !== false){
+            $landingPage = false; 
+        }
 
         $integration = $this->integrationHelper->getIntegrationObject('FCM');        
 
@@ -250,13 +259,9 @@ JS;
         }
 
         $supportedFeatures = $integration->getIntegrationSettings()->getSupportedFeatures();
-        $notificationPopupUrl         = $this->router->generate(
-            'mautic_notification_popup',
-            [],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        ); 
         
-        var_dump($landingPage, $supportedFeatures, $notificationPopupUrl, $server->get('HTTP_REFERER'), strpos($server->get('HTTP_REFERER'), $notificationPopupUrl));
+                
+        
 
         // disable on Landing pages
         if ($landingPage === true && !in_array('landing_page_enabled', $supportedFeatures)) {
@@ -264,7 +269,7 @@ JS;
         }
 
         // disable on Landing pages
-        if ($landingPage === false && !in_array('tracking_page_enabled', $supportedFeatures) && strpos($server->get('HTTP_REFERER'), $notificationPopupUrl) !== false) {
+        if ($landingPage === false && !in_array('tracking_page_enabled', $supportedFeatures)) {
             return false;
         }
 
