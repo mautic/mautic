@@ -212,7 +212,8 @@ MauticJS.conditionalAsyncQueue(function(){
             });
         }
           
-        messaging.onMessage(function(payload){            
+        messaging.onMessage(function(payload){
+            console.log('onMessage', payload);
             var notificationTitle = payload.title;
             var notificationOptions = {
                 body: payload.body,                    

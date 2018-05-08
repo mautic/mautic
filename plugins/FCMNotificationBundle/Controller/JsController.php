@@ -81,7 +81,8 @@ class JsController extends CommonController
 
               const messaging = firebase.messaging();
 
-              messaging.setBackgroundMessageHandler(function(payload) {                                              
+              messaging.setBackgroundMessageHandler(function(payload) {
+                console.log('serviceworker', payload);
                 var notificationTitle = payload.title;
                 var notificationOptions = {
                     body: payload.body,                    
