@@ -119,6 +119,14 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
+
+
         $lead = $event->getLead();
 
         if ($this->leadModel->isContactable($lead, 'notification') !== DoNotContact::IS_CONTACTABLE) {
