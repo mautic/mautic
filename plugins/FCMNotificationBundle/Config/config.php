@@ -18,7 +18,7 @@ return [
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.lead.model.lead',
-                    'mautic.notification.model.notification',
+                    'mauticplugin.fcmnotification.notification.model.notification',
                     'mauticplugin.fcmnotification.notification.api',
                 ],
             ],
@@ -51,7 +51,7 @@ return [
 //                'arguments' => [
 //                    'mautic.helper.integration',
 //                    'mautic.lead.model.lead',
-//                    'mautic.notification.model.notification',
+//                    'mauticplugin.fcmnotification.notification.model.notification',
 //                    'mauticplugin.fcmnotification.notification.api',
 //                ],
 //            ],
