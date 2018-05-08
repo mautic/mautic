@@ -147,6 +147,28 @@ class UrlHelper
         return $scheme.'://'.$abs;
     }
 
+    public static function getUrlsFromPlaintext($text)
+    {
+        $regex = '#[-a-zA-Z0-9@:%_\+.~\#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~\#?&//=]*)?#si';
+
+        if (!preg_match_all($regex, $text, $matches)) {
+            return [];
+        }
+
+        $urls = $matches[0];
+
+        foreach ($urls as $key => $url) {
+            // We don't want to match URLs in token default values
+            // like {contactfield=website|http://ignore.this.url}
+            $isDefautlTokenValue = stripos($text, "|$url}") !== false;
+            if ($isDefautlTokenValue) {
+                unset($urls[$key]);
+            }
+        }
+
+        return $urls;
+    }
+
     /**
      * Sanitize parts of the URL to make sure the URL query values are HTTP encoded.
      *

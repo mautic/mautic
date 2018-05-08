@@ -78,4 +78,28 @@ class UrlHelperTest extends \PHPUnit_Framework_TestCase
             UrlHelper::sanitizeAbsoluteUrl('http://username:password@hostname:9090/path?ar g1=value&arg2=some+email@address.com#anchor')
         );
     }
+
+    public function testGetUrlsFromPlaintextWithHttp()
+    {
+        $this->assertEquals(
+            ['http://mautic.org'],
+            UrlHelper::getUrlsFromPlaintext('Hello there, http://mautic.org!')
+        );
+    }
+
+    public function testGetUrlsFromPlaintextSkipDefaultTokenValues()
+    {
+        $this->assertEquals(
+            ['https://find.this'],
+            UrlHelper::getUrlsFromPlaintext('Find this url: https://find.this, but ignore this one: {contactfield=website|http://skip.this}! ')
+        );
+    }
+
+    public function testGetUrlsFromPlaintextWith2Urls()
+    {
+        $this->assertEquals(
+            ['http://mautic.org', 'http://mucktick.org'],
+            UrlHelper::getUrlsFromPlaintext('Hello there, http://mautic.org is the correct URL. Not http://mucktick.org.')
+        );
+    }
 }
