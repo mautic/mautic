@@ -66,7 +66,7 @@ class FCMApi extends AbstractNotificationApi
 
         if (!empty($this->apiKeys['service_account_json'])){            
              //-- Init the service account --//    
-            $this->serviceAccount = new ServiceAccount($keys['service_account_json']);
+            $this->serviceAccount = new ServiceAccount($this->apiKeys['service_account_json']);
             $cacheHandler = new Google\Auth\Cache\MemoryCacheItemPool\MemoryCacheItemPool();
             $this->serviceAccount->setCacheHandler($cacheHandler);    
         }else{
@@ -107,9 +107,7 @@ class FCMApi extends AbstractNotificationApi
         $validate_only = false;
         //Create a request
         $rq = new Request($this->serviceAccount,$validate_only,$client);
-
-        var_dump($this->serviceAccount);
-
+        
         try{
             //Use the request to submit the message
             return $message->send($rq);
