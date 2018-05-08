@@ -172,6 +172,14 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
         $message = $this->messageToArray($mauticTokens, $mergeVarPlaceholders, true);
 
+        // These are reserved headers
+        unset(
+            $message['headers']['Subject'],
+            $message['headers']['MIME-Version'],
+            $message['headers']['Content-Type'],
+            $message['headers']['Content-Transfer-Encoding']
+        );
+
         // Sparkpost requires a subject
         if (empty($message['subject'])) {
             throw new \Exception($this->translator->trans('mautic.email.subject.notblank', [], 'validators'));
@@ -246,6 +254,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             'from'    => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
                 : $message['from']['email'],
             'subject' => $message['subject'],
+            'headers' => $message['headers'],
         ];
 
         // Sparkpost will set parts regardless if they are empty or not
@@ -276,7 +285,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         $sparkPostMessage = [
             'content'    => $content,
             'recipients' => $recipients,
-            'headers'    => $message['headers'],
             'inline_css' => $inlineCss,
             'tags'       => $tags,
         ];
