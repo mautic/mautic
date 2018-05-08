@@ -102,7 +102,7 @@ class FCMApi extends AbstractNotificationApi
         //If true the validate_only is set to true the message will not be submitted but just checked with FCM
         $validate_only = false;
         //Create a request
-        $rq = new Request($serviceAccount,$validate_only,$client);
+        $rq = new Request($this->serviceAccount,$validate_only,$client);
         try{
             //Use the request to submit the message
             return $message->send($rq);
