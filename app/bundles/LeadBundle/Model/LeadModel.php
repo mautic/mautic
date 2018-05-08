@@ -27,6 +27,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -49,6 +51,7 @@ use Mautic\LeadBundle\Event\CategoryChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -174,6 +177,21 @@ class LeadModel extends FormModel
     private $deviceTracker;
 
     /**
+     * @var bool
+     */
+    private $repoSetup = false;
+
+    /**
+     * @var array
+     */
+    private $flattenedFields = [];
+
+    /**
+     * @var array
+     */
+    private $fieldsByGroup = [];
+
+    /**
      * LeadModel constructor.
      *
      * @param RequestStack         $requestStack
@@ -236,13 +254,11 @@ class LeadModel extends FormModel
      */
     public function getRepository()
     {
-        static $repoSetup;
-
         $repo = $this->em->getRepository('MauticLeadBundle:Lead');
         $repo->setDispatcher($this->dispatcher);
 
-        if (!$repoSetup) {
-            $repoSetup = true;
+        if (!$this->repoSetup) {
+            $this->repoSetup = true;
 
             //set the point trigger model in order to get the color code for the lead
             $fields = $this->leadFieldModel->getFieldList(true, false);
@@ -599,19 +615,18 @@ class LeadModel extends FormModel
 
         if (empty($fieldValues) || $bindWithForm) {
             // Lead is new or they haven't been populated so let's build the fields now
-            static $flatFields, $fields;
-            if (empty($flatFields)) {
-                $flatFields = $this->leadFieldModel->getEntities(
+            if (empty($this->flattenedFields)) {
+                $this->flattenedFields = $this->leadFieldModel->getEntities(
                     [
                         'filter'         => ['isPublished' => true, 'object' => 'lead'],
                         'hydration_mode' => 'HYDRATE_ARRAY',
                     ]
                 );
-                $fields = $this->organizeFieldsByGroup($flatFields);
+                $this->fieldsByGroup = $this->organizeFieldsByGroup($this->flattenedFields);
             }
 
             if (empty($fieldValues)) {
-                $fieldValues = $fields;
+                $fieldValues = $this->fieldsByGroup;
             }
         }
 
@@ -621,7 +636,7 @@ class LeadModel extends FormModel
                 new Lead(), // use empty lead to prevent binding errors
                 $this->formFactory,
                 null,
-                ['fields' => $flatFields, 'csrf_protection' => false, 'allow_extra_fields' => true]
+                ['fields' => $this->flattenedFields, 'csrf_protection' => false, 'allow_extra_fields' => true]
             );
 
             // Unset stage and owner from the form because it's already been handled
@@ -881,46 +896,23 @@ class LeadModel extends FormModel
      */
     public function getContactFromRequest($queryFields = [])
     {
-        $lead = null;
+        // @todo Instantiate here until we can remove circular dependency on LeadModel in order to make it a service
+        /** @var StatRepository $emailStatRepository */
+        $emailStatRepository = $this->em->getRepository('MauticEmailBundle:Stat');
+        $requestStack        = new RequestStack();
+        $requestStack->push($this->request);
+        $contactRequestHelper = new ContactRequestHelper(
+            $this,
+            $this->contactTracker,
+            $this->coreParametersHelper,
+            $this->ipLookupHelper,
+            $emailStatRepository,
+            $this->getDeviceRepository(),
+            $requestStack,
+            $this->logger
+        );
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-
-        // Check for a lead requested through clickthrough query parameter
-        if (isset($queryFields['ct'])) {
-            $clickthrough = $queryFields['ct'];
-        } elseif ($clickthrough = $this->request->get('ct', [])) {
-            $clickthrough = $this->decodeArrayFromUrl($clickthrough);
-        }
-
-        if (is_array($clickthrough) && !empty($clickthrough['lead'])) {
-            $lead = $this->getEntity($clickthrough['lead']);
-            // identify contact from link
-            if ($this->coreParametersHelper->getParameter('track_by_tracking_url') && !isset($queryFields['email']) && $lead && $email = $lead->getEmail()) {
-                $queryFields['email'] = $email;
-            }
-            $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
-        }
-
-        $lead = $this->contactTracker->getContact();
-
-        list($lead, $inQuery) = $this->checkForDuplicateContact($queryFields, $lead, true, true);
-
-        if ($lead) {
-            $leadIpAddresses = $lead->getIpAddresses();
-            if (!$leadIpAddresses->contains($ipAddress)) {
-                $lead->addIpAddress($ipAddress);
-            }
-
-            $this->setFieldValues($lead, $inQuery, false, true, true);
-
-            if (isset($queryFields['tags'])) {
-                $this->modifyTags($lead, $queryFields['tags']);
-            }
-
-            $this->setCurrentLead($lead);
-        }
-
-        return $lead;
+        return $contactRequestHelper->getContactFromQuery($queryFields);
     }
 
     /**
@@ -1139,6 +1131,11 @@ class LeadModel extends FormModel
         $mergeFromFields = $mergeFrom->getFields();
         foreach ($mergeFromFields as $group => $groupFields) {
             foreach ($groupFields as $alias => $details) {
+                if ('points' === $alias) {
+                    // We have to ignore this as it's a special field and it will reset the points for the contact
+                    continue;
+                }
+
                 //overwrite old lead's data with new lead's if new lead's is not empty
                 if (!empty($details['value'])) {
                     $mergeWith->addUpdatedField($alias, $details['value']);
@@ -1158,11 +1155,11 @@ class LeadModel extends FormModel
             $this->logger->debug('LEAD: New owner is '.$newOwner->getId());
         }
 
-        //sum points
-        $mergeWithPoints = $mergeWith->getPoints();
+        // Sum points
         $mergeFromPoints = $mergeFrom->getPoints();
-        $mergeWith->setPoints($mergeWithPoints + $mergeFromPoints);
-        $this->logger->debug('LEAD: Adding '.$mergeFromPoints.' points to lead');
+        $mergeWithPoints = $mergeWith->getPoints();
+        $mergeWith->adjustPoints($mergeFromPoints);
+        $this->logger->debug('LEAD: Adding '.$mergeFromPoints.' points from lead ID #'.$mergeFrom->getId().' to lead ID #'.$mergeWith->getId().' with '.$mergeWithPoints.' points');
 
         //merge tags
         $mergeFromTags = $mergeFrom->getTags();
@@ -1878,6 +1875,10 @@ class LeadModel extends FormModel
             $tags = explode(',', $tags);
         }
 
+        if (empty($tags)) {
+            return false;
+        }
+
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
         array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
@@ -2539,6 +2540,16 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @param Lead  $trackedLead
+     * @param array $queryFields
+     *
+     * @return Lead
+     */
+    private function getContactFromClickthrough(Lead $trackedLead, array &$queryFields)
+    {
+    }
+
+    /**
      * @param IpAddress $ip
      * @param bool      $persist
      *
@@ -2553,7 +2564,6 @@ class LeadModel extends FormModel
 
         if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
             // Set to prevent loops
-            $this->setCurrentLead($lead);
             $this->contactTracker->setTrackedContact($lead);
 
             // Note ignoring a lead manipulator object here on purpose to not falsely record entries
