@@ -27,6 +27,7 @@ use Plokko\Firebase\FCM\Message;
 use Plokko\Firebase\FCM\Request;
 use Plokko\Firebase\FCM\Targets\Token;
 use Plokko\Firebase\ServiceAccount;
+use Google\Auth\Cache\MemoryCacheItemPool;
 
 class FCMApi extends AbstractNotificationApi
 {
@@ -67,7 +68,7 @@ class FCMApi extends AbstractNotificationApi
         if (!empty($this->apiKeys['service_account_json'])){            
              //-- Init the service account --//    
             $this->serviceAccount = new ServiceAccount($this->apiKeys['service_account_json']);
-            $cacheHandler = new Google\Auth\Cache\MemoryCacheItemPool\MemoryCacheItemPool();
+            $cacheHandler = new MemoryCacheItemPool();
             $this->serviceAccount->setCacheHandler($cacheHandler);    
         }else{
             throw new MissingServiceAccountJsonException();   
