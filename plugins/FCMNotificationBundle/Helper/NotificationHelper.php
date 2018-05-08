@@ -117,6 +117,9 @@ class NotificationHelper
             $messagingSenderId  = $keys['messagingSenderId'];
             
             $welcomenotificationEnabled = intval(in_array('welcome_notification_enabled', $supported));
+            $welcomeNotificationTitle = $featureSettings['welcome_notification_title'];
+            $welcomeNotificationBody = $featureSettings['welcome_notification_text'];
+            $welcomeNotificationIcon = $featureSettings['notification_icon'];
             $landingPageEnabled = intval(in_array('landing_page_enabled', $supported));
             $trackingPageEnabled = intval(in_array('tracking_page_enabled', $supported));
 
@@ -164,26 +167,51 @@ MauticJS.conditionalAsyncQueue(function(){
       this.messaging = firebase.messaging();            
 
 
-    MauticJS.postUserIdToMautic = function(userId) {
+    MauticJS.postUserIdToMautic = function(userId, successCallback) {
         var data = [];
         data['fcm_id'] = userId;
-        MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}', data);
+        if (typeof successCallback == 'function'){
+            MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}', data, successCallback);
+        }else{
+            MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}', data);
+        }
     };
         
         var fcmLandingPageEnabled = {$landingPageEnabled};
-        var fcmTrackingPageEnabled = {$trackingPageEnabled};        
+        var fcmTrackingPageEnabled = {$trackingPageEnabled};
+        var welcomenotificationEnabled = {$welcomenotificationEnabled};
         if ((MauticDomain.replace(/https?:\/\//,'') == location.host && (fcmLandingPageEnabled || location == '{$notificationPopupUrl}'))
             ||
             (MauticDomain.replace(/https?:\/\//,'') != location.host && fcmTrackingPageEnabled) ){
             
             this.messaging.getToken().then(function(currentToken){
+                console.log(currentToken);
                 if (currentToken) {
+                    console.log(refreshToken);
                     MauticJS.postUserIdToMautic(currentToken);          
                 } else {
                     this.messaging.requestPermission().then(function() {
                         this.messaging.getToken().then(function(currentToken){
                             if (currentToken) {
-                                MauticJS.postUserIdToMautic(currentToken);          
+                                if (welcomenotificationEnabled){
+                                    MauticJS.postUserIdToMautic(currentToken, function(){
+                                        console.log('welcomeNotification');
+                                        var notificationTitle = '{$welcomeNotificationTitle}';
+                                        var notificationOptions = {
+                                            body: '{$welcomeNotificationBody}',                                                                
+                                        };
+                                        if ('{$welcomeNotificationIcon}'){
+                                            notificationOptions.icon = '{$welcomeNotificationIcon}';
+                                        }
+
+                                        return new Notification(
+                                            notificationTitle,
+                                            notificationOptions
+                                        );
+                                    };          
+                                }else{
+                                    MauticJS.postUserIdToMautic(currentToken);
+                                }
                             }
                         });
                     }).catch(function(err) {
