@@ -26,24 +26,47 @@ final class SparkpostFactory implements SparkpostFactoryInterface
     }
 
     /**
-     * @param string $host
-     * @param string $apiKey
+     * @param      $host
+     * @param      $apiKey
+     * @param null $port
      *
-     * @return SparkPost
+     * @return mixed|SparkPost
      */
-    public function create($host, $apiKey)
+    public function create($host, $apiKey, $port = null)
     {
         if ((strpos($host, '://') === false && substr($host, 0, 1) != '/')) {
             $host = 'https://'.$host;
         }
+
         $hostInfo = parse_url($host);
+
         if ($hostInfo) {
-            return new SparkPost($this->client, [
-                'host'     => $hostInfo['host'].$hostInfo['path'],
+            if (empty($port)) {
+                $port = $hostInfo['scheme'] === 'https' ? 443 : 80;
+            }
+
+            $options = [
                 'protocol' => $hostInfo['scheme'],
-                'port'     => $hostInfo['scheme'] === 'https' ? 443 : 80,
+                'port'     => $port,
                 'key'      => $apiKey,
-            ]);
+            ];
+
+            $host = $hostInfo['host'];
+            if (isset($hostInfo['path'])) {
+                $path = $hostInfo['path'];
+                if (preg_match('~/api/(v\d+)$~i', $path, $matches)) {
+                    // Remove /api from the path and extract the version in case differnt than the Sparkpost SDK default
+                    $path               = str_replace($matches[0], '', $path);
+                    $options['version'] = $matches[1];
+                }
+
+                // Append whatever is left over to the host (assuming Momentum can be in a subfolder?)
+                $host .= $path;
+            }
+
+            $options['host'] = $host;
+
+            return new SparkPost($this->client, $options);
         } else {
             // problem :/
         }
