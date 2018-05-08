@@ -209,6 +209,7 @@ class CampaignSubscriber extends CommonSubscriber
         */
        
         /* FCM PHP API uses Guzzlehttp instead of joomla/http thus response differs */
+        var_dump($response);
         if (!$response) {
             return $event->setResult(false);
         }
