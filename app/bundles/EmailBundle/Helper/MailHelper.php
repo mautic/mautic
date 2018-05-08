@@ -1438,6 +1438,13 @@ class MailHelper
             }
         }
 
+        // Set custom headers
+        if ($headers = $email->getHeaders()) {
+            foreach ($headers as $name => $value) {
+                $this->addCustomHeader($name, $value);
+            }
+        }
+
         return empty($this->errors);
     }
 
@@ -1445,9 +1452,16 @@ class MailHelper
      * Set custom headers.
      *
      * @param array $headers
+     * @param bool  $merge
      */
-    public function setCustomHeaders(array $headers)
+    public function setCustomHeaders(array $headers, $merge = true)
     {
+        if ($merge) {
+            $this->headers = array_merge($this->headers, $headers);
+
+            return;
+        }
+
         $this->headers = $headers;
     }
 
