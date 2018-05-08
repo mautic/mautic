@@ -35,4 +35,6 @@ interface DeviceTrackingServiceInterface
      * @return LeadDevice
      */
     public function trackCurrentDevice(LeadDevice $device, $replaceExistingTracking = false);
+
+    public function clearTrackingCookies();
 }

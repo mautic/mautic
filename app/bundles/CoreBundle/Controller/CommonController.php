@@ -802,7 +802,7 @@ class CommonController extends Controller implements MauticController
         $filename    = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
         $handler     = Handler::create($sourceIterator, $writer);
 
-        return new StreamedResponse(function () use ($handler, $sourceIterator, $writer) {
+        return new StreamedResponse(function () use ($handler) {
             $handler->export();
         }, 200, ['Content-Type' => $contentType, 'Content-Disposition' => sprintf('attachment; filename=%s', $filename)]);
     }
