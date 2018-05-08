@@ -129,19 +129,16 @@ class FCMApi extends AbstractNotificationApi
                 case 'UNAVAILABLE':
                 case 'INTERNAL':
             }
-            echo 'FCM error ['.$e->getErrorCode().']: ',$e->getMessage();
-            return false;
+            return 'FCM error ['.$e->getErrorCode().']: ',$e->getMessage();            
         }
         catch(RequestException $e){
             //HTTP response error
             $response = $e->getResponse();
-            echo 'Got an http response error:',$response->getStatusCode(),':',$response->getReasonPhrase();            
-            return false;
+            return 'Got an http response error:',$response->getStatusCode(),':',$response->getReasonPhrase();                        
         }
         catch(GuzzleException $e){
             //GuzzleHttp generic error
-            echo  'Got an http error:',$e->getMessage();
-            return false;
+            return  'Got an http error:',$e->getMessage();            
         }
 
     }
