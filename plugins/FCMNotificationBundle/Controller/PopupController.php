@@ -61,6 +61,8 @@ class PopupController extends CommonController
 
         //-- Init the service account --//        
         $serviceAccount = new ServiceAccount($keys['service_account_json']);
+        $cacheHandler = new Google\Auth\Cache\MemoryCacheItemPool\MemoryCacheItemPool();
+        $serviceAccount->setCacheHandler($cacheHandler);
 
         $message = new Message();
 
@@ -77,9 +79,9 @@ class PopupController extends CommonController
 
         $message->setTarget(new Token('dj_BwvWGX2Y:APA91bF2QavspU0jW6-0FiLwloqIQXm6gnnsTo30U9tgSEsTw1Qdu9P0GW8qCaIAT7CyQ_3byyM7NBNLQjl038T_p94Q2iSR4QTko-W4sGwtcfnEzXu08UyvgeDZpamGuvlbM4QYhGFm'));
 
-        $client = new Client(['debug'=>false]);
+        $client = new Client(['debug'=>true]);
         //If true the validate_only is set to true the message will not be submitted but just checked with FCM
-        $validate_only = false;
+        $validate_only = true;
         //Create a request
         $rq = new Request($serviceAccount,$validate_only,$client);
         try{
