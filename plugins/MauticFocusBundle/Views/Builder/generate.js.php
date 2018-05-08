@@ -577,7 +577,7 @@ switch ($style) {
                 Focus.iframeResizerEnabled = true;
 
                 return true;
-                <?php else; ?>
+                <?php else: ?>
 
                 return false;
                 <?php endif; ?>
