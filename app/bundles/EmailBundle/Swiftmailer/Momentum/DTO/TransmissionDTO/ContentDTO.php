@@ -28,6 +28,11 @@ final class ContentDTO implements \JsonSerializable
     /**
      * @var string|null
      */
+    private $inlineCss = null;
+
+    /**
+     * @var string|null
+     */
     private $text = null;
 
     /**
@@ -65,6 +70,18 @@ final class ContentDTO implements \JsonSerializable
     public function setHtml($html)
     {
         $this->html = $html;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $inlineCss
+     *
+     * @return ContentDTO\
+     */
+    public function setInlineCss($inlineCss = null)
+    {
+        $this->inlineCss = $inlineCss;
 
         return $this;
     }
@@ -129,6 +146,9 @@ final class ContentDTO implements \JsonSerializable
         }
         if (count($this->attachments) !== 0) {
             $json['attachments'] = $this->attachments;
+        }
+        if ($this->inlineCss !== null) {
+            $json['inline_css'] = $this->inlineCss;
         }
 
         return $json;

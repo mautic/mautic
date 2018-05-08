@@ -97,6 +97,10 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
                 }
             }
         }
+        $cssHeader = $message->getHeaders()->get('X-MC-InlineCSS');
+        if ($cssHeader !== null) {
+            $content->setInlineCss($cssHeader);
+        }
 
         $returnPath   = $message->getReturnPath() ? $message->getReturnPath() : $messageFromEmail;
         $transmission = new TransmissionDTO($content, $returnPath);
