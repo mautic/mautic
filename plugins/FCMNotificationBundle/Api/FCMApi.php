@@ -47,6 +47,8 @@ class FCMApi extends AbstractNotificationApi
 
         $this->apiKeys    = $this->integrationHelper->getIntegrationObject('FCM')->getKeys();
         
+        var_dump($this->apiKeys);
+
         if (!empty($this->apiKeys['apiKey'])){
             $this->apiKey      = $this->apiKeys['apiKey'];    
         }else{
