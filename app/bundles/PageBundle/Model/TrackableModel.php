@@ -11,7 +11,9 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
@@ -428,12 +430,12 @@ class TrackableModel extends AbstractCommonModel
     protected function extractTrackablesFromText($text)
     {
         // Remove any HTML tags (such as img) that could contain href or src attributes prior to parsing for links
-        $text = strip_tags($text);
-
-        // Plaintext links
+        $text          = strip_tags($text);
+        $allUrls       = UrlHelper::getUrlsFromPlaintext($text);
         $trackableUrls = [];
-        if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\]"]+)?/i', $text, $matches)) {
-            foreach ($matches[0] as $url) {
+
+        if ($allUrls) {
+            foreach ($allUrls as $url) {
                 if ($preparedUrl = $this->prepareUrlForTracking($url)) {
                     list($urlKey, $urlValue) = $preparedUrl;
                     $trackableUrls[$urlKey]  = $urlValue;
@@ -508,25 +510,10 @@ class TrackableModel extends AbstractCommonModel
             return false;
         }
 
-        // Check if URL is trackable
-        $tokenizedHost = (!isset($urlParts['host']) && isset($urlParts['path'])) ? $urlParts['path'] : $urlParts['host'];
-        if (preg_match('/^(\{\S+?\})/', $tokenizedHost, $match)) {
-            $token = $match[1];
+        $trackableUrl = $this->httpBuildUrl($urlParts);
 
-            // Validate that the token is something that can be trackable
-            if (!$this->validateTokenIsTrackable($token, $tokenizedHost)) {
-                return false;
-            }
-
-            // Replace the URL token with the actual URL
-            $this->contentReplacements['first_pass'][$url] = $trackableUrl;
-        } else {
-            // Regular URL without a tokenized host
-            $trackableUrl = $this->httpBuildUrl($urlParts);
-
-            if ($this->isInDoNotTrack($trackableUrl)) {
-                return false;
-            }
+        if ($this->isInDoNotTrack($trackableUrl)) {
+            return false;
         }
 
         return [$trackableKey, $trackableUrl];
@@ -566,8 +553,14 @@ class TrackableModel extends AbstractCommonModel
             return false;
         }
 
-        // Validate that the token is available and is a URL
-        if (!isset($this->contentTokens[$token])) {
+        $tokenValue = TokenHelper::getValueFromTokens($this->contentTokens, $token);
+
+        // Validate that the token is available
+        if (!$tokenValue) {
+            return false;
+        }
+
+        if (!$this->isValidUrl($tokenValue)) {
             return false;
         }
 
