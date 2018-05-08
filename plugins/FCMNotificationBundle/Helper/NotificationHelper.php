@@ -208,7 +208,7 @@ MauticJS.conditionalAsyncQueue(function(){
                                             notificationTitle,
                                             notificationOptions
                                         );
-                                    };          
+                                    });          
                                 }else{
                                     MauticJS.postUserIdToMautic(currentToken);
                                 }
