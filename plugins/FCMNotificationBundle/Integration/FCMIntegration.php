@@ -132,7 +132,20 @@ class FCMIntegration extends AbstractIntegration
         if ($formArea == 'features') {
             /* @var FormBuilder $builder */
             
-             $builder->add(
+            $builder->add(
+                'notification_icon',
+                TextType::class,
+                [
+                    'label'    => 'mautic.plugin.integration.form.features.icon',                    
+                    'required' => false,
+                    'attr'     => [
+                        'class' => 'form-control',
+                        'tooltip'      => 'mautic.plugin.integration.form.features.icon.toolip',                        
+                    ],
+                ]
+            );
+
+            $builder->add(
                 'sample_notification_title',
                 TextType::class,
                 [
@@ -187,6 +200,8 @@ class FCMIntegration extends AbstractIntegration
                     ],
                 ]
             );
+
+            
 
             
             /*
