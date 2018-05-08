@@ -40,6 +40,10 @@ class FCMApi extends AbstractNotificationApi
     protected $notificationIcon = '';
 
     public function __construct() {
+        $args = func_get_args();
+        call_user_func_array(array($this, 'parent::__construct'), $args);
+
+
         $this->apiKeys    = $this->integrationHelper->getIntegrationObject('FCM')->getKeys();
         
         if (!empty($this->apiKeys['apiKey'])){
