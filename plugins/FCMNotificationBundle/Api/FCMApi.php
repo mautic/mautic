@@ -171,7 +171,7 @@ class FCMApi extends AbstractNotificationApi
             $playerId = [$playerId];
         }
 
-        foreach ($playerId as $plId){            
+        foreach ($playerId as $token){            
             $data = [
                 'title' => $title,
                 'body' => $message                
@@ -191,7 +191,7 @@ class FCMApi extends AbstractNotificationApi
                     $data['web_buttons'][] = ['id' => $buttonId, 'text' => $button, 'url' => $url];
                 }
             }
-            $result = $this->send($playerId, $data);
+            $result = $this->send($token, $data);
         }
 
         //returning only last result;
