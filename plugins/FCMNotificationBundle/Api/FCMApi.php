@@ -100,9 +100,7 @@ class FCMApi extends AbstractNotificationApi
         $message = new Message();        
 
         $message->data->fill($data);
-        $message->setTarget(new Token($token));
-
-        var_dump($token, $data);
+        $message->setTarget(new Token($token));        
 
         $client = new Client(['debug'=>false]);
 
