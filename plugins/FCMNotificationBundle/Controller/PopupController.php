@@ -25,7 +25,7 @@ use Plokko\Firebase\FCM\Message;
 use Plokko\Firebase\FCM\Request;
 use Plokko\Firebase\FCM\Targets\Token;
 use Plokko\Firebase\ServiceAccount;
-use Google\Auth\Cache\MemoryCacheItemPool\MemoryCacheItemPool;
+use Google\Auth\Cache\MemoryCacheItemPool;
 
 class PopupController extends CommonController
 {

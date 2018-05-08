@@ -19,12 +19,20 @@ use Mautic\NotificationBundle\Exception\MissingMessagingSenderIdException;
 use Mautic\NotificationBundle\Exception\MissingServiceAccountJsonException;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
+use Plokko\Firebase\FCM\Exceptions\FcmErrorException;
+use Plokko\Firebase\FCM\Message;
+use Plokko\Firebase\FCM\Request;
+use Plokko\Firebase\FCM\Targets\Token;
+use Plokko\Firebase\ServiceAccount;
+
 class FCMApi extends AbstractNotificationApi
 {
     /**
      * @var string
-     */
-    protected $apiUrlBase = '';
+     */    
     protected $apiKey = '';
     protected $projectId = '';
     protected $messagingSenderId = '';
@@ -51,13 +59,14 @@ class FCMApi extends AbstractNotificationApi
             throw new MissingMessagingSenderIdException();   
         }
 
-        if (!empty($this->apiKeys['service_account_json'])){
-            $this->serviceAccount      = $this->apiKeys['service_account_json'];    
+        if (!empty($this->apiKeys['service_account_json'])){            
+             //-- Init the service account --//    
+            $this->serviceAccount = new ServiceAccount($keys['service_account_json']);
+            $cacheHandler = new Google\Auth\Cache\MemoryCacheItemPool\MemoryCacheItemPool();
+            $this->serviceAccount->setCacheHandler($cacheHandler);    
         }else{
             throw new MissingServiceAccountJsonException();   
-        }
-
-        $this->apiUrlBase = "https://fcm.googleapis.com/v1/projects/{$this->projectId}/messages";
+        }        
     }
 
 
@@ -74,8 +83,14 @@ class FCMApi extends AbstractNotificationApi
      * @throws MissingAppIDException
      * @throws MissingApiKeyException
      */
-    public function send($endpoint, $data)
-    {    
+    public function send($endpoint, $data){    
+        $message = new Message();
+
+        $message->notification
+        ->setTitle($data['title'])
+        ->setBody($data['body']);
+
+
         return $this->http->post(
             $this->apiUrlBase.$endpoint,
             json_encode($data),
@@ -87,6 +102,66 @@ class FCMApi extends AbstractNotificationApi
 
         
     }
+
+   
+
+
+           
+        
+        
+
+        
+
+        
+
+        $message->data->fill([
+            'a'=>1,
+            'b'=>'2',
+        ]);
+        $message->data->set('x','value');
+        $message->data->y='Same as above';
+
+        $message->setTarget(new Token('dj_BwvWGX2Y:APA91bF2QavspU0jW6-0FiLwloqIQXm6gnnsTo30U9tgSEsTw1Qdu9P0GW8qCaIAT7CyQ_3byyM7NBNLQjl038T_p94Q2iSR4QTko-W4sGwtcfnEzXu08UyvgeDZpamGuvlbM4QYhGFm'));
+
+        $client = new Client(['debug'=>false]);
+        //If true the validate_only is set to true the message will not be submitted but just checked with FCM
+        $validate_only = false;
+        //Create a request
+        $rq = new Request($serviceAccount,$validate_only,$client);
+        try{
+            //Use the request to submit the message
+            $message->send($rq);
+            //You can force the validate_only flag via the validate method, the request will be left intact
+            //$message->validate($rq);
+        }
+        /** Catch all the exceptions @see https://firebase.google.com/docs/reference/fcm/rest/v1/ErrorCode **/
+        //Like this
+        catch(FcmErrorException $e){
+            switch($e->getErrorCode()){
+                default:
+                case 'UNSPECIFIED_ERROR':
+                case 'INVALID_ARGUMENT':
+                case 'UNREGISTERED':
+                case 'SENDER_ID_MISMATCH':
+                case 'QUOTA_EXCEEDED':
+                case 'APNS_AUTH_ERROR':
+                case 'UNAVAILABLE':
+                case 'INTERNAL':
+            }
+            echo 'FCM error ['.$e->getErrorCode().']: ',$e->getMessage();
+        }
+        catch(RequestException $e){
+            //HTTP response error
+            $response = $e->getResponse();
+            echo 'Got an http response error:',$response->getStatusCode(),':',$response->getReasonPhrase();
+            var_dump($response);
+        }
+        catch(GuzzleException $e){
+            //GuzzleHttp generic error
+            echo 'Got an http error:',$e->getMessage();
+        }
+
+
 
     /**
      * @param string|array $playerId     Player ID as string, or an array of player ID's
