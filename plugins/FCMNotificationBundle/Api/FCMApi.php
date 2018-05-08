@@ -52,8 +52,11 @@ class FCMApi extends AbstractNotificationApi
         if (!empty($this->apiKeys['apiKey'])){
             $this->apiKey      = $this->apiKeys['apiKey'];    
         }else{
+            var_dump('throw exception');
             throw new MissingApiKeyException();   
         }
+
+        var_dump($this->apiKey);
 
         if (!empty($this->apiKeys['projectId'])){
             $this->projectId      = $this->apiKeys['projectId'];    
