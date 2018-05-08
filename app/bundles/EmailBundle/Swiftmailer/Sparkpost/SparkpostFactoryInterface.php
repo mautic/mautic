@@ -2,18 +2,17 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Sparkpost;
 
-use SparkPost\SparkPost;
-
 /**
  * Interface SparkpostFactoryInterface.
  */
 interface SparkpostFactoryInterface
 {
     /**
-     * @param string $host
-     * @param string $apiKey
+     * @param      $host
+     * @param      $apiKey
+     * @param null $port
      *
-     * @return SparkPost
+     * @return mixed
      */
-    public function create($host, $apiKey);
+    public function create($host, $apiKey, $port = null);
 }

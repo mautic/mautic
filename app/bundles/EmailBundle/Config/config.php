@@ -373,6 +373,7 @@ return [
                 'tagArguments' => [
                     \Mautic\EmailBundle\Model\TransportType::TRANSPORT_ALIAS => 'mautic.email.config.mailer_transport.momentum',
                     \Mautic\EmailBundle\Model\TransportType::FIELD_HOST      => true,
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_PORT      => true,
                     \Mautic\EmailBundle\Model\TransportType::FIELD_API_KEY   => true,
                 ],
             ],
@@ -415,6 +416,7 @@ return [
                 'arguments' => [
                     '%mautic.mailer_host%',
                     '%mautic.mailer_api_key%',
+                    '%mautic.mailer_port%',
                 ],
             ],
             'mautic.transport.sendgrid' => [
