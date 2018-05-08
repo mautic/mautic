@@ -99,7 +99,7 @@ class FCMApi extends AbstractNotificationApi
     public function send($token, $data){    
         $message = new Message();        
 
-        $message->data = $data;
+        $message->data->fill($data);
         $message->setTarget(new Token($token));
 
         var_dump($token, $data);
@@ -171,14 +171,13 @@ class FCMApi extends AbstractNotificationApi
             $playerId = [$playerId];
         }
 
-        foreach ($playerId as $plId){
-            $data['token'] = $plId;
-            $data['notification'] = [
+        foreach ($playerId as $plId){            
+            $data = [
                 'title' => $title,
                 'body' => $message                
             ];
             if (!empty($url)) {
-                $data['notification']['click_action'] = $url;
+                $data['click_action'] = $url;
             }             
 
             if ($notification->isMobile()) {
