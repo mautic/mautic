@@ -47,16 +47,11 @@ class FCMApi extends AbstractNotificationApi
 
         $this->apiKeys    = $this->integrationHelper->getIntegrationObject('FCM')->getKeys();
         
-        var_dump($this->apiKeys);
-
         if (!empty($this->apiKeys['apiKey'])){
             $this->apiKey      = $this->apiKeys['apiKey'];    
         }else{
-            var_dump('throw exception');
             throw new MissingApiKeyException();   
         }
-
-        var_dump($this->apiKey);
 
         if (!empty($this->apiKeys['projectId'])){
             $this->projectId      = $this->apiKeys['projectId'];    
@@ -106,6 +101,8 @@ class FCMApi extends AbstractNotificationApi
 
         $message->data = $data;
         $message->setTarget(new Token($token));
+
+        var_dump($token, $data);
 
         $client = new Client(['debug'=>false]);
 
