@@ -103,6 +103,9 @@ class FCMApi extends AbstractNotificationApi
         $validate_only = false;
         //Create a request
         $rq = new Request($this->serviceAccount,$validate_only,$client);
+
+        var_dump($this->serviceAccount);
+
         try{
             //Use the request to submit the message
             return $message->send($rq);
