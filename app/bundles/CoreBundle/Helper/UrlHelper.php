@@ -147,6 +147,14 @@ class UrlHelper
         return $scheme.'://'.$abs;
     }
 
+    /**
+     * Takes a plaintext, finds all URLs in it and return the array of those URLs.
+     * With exception of URLs used as a token default values.
+     *
+     * @param string $text
+     *
+     * @return array
+     */
     public static function getUrlsFromPlaintext($text)
     {
         $regex = '#[-a-zA-Z0-9@:%_\+.~\#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~\#?&//=]*)?#si';
