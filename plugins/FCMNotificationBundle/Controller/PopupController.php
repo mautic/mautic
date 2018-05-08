@@ -81,7 +81,7 @@ class PopupController extends CommonController
         $message->data->set('body', 'My notification body....');        
         $message->data->set('icon', $featureSettings['notification_icon']);
         
-        $message->setTarget(new Token('fBiGDEMndMM:APA91bGO9Tz6pfSwl5ZBYXfAC3JeVDCDFZiswEVKxW1N_lhgFKK8zDx9iZ7OS611suC-99I3rKWEvcPppz0F2uodLFPEzu5hPWRKsvWt-baq1GMmyjjp-3L29yPE0K783gsel4-b4bde'));
+        $message->setTarget(new Token('c_4CGrLSyA8:APA91bHAKV10vdTdVA0p11_MSDdpcqbbVVa_tc6b5jdEsXtNIxlNqLIWVEFFfwaqzZKN5oz3vMD-XiWtc_hcVwwwqsKBF3Zd3Pb9xcIeWLsPrRGEW5HUUJQekMCjBBd_niqLAiQfmK-J'));
 
         $client = new Client(['debug'=>false]);
         //If true the validate_only is set to true the message will not be submitted but just checked with FCM
