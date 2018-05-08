@@ -17,7 +17,14 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 
 
-
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
+use Plokko\Firebase\FCM\Exceptions\FcmErrorException;
+use Plokko\Firebase\FCM\Message;
+use Plokko\Firebase\FCM\Request;
+use Plokko\Firebase\FCM\Targets\Token;
+use Plokko\Firebase\ServiceAccount;
 
 class PopupController extends CommonController
 {
