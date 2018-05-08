@@ -68,7 +68,7 @@ class PopupController extends CommonController
 
         //-- Init the service account --//        
         $serviceAccount = new ServiceAccount($keys['service_account_json']);
-        $cacheHandler = new Google\Auth\Cache\MemoryCacheItemPool\MemoryCacheItemPool();
+        $cacheHandler = new \Google\Auth\Cache\MemoryCacheItemPool\MemoryCacheItemPool();
         $serviceAccount->setCacheHandler($cacheHandler);
 
         $message = new Message();
