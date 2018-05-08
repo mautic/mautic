@@ -76,7 +76,7 @@ class PopupController extends CommonController
 
         $message->data->set('title', 'My notification title');
         $message->data->set('body', 'My notification body....');
-        $message->data->set('icon', 'localhost/plugins/FCMNotificationBundle/Assets/img/fcm_logo.png');
+        $message->data->set('icon', '/plugins/FCMNotificationBundle/Assets/img/fcm_logo.png');
         
         $message->setTarget(new Token('fBiGDEMndMM:APA91bGO9Tz6pfSwl5ZBYXfAC3JeVDCDFZiswEVKxW1N_lhgFKK8zDx9iZ7OS611suC-99I3rKWEvcPppz0F2uodLFPEzu5hPWRKsvWt-baq1GMmyjjp-3L29yPE0K783gsel4-b4bde'));
 
