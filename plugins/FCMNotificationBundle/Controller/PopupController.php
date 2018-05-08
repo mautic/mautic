@@ -25,6 +25,7 @@ use Plokko\Firebase\FCM\Message;
 use Plokko\Firebase\FCM\Request;
 use Plokko\Firebase\FCM\Targets\Token;
 use Plokko\Firebase\ServiceAccount;
+use Google\Auth\Cache\MemoryCacheItemPool\MemoryCacheItemPool;
 
 class PopupController extends CommonController
 {
@@ -68,7 +69,7 @@ class PopupController extends CommonController
 
         //-- Init the service account --//        
         $serviceAccount = new ServiceAccount($keys['service_account_json']);
-        $cacheHandler = new \Google\Auth\Cache\MemoryCacheItemPool\MemoryCacheItemPool();
+        $cacheHandler = new MemoryCacheItemPool();
         $serviceAccount->setCacheHandler($cacheHandler);
 
         $message = new Message();
