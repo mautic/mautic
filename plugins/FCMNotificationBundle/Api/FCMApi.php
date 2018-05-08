@@ -37,6 +37,7 @@ class FCMApi extends AbstractNotificationApi
     protected $projectId = '';
     protected $messagingSenderId = '';
     protected $serviceAccount = '';
+    protected $notificationIcon = '';
 
     public function __construct() {
         $this->apiKeys    = $this->integrationHelper->getIntegrationObject('FCM')->getKeys();
@@ -66,7 +67,14 @@ class FCMApi extends AbstractNotificationApi
             $this->serviceAccount->setCacheHandler($cacheHandler);    
         }else{
             throw new MissingServiceAccountJsonException();   
-        }        
+        }   
+
+        $settings          = $this->integrationHelper->getIntegrationObject('FCM')->getIntegrationSettings();        
+        $featureSettings   = $settings->getFeatureSettings(); 
+
+        if (!empty($featureSettings['notification_icon'])){
+            $this->notificationIcon = $featureSettings['notification_icon'];
+        }
     }
 
 
@@ -74,8 +82,8 @@ class FCMApi extends AbstractNotificationApi
    
 
 
-    /**
-     * @param string $endpoint One of "apps", "players", or "notifications"
+    /**     
+     * @param string $token    FCM token of the targeted user
      * @param string $data     JSON encoded array of data to send
      *
      * @return Response
@@ -83,54 +91,21 @@ class FCMApi extends AbstractNotificationApi
      * @throws MissingAppIDException
      * @throws MissingApiKeyException
      */
-    public function send($endpoint, $data){    
-        $message = new Message();
+    public function send($token, $data){    
+        $message = new Message();        
 
-        $message->notification
-        ->setTitle($data['title'])
-        ->setBody($data['body']);
-
-
-        return $this->http->post(
-            $this->apiUrlBase.$endpoint,
-            json_encode($data),
-            [
-                'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer '.$TOKEN,
-            ]
-        );
-
-        
-    }
-
-   
-
-
-           
-        
-        
-
-        
-
-        
-
-        $message->data->fill([
-            'a'=>1,
-            'b'=>'2',
-        ]);
-        $message->data->set('x','value');
-        $message->data->y='Same as above';
-
-        $message->setTarget(new Token('dj_BwvWGX2Y:APA91bF2QavspU0jW6-0FiLwloqIQXm6gnnsTo30U9tgSEsTw1Qdu9P0GW8qCaIAT7CyQ_3byyM7NBNLQjl038T_p94Q2iSR4QTko-W4sGwtcfnEzXu08UyvgeDZpamGuvlbM4QYhGFm'));
+        $message->data = $data;
+        $message->setTarget(new Token($token));
 
         $client = new Client(['debug'=>false]);
+
         //If true the validate_only is set to true the message will not be submitted but just checked with FCM
         $validate_only = false;
         //Create a request
         $rq = new Request($serviceAccount,$validate_only,$client);
         try{
             //Use the request to submit the message
-            $message->send($rq);
+            return $message->send($rq);
             //You can force the validate_only flag via the validate method, the request will be left intact
             //$message->validate($rq);
         }
@@ -149,20 +124,23 @@ class FCMApi extends AbstractNotificationApi
                 case 'INTERNAL':
             }
             echo 'FCM error ['.$e->getErrorCode().']: ',$e->getMessage();
+            return false;
         }
         catch(RequestException $e){
             //HTTP response error
             $response = $e->getResponse();
-            echo 'Got an http response error:',$response->getStatusCode(),':',$response->getReasonPhrase();
-            var_dump($response);
+            echo 'Got an http response error:',$response->getStatusCode(),':',$response->getReasonPhrase();            
+            return false;
         }
         catch(GuzzleException $e){
             //GuzzleHttp generic error
-            echo 'Got an http error:',$e->getMessage();
+            echo  'Got an http error:',$e->getMessage();
+            return false;
         }
 
+    }
 
-
+   
     /**
      * @param string|array $playerId     Player ID as string, or an array of player ID's
      * @param Notification $notification
@@ -189,7 +167,7 @@ class FCMApi extends AbstractNotificationApi
             $data['token'] = $plId;
             $data['notification'] = [
                 'title' => $title,
-                'body' => $message
+                'body' => $message                
             ];
             if (!empty($url)) {
                 $data['notification']['click_action'] = $url;
@@ -206,9 +184,11 @@ class FCMApi extends AbstractNotificationApi
                     $data['web_buttons'][] = ['id' => $buttonId, 'text' => $button, 'url' => $url];
                 }
             }
+            $result = $this->send($playerId, $data);
         }
 
-        return $this->send(':send', $data);
+        //returning only last result;
+        return $result;
     }
 
     /**

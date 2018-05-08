@@ -176,8 +176,15 @@ class FormSubscriber extends CommonSubscriber
 
         $event->setChannel('notification', $notification->getId());
 
+        /*
         // If for some reason the call failed, tell mautic to try again by return false
         if ($response->code !== 200) {
+            return $event->setResult(false);
+        }
+        */
+       
+        /* FCM PHP API uses Guzzlehttp instead of joomla/http thus response differs */
+        if (!$response) {
             return $event->setResult(false);
         }
 

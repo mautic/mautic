@@ -46,7 +46,7 @@ class PopupController extends CommonController
             'FCMNotificationBundle:Popup:index.html.php',
             [
                 'siteUrl' => $this->coreParametersHelper->getParameter('site_url'),
-                'icon'  => $integration->getIcon(),
+                'icon'  => !empty($featureSettings['notification_icon'])?$featureSettings['notification_icon']:$integration->getIcon(),
                 'sampleNotificationTitle'  => $featureSettings['sample_notification_title'],
                 'sampleNotificationText'  => $featureSettings['sample_notification_text']
             ]
@@ -62,6 +62,15 @@ class PopupController extends CommonController
     }
 
     public function testAction(){
+        $this->notificationApi = $this->get('mauticplugin.fcmnotification.notification.api');       
+        $this->notificationApi->send(
+            'fBiGDEMndMM:APA91bGO9Tz6pfSwl5ZBYXfAC3JeVDCDFZiswEVKxW1N_lhgFKK8zDx9iZ7OS611suC-99I3rKWEvcPppz0F2uodLFPEzu5hPWRKsvWt-baq1GMmyjjp-3L29yPE0K783gsel4-b4bde',
+            [
+                'title' => 'My notification title2',
+                'body' => 'bádi',
+            ]
+        );
+        /*
         $this->integrationHelper = $this->get('mautic.helper.integration');       
         $integration = $this->integrationHelper->getIntegrationObject('FCM');
         $keys        = $integration->getDecryptedApiKeys();
@@ -94,7 +103,7 @@ class PopupController extends CommonController
             //You can force the validate_only flag via the validate method, the request will be left intact
             //$message->validate($rq);
         }
-        /** Catch all the exceptions @see https://firebase.google.com/docs/reference/fcm/rest/v1/ErrorCode **/
+        
         //Like this
         catch(FcmErrorException $e){
             switch($e->getErrorCode()){
@@ -120,6 +129,10 @@ class PopupController extends CommonController
             //GuzzleHttp generic error
             echo 'Got an http error:',$e->getMessage();
         }
+
+        */
+
+
 
         $response = $this->render(
             'FCMNotificationBundle:Popup:index.html.php'

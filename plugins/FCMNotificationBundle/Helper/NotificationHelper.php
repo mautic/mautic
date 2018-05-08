@@ -187,15 +187,14 @@ MauticJS.conditionalAsyncQueue(function(){
             this.messaging.getToken().then(function(currentToken){
                 console.log(currentToken);
                 if (currentToken) {
-                    console.log(refreshToken);
+                    console.log('refreshToken');
                     MauticJS.postUserIdToMautic(currentToken);          
                 } else {
                     this.messaging.requestPermission().then(function() {
                         this.messaging.getToken().then(function(currentToken){
                             if (currentToken) {
                                 if (welcomenotificationEnabled){
-                                    MauticJS.postUserIdToMautic(currentToken, function(){
-                                        console.log('welcomeNotification');
+                                    MauticJS.postUserIdToMautic(currentToken, function(){                                        
                                         var notificationTitle = '{$welcomeNotificationTitle}';
                                         var notificationOptions = {
                                             body: '{$welcomeNotificationBody}',                                                                
