@@ -214,13 +214,13 @@ MauticJS.conditionalAsyncQueue(function(){
           
         messaging.onMessage(function(payload){
             console.log('onMessage', payload);
-            var notificationTitle = payload.title;
+            var notificationTitle = payload.data.title;
             var notificationOptions = {
-                body: payload.body,                    
+                body: payload.data.body,                    
                 requireInteraction: true,
             };
-            if (payload.icon){
-                notificationOptions.icon = payload.icon;
+            if (payload.data.icon){
+                notificationOptions.icon = payload.data.icon;
             }
 
             return new Notification(
