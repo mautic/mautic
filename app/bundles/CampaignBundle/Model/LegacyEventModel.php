@@ -21,12 +21,13 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
-use Mautic\CampaignBundle\Executioner\DecisionExecutioner;
-use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
-use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
@@ -45,9 +46,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class LegacyEventModel extends CommonFormModel
 {
     /**
-     * @var DecisionExecutioner
+     * @var RealTimeExecutioner
      */
-    private $decisionExecutioner;
+    private $realTimeExecutioner;
 
     /**
      * @var KickoffExecutioner
@@ -70,19 +71,24 @@ class LegacyEventModel extends CommonFormModel
     private $eventExecutioner;
 
     /**
-     * @var EventDispatcher
-     */
-    private $eventDispatcher;
-
-    /**
      * @var EventCollector
      */
     private $eventCollector;
 
     /**
-     * @var NotificationHelper
+     * @var ActionDispatcher
      */
-    private $notificationHelper;
+    private $actionDispatcher;
+
+    /**
+     * @var ConditionDispatcher
+     */
+    private $conditionDispatcher;
+
+    /**
+     * @var DecisionDispatcher
+     */
+    private $decisionDispatcher;
 
     /**
      * @var
@@ -115,19 +121,22 @@ class LegacyEventModel extends CommonFormModel
     protected $notificationModel;
 
     /**
-     * EventModel constructor.
+     * LegacyEventModel constructor.
      *
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param LeadModel            $leadModel
      * @param UserModel            $userModel
      * @param NotificationModel    $notificationModel
      * @param CampaignModel        $campaignModel
-     * @param DecisionExecutioner  $decisionExecutioner
+     * @param LeadModel            $leadModel
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param RealTimeExecutioner  $realTimeExecutioner
      * @param KickoffExecutioner   $kickoffExecutioner
      * @param ScheduledExecutioner $scheduledExecutioner
      * @param InactiveExecutioner  $inactiveExecutioner
      * @param EventExecutioner     $eventExecutioner
-     * @param EventDispatcher      $eventDispatcher
+     * @param EventCollector       $eventCollector
+     * @param ActionDispatcher     $actionDispatcher
+     * @param ConditionDispatcher  $conditionDispatcher
+     * @param DecisionDispatcher   $decisionDispatcher
      */
     public function __construct(
         UserModel $userModel,
@@ -135,26 +144,30 @@ class LegacyEventModel extends CommonFormModel
         CampaignModel $campaignModel,
         LeadModel $leadModel,
         IpLookupHelper $ipLookupHelper,
-        DecisionExecutioner $decisionExecutioner,
+        RealTimeExecutioner $realTimeExecutioner,
         KickoffExecutioner $kickoffExecutioner,
         ScheduledExecutioner $scheduledExecutioner,
         InactiveExecutioner $inactiveExecutioner,
         EventExecutioner $eventExecutioner,
-        EventDispatcher $eventDispatcher,
-        EventCollector $eventCollector
+        EventCollector $eventCollector,
+        ActionDispatcher $actionDispatcher,
+        ConditionDispatcher $conditionDispatcher,
+        DecisionDispatcher $decisionDispatcher
     ) {
         $this->userModel            = $userModel;
         $this->notificationModel    = $notificationModel;
         $this->campaignModel        = $campaignModel;
         $this->leadModel            = $leadModel;
         $this->ipLookupHelper       = $ipLookupHelper;
-        $this->decisionExecutioner  = $decisionExecutioner;
+        $this->realTimeExecutioner  = $realTimeExecutioner;
         $this->kickoffExecutioner   = $kickoffExecutioner;
         $this->scheduledExecutioner = $scheduledExecutioner;
         $this->inactiveExecutioner  = $inactiveExecutioner;
         $this->eventExecutioner     = $eventExecutioner;
-        $this->eventDispatcher      = $eventDispatcher;
         $this->eventCollector       = $eventCollector;
+        $this->actionDispatcher     = $actionDispatcher;
+        $this->conditionDispatcher  = $conditionDispatcher;
+        $this->decisionDispatcher   = $decisionDispatcher;
     }
 
     /**
@@ -294,7 +307,7 @@ class LegacyEventModel extends CommonFormModel
      */
     public function triggerEvent($type, $eventDetails = null, $channel = null, $channelId = null)
     {
-        $response = $this->decisionExecutioner->execute($type, $eventDetails, $channel, $channelId);
+        $response = $this->realTimeExecutioner->execute($type, $eventDetails, $channel, $channelId);
 
         return $response->getResponseArray();
     }
@@ -389,17 +402,17 @@ class LegacyEventModel extends CommonFormModel
             case Event::TYPE_ACTION:
                 $logs = new ArrayCollection([$log]);
                 /* @var ActionAccessor $config */
-                $this->eventDispatcher->dispatchActionEvent($config, $event, $logs);
+                $this->actionDispatcher->dispatchEvent($config, $event, $logs);
 
                 return !$log->getFailedLog();
             case Event::TYPE_CONDITION:
                 /** @var ConditionAccessor $config */
-                $eventResult = $this->eventDispatcher->dispatchConditionEvent($config, $log);
+                $eventResult = $this->conditionDispatcher->dispatchEvent($config, $log);
 
                 return $eventResult->getResult();
             case Event::TYPE_DECISION:
                 /** @var DecisionAccessor $config */
-                $eventResult = $this->eventDispatcher->dispatchDecisionEvent($config, $log, $eventDetails);
+                $eventResult = $this->decisionDispatcher->dispatchEvent($config, $log, $eventDetails);
 
                 return $eventResult->getResult();
         }

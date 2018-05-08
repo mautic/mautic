@@ -15,45 +15,52 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
-use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
-use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
+use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
+use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 
-class Action implements EventInterface
+class ActionExecutioner implements EventInterface
 {
     const TYPE = 'action';
 
     /**
-     * @var EventDispatcher
+     * @var ActionDispatcher
      */
     private $dispatcher;
 
     /**
-     * Action constructor.
-     *
-     * @param EventDispatcher $dispatcher
+     * @var EventLogger
      */
-    public function __construct(EventDispatcher $dispatcher)
+    private $eventLogger;
+
+    /**
+     * ActionExecutioner constructor.
+     *
+     * @param ActionDispatcher   $dispatcher
+     * @param EventLogger        $eventLogger
+     */
+    public function __construct(ActionDispatcher $dispatcher, EventLogger $eventLogger)
     {
-        $this->dispatcher = $dispatcher;
+        $this->dispatcher         = $dispatcher;
+        $this->eventLogger        = $eventLogger;
     }
 
     /**
-     * @param ActionAccessor  $config
-     * @param ArrayCollection $logs
+     * @param AbstractEventAccessor $config
+     * @param ArrayCollection       $logs
      *
-     * @return mixed|void
-     *
+     * @return EvaluatedContacts
      * @throws CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    public function executeLogs(AbstractEventAccessor $config, ArrayCollection $logs)
+    public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
     {
         /** @var LeadEventLog $firstLog */
         if (!$firstLog = $logs->first()) {
-            return;
+            return new EvaluatedContacts();
         }
 
         $event = $firstLog->getEvent();
@@ -63,6 +70,12 @@ class Action implements EventInterface
         }
 
         // Execute to process the batch of contacts
-        $this->dispatcher->dispatchActionEvent($config, $event, $logs);
+        $pendingEvent = $this->dispatcher->dispatchEvent($config, $event, $logs);
+
+        /** @var ArrayCollection $contacts */
+        $passed = $this->eventLogger->extractContactsFromLogs($pendingEvent->getSuccessful());
+        $failed = $this->eventLogger->extractContactsFromLogs($pendingEvent->getFailures());
+
+        return new EvaluatedContacts($passed, $failed);
     }
 }

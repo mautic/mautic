@@ -25,6 +25,7 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
+use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
@@ -35,7 +36,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EventDispatcherTest extends \PHPUnit_Framework_TestCase
+class ActionDispatcherTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockBuilder|EventDispatcherInterface
@@ -159,7 +160,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->legacyDispatcher->expects($this->once())
             ->method('dispatchExecutionEvents');
 
-        $this->getEventDispatcher()->dispatchActionEvent($config, $event, $logs);
+        $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
     public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithSuccess()
@@ -225,7 +226,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->getEventDispatcher()->dispatchActionEvent($config, $event, $logs);
+        $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
     public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithFailed()
@@ -291,7 +292,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->getEventDispatcher()->dispatchActionEvent($config, $event, $logs);
+        $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
     public function testActionBatchEventIsIgnoredWithLegacy()
@@ -312,65 +313,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->legacyDispatcher->expects($this->once())
             ->method('dispatchCustomEvent');
 
-        $this->getEventDispatcher()->dispatchActionEvent($config, $event, new ArrayCollection());
-    }
-
-    public function testDecisionEventIsDispatched()
-    {
-        $config = $this->getMockBuilder(DecisionAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->once())
-            ->method('getEventName')
-            ->willReturn('something');
-
-        $this->legacyDispatcher->expects($this->once())
-            ->method('dispatchDecisionEvent');
-
-        $this->dispatcher->expects($this->at(0))
-            ->method('dispatch')
-            ->with('something', $this->isInstanceOf(DecisionEvent::class));
-
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_DECISION_EVALUATION, $this->isInstanceOf(DecisionEvent::class));
-
-        $this->getEventDispatcher()->dispatchDecisionEvent($config, new LeadEventLog(), null);
-    }
-
-    public function testDecisionResultsEventIsDispatched()
-    {
-        $config = $this->getMockBuilder(DecisionAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->dispatcher->expects($this->at(0))
-            ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS, $this->isInstanceOf(DecisionResultsEvent::class));
-
-        $this->getEventDispatcher()->dispatchDecisionResultsEvent($config, new ArrayCollection(), new EvaluatedContacts());
-    }
-
-    public function testConditionEventIsDispatched()
-    {
-        $config = $this->getMockBuilder(ConditionAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->once())
-            ->method('getEventName')
-            ->willReturn('something');
-
-        $this->dispatcher->expects($this->at(0))
-            ->method('dispatch')
-            ->with('something', $this->isInstanceOf(ConditionEvent::class));
-
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_CONDITION_EVALUATION, $this->isInstanceOf(ConditionEvent::class));
-
-        $this->getEventDispatcher()->dispatchConditionEvent($config, new LeadEventLog());
+        $this->getEventDispatcher()->dispatchEvent($config, $event, new ArrayCollection());
     }
 
     /**
@@ -378,7 +321,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
      */
     private function getEventDispatcher()
     {
-        return new EventDispatcher(
+        return new ActionDispatcher(
             $this->dispatcher,
             new NullLogger(),
             $this->scheduler,

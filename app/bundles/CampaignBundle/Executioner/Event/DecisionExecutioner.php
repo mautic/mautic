@@ -16,14 +16,14 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
-use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher;
 use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\LeadBundle\Entity\Lead;
 
-class Decision implements EventInterface
+class DecisionExecutioner implements EventInterface
 {
     const TYPE = 'decision';
 
@@ -33,51 +33,20 @@ class Decision implements EventInterface
     private $eventLogger;
 
     /**
-     * @var EventDispatcher
+     * @var DecisionDispatcher
      */
     private $dispatcher;
 
     /**
-     * Action constructor.
+     * DecisionExecutioner constructor.
      *
-     * @param EventLogger $eventLogger
+     * @param EventLogger        $eventLogger
+     * @param DecisionDispatcher $dispatcher
      */
-    public function __construct(EventLogger $eventLogger, EventDispatcher $dispatcher)
+    public function __construct(EventLogger $eventLogger, DecisionDispatcher $dispatcher)
     {
         $this->eventLogger = $eventLogger;
         $this->dispatcher  = $dispatcher;
-    }
-
-    /**
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
-     *
-     * @return EvaluatedContacts|mixed
-     *
-     * @throws CannotProcessEventException
-     */
-    public function executeLogs(AbstractEventAccessor $config, ArrayCollection $logs)
-    {
-        $evaluatedContacts = new EvaluatedContacts();
-
-        /** @var LeadEventLog $log */
-        foreach ($logs as $log) {
-            if (Event::TYPE_DECISION !== $log->getEvent()->getEventType()) {
-                throw new CannotProcessEventException('Event ID '.$log->getEvent()->getId().' is not a decision');
-            }
-
-            try {
-                /* @var DecisionAccessor $config */
-                $this->execute($config, $log);
-                $evaluatedContacts->pass($log->getLead());
-            } catch (DecisionNotApplicableException $exception) {
-                $evaluatedContacts->fail($log->getLead());
-            }
-        }
-
-        $this->dispatcher->dispatchDecisionResultsEvent($config, $logs, $evaluatedContacts);
-
-        return $evaluatedContacts;
     }
 
     /**
@@ -101,8 +70,40 @@ class Decision implements EventInterface
         $log->setChannel($channel)
             ->setChannelId($channelId);
 
-        $this->execute($config, $log, $passthrough);
+        $this->dispatchEvent($config, $log, $passthrough);
         $this->eventLogger->persistLog($log);
+    }
+
+    /**
+     * @param AbstractEventAccessor $config
+     * @param ArrayCollection       $logs
+     *
+     * @return EvaluatedContacts
+     *
+     * @throws CannotProcessEventException
+     */
+    public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
+    {
+        $evaluatedContacts = new EvaluatedContacts();
+
+        /** @var LeadEventLog $log */
+        foreach ($logs as $log) {
+            if (Event::TYPE_DECISION !== $log->getEvent()->getEventType()) {
+                throw new CannotProcessEventException('Event ID '.$log->getEvent()->getId().' is not a decision');
+            }
+
+            try {
+                /* @var DecisionAccessor $config */
+                $this->dispatchEvent($config, $log);
+                $evaluatedContacts->pass($log->getLead());
+            } catch (DecisionNotApplicableException $exception) {
+                $evaluatedContacts->fail($log->getLead());
+            }
+        }
+
+        $this->dispatcher->dispatchDecisionResultsEvent($config, $logs, $evaluatedContacts);
+
+        return $evaluatedContacts;
     }
 
     /**
@@ -112,9 +113,9 @@ class Decision implements EventInterface
      *
      * @throws DecisionNotApplicableException
      */
-    private function execute(DecisionAccessor $config, LeadEventLog $log, $passthrough = null)
+    private function dispatchEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough = null)
     {
-        $decisionEvent = $this->dispatcher->dispatchDecisionEvent($config, $log, $passthrough);
+        $decisionEvent = $this->dispatcher->dispatchEvent($config, $log, $passthrough);
 
         if (!$decisionEvent->wasDecisionApplicable()) {
             throw new DecisionNotApplicableException('evaluation failed');

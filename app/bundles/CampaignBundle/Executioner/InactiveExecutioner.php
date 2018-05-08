@@ -292,7 +292,7 @@ class InactiveExecutioner implements ExecutionerInterface
 
                 if ($contacts->count()) {
                     // Execute or schedule the events attached to the inactive side of the decision
-                    $this->executioner->executeContactsForInactiveChildren($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
+                    $this->executeLogsForInactiveEvents($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
                     // Record decision for these contacts
                     $this->executioner->recordLogsAsExecutedForEvent($decisionEvent, $contacts, true);
                 }
@@ -333,5 +333,53 @@ class InactiveExecutioner implements ExecutionerInterface
         $this->startAtContactId = $maxId;
 
         return $maxId;
+    }
+
+    /**
+     * @param ArrayCollection $children
+     * @param ArrayCollection $contacts
+     * @param Counter         $childrenCounter
+     * @param \DateTime       $earliestLastActiveDateTime
+     *
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
+     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     */
+    private function executeLogsForInactiveEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter, \DateTime $earliestLastActiveDateTime)
+    {
+        $eventExecutionDates = $this->scheduler->getSortedExecutionDates($events, $earliestLastActiveDateTime);
+
+        /** @var \DateTime $earliestExecutionDate */
+        $earliestExecutionDate = reset($eventExecutionDates);
+
+        $executionDate = $this->executioner->getExecutionDate();
+
+        foreach ($events as $event) {
+            // Ignore decisions
+            if (Event::TYPE_DECISION == $event->getEventType()) {
+                $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$event->getId().' as a decision');
+                continue;
+            }
+
+            $eventExecutionDate = $this->scheduler->getExecutionDateForInactivity(
+                $eventExecutionDates[$event->getId()],
+                $earliestExecutionDate,
+                $executionDate
+            );
+
+            $this->logger->debug(
+                'CAMPAIGN: Event ID# '.$event->getId().
+                ' to be executed on '.$eventExecutionDate->format('Y-m-d H:i:s')
+            );
+
+            if ($this->scheduler->shouldSchedule($eventExecutionDate, $executionDate)) {
+                $childrenCounter->advanceTotalScheduled($contacts->count());
+                $this->scheduler->schedule($event, $eventExecutionDate, $contacts, true);
+                continue;
+            }
+
+            $this->executioner->executeForContacts($event, $contacts, $childrenCounter, true);
+        }
     }
 }

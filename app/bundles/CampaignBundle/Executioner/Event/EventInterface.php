@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\Executioner\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 
 interface EventInterface
 {
@@ -20,7 +21,7 @@ interface EventInterface
      * @param AbstractEventAccessor $config
      * @param ArrayCollection       $logs
      *
-     * @return mixed
+     * @return EvaluatedContacts
      */
-    public function executeLogs(AbstractEventAccessor $config, ArrayCollection $logs);
+    public function execute(AbstractEventAccessor $config, ArrayCollection $logs);
 }

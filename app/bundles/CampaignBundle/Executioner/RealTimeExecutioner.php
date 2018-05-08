@@ -16,7 +16,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Executioner\Event\Decision;
+use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner as Executioner;
 use Mautic\CampaignBundle\Executioner\Exception\CampaignNotExecutableException;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
@@ -26,7 +26,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 
-class DecisionExecutioner
+class RealTimeExecutioner
 {
     /**
      * @var LoggerInterface
@@ -59,7 +59,7 @@ class DecisionExecutioner
     private $executioner;
 
     /**
-     * @var Decision
+     * @var Executioner
      */
     private $decisionExecutioner;
 
@@ -84,13 +84,13 @@ class DecisionExecutioner
     private $responses;
 
     /**
-     * DecisionExecutioner constructor.
+     * RealTimeExecutioner constructor.
      *
      * @param LoggerInterface  $logger
      * @param LeadModel        $leadModel
      * @param EventRepository  $eventRepository
      * @param EventExecutioner $executioner
-     * @param Decision         $decisionExecutioner
+     * @param Executioner         $decisionExecutioner
      * @param EventCollector   $collector
      * @param EventScheduler   $scheduler
      * @param ContactTracker   $contactTracker
@@ -100,7 +100,7 @@ class DecisionExecutioner
         LeadModel $leadModel,
         EventRepository $eventRepository,
         EventExecutioner $executioner,
-        Decision $decisionExecutioner,
+        Executioner $decisionExecutioner,
         EventCollector $collector,
         EventScheduler $scheduler,
         ContactTracker $contactTracker

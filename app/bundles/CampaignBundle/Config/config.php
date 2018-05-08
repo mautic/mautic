@@ -220,20 +220,22 @@ return [
                 ],
             ],
             'mautic.campaign.model.event'     => [
-                'class'     => 'Mautic\CampaignBundle\Model\EventModel',
+                'class'     => \Mautic\CampaignBundle\Model\EventModel::class,
                 'arguments' => [
                     'mautic.user.model.user',
                     'mautic.core.model.notification',
                     'mautic.campaign.model.campaign',
                     'mautic.lead.model.lead',
                     'mautic.helper.ip_lookup',
-                    'mautic.campaign.executioner.active_decision',
+                    'mautic.campaign.executioner.realtime',
                     'mautic.campaign.executioner.kickoff',
                     'mautic.campaign.executioner.scheduled',
                     'mautic.campaign.executioner.inactive',
-                    'mautic.campaign.executioner',
-                    'mautic.campaign.event_dispatcher',
+                    'mautic.campaign.event_executioner',
                     'mautic.campaign.event_collector',
+                    'mautic.campaign.dispatcher.action',
+                    'mautic.campaign.dispatcher.condition',
+                    'mautic.campaign.dispatcher.decision',
                 ],
             ],
             'mautic.campaign.model.event_log' => [
@@ -299,13 +301,26 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
-            'mautic.campaign.event_dispatcher'        => [
-                'class'     => \Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher::class,
+            'mautic.campaign.dispatcher.action'        => [
+                'class'     => \Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher::class,
                 'arguments' => [
                     'event_dispatcher',
                     'monolog.logger.mautic',
                     'mautic.campaign.scheduler',
                     'mautic.campaign.helper.notification',
+                    'mautic.campaign.legacy_event_dispatcher',
+                ],
+            ],
+            'mautic.campaign.dispatcher.condition'        => [
+                'class'     => \Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.campaign.dispatcher.decision'        => [
+                'class'     => \Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
                     'mautic.campaign.legacy_event_dispatcher',
                 ],
             ],
@@ -349,25 +364,26 @@ return [
                 ],
             ],
             'mautic.campaign.executioner.action' => [
-                'class'     => \Mautic\CampaignBundle\Executioner\Event\Action::class,
+                'class'     => \Mautic\CampaignBundle\Executioner\Event\ActionExecutioner::class,
                 'arguments' => [
-                    'mautic.campaign.event_dispatcher',
+                    'mautic.campaign.dispatcher.action',
+                    'mautic.campaign.event_logger',
                 ],
             ],
             'mautic.campaign.executioner.condition' => [
-                'class'     => \Mautic\CampaignBundle\Executioner\Event\Condition::class,
+                'class'     => \Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner::class,
                 'arguments' => [
-                    'mautic.campaign.event_dispatcher',
+                    'mautic.campaign.dispatcher.condition',
                 ],
             ],
             'mautic.campaign.executioner.decision' => [
-                'class'     => \Mautic\CampaignBundle\Executioner\Event\Decision::class,
+                'class'     => \Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner::class,
                 'arguments' => [
                     'mautic.campaign.event_logger',
-                    'mautic.campaign.event_dispatcher',
+                    'mautic.campaign.dispatcher.decision',
                 ],
             ],
-            'mautic.campaign.executioner' => [
+            'mautic.campaign.event_executioner' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\EventExecutioner::class,
                 'arguments' => [
                     'mautic.campaign.event_collector',
@@ -386,7 +402,7 @@ return [
                     'monolog.logger.mautic',
                     'mautic.campaign.contact_finder.kickoff',
                     'translator',
-                    'mautic.campaign.executioner',
+                    'mautic.campaign.event_executioner',
                     'mautic.campaign.scheduler',
                 ],
             ],
@@ -396,18 +412,18 @@ return [
                     'mautic.campaign.repository.lead_event_log',
                     'monolog.logger.mautic',
                     'translator',
-                    'mautic.campaign.executioner',
+                    'mautic.campaign.event_executioner',
                     'mautic.campaign.scheduler',
                     'mautic.campaign.contact_finder.scheduled',
                 ],
             ],
-            'mautic.campaign.executioner.active_decision'     => [
-                'class'     => \Mautic\CampaignBundle\Executioner\DecisionExecutioner::class,
+            'mautic.campaign.executioner.realtime'     => [
+                'class'     => \Mautic\CampaignBundle\Executioner\RealTimeExecutioner::class,
                 'arguments' => [
                     'monolog.logger.mautic',
                     'mautic.lead.model.lead',
                     'mautic.campaign.repository.event',
-                    'mautic.campaign.executioner',
+                    'mautic.campaign.event_executioner',
                     'mautic.campaign.executioner.decision',
                     'mautic.campaign.event_collector',
                     'mautic.campaign.scheduler',
@@ -422,7 +438,7 @@ return [
                     'translator',
                     'mautic.campaign.scheduler',
                     'mautic.campaign.helper.inactivity',
-                    'mautic.campaign.executioner',
+                    'mautic.campaign.event_executioner',
                 ],
             ],
             'mautic.campaign.helper.inactivity' => [

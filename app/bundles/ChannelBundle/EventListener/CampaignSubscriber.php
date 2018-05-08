@@ -19,7 +19,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Model\MessageModel;
@@ -39,9 +39,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     protected $messageModel;
 
     /**
-     * @var EventDispatcher
+     * @var ActionDispatcher
      */
-    private $eventDispatcher;
+    private $actionDispatcher;
 
     /**
      * @var EventCollector
@@ -82,23 +82,23 @@ class CampaignSubscriber implements EventSubscriberInterface
      * CampaignSubscriber constructor.
      *
      * @param MessageModel        $messageModel
-     * @param EventDispatcher     $eventDispatcher
+     * @param ActionDispatcher    $actionDispatcher
      * @param EventCollector      $collector
      * @param LoggerInterface     $logger
      * @param TranslatorInterface $translator
      */
     public function __construct(
         MessageModel $messageModel,
-        EventDispatcher $eventDispatcher,
+        ActionDispatcher $actionDispatcher,
         EventCollector $collector,
         LoggerInterface $logger,
         TranslatorInterface $translator
     ) {
-        $this->messageModel    = $messageModel;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->eventCollector  = $collector;
-        $this->logger          = $logger;
-        $this->translator      = $translator;
+        $this->messageModel     = $messageModel;
+        $this->actionDispatcher = $actionDispatcher;
+        $this->eventCollector   = $collector;
+        $this->logger           = $logger;
+        $this->translator       = $translator;
     }
 
     /**
@@ -232,7 +232,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $pendingEvent = new PendingEvent($config, $this->pseudoEvent, $logs);
         $pendingEvent->setChannel('campaign.event', $messageChannel['channel_id']);
 
-        $this->eventDispatcher->dispatchActionEvent(
+        $this->actionDispatcher->dispatchEvent(
             $config,
             $this->pseudoEvent,
             $logs,

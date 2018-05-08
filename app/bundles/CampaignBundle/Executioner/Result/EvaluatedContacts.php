@@ -27,12 +27,15 @@ class EvaluatedContacts
     private $failed;
 
     /**
-     * ConditionContacts constructor.
+     * EvaluatedContacts constructor.
+     *
+     * @param ArrayCollection|null $passed
+     * @param ArrayCollection|null $failed
      */
-    public function __construct()
+    public function __construct(ArrayCollection $passed = null, ArrayCollection $failed = null)
     {
-        $this->passed = new ArrayCollection();
-        $this->failed = new ArrayCollection();
+        $this->passed = (null === $passed) ? new ArrayCollection() : $passed;
+        $this->failed = (null === $failed) ? new ArrayCollection() : $failed;
     }
 
     /**

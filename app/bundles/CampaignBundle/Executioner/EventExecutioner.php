@@ -14,12 +14,11 @@ namespace Mautic\CampaignBundle\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\TypeNotFoundException;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Executioner\Event\Action;
-use Mautic\CampaignBundle\Executioner\Event\Condition;
-use Mautic\CampaignBundle\Executioner\Event\Decision;
+use Mautic\CampaignBundle\Executioner\Event\ActionExecutioner;
+use Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner;
+use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
@@ -32,17 +31,17 @@ use Psr\Log\LoggerInterface;
 class EventExecutioner
 {
     /**
-     * @var Action
+     * @var ActionExecutioner
      */
     private $actionExecutioner;
 
     /**
-     * @var Condition
+     * @var ConditionExecutioner
      */
     private $conditionExecutioner;
 
     /**
-     * @var Decision
+     * @var DecisionExecutioner
      */
     private $decisionExecutioner;
 
@@ -67,11 +66,6 @@ class EventExecutioner
     private $scheduler;
 
     /**
-     * @var \DateTime
-     */
-    private $now;
-
-    /**
      * @var Responses
      */
     private $responses;
@@ -82,22 +76,27 @@ class EventExecutioner
     private $removedContactTracker;
 
     /**
+     * @var \DateTime
+     */
+    private $executionDate;
+
+    /**
      * EventExecutioner constructor.
      *
-     * @param EventCollector  $eventCollector
-     * @param EventLogger     $eventLogger
-     * @param Action          $actionExecutioner
-     * @param Condition       $conditionExecutioner
-     * @param Decision        $decisionExecutioner
-     * @param LoggerInterface $logger
-     * @param EventScheduler  $scheduler
+     * @param EventCollector       $eventCollector
+     * @param EventLogger          $eventLogger
+     * @param ActionExecutioner    $actionExecutioner
+     * @param ConditionExecutioner $conditionExecutioner
+     * @param DecisionExecutioner  $decisionExecutioner
+     * @param LoggerInterface      $logger
+     * @param EventScheduler       $scheduler
      */
     public function __construct(
         EventCollector $eventCollector,
         EventLogger $eventLogger,
-        Action $actionExecutioner,
-        Condition $conditionExecutioner,
-        Decision $decisionExecutioner,
+        ActionExecutioner $actionExecutioner,
+        ConditionExecutioner $conditionExecutioner,
+        DecisionExecutioner $decisionExecutioner,
         LoggerInterface $logger,
         EventScheduler $scheduler,
         RemovedContactTracker $removedContactTracker
@@ -110,15 +109,9 @@ class EventExecutioner
         $this->logger                = $logger;
         $this->scheduler             = $scheduler;
         $this->removedContactTracker = $removedContactTracker;
-        $this->now                   = new \DateTime();
-    }
 
-    /**
-     * @param \DateTime $now
-     */
-    public function setNow(\DateTime $now)
-    {
-        $this->now = $now;
+        // Be sure that all events are compared using the exact same \DateTime
+        $this->executionDate = new \DateTime();
     }
 
     /**
@@ -191,21 +184,69 @@ class EventExecutioner
         $this->checkForRemovedContacts($logs);
 
         if ($counter) {
+            // Must pass $counter around rather than setting it as a class property as this class is used
+            // circularly to process children of parent events thus counter must be kept track separately
             $counter->advanceExecuted($logs->count());
         }
 
         switch ($event->getEventType()) {
             case Event::TYPE_ACTION:
-                $this->executeAction($config, $event, $logs, $counter);
+                $evaluatedContacts = $this->actionExecutioner->execute($config, $logs);
+                $this->persistLogs($logs);
+                $this->executeEventConditionsForContacts($event, $evaluatedContacts->getPassed(), $counter);
                 break;
             case Event::TYPE_CONDITION:
-                $this->executeCondition($config, $event, $logs, $counter);
+                $evaluatedContacts = $this->conditionExecutioner->execute($config, $logs);
+                $this->persistLogs($logs);
+                $this->executeDecisionPathEventsForContacts($event, $evaluatedContacts, $counter);
                 break;
             case Event::TYPE_DECISION:
-                $this->executeDecision($config, $event, $logs, $counter);
+                $evaluatedContacts = $this->decisionExecutioner->execute($config, $logs);
+                $this->persistLogs($logs);
+                $this->executeDecisionPathEventsForContacts($event, $evaluatedContacts, $counter);
                 break;
             default:
                 throw new TypeNotFoundException("{$event->getEventType()} is not a valid event type");
+        }
+    }
+
+    /**
+     * @param ArrayCollection $children
+     * @param ArrayCollection $contacts
+     * @param Counter         $childrenCounter
+     *
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
+     */
+    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter)
+    {
+        if (!$contacts->count()) {
+            return;
+        }
+
+        foreach ($events as $event) {
+            // Ignore decisions
+            if (Event::TYPE_DECISION == $event->getEventType()) {
+                $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$event->getId().' as a decision');
+                continue;
+            }
+
+            $executionDate = $this->scheduler->getExecutionDateTime($event, $this->executionDate);
+
+            $this->logger->debug(
+                'CAMPAIGN: Event ID# '.$event->getId().
+                ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
+            );
+
+            if ($this->scheduler->shouldSchedule($executionDate, $this->executionDate)) {
+                $childrenCounter->advanceTotalScheduled($contacts->count());
+                $this->scheduler->schedule($event, $executionDate, $contacts);
+                continue;
+            }
+
+            $this->executeForContacts($event, $contacts, $childrenCounter);
         }
     }
 
@@ -225,216 +266,11 @@ class EventExecutioner
     }
 
     /**
-     * @param Event             $event
-     * @param EvaluatedContacts $contacts
-     * @param Counter|null      $counter
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @return \DateTime
      */
-    public function executeContactsForDecisionPathChildren(Event $event, EvaluatedContacts $contacts, Counter $counter = null)
+    public function getExecutionDate()
     {
-        $childrenCounter = new Counter();
-        $positive        = $contacts->getPassed();
-        if ($positive->count()) {
-            $this->logger->debug('CAMPAIGN: Contact IDs '.implode(',', $positive->getKeys()).' passed evaluation for event ID '.$event->getId());
-
-            $children = $event->getPositiveChildren();
-            $childrenCounter->advanceEvaluated($children->count());
-            $this->executeContactsForChildren($children, $positive, $childrenCounter);
-        }
-
-        $negative = $contacts->getFailed();
-        if ($negative->count()) {
-            $this->logger->debug('CAMPAIGN: Contact IDs '.implode(',', $negative->getKeys()).' failed evaluation for event ID '.$event->getId());
-
-            $children = $event->getNegativeChildren();
-
-            $childrenCounter->advanceEvaluated($children->count());
-            $this->executeContactsForChildren($children, $negative, $childrenCounter);
-        }
-
-        if ($counter) {
-            $counter->advanceTotalEvaluated($childrenCounter->getTotalEvaluated());
-            $counter->advanceTotalExecuted($childrenCounter->getTotalExecuted());
-        }
-    }
-
-    /**
-     * @param Event           $event
-     * @param ArrayCollection $contacts
-     * @param Counter|null    $counter
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
-     */
-    public function executeContactsForConditionChildren(Event $event, ArrayCollection $contacts, Counter $counter = null)
-    {
-        $childrenCounter = new Counter();
-        $conditions      = $event->getChildrenByEventType(Event::TYPE_CONDITION);
-        $childrenCounter->advanceEvaluated($conditions->count());
-
-        $this->logger->debug('CAMPAIGN: Evaluating '.$conditions->count().' conditions for action ID '.$event->getId());
-
-        $this->executeContactsForChildren($conditions, $contacts, $childrenCounter);
-
-        if ($counter) {
-            $counter->advanceTotalEvaluated($childrenCounter->getTotalEvaluated());
-            $counter->advanceTotalExecuted($childrenCounter->getTotalExecuted());
-        }
-    }
-
-    /**
-     * @param ArrayCollection $children
-     * @param ArrayCollection $contacts
-     * @param Counter         $childrenCounter
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
-     */
-    public function executeContactsForChildren(ArrayCollection $children, ArrayCollection $contacts, Counter $childrenCounter)
-    {
-        foreach ($children as $child) {
-            // Ignore decisions
-            if (Event::TYPE_DECISION == $child->getEventType()) {
-                $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$child->getId().' as a decision');
-                continue;
-            }
-
-            $executionDate = $this->scheduler->getExecutionDateTime($child, $this->now);
-
-            $this->logger->debug(
-                'CAMPAIGN: Event ID# '.$child->getId().
-                ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
-            );
-
-            if ($this->scheduler->shouldSchedule($executionDate, $this->now)) {
-                $childrenCounter->advanceTotalScheduled($contacts->count());
-                $this->scheduler->schedule($child, $executionDate, $contacts);
-                continue;
-            }
-
-            $this->executeForContacts($child, $contacts, $childrenCounter);
-        }
-    }
-
-    /**
-     * @param ArrayCollection $children
-     * @param ArrayCollection $contacts
-     * @param Counter         $childrenCounter
-     * @param bool            $validatingInaction
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
-     */
-    public function executeContactsForInactiveChildren(ArrayCollection $children, ArrayCollection $contacts, Counter $childrenCounter, \DateTime $earliestLastActiveDateTime)
-    {
-        $eventExecutionDates = $this->scheduler->getSortedExecutionDates($children, $earliestLastActiveDateTime);
-
-        /** @var \DateTime $earliestExecutionDate */
-        $earliestExecutionDate = reset($eventExecutionDates);
-
-        foreach ($children as $child) {
-            // Ignore decisions
-            if (Event::TYPE_DECISION == $child->getEventType()) {
-                $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$child->getId().' as a decision');
-                continue;
-            }
-
-            $executionDate = $this->scheduler->getExecutionDateForInactivity(
-                $eventExecutionDates[$child->getId()],
-                $earliestExecutionDate,
-                $this->now
-            );
-
-            $this->logger->debug(
-                'CAMPAIGN: Event ID# '.$child->getId().
-                ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
-            );
-
-            if ($this->scheduler->shouldSchedule($executionDate, $this->now)) {
-                $childrenCounter->advanceTotalScheduled($contacts->count());
-                $this->scheduler->schedule($child, $executionDate, $contacts, true);
-                continue;
-            }
-
-            $this->executeForContacts($child, $contacts, $childrenCounter, true);
-        }
-    }
-
-    /**
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
-     * @param Counter|null          $counter
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
-     */
-    private function executeAction(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, Counter $counter = null)
-    {
-        $this->actionExecutioner->executeLogs($config, $logs);
-
-        /** @var ArrayCollection $contacts */
-        $contacts = $this->eventLogger->extractContactsFromLogs($logs);
-
-        // Update and clear any pending logs
-        $this->persistLogs($logs);
-
-        // Process conditions that are attached to this action
-        $this->executeContactsForConditionChildren($event, $contacts, $counter);
-    }
-
-    /**
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
-     * @param Counter|null          $counter
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
-     */
-    private function executeCondition(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, Counter $counter = null)
-    {
-        $evaluatedContacts = $this->conditionExecutioner->executeLogs($config, $logs);
-
-        // Update and clear any pending logs
-        $this->persistLogs($logs);
-
-        $this->executeContactsForDecisionPathChildren($event, $evaluatedContacts, $counter);
-    }
-
-    /**
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
-     * @param Counter|null          $counter
-     *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
-     */
-    private function executeDecision(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, Counter $counter = null)
-    {
-        $evaluatedContacts = $this->decisionExecutioner->executeLogs($config, $logs);
-
-        // Update and clear any pending logs
-        $this->persistLogs($logs);
-
-        $this->executeContactsForDecisionPathChildren($event, $evaluatedContacts, $counter);
+        return $this->executionDate;
     }
 
     /**
@@ -469,6 +305,65 @@ class EventExecutioner
                 $this->logger->debug("CAMPAIGN: Contact ID# $contactId has been removed from campaign ID $campaignId");
                 $logs->remove($key);
             }
+        }
+    }
+
+    /**
+     * @param Event           $event
+     * @param ArrayCollection $contacts
+     * @param Counter|null    $counter
+     *
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
+     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     */
+    private function executeEventConditionsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null)
+    {
+        $childrenCounter = new Counter();
+        $conditions      = $event->getChildrenByEventType(Event::TYPE_CONDITION);
+        $childrenCounter->advanceEvaluated($conditions->count());
+
+        $this->logger->debug('CAMPAIGN: Evaluating '.$conditions->count().' conditions for action ID '.$event->getId());
+
+        $this->executeEventsForContacts($conditions, $contacts, $childrenCounter);
+
+        if ($counter) {
+            $counter->advanceTotalEvaluated($childrenCounter->getTotalEvaluated());
+            $counter->advanceTotalExecuted($childrenCounter->getTotalExecuted());
+        }
+    }
+
+    /**
+     * @param Event             $event
+     * @param EvaluatedContacts $contacts
+     * @param Counter|null      $counter
+     */
+    private function executeDecisionPathEventsForContacts(Event $event, EvaluatedContacts $contacts, Counter $counter = null)
+    {
+        $childrenCounter = new Counter();
+        $positive        = $contacts->getPassed();
+        if ($positive->count()) {
+            $this->logger->debug('CAMPAIGN: Contact IDs '.implode(',', $positive->getKeys()).' passed evaluation for event ID '.$event->getId());
+
+            $children = $event->getPositiveChildren();
+            $childrenCounter->advanceEvaluated($children->count());
+            $this->executeEventsForContacts($children, $positive, $childrenCounter);
+        }
+
+        $negative = $contacts->getFailed();
+        if ($negative->count()) {
+            $this->logger->debug('CAMPAIGN: Contact IDs '.implode(',', $negative->getKeys()).' failed evaluation for event ID '.$event->getId());
+
+            $children = $event->getNegativeChildren();
+
+            $childrenCounter->advanceEvaluated($children->count());
+            $this->executeEventsForContacts($children, $negative, $childrenCounter);
+        }
+
+        if ($counter) {
+            $counter->advanceTotalEvaluated($childrenCounter->getTotalEvaluated());
+            $counter->advanceTotalExecuted($childrenCounter->getTotalExecuted());
         }
     }
 }

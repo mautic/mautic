@@ -64,7 +64,7 @@ return [
                 'class'     => Mautic\ChannelBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.channel.model.message',
-                    'mautic.campaign.event_dispatcher',
+                    'mautic.campaign.dispatcher.action',
                     'mautic.campaign.event_collector',
                     'monolog.logger.mautic',
                     'translator',

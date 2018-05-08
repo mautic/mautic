@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2017 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://mautic.org
@@ -15,29 +15,20 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\ConditionEvent;
-use Mautic\CampaignBundle\Event\DecisionEvent;
-use Mautic\CampaignBundle\Event\DecisionResultsEvent;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
-use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
-use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
-use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class EventDispatcher.
- */
-class EventDispatcher
+class ActionDispatcher
 {
     /**
      * @var EventDispatcherInterface
@@ -99,7 +90,7 @@ class EventDispatcher
      * @throws LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    public function dispatchActionEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null)
+    public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null)
     {
         if (!$pendingEvent) {
             $pendingEvent = new PendingEvent($config, $event, $logs);
@@ -131,52 +122,6 @@ class EventDispatcher
         $this->legacyDispatcher->dispatchCustomEvent($config, $logs, ($customEvent), $pendingEvent);
 
         return $pendingEvent;
-    }
-
-    /**
-     * @param DecisionAccessor $config
-     * @param LeadEventLog     $log
-     * @param                  $passthrough
-     *
-     * @return DecisionEvent
-     */
-    public function dispatchDecisionEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough)
-    {
-        $event = new DecisionEvent($config, $log, $passthrough);
-        $this->dispatcher->dispatch($config->getEventName(), $event);
-        $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DECISION_EVALUATION, $event);
-
-        $this->legacyDispatcher->dispatchDecisionEvent($event);
-
-        return $event;
-    }
-
-    /**
-     * @param DecisionAccessor  $config
-     * @param ArrayCollection   $logs
-     * @param EvaluatedContacts $evaluatedContacts
-     */
-    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
-    {
-        $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS,
-            new DecisionResultsEvent($config, $logs, $evaluatedContacts)
-        );
-    }
-
-    /**
-     * @param ConditionAccessor $config
-     * @param LeadEventLog      $log
-     *
-     * @return ConditionEvent
-     */
-    public function dispatchConditionEvent(ConditionAccessor $config, LeadEventLog $log)
-    {
-        $event = new ConditionEvent($config, $log);
-        $this->dispatcher->dispatch($config->getEventName(), $event);
-        $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_CONDITION_EVALUATION, $event);
-
-        return $event;
     }
 
     /**

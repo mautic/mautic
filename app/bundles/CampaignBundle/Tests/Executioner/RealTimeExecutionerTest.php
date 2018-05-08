@@ -16,7 +16,8 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Executioner\DecisionExecutioner;
+use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CampaignBundle\Executioner\Event\Decision;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
@@ -25,7 +26,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\NullLogger;
 
-class DecisionExecutionerTest extends \PHPUnit_Framework_TestCase
+class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LeadModel
@@ -43,7 +44,7 @@ class DecisionExecutionerTest extends \PHPUnit_Framework_TestCase
     private $executioner;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Decision
+     * @var \PHPUnit_Framework_MockObject_MockObject|DecisionExecutioner
      */
     private $decisionExecutioner;
 
@@ -76,7 +77,7 @@ class DecisionExecutionerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->decisionExecutioner = $this->getMockBuilder(Decision::class)
+        $this->decisionExecutioner = $this->getMockBuilder(DecisionExecutioner::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -102,7 +103,7 @@ class DecisionExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->eventRepository->expects($this->never())
             ->method('getContactPendingEvents');
 
-        $responses = $this->getDecisionExecutioner()->execute('something');
+        $responses = $this->getExecutioner()->execute('something');
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -126,7 +127,7 @@ class DecisionExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->eventCollector->expects($this->never())
             ->method('getEventConfig');
 
-        $responses = $this->getDecisionExecutioner()->execute('something');
+        $responses = $this->getExecutioner()->execute('something');
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -156,7 +157,7 @@ class DecisionExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->eventCollector->expects($this->never())
             ->method('getEventConfig');
 
-        $responses = $this->getDecisionExecutioner()->execute('something', null, 'page');
+        $responses = $this->getExecutioner()->execute('something', null, 'page');
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -189,7 +190,7 @@ class DecisionExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->eventCollector->expects($this->never())
             ->method('getEventConfig');
 
-        $responses = $this->getDecisionExecutioner()->execute('something', null, 'email', 1);
+        $responses = $this->getExecutioner()->execute('something', null, 'email', 1);
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -229,7 +230,7 @@ class DecisionExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->decisionExecutioner->expects($this->once())
             ->method('evaluateForContact');
 
-        $responses = $this->getDecisionExecutioner()->execute('something', null, 'email', 3);
+        $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -298,17 +299,17 @@ class DecisionExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->executioner->expects($this->once())
             ->method('executeForContact');
 
-        $responses = $this->getDecisionExecutioner()->execute('something', null, 'email', 3);
+        $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
 
         $this->assertEquals(0, $responses->containsResponses());
     }
 
     /**
-     * @return DecisionExecutioner
+     * @return RealTimeExecutioner
      */
-    private function getDecisionExecutioner()
+    private function getExecutioner()
     {
-        return new DecisionExecutioner(
+        return new RealTimeExecutioner(
             new NullLogger(),
             $this->leadModel,
             $this->eventRepository,

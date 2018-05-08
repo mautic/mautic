@@ -57,6 +57,7 @@ class InactiveHelper
      * @param EventScheduler         $scheduler
      * @param InactiveContactFinder  $inactiveContactFinder
      * @param LeadEventLogRepository $eventLogRepository
+     * @param EventRepository        $eventRepository
      * @param LoggerInterface        $logger
      */
     public function __construct(
