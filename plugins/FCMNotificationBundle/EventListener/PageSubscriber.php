@@ -67,10 +67,11 @@ class PageSubscriber extends CommonSubscriber
             return;
         }
     
-        $script = '';
-        if (!in_array('landing_page_enabled', $features)) {
-            $script = 'var disable_fcm_notification = true;';
-        }
+        $script = "(function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
+        w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
+        m=d.getElementsByTagName(t)[0];a.src=u;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','/mtc.js','mt');';";
+        
 
         $this->assetsHelper->addScriptDeclaration($script, 'onPageDisplay_headClose');
     }
