@@ -81,21 +81,21 @@ class JsController extends CommonController
 
               const messaging = firebase.messaging();
 
-              messaging.setBackgroundMessageHandler(function(payload) {
-              
-              console.log('[firebase-messaging-sw.js] Received background message ', payload);
-              // Customize notification here
-              var notificationTitle = 'Background Message Title';
-              var notificationOptions = {
-                body: 'Background Message body.',
-                icon: ''
-              };
+              messaging.setBackgroundMessageHandler(function(payload) {                                              
+                var notificationTitle = payload.title;
+                var notificationOptions = {
+                    body: payload.body,                    
+                    requireInteraction: true,
+                };
+                if (payload.icon){
+                    notificationOptions.icon = payload.icon;
+                }
 
-              return self.registration.showNotification(
-                notificationTitle,
-                notificationOptions
-              );
-            });
+                return self.registration.showNotification(
+                    notificationTitle,
+                    notificationOptions
+                );
+              });
              ",
             200,
             [

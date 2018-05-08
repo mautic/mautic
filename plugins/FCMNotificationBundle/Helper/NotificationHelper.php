@@ -212,8 +212,20 @@ MauticJS.conditionalAsyncQueue(function(){
             });
         }
           
-        messaging.onMessage(function(payload){
-            console.log('message arrived to open site', payload);
+        messaging.onMessage(function(payload){            
+            var notificationTitle = payload.title;
+            var notificationOptions = {
+                body: payload.body,                    
+                requireInteraction: true,
+            };
+            if (payload.icon){
+                notificationOptions.icon = payload.icon;
+            }
+
+            return new Notification(
+                notificationTitle,
+                notificationOptions
+            );
         });
 }, function(){
     return (typeof firebase !== 'undefined' && firebase)?true:false;

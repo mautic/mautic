@@ -74,22 +74,15 @@ class PopupController extends CommonController
 
         $message = new Message();
 
-        $message->notification
-        ->setTitle('My notification title')
-        ->setBody('My notification body....');
+        $message->data->set('title', 'My notification title');
+        $message->data->set('body', 'My notification body....');
+        $message->data->set('icon', 'localhost/plugins/FCMNotificationBundle/Assets/img/fcm_logo.png');
+        
+        $message->setTarget(new Token('fBiGDEMndMM:APA91bGO9Tz6pfSwl5ZBYXfAC3JeVDCDFZiswEVKxW1N_lhgFKK8zDx9iZ7OS611suC-99I3rKWEvcPppz0F2uodLFPEzu5hPWRKsvWt-baq1GMmyjjp-3L29yPE0K783gsel4-b4bde'));
 
-        $message->data->fill([
-            'a'=>1,
-            'b'=>'2',
-        ]);
-        $message->data->set('x','value');
-        $message->data->y='Same as above';
-
-        $message->setTarget(new Token('dj_BwvWGX2Y:APA91bF2QavspU0jW6-0FiLwloqIQXm6gnnsTo30U9tgSEsTw1Qdu9P0GW8qCaIAT7CyQ_3byyM7NBNLQjl038T_p94Q2iSR4QTko-W4sGwtcfnEzXu08UyvgeDZpamGuvlbM4QYhGFm'));
-
-        $client = new Client(['debug'=>true]);
+        $client = new Client(['debug'=>false]);
         //If true the validate_only is set to true the message will not be submitted but just checked with FCM
-        $validate_only = true;
+        //$validate_only = true;
         //Create a request
         $rq = new Request($serviceAccount,$validate_only,$client);
         try{
