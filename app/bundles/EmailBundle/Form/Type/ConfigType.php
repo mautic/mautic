@@ -227,7 +227,7 @@ class ConfigType extends AbstractType
             'mailer_transport',
             ChoiceType::class,
             [
-                'choices'     => $this->transportType->getTransportTypes(),
+                'choices'     => $this->getTransportChoices(),
                 'label'       => 'mautic.email.config.mailer.transport',
                 'required'    => false,
                 'attr'        => [
@@ -776,5 +776,21 @@ class ConfigType extends AbstractType
     public function getName()
     {
         return 'emailconfig';
+    }
+
+    /**
+     * @return array
+     */
+    private function getTransportChoices()
+    {
+        $choices = $this->transportType->getTransportTypes();
+
+        foreach ($choices as $value => $label) {
+            $choices[$value] = $this->translator->trans($label);
+        }
+
+        asort($choices, SORT_NATURAL);
+
+        return $choices;
     }
 }
