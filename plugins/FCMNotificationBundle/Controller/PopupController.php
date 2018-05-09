@@ -123,7 +123,7 @@ class PopupController extends CommonController
             //HTTP response error
             $response = $e->getResponse();
             echo 'Got an http response error:',$response->getStatusCode(),':',$response->getReasonPhrase();
-            var_dump($response);
+
         }
         catch(GuzzleException $e){
             //GuzzleHttp generic error

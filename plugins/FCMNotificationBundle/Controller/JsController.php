@@ -123,7 +123,7 @@ class JsController extends CommonController
                         fetch('{$trackOpenUrl}', {  
                             credentials: 'include',
                             method: 'post',                                                          
-                            body: JSON.stringify({notification_id: payload.notification_id}),
+                            body: JSON.stringify({notification_id: payload.data.notification_id}),
                             headers: {
                                 'Accept': 'application/json, text/plain, */*',
                                 'Content-Type': 'application/json'
