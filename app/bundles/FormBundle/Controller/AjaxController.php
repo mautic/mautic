@@ -69,7 +69,7 @@ class AjaxController extends CommonAjaxController
         $dataArray  = ['success' => 0];
         $model      = $this->getModel('form');
         $entity     = $model->getEntity($formId);
-        $formFields = $entity->getFields();
+        $formFields = empty($entity) ? [] : $entity->getFields();
         $fields     = [];
 
         foreach ($formFields as $field) {
