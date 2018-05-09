@@ -22,6 +22,7 @@ use MauticPlugin\FCMNotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
  * Class NotificationSubscriber.
@@ -49,7 +50,7 @@ class NotificationSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * @var AuditLogModel
+     * @var integrationHelper
      */
     protected $integrationHelper;
 
