@@ -85,6 +85,11 @@ class FormSubscriber extends CommonSubscriber
      */
     public function onFormBuild(FormBuilderEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
         $action = [
             'group'       => 'mautic.notification.actions',
             'description' => 'mautic.notification.actions.mobile_tooltip',
@@ -98,6 +103,11 @@ class FormSubscriber extends CommonSubscriber
 
     public function onFormActionSend(SubmissionEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
         $lead         = $event->getLead();
         $actionConfig = $event->getActionConfig();
 

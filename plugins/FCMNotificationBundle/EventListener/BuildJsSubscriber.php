@@ -61,7 +61,6 @@ class BuildJsSubscriber extends CommonSubscriber
     public function onBuildJs(BuildJsEvent $event)
     {
         $integration = $this->integrationHelper->getIntegrationObject('FCM');
-
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }

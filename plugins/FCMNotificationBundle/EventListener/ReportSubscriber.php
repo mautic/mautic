@@ -69,6 +69,11 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
         if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
             return;
         }
@@ -201,6 +206,11 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
         if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
             return;
         }
@@ -271,6 +281,11 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
         // Context check, we only want to fire for Mobile Notification reports
         if (!$event->checkContext(self::MOBILE_NOTIFICATIONS_STATS)) {
             return;

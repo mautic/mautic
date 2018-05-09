@@ -26,6 +26,11 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
         $this->addContactRestrictedRepositories($em, 'MauticNotificationBundle:Stat');
     }
 }

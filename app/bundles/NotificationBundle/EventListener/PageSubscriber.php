@@ -59,6 +59,11 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageDisplay(PageDisplayEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+        
         $integrationObject = $this->integrationHelper->getIntegrationObject('OneSignal');
         $settings          = $integrationObject->getIntegrationSettings();
         $features          = $settings->getFeatureSettings();

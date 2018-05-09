@@ -83,6 +83,11 @@ class NotificationSubscriber extends CommonSubscriber
      */
     public function onPostSave(NotificationEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
         $entity = $event->getNotification();
         if ($details = $event->getChanges()) {
             $log = [
@@ -103,6 +108,11 @@ class NotificationSubscriber extends CommonSubscriber
      */
     public function onDelete(NotificationEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
         $entity = $event->getNotification();
         $log    = [
             'bundle'   => 'notification',
@@ -119,6 +129,11 @@ class NotificationSubscriber extends CommonSubscriber
      */
     public function onTokenReplacement(TokenReplacementEvent $event)
     {
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
         /** @var Lead $lead */
         $lead         = $event->getLead();
         $content      = $event->getContent();
