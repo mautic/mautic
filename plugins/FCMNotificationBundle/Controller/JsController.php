@@ -121,9 +121,9 @@ class JsController extends CommonController
                 if (payload.data.notification_id){
                     notification.onshow = function(){
                         fetch('{$trackOpenUrl}', {  
-                            credentials: 'include'  
+                            credentials: 'include',
                             method: 'post',                              
-                            body: 'notification_id=payload.notification_id'  
+                            body: 'notification_id='+payload.notification_id
                           })
                           .then(response => response.json())  
                           .then(function (data) {  
