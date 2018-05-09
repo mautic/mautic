@@ -13,6 +13,7 @@ namespace Mautic\NotificationBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
  * Class StatsSubscriber.

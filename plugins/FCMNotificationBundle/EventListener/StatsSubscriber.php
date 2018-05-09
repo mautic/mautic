@@ -13,6 +13,7 @@ namespace MauticPlugin\FCMNotificationBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
  * Class StatsSubscriber.

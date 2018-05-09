@@ -19,6 +19,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
  * Class ReportSubscriber.
