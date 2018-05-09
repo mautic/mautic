@@ -19,7 +19,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Executioner\Dispatcher\EventDispatcher as CampaignEventDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
@@ -49,7 +49,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
     private $messageModel;
 
     /**
-     * @var CampaignEventDispatcher
+     * @var ActionDispatcher
      */
     private $eventDispatcher;
 
@@ -150,7 +150,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             $factory
         );
 
-        $this->eventDispatcher = new CampaignEventDispatcher(
+        $this->eventDispatcher = new ActionDispatcher(
             $this->dispatcher,
             new NullLogger(),
             $this->scheduler,
