@@ -14,6 +14,8 @@ namespace MauticPlugin\FCMNotificationBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 
 class JsController extends CommonController
 {
