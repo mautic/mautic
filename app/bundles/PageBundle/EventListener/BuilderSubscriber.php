@@ -250,7 +250,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $event->addSlotType(
                     'successmessage',
                     $this->translator->trans('mautic.core.slot.label.successmessage'),
-                    'floppy-o',
+                    'check',
                     'MauticCoreBundle:Slots:successmessage.html.php',
                     'slot_successmessage',
                     540
