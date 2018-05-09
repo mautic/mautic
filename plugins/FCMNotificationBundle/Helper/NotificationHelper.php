@@ -203,10 +203,12 @@ MauticJS.conditionalAsyncQueue(function(){
                                             notificationOptions.icon = '{$welcomeNotificationIcon}';
                                         }
 
-                                        return new Notification(
+                                        var notification = new Notification(
                                             notificationTitle,
                                             notificationOptions
                                         );
+
+                                        return notification;                                        
                                     });          
                                 }else{
                                     MauticJS.postUserIdToMautic(currentToken);
@@ -250,10 +252,17 @@ MauticJS.conditionalAsyncQueue(function(){
                 notificationOptions.icon = payload.data.icon;
             }
 
-            return new Notification(
+            var notification = new Notification(
                 notificationTitle,
                 notificationOptions
             );
+
+            if (payload.data.url){
+                notification.onclick = function(event){
+                    event.preventDefault();
+                    window.open(payload.data.url);
+                }
+            }
         });
 }, function(){
     return (typeof firebase !== 'undefined' && firebase)?true:false;

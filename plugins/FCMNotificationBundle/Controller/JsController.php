@@ -64,9 +64,7 @@ class JsController extends CommonController
         $messagingSenderId  = $keys['messagingSenderId'];
 
         return new Response(
-            "//importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js');
-             //importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase-messaging.js');
-            importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase.js');
+            "importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase.js');
 
                // Initialize Firebase
               var config = {
@@ -81,8 +79,7 @@ class JsController extends CommonController
 
               const messaging = firebase.messaging();
 
-              messaging.setBackgroundMessageHandler(function(payload) {
-                console.log('serviceworker', payload);
+              messaging.setBackgroundMessageHandler(function(payload) {                
                 var notificationTitle = payload.data.title;
                 var notificationOptions = {
                     body: payload.data.body,                    
@@ -92,10 +89,22 @@ class JsController extends CommonController
                     notificationOptions.icon = payload.data.icon;
                 }
 
-                return self.registration.showNotification(
+                var notifcation = self.registration.showNotification(
                     notificationTitle,
                     notificationOptions
                 );
+
+                if (payload.data.url){
+                    self.addEventListener('notificationclick', function(event) {
+                        console.log('[Service Worker] Notification click Received.');
+                        event.notification.close();
+                        event.waitUntil(
+                            clients.openWindow(payload.data.url);
+                        );
+                    });
+                }
+
+                return notifcation;
               });
              ",
             200,
