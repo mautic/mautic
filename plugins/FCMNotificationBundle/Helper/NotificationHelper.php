@@ -270,7 +270,11 @@ MauticJS.conditionalAsyncQueue(function(){
                     fetch('{$trackOpenUrl}', {  
                         credentials: 'include',  
                         method: 'post',                              
-                        body: 'notification_id='+payload.notification_id
+                        body: JSON.stringify({notification_id: payload.notification_id}),
+                        headers: {
+                            'Accept': 'application/json, text/plain, */*',
+                            'Content-Type': 'application/json'
+                        }
                       })
                       .then(response => response.json())  
                       .then(function (data) {  
