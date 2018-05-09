@@ -136,7 +136,7 @@ class JsController extends CommonController
                 }
 
 
-                return notifcation;
+                return notification;
               });
              ",
             200,

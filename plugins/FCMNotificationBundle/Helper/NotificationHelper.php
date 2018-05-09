@@ -138,6 +138,7 @@ class NotificationHelper
                 UrlGeneratorInterface::ABSOLUTE_URL
             ); 
             
+            $trackOpenUrl   = $this->router->generate('mautic_track_notification_open', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
             $server        = $this->request->getCurrentRequest()->server;
             $https         = (parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME) == 'https') ? true : false;                        
