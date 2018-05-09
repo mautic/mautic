@@ -65,6 +65,7 @@ class NotificationApiController extends CommonApiController
     {
         $notification_id = $this->request->get('notification_id');        
         if ($notification_id) {
+            $this->integrationHelper = $this->get('mautic.helper.integration'); 
             $integrationObject = $this->integrationHelper->getIntegrationObject('FCM');
         
             $notificationModel = $this->get('mauticplugin.fcmnotification.notification.model.notification');             
