@@ -94,12 +94,12 @@ class JsController extends CommonController
                     notificationOptions
                 );
 
-                if (payload.data.url){
+                if (payload.data.click_action){
                     self.addEventListener('notificationclick', function(event) {
                         console.log('[Service Worker] Notification click Received.');
                         event.notification.close();
                         event.waitUntil(
-                            clients.openWindow(payload.data.url)
+                            clients.openWindow(payload.data.click_action)
                         );
                     });
                 }

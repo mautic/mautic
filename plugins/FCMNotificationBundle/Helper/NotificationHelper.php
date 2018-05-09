@@ -257,10 +257,10 @@ MauticJS.conditionalAsyncQueue(function(){
                 notificationOptions
             );
 
-            if (payload.data.url){
+            if (payload.data.click_action){
                 notification.onclick = function(event){
                     event.preventDefault();
-                    window.open(payload.data.url);
+                    window.open(payload.data.click_action);
                 }
             }
         });
