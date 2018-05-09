@@ -32,7 +32,7 @@ class Version20180508202930 extends AbstractMigration
 
         $ownerAsMailerConfigSetting = $this->container->getParameter('mailer_is_owner');
 
-        $this->addSql("UPDATE {$this->prefix}emails SET use_owner_as_mailer = $ownerAsMailerConfigSetting;");
+        $this->addSql("UPDATE {$this->prefix}emails SET use_owner_as_mailer = {$ownerAsMailerConfigSetting};");
     }
 
     /**
