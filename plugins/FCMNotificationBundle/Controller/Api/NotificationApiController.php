@@ -64,6 +64,7 @@ class NotificationApiController extends CommonApiController
     public function trackopenAction()
     {
         $notification_id = $this->request->get('notification_id');
+        var_dump($notification_id);
         if ($notification_id) {
             $integrationObject = $this->integrationHelper->getIntegrationObject('FCM');
         
