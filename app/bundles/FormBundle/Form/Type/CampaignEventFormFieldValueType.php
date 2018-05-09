@@ -133,7 +133,7 @@ class CampaignEventFormFieldValueType extends AbstractType
             );
 
             // Display selectbox for a field with choices, textbox for others
-            if (empty($options[$data['field']])) {
+            if (empty($data['field']) || empty($options[$data['field']])) {
                 $form->add(
                     'value',
                     'text',
