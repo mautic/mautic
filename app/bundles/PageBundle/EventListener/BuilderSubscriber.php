@@ -59,6 +59,7 @@ class BuilderSubscriber extends CommonSubscriber
     const channelfrequency  = '{channelfrequency}';
     const preferredchannel  = '{preferredchannel}';
     const saveprefsRegex    = '{saveprefsbutton}';
+    const successmessage    = '{successmessage}';
     const identifierToken   = '{leadidentifier}';
 
     /**
@@ -142,6 +143,7 @@ class BuilderSubscriber extends CommonSubscriber
                         self::preferredchannel   => $this->translator->trans('mautic.page.form.preferredchannel'),
                         self::channelfrequency   => $this->translator->trans('mautic.page.form.channelfrequency'),
                         self::saveprefsRegex     => $this->translator->trans('mautic.page.form.saveprefs'),
+                        self::successmessage     => $this->translator->trans('mautic.page.form.successmessage'),
                         self::identifierToken    => $this->translator->trans('mautic.page.form.leadidentifier'),
                     ]
                 )
@@ -414,6 +416,11 @@ class BuilderSubscriber extends CommonSubscriber
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
+
+            if (false !== strpos($content, self::successmessage)) {
+                $successMessage = $this->renderSuccessMessage($params);
+                $content        = str_ireplace(self::successmessage, $successMessage, $content);
+            }
         }
 
         $clickThrough = ['source' => ['page', $page->getId()]];
@@ -537,6 +544,24 @@ class BuilderSubscriber extends CommonSubscriber
         if (empty($content)) {
             $content = "<div class='pref-saveprefs'>\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
+            $content .= "</div>\n";
+        }
+
+        return $content;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return string
+     */
+    protected function renderSuccessMessage(array $params = [])
+    {
+        static $content = '';
+
+        if (empty($content)) {
+            $content = "<div class=\"pref-successmessage\">\n";
+            $content .= $this->templating->render('MauticCoreBundle:Slots:successmessage.html.php', $params);
             $content .= "</div>\n";
         }
 

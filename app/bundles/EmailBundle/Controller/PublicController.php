@@ -161,7 +161,9 @@ class PublicController extends CommonFormController
                 if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
                     $formModel    = $this->getModel('form');
-                    $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
+                    $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent(
+                            $unsubscribeForm
+                        ).'</div>';
                 }
             }
         }
@@ -197,13 +199,23 @@ class PublicController extends CommonFormController
                 $viewParameters = [
                     'lead'                         => $lead,
                     'idHash'                       => $idHash,
-                    'showContactFrequency'         => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_frequency'),
-                    'showContactPauseDates'        => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_pause_dates'),
-                    'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferred_channels'),
-                    'showContactCategories'        => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_categories'),
-                    'showContactSegments'          => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_segments'),
+                    'showContactFrequency'         => $this->get('mautic.helper.core_parameters')->getParameter(
+                        'show_contact_frequency'
+                    ),
+                    'showContactPauseDates'        => $this->get('mautic.helper.core_parameters')->getParameter(
+                        'show_contact_pause_dates'
+                    ),
+                    'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->getParameter(
+                        'show_contact_preferred_channels'
+                    ),
+                    'showContactCategories'        => $this->get('mautic.helper.core_parameters')->getParameter(
+                        'show_contact_categories'
+                    ),
+                    'showContactSegments'          => $this->get('mautic.helper.core_parameters')->getParameter(
+                        'show_contact_segments'
+                    ),
                 ];
-                $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action);
+                $form           = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action);
                 if (true === $form) {
                     $session->set($successSessionName, 1);
 
@@ -222,10 +234,10 @@ class PublicController extends CommonFormController
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
                     $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
-                                        false !== strpos($html, BuilderSubscriber::saveprefsRegex);
+                        false !== strpos($html, BuilderSubscriber::saveprefsRegex);
                     $frequencyPresent = false !== strpos($html, 'data-slot="channelfrequency"') ||
-                                        false !== strpos($html, BuilderSubscriber::channelfrequency);
-                    $tokensPresent = $savePrefsPresent && $frequencyPresent;
+                        false !== strpos($html, BuilderSubscriber::channelfrequency);
+                    $tokensPresent    = $savePrefsPresent && $frequencyPresent;
                     if ($tokensPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
@@ -234,27 +246,47 @@ class PublicController extends CommonFormController
                             [
                                 'form'                         => $formView,
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
-                                'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
-                                'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
-                                'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
+                                'showContactSegments'          => false !== strpos(
+                                        $html,
+                                        'data-slot="segmentlist"'
+                                    ) || false !== strpos($html, BuilderSubscriber::segmentListRegex),
+                                'showContactCategories'        => false !== strpos(
+                                        $html,
+                                        'data-slot="categorylist"'
+                                    ) || false !== strpos($html, BuilderSubscriber::categoryListRegex),
+                                'showContactPreferredChannels' => false !== strpos(
+                                        $html,
+                                        'data-slot="preferredchannel"'
+                                    ) || false !== strpos($html, BuilderSubscriber::preferredchannel),
                             ]
                         );
                         // Replace tokens in preference center page
                         $event = new PageDisplayEvent($html, $prefCenter, $params);
                         $this->get('event_dispatcher')
-                             ->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+                            ->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
                         $html = $event->getContent();
                         if (!$session->has($successSessionName)) {
-                            $successMessageDataSlot = 'data-slot="successmessage"';
-                            $html                   = str_replace(
-                                $successMessageDataSlot,
-                                $successMessageDataSlot.' style=display:none',
+                            $successMessageDataSlots       = [
+                                'data-slot="successmessage"',
+                                'class="pref-successmessage"',
+                            ];
+                            $successMessageDataSlotsHidden = [];
+                            foreach ($successMessageDataSlots as $successMessageDataSlot) {
+                                $successMessageDataSlotsHidden[] = $successMessageDataSlot.' style=display:none';
+                            }
+                            $html = str_replace(
+                                $successMessageDataSlots,
+                                $successMessageDataSlotsHidden,
                                 $html
                             );
                         } else {
                             $session->remove($successSessionName);
                         }
-                        $html = preg_replace('/'.BuilderSubscriber::identifierToken.'/', $lead->getPrimaryIdentifier(), $html);
+                        $html = preg_replace(
+                            '/'.BuilderSubscriber::identifierToken.'/',
+                            $lead->getPrimaryIdentifier(),
+                            $html
+                        );
                     } else {
                         unset($html);
                     }
@@ -296,7 +328,9 @@ class PublicController extends CommonFormController
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
             if (in_array('form', $config['features'])) {
-                $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.php');
+                $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(
+                    ':'.$template.':form.html.php'
+                );
             } else {
                 $contentTemplate = 'MauticFormBundle::form.html.php';
             }
@@ -359,11 +393,12 @@ class PublicController extends CommonFormController
                 $message
             );
         } else {
-            $email   = $lead   = false;
+            $email   = $lead = false;
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
-        $template = ($email !== null && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->getParameter('theme');
+        $template = ($email !== null && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate(
+        ) : $this->coreParametersHelper->getParameter('theme');
 
         $theme = $this->factory->getTheme($template);
 
@@ -535,7 +570,7 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $slots
+     * @param       $slots
      * @param Email $entity
      */
     public function processSlots($slots, $entity)
