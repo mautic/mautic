@@ -152,7 +152,7 @@ class FCMApi extends AbstractNotificationApi
      *
      * @throws \Exception
      */
-    public function sendNotification($playerId, $notificationId, Notification $notification)
+    public function sendNotification($playerId, Notification $notification, $notificationId)
     {
         $data = [];
 

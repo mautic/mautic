@@ -195,8 +195,8 @@ class CampaignSubscriber extends CommonSubscriber
         
         $response = $this->notificationApi->sendNotification(
             $playerID,
-            $notificationId,
-            $sendNotification
+            $sendNotification,
+            $notificationId
         );
 
         $event->setChannel('notification', $notification->getId());
