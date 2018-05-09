@@ -37,8 +37,8 @@ class ActionExecutioner implements EventInterface
     /**
      * ActionExecutioner constructor.
      *
-     * @param ActionDispatcher   $dispatcher
-     * @param EventLogger        $eventLogger
+     * @param ActionDispatcher $dispatcher
+     * @param EventLogger      $eventLogger
      */
     public function __construct(ActionDispatcher $dispatcher, EventLogger $eventLogger)
     {
@@ -51,6 +51,7 @@ class ActionExecutioner implements EventInterface
      * @param ArrayCollection       $logs
      *
      * @return EvaluatedContacts
+     *
      * @throws CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException

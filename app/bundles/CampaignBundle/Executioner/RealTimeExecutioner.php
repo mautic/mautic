@@ -90,7 +90,7 @@ class RealTimeExecutioner
      * @param LeadModel        $leadModel
      * @param EventRepository  $eventRepository
      * @param EventExecutioner $executioner
-     * @param Executioner         $decisionExecutioner
+     * @param Executioner      $decisionExecutioner
      * @param EventCollector   $collector
      * @param EventScheduler   $scheduler
      * @param ContactTracker   $contactTracker
