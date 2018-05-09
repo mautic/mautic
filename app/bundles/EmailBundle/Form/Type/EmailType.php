@@ -37,6 +37,7 @@ class EmailType extends AbstractType
     private $defaultTheme;
     private $em;
     private $request;
+    private $configOwnerAsMailerSetting;
 
     private $countryChoices  = [];
     private $regionChoices   = [];
@@ -49,10 +50,11 @@ class EmailType extends AbstractType
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->translator   = $factory->getTranslator();
-        $this->defaultTheme = $factory->getParameter('theme');
-        $this->em           = $factory->getEntityManager();
-        $this->request      = $factory->getRequest();
+        $this->translator                 = $factory->getTranslator();
+        $this->defaultTheme               = $factory->getParameter('theme');
+        $this->em                         = $factory->getEntityManager();
+        $this->request                    = $factory->getRequest();
+        $this->configOwnerAsMailerSetting = $factory->getSystemParameters()['mailer_is_owner'];
 
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
@@ -154,6 +156,21 @@ class EmailType extends AbstractType
                     'preaddon' => 'fa fa-envelope',
                     'tooltip'  => 'mautic.email.bcc.tooltip',
                 ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'useOwnerAsMailer',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.use.owner.as.mailer',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.use.owner.as.mailer.tooltip',
+                ],
+                'data'     => empty($options['data']->getId()) ?  (bool)$this->configOwnerAsMailerSetting : $options['data']->getUseOwnerAsMailer(),
                 'required' => false,
             ]
         );
