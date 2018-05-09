@@ -54,6 +54,8 @@ class JsController extends CommonController
             return;
         }
 
+
+
         $settings        = $integration->getIntegrationSettings();
         $keys            = $integration->getDecryptedApiKeys();
         $supported       = $settings->getSupportedFeatures();
@@ -63,6 +65,7 @@ class JsController extends CommonController
         $projectId          = $keys['projectId'];
         $messagingSenderId  = $keys['messagingSenderId'];
 
+        $this->router   = $this->get('router');
         $trackOpenUrl   = $this->router->generate('mautic_track_notification_open', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return new Response(
