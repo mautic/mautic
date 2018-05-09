@@ -96,7 +96,7 @@ class BaseDecorator implements FilterDecoratorInterface
 
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     * @param                           $argument
+     * @param array|string              $argument
      *
      * @return array|string
      */
@@ -117,7 +117,7 @@ class BaseDecorator implements FilterDecoratorInterface
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return array|bool|float|mixed|null|string
+     * @return array|bool|float|null|string
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

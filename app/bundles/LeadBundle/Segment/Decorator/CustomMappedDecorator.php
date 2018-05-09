@@ -90,7 +90,7 @@ class CustomMappedDecorator extends BaseDecorator
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return bool
+     * @return string|bool if no func needed
      */
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
