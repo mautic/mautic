@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -73,16 +73,31 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
      */
     abstract protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate);
 
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return null|string
+     */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return $this->dateDecorator->getField($contactSegmentFilterCrate);
     }
 
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return string
+     */
     public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return $this->dateDecorator->getTable($contactSegmentFilterCrate);
     }
 
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return string
+     */
     public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         if ($this->dateOptionParameters->isBetweenRequired()) {
@@ -92,11 +107,22 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
         return $this->dateDecorator->getOperator($contactSegmentFilterCrate);
     }
 
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     * @param array|string              $argument
+     *
+     * @return array|string
+     */
     public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
     {
         return $this->dateDecorator->getParameterHolder($contactSegmentFilterCrate, $argument);
     }
 
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return array|bool|float|null|string
+     */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         $dateTimeHelper = $this->dateDecorator->getDefaultDate();
@@ -118,16 +144,31 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
         return $dateTimeHelper->toUtcString($dateFormat);
     }
 
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return string
+     */
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
     }
 
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return bool|string
+     */
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }
 
+    /**
+     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
+     *
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|null|string
+     */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -29,6 +29,9 @@ class DateDecorator extends CustomMappedDecorator
         throw new \Exception('Instance of Date option needs to implement this function');
     }
 
+    /**
+     * @return DateTimeHelper
+     */
     public function getDefaultDate()
     {
         return new DateTimeHelper('midnight today', null, 'local');
