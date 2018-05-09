@@ -133,6 +133,9 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                                 <div class="clearfix"></div>
                                 <?php echo $view['form']->widget($form['assetAttachments']); ?>
                             </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['useOwnerAsMailer']); ?>
+                            </div>
                         </div>
 
                         <br>
