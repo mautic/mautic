@@ -136,13 +136,15 @@ class PublicController extends CommonFormController
     {
         // Find the email
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model      = $this->getModel('email');
-        $translator = $this->get('translator');
-        $stat       = $model->getEmailStatus($idHash);
-        $message    = '';
-        $email      = null;
-        $lead       = null;
-        $template   = null;
+        $model              = $this->getModel('email');
+        $translator         = $this->get('translator');
+        $stat               = $model->getEmailStatus($idHash);
+        $message            = '';
+        $email              = null;
+        $lead               = null;
+        $template           = null;
+        $session            = $this->get('session');
+        $successSessionName = 'mautic.email.prefscenter.success';
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
@@ -201,9 +203,10 @@ class PublicController extends CommonFormController
                     'showContactCategories'        => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_categories'),
                     'showContactSegments'          => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_segments'),
                 ];
-
                 $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action);
                 if (true === $form) {
+                    $session->set($successSessionName, 1);
+
                     return $this->postActionRedirect(
                         [
                             'returnUrl'       => $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]),
@@ -241,6 +244,16 @@ class PublicController extends CommonFormController
                         $this->get('event_dispatcher')
                              ->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
                         $html = $event->getContent();
+                        if (!$session->has($successSessionName)) {
+                            $successMessageDataSlot = 'data-slot="successmessage"';
+                            $html                   = str_replace(
+                                $successMessageDataSlot,
+                                $successMessageDataSlot.' style=display:none',
+                                $html
+                            );
+                        } else {
+                            $session->remove($successSessionName);
+                        }
                         $html = preg_replace('/'.BuilderSubscriber::identifierToken.'/', $lead->getPrimaryIdentifier(), $html);
                     } else {
                         unset($html);

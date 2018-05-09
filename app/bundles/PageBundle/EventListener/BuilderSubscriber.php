@@ -246,6 +246,15 @@ class BuilderSubscriber extends CommonSubscriber
                     'slot_saveprefsbutton',
                     540
                 );
+
+                $event->addSlotType(
+                    'successmessage',
+                    $this->translator->trans('mautic.core.slot.label.successmessage'),
+                    'floppy-o',
+                    'MauticCoreBundle:Slots:successmessage.html.php',
+                    'slot_successmessage',
+                    540
+                );
             }
             $event->addSlotType(
                 'codemode',
