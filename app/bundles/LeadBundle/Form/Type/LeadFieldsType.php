@@ -44,12 +44,20 @@ class LeadFieldsType extends AbstractType
                 if ($options['with_tags']) {
                     $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
                 }
+                if ($options['with_utm']) {
+                    $fieldList['UTM']['utm_campaign'] = 'mautic.lead.field.utmcampaign';
+                    $fieldList['UTM']['utm_content']  = 'mautic.lead.field.utmcontent';
+                    $fieldList['UTM']['utm_medium']   = 'mautic.lead.field.utmmedium';
+                    $fieldList['UTM']['utm_source']   = 'mautic.lead.field.umtsource';
+                    $fieldList['UTM']['utm_term']     = 'mautic.lead.field.utmterm';
+                }
 
                 return $fieldList;
             },
             'global_only' => false,
             'required'    => false,
             'with_tags'   => false,
+            'with_utm'    => false,
         ]);
     }
 
