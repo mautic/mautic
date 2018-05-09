@@ -49,6 +49,11 @@ class NotificationSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
+     * @var AuditLogModel
+     */
+    protected $integrationHelper;
+
+    /**
      * NotificationSubscriber constructor.
      *
      * @param AuditLogModel    $auditLogModel
@@ -56,12 +61,13 @@ class NotificationSubscriber extends CommonSubscriber
      * @param PageTokenHelper  $pageTokenHelper
      * @param AssetTokenHelper $assetTokenHelper
      */
-    public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
+    public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper, IntegrationHelper $integrationHelper)
     {
         $this->auditLogModel    = $auditLogModel;
         $this->trackableModel   = $trackableModel;
         $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**

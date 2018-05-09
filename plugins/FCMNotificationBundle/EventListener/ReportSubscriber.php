@@ -39,15 +39,21 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
+     * @var integrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
      * ReportSubscriber constructor.
      *
      * @param Connection        $db
      * @param CompanyReportData $companyReportData
      */
-    public function __construct(Connection $db, CompanyReportData $companyReportData)
+    public function __construct(Connection $db, CompanyReportData $companyReportData, IntegrationHelper $integrationHelper)
     {
         $this->db                = $db;
         $this->companyReportData = $companyReportData;
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**

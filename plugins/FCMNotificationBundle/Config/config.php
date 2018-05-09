@@ -43,6 +43,7 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
+                    'mautic.helper.integration',
                 ],
             ],
 //            Left out until 2.9
@@ -65,6 +66,7 @@ return [
                 'class'     => \MauticPlugin\FCMNotificationBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic.helper.integration',
                 ],
             ],
             'mauticplugin.fcmnotification.mobile_notification.report.subscriber' => [
@@ -72,6 +74,7 @@ return [
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                     'mautic.lead.model.company_report_data',
+                    'mautic.helper.integration',
                 ],
             ],
         ],
