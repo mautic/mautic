@@ -211,6 +211,11 @@ $dbalSettings = [
     'user'     => '%mautic.db_user%',
     'password' => '%mautic.db_password%',
     'charset'  => 'UTF8',
+    'default_table_options' => [
+        'charset'    => 'utf8',
+        'collate'    => 'utf8_unicode_ci',
+        'row_format' => 'DYNAMIC',
+    ],
     'types'    => [
         'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
         'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType',
