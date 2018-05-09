@@ -229,7 +229,7 @@ class ReportSubscriber extends CommonSubscriber
         $clickColumns = ['hits', 'unique_hits', 'hits_ratio', 'unique_ratio'];
 
         // Ensure this only stats mobile notifications
-        $qb->andWhere('pn.mobile = 1');
+        //$qb->andWhere('pn.mobile = 1');
 
         switch ($event->getContext()) {
             case self::MOBILE_NOTIFICATIONS:
