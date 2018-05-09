@@ -81,8 +81,6 @@ class DateAnniversary implements FilterDecoratorInterface
         $dateTimeHelper = $this->dateDecorator->getDefaultDate();
 
         return $dateTimeHelper->toUtcString('%-m-d');
-
-        return '%'.date('-m-d');
     }
 
     /**
