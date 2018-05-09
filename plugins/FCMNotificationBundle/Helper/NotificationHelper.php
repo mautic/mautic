@@ -263,6 +263,23 @@ MauticJS.conditionalAsyncQueue(function(){
                     window.open(payload.data.click_action);
                 }
             }
+
+            if (payload.data.notification_id){
+                notification.onshow = function(){
+                    fetch('{$trackOpenUrl}', {  
+                        credentials: 'include'  
+                        method: 'post',                              
+                        body: 'notification_id=payload.notification_id'  
+                      })
+                      .then(response => response.json())  
+                      .then(function (data) {  
+                        console.log('Request succeeded with JSON response', data);  
+                      })  
+                      .catch(function (error) {  
+                        console.log('Request failed', error);  
+                      });
+                }
+            }
         });
 }, function(){
     return (typeof firebase !== 'undefined' && firebase)?true:false;

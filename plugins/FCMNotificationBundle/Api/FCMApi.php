@@ -169,7 +169,8 @@ class FCMApi extends AbstractNotificationApi
         foreach ($playerId as $token){            
             $data = [
                 'title' => $title,
-                'body' => $message                
+                'body' => $message,
+                'notification_id' => $notification->getId()
             ];
             if (!empty($url)) {
                 $data['click_action'] = $url;

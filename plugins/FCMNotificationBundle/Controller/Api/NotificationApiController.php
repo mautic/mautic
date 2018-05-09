@@ -55,4 +55,24 @@ class NotificationApiController extends CommonApiController
 
         return new JsonResponse(['success' => 'false'], 200, ['Access-Control-Allow-Origin' => '*']);
     }
+
+    /**
+     * Receive Web Push show event.
+     *
+     * @return JsonResponse
+     */
+    public function trackopenAction()
+    {
+        $notification_id = $this->request->get('notification_id');
+        if ($notification_id) {
+            $integrationObject = $this->integrationHelper->getIntegrationObject('FCM');
+        
+            $notificationModel = $this->get('mauticplugin.fcmnotification.notification.model.notification');             
+            $notificationModel->getRepository()->upCount($notification_id, 'open');
+    
+            return new JsonResponse(['success' => true], 200, ['Access-Control-Allow-Origin' => '*']);
+        }
+
+        return new JsonResponse(['success' => 'false'], 200, ['Access-Control-Allow-Origin' => '*']);
+    }
 }

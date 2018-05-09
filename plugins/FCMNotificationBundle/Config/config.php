@@ -193,6 +193,10 @@ return [
                 'path'       => '/notification/subscribe',
                 'controller' => 'FCMNotificationBundle:Api\NotificationApi:subscribe',
             ],
+            'mautic_track_notification_open' => [
+                'path'       => '/notification/trackopen',
+                'controller' => 'FCMNotificationBundle:Api\NotificationApi:trackopen',
+            ],
             'mautic_notification_popup' => [
                 'path'       => '/notification',
                 'controller' => 'FCMNotificationBundle:Popup:index',

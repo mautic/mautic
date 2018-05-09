@@ -14,6 +14,7 @@ namespace MauticPlugin\FCMNotificationBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 
@@ -50,7 +51,7 @@ class PageSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
+            PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],            
         ];
     }
 

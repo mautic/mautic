@@ -63,6 +63,8 @@ class JsController extends CommonController
         $projectId          = $keys['projectId'];
         $messagingSenderId  = $keys['messagingSenderId'];
 
+        $trackOpenUrl   = $this->router->generate('mautic_track_notification_open', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
         return new Response(
             "importScripts('https://www.gstatic.com/firebasejs/4.12.1/firebase.js');
 
@@ -96,7 +98,7 @@ class JsController extends CommonController
                     }];
                 }   
 
-                var notifcation = self.registration.showNotification(
+                var notification = self.registration.showNotification(
                     notificationTitle,
                     notificationOptions
                 );
@@ -110,7 +112,23 @@ class JsController extends CommonController
                         );
                     });
                 }
-
+            
+                if (payload.data.notification_id){
+                    notification.onshow = function(){
+                        fetch('{$trackOpenUrl}', {  
+                            credentials: 'include'  
+                            method: 'post',                              
+                            body: 'notification_id=payload.notification_id'  
+                          })
+                          .then(response => response.json())  
+                          .then(function (data) {  
+                            console.log('Request succeeded with JSON response', data);  
+                          })  
+                          .catch(function (error) {  
+                            console.log('Request failed', error);  
+                          });
+                    }
+                }
 
 
                 return notifcation;
