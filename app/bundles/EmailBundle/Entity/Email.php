@@ -64,6 +64,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $subject;
 
     /**
+     * @var bool
+     */
+    private $useOwnerAsMailer;
+
+    /**
      * @var string
      */
     private $fromAddress;
@@ -255,6 +260,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $builder->createField('bccAddress', 'string')
             ->columnName('bcc_address')
+            ->nullable()
+            ->build();
+
+            $builder->createField('useOwnerAsMailer', 'boolean')
+            ->columnName('use_owner_as_mailer')
             ->nullable()
             ->build();
 
@@ -464,6 +474,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'fromName',
                     'replyToAddress',
                     'bccAddress',
+                    'useOwnerAsMailer',
                     'utmTags',
                     'customHtml',
                     'plainText',
@@ -703,6 +714,23 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->subject = $subject;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUseOwnerAsMailer()
+    {
+        return $this->useOwnerAsMailer;
+    }
+
+    /**
+     * @param bool $useOwnerAsMailer
+     *
+     * @return Email
+     */
+    public function setUseOwnerAsMailer($useOwnerAsMailer) {
+        $this->useOwnerAsMailer = $useOwnerAsMailer;
     }
 
     /**
