@@ -89,6 +89,13 @@ class JsController extends CommonController
                     notificationOptions.icon = payload.data.icon;
                 }
 
+                if (payload.data.web_button_id){
+                    notificationOptions.actions = [{
+                        action: payload.data.web_button_id,
+                        title: payload.data.web_button_text,                        
+                    }];
+                }   
+
                 var notifcation = self.registration.showNotification(
                     notificationTitle,
                     notificationOptions
@@ -103,6 +110,8 @@ class JsController extends CommonController
                         );
                     });
                 }
+
+
 
                 return notifcation;
               });

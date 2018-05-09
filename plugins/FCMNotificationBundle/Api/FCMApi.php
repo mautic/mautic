@@ -179,11 +179,15 @@ class FCMApi extends AbstractNotificationApi
                 $this->addMobileData($data, $notification->getMobileSettings());
 
                 if ($button) {
-                    $data['buttons'][] = ['id' => $buttonId, 'text' => $button];
+                    $data['button_id'] = $buttonId;
+                    $data['button_text'] = $button;
+                    $data['button_url'] = $url;
                 }
             } else {
                 if ($button && $url) {
-                    $data['web_buttons'][] = ['id' => $buttonId, 'text' => $button, 'url' => $url];
+                    $data['web_button_id'] = $buttonId;
+                    $data['web_button_text'] = $button;
+                    $data['web_button_url'] = $url;
                 }
             }
             $result = $this->send($token, $data);

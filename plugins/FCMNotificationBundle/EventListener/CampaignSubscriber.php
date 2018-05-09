@@ -221,9 +221,7 @@ class CampaignSubscriber extends CommonSubscriber
             'name'    => $notification->getName(),
             'heading' => $sendEvent->getHeading(),
             'content' => $sendEvent->getMessage(),
-        ];
-
-        var_dump('delivered', $result);
+        ];        
 
         $event->setResult($result);
     }
