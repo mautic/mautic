@@ -152,10 +152,10 @@ class FCMApi extends AbstractNotificationApi
      *
      * @throws \Exception
      */
-    public function sendNotification($playerId, Notification $notification)
+    public function sendNotification($playerId, $notificationId, Notification $notification)
     {
         $data = [];
-        
+
         $buttonId = $notification->getHeading();
         $title    = $notification->getHeading();
         $url      = $notification->getUrl();
@@ -170,7 +170,7 @@ class FCMApi extends AbstractNotificationApi
             $data = [
                 'title' => $title,
                 'body' => $message,
-                'notification_id' => $notification->getId()
+                'notification_id' => $notificationId
             ];
             if (!empty($url)) {
                 $data['click_action'] = $url;
