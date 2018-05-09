@@ -29,10 +29,6 @@ class Version20180508202930 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql("ALTER TABLE {$this->prefix}emails ADD use_owner_as_mailer TINYINT(4) AFTER email_type;");
-
-        $ownerAsMailerConfigSetting = $this->container->getParameter('mailer_is_owner');
-
-        $this->addSql("UPDATE {$this->prefix}emails SET use_owner_as_mailer = {$ownerAsMailerConfigSetting};");
     }
 
     /**
