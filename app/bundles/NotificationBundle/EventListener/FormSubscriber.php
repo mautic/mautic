@@ -107,7 +107,7 @@ class FormSubscriber extends CommonSubscriber
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
-            
+
         $lead         = $event->getLead();
         $actionConfig = $event->getActionConfig();
 
@@ -181,7 +181,8 @@ class FormSubscriber extends CommonSubscriber
 
         $response = $this->notificationApi->sendNotification(
             $playerID,
-            $notification
+            $notification,
+            $notification->getId()
         );
 
         $event->setChannel('notification', $notification->getId());

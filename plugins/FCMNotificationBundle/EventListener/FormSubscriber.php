@@ -181,7 +181,8 @@ class FormSubscriber extends CommonSubscriber
 
         $response = $this->notificationApi->sendNotification(
             $playerID,
-            $notification
+            $notification,
+            $notification->getId()
         );
 
         $event->setChannel('notification', $notification->getId());

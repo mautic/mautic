@@ -75,7 +75,7 @@ abstract class AbstractNotificationApi
      *
      * @return mixed
      */
-    abstract public function sendNotification($id, Notification $notification);
+    abstract public function sendNotification($id, Notification $notification, $notificationId);
 
     /**
      * Convert a non-tracked url to a tracked url.
