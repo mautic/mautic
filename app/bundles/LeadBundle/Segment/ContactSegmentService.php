@@ -38,6 +38,11 @@ class ContactSegmentService
      */
     private $preparedQB;
 
+    /**
+     * @param ContactSegmentFilterFactory $contactSegmentFilterFactory
+     * @param ContactSegmentQueryBuilder  $queryBuilder
+     * @param Logger                      $logger
+     */
     public function __construct(
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         ContactSegmentQueryBuilder $queryBuilder,
@@ -120,11 +125,11 @@ class ContactSegmentService
         $qb = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
 
         if (isset($batchLimiters['minId'])) {
-            $qb->andWhere($qb->expr()->gte('l.id', $qb->expr()->literal(intval($batchLimiters['minId']))));
+            $qb->andWhere($qb->expr()->gte('l.id', $qb->expr()->literal((int) $batchLimiters['minId'])));
         }
 
         if (isset($batchLimiters['maxId'])) {
-            $qb->andWhere($qb->expr()->lte('l.id', $qb->expr()->literal(intval($batchLimiters['maxId']))));
+            $qb->andWhere($qb->expr()->lte('l.id', $qb->expr()->literal((int) $batchLimiters['maxId'])));
         }
 
         $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
@@ -142,9 +147,6 @@ class ContactSegmentService
      * @return array
      *
      * @throws \Exception
-     *
-     * @nottotodo This is almost copy of getNewLeadListLeadsCount method. Only difference is that it calls getTotalSegmentContactsQuery
-     * @answer Yes it is, it's just a facade
      */
     public function getTotalLeadListLeadsCount(LeadList $segment)
     {
@@ -165,7 +167,6 @@ class ContactSegmentService
         $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
 
         $this->logger->debug('Segment QB: Create SQL: '.$qb->getDebugOutput(), ['segmentId' => $segment->getId()]);
-        //dump($qb->getDebugOutput());
 
         $result = $this->timedFetch($qb, $segment->getId());
 
@@ -283,7 +284,7 @@ class ContactSegmentService
      *
      * @return string
      */
-    private function format_period($inputSeconds)
+    private function formatPeriod($inputSeconds)
     {
         $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
 
@@ -307,7 +308,7 @@ class ContactSegmentService
 
             $end = microtime(true) - $start;
 
-            $this->logger->debug('Segment QB: Query took: '.$this->format_period($end).', Result count: '.count($result), ['segmentId' => $segmentId]);
+            $this->logger->debug('Segment QB: Query took: '.$this->formatPeriod($end).', Result count: '.count($result), ['segmentId' => $segmentId]);
         } catch (\Exception $e) {
             $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
                 'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),
@@ -334,7 +335,7 @@ class ContactSegmentService
 
             $end = microtime(true) - $start;
 
-            $this->logger->debug('Segment QB: Query took: '.$this->format_period($end).'ms. Result count: '.count($result), ['segmentId' => $segmentId]);
+            $this->logger->debug('Segment QB: Query took: '.$this->formatPeriod($end).'ms. Result count: '.count($result), ['segmentId' => $segmentId]);
         } catch (\Exception $e) {
             $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
                 'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),
