@@ -196,6 +196,11 @@ class MailHelper
     /**
      * @var array
      */
+    private $systemHeaders = [];
+
+    /**
+     * @var array
+     */
     protected $body = [
         'content'     => '',
         'contentType' => 'text/html',
@@ -363,6 +368,8 @@ class MailHelper
         }
 
         if (empty($this->fatal)) {
+            $this->mergeSystemHeaders();
+
             if (!$isQueueFlush) {
                 // Only add unsubscribe header to one-off sends as tokenized sends are built by the transport
                 $this->addUnsubscribeHeader();
@@ -2069,6 +2076,25 @@ class MailHelper
             : EmojiHelper::toHtml(
                 str_replace('|FROM_NAME|', $owner['first_name'].' '.$owner['last_name'], nl2br($owner['signature']))
             );
+    }
+
+    /**
+     * Merge system headers into local headers if this send is not based on an Email entity.
+     */
+    private function mergeSystemHeaders()
+    {
+        if ($this->email) {
+            // We are purposively ignoring system headers if using an Email entity
+            return;
+        }
+
+        if (!$systemHeaders = $this->factory->getParameter('mailer_custom_headers', [])) {
+            return;
+        }
+
+        foreach ($systemHeaders as $name => $value) {
+            $this->addCustomHeader($name, $value);
+        }
     }
 
     /**
