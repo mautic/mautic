@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2017 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://mautic.org

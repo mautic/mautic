@@ -56,11 +56,12 @@ class ContactMerger
     protected $dispatcher;
 
     /**
-     * MergeModel constructor.
+     * ContactMerger constructor.
      *
-     * @param LeadModel             $leadModel
-     * @param MergeRecordRepository $repo
-     * @param LoggerInterface       $logger
+     * @param LeadModel                $leadModel
+     * @param MergeRecordRepository    $repo
+     * @param EventDispatcherInterface $dispatcher
+     * @param LoggerInterface          $logger
      */
     public function __construct(LeadModel $leadModel, MergeRecordRepository $repo, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
     {
