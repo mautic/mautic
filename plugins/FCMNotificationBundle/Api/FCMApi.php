@@ -156,6 +156,8 @@ class FCMApi extends AbstractNotificationApi
     {
         $data = [];
 
+        var_dump($notification);
+
         $buttonId = $notification->getHeading();
         $title    = $notification->getHeading();
         $url      = $notification->getUrl();

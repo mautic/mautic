@@ -192,6 +192,9 @@ class CampaignSubscriber extends CommonSubscriber
         $sendNotification->setMessage($sendEvent->getMessage());
         $sendNotification->setHeading($sendEvent->getHeading());
 
+
+        var_dump($notificationId, $notification->getId(), $sendNotification->getId());
+
         $response = $this->notificationApi->sendNotification(
             $playerID,
             $sendNotification
