@@ -69,7 +69,7 @@ class NotificationApiController extends CommonApiController
             $integrationObject = $this->integrationHelper->getIntegrationObject('FCM');
         
             $notificationModel = $this->get('mauticplugin.fcmnotification.notification.model.notification');             
-            $notificationModel->getRepository()->upCount($notification_id, 'open');
+            $notificationModel->getRepository()->upCount($notification_id, 'read');
     
             return new JsonResponse(['success' => true], 200, ['Access-Control-Allow-Origin' => '*']);
         }
