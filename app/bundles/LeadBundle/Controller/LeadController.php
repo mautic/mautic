@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -1404,7 +1405,6 @@ class LeadController extends FormController
                     if (!empty($bodyCheck)) {
                         $mailer = $mailHelper->getMailer();
 
-                        // To lead
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
@@ -1423,11 +1423,8 @@ class LeadController extends FormController
                         // Set Content
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
-
-                        // Set lead
                         $mailer->setLead($leadFields);
                         $mailer->setIdHash();
-
                         $mailer->setSubject($email['subject']);
 
                         // Ensure safe emoji for notification

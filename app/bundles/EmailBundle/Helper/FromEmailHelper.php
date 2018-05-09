@@ -61,14 +61,14 @@ class FromEmailHelper
     /**
      * @param mixed[] $contact
      */
-    public function getFromAddressDto(AddressDTO $address, array $contact = null): AddressDTO
+    public function getFromAddressDto(AddressDTO $address, array $contact = null, Email $email = null): AddressDTO
     {
         // Reset last owner
         $this->lastOwner = null;
 
         // Check for token
         if ($address->isEmailTokenized() || $address->isNameTokenized()) {
-            return $this->getEmailFromToken($address, $contact, false);
+            return $this->getEmailFromToken($address, $contact, false, $email);
         }
 
         return $address;

@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
@@ -45,7 +45,7 @@ class EmailType extends AbstractType
 
     public function __construct(
         private TranslatorInterface $translator,
-        private EntityManager $em,
+        private EntityManagerInterface $em,
         private StageModel $stageModel,
         private CoreParametersHelper $coreParametersHelper,
         private ThemeHelperInterface $themeHelper
@@ -148,12 +148,17 @@ class EmailType extends AbstractType
             [
                 'label'      => 'mautic.email.use.owner.as.mailer',
                 'label_attr' => ['class' => 'control-label'],
+                'data'       => $this->getUseOwnerAsMailerOrDefaultValue($options['data']),
+                'required'   => false,
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.use.owner.as.mailer.tooltip',
+                    'data-global-mailer-is-onwer' => (string) $this->getGlobalMailerIsOwner(),
+                    'class'                       => 'form-control mailer-is-owner-local',
+                    'tooltip'                     => 'mautic.email.use.owner.as.mailer.tooltip',
+                    'data-warning'                => $this->translator->trans(
+                        'mautic.email.config.mailer.is.owner.local.warning',
+                        ['%value%' => $this->translator->trans($this->getGlobalMailerIsOwner() ? 'mautic.core.yes' : 'mautic.core.no')]
+                    ),
                 ],
-                'data'     => (bool) (is_null($options['data']->getUseOwnerAsMailer()) ? $this->coreParametersHelper->get('mailer_is_owner') : $options['data']->getUseOwnerAsMailer()),
-                'required' => false,
             ]
         );
 
@@ -524,5 +529,23 @@ class EmailType extends AbstractType
     public function getBlockPrefix()
     {
         return 'emailform';
+    }
+
+    /**
+     * The owner as mailer value will be taken from the email entity unless the email is new.
+     * If so, it will choose the value from the global configuration as default.
+     *
+     * @param Email $email
+     *
+     * @return bool
+     */
+    private function getUseOwnerAsMailerOrDefaultValue(Email $email)
+    {
+        return $email->getId() ? $email->getUseOwnerAsMailer() : $this->getGlobalMailerIsOwner();
+    }
+
+    private function getGlobalMailerIsOwner()
+    {
+        return (bool) $this->coreParametersHelper->getParameter('mailer_is_owner');
     }
 }

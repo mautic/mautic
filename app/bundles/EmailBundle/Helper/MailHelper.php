@@ -1984,7 +1984,7 @@ class MailHelper
             }
         }
 
-        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead);
+        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead, $email);
 
         $this->setMessageFrom($from);
     }
