@@ -617,7 +617,7 @@ class MailHelper
                 if (!empty($email)) {
                     if ($email->getUseOwnerAsMailer() && 'default' !== $fromKey) {
                         $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
-                    } else if(!empty($email->getFromAddress())){
+                    } elseif (!empty($email->getFromAddress())) {
                         $this->setFrom($email->getFromAddress(), $email->getFromName());
                     } else {
                         $this->setFrom($this->systemFrom, null);

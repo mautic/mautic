@@ -2,7 +2,6 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
@@ -17,7 +16,7 @@ class Version20180508202930 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->getTable($this->prefix.'emails')->hasColumn("use_owner_as_mailer")) {
+        if ($schema->getTable($this->prefix.'emails')->hasColumn('use_owner_as_mailer')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
