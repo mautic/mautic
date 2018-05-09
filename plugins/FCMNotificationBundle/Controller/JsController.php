@@ -99,7 +99,7 @@ class JsController extends CommonController
                         console.log('[Service Worker] Notification click Received.');
                         event.notification.close();
                         event.waitUntil(
-                            clients.openWindow(payload.data.url);
+                            clients.openWindow(payload.data.url)
                         );
                     });
                 }
