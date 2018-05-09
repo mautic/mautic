@@ -529,15 +529,10 @@ class LeadListRepository extends CommonRepository
                 }
 
                 $logger->debug(sprintf('Old version SQL: %s', $sqlT));
-                if (defined('blah_2')) {
-                    echo $id.";1;\"{$sqlT}\"\n";
-                    $results = [];
-                } else {
-                    $timer   = microtime(true);
-                    $results = $q->execute()->fetchAll();
-                    $timer   = microtime(true) - $timer;
-                    $logger->debug(sprintf('Old version SQL took: %s', $this->format_period($timer)));
-                }
+                $timer   = microtime(true);
+                $results = $q->execute()->fetchAll();
+                $timer   = microtime(true) - $timer;
+                $logger->debug(sprintf('Old version SQL took: %s', $this->format_period($timer)));
 
                 foreach ($results as $r) {
                     if ($countOnly) {
