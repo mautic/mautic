@@ -215,13 +215,6 @@ class MailHelper
     protected $fatal = false;
 
     /**
-     * Flag whether to use only the globally set From email and name or whether to switch to mailer is owner.
-     *
-     * @var bool
-     */
-    protected $useGlobalFrom = false;
-
-    /**
      * Large batch mail sends may result on timeouts with SMTP servers. This will will keep track of the number of sends and restart the connection once met.
      *
      * @var int
@@ -327,14 +320,14 @@ class MailHelper
      *
      * @return bool
      */
-    public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
+    public function send($dispatchSendEvent = false, $isQueueFlush = false)
     {
         if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
             // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
             // properly populate metadata for this transport
 
             if ($result = $this->queue($dispatchSendEvent)) {
-                $result = $this->flushQueue(['To', 'Cc', 'Bcc'], $useOwnerAsMailer);
+                $result = $this->flushQueue(['To', 'Cc', 'Bcc']);
             }
 
             return $result;
@@ -343,15 +336,23 @@ class MailHelper
         // Set from email
         $ownerSignature = false;
         if (!$isQueueFlush) {
-            if ($useOwnerAsMailer) {
-                if ($owner = $this->getContactOwner($this->lead)) {
-                    $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name'], null);
-                    $ownerSignature = $this->getContactOwnerSignature($owner);
+            $emailToSend    = $this->getEmail();
+            if (!empty($emailToSend)) {
+                if ($emailToSend->getUseOwnerAsMailer()) {
+                    $owner = $this->getContactOwner($this->lead);
+                    if (!empty($owner)) {
+                        $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
+                        $ownerSignature = $this->getContactOwnerSignature($owner);
+                    } else {
+                        $this->setFrom($this->systemFrom, null);
+                    }
+                } elseif (!empty($emailToSend->getFromAddress())) {
+                    $this->setFrom($emailToSend->getFromAddress(), null);
                 } else {
-                    $this->setFrom($this->from, null, null);
+                    $this->setFrom($this->systemFrom, null);
                 }
-            } elseif (!$from = $this->message->getFrom()) {
-                $this->setFrom($this->from, null, null);
+            } else {
+                $this->setFrom($this->from, null);
             }
         } // from is set in flushQueue
 
@@ -595,7 +596,7 @@ class MailHelper
      *
      * @return bool
      */
-    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'], $useOwnerAsMailer = true)
+    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
@@ -611,10 +612,18 @@ class MailHelper
 
                 $this->errors = [];
 
-                if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
-                    $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
+                $email = $this->getEmail();
+
+                if (!empty($email)) {
+                    if ($email->getUseOwnerAsMailer() && 'default' !== $fromKey) {
+                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
+                    } else if(!empty($email->getFromAddress())){
+                        $this->setFrom($email->getFromAddress(), $email->getFromName());
+                    } else {
+                        $this->setFrom($this->systemFrom, null);
+                    }
                 } else {
-                    $this->setFrom($this->from, null, null);
+                    $this->setFrom($this->from, null);
                 }
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
@@ -1230,7 +1239,7 @@ class MailHelper
      * @param string       $fromName
      * @param bool|null    $isGlobal
      */
-    public function setFrom($fromEmail, $fromName = null, $isGlobal = true)
+    public function setFrom($fromEmail, $fromName = null)
     {
         if (null !== $isGlobal) {
             if ($isGlobal) {
@@ -1365,7 +1374,7 @@ class MailHelper
                 $fromEmail = key($this->from);
             }
 
-            $this->setFrom($fromEmail, $fromName, null);
+            $this->setFrom($fromEmail, $fromName);
             $this->from = [$fromEmail => $fromName];
         } else {
             $this->from = $this->systemFrom;
@@ -2028,7 +2037,7 @@ class MailHelper
     {
         $owner = false;
 
-        if ($this->factory->getParameter('mailer_is_owner') && is_array($contact) && isset($contact['id'])) {
+        if (is_array($contact) && isset($contact['id'])) {
             if (!isset($contact['owner_id'])) {
                 $contact['owner_id'] = 0;
             } elseif (isset($contact['owner_id'])) {
