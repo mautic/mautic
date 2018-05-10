@@ -853,6 +853,7 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.lead.model.lead_segment_service' => [

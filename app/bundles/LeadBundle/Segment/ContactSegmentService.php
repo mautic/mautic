@@ -72,7 +72,8 @@ class ContactSegmentService
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
         $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
-        //$queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubsribedQuery($queryBuilder, $segment->getId());
+        // I really the following line should be enabled; but it doesn't match with the old results
+        //$queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $segment->getId());
 
         return $queryBuilder;
     }

@@ -12,10 +12,13 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Event\LeadListFilteringEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Class ContactSegmentQueryBuilder is responsible for building queries for segments.
@@ -29,15 +32,22 @@ class ContactSegmentQueryBuilder
     private $randomParameterName;
 
     /**
+     * @var EventDispatcher
+     */
+    private $dispatcher;
+
+    /**
      * ContactSegmentQueryBuilder constructor.
      *
      * @param EntityManager       $entityManager
      * @param RandomParameterName $randomParameterName
+     * @param EventDispatcher     $dispatcher
      */
-    public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName)
+    public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName, EventDispatcher $dispatcher)
     {
         $this->entityManager       = $entityManager;
         $this->randomParameterName = $randomParameterName;
+        $this->dispatcher          = $dispatcher;
     }
 
     /**
@@ -68,7 +78,19 @@ class ContactSegmentQueryBuilder
                 }
                 $references = $references + $segmentIdArray;
             }
+            //  This has to run for every filter
+            $filterCrate = $filter->contactSegmentFilterCrate->getArray();
+
             $queryBuilder = $filter->applyQuery($queryBuilder);
+
+            if ($this->dispatcher && $this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
+                $alias = $this->generateRandomParameterName();
+                $event = new LeadListFilteringEvent($filterCrate, null, $alias, $filterCrate['operator'], $queryBuilder, $this->entityManager);
+                $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
+                if ($event->isFilteringDone()) {
+                    $queryBuilder->andWhere($event->getSubQuery());
+                }
+            }
         }
 
         $queryBuilder->applyStackLogic();

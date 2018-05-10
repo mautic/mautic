@@ -47,18 +47,24 @@ class ContactSegmentFilterCrate
     private $operator;
 
     /**
+     * @var array
+     */
+    private $sourceArray;
+
+    /**
      * ContactSegmentFilterCrate constructor.
      *
      * @param array $filter
      */
     public function __construct(array $filter)
     {
-        $this->glue     = isset($filter['glue']) ? $filter['glue'] : null;
-        $this->field    = isset($filter['field']) ? $filter['field'] : null;
-        $this->object   = isset($filter['object']) ? $filter['object'] : self::CONTACT_OBJECT;
-        $this->type     = isset($filter['type']) ? $filter['type'] : null;
-        $this->operator = isset($filter['operator']) ? $filter['operator'] : null;
-        $this->filter   = isset($filter['filter']) ? $filter['filter'] : null;
+        $this->glue        = isset($filter['glue']) ? $filter['glue'] : null;
+        $this->field       = isset($filter['field']) ? $filter['field'] : null;
+        $this->object      = isset($filter['object']) ? $filter['object'] : self::CONTACT_OBJECT;
+        $this->type        = isset($filter['type']) ? $filter['type'] : null;
+        $this->operator    = isset($filter['operator']) ? $filter['operator'] : null;
+        $this->filter      = isset($filter['filter']) ? $filter['filter'] : null;
+        $this->sourceArray = $filter;
     }
 
     /**
@@ -164,5 +170,13 @@ class ContactSegmentFilterCrate
     private function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @return array
+     */
+    public function getArray()
+    {
+        return $this->sourceArray;
     }
 }
