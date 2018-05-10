@@ -61,7 +61,9 @@ final class SparkpostFactory implements SparkpostFactoryInterface
                 }
 
                 // Append whatever is left over to the host (assuming Momentum can be in a subfolder?)
-                $host .= $path;
+                if ('/' !== $path) {
+                    $host .= $path;
+                }
             }
 
             $options['host'] = $host;
