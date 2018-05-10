@@ -227,15 +227,17 @@ class ContactSegmentService
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
 
-        $queryBuilder->rightJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp', 'l.id = orp.lead_id and orp.leadlist_id = '.$segment->getId());
-        $queryBuilder->andWhere($queryBuilder->expr()->andX(
-            $queryBuilder->expr()->isNull('l.id'),
-            $queryBuilder->expr()->eq('orp.leadlist_id', $segment->getId())
-        ));
+        $qbO = new QueryBuilder($queryBuilder->getConnection());
+        $qbO->select('orp.lead_id as id, orp.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
+        $qbO->leftJoin('orp', '('.$queryBuilder->getSQL().')', 'members', 'members.id=orp.lead_id');
+        $qbO->setParameters($queryBuilder->getParameters());
+        $qbO->andWhere($qbO->expr()->eq('orp.leadlist_id', ':orpsegid'));
+        $qbO->andWhere($qbO->expr()->isNull('members.id'));
+        $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));
+        $qbO->setParameter(':orpsegid', $segment->getId());
 
-        $queryBuilder->select($queryBuilder->guessPrimaryLeadContactIdColumn().' as id');
-
-        return $queryBuilder;
+        return $qbO;
     }
 
     /**
