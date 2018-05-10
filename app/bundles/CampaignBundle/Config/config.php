@@ -488,6 +488,7 @@ return [
                     'mautic.campaign.executioner.inactive',
                     'doctrine.orm.entity_manager',
                     'monolog.logger.mautic',
+                    'mautic.helper.template.formatter',
                 ],
                 'tag' => 'console.command',
             ],
@@ -496,6 +497,7 @@ return [
                 'arguments' => [
                     'mautic.campaign.executioner.scheduled',
                     'translator',
+                    'mautic.helper.template.formatter',
                 ],
                 'tag' => 'console.command',
             ],
@@ -504,6 +506,7 @@ return [
                 'arguments' => [
                     'mautic.campaign.executioner.inactive',
                     'translator',
+                    'mautic.helper.template.formatter',
                 ],
                 'tag' => 'console.command',
             ],

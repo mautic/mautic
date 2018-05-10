@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
+use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,7 +25,6 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class ValidateEventCommand extends Command
 {
-    use ContactIdsInputTrait;
     use WriteCountTrait;
 
     /**
@@ -38,17 +38,24 @@ class ValidateEventCommand extends Command
     private $translator;
 
     /**
+     * @var FormatterHelper
+     */
+    private $formatterHelper;
+
+    /**
      * ValidateEventCommand constructor.
      *
      * @param InactiveExecutioner $inactiveExecutioner
      * @param TranslatorInterface $translator
+     * @param FormatterHelper     $formatterHelper
      */
-    public function __construct(InactiveExecutioner $inactiveExecutioner, TranslatorInterface $translator)
+    public function __construct(InactiveExecutioner $inactiveExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {
         parent::__construct();
 
         $this->inactiveExecution = $inactiveExecutioner;
         $this->translator        = $translator;
+        $this->formatterHelper   = $formatterHelper;
     }
 
     /**
@@ -95,7 +102,7 @@ class ValidateEventCommand extends Command
 
         $decisionId = $input->getOption('decision-id');
         $contactId  = $input->getOption('contact-id');
-        $contactIds = $this->getContactIds($input);
+        $contactIds = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
 
         if (!$contactIds && !$contactId) {
             $output->writeln(

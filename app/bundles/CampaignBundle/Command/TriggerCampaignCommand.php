@@ -21,6 +21,7 @@ use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,7 +35,6 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class TriggerCampaignCommand extends ModeratedCommand
 {
-    use ContactIdsInputTrait;
     use WriteCountTrait;
 
     /**
@@ -78,6 +78,11 @@ class TriggerCampaignCommand extends ModeratedCommand
     private $logger;
 
     /**
+     * @var FormatterHelper
+     */
+    private $formatterHelper;
+
+    /**
      * @var OutputInterface
      */
     protected $output;
@@ -118,6 +123,7 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @param InactiveExecutioner      $inactiveExecutioner
      * @param EntityManagerInterface   $em
      * @param LoggerInterface          $logger
+     * @param FormatterHelper          $formatterHelper
      */
     public function __construct(
         CampaignModel $campaignModel,
@@ -127,7 +133,8 @@ class TriggerCampaignCommand extends ModeratedCommand
         ScheduledExecutioner $scheduledExecutioner,
         InactiveExecutioner $inactiveExecutioner,
         EntityManagerInterface $em,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        FormatterHelper $formatterHelper
     ) {
         parent::__construct();
 
@@ -139,6 +146,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->inactiveExecutioner  = $inactiveExecutioner;
         $this->em                   = $em;
         $this->logger               = $logger;
+        $this->formatterHelper      = $formatterHelper;
     }
 
     /**
@@ -238,7 +246,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         $contactMinId = $input->getOption('min-contact-id');
         $contactMaxId = $input->getOption('max-contact-id');
         $contactId    = $input->getOption('contact-id');
-        $contactIds   = $this->getContactIds($input);
+        $contactIds   = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
 
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds);
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -36,16 +37,24 @@ class ExecuteEventCommand extends Command
     private $translator;
 
     /**
+     * @var FormatterHelper
+     */
+    private $formatterHelper;
+
+    /**
      * ExecuteEventCommand constructor.
      *
      * @param ScheduledExecutioner $scheduledExecutioner
+     * @param TranslatorInterface  $translator
+     * @param FormatterHelper      $formatterHelper
      */
-    public function __construct(ScheduledExecutioner $scheduledExecutioner, TranslatorInterface $translator)
+    public function __construct(ScheduledExecutioner $scheduledExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {
         parent::__construct();
 
         $this->scheduledExecutioner = $scheduledExecutioner;
         $this->translator           = $translator;
+        $this->formatterHelper      = $formatterHelper;
     }
 
     /**
@@ -78,15 +87,7 @@ class ExecuteEventCommand extends Command
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
-        $scheduledLogIds = $input->getOption('scheduled-log-ids');
-
-        $ids = array_map(
-            function ($id) {
-                return (int) trim($id);
-            },
-            explode(',', $scheduledLogIds)
-        );
-
+        $ids     = $this->formatterHelper->simpleCsvToArray($input->getOption('scheduled-log-ids'), 'int');
         $counter = $this->scheduledExecutioner->executeByIds($ids, $output);
 
         $this->writeCounts($output, $this->translator, $counter);
