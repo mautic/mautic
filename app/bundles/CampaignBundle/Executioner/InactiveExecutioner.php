@@ -160,7 +160,7 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param                      $decisionId
+     * @param int                  $decisionId
      * @param ContactLimiter       $limiter
      * @param OutputInterface|null $output
      *

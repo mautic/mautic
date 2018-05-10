@@ -94,7 +94,7 @@ class EventAccessor
     }
 
     /**
-     * @param $key
+     * @param string $key
      *
      * @return mixed
      *
