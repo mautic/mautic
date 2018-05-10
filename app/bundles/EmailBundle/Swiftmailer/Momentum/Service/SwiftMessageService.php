@@ -105,24 +105,12 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         $returnPath   = $message->getReturnPath() ? $message->getReturnPath() : $messageFromEmail;
         $transmission = new TransmissionDTO($content, $returnPath);
 
-        $ccRecipients = [];
-        foreach ($message->getTo() as $email => $name) {
-            $ccRecipients[$email] = $name;
-        }
-        if ($message->getCc() !== null) {
-            foreach ($message->getCc() as $email => $name) {
-                $ccRecipients[$email] = $name;
-            }
-        }
-        $bccRecipients = [];
-        if ($message->getBcc() !== null) {
-            $bccRecipients = $message->getBcc();
-        }
-
         $recipientsGrouped = [
-            'cc'  => $ccRecipients,
-            'bcc' => $bccRecipients,
+            'to'  => (array) $message->getTo(),
+            'cc'  => (array) $message->getCc(),
+            'bcc' => (array) $message->getBcc(),
         ];
+
         foreach ($recipientsGrouped as $group => $recipients) {
             $isBcc = ($group === 'bcc');
             foreach ($recipients as $email => $name) {
@@ -135,6 +123,10 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
 
                 $transmission->addRecipient($recipientDTO);
             }
+        }
+
+        if (count($recipientsGrouped['cc'])) {
+            $content->addHeader('CC', implode(',', array_keys($recipientsGrouped['cc'])));
         }
 
         return $transmission;
