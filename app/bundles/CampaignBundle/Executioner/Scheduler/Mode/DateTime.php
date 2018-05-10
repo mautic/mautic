@@ -36,7 +36,7 @@ class DateTime implements ScheduleModeInterface
      * @param \DateTime $compareFromDateTime
      * @param \DateTime $comparedToDateTime
      *
-     * @return \DateTime|mixed
+     * @return \DateTime
      */
     public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)
     {

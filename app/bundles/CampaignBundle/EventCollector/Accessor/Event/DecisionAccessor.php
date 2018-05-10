@@ -13,6 +13,11 @@ namespace Mautic\CampaignBundle\EventCollector\Accessor\Event;
 
 class DecisionAccessor extends AbstractEventAccessor
 {
+    /**
+     * DecisionAccessor constructor.
+     *
+     * @param array $config
+     */
     public function __construct(array $config)
     {
         $this->systemProperties[] = 'eventName';
@@ -21,7 +26,7 @@ class DecisionAccessor extends AbstractEventAccessor
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getEventName()
     {

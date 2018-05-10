@@ -44,7 +44,7 @@ class ConditionExecutioner implements EventInterface
      * @param AbstractEventAccessor $config
      * @param ArrayCollection       $logs
      *
-     * @return EvaluatedContacts|mixed
+     * @return EvaluatedContacts
      *
      * @throws CannotProcessEventException
      */

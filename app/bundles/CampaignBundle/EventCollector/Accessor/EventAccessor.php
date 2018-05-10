@@ -14,7 +14,6 @@ namespace Mautic\CampaignBundle\EventCollector\Accessor;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
-use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\EventNotFoundException;
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\TypeNotFoundException;
@@ -48,8 +47,8 @@ class EventAccessor
     }
 
     /**
-     * @param $type
-     * @param $key
+     * @param string $type
+     * @param string $key
      *
      * @return AbstractEventAccessor
      *
@@ -71,9 +70,11 @@ class EventAccessor
     }
 
     /**
-     * @param $key
+     * @param string $key
      *
      * @return ActionAccessor
+     *
+     * @throws EventNotFoundException
      */
     public function getAction($key)
     {
@@ -95,7 +96,9 @@ class EventAccessor
     /**
      * @param $key
      *
-     * @return ConditionAccessor
+     * @return mixed
+     *
+     * @throws EventNotFoundException
      */
     public function getCondition($key)
     {
@@ -115,9 +118,11 @@ class EventAccessor
     }
 
     /**
-     * @param $key
+     * @param string $key
      *
      * @return DecisionAccessor
+     *
+     * @throws EventNotFoundException
      */
     public function getDecision($key)
     {

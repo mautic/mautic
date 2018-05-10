@@ -30,7 +30,7 @@ class Responses
     /**
      * DecisionResponses constructor.
      *
-     * @param ArrayCollection|null $logs
+     * @param ArrayCollection $logs
      */
     public function setFromLogs(ArrayCollection $logs)
     {
@@ -42,7 +42,7 @@ class Responses
 
     /**
      * @param Event $event
-     * @param       $response
+     * @param mixed $response
      */
     public function setResponse(Event $event, $response)
     {
@@ -63,9 +63,9 @@ class Responses
     }
 
     /**
-     * @param null $type
+     * @param string|null $type
      *
-     * @return array|mixed
+     * @return array
      */
     public function getActionResponses($type = null)
     {
@@ -77,9 +77,9 @@ class Responses
     }
 
     /**
-     * @param null $type
+     * @param string|null $type
      *
-     * @return array|mixed
+     * @return array
      */
     public function getConditionResponses($type = null)
     {

@@ -38,7 +38,6 @@ class ConditionEvent extends CampaignExecutionEvent
      *
      * @param AbstractEventAccessor $config
      * @param LeadEventLog          $log
-     * @param                       $passthrough
      */
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
     {
@@ -100,8 +99,8 @@ class ConditionEvent extends CampaignExecutionEvent
     }
 
     /**
-     * @param      $channel
-     * @param null $channelId
+     * @param string   $channel
+     * @param null|int $channelId
      */
     public function setChannel($channel, $channelId = null)
     {

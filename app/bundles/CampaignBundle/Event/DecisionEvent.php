@@ -30,6 +30,8 @@ class DecisionEvent extends CampaignExecutionEvent
     private $eventLog;
 
     /**
+     * Anything that the dispatching listener wants to pass through to other listeners.
+     *
      * @var mixed
      */
     private $passthrough;
@@ -108,8 +110,8 @@ class DecisionEvent extends CampaignExecutionEvent
     }
 
     /**
-     * @param      $channel
-     * @param null $channelId
+     * @param string   $channel
+     * @param null|int $channelId
      */
     public function setChannel($channel, $channelId = null)
     {
@@ -130,13 +132,13 @@ class DecisionEvent extends CampaignExecutionEvent
     /**
      * @deprecated 2.13.0 to be removed in 3.0; BC support
      *
-     * @param $result
+     * @param mixed $result
      *
      * @return $this
      */
     public function setResult($result)
     {
-        $this->applicable = $result;
+        $this->applicable = (bool) $result;
 
         return $this;
     }

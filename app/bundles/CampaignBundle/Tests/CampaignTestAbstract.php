@@ -82,13 +82,9 @@ class CampaignTestAbstract extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($formRepository));
 
-        $eventCollector = $this->getMockBuilder(EventCollector::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $eventCollector = $this->createMock(EventCollector::class);
 
-        $removedContactTracker = $this->getMockBuilder(RemovedContactTracker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $removedContactTracker = $this->createMock(RemovedContactTracker::class);
 
         $campaignModel = new CampaignModel($coreParametersHelper, $leadModel, $leadListModel, $formModel, $eventCollector, $removedContactTracker);
 

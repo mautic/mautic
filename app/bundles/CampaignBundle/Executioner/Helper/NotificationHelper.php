@@ -44,8 +44,10 @@ class NotificationHelper
     /**
      * NotificationHelper constructor.
      *
-     * @param UserModel         $userModel
-     * @param NotificationModel $notificationModel
+     * @param UserModel           $userModel
+     * @param NotificationModel   $notificationModel
+     * @param TranslatorInterface $translator
+     * @param Router              $router
      */
     public function __construct(UserModel $userModel, NotificationModel $notificationModel, TranslatorInterface $translator, Router $router)
     {
@@ -58,7 +60,6 @@ class NotificationHelper
     /**
      * @param Lead  $contact
      * @param Event $event
-     * @param       $header
      */
     public function notifyOfFailure(Lead $contact, Event $event)
     {
@@ -90,7 +91,7 @@ class NotificationHelper
      * @param Lead  $contact
      * @param Event $event
      *
-     * @return User|null|object
+     * @return User
      */
     private function getUser(Lead $contact, Event $event)
     {

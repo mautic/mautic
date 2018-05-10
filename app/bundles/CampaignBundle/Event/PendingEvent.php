@@ -101,7 +101,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @param $reason
+     * @param string $reason
      */
     public function failAll($reason)
     {
@@ -112,6 +112,8 @@ class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * Fail all that have not passed yet.
+     *
+     * @param string $reason
      */
     public function failRemaining($reason)
     {
@@ -124,7 +126,7 @@ class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * @param ArrayCollection $logs
-     * @param                 $reason
+     * @param string          $reason
      */
     public function failLogs(ArrayCollection $logs, $reason)
     {
@@ -150,7 +152,7 @@ class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * @param LeadEventLog $log
-     * @param              $error
+     * @param string       $error
      */
     public function passWithError(LeadEventLog $log, $error)
     {
@@ -214,8 +216,8 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @param      $channel
-     * @param null $channelId
+     * @param string   $channel
+     * @param null|int $channelId
      */
     public function setChannel($channel, $channelId = null)
     {

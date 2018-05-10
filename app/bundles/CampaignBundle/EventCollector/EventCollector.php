@@ -71,8 +71,8 @@ class EventCollector
     }
 
     /**
-     * @param $type
-     * @param $key
+     * @param string $type
+     * @param string $key
      *
      * @return AbstractEventAccessor
      */
@@ -86,7 +86,7 @@ class EventCollector
      *
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param null $type
+     * @param null|string $type
      *
      * @return array|mixed
      */

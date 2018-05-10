@@ -116,10 +116,10 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param      $type
-     * @param null $passthrough
-     * @param null $channel
-     * @param null $channelId
+     * @param string      $type
+     * @param mixed       $passthrough
+     * @param string|null $channel
+     * @param int|null    $channelId
      *
      * @return Responses
      *

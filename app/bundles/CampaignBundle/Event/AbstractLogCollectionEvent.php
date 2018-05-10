@@ -101,9 +101,9 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
     }
 
     /**
-     * @param $id
+     * @param int $id
      *
-     * @return mixed|null
+     * @return LeadEventLog
      *
      * @throws NoContactsFoundException
      */

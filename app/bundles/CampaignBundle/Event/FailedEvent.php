@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\Event;
 
-use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
@@ -28,10 +27,10 @@ class FailedEvent extends \Symfony\Component\EventDispatcher\Event
     private $log;
 
     /**
-     * ExecutedEvent constructor.
+     * FailedEvent constructor.
      *
      * @param AbstractEventAccessor $config
-     * @param Event                 $event
+     * @param LeadEventLog          $log
      */
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
     {

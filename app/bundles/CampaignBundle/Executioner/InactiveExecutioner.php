@@ -126,7 +126,7 @@ class InactiveExecutioner implements ExecutionerInterface
      * @param ContactLimiter       $limiter
      * @param OutputInterface|null $output
      *
-     * @return Counter|mixed
+     * @return Counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
@@ -316,7 +316,7 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * @param ArrayCollection $contacts
      *
-     * @return mixed
+     * @return int
      *
      * @throws NoContactsFoundException
      */

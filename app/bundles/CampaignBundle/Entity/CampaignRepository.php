@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -660,11 +661,11 @@ class CampaignRepository extends CommonRepository
     /**
      * Get a count of leads that belong to the campaign.
      *
-     * @param       $campaignId
+     * @param int   $campaignId
      * @param int   $leadId        Optional lead ID to check if lead is part of campaign
      * @param array $pendingEvents List of specific events to rule out
      *
-     * @return mixed
+     * @return int
      */
     public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [])
     {
@@ -678,7 +679,7 @@ class CampaignRepository extends CommonRepository
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
-            ->setParameter('false', false, 'boolean');
+            ->setParameter('false', false, Type::BOOLEAN);
 
         if ($leadId) {
             $q->andWhere(

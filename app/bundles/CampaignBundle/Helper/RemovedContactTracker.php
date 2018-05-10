@@ -19,8 +19,8 @@ class RemovedContactTracker
     private $removedContacts = [];
 
     /**
-     * @param $campaignId
-     * @param $contactId
+     * @param int $campaignId
+     * @param int $contactId
      */
     public function addRemovedContact($campaignId, $contactId)
     {
@@ -32,7 +32,7 @@ class RemovedContactTracker
     }
 
     /**
-     * @param $campaignId
+     * @param int $campaignId
      */
     public function wasContactRemoved($campaignId, $contactId)
     {

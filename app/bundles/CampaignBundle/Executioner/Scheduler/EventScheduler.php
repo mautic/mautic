@@ -181,8 +181,8 @@ class EventScheduler
      * @param Event          $event
      * @param \DateTime|null $compareFromDateTime
      * @param \DateTime|null $comparedToDateTime
-     ]     *
-     * @return \DateTime|mixed
+     *
+     * @return \DateTime
      *
      * @throws NotSchedulableException
      */

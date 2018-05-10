@@ -178,7 +178,7 @@ class ScheduledExecutioner implements ExecutionerInterface
             return $this->counter;
         }
 
-        $logs           = $this->repo->getScheduledById($logIds);
+        $logs           = $this->repo->getScheduledByIds($logIds);
         $totalLogsFound = $logs->count();
         $this->counter->advanceEvaluated($totalLogsFound);
 

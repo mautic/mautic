@@ -21,7 +21,7 @@ interface ChannelInterface
     /**
      * @param $channel
      *
-     * @return mixed
+     * @return ChannelInterface
      */
     public function setChannel($channel);
 
@@ -33,7 +33,7 @@ interface ChannelInterface
     /**
      * @param $id
      *
-     * @return mixed
+     * @return ChannelInterface
      */
     public function setChannelId($id);
 }

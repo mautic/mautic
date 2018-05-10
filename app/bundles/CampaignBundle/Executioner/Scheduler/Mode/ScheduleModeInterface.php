@@ -20,7 +20,7 @@ interface ScheduleModeInterface
      * @param \DateTime $now
      * @param \DateTime $comparedToDateTime
      *
-     * @return mixed
+     * @return \DateTime
      */
     public function getExecutionDateTime(Event $event, \DateTime $now, \DateTime $comparedToDateTime);
 }

@@ -16,6 +16,11 @@ namespace Mautic\CampaignBundle\EventCollector\Accessor\Event;
  */
 class ConditionAccessor extends AbstractEventAccessor
 {
+    /**
+     * ConditionAccessor constructor.
+     *
+     * @param array $config
+     */
     public function __construct(array $config)
     {
         $this->systemProperties[] = 'eventName';
@@ -24,7 +29,7 @@ class ConditionAccessor extends AbstractEventAccessor
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getEventName()
     {

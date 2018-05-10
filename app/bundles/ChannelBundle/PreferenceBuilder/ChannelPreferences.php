@@ -41,7 +41,9 @@ class ChannelPreferences
     /**
      * ChannelPreferences constructor.
      *
-     * @param $channel
+     * @param string          $channel
+     * @param Event           $event
+     * @param LoggerInterface $logger
      */
     public function __construct($channel, Event $event, LoggerInterface $logger)
     {
@@ -51,12 +53,14 @@ class ChannelPreferences
     }
 
     /**
-     * @param $priority
+     * @param int $priority
      *
      * @return $this
      */
     public function addPriority($priority)
     {
+        $priority = (int) $priority;
+
         if (!isset($this->organizedByPriority[$priority])) {
             $this->organizedByPriority[$priority] = new ArrayCollection();
         }
@@ -66,12 +70,14 @@ class ChannelPreferences
 
     /**
      * @param LeadEventLog $log
-     * @param              $priority
+     * @param int          $priority
      *
      * @return $this
      */
     public function addLog(LeadEventLog $log, $priority)
     {
+        $priority = (int) $priority;
+
         $this->addPriority($priority);
 
         // We have to clone the log to not affect the original assocaited with the MM event itself
@@ -106,12 +112,14 @@ class ChannelPreferences
     }
 
     /**
-     * @param $priority
+     * @param int $priority
      *
      * @return ArrayCollection|LeadEventLog[]
      */
     public function getLogsByPriority($priority)
     {
+        $priority = (int) $priority;
+
         return isset($this->organizedByPriority[$priority]) ? $this->organizedByPriority[$priority] : new ArrayCollection();
     }
 }

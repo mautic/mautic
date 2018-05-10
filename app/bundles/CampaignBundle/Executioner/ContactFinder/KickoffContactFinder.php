@@ -51,7 +51,7 @@ class KickoffContactFinder
     }
 
     /**
-     * @param                $campaignId
+     * @param int            $campaignId
      * @param ContactLimiter $limiter
      *
      * @return ArrayCollection
@@ -85,11 +85,11 @@ class KickoffContactFinder
     }
 
     /**
-     * @param       $campaignId
-     * @param array $eventIds
-     * @param null  $specificContactId
+     * @param int            $campaignId
+     * @param array          $eventIds
+     * @param ContactLimiter $limiter
      *
-     * @return mixed
+     * @return int
      */
     public function getContactCount($campaignId, array $eventIds, ContactLimiter $limiter)
     {

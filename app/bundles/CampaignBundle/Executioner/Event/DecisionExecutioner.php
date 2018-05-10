@@ -53,9 +53,9 @@ class DecisionExecutioner implements EventInterface
      * @param DecisionAccessor $config
      * @param Event            $event
      * @param Lead             $contact
-     * @param null             $passthrough
-     * @param null             $channel
-     * @param null             $channelId
+     * @param mixed            $passthrough
+     * @param string|null      $channel
+     * @param int|null         $channelId
      *
      * @throws CannotProcessEventException
      * @throws DecisionNotApplicableException
@@ -109,7 +109,7 @@ class DecisionExecutioner implements EventInterface
     /**
      * @param DecisionAccessor $config
      * @param LeadEventLog     $log
-     * @param null             $passthrough
+     * @param mixed            $passthrough
      *
      * @throws DecisionNotApplicableException
      */

@@ -39,7 +39,7 @@ abstract class AbstractEventAccessor
     private $extraProperties = [];
 
     /**
-     * ActionAccessor constructor.
+     * AbstractEventAccessor constructor.
      *
      * @param array $config
      */

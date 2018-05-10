@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -386,7 +387,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param                $eventId
+     * @param int            $eventId
      * @param \DateTime      $now
      * @param ContactLimiter $limiter
      *
@@ -412,7 +413,7 @@ class LeadEventLogRepository extends CommonRepository
             )
             ->setParameter('eventId', (int) $eventId)
             ->setParameter('now', $now)
-            ->setParameter('true', true, 'boolean');
+            ->setParameter('true', true, Type::BOOLEAN);
 
         if ($contactId = $limiter->getContactId()) {
             $q->andWhere(
@@ -445,7 +446,7 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function getScheduledById(array $ids)
+    public function getScheduledByIds(array $ids)
     {
         $q = $this->createQueryBuilder('o');
 
@@ -465,7 +466,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param                $campaignId
+     * @param int            $campaignId
      * @param \DateTime      $date
      * @param ContactLimiter $limiter
      *

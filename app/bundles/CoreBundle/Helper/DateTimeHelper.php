@@ -285,8 +285,8 @@ class DateTimeHelper
     /**
      * Returns interval based on $interval number and $unit.
      *
-     * @param $interval
-     * @param $unit
+     * @param int    $interval
+     * @param string $unit
      *
      * @return \DateInterval
      *

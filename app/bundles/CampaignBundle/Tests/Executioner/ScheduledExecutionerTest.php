@@ -178,7 +178,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $logs = new ArrayCollection([$log1, $log2]);
 
         $this->repository->expects($this->once())
-            ->method('getScheduledById')
+            ->method('getScheduledByIds')
             ->with([1, 2])
             ->willReturn($logs);
 

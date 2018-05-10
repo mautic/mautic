@@ -26,6 +26,6 @@ trait ContextTrait
 
         $type = ($this->event instanceof \Mautic\CampaignBundle\Entity\Event) ? $this->event->getType() : $this->event['type'];
 
-        return strtolower($eventType) == strtolower($type);
+        return strtolower($eventType) === strtolower($type);
     }
 }

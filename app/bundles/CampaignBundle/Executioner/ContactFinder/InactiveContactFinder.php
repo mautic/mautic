@@ -55,8 +55,12 @@ class InactiveContactFinder
      * @param CampaignLeadRepository $campaignLeadRepository
      * @param LoggerInterface        $logger
      */
-    public function __construct(LeadRepository $leadRepository, CampaignRepository $campaignRepository, CampaignLeadRepository $campaignLeadRepository, LoggerInterface $logger)
-    {
+    public function __construct(
+        LeadRepository $leadRepository,
+        CampaignRepository $campaignRepository,
+        CampaignLeadRepository $campaignLeadRepository,
+        LoggerInterface $logger
+    ) {
         $this->leadRepository         = $leadRepository;
         $this->campaignRepository     = $campaignRepository;
         $this->campaignLeadRepository = $campaignLeadRepository;
@@ -64,9 +68,9 @@ class InactiveContactFinder
     }
 
     /**
-     * @param                $campaignId
+     * @param int            $campaignId
      * @param Event          $decisionEvent
-     * @param                $startAtContactId
+     * @param int            $startAtContactId
      * @param ContactLimiter $limiter
      *
      * @return ArrayCollection
@@ -115,9 +119,9 @@ class InactiveContactFinder
     }
 
     /**
-     * @param       $campaignId
-     * @param array $decisionEvents
-     * @param null  $specificContactId
+     * @param int            $campaignId
+     * @param array          $decisionEvents
+     * @param ContactLimiter $limiter
      *
      * @return int
      */

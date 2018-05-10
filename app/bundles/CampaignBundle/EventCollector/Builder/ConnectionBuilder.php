@@ -18,7 +18,7 @@ class ConnectionBuilder
     /**
      * @var array
      */
-    private static $eventTypes =[];
+    private static $eventTypes = [];
 
     /**
      * @var array
@@ -49,9 +49,9 @@ class ConnectionBuilder
     }
 
     /**
-     * @param       $eventType
-     * @param       $key
-     * @param array $event
+     * @param string $eventType
+     * @param string $key
+     * @param array  $event
      */
     private static function addTypeConnection($eventType, $key, array $event)
     {
@@ -76,9 +76,9 @@ class ConnectionBuilder
     }
 
     /**
-     * @param       $key
-     * @param       $restrictionType
-     * @param array $restrictions
+     * @param string $key
+     * @param string $restrictionType
+     * @param array  $restrictions
      */
     private static function addRestriction($key, $restrictionType, array $restrictions)
     {
@@ -102,9 +102,9 @@ class ConnectionBuilder
     /**
      * @deprecated 2.6.0 to be removed in 3.0; BC support
      *
-     * @param $eventType
-     * @param $event
-     * @param $key
+     * @param string $eventType
+     * @param string $key
+     * @param array  $event
      */
     private static function addDeprecatedAnchorRestrictions($eventType, $key, array $event)
     {

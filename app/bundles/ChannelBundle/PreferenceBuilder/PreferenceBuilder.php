@@ -47,25 +47,7 @@ class PreferenceBuilder
         $this->logger = $logger;
         $this->event  = $event;
 
-        /** @var LeadEventLog $log */
-        foreach ($logs as $log) {
-            $channelRules = $log->getLead()->getChannelRules();
-            $allChannels  = $channels;
-            $priority     = 1;
-
-            // Build priority based on channel rules
-            foreach ($channelRules as $channel => $rule) {
-                $this->addChannelRule($channel, $rule, $log, $priority);
-                ++$priority;
-                unset($allChannels[$channel]);
-            }
-
-            // Add the rest of the channels as least priority
-            foreach ($allChannels as $channel => $messageSettings) {
-                $this->addChannelRule($channel, ['dnc' => DoNotContact::IS_CONTACTABLE], $log, $priority);
-                ++$priority;
-            }
-        }
+        $this->buildRules($logs, $channels);
     }
 
     /**
@@ -87,10 +69,10 @@ class PreferenceBuilder
     }
 
     /**
-     * @param              $channel
+     * @param string       $channel
      * @param array        $rule
      * @param LeadEventLog $log
-     * @param              $priority
+     * @param int          $priority
      */
     private function addChannelRule($channel, array $rule, LeadEventLog $log, $priority)
     {
@@ -115,7 +97,7 @@ class PreferenceBuilder
     }
 
     /**
-     * @param $channel
+     * @param string $channel
      *
      * @return ChannelPreferences
      */
@@ -128,5 +110,32 @@ class PreferenceBuilder
         $this->channels[$channel]->addPriority($priority);
 
         return $this->channels[$channel];
+    }
+
+    /**
+     * @param ArrayCollection $logs
+     * @param array           $channels
+     */
+    private function buildRules(ArrayCollection $logs, array $channels)
+    {
+        /** @var LeadEventLog $log */
+        foreach ($logs as $log) {
+            $channelRules = $log->getLead()->getChannelRules();
+            $allChannels  = $channels;
+            $priority     = 1;
+
+            // Build priority based on channel rules
+            foreach ($channelRules as $channel => $rule) {
+                $this->addChannelRule($channel, $rule, $log, $priority);
+                ++$priority;
+                unset($allChannels[$channel]);
+            }
+
+            // Add the rest of the channels as least priority
+            foreach ($allChannels as $channel => $messageSettings) {
+                $this->addChannelRule($channel, ['dnc' => DoNotContact::IS_CONTACTABLE], $log, $priority);
+                ++$priority;
+            }
+        }
     }
 }

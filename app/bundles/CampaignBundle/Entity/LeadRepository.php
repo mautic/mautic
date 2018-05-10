@@ -192,10 +192,10 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param                $campaignId
-     * @param                $decisionId
-     * @param                $parentDecisionId
-     * @param                $startAtContactId
+     * @param int            $campaignId
+     * @param int            $decisionId
+     * @param int            $parentDecisionId
+     * @param int            $startAtContactId
      * @param ContactLimiter $limiter
      *
      * @return array
@@ -289,8 +289,8 @@ class LeadRepository extends CommonRepository
     /**
      * This is approximate because the query that fetches contacts per decision is based on if the grandparent has been executed or not.
      *
-     * @param      $decisionId
-     * @param      $parentDecisionId
+     * @param int  $decisionId
+     * @param int  $parentDecisionId
      * @param null $specificContactId
      *
      * @return int
