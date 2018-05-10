@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Callback;
 
 use Mautic\EmailBundle\Model\TransportCallback;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
 class MomentumCallback
@@ -21,16 +22,42 @@ class MomentumCallback
      */
     private $transportCallback;
 
+    /**
+     * MomentumCallback constructor.
+     *
+     * @param TransportCallback $transportCallback
+     */
     public function __construct(TransportCallback $transportCallback)
     {
         $this->transportCallback = $transportCallback;
     }
 
+    /**
+     * @param Request $request
+     */
     public function processCallbackRequest(Request $request)
     {
         $responseItems = new ResponseItems($request);
         foreach ($responseItems as $item) {
             $this->transportCallback->addFailureByAddress($item->getEmail(), $item->getReason(), $item->getDncReason());
+        }
+    }
+
+    /**
+     * @param $transmission
+     * @param $response
+     */
+    public function processImmediateFeedback($transmission, $response)
+    {
+        if (!empty($response['errors'][0]['code']) && 1902 == (int) $response['errors'][0]['code']) {
+            $comments     = $response['errors'][0]['description'];
+            $emailAddress = $transmission['recipients']['to'][0]['email'];
+            $metadata     = $this->getMetadata();
+
+            if (isset($metadata[$emailAddress]) && isset($metadata[$emailAddress]['leadId'])) {
+                $emailId = (!empty($metadata[$emailAddress]['emailId'])) ? $metadata[$emailAddress]['emailId'] : null;
+                $this->transportCallback->addFailureByContactId($metadata[$emailAddress]['leadId'], $comments, DoNotContact::BOUNCED, $emailId);
+            }
         }
     }
 }

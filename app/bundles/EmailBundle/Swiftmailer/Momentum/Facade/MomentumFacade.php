@@ -3,8 +3,8 @@
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Facade;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\AdapterInterface;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallback;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Facade\MomentumSendException;
-use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Validator\SwiftMessageValidator\SwiftMessageValidationException;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageServiceInterface;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator\SwiftMessageValidatorInterface;
 use Monolog\Logger;
@@ -29,8 +29,15 @@ final class MomentumFacade implements MomentumFacadeInterface
      */
     private $swiftMessageValidator;
 
-    /** @var Logger */
+    /**
+     * @var Logger
+     */
     private $logger;
+
+    /**
+     * @var MomentumCallback
+     */
+    private $momentumCallback;
 
     /**
      * MomentumFacade constructor.
@@ -38,12 +45,14 @@ final class MomentumFacade implements MomentumFacadeInterface
      * @param AdapterInterface               $adapter
      * @param SwiftMessageServiceInterface   $swiftMessageService
      * @param SwiftMessageValidatorInterface $swiftMessageValidator
+     * @param MomentumCallback               $momentumCallback
      * @param Logger                         $logger
      */
     public function __construct(
         AdapterInterface $adapter,
         SwiftMessageServiceInterface $swiftMessageService,
         SwiftMessageValidatorInterface $swiftMessageValidator,
+        MomentumCallback $momentumCallback,
         Logger $logger
     ) {
         $this->adapter               = $adapter;
@@ -55,8 +64,9 @@ final class MomentumFacade implements MomentumFacadeInterface
     /**
      * @param \Swift_Mime_Message $message
      *
-     * @throws SwiftMessageValidationException
-     * @throws MomentumSendException
+     * @return mixed
+     *
+     * @throws \Exception
      */
     public function send(\Swift_Mime_Message $message)
     {
@@ -67,7 +77,12 @@ final class MomentumFacade implements MomentumFacadeInterface
             $response     = $response->wait();
 
             if (200 === (int) $response->getStatusCode()) {
-                return;
+                $results = $response->getBody();
+                if (!$sendCount = $results['results']['total_accepted_recipients']) {
+                    $this->momentumCallback->processImmediateFeedback($transmission, $results);
+                }
+
+                return $sendCount;
             }
 
             $message = $this->getErrors($response->getBody());

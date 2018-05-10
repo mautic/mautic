@@ -48,8 +48,7 @@ class MomentumTransport implements \Swift_Transport, TokenTransportInterface, Ca
     public function __construct(
         MomentumCallback $momentumCallback,
         MomentumFacadeInterface $momentumFacade
-    )
-    {
+    ) {
         $this->momentumCallback = $momentumCallback;
         $this->momentumFacade   = $momentumFacade;
     }
@@ -96,9 +95,7 @@ class MomentumTransport implements \Swift_Transport, TokenTransportInterface, Ca
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
-        $this->momentumFacade->send($message);
-
-        return count($message->getTo());
+        return $this->momentumFacade->send($message);
     }
 
     /**

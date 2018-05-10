@@ -407,6 +407,7 @@ return [
                     'mautic.transport.momentum.adapter',
                     'mautic.transport.momentum.service.swift_message',
                     'mautic.transport.momentum.validator.swift_message',
+                    'mautic.transport.momentum.callback',
                     'monolog.logger.mautic',
                 ],
             ],
