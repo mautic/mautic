@@ -74,6 +74,7 @@ class LeadSubscriber extends CommonSubscriber
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$log['id'],
                         'eventLabel' => $eventLabel,
                         'eventType'  => $eventTypeName,
                         'timestamp'  => $log['dateAdded'],

@@ -11,7 +11,6 @@
 
 namespace Mautic\PageBundle\Controller;
 
-use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
@@ -1000,7 +999,6 @@ class PageController extends FormController
         $content = $entity->getContent();
 
         foreach ($slots as $slot => $slotConfig) {
-
             // backward compatibility - if slotConfig array does not exist
             if (is_numeric($slot)) {
                 $slot       = $slotConfig;
@@ -1093,7 +1091,6 @@ class PageController extends FormController
             }
         }
 
-        //add builder toolbar
         $slotsHelper->start('builder'); ?>
         <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
         <?php

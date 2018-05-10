@@ -138,7 +138,7 @@ class FileUploaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Test for file delete
      *
-     * @covers \Mautic\CoreBundle\Helper\FileUploader::deleteFile
+     * @covers \Mautic\CoreBundle\Helper\FileUploader::delete
      */
     public function testDeleteFile()
     {

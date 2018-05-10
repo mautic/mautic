@@ -1162,7 +1162,7 @@ class EmailController extends FormController
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model   = $this->getModel('email');
         $entity  = $model->getEntity($objectId);
-        $session = $this->get('session');
+        $session = $this->container->get('session');
         $page    = $session->get('mautic.email.page', 1);
 
         //set the return URL
@@ -1194,7 +1194,29 @@ class EmailController extends FormController
                     ]
                 )
             );
-        } elseif ($entity->getEmailType() == 'template'
+        }
+
+        if (!$entity->isPublished()) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.email.error.send.unpublished',
+                                'msgVars' => [
+                                    '%id%'   => $objectId,
+                                    '%name%' => $entity->getName(),
+                                ],
+                            ],
+                        ],
+                    ]
+                )
+            );
+        }
+
+        if ($entity->getEmailType() == 'template'
             || !$this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
@@ -1213,6 +1235,7 @@ class EmailController extends FormController
                 ]
             ));
         }
+
         if ($translationParent = $entity->getTranslationParent()) {
             return $this->redirect($this->generateUrl('mautic_email_action',
                 [
@@ -1220,28 +1243,6 @@ class EmailController extends FormController
                     'objectId'     => $translationParent->getId(),
                 ]
             ));
-        }
-
-        // Make sure email and category are published
-        $category     = $entity->getCategory();
-        $catPublished = (!empty($category)) ? $category->isPublished() : true;
-        $published    = $entity->isPublished();
-
-        if (!$catPublished || !$published) {
-            return $this->postActionRedirect(
-                array_merge(
-                    $postActionVars,
-                    [
-                        'flashes' => [
-                            [
-                                'type'    => 'error',
-                                'msg'     => 'mautic.email.error.send',
-                                'msgVars' => ['%name%' => $entity->getName()],
-                            ],
-                        ],
-                    ]
-                )
-            );
         }
 
         $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'send', 'objectId' => $objectId]);

@@ -2,17 +2,11 @@
     width: 75px;
 }
 
-.btn-close-campaign-builder {
+
+.campaign-builder .btns-builder {
     position: fixed;
     top: 15px;
     right: 30px;
-    z-index: 1040;
-}
-
-.campaign-builder .btn-apply-builder {
-    position: fixed;
-    top: 15px;
-    right: 142px;
     z-index: 1040;
 }
 
@@ -218,6 +212,9 @@
 
 .preview .builder-content {
     position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
 }
 
 .preview .builder-active {

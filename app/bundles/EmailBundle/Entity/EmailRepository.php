@@ -180,65 +180,64 @@ class EmailRepository extends CommonRepository
      * @param null $listIds
      * @param bool $countOnly
      * @param null $limit
+     * @param int  $minContactId
+     * @param int  $maxContactId
+     * @param bool $countWithMaxMin
      *
      * @return QueryBuilder|int|array
      */
-    public function getEmailPendingQuery($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
-    {
+    public function getEmailPendingQuery(
+        $emailId,
+        $variantIds = null,
+        $listIds = null,
+        $countOnly = false,
+        $limit = null,
+        $minContactId = null,
+        $maxContactId = null,
+        $countWithMaxMin = false
+    ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $dncQb->select('null')
+        $dncQb->select('dnc.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
-                $dncQb->expr()->andX(
-                    $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
-                    $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
-                )
+                $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
             );
 
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $mqQb->select('null')
+        $mqQb->select('mq.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq');
 
         $messageExpr = $mqQb->expr()->andX(
-            $mqQb->expr()->eq('mq.lead_id', 'l.id'),
             $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('email')),
             $mqQb->expr()->neq('mq.status', $mqQb->expr()->literal(MessageQueue::STATUS_SENT))
         );
 
         // Do not include leads that have already been emailed
         $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('null')
+            ->select('stat.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
-
-        $statExpr = $statQb->expr()->andX(
-            $statQb->expr()->eq('stat.lead_id', 'l.id')
-        );
 
         if ($variantIds) {
             if (!in_array($emailId, $variantIds)) {
                 $variantIds[] = (int) $emailId;
             }
-            $statExpr->add(
-                $statQb->expr()->in('stat.email_id', $variantIds)
-            );
+            $statQb->where($statQb->expr()->in('stat.email_id', $variantIds));
             $messageExpr->add(
                 $mqQb->expr()->in('mq.channel_id', $variantIds)
             );
         } else {
-            $statExpr->add(
-                $statQb->expr()->eq('stat.email_id', (int) $emailId)
-            );
+            $statQb->where($statQb->expr()->eq('stat.email_id', (int) $emailId));
             $messageExpr->add(
                 $mqQb->expr()->eq('mq.channel_id', (int) $emailId)
             );
         }
-        $statQb->where($statExpr);
+        $statQb->andWhere($statQb->expr()->isNotNull('stat.lead_id'));
         $mqQb->where($messageExpr);
 
         // Only include those who belong to the associated lead lists
-        if (null === $listIds) {
+        if (is_null($listIds)) {
             // Get a list of lists associated with this email
             $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->select('el.leadlist_id')
@@ -272,6 +271,11 @@ class EmailRepository extends CommonRepository
                     $q->expr()->eq('ll.manually_removed', ':false')
                 )
             );
+
+            if ($countWithMaxMin) {
+                $q->addSelect('MIN(l.id) as min_id');
+                $q->addSelect('MAX(l.id) as max_id');
+            }
         } else {
             $q->select('l.*');
 
@@ -286,13 +290,23 @@ class EmailRepository extends CommonRepository
                         $listQb->expr()->eq('ll.manually_removed', ':false')
                     )
                 );
+
+            $listQb = $this->setMinMaxIds($listQb, 'll.lead_id', $minContactId, $maxContactId);
+
             $q->innerJoin('l', sprintf('(%s)', $listQb->getSQL()), 'in_list', 'l.id = in_list.lead_id');
         }
+
+        $dncQb  = $this->setMinMaxIds($dncQb, 'dnc.lead_id', $minContactId, $maxContactId);
+        $mqQb   = $this->setMinMaxIds($mqQb, 'mq.lead_id', $minContactId, $maxContactId);
+        $statQb = $this->setMinMaxIds($statQb, 'stat.lead_id', $minContactId, $maxContactId);
+
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()))
-            ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
-            ->andWhere(sprintf('NOT EXISTS (%s)', $mqQb->getSQL()))
+            ->andWhere(sprintf('l.id NOT IN (%s)', $dncQb->getSQL()))
+            ->andWhere(sprintf('l.id NOT IN (%s)', $statQb->getSQL()))
+            ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
+
+        $q = $this->setMinMaxIds($q, 'l.id', $minContactId, $maxContactId);
 
         // Has an email
         $q->andWhere(
@@ -316,12 +330,32 @@ class EmailRepository extends CommonRepository
      * @param null $listIds
      * @param bool $countOnly
      * @param null $limit
+     * @param int  $minContactId
+     * @param int  $maxContactId
+     * @param bool $countWithMaxMin
      *
      * @return array|int
      */
-    public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
-    {
-        $q = $this->getEmailPendingQuery($emailId, $variantIds, $listIds, $countOnly, $limit);
+    public function getEmailPendingLeads(
+        $emailId,
+        $variantIds = null,
+        $listIds = null,
+        $countOnly = false,
+        $limit = null,
+        $minContactId = null,
+        $maxContactId = null,
+        $countWithMaxMin = false
+    ) {
+        $q = $this->getEmailPendingQuery(
+            $emailId,
+            $variantIds,
+            $listIds,
+            $countOnly,
+            $limit,
+            $minContactId,
+            $maxContactId,
+            $countWithMaxMin
+        );
 
         if (!($q instanceof QueryBuilder)) {
             return $q;
@@ -329,7 +363,10 @@ class EmailRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        if ($countOnly) {
+        if ($countOnly && $countWithMaxMin) {
+            // returns array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
+            return $results[0];
+        } elseif ($countOnly) {
             return (isset($results[0])) ? $results[0]['count'] : 0;
         } else {
             $leads = [];
@@ -543,6 +580,10 @@ class EmailRepository extends CommonRepository
      */
     public function upCount($id, $type = 'sent', $increaseBy = 1, $variant = false)
     {
+        if (!$increaseBy) {
+            return;
+        }
+
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'emails')
@@ -578,5 +619,30 @@ class EmailRepository extends CommonRepository
         $qb->where($expr);
 
         return $qb->getQuery()->iterate();
+    }
+
+    /**
+     * Set Max and/or Min ID where conditions to the query builder.
+     *
+     * @param QueryBuilder $q
+     * @param string       $column
+     * @param int          $minContactId
+     * @param int          $maxContactId
+     *
+     * @return QueryBuilder
+     */
+    private function setMinMaxIds(QueryBuilder $q, $column, $minContactId, $maxContactId)
+    {
+        if ($minContactId && is_numeric($minContactId)) {
+            $q->andWhere($column.' >= :minContactId');
+            $q->setParameter('minContactId', $minContactId);
+        }
+
+        if ($maxContactId && is_numeric($maxContactId)) {
+            $q->andWhere($column.' <= :maxContactId');
+            $q->setParameter('maxContactId', $maxContactId);
+        }
+
+        return $q;
     }
 }

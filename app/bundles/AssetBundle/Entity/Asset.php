@@ -158,6 +158,11 @@ class Asset extends FormEntity
     private $downloadUrl;
 
     /**
+     * @var bool
+     */
+    private $disallow = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -220,6 +225,10 @@ class Asset extends FormEntity
         $builder->createField('size', 'integer')
             ->nullable()
             ->build();
+
+        $builder->createField('disallow', 'boolean')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -252,6 +261,7 @@ class Asset extends FormEntity
                     'size',
                     'downloadUrl',
                     'storageLocation',
+                    'disallow',
                 ]
             )
             ->build();
@@ -693,7 +703,6 @@ class Asset extends FormEntity
     public function preUpload()
     {
         if (null !== $this->getFile()) {
-
             // set the asset title as original file name if title is missing
             if (null === $this->getTitle()) {
                 $this->setTitle($this->file->getClientOriginalName());
@@ -716,7 +725,6 @@ class Asset extends FormEntity
     {
         // the file property can be empty if the field is not required
         if (null === $this->getFile()) {
-
             // check for the remote and set type data
             if ($this->isRemote()) {
                 $this->setFileInfoFromFile();
@@ -1440,5 +1448,21 @@ class Asset extends FormEntity
     public function isRemote()
     {
         return $this->storageLocation === 'remote';
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDisallow()
+    {
+        return $this->disallow;
+    }
+
+    /**
+     * @param mixed $disallow
+     */
+    public function setDisallow($disallow)
+    {
+        $this->disallow = $disallow;
     }
 }

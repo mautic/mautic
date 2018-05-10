@@ -26,6 +26,7 @@ class CampaignEventLeadTagsType extends AbstractType
     {
         $this->translator = $translator;
     }
+
     /**
      * {@inheritdoc}
      */

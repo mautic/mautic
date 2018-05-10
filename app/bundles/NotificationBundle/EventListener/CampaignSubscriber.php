@@ -142,6 +142,15 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
         }
 
+        $notificationId = (int) $event->getConfig()['notification'];
+
+        /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
+        $notification = $this->notificationModel->getEntity($notificationId);
+
+        if ($notification->getId() !== $notificationId) {
+            return $event->setFailed('mautic.notification.campaign.failed.missing_entity');
+        }
+
         // If lead has subscribed on multiple devices, get all of them.
         /** @var \Mautic\NotificationBundle\Entity\PushID[] $pushIDs */
         $pushIDs = $lead->getPushIDs();
@@ -164,15 +173,6 @@ class CampaignSubscriber extends CommonSubscriber
 
         if (empty($playerID)) {
             return $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
-        }
-
-        $notificationId = (int) $event->getConfig()['notification'];
-
-        /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
-        $notification = $this->notificationModel->getEntity($notificationId);
-
-        if ($notification->getId() !== $notificationId) {
-            return $event->setFailed('mautic.notification.campaign.failed.missing_entity');
         }
 
         if ($url = $notification->getUrl()) {
@@ -202,13 +202,15 @@ class CampaignSubscriber extends CommonSubscriber
             new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
         );
 
-        $notification->setUrl($url);
-        $notification->setMessage($sendEvent->getMessage());
-        $notification->setHeading($sendEvent->getHeading());
+        // prevent rewrite notification entity
+        $sendNotification = clone $notification;
+        $sendNotification->setUrl($url);
+        $sendNotification->setMessage($sendEvent->getMessage());
+        $sendNotification->setHeading($sendEvent->getHeading());
 
         $response = $this->notificationApi->sendNotification(
             $playerID,
-            $notification
+            $sendNotification
         );
 
         $event->setChannel('notification', $notification->getId());

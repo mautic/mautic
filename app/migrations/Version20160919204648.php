@@ -40,33 +40,33 @@ class Version20160919204648 extends AbstractMauticMigration
     {
         $categoryIdx = $this->generatePropertyName('focus', 'idx', ['category_id']);
         $sql         = <<<SQL
-CREATE TABLE {$this->prefix}focus (
-  id INT AUTO_INCREMENT NOT NULL, 
-  category_id INT DEFAULT NULL, 
-  is_published TINYINT(1) NOT NULL, 
-  date_added DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', 
-  created_by INT DEFAULT NULL, 
-  created_by_user VARCHAR(255) DEFAULT NULL, 
-  date_modified DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', 
-  modified_by INT DEFAULT NULL, 
-  modified_by_user VARCHAR(255) DEFAULT NULL, 
-  checked_out DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', 
-  checked_out_by INT DEFAULT NULL, 
-  checked_out_by_user VARCHAR(255) DEFAULT NULL, 
-  name VARCHAR(255) NOT NULL, 
-  description LONGTEXT DEFAULT NULL, 
-  focus_type VARCHAR(255) NOT NULL, 
-  style VARCHAR(255) NOT NULL, 
-  website VARCHAR(255) DEFAULT NULL, 
-  publish_up DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', 
-  publish_down DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', 
-  properties LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)', 
-  form_id INT DEFAULT NULL, 
-  cache LONGTEXT DEFAULT NULL, 
-  INDEX $categoryIdx (category_id),    
-  INDEX {$this->prefix}focus_type (focus_type), 
-  INDEX {$this->prefix}focus_style (style), 
-  INDEX {$this->prefix}focus_form (form_id), 
+CREATE TABLE IF NOT EXISTS {$this->prefix}focus (
+  id INT AUTO_INCREMENT NOT NULL,
+  category_id INT DEFAULT NULL,
+  is_published TINYINT(1) NOT NULL,
+  date_added DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
+  created_by INT DEFAULT NULL,
+  created_by_user VARCHAR(255) DEFAULT NULL,
+  date_modified DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
+  modified_by INT DEFAULT NULL,
+  modified_by_user VARCHAR(255) DEFAULT NULL,
+  checked_out DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
+  checked_out_by INT DEFAULT NULL,
+  checked_out_by_user VARCHAR(255) DEFAULT NULL,
+  name VARCHAR(255) NOT NULL,
+  description LONGTEXT DEFAULT NULL,
+  focus_type VARCHAR(255) NOT NULL,
+  style VARCHAR(255) NOT NULL,
+  website VARCHAR(255) DEFAULT NULL,
+  publish_up DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
+  publish_down DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
+  properties LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)',
+  form_id INT DEFAULT NULL,
+  cache LONGTEXT DEFAULT NULL,
+  INDEX $categoryIdx (category_id),
+  INDEX {$this->prefix}focus_type (focus_type),
+  INDEX {$this->prefix}focus_style (style),
+  INDEX {$this->prefix}focus_form (form_id),
   PRIMARY KEY(id)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
 SQL;
@@ -74,15 +74,15 @@ SQL;
 
         $focusIdx = $this->generatePropertyName('focus_stats', 'idx', ['focus_id']);
         $sql      = <<<SQL
-CREATE TABLE {$this->prefix}focus_stats (
-  id INT AUTO_INCREMENT NOT NULL, 
-  focus_id INT NOT NULL, 
-  type VARCHAR(255) NOT NULL, 
-  type_id INT DEFAULT NULL, 
-  date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)', 
-  INDEX $focusIdx (focus_id), 
-  INDEX {$this->prefix}focus_type (type), 
-  INDEX {$this->prefix}focus_type_id (type, type_id), 
+CREATE TABLE IF NOT EXISTS {$this->prefix}focus_stats (
+  id INT AUTO_INCREMENT NOT NULL,
+  focus_id INT NOT NULL,
+  type VARCHAR(255) NOT NULL,
+  type_id INT DEFAULT NULL,
+  date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)',
+  INDEX $focusIdx (focus_id),
+  INDEX {$this->prefix}focus_type (type),
+  INDEX {$this->prefix}focus_type_id (type, type_id),
   INDEX {$this->prefix}focus_date_added (date_added),
   PRIMARY KEY(id)
 )

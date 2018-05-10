@@ -50,6 +50,22 @@ EOT
                         'id', 'i', InputOption::VALUE_OPTIONAL,
                         'The ID for a specifc channel to process broadcasts for pending contacts.'
                     ),
+                    new InputOption(
+                        'min-contact-id', null, InputOption::VALUE_OPTIONAL,
+                        'Min contact ID to filter recipients.'
+                    ),
+                    new InputOption(
+                        'max-contact-id', null, InputOption::VALUE_OPTIONAL,
+                        'Max contact ID to filter recipients.'
+                    ),
+                    new InputOption(
+                        'limit', 'l', InputOption::VALUE_OPTIONAL,
+                        'Limit how many contacts to load from database to process.'
+                    ),
+                    new InputOption(
+                        'batch', 'b', InputOption::VALUE_OPTIONAL,
+                        'Limit how many messages to send at once.'
+                    ),
                 ]
             );
 
@@ -64,9 +80,14 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $channel   = $input->getOption('channel');
-        $channelId = $input->getOption('id');
-        $key       = $channel.$channelId;
+        $channel      = $input->getOption('channel');
+        $channelId    = $input->getOption('id');
+        $limit        = $input->getOption('limit');
+        $batch        = $input->getOption('batch');
+        $minContactId = $input->getOption('min-contact-id');
+        $maxContactId = $input->getOption('max-contact-id');
+        $key          = $channel.$channelId;
+
         if (!$this->checkRunStatus($input, $output, (empty($key)) ? 'all' : $key)) {
             return 0;
         }
@@ -76,11 +97,14 @@ EOT
 
         $dispatcher = $this->getContainer()->get('event_dispatcher');
 
-        /** @var ChannelBroadcastEvent $event */
-        $event = $dispatcher->dispatch(
-            ChannelEvents::CHANNEL_BROADCAST,
-            new ChannelBroadcastEvent($channel, $channelId, $output)
-        );
+        $event = new ChannelBroadcastEvent($channel, $channelId, $output);
+        $event->setLimit($limit);
+        $event->setBatch($batch);
+        $event->setMinContactIdFilter($minContactId);
+        $event->setMaxContactIdFilter($maxContactId);
+
+        $dispatcher->dispatch(ChannelEvents::CHANNEL_BROADCAST, $event);
+
         $results = $event->getResults();
 
         // @deprecated 2.4 to be removed in 3.0; BC support

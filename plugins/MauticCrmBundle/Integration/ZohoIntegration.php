@@ -815,8 +815,9 @@ class ZohoIntegration extends CrmAbstractIntegration
                                 ];
                             }
                         }
-
-                        $this->cache->set('leadFields'.$cacheSuffix, $zohoFields[$zohoObject]);
+                        if (empty($settings['ignore_field_cache'])) {
+                            $this->cache->set('leadFields'.$cacheSuffix, $zohoFields[$zohoObject]);
+                        }
                     }
                 }
             }
@@ -852,8 +853,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $lead
-     * @param $config
+     * @param Lead  $lead
+     * @param array $config
      *
      * @return string
      */
@@ -861,9 +862,12 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $config['object'] = 'Leads';
         $mappedData       = parent::populateLeadData($lead, $config);
-        $writer           = (new Writer($config['object']));
-        $row              = $writer->row($lead['id']);
-
+        $writer           = new Writer($config['object']);
+        if ($lead instanceof Lead) {
+            $row = $writer->row($lead->getId());
+        } else {
+            $row = $writer->row($lead['id']);
+        }
         foreach ($mappedData as $name => $value) {
             $row->add($name, $value);
         }

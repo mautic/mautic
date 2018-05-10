@@ -43,7 +43,7 @@ class AjaxController extends CommonController
     {
         $response = new JsonResponse();
 
-        if ($this->factory->getEnvironment() == 'dev' && $addIgnoreWdt) {
+        if ($this->container->getParameter('kernel.environment') == 'dev' && $addIgnoreWdt) {
             $dataArray['ignore_wdt'] = 1;
         }
 
@@ -587,7 +587,6 @@ class AjaxController extends CommonController
             $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->deleteCookie('mautic_update');
         } else {
-
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
             /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */

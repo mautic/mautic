@@ -244,6 +244,24 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Add IP left join with lead join.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param string       $ipXrefPrefix
+     * @param string       $ipPrefix
+     * @param string       $leadPrefix
+     *
+     * @return $this
+     */
+    public function addLeadIpAddressLeftJoin(QueryBuilder $queryBuilder, $ipXrefPrefix = 'lip', $ipPrefix = 'i', $leadPrefix = 'l')
+    {
+        $this->addIpAddressLeftJoin($queryBuilder, $ipXrefPrefix, $ipPrefix);
+        $queryBuilder->leftJoin($leadPrefix, MAUTIC_TABLE_PREFIX.'lead_ips_xref', $ipXrefPrefix, $ipXrefPrefix.'.lead_id = '.$leadPrefix.'.id');
+
+        return $this;
+    }
+
+    /**
      * Add IP left join.
      *
      * @param QueryBuilder $queryBuilder
@@ -261,8 +279,10 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
         if ($this->hasColumn($cmpName)
             || $this->hasFilter($cmpName)
+            || $this->hasGroupByColumn($cmpName)
             || $this->hasColumn($cmpId)
             || $this->hasFilter($cmpId)
+            || $this->hasGroupByColumn($cmpId)
             || (!empty($options['order'][0]
                     && ($options['order'][0] === $cmpName
                         || $options['order'][0] === $cmpId)))) {
@@ -310,6 +330,17 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Add company left join.
+     *
+     * @param QueryBuilder $queryBuilder
+     */
+    public function addCompanyLeftJoin(QueryBuilder $queryBuilder)
+    {
+        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
+        $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'companies_lead.company_id = comp.id');
+    }
+
+    /**
      * Apply date filters to the query.
      *
      * @param QueryBuilder $queryBuilder
@@ -334,11 +365,11 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         if ($dateOnly) {
-            $queryBuilder->andWhere('DATE('.$tablePrefix.$dateColumn.') BETWEEN :dateFrom AND :dateTo');
+            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
         } else {
-            $queryBuilder->andWhere($tablePrefix.$dateColumn.' BETWEEN :dateFrom AND :dateTo');
+            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
         }
@@ -349,25 +380,15 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Check if the report has a specific column.
      *
-     * @param $column
+     * @param array|string $column
      *
      * @return bool
      */
     public function hasColumn($column)
     {
-        static $sorted;
-
-        if (null == $sorted) {
-            $columns = $this->getReport()->getColumns();
-
-            foreach ($columns as $field) {
-                $sorted[$field] = true;
-            }
-        }
-
         if (is_array($column)) {
             foreach ($column as $checkMe) {
-                if (isset($sorted[$checkMe])) {
+                if (in_array($checkMe, $this->getReport()->getColumns(), true)) {
                     return true;
                 }
             }
@@ -375,13 +396,13 @@ class ReportGeneratorEvent extends AbstractReportEvent
             return false;
         }
 
-        return isset($sorted[$column]);
+        return in_array($column, $this->getReport()->getColumns(), true);
     }
 
     /**
      * Check if the report has a specific filter.
      *
-     * @param $column
+     * @param array|string $column
      *
      * @return bool
      */
@@ -423,6 +444,18 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         return false;
+    }
+
+    /**
+     * Check if the report has a specific column.
+     *
+     * @param string $column
+     *
+     * @return bool
+     */
+    private function hasGroupByColumn($column)
+    {
+        return in_array($column, $this->getReport()->getGroupBy(), true);
     }
 
     /**

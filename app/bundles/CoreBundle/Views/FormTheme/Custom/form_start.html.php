@@ -4,7 +4,7 @@
     printf(' %s="%s"', $view->escape($k), $view->escape($v));
 } ?><?php if ($multipart): ?> enctype="multipart/form-data"<?php endif ?>>
 <?php if ($form_method !== $method): ?>
-    <input type="hidden" name="_method" value="<?php echo $method ?>" />
+    <input type="hidden" name="_method" value="<?php echo $view->escape($method) ?>" />
 <?php endif ?>
 <?php if (count($form->vars['errors'])): ?>
 <div class="has-error pa-10">

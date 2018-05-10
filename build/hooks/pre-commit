@@ -13,7 +13,7 @@ fi
 
 if $HAS_PHP_CS_FIXER; then
     git status --porcelain | grep -e '^[AM]\(.*\).php$' | cut -c 3- | while read line; do
-        $PHP_CS_FIXER fix --config-file=$ROOT/.php_cs --verbose "$line";
+        $PHP_CS_FIXER fix --config=$ROOT/.php_cs --verbose "$line";
         git add "$line";
     done
 else

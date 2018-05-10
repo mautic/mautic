@@ -118,7 +118,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="panel-body pt-xs">
                 <div class="input-group">
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
-                           value="<?php echo $item->getWebhookUrl(); ?>" />
+                           value="<?php echo $view->escape($item->getWebhookUrl()); ?>" />
                     <span class="input-group-btn">
                         <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $item->getWebhookUrl(); ?>', '_blank');">
                             <i class="fa fa-external-link"></i>

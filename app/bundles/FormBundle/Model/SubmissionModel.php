@@ -34,6 +34,7 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
@@ -41,6 +42,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,18 +115,22 @@ class SubmissionModel extends CommonFormModel
      */
     private $formUploader;
 
+    /** @var DeviceTrackingServiceInterface */
+    private $deviceTrackingService;
+
     /**
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param FormModel            $formModel
-     * @param PageModel            $pageModel
-     * @param LeadModel            $leadModel
-     * @param CampaignModel        $campaignModel
-     * @param LeadFieldModel       $leadFieldModel
-     * @param CompanyModel         $companyModel
-     * @param FormFieldHelper      $fieldHelper
-     * @param UploadFieldValidator $uploadFieldValidator
-     * @param FormUploader         $formUploader
+     * @param IpLookupHelper                 $ipLookupHelper
+     * @param TemplatingHelper               $templatingHelper
+     * @param FormModel                      $formModel
+     * @param PageModel                      $pageModel
+     * @param LeadModel                      $leadModel
+     * @param CampaignModel                  $campaignModel
+     * @param LeadFieldModel                 $leadFieldModel
+     * @param CompanyModel                   $companyModel
+     * @param FormFieldHelper                $fieldHelper
+     * @param UploadFieldValidator           $uploadFieldValidator
+     * @param FormUploader                   $formUploader
+     * @param DeviceTrackingServiceInterface $deviceTrackingService
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -137,19 +143,21 @@ class SubmissionModel extends CommonFormModel
         CompanyModel $companyModel,
         FormFieldHelper $fieldHelper,
         UploadFieldValidator $uploadFieldValidator,
-        FormUploader $formUploader
+        FormUploader $formUploader,
+        DeviceTrackingServiceInterface $deviceTrackingService
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->templatingHelper     = $templatingHelper;
-        $this->formModel            = $formModel;
-        $this->pageModel            = $pageModel;
-        $this->leadModel            = $leadModel;
-        $this->campaignModel        = $campaignModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->companyModel         = $companyModel;
-        $this->fieldHelper          = $fieldHelper;
-        $this->uploadFieldValidator = $uploadFieldValidator;
-        $this->formUploader         = $formUploader;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->templatingHelper       = $templatingHelper;
+        $this->formModel              = $formModel;
+        $this->pageModel              = $pageModel;
+        $this->leadModel              = $leadModel;
+        $this->campaignModel          = $campaignModel;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->companyModel           = $companyModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->uploadFieldValidator   = $uploadFieldValidator;
+        $this->formUploader           = $formUploader;
+        $this->deviceTrackingService  = $deviceTrackingService;
     }
 
     /**
@@ -249,8 +257,7 @@ class SubmissionModel extends CommonFormModel
                 }
             }
 
-            if (empty($value) && $f->isRequired()) {
-
+            if ($value === '' && $f->isRequired()) {
                 //field is required, but hidden from form because of 'ShowWhenValueExists'
                 if ($f->getShowWhenValueExists() === false && !isset($post[$alias])) {
                     continue;
@@ -362,8 +369,9 @@ class SubmissionModel extends CommonFormModel
 
         // Get updated lead if applicable with tracking ID
         /** @var Lead $lead */
-        list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
-
+        $lead          = $this->leadModel->getCurrentLead();
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
             ->setLead($lead);
@@ -476,6 +484,7 @@ class SubmissionModel extends CommonFormModel
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
+        $queryArgs['simpleResults']  = true;
         $results                     = $this->getEntities($queryArgs);
         $translator                  = $this->translator;
 
@@ -512,8 +521,8 @@ class SubmissionModel extends CommonFormModel
                         foreach ($results as $k => $s) {
                             $row = [
                                 $s['id'],
-                                $s['dateSubmitted']->format('Y-m-d H:i:s'),
-                                $s['ipAddress']['ipAddress'],
+                                $s['dateSubmitted'],
+                                $s['ipAddress'],
                                 $s['referer'],
                             ];
                             foreach ($s['results'] as $k2 => $r) {
@@ -589,8 +598,8 @@ class SubmissionModel extends CommonFormModel
                             foreach ($results as $k => $s) {
                                 $row = [
                                     $s['id'],
-                                    $s['dateSubmitted']->format('Y-m-d H:i:s'),
-                                    $s['ipAddress']['ipAddress'],
+                                    $s['dateSubmitted'],
+                                    $s['ipAddress'],
                                     $s['referer'],
                                 ];
                                 foreach ($s['results'] as $k2 => $r) {
@@ -1005,6 +1014,12 @@ class SubmissionModel extends CommonFormModel
         $lead->setLastActive(new \DateTime());
 
         //create a new lead
+        $lead->setManipulator(new LeadManipulator(
+            'form',
+            'submission',
+            $form->getId(),
+            $form->getName()
+        ));
         $this->leadModel->saveEntity($lead, false);
 
         if (!$inKioskMode) {

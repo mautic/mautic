@@ -1,9 +1,12 @@
+**Please be sure you are submitting this against the _staging_ branch.**
+
 [//]: # ( Please answer the following questions: )
 
 | Q  | A
 | --- | ---
 | Bug fix? | 
 | New feature? | 
+| Automated tests included? |
 | Related user documentation PR URL | 
 | Related developer documentation PR URL | 
 | Issues addressed (#s or URLs) | 
