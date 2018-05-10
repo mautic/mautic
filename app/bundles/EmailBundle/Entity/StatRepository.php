@@ -541,18 +541,13 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param      $contacts
-     * @param      $emailId
-     * @param bool $organizeByContact
+     * @param $contacts
+     * @param   $emailId
      *
-     * @return array|mixed|string
+     * @return mixed
      */
-    public function checkContactsSentEmail($contacts, $emailId, $organizeByContact = false)
+    public function checkContactsSentEmail($contacts, $emailId)
     {
-        if (is_array($contacts)) {
-            $contacts = implode(',', $contacts);
-        }
-
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
         $query->select('id, lead_id')
@@ -560,24 +555,39 @@ class StatRepository extends CommonRepository
             ->andWhere('s.lead_id in (:contacts)')
             ->andWhere('is_failed = 0')
             ->setParameter(':email', $emailId)
-            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
-            ->groupBy('lead_id');
+            ->setParameter(':contacts', $contacts);
 
         $results = $query->execute()->fetch();
 
-        if ($organizeByContact) {
-            $contacts = [];
-            foreach ($results as $result) {
-                if (!isset($contacts[$result['lead_id']])) {
-                    $contacts[$result['lead_id']] = [];
-                }
+        return $results;
+    }
 
-                $contacts[$result['lead_id']][] = $result['id'];
-            }
+    /**
+     * @param array $contacts
+     * @param       $emailId
+     * @param bool  $organizeByContact
+     *
+     * @return array Formatted as [contactId => sentCount]
+     */
+    public function getSentCountForContacts(array $contacts, $emailId)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+        $query->select('count(s.id) as sent_count, s.lead_id')
+            ->where('s.email_id = :email')
+            ->andWhere('s.lead_id in (:contacts)')
+            ->andWhere('s.is_failed = 0')
+            ->setParameter(':email', $emailId)
+            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->groupBy('s.lead_id');
 
-            return $contacts;
+        $results = $query->execute()->fetchAll();
+
+        $contacts = [];
+        foreach ($results as $result) {
+            $contacts[$result['lead_id']] = $result['sent_count'];
         }
 
-        return $results;
+        return $contacts;
     }
 }
