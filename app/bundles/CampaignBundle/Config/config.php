@@ -328,7 +328,7 @@ return [
                 'class'     => \Mautic\CampaignBundle\Executioner\Logger\EventLogger::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
-                    'mautic.lead.model.lead',
+                    'mautic.tracker.contact',
                     'mautic.campaign.repository.lead_event_log',
                 ],
             ],

@@ -18,7 +18,8 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class EventLogger
 {
@@ -28,9 +29,9 @@ class EventLogger
     private $ipLookupHelper;
 
     /**
-     * @var LeadModel
+     * @var ContactTracker
      */
-    private $leadModel;
+    private $contactTracker;
 
     /**
      * @var LeadEventLogRepository
@@ -51,14 +52,14 @@ class EventLogger
      * LogHelper constructor.
      *
      * @param IpLookupHelper         $ipLookupHelper
-     * @param LeadModel              $leadModel
+     * @param ContactTracker         $contactTracker
      * @param LeadEventLogRepository $repo
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, LeadEventLogRepository $repo)
+    public function __construct(IpLookupHelper $ipLookupHelper, ContactTracker $contactTracker, LeadEventLogRepository $repo)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel      = $leadModel;
-        $this->repo           = $repo;
+        $this->ipLookupHelper      = $ipLookupHelper;
+        $this->contactTracker      = $contactTracker;
+        $this->repo                = $repo;
 
         $this->queued    = new ArrayCollection();
         $this->processed = new ArrayCollection();
@@ -85,13 +86,13 @@ class EventLogger
     }
 
     /**
-     * @param Event $event
-     * @param null  $lead
-     * @param bool  $isInactiveEvent
+     * @param Event     $event
+     * @param Lead|null $lead
+     * @param bool      $isInactiveEvent
      *
      * @return LeadEventLog
      */
-    public function buildLogEntry(Event $event, $lead = null, $isInactiveEvent = false)
+    public function buildLogEntry(Event $event, Lead $lead = null, $isInactiveEvent = false)
     {
         $log = new LeadEventLog();
 
@@ -100,8 +101,8 @@ class EventLogger
         $log->setEvent($event);
         $log->setCampaign($event->getCampaign());
 
-        if ($lead == null) {
-            $lead = $this->leadModel->getCurrentLead();
+        if (null === $lead) {
+            $lead = $this->contactTracker->getContact();
         }
         $log->setLead($lead);
 
