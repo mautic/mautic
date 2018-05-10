@@ -244,6 +244,18 @@ class DateOptionFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
+     */
+    public function testNullValue()
+    {
+        $filterName = null;
+
+        $filterDecorator = $this->getFilterDecorator($filterName);
+
+        $this->assertInstanceOf(DateDefault::class, $filterDecorator);
+    }
+
+    /**
      * @param string $filterName
      *
      * @return \Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface
