@@ -120,7 +120,13 @@ final class MomentumFacade implements MomentumFacadeInterface
         if (isset($body['errors'])) {
             $errors = [];
             foreach ($body['errors'] as $error) {
-                $errors[] = $error['message'].' : '.$error['description'];
+                $error = $error['message'];
+
+                if (isset($error['description'])) {
+                    $error .= ' : '.$error['description'];
+                }
+
+                $errors[] = $error;
             }
 
             return implode('; ', $errors);
