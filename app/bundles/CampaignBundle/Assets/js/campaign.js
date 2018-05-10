@@ -579,6 +579,7 @@ Mautic.prepareCampaignCanvas = function() {
 
         var startingPosition;
         Mautic.campaignDragOptions = {
+            grid:[ 25, 25 ],
             start: function (params) {
                 //double clicking activates the stop function so add a catch to prevent unnecessary ajax calls
                 startingPosition =
@@ -1195,7 +1196,7 @@ Mautic.campaignBuilderRegisterEndpoint = function (name, params) {
     if (params.connectorStyle) {
         connectorStyle = params.connectorStyle;
     } else {
-        connectorStyle = ["Bezier", {curviness: 25}];
+        connectorStyle = [ "Flowchart", { cornerRadius: 5, stub: 20, gap: 0 } ];
     }
 
     isTarget = params.isTarget;
