@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class ContactSegmentQueryBuilder is responsible for building queries for segments.
@@ -32,18 +32,18 @@ class ContactSegmentQueryBuilder
     private $randomParameterName;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
      * ContactSegmentQueryBuilder constructor.
      *
-     * @param EntityManager       $entityManager
-     * @param RandomParameterName $randomParameterName
-     * @param EventDispatcher     $dispatcher
+     * @param EntityManager            $entityManager
+     * @param RandomParameterName      $randomParameterName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName, EventDispatcher $dispatcher)
+    public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName, EventDispatcherInterface $dispatcher)
     {
         $this->entityManager       = $entityManager;
         $this->randomParameterName = $randomParameterName;
