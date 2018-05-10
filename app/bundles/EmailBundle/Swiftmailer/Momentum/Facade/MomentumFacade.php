@@ -65,24 +65,52 @@ final class MomentumFacade implements MomentumFacadeInterface
             $transmission = $this->swiftMessageService->transformToTransmission($message);
             $response     = $this->adapter->createTransmission($transmission);
             $response     = $response->wait();
-            if (200 !== (int) $response->getStatusCode()) {
-                $this->logger->addError(
-                    'Momentum send: '.$response->getStatusCode(),
-                    [
-                        'response' => $response->getBody(),
-                    ]
-                );
+
+            if (200 === (int) $response->getStatusCode()) {
+                return;
             }
+
+            $message = $this->getErrors($response->getBody());
+
+            $this->logger->addError(
+                'Momentum send: '.$response->getStatusCode(),
+                [
+                    'response' => $response->getBody(),
+                ]
+            );
+
+            throw new MomentumSendException($message);
         } catch (\Exception $exception) {
             $this->logger->addError(
                 'Momentum send exception',
                 [
                     'message' => $exception->getMessage(),
                 ]);
-            if ($exception instanceof SwiftMessageValidationException) {
-                throw $exception;
-            }
-            throw new MomentumSendException();
+
+            throw $exception;
         }
+    }
+
+    /**
+     * @param $body
+     *
+     * @return string
+     */
+    private function getErrors($body)
+    {
+        if (!is_array($body)) {
+            return (string) $body;
+        }
+
+        if (isset($body['errors'])) {
+            $errors = [];
+            foreach ($body['errors'] as $error) {
+                $errors[] = $error['message'].' : '.$error['description'];
+            }
+
+            return implode('; ', $errors);
+        }
+
+        return var_export($body, true);
     }
 }

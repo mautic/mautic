@@ -5,6 +5,6 @@ namespace Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Validator\SwiftMessa
 /**
  * Class SwiftMessageValidationException.
  */
-final class SwiftMessageValidationException extends \RuntimeException
+final class SwiftMessageValidationException extends \Swift_TransportException
 {
 }
