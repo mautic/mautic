@@ -44,14 +44,13 @@ class MomentumCallback
     }
 
     /**
-     * @param $transmission
+     * @param $emailAddress
      * @param $response
      */
-    public function processImmediateFeedback($transmission, $response)
+    public function processImmediateFeedback($emailAddress, array $response)
     {
         if (!empty($response['errors'][0]['code']) && 1902 == (int) $response['errors'][0]['code']) {
             $comments     = $response['errors'][0]['description'];
-            $emailAddress = $transmission['recipients']['to'][0]['email'];
             $metadata     = $this->getMetadata();
 
             if (isset($metadata[$emailAddress]) && isset($metadata[$emailAddress]['leadId'])) {

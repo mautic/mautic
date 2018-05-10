@@ -79,7 +79,7 @@ final class MomentumFacade implements MomentumFacadeInterface
             if (200 === (int) $response->getStatusCode()) {
                 $results = $response->getBody();
                 if (!$sendCount = $results['results']['total_accepted_recipients']) {
-                    $this->momentumCallback->processImmediateFeedback($transmission, $results);
+                    $this->momentumCallback->processImmediateFeedback(key($message->getTo()), $results);
                 }
 
                 return $sendCount;
