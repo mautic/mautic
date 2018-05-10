@@ -42,9 +42,9 @@ final class AttachementDTO implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'type'    => $this->type,
-            'name'    => $this->name,
-            'content' => $this->content,
+            'type' => $this->type,
+            'name' => $this->name,
+            'data' => $this->content,
         ];
     }
 }
