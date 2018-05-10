@@ -32,19 +32,14 @@ class MetadataProcessor
     private $substitutionMergeVars = [];
 
     /**
+     * @var array
+     */
+    private $mauticTokens = [];
+
+    /**
      * @var \Swift_Message
      */
     private $message;
-
-    /**
-     * @var string
-     */
-    private $body;
-
-    /**
-     * @var string
-     */
-    private $text;
 
     /**
      * MetadataProcessor constructor.
@@ -61,9 +56,9 @@ class MetadataProcessor
         // Build the substitution merge vars
         $this->buildSubstitutionData();
 
-        if (count($this->substitutionKeys)) {
+        if (count($this->mauticTokens)) {
             // Update the content with the substitution merge vars
-            MailHelper::searchReplaceTokens($this->substitutionKeys, $this->substitutionMergeVars, $this->message);
+            MailHelper::searchReplaceTokens($this->mauticTokens, $this->substitutionMergeVars, $this->message);
         }
     }
 
@@ -99,7 +94,7 @@ class MetadataProcessor
 
         $substitutionData = [];
         foreach ($this->metadata[$email]['tokens'] as $token => $value) {
-            $substitutionData[$this->substitutionMergeVars[$token]] = $value;
+            $substitutionData[$this->substitutionKeys[$token]] = $value;
         }
 
         return $substitutionData;
@@ -108,11 +103,11 @@ class MetadataProcessor
     private function buildSubstitutionData()
     {
         // Sparkpost uses {{ name }} for tokens so Mautic's need to be converted; although using their {{{ }}} syntax to prevent HTML escaping
-        $metadataSet  = reset($this->metadata);
-        $tokens       = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
-        $mauticTokens = array_keys($tokens);
+        $metadataSet        = reset($this->metadata);
+        $tokens             = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
+        $this->mauticTokens = array_keys($tokens);
 
-        foreach ($mauticTokens as $token) {
+        foreach ($this->mauticTokens as $token) {
             $this->substitutionKeys[$token]      = strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
             $this->substitutionMergeVars[$token] = '{{{ '.$this->substitutionKeys[$token].' }}}';
         }
