@@ -290,3 +290,19 @@
 .btn-close-campaign-builder::before {
     content: '\f00d';
 }
+
+/* Connector */
+#CampaignCanvas .jtk-label {
+    font-size: 10px;
+    padding: 3px 5px;
+    line-height: 16px;
+    border-radius: 4px;
+}
+
+#CampaignCanvas .jtk-label::before {
+    font-family: FontAwesome;
+    font-size: 12px;
+    content: '\f017';
+    line-height: 16px;
+    margin-right: 5px;
+}
