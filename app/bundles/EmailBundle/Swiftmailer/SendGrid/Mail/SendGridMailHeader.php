@@ -44,8 +44,9 @@ class SendGridMailHeader
         $headers = $message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
-            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT && !in_array($header->getFieldName(), $this->reservedKeys)) {
-                $mail->addHeader($header->getFieldName(), $header->getFieldBodyModel());
+            $headerName = $header->getFieldName();
+            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT && !in_array($headerName, $this->reservedKeys)) {
+                $mail->addHeader($headerName, $header->getFieldBodyModel());
             }
         }
     }
