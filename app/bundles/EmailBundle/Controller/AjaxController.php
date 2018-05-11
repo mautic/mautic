@@ -294,7 +294,9 @@ class AjaxController extends CommonAjaxController
         $message = $translator->trans('mautic.core.success');
         if (!$mailer->send(true)) {
             $success   = 0;
-            $message   = implode('; ', $mailer->getErrors());
+            $errors    = $mailer->getErrors();
+            unset($errors['failures']);
+            $message = implode('; ', $errors);
         }
 
         return $this->sendJsonResponse(['success' => $success, 'message' => $message]);
