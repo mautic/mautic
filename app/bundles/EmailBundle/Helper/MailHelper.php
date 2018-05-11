@@ -368,8 +368,6 @@ class MailHelper
         }
 
         if (empty($this->fatal)) {
-            $this->mergeSystemHeaders();
-
             if (!$isQueueFlush) {
                 // Only add unsubscribe header to one-off sends as tokenized sends are built by the transport
                 $this->addUnsubscribeHeader();
@@ -439,18 +437,7 @@ class MailHelper
                 }
             }
 
-            // Set custom headers
-            if (!empty($this->headers)) {
-                $headers = $this->message->getHeaders();
-                foreach ($this->headers as $headerKey => $headerValue) {
-                    if ($headers->has($headerKey)) {
-                        $header = $headers->get($headerKey);
-                        $header->setFieldBodyModel($headerValue);
-                    } else {
-                        $headers->addTextHeader($headerKey, $headerValue);
-                    }
-                }
-            }
+            $this->setMessageHeaders();
 
             try {
                 $failures = [];
@@ -1486,7 +1473,10 @@ class MailHelper
      */
     public function getCustomHeaders()
     {
-        return $this->headers;
+        $headers       = $this->headers;
+        $systemHeaders = $this->getSystemHeaders();
+
+        return array_merge($headers, $systemHeaders);
     }
 
     /**
@@ -2079,21 +2069,40 @@ class MailHelper
     }
 
     /**
-     * Merge system headers into local headers if this send is not based on an Email entity.
+     * @return array
      */
-    private function mergeSystemHeaders()
+    private function getSystemHeaders()
     {
         if ($this->email) {
             // We are purposively ignoring system headers if using an Email entity
-            return;
+            return [];
         }
 
         if (!$systemHeaders = $this->factory->getParameter('mailer_custom_headers', [])) {
-            return;
+            return [];
         }
 
-        foreach ($systemHeaders as $name => $value) {
-            $this->addCustomHeader($name, $value);
+        return $systemHeaders;
+    }
+
+    /**
+     * Merge system headers into custom headers if applicable.
+     */
+    private function setMessageHeaders()
+    {
+        $headers = $this->getCustomHeaders();
+
+        // Set custom headers
+        if (!empty($headers)) {
+            $messageHeaders = $this->message->getHeaders();
+            foreach ($headers as $headerKey => $headerValue) {
+                if ($messageHeaders->has($headerKey)) {
+                    $header = $messageHeaders->get($headerKey);
+                    $header->setFieldBodyModel($headerValue);
+                } else {
+                    $messageHeaders->addTextHeader($headerKey, $headerValue);
+                }
+            }
         }
     }
 
