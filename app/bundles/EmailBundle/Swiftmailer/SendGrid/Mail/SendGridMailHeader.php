@@ -16,6 +16,26 @@ use SendGrid\Mail;
 class SendGridMailHeader
 {
     /**
+     * https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#personalizations_headers.
+     *
+     * @var array
+     */
+    private $reservedKeys = [
+        'x-sg-id',
+        'x-sg-eid',
+        'received',
+        'dkim-signature',
+        'Content-Type',
+        'Content-Transfer-Encoding',
+        'To',
+        'From',
+        'Subject',
+        'Reply-To',
+        'CC',
+        'BCC',
+    ];
+
+    /**
      * @param Mail                $mail
      * @param \Swift_Mime_Message $message
      */
@@ -24,7 +44,7 @@ class SendGridMailHeader
         $headers = $message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
-            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT) {
+            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT && !in_array($header->getFieldName(), $this->reservedKeys)) {
                 $mail->addHeader($header->getFieldName(), $header->getFieldBodyModel());
             }
         }
