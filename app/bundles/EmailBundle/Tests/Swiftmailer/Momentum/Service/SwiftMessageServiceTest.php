@@ -116,9 +116,12 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
                         {
                             "type": "text\/plain",
                             "name": "sample.txt",
-                            "content": "VGhpcyBpcyBzYW1wbGUgYXR0YWNobWVudAo="
+                            "data": "VGhpcyBpcyBzYW1wbGUgYXR0YWNobWVudAo="
                         }
-                    ]
+                    ],
+                    "headers": {
+                        "CC": "cc1@test.local,cc2@test.local"
+                    }
                 }
             }
         ';
