@@ -90,6 +90,7 @@ class DecisionExecutioner implements EventInterface
     public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
     {
         $evaluatedContacts = new EvaluatedContacts();
+        $failedLogs        = [];
 
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
@@ -104,12 +105,17 @@ class DecisionExecutioner implements EventInterface
             } catch (DecisionNotApplicableException $exception) {
                 // Fail the contact but remove the log from being processed upstream
                 // active/positive/green path while letting the InactiveExecutioner handle the inactive/negative/red paths
-                $logs->removeElement($log);
+                $failedLogs[] = $log;
                 $evaluatedContacts->fail($log->getLead());
             }
         }
 
         $this->dispatcher->dispatchDecisionResultsEvent($config, $logs, $evaluatedContacts);
+
+        // Remove the logs
+        foreach ($failedLogs as $log) {
+            $logs->removeElement($log);
+        }
 
         return $evaluatedContacts;
     }
