@@ -99,10 +99,7 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
     {
         $swiftMessageMock                    = $this->createMock(\Swift_Mime_Message::class);
         $exceptionMessage                    = 'Example exception message';
-        $swiftMessageValidationExceptionMock = $this->createMock(SwiftMessageValidationException::class);
-        $swiftMessageValidationExceptionMock->expects($this->at(0))
-            ->method('getMessage')
-            ->willReturn($exceptionMessage);
+        $swiftMessageValidationExceptionMock = new SwiftMessageValidationException($exceptionMessage);
         $this->swiftMessageValidatorMock->expects($this->at(0))
             ->method('validate')
             ->with($swiftMessageMock)
