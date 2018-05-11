@@ -145,7 +145,7 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $event = $this->getMockBuilder(Event::class)
             ->getMock();
-        $event->expects($this->exactly(2))
+        $event->expects($this->exactly(3))
             ->method('getChannel')
             ->willReturn('email');
 
@@ -178,7 +178,7 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->exactly(2))
             ->method('getChannel')
             ->willReturn('email');
-        $event->expects($this->exactly(2))
+        $event->expects($this->exactly(3))
             ->method('getChannelId')
             ->willReturn(3);
 

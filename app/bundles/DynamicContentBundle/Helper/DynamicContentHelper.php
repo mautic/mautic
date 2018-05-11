@@ -63,7 +63,7 @@ class DynamicContentHelper
      */
     public function getDynamicContentForLead($slot, $lead)
     {
-        $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dwc.decision.'.$slot);
+        $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dynamicContent');
         $content  = '';
 
         if (is_array($response) && !empty($response['action']['dwc.push_content'])) {

@@ -127,7 +127,9 @@ class EventExecutioner
      */
     public function executeForContact(Event $event, Lead $contact, Responses $responses = null, Counter $counter = null)
     {
-        $this->responses = $responses;
+        if ($responses) {
+            $this->responses = $responses;
+        }
 
         $contacts = new ArrayCollection([$contact->getId() => $contact]);
 

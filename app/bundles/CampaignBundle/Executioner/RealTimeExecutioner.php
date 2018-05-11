@@ -225,11 +225,11 @@ class RealTimeExecutioner
 
         // If channels do not match up, there's no need to go further
         if ($channel && $event->getChannel() && $channel !== $event->getChannel()) {
-            throw new DecisionNotApplicableException('channels do not match');
+            throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");
         }
 
         if ($channel && $channelId && $event->getChannelId() && $channelId !== $event->getChannelId()) {
-            throw new DecisionNotApplicableException('channel IDs do not match for channel '.$channel);
+            throw new DecisionNotApplicableException("Channel IDs, $channelId and {$event->getChannelId()}, do not match for $channel.");
         }
 
         /** @var DecisionAccessor $config */
