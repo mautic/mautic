@@ -9,7 +9,7 @@ use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientDTO;
 /**
  * Class Mail.
  */
-final class TransmissionDTO implements \JsonSerializable
+class TransmissionDTO implements \JsonSerializable
 {
     /**
      * @var OptionsDTO|null

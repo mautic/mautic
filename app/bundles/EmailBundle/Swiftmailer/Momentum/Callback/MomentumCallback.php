@@ -15,7 +15,7 @@ use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
-class MomentumCallback
+final class MomentumCallback implements MomentumCallbackInterface
 {
     /**
      * @var TransportCallback

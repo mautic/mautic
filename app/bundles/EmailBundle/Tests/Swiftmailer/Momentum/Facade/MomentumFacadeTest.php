@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Tests\Swiftmailer\Momentum\Facade;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\AdapterInterface;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallbackInterface;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Validator\SwiftMessageValidator\SwiftMessageValidationException;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Facade\MomentumFacade;
@@ -33,6 +34,11 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
     private $swiftMessageValidatorMock;
 
     /**
+     * @var MomentumCallbackInterface
+     */
+    private $momentumCallback;
+
+    /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     private $loggerMock;
@@ -43,6 +49,7 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
         $this->adapterMock               = $this->createMock(AdapterInterface::class);
         $this->swiftMessageServiceMock   = $this->createMock(SwiftMessageServiceInterface::class);
         $this->swiftMessageValidatorMock = $this->createMock(SwiftMessageValidatorInterface::class);
+        $this->momentumCallback          = $this->createMock(MomentumCallbackInterface::class);
         $this->loggerMock                = $this->createMock(Logger::class);
     }
 
@@ -69,6 +76,13 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
         $sparkPostResponseMock->expects($this->at(0))
             ->method('getStatusCode')
             ->willReturn('200');
+        $sparkPostResponseMock->expects($this->at(1))
+            ->method('getBody')
+            ->willReturn([
+                'results' => [
+
+                ]
+            ])
         $facade = $this->getMomentumFacade();
         $facade->send($swiftMessageMock);
     }
@@ -107,6 +121,7 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
             $this->adapterMock,
             $this->swiftMessageServiceMock,
             $this->swiftMessageValidatorMock,
+            $this->momentumCallbackMock,
             $this->loggerMock
         );
     }

@@ -3,7 +3,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Facade;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\AdapterInterface;
-use Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallback;
+use Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallbackInterface;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Facade\MomentumSendException;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageServiceInterface;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator\SwiftMessageValidatorInterface;
@@ -35,7 +35,7 @@ final class MomentumFacade implements MomentumFacadeInterface
     private $logger;
 
     /**
-     * @var MomentumCallback
+     * @var MomentumCallbackInterface
      */
     private $momentumCallback;
 
@@ -45,19 +45,20 @@ final class MomentumFacade implements MomentumFacadeInterface
      * @param AdapterInterface               $adapter
      * @param SwiftMessageServiceInterface   $swiftMessageService
      * @param SwiftMessageValidatorInterface $swiftMessageValidator
-     * @param MomentumCallback               $momentumCallback
+     * @param MomentumCallbackInterface      $momentumCallback
      * @param Logger                         $logger
      */
     public function __construct(
         AdapterInterface $adapter,
         SwiftMessageServiceInterface $swiftMessageService,
         SwiftMessageValidatorInterface $swiftMessageValidator,
-        MomentumCallback $momentumCallback,
+        MomentumCallbackInterface $momentumCallback,
         Logger $logger
     ) {
         $this->adapter               = $adapter;
         $this->swiftMessageService   = $swiftMessageService;
         $this->swiftMessageValidator = $swiftMessageValidator;
+        $this->momentumCallback      = $momentumCallback;
         $this->logger                = $logger;
     }
 
