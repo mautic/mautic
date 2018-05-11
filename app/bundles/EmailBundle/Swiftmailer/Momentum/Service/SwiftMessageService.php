@@ -22,6 +22,17 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 final class SwiftMessageService implements SwiftMessageServiceInterface
 {
+    private $reservedKeys = [
+        'MIME-Version',
+        'Content-Type',
+        'Content-Transfer-Encoding',
+        'To',
+        'From',
+        'Subject',
+        'Reply-To',
+        'BCC',
+    ];
+
     /**
      * @var TranslatorInterface
      */
@@ -62,12 +73,7 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         $headers = $message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
-            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT &&
-                !in_array($header->getFieldName(), [
-                'Content-Transfer-Encoding',
-                'MIME-Version',
-                'Subject',
-            ])) {
+            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT && !in_array($header->getFieldName(), $this->reservedKeys)) {
                 $content->addHeader($header->getFieldName(), $header->getFieldBodyModel());
             }
         }
