@@ -70,14 +70,13 @@ class InactiveContactFinder
     /**
      * @param int            $campaignId
      * @param Event          $decisionEvent
-     * @param int            $startAtContactId
      * @param ContactLimiter $limiter
      *
      * @return ArrayCollection
      *
      * @throws NoContactsFoundException
      */
-    public function getContacts($campaignId, Event $decisionEvent, $startAtContactId, ContactLimiter $limiter)
+    public function getContacts($campaignId, Event $decisionEvent, ContactLimiter $limiter)
     {
         // Get list of all campaign leads
         $decisionParentEvent            = $decisionEvent->getParent();
@@ -85,7 +84,6 @@ class InactiveContactFinder
             $campaignId,
             $decisionEvent->getId(),
             ($decisionParentEvent) ? $decisionParentEvent->getId() : null,
-            $startAtContactId,
             $limiter
         );
 

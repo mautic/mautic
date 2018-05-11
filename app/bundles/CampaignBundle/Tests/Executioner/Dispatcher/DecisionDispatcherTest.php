@@ -55,18 +55,33 @@ class DecisionDispatcherTest extends \PHPUnit_Framework_TestCase
             ->method('getEventName')
             ->willReturn('something');
 
-        $this->legacyDispatcher->expects($this->once())
+        $this->legacyDispatcher->expects($this->never())
             ->method('dispatchDecisionEvent');
 
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with('something', $this->isInstanceOf(DecisionEvent::class));
 
-        $this->dispatcher->expects($this->at(1))
+        $this->getEventDispatcher()->dispatchRealTimeEvent($config, new LeadEventLog(), null);
+    }
+
+    public function testDecisionEvaluationEventIsDispatched()
+    {
+        $config = $this->getMockBuilder(DecisionAccessor::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $config->expects($this->never())
+            ->method('getEventName');
+
+        $this->legacyDispatcher->expects($this->once())
+            ->method('dispatchDecisionEvent');
+
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(CampaignEvents::ON_EVENT_DECISION_EVALUATION, $this->isInstanceOf(DecisionEvent::class));
 
-        $this->getEventDispatcher()->dispatchEvent($config, new LeadEventLog(), null);
+        $this->getEventDispatcher()->dispatchEvaluationEvent($config, new LeadEventLog());
     }
 
     public function testDecisionResultsEventIsDispatched()

@@ -70,7 +70,12 @@ class DecisionExecutioner implements EventInterface
         $log->setChannel($channel)
             ->setChannelId($channelId);
 
-        $this->dispatchEvent($config, $log, $passthrough);
+        $decisionEvent = $this->dispatcher->dispatchRealTimeEvent($config, $log, $passthrough);
+
+        if (!$decisionEvent->wasDecisionApplicable()) {
+            throw new DecisionNotApplicableException('evaluation failed');
+        }
+
         $this->eventLogger->persistLog($log);
     }
 
@@ -97,6 +102,9 @@ class DecisionExecutioner implements EventInterface
                 $this->dispatchEvent($config, $log);
                 $evaluatedContacts->pass($log->getLead());
             } catch (DecisionNotApplicableException $exception) {
+                // Fail the contact but remove the log from being processed upstream
+                // active/positive/green path while letting the InactiveExecutioner handle the inactive/negative/red paths
+                $logs->removeElement($log);
                 $evaluatedContacts->fail($log->getLead());
             }
         }
@@ -115,7 +123,7 @@ class DecisionExecutioner implements EventInterface
      */
     private function dispatchEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough = null)
     {
-        $decisionEvent = $this->dispatcher->dispatchEvent($config, $log, $passthrough);
+        $decisionEvent = $this->dispatcher->dispatchEvaluationEvent($config, $log, $passthrough);
 
         if (!$decisionEvent->wasDecisionApplicable()) {
             throw new DecisionNotApplicableException('evaluation failed');

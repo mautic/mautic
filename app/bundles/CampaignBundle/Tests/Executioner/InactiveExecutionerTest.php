@@ -126,11 +126,7 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $this->inactiveContactFinder->expects($this->exactly(3))
             ->method('getContacts')
-            ->withConsecutive(
-                [null, $decision, 0, $limiter],
-                [null, $decision, 3, $limiter],
-                [null, $decision, 10, $limiter]
-            )
+            ->with(null, $decision, $limiter)
             ->willReturnOnConsecutiveCalls(
                 new ArrayCollection([3 => new Lead()]),
                 new ArrayCollection([10 => new Lead()]),
@@ -140,6 +136,10 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->inactiveHelper->expects($this->exactly(2))
             ->method('getEarliestInactiveDateTime')
             ->willReturn(new \DateTime());
+
+        $this->eventScheduler->expects($this->exactly(2))
+            ->method('getSortedExecutionDates')
+            ->willReturn([]);
 
         $this->getExecutioner()->execute($campaign, $limiter);
     }
@@ -193,11 +193,7 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $this->inactiveContactFinder->expects($this->exactly(3))
             ->method('getContacts')
-            ->withConsecutive(
-                [null, $decision, 0, $limiter],
-                [null, $decision, 3, $limiter],
-                [null, $decision, 10, $limiter]
-            )
+            ->with(null, $decision, $limiter)
             ->willReturnOnConsecutiveCalls(
                 new ArrayCollection([3 => new Lead()]),
                 new ArrayCollection([10 => new Lead()]),
@@ -207,6 +203,10 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->inactiveHelper->expects($this->exactly(2))
             ->method('getEarliestInactiveDateTime')
             ->willReturn(new \DateTime());
+
+        $this->eventScheduler->expects($this->exactly(2))
+            ->method('getSortedExecutionDates')
+            ->willReturn([]);
 
         $this->getExecutioner()->validate(1, $limiter);
     }

@@ -193,17 +193,17 @@ class EventExecutioner
             case Event::TYPE_ACTION:
                 $evaluatedContacts = $this->actionExecutioner->execute($config, $logs);
                 $this->persistLogs($logs);
-                $this->executeEventConditionsForContacts($event, $evaluatedContacts->getPassed(), $counter);
+                $this->executeConditionEventsForContacts($event, $evaluatedContacts->getPassed(), $counter);
                 break;
             case Event::TYPE_CONDITION:
                 $evaluatedContacts = $this->conditionExecutioner->execute($config, $logs);
                 $this->persistLogs($logs);
-                $this->executeDecisionPathEventsForContacts($event, $evaluatedContacts, $counter);
+                $this->executeBranchedEventsForContacts($event, $evaluatedContacts, $counter);
                 break;
             case Event::TYPE_DECISION:
                 $evaluatedContacts = $this->decisionExecutioner->execute($config, $logs);
                 $this->persistLogs($logs);
-                $this->executeDecisionPathEventsForContacts($event, $evaluatedContacts, $counter);
+                $this->executePositivePathEventsForContacts($event, $evaluatedContacts->getPassed(), $counter);
                 break;
             default:
                 throw new TypeNotFoundException("{$event->getEventType()} is not a valid event type");
@@ -318,7 +318,7 @@ class EventExecutioner
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeEventConditionsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null)
+    private function executeConditionEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null)
     {
         $childrenCounter = new Counter();
         $conditions      = $event->getChildrenByEventType(Event::TYPE_CONDITION);
@@ -338,32 +338,69 @@ class EventExecutioner
      * @param Event             $event
      * @param EvaluatedContacts $contacts
      * @param Counter|null      $counter
+     *
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeDecisionPathEventsForContacts(Event $event, EvaluatedContacts $contacts, Counter $counter = null)
+    private function executeBranchedEventsForContacts(Event $event, EvaluatedContacts $contacts, Counter $counter = null)
     {
         $childrenCounter = new Counter();
-        $positive        = $contacts->getPassed();
-        if ($positive->count()) {
-            $this->logger->debug('CAMPAIGN: Contact IDs '.implode(',', $positive->getKeys()).' passed evaluation for event ID '.$event->getId());
-
-            $children = $event->getPositiveChildren();
-            $childrenCounter->advanceEvaluated($children->count());
-            $this->executeEventsForContacts($children, $positive, $childrenCounter);
-        }
-
-        $negative = $contacts->getFailed();
-        if ($negative->count()) {
-            $this->logger->debug('CAMPAIGN: Contact IDs '.implode(',', $negative->getKeys()).' failed evaluation for event ID '.$event->getId());
-
-            $children = $event->getNegativeChildren();
-
-            $childrenCounter->advanceEvaluated($children->count());
-            $this->executeEventsForContacts($children, $negative, $childrenCounter);
-        }
+        $this->executePositivePathEventsForContacts($event, $contacts->getPassed(), $childrenCounter);
+        $this->executeNegativePathEventsForContacts($event, $contacts->getFailed(), $childrenCounter);
 
         if ($counter) {
             $counter->advanceTotalEvaluated($childrenCounter->getTotalEvaluated());
             $counter->advanceTotalExecuted($childrenCounter->getTotalExecuted());
         }
+    }
+
+    /**
+     * @param Event           $event
+     * @param ArrayCollection $contacts
+     * @param Counter|null    $counter
+     *
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
+     */
+    private function executePositivePathEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter)
+    {
+        if (!$contacts->count()) {
+            return;
+        }
+
+        $this->logger->debug('CAMPAIGN: Contact IDs '.implode(',', $contacts->getKeys()).' passed evaluation for event ID '.$event->getId());
+
+        $children        = $event->getPositiveChildren();
+        $counter->advanceEvaluated($children->count());
+
+        $this->executeEventsForContacts($children, $contacts, $counter);
+    }
+
+    /**
+     * @param Event           $event
+     * @param ArrayCollection $contacts
+     * @param Counter|null    $counter
+     *
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
+     */
+    private function executeNegativePathEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter)
+    {
+        if (!$contacts->count()) {
+            return;
+        }
+
+        $this->logger->debug('CAMPAIGN: Contact IDs '.implode(',', $contacts->getKeys()).' failed evaluation for event ID '.$event->getId());
+
+        $children        = $event->getNegativeChildren();
+        $counter->advanceEvaluated($children->count());
+
+        $this->executeEventsForContacts($children, $contacts, $counter);
     }
 }

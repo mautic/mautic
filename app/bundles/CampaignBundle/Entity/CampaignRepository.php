@@ -20,6 +20,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class CampaignRepository extends CommonRepository
 {
+    use ContactLimiterTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -609,21 +611,7 @@ class CampaignRepository extends CommonRepository
             ->setParameter('false', false, 'boolean')
             ->orderBy('cl.lead_id', 'ASC');
 
-        if ($contactId = $limiter->getContactId()) {
-            $q->andWhere(
-                $q->expr()->eq('cl.lead_id', $contactId)
-            );
-        } elseif ($minContactId = $limiter->getMinContactId()) {
-            $q->andWhere(
-                'cl.lead_id BETWEEN :minContactId AND :maxContactId'
-            )
-                ->setParameter('minContactId', $minContactId)
-                ->setParameter('maxContactId', $limiter->getMaxContactId());
-        } elseif ($contactIds = $limiter->getContactIdList()) {
-            $q->andWhere(
-                $q->expr()->in('cl.lead_id', $contactIds)
-            );
-        }
+        $this->updateQueryFromContactLimiter('cl', $q, $limiter);
 
         // Only leads that have not started the campaign
         $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -641,10 +629,6 @@ class CampaignRepository extends CommonRepository
             sprintf('NOT EXISTS (%s)', $sq->getSQL())
         )
             ->setParameter('campaignId', (int) $campaignId);
-
-        if ($limit = $limiter->getBatchLimit()) {
-            $q->setMaxResults($limit);
-        }
 
         $results = $q->execute()->fetchAll();
 

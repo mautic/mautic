@@ -19,6 +19,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class LeadRepository extends CommonRepository
 {
+    use ContactLimiterTrait;
+
     /**
      * Get the details of leads added to a campaign.
      *
@@ -195,12 +197,11 @@ class LeadRepository extends CommonRepository
      * @param int            $campaignId
      * @param int            $decisionId
      * @param int            $parentDecisionId
-     * @param int            $startAtContactId
      * @param ContactLimiter $limiter
      *
      * @return array
      */
-    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, $startAtContactId, ContactLimiter $limiter)
+    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter)
     {
         // Main query
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -213,33 +214,10 @@ class LeadRepository extends CommonRepository
             ->setParameter('decisionId', (int) $decisionId);
 
         // Contact IDs
-        $expr = $q->expr()->andX();
-        if ($specificContactId = $limiter->getContactId()) {
-            // Still query for this ID in case the ID fed to the command no longer exists
-            $expr->add(
-                $q->expr()->eq('l.lead_id', ':contactId')
-            );
-            $q->setParameter('contactId', (int) $specificContactId);
-        } elseif ($contactIds = $limiter->getContactIdList()) {
-            $expr->add(
-                $q->expr()->in('l.lead_id', $contactIds)
-            );
-        } else {
-            $expr->add(
-                $q->expr()->gt('l.lead_id', ':minContactId')
-            );
-            $q->setParameter('minContactId', (int) $startAtContactId);
-
-            if ($maxContactId = $limiter->getMaxContactId()) {
-                $expr->add(
-                    $q->expr()->lte('l.lead_id', ':maxContactId')
-                );
-                $q->setParameter('maxContactId', $maxContactId);
-            }
-        }
+        $this->updateQueryFromContactLimiter('l', $q, $limiter);
 
         // Limit to specific campaign
-        $expr->add(
+        $q->andWhere(
             $q->expr()->eq('l.campaign_id', ':campaignId')
         );
 
@@ -254,7 +232,7 @@ class LeadRepository extends CommonRepository
                     $eventQb->expr()->eq('log.rotation', 'l.rotation')
                 )
             );
-        $expr->add(
+        $q->andWhere(
             sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
         );
 
@@ -270,12 +248,10 @@ class LeadRepository extends CommonRepository
                 );
             $q->setParameter('grandparentId', (int) $parentDecisionId);
 
-            $expr->add(
+            $q->andWhere(
                 sprintf('EXISTS (%s)', $grandparentQb->getSQL())
             );
         }
-
-        $q->where($expr);
 
         $results  = $q->execute()->fetchAll();
         $contacts = [];

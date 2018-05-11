@@ -49,16 +49,29 @@ class DecisionDispatcher
     /**
      * @param DecisionAccessor $config
      * @param LeadEventLog     $log
-     * @param                  $passthrough
+     * @param mixed            $passthrough
      *
      * @return DecisionEvent
      */
-    public function dispatchEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough)
+    public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough)
     {
         $event = new DecisionEvent($config, $log, $passthrough);
         $this->dispatcher->dispatch($config->getEventName(), $event);
-        $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DECISION_EVALUATION, $event);
 
+        return $event;
+    }
+
+    /**
+     * @param DecisionAccessor $config
+     * @param LeadEventLog     $log
+     *
+     * @return DecisionEvent
+     */
+    public function dispatchEvaluationEvent(DecisionAccessor $config, LeadEventLog $log)
+    {
+        $event = new DecisionEvent($config, $log);
+
+        $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DECISION_EVALUATION, $event);
         $this->legacyDispatcher->dispatchDecisionEvent($event);
 
         return $event;

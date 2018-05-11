@@ -11,6 +11,8 @@
 
 namespace Mautic\CampaignBundle\Executioner\ContactFinder\Limiter;
 
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
+
 /**
  * Class ContactLimiter.
  */
@@ -30,6 +32,11 @@ class ContactLimiter
      * @var int|null
      */
     private $minContactId;
+
+    /**
+     * @var int|null
+     */
+    private $batchMinContactId;
 
     /**
      * @var int|null
@@ -80,7 +87,7 @@ class ContactLimiter
      */
     public function getMinContactId()
     {
-        return $this->minContactId;
+        return ($this->batchMinContactId) ? $this->batchMinContactId : $this->minContactId;
     }
 
     /**
@@ -97,5 +104,30 @@ class ContactLimiter
     public function getContactIdList()
     {
         return $this->contactIdList;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @throws NoContactsFoundException
+     */
+    public function setBatchMinContactId($id)
+    {
+        // Prevent a never ending loop if the contact ID never changes due to being the last batch of contacts
+        if ($this->minContactId && $this->minContactId > (int) $id) {
+            throw new NoContactsFoundException();
+        }
+
+        // We've surpasssed the max so bai
+        if ($this->maxContactId && $this->maxContactId < (int) $id) {
+            throw new NoContactsFoundException();
+        }
+
+        // The same batch of contacts were somehow processed so let's stop to prevent the loop
+        if ($this->batchMinContactId && $this->batchMinContactId >= $id) {
+            throw new NoContactsFoundException();
+        }
+
+        $this->batchMinContactId = (int) $id;
     }
 }

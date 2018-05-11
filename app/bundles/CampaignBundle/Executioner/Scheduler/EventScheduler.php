@@ -123,7 +123,7 @@ class EventScheduler
             $log->setTriggerDate($executionDate);
 
             // Add it to the queue to persist to the DB
-            $this->eventLogger->addToQueue($log);
+            $this->eventLogger->queueToPersist($log);
 
             //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
             $this->logger->debug(
@@ -135,7 +135,7 @@ class EventScheduler
         }
 
         // Persist any pending in the queue
-        $this->eventLogger->persistQueued();
+        $this->eventLogger->persistQueuedLogs();
 
         // Send out a batch event
         $this->dispatchBatchScheduledEvent($config, $event, $this->eventLogger->getLogs());

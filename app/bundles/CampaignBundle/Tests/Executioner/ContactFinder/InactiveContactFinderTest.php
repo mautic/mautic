@@ -63,7 +63,7 @@ class InactiveContactFinderTest extends \PHPUnit_Framework_TestCase
         $this->expectException(NoContactsFoundException::class);
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
-        $this->getContactFinder()->getContacts(1, new Event(), 0, $limiter);
+        $this->getContactFinder()->getContacts(1, new Event(), $limiter);
     }
 
     public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound()
@@ -83,7 +83,7 @@ class InactiveContactFinderTest extends \PHPUnit_Framework_TestCase
         $this->expectException(NoContactsFoundException::class);
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
-        $this->getContactFinder()->getContacts(1, new Event(), 0, $limiter);
+        $this->getContactFinder()->getContacts(1, new Event(), $limiter);
     }
 
     public function testContactsAreFoundAndStoredInCampaignMemberDatesAdded()
@@ -103,7 +103,7 @@ class InactiveContactFinderTest extends \PHPUnit_Framework_TestCase
         $contactFinder = $this->getContactFinder();
 
         $limiter  = new ContactLimiter(0, 0, 0, 0);
-        $contacts = $contactFinder->getContacts(1, new Event(), 0, $limiter);
+        $contacts = $contactFinder->getContacts(1, new Event(), $limiter);
         $this->assertCount(1, $contacts);
 
         $this->assertEquals($contactMemberDates, $contactFinder->getDatesAdded());

@@ -41,12 +41,12 @@ class EventLogger
     /**
      * @var ArrayCollection
      */
-    private $queued;
+    private $persistQueue;
 
     /**
      * @var ArrayCollection
      */
-    private $processed;
+    private $logs;
 
     /**
      * LogHelper constructor.
@@ -61,19 +61,19 @@ class EventLogger
         $this->contactTracker      = $contactTracker;
         $this->repo                = $repo;
 
-        $this->queued    = new ArrayCollection();
-        $this->processed = new ArrayCollection();
+        $this->persistQueue    = new ArrayCollection();
+        $this->logs            = new ArrayCollection();
     }
 
     /**
      * @param LeadEventLog $log
      */
-    public function addToQueue(LeadEventLog $log)
+    public function queueToPersist(LeadEventLog $log)
     {
-        $this->queued->add($log);
+        $this->persistQueue->add($log);
 
-        if ($this->queued->count() >= 20) {
-            $this->persistQueued();
+        if ($this->persistQueue->count() >= 20) {
+            $this->persistQueuedLogs();
         }
     }
 
@@ -119,19 +119,19 @@ class EventLogger
     /**
      * Persist the queue, clear the entities from memory, and reset the queue.
      */
-    public function persistQueued()
+    public function persistQueuedLogs()
     {
-        if ($this->queued->count()) {
-            $this->repo->saveEntities($this->queued->getValues());
+        if ($this->persistQueue->count()) {
+            $this->repo->saveEntities($this->persistQueue->getValues());
         }
 
-        // Push them into the processed ArrayCollection to be used later.
+        // Push them into the logs ArrayCollection to be used later.
         /** @var LeadEventLog $log */
-        foreach ($this->queued as $log) {
-            $this->processed->set($log->getId(), $log);
+        foreach ($this->persistQueue as $log) {
+            $this->logs->set($log->getId(), $log);
         }
 
-        $this->queued->clear();
+        $this->persistQueue->clear();
     }
 
     /**
@@ -139,7 +139,7 @@ class EventLogger
      */
     public function getLogs()
     {
-        return $this->processed;
+        return $this->logs;
     }
 
     /**
@@ -171,17 +171,17 @@ class EventLogger
     }
 
     /**
-     * Persist processed entities after they've been updated.
+     * Persist logs entities after they've been updated.
      *
      * @return $this
      */
     public function persist()
     {
-        if (!$this->processed->count()) {
+        if (!$this->logs->count()) {
             return $this;
         }
 
-        $this->repo->saveEntities($this->processed->getValues());
+        $this->repo->saveEntities($this->logs->getValues());
 
         return $this;
     }
@@ -191,7 +191,7 @@ class EventLogger
      */
     public function clear()
     {
-        $this->processed->clear();
+        $this->logs->clear();
         $this->repo->clear();
 
         return $this;
@@ -225,6 +225,8 @@ class EventLogger
      */
     public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry = false)
     {
+        $isDecision = Event::TYPE_DECISION === $event->getEventType();
+
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
             $log = $this->buildLogEntry($event, $contact, $isInactiveEntry);
@@ -233,11 +235,16 @@ class EventLogger
 
             ChannelExtractor::setChannel($log, $event, $config);
 
-            $this->addToQueue($log);
+            if ($isDecision) {
+                // Do not pre-persist decision logs as they must be evaluated first
+                $this->logs->add($log);
+            } else {
+                $this->queueToPersist($log);
+            }
         }
 
-        $this->persistQueued();
+        $this->persistQueuedLogs();
 
-        return $this->getLogs();
+        return $this->logs;
     }
 }

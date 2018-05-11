@@ -266,17 +266,13 @@ class InactiveExecutioner implements ExecutionerInterface
             $parentEvent   = $decisionEvent->getParent();
             $parentEventId = ($parentEvent) ? $parentEvent->getId() : null;
 
-            // Because timing may not be appropriate, the starting row of the query may or may not change.
-            // So use the max contact ID to filter/sort results.
-            $this->startAtContactId = $this->limiter->getMinContactId() ?: 0;
-
             // Ge the first batch of contacts
-            $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->startAtContactId, $this->limiter);
+            $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
 
             // Loop over all contacts till we've processed all those applicable for this decision
             while ($contacts->count()) {
                 // Get the max contact ID before any are removed
-                $startAtContactId = $this->getStartingContactIdForNextBatch($contacts);
+                $batchMinContactId = max($contacts->getKeys()) + 1;
 
                 $this->progressBar->advance($contacts->count());
                 $this->counter->advanceEvaluated($contacts->count());
@@ -305,34 +301,13 @@ class InactiveExecutioner implements ExecutionerInterface
                     break;
                 }
 
-                $this->logger->debug('CAMPAIGN: Fetching the next batch of inactive contacts after contact ID '.$startAtContactId);
+                $this->logger->debug('CAMPAIGN: Fetching the next batch of inactive contacts starting with contact ID '.$batchMinContactId);
+                $this->limiter->setBatchMinContactId($batchMinContactId);
 
                 // Get the next batch, starting with the max contact ID
-                $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $startAtContactId, $this->limiter);
+                $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
             }
         }
-    }
-
-    /**
-     * @param ArrayCollection $contacts
-     *
-     * @return int
-     *
-     * @throws NoContactsFoundException
-     */
-    private function getStartingContactIdForNextBatch(ArrayCollection $contacts)
-    {
-        $maxId = max($contacts->getKeys());
-
-        // Prevent a never ending loop if the contact ID never changes due to the last batch of contacts
-        // getting removed because previously executed events are scheduled
-        if ($this->startAtContactId === $maxId) {
-            throw new NoContactsFoundException();
-        }
-
-        $this->startAtContactId = $maxId;
-
-        return $maxId;
     }
 
     /**
