@@ -54,7 +54,7 @@ class MomentumTransport implements \Swift_Transport, TokenTransportInterface, Ca
     }
 
     /**
-     * Test if this Transport mechanism has starte-d.
+     * Test if this Transport mechanism has started.
      *
      * @return bool
      */
