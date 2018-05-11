@@ -15,8 +15,10 @@ interface MomentumCallbackInterface
     public function processCallbackRequest(Request $request);
 
     /**
-     * @param string $emailAddress
-     * @param array  $response
+     * @param \Swift_Mime_Message $message
+     * @param array               $response
+     *
+     * @return mixed
      */
-    public function processImmediateFeedback($emailAddress, array $response);
+    public function processImmediateFeedback(\Swift_Mime_Message $message, array $response);
 }
