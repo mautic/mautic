@@ -374,7 +374,7 @@ Mautic.campaignBuilderUpdateLabel = function (domEventId) {
             if (theLabel) {
                 conn.addOverlay(["Label", {
                     label: theLabel,
-                    location: 0.65,
+                    location: 0.9,
                     cssClass: "jtk-label",
                     id: conn.sourceId + "_" + conn.targetId + "_connectionLabel"
                 }]);
@@ -1226,7 +1226,13 @@ Mautic.campaignBuilderRegisterEndpoint = function (name, params) {
             strokeWidth: 1
         },
         connector: connectorStyle,
-        connectorOverlays: [["Arrow", {width: 8, length: 8, location: 0.5}]],
+        connectorOverlays: [
+            [
+                "Arrow", { width: 8, length: 8, location: 0.25 }
+            ], [
+                "Arrow", { width: 8, length: 8, location: 0.75 }
+            ]
+        ],
         maxConnections: -1,
         isTarget: isTarget,
         isSource: isSource,
