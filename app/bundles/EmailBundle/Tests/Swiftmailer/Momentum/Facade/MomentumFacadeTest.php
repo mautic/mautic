@@ -34,9 +34,9 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
     private $swiftMessageValidatorMock;
 
     /**
-     * @var MomentumCallbackInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $momentumCallback;
+    private $momentumCallbackMock;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -49,7 +49,7 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
         $this->adapterMock               = $this->createMock(AdapterInterface::class);
         $this->swiftMessageServiceMock   = $this->createMock(SwiftMessageServiceInterface::class);
         $this->swiftMessageValidatorMock = $this->createMock(SwiftMessageValidatorInterface::class);
-        $this->momentumCallback          = $this->createMock(MomentumCallbackInterface::class);
+        $this->momentumCallbackMock      = $this->createMock(MomentumCallbackInterface::class);
         $this->loggerMock                = $this->createMock(Logger::class);
     }
 
@@ -76,15 +76,20 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
         $sparkPostResponseMock->expects($this->at(0))
             ->method('getStatusCode')
             ->willReturn('200');
+        $totalRecipients = 0;
+        $bodyResults     = [
+            'results' => [
+                'total_accepted_recipients' => $totalRecipients,
+            ],
+        ];
         $sparkPostResponseMock->expects($this->at(1))
             ->method('getBody')
-            ->willReturn([
-                'results' => [
-
-                ]
-            ])
+            ->willReturn($bodyResults);
+        $this->momentumCallbackMock->expects($this->at(0))
+            ->method('processImmediateFeedback')
+            ->with($swiftMessageMock, $bodyResults);
         $facade = $this->getMomentumFacade();
-        $facade->send($swiftMessageMock);
+        $this->assertSame($totalRecipients, $facade->send($swiftMessageMock));
     }
 
     /**
@@ -93,15 +98,15 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
     public function testSendValidatorError()
     {
         $swiftMessageMock                    = $this->createMock(\Swift_Mime_Message::class);
+        $exceptionMessage                    = 'Example exception message';
         $swiftMessageValidationExceptionMock = $this->createMock(SwiftMessageValidationException::class);
+        $swiftMessageValidationExceptionMock->expects($this->at(0))
+            ->method('getMessage')
+            ->willReturn($exceptionMessage);
         $this->swiftMessageValidatorMock->expects($this->at(0))
             ->method('validate')
             ->with($swiftMessageMock)
             ->willThrowException($swiftMessageValidationExceptionMock);
-        $exceptionMessage = 'Example exception message';
-        $swiftMessageValidationExceptionMock->expects($this->at(0))
-            ->method('getMessage')
-            ->willReturn($exceptionMessage);
         $this->loggerMock->expects($this->at(0))
             ->method('addError')
             ->with('Momentum send exception', [
