@@ -23,7 +23,7 @@ class SlotSuccessMessageType extends SlotType
     {
         $builder->add(
             'successmessage',
-            TextareaType::class,
+                TextareaType::class,
             [
                 'label'      => false,
                 'label_attr' => ['class' => 'control-label'],
