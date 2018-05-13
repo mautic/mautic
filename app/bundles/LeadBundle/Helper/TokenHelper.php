@@ -80,6 +80,7 @@ class TokenHelper
 
         if ('true' === $defaultValue) {
             $value = urlencode($value);
+            return $value;
         }
 
         return $value ?: $defaultValue;
