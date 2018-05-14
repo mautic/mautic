@@ -47,6 +47,8 @@ final class SparkpostFactory implements SparkpostFactoryInterface
 
         $hostInfo = parse_url($host);
         if ($hostInfo) {
+            $options['protocol'] =  $hostInfo['scheme'];
+
             if (empty($port)) {
                 $options['port'] = $hostInfo['scheme'] === 'https' ? 443 : 80;
             }
