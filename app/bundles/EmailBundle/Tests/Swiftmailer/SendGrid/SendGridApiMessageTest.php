@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid;
 
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase;
+use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailHeader;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage;
@@ -38,6 +39,10 @@ class SendGridApiMessageTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $sendGridMailHeader = $this->getMockBuilder(SendGridMailHeader::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $mail = $this->getMockBuilder(Mail::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -46,7 +51,7 @@ class SendGridApiMessageTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridApiMessage = new SendGridApiMessage($sendGridMailBase, $sendGridMailPersonalization, $sendGridMailMetadata, $sendGridMailAttachment);
+        $sendGridApiMessage = new SendGridApiMessage($sendGridMailBase, $sendGridMailPersonalization, $sendGridMailMetadata, $sendGridMailAttachment, $sendGridMailHeader);
 
         $sendGridMailBase->expects($this->once())
             ->method('getSendGridMail')
@@ -63,6 +68,10 @@ class SendGridApiMessageTest extends \PHPUnit_Framework_TestCase
 
         $sendGridMailAttachment->expects($this->once())
             ->method('addAttachmentsToMail')
+            ->with($mail, $message);
+
+        $sendGridMailHeader->expects($this->once())
+            ->method('addHeadersToMail')
             ->with($mail, $message);
 
         $result = $sendGridApiMessage->getMessage($message);
