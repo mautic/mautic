@@ -534,6 +534,9 @@ class MailHelper
             // Reset recipients
             $this->queuedRecipients = [];
 
+            // Reset hash which is unique to the recipient
+            $this->idHash = null;
+
             // Assume success
             return (self::QUEUE_RETURN_ERRORS) ? [true, []] : true;
         } else {
@@ -1485,10 +1488,17 @@ class MailHelper
      */
     private function getUnsubscribeHeader()
     {
-        $unsubscribeLink = ($this->idHash) ? $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], true) :
-            '<{unsubscribe_url}>';
+        if ($this->idHash) {
+            $url = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], true);
 
-        return ['List-Unsubscribe' => "<$unsubscribeLink>"];
+            return ['List-Unsubscribe' => "<$url>"];
+        }
+
+        if (!empty($this->queuedRecipients) || !empty($this->lead)) {
+            return ['List-Unsubscribe' => '<{unsubscribe_url}>'];
+        }
+
+        return [];
     }
 
     /**
