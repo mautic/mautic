@@ -152,6 +152,22 @@ class FormatterHelper extends Helper
     }
 
     /**
+     * @param array  $array
+     * @param string $delimeter
+     *
+     * @return string
+     */
+    public function simpleArrayToHtml(array $array, $delimeter = '<br />')
+    {
+        $pairs = [];
+        foreach ($array as $key => $value) {
+            $pairs[] = "$key: $value";
+        }
+
+        return implode($delimeter, $pairs);
+    }
+
+    /**
      * @return string
      */
     public function getName()
