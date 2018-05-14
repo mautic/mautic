@@ -1477,28 +1477,37 @@ class MailHelper
      */
     public function getCustomHeaders()
     {
-        $headers       = $this->headers;
-        $systemHeaders = $this->getSystemHeaders();
+        $headers = array_merge($this->headers, $this->getSystemHeaders());
 
-        return array_merge($this->getUnsubscribeHeader(), $headers, $systemHeaders);
+        $listUnsubscribeHeader = $this->getUnsubscribeHeader();
+        if ($listUnsubscribeHeader) {
+            if (!empty($headers['List-Unsubscribe'])) {
+                // Ensure Mautic's is always part of this header
+                $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
+            } else {
+                $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
+            }
+        }
+
+        return $headers;
     }
 
     /**
-     * @return array
+     * @return bool|string
      */
     private function getUnsubscribeHeader()
     {
         if ($this->idHash) {
             $url = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], true);
 
-            return ['List-Unsubscribe' => "<$url>"];
+            return "<$url>";
         }
 
         if (!empty($this->queuedRecipients) || !empty($this->lead)) {
-            return ['List-Unsubscribe' => '<{unsubscribe_url}>'];
+            return '<{unsubscribe_url}>';
         }
 
-        return [];
+        return false;
     }
 
     /**
