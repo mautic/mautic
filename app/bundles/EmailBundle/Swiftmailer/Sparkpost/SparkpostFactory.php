@@ -38,18 +38,18 @@ final class SparkpostFactory implements SparkpostFactoryInterface
             $host = 'https://'.$host;
         }
 
-        $hostInfo = parse_url($host);
+        $options = [
+            'host'     => '',
+            'protocol' => 'https',
+            'port'     => $port,
+            'key'      => $apiKey,
+        ];
 
+        $hostInfo = parse_url($host);
         if ($hostInfo) {
             if (empty($port)) {
-                $port = $hostInfo['scheme'] === 'https' ? 443 : 80;
+                $options['port'] = $hostInfo['scheme'] === 'https' ? 443 : 80;
             }
-
-            $options = [
-                'protocol' => $hostInfo['scheme'],
-                'port'     => $port,
-                'key'      => $apiKey,
-            ];
 
             $host = $hostInfo['host'];
             if (isset($hostInfo['path'])) {
@@ -67,10 +67,9 @@ final class SparkpostFactory implements SparkpostFactoryInterface
             }
 
             $options['host'] = $host;
-
-            return new SparkPost($this->client, $options);
-        } else {
-            // problem :/
         }
+
+        // Must always return a SparkPost host or else Symfony will fail to build the container if host is empty
+        return new SparkPost($this->client, $options);
     }
 }
