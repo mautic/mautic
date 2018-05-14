@@ -260,9 +260,9 @@ class TriggerCampaignCommand extends ModeratedCommand
         $contactId    = $input->getOption('contact-id');
         $contactIds   = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
         $threadId     = $input->getOption('thread-id');
-        $threadMaxId  = $input->getOption('max-thread-id');
+        $maxThreadId  = $input->getOption('max-thread-id');
 
-        $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $threadMaxId);
+        $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreadId);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
