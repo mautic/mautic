@@ -155,7 +155,7 @@ class ContactLimiter
     /**
      * @return int|null
      */
-    public function getThreadMaxId()
+    public function getMaxThreadId()
     {
         return $this->maxThreadId;
     }
