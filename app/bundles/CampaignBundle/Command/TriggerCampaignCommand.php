@@ -192,6 +192,18 @@ class TriggerCampaignCommand extends ModeratedCommand
                 null
             )
             ->addOption(
+                '--thread-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The number of this current process if running multiple in parallel.'
+            )
+            ->addOption(
+                '--max-thread-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The maximum number of processes you intend to run in parallel.'
+            )
+            ->addOption(
                 '--kickoff-only',
                 null,
                 InputOption::VALUE_NONE,
@@ -247,8 +259,10 @@ class TriggerCampaignCommand extends ModeratedCommand
         $contactMaxId = $input->getOption('max-contact-id');
         $contactId    = $input->getOption('contact-id');
         $contactIds   = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
+        $threadId     = $input->getOption('thread-id');
+        $threadMaxId  = $input->getOption('max-thread-id');
 
-        $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds);
+        $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $threadMaxId);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 

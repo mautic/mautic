@@ -49,6 +49,16 @@ class ContactLimiter
     private $contactIdList;
 
     /**
+     * @var int|null
+     */
+    private $threadId;
+
+    /**
+     * @var int|null
+     */
+    private $maxThreadId;
+
+    /**
      * ContactLimiter constructor.
      *
      * @param       $batchLimit
@@ -56,14 +66,25 @@ class ContactLimiter
      * @param       $minContactId
      * @param       $maxContactId
      * @param array $contactIdList
+     * @param       $threadId
+     * @param       $maxThreadId
      */
-    public function __construct($batchLimit, $contactId, $minContactId, $maxContactId, array $contactIdList = [])
-    {
+    public function __construct(
+        $batchLimit,
+        $contactId,
+        $minContactId,
+        $maxContactId,
+        array $contactIdList = [],
+        $threadId,
+        $maxThreadId
+    ) {
         $this->batchLimit    = ($batchLimit) ? (int) $batchLimit : 100;
         $this->contactId     = ($contactId) ? (int) $contactId : null;
         $this->minContactId  = ($minContactId) ? (int) $minContactId : null;
         $this->maxContactId  = ($maxContactId) ? (int) $maxContactId : null;
         $this->contactIdList = $contactIdList;
+        $this->threadId      = ($threadId) ? (int) $threadId : null;
+        $this->maxThreadId   = ($maxThreadId && $this->threadId) ? (int) $maxThreadId : null;
     }
 
     /**
@@ -129,5 +150,21 @@ class ContactLimiter
         }
 
         $this->batchMinContactId = (int) $id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getThreadMaxId()
+    {
+        return $this->maxThreadId;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getThreadId()
+    {
+        return $this->threadId;
     }
 }

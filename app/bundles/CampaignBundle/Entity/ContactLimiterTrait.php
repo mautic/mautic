@@ -54,6 +54,14 @@ trait ContactLimiterTrait
                 ->setParameter('maxContactId', $maxContactId);
         }
 
+        if ($threadId = $contactLimiter->getThreadId() && $threadMaxId = $contactLimiter->getThreadMaxId()) {
+            if ($threadId < $threadMaxId) {
+                $qb->andWhere("MOD(($alias.lead_id + :threadShift), :threadMax) = 0");
+                $qb->setParameter('threadShift', $threadId - 1);
+                $qb->setParameter('threadMax', $threadMaxId);
+            }
+        }
+
         if ($limit = $contactLimiter->getBatchLimit()) {
             $qb->setMaxResults($limit);
         }
