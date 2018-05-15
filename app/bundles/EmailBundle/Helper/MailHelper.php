@@ -534,9 +534,6 @@ class MailHelper
             // Reset recipients
             $this->queuedRecipients = [];
 
-            // Reset hash which is unique to the recipient
-            $this->idHash = null;
-
             // Assume success
             return (self::QUEUE_RETURN_ERRORS) ? [true, []] : true;
         } else {
