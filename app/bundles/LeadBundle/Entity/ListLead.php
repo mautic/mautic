@@ -71,7 +71,7 @@ class ListLead
         $builder->createField('manuallyAdded', 'boolean')
             ->columnName('manually_added')
             ->build();
-        
+
         $builder->addIndex(['manually_removed'], 'manually_removed');
     }
 
