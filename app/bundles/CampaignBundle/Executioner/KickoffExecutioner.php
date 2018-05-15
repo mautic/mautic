@@ -197,10 +197,6 @@ class KickoffExecutioner implements ExecutionerInterface
         $now = new \DateTime();
         $this->counter->advanceEventCount($this->rootEvents->count());
 
-        // We have to keep track of this in case the campaign begins with a decision in order
-        // to prevent a never ending loop
-        $originalMinContactId = $this->limiter->getMinContactId();
-
         // Loop over contacts until the entire campaign is executed
         $contacts = $this->kickoffContactFinder->getContacts($this->campaign->getId(), $this->limiter);
         while ($contacts->count()) {

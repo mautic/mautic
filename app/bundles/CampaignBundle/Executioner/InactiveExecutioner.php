@@ -91,11 +91,6 @@ class InactiveExecutioner implements ExecutionerInterface
     private $helper;
 
     /**
-     * @var int
-     */
-    private $startAtContactId = 0;
-
-    /**
      * InactiveExecutioner constructor.
      *
      * @param InactiveContactFinder $inactiveContactFinder
@@ -262,50 +257,58 @@ class InactiveExecutioner implements ExecutionerInterface
 
         /** @var Event $decisionEvent */
         foreach ($this->decisions as $decisionEvent) {
-            // We need the parent ID of the decision in order to fetch the time the contact executed this event
-            $parentEvent   = $decisionEvent->getParent();
-            $parentEventId = ($parentEvent) ? $parentEvent->getId() : null;
+            try {
+                // Ensure the batch min is reset from the last decision event
+                $this->limiter->setBatchMinContactId(null);
 
-            // Ge the first batch of contacts
-            $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
+                // We need the parent ID of the decision in order to fetch the time the contact executed this event
+                $parentEvent   = $decisionEvent->getParent();
+                $parentEventId = ($parentEvent) ? $parentEvent->getId() : null;
 
-            // Loop over all contacts till we've processed all those applicable for this decision
-            while ($contacts->count()) {
-                // Get the max contact ID before any are removed
-                $batchMinContactId = max($contacts->getKeys()) + 1;
-
-                $this->progressBar->advance($contacts->count());
-                $this->counter->advanceEvaluated($contacts->count());
-
-                $inactiveEvents = $decisionEvent->getNegativeChildren();
-                $this->helper->removeContactsThatAreNotApplicable($now, $contacts, $parentEventId, $inactiveEvents);
-                $earliestLastActiveDateTime = $this->helper->getEarliestInactiveDateTime();
-
-                $this->logger->debug(
-                    'CAMPAIGN: ('.$decisionEvent->getId().') Earliest date for inactivity for this batch of contacts is '.
-                    $earliestLastActiveDateTime->format('Y-m-d H:i:s T')
-                );
-
-                if ($contacts->count()) {
-                    // Execute or schedule the events attached to the inactive side of the decision
-                    $this->executeLogsForInactiveEvents($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
-                    // Record decision for these contacts
-                    $this->executioner->recordLogsAsExecutedForEvent($decisionEvent, $contacts, true);
-                }
-
-                // Clear contacts from memory
-                $this->inactiveContactFinder->clear();
-
-                if ($this->limiter->getContactId()) {
-                    // No use making another call
-                    break;
-                }
-
-                $this->logger->debug('CAMPAIGN: Fetching the next batch of inactive contacts starting with contact ID '.$batchMinContactId);
-                $this->limiter->setBatchMinContactId($batchMinContactId);
-
-                // Get the next batch, starting with the max contact ID
+                // Ge the first batch of contacts
                 $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
+
+                // Loop over all contacts till we've processed all those applicable for this decision
+                while ($contacts->count()) {
+                    // Get the max contact ID before any are removed
+                    $batchMinContactId = max($contacts->getKeys()) + 1;
+
+                    $this->progressBar->advance($contacts->count());
+                    $this->counter->advanceEvaluated($contacts->count());
+
+                    $inactiveEvents = $decisionEvent->getNegativeChildren();
+                    $this->helper->removeContactsThatAreNotApplicable($now, $contacts, $parentEventId, $inactiveEvents);
+                    $earliestLastActiveDateTime = $this->helper->getEarliestInactiveDateTime();
+
+                    $this->logger->debug(
+                        'CAMPAIGN: ('.$decisionEvent->getId().') Earliest date for inactivity for this batch of contacts is '.
+                        $earliestLastActiveDateTime->format('Y-m-d H:i:s T')
+                    );
+
+                    if ($contacts->count()) {
+                        // Execute or schedule the events attached to the inactive side of the decision
+                        $this->executeLogsForInactiveEvents($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
+                        // Record decision for these contacts
+                        $this->executioner->recordLogsAsExecutedForEvent($decisionEvent, $contacts, true);
+                    }
+
+                    // Clear contacts from memory
+                    $this->inactiveContactFinder->clear();
+
+                    if ($this->limiter->getContactId()) {
+                        // No use making another call
+                        break;
+                    }
+
+                    $this->logger->debug('CAMPAIGN: Fetching the next batch of inactive contacts starting with contact ID '.$batchMinContactId);
+                    $this->limiter->setBatchMinContactId($batchMinContactId);
+
+                    // Get the next batch, starting with the max contact ID
+                    $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
+                }
+            } catch (NoContactsFoundException $exception) {
+                // On to the next decision
+                $this->logger->debug('CAMPAIGN: No more contacts to process for decision ID #'.$decisionEvent->getId());
             }
         }
     }
