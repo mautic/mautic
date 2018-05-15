@@ -86,14 +86,17 @@ class LeadSubscriber extends CommonSubscriber
         //     return;
         // }
 
-        $data = json_encode([
-            "source" => "mautic",
-            "entity" => "contact",
-            "operation" => $event->isNew() ? 'new' : 'update',
-            "data" => $leadData
-        ]);
+        // Email is primary key, so if its not set don't send anything to RabbitMQ. (Helps with some unexpected event triggering)
+        if(!empty($leadData['email'])){
+            $data = json_encode([
+                "source" => "mautic",
+                "entity" => "contact",
+                "operation" => $event->isNew() ? 'new' : 'update',
+                "data" => $leadData
+            ]);
 
-        $this->publish($data);
+            $this->publish($data);
+        }
     }
 
     /**
@@ -102,17 +105,19 @@ class LeadSubscriber extends CommonSubscriber
     public function onLeadPostDelete(Events\LeadEvent $event)
     {
         $lead = $event->getLead();
+        // Email is primary key, so if its not set don't send anything to RabbitMQ. (Helps with some unexpected event triggering)
+        if(!empty($lead->getEmail())){
+            $data = json_encode([
+                "source" => "mautic",
+                "entity" => "contact",
+                "operation" => "delete",
+                "data" => [
+                    'email' => $lead->getEmail()
+                ]
+            ]);
 
-        $data = json_encode([
-            "source" => "mautic",
-            "entity" => "contact",
-            "operation" => "delete",
-            "data" => [
-                'email' => $lead->getEmail()
-            ]
-        ]);
-
-        $this->publish($data);
+            $this->publish($data);
+        }
     }
 
     /**
@@ -136,6 +141,7 @@ class LeadSubscriber extends CommonSubscriber
                 'cafile'=>getenv("RABBITMQ_SSL_CACERT_FILE"),
                 'local_cert'=>getenv("RABBITMQ_SSL_CERT_FILE"),
                 'local_pk'=>getenv("RABBITMQ_SSL_KEY_FILE"),
+                'verify_peer_name'=>false,
             ]);
         $channel = $connection->channel();
 
@@ -143,7 +149,7 @@ class LeadSubscriber extends CommonSubscriber
         $channel->exchange_declare('kiazaki', 'topic', false, true, false);
 
         $msg = new AMQPMessage($data);
-
+        
         $channel->basic_publish($msg, 'kiazaki', 'mautic.contact');
 
         $channel->close();
