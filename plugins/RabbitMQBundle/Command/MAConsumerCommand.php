@@ -99,7 +99,7 @@ class MAConsumerCommand extends ModeratedCommand
         $channel->queue_declare('mautic.contact', false, true, false, false);
 
         // Declare the route_keys to listen to
-        $routing_keys = ['mailengine.contact', 'salesforce.contact','kiazaki_ws.*'];
+        $routing_keys = ['mailengine.contact', 'salesforce.contact','kiazaki_ws.*','pimcore.news'];
 
         foreach($routing_keys as $routing_key) {
             $channel->queue_bind('mautic.contact', 'kiazaki', $routing_key);
@@ -141,6 +141,9 @@ class MAConsumerCommand extends ModeratedCommand
                 }else{
 
                 }
+            }
+            else if($leadFields['entity']=='news'){
+
             }else{
                 /* If entity is not geofence than update contact. */
                 $lead = new Lead();
@@ -207,7 +210,8 @@ class MAConsumerCommand extends ModeratedCommand
                     // Adding lead to segments (fences)
                     $fenceIds = [];
                     $fenceNames = [];
-                    if(isset($leadFields['data']['in_fence']) && count($leadFields['data']['in_fence'])>0 ){
+                    // Work with fences only when message is sent from kiazaki_ws
+                    if(isset($leadFields['data']['in_fence']) && $leadFields['source']=="kiazaki_ws" ){
                         foreach ($leadFields['data']['in_fence'] as $key => $value) {
                             $fenceNames[] = $value;
                         }

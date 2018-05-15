@@ -2,7 +2,6 @@
     /**
      * @author Tomasz Kapusta
      * @copyright 2010
-
      **/
 
     /**

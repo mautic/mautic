@@ -44,7 +44,7 @@ class WebhookQueueEvent extends CommonEvent
      */
     public function getWebhookQueue()
     {
-        return $this->getWebhookQueue();
+        return $this->entity;
     }
 
     /**
@@ -64,7 +64,7 @@ class WebhookQueueEvent extends CommonEvent
      */
     public function getWebhook()
     {
-        return $this->getWebhook();
+        return $this->webhook;
     }
 
     /**
