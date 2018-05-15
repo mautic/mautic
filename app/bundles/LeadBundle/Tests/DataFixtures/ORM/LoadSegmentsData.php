@@ -824,6 +824,23 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
+            [ // ID 39
+                'name'    => 'Name is not equal (not null test)',
+                'alias'   => 'name-is-not-equal-not-null-test',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'firstname',
+                        'operator' => '!=',
+                        'filter'   => 'xxxxx',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {

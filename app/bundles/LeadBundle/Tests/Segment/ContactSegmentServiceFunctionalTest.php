@@ -191,6 +191,14 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             $segmentContacts[$segmentMembershipCompanyOnlyFields->getId()]['count'],
             'There should be 14 in this segment.'
         );
+
+        $segmentMembershipCompanyOnlyFields = $this->fixtures->getReference('name-is-not-equal-not-null-test');
+        $segmentContacts                    = $contactSegmentService->getTotalLeadListLeadsCount($segmentMembershipCompanyOnlyFields);
+        $this->assertEquals(
+            54,
+            $segmentContacts[$segmentMembershipCompanyOnlyFields->getId()]['count'],
+            'There should be 54 in this segment. Check that contact with NULL firstname were added if error here'
+        );
     }
 
     public function testSegmentRebuildCommand()
