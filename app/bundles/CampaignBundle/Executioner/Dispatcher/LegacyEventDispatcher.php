@@ -138,7 +138,9 @@ class LegacyEventDispatcher
             if (!$wasBatchProcessed) {
                 $this->dispatchExecutionEvent($config, $log, $result);
 
-                $log->appendToMetadata($result);
+                if (!is_bool($result)) {
+                    $log->appendToMetadata($result);
+                }
 
                 // Dispatch new events for legacy processed logs
                 if ($this->isFailed($result)) {
