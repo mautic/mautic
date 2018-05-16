@@ -193,7 +193,7 @@ class ExpressionBuilder
      */
     public function notRegexp($x, $y)
     {
-        return $this->comparison($x, self::REGEXP, $y);
+        return 'NOT '.$this->comparison($x, self::REGEXP, $y);
     }
 
     /**
