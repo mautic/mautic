@@ -36,11 +36,14 @@ class DateRangeType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $humanFormat = 'M j, Y';
+        $humanFormat      = 'M j, Y';
+        $dateRangeDefault = $this->factory->getParameter('default_daterange_filter') ? $this->factory->getParameter('default_daterange_filter') : 'P30D';
+
+        $defaultFrom = new \DateTime($dateRangeDefault);
 
         $dateFrom = (empty($options['data']['date_from']))
             ?
-            new \DateTime('-30 days')
+            $defaultFrom
             :
             new \DateTime($options['data']['date_from']);
 

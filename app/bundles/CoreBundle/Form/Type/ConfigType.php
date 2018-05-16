@@ -452,6 +452,35 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'default_daterange_filter',
+            'choice',
+            [
+                'choices' => [
+                    ''  => 'mautic.core.daterange.0days',
+                    '-24 Hours'  => 'mautic.core.daterange.1days',
+                    '-48 Hours'  => 'mautic.core.daterange.2days',
+                    '-72 Hours'  => 'mautic.core.daterange.3days',
+                    '-1 week'  => 'mautic.core.daterange.1weeks',
+                    '-24 weeks'  => 'mautic.core.daterange.2weeks',
+                    '-3 weeks'  => 'mautic.core.daterange.3weeks',
+                    '-1 month'  => 'mautic.core.daterange.1month',
+                    '-2 months'  => 'mautic.core.daterange.2month',
+                    '-3 months'  => 'mautic.core.daterange.3month',
+                ],
+                'expanded'   => false,
+                'multiple'   => false,
+                'label'      => 'mautic.core.config.form.default.daterange_default',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.default.daterange_default.tooltip',
+                ],
+                'required'    => false,
+                'empty_value' => false,
+            ]
+        );
+
+        $builder->add(
             'ip_lookup_service',
             'choice',
             [
