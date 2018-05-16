@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PipedriveIntegration extends CrmAbstractIntegration
@@ -88,8 +88,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
         return [
             'url'      => 'mautic.pipedrive.api_url',
             'token'    => 'mautic.pipedrive.token',
-            'user'     => 'mautic.pipedrive.webhook_user',
-            'password' => 'mautic.pipedrive.webhook_password',
         ];
     }
 
@@ -211,7 +209,31 @@ class PipedriveIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ($formArea == 'keys') {
+            $builder->add(
+                'username',
+                TextType::class,
+                [
+                    'label'       => 'mautic.pipedrive.webhook_user',
+                    'attr'        => [
+                        'class' => 'form-control',
+                    ],
+                    'required' => false,
+                ]
+            );
+
+            $builder->add(
+                'password',
+                TextType::class,
+                [
+                    'label'       => 'mautic.pipedrive.webhook_password',
+                    'attr'        => [
+                        'class' => 'form-control',
+                    ],
+                    'required' => false,
+                ]
+            );
+        } elseif ($formArea == 'features') {
             $builder->add(
                 'objects',
                 'choice',
