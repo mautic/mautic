@@ -151,7 +151,7 @@ class ContactSegmentQueryBuilder
             $qb->addSelect($select);
         }
 
-        $queryBuilder->select('count(leadIdPrimary) count, max(leadIdPrimary) maxId')
+        $queryBuilder->select('count(leadIdPrimary) count, max(leadIdPrimary) maxId, min(leadIdPrimary) minId')
                      ->from('('.$qb->getSQL().')', 'sss');
         $queryBuilder->setParameters($qb->getParameters());
 
