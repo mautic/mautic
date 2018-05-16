@@ -106,4 +106,52 @@ class TokenHelperTest extends \PHPUnit_Framework_TestCase
         $tokenList = TokenHelper::findLeadTokens($token, $lead);
         $this->assertEquals([$token => 'Somewhere%26Else'], $tokenList);
     }
+
+    public function testGetValueFromTokensWhenSomeValue()
+    {
+        $token  = '{contactfield=website}';
+        $tokens = [
+            '{contactfield=website}' => 'https://mautic.org',
+        ];
+        $this->assertEquals(
+            'https://mautic.org',
+            TokenHelper::getValueFromTokens($tokens, $token)
+        );
+    }
+
+    public function testGetValueFromTokensWhenSomeValueWithDefaultValue()
+    {
+        $token  = '{contactfield=website|ftp://default.url}';
+        $tokens = [
+            '{contactfield=website}' => 'https://mautic.org',
+        ];
+        $this->assertEquals(
+            'https://mautic.org',
+            TokenHelper::getValueFromTokens($tokens, $token)
+        );
+    }
+
+    public function testGetValueFromTokensWhenNoValueWithDefaultValue()
+    {
+        $token  = '{contactfield=website|ftp://default.url}';
+        $tokens = [
+            '{contactfield=website}' => '',
+        ];
+        $this->assertEquals(
+            'ftp://default.url',
+            TokenHelper::getValueFromTokens($tokens, $token)
+        );
+    }
+
+    public function testGetValueFromTokensWhenNoValueWithoutDefaultValue()
+    {
+        $token  = '{contactfield=website}';
+        $tokens = [
+            '{contactfield=website}' => '',
+        ];
+        $this->assertEquals(
+            '',
+            TokenHelper::getValueFromTokens($tokens, $token)
+        );
+    }
 }

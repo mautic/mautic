@@ -146,4 +146,105 @@ class UrlHelper
         /* absolute URL is ready! */
         return $scheme.'://'.$abs;
     }
+
+    /**
+     * Takes a plaintext, finds all URLs in it and return the array of those URLs.
+     * With exception of URLs used as a token default values.
+     *
+     * @param string $text
+     *
+     * @return array
+     */
+    public static function getUrlsFromPlaintext($text)
+    {
+        $regex = '#[-a-zA-Z0-9@:%_\+.~\#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~\#?&//=]*)?#si';
+
+        if (!preg_match_all($regex, $text, $matches)) {
+            return [];
+        }
+
+        $urls = $matches[0];
+
+        foreach ($urls as $key => $url) {
+            // We don't want to match URLs in token default values
+            // like {contactfield=website|http://ignore.this.url}
+            $isDefautlTokenValue = stripos($text, "|$url}") !== false;
+            if ($isDefautlTokenValue) {
+                unset($urls[$key]);
+            }
+        }
+
+        return $urls;
+    }
+
+    /**
+     * Sanitize parts of the URL to make sure the URL query values are HTTP encoded.
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    public static function sanitizeAbsoluteUrl($url)
+    {
+        if (!$url) {
+            return $url;
+        }
+
+        $url = self::sanitizeUrlScheme($url);
+        $url = self::sanitizeUrlQuery($url);
+
+        return $url;
+    }
+
+    /**
+     * Make sure the URL has a scheme. Defaults to HTTP if not provided.
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    private static function sanitizeUrlScheme($url)
+    {
+        $isRelative = strpos($url, '//') === 0;
+
+        if ($isRelative) {
+            return $url;
+        }
+
+        $containSlashes = strpos($url, '://') !== false;
+
+        if (!$containSlashes) {
+            $url = sprintf('://%s', $url);
+        }
+
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+
+        // Set default scheme to http if missing
+        if (empty($scheme)) {
+            $url = sprintf('http%s', $url);
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private static function sanitizeUrlQuery($url)
+    {
+        $query = parse_url($url, PHP_URL_QUERY);
+
+        if (!empty($query)) {
+            parse_str($query, $parsedQuery);
+
+            if ($parsedQuery) {
+                $encodedQuery = http_build_query($parsedQuery);
+                $url          = str_replace($query, $encodedQuery, $url);
+            }
+        }
+
+        return $url;
+    }
 }
