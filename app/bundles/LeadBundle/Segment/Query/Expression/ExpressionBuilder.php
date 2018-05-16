@@ -149,10 +149,6 @@ class ExpressionBuilder
      */
     public function notBetween($x, $arr)
     {
-        if (!is_array($arr) || count($arr) != 2) {
-            throw new SegmentQueryException('Not between expression expects second argument to be an array with exactly two elements');
-        }
-
         return 'NOT '.$this->between($x, $arr);
     }
 
