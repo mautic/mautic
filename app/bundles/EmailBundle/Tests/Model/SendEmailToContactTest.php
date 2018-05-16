@@ -763,9 +763,6 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
 
     public function testSetSampleMailerByTemporaryMailerSpoolMemory($type = 'memory')
     {
-        $this->builder->expects($this->any())
-            ->method('getOptions')
-            ->will($this->returnValue(['with_immediately' => false]));
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(true, 1);
         $mailer    = new \Swift_Mailer($transport);
