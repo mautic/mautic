@@ -86,22 +86,23 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $this->copyRepoMock   = $this->createMock(CopyRepository::class);
         $this->mockDispatcher = $this->createMock(EventDispatcher::class);
         $this->emailModelMock = $this->createMock(EmailModel::class);
-        $this->factoryMock    =  $this->createMock(MauticFactory::class);
+        $this->factoryMock    = $this->createMock(MauticFactory::class);
         $this->routerMock     = $this->createMock(Router::class);
         $this->statRepository = $this->createMock(StatRepository::class);
         $this->dncModel       = $this->createMock(DoNotContact::class);
         $this->mockEm         = $this->createMock(EntityManager::class);
+        $this->builder        = $this->getMockBuilder('Symfony\Component\Form\Test\FormBuilderInterface')->getMock();
     }
 
     /**
      * @testdox Tests that all contacts are temporarily failed if an Email entity happens to be incorrectly configured
      *
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::setEmail()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::send()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::finalFlush()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::setEmail()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::send()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::finalFlush()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
      */
     public function testContactsAreFailedIfSettingEmailEntityFails()
     {
@@ -152,11 +153,11 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Tests that bad emails are failed
      *
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::send()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::finalFlush()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::send()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::finalFlush()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
      */
     public function testExceptionIsThrownIfEmailIsSentToBadContact()
     {
@@ -231,12 +232,13 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @testdox Test a tokenized transport that limits batches does not throw BatchQueueMaxException on subsequent contacts when one fails
+     * @testdox Test a tokenized transport that limits batches does not throw BatchQueueMaxException on subsequent
+     *          contacts when one fails
      *
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::send()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::send()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
      */
     public function testBadEmailDoesNotCauseBatchQueueMaxExceptionOnSubsequentContacts()
     {
@@ -357,10 +359,10 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Test a tokenized transport that fills tokens correctly
      *
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::send()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::send()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
      */
     public function testBatchQueueContactsHaveTokensHydrated()
     {
@@ -430,7 +432,7 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $factoryMock->method('getRouter')
             ->willReturn($routerMock);
 
-        $copyRepoMock = $this->getMockBuilder(CopyRepository::class)
+        $copyRepoMock   = $this->getMockBuilder(CopyRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
         $emailModelMock = $this->getMockBuilder(EmailModel::class)
@@ -494,11 +496,11 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Test that stat entries are saved in batches of 20
      *
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::send()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::createContactStatEntry()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::send()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::createContactStatEntry()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
      */
     public function testThatStatEntriesAreCreatedAndPersistedEveryBatch()
     {
@@ -629,13 +631,13 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Test that a failed email from the transport is handled
      *
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::send()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::upEmailSentCount()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::downEmailSentCount()
-     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::getSentCounts()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::send()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::getFailedContacts()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::upEmailSentCount()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::downEmailSentCount()
+     * @covers  \Mautic\EmailBundle\Model\SendEmailToContact::getSentCounts()
      */
     public function testThatAFailureFromTransportIsHandled()
     {
@@ -761,6 +763,9 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
 
     public function testSetSampleMailerByTemporaryMailerSpoolMemory($type = 'memory')
     {
+        $this->builder->expects($this->any())
+            ->method('getOptions')
+            ->will($this->returnValue(['with_immediately' => false]));
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(true, 1);
         $mailer    = new \Swift_Mailer($transport);
@@ -824,6 +829,21 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $translator = $this->createMock(Translator::class);
 
         $statHelper = new StatHelper($this->statRepository);
+
+        $this->builder->expects($this->any())
+            ->method('getOptions')
+            ->will($this->returnValue(['with_immediately' => true]));
+
+        $model = new SendEmailToContact($mailHelper, $statHelper, $this->dncModel, $translator);
+        $model->setSampleMailer();
+        $this->assertNotNull($model->getTemporaryMailer());
+
+        $model->reset();
+        $this->assertNull($model->getTemporaryMailer());
+
+        $this->builder->expects($this->any())
+            ->method('getOptions')
+            ->will($this->returnValue(['with_immediately' => false]));
 
         $model = new SendEmailToContact($mailHelper, $statHelper, $this->dncModel, $translator);
         $model->setSampleMailer();
