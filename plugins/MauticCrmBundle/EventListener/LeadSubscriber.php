@@ -72,8 +72,6 @@ class LeadSubscriber extends CommonSubscriber
         }
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        die(print_r($integrationObject->getIntegrationSettings()->getFeatureSettings()));
-
         if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getIntegrationSettings()->getFeatureSettings()['import'])) {
             return;
         }

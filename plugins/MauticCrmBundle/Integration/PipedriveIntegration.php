@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -218,7 +218,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
             );
             $builder->add(
                 'password',
-                TextType::class,
+                PasswordType::class,
                 [
                     'label'       => 'mautic.pipedrive.webhook_password',
                     'attr'        => [
