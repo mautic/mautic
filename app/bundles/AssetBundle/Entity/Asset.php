@@ -160,7 +160,7 @@ class Asset extends FormEntity
     /**
      * @var bool
      */
-    private $disallow;
+    private $disallow = false;
 
     /**
      * @param ORM\ClassMetadata $metadata

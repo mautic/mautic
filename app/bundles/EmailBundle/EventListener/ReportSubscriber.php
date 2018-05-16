@@ -14,8 +14,10 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -40,6 +42,11 @@ class ReportSubscriber extends CommonSubscriber
      * @var CompanyReportData
      */
     private $companyReportData;
+
+    /**
+     * @var bool Property is used to avoid Joining DNC table more times
+     */
+    private $dncWasAddedToQb = false;
 
     /**
      * ReportSubscriber constructor.
@@ -178,13 +185,10 @@ class ReportSubscriber extends CommonSubscriber
             ],
         ];
 
-        $companyColumns = $this->companyReportData->getCompanyData();
-
         $columns = array_merge(
             $columns,
             $event->getStandardColumns($prefix, [], 'mautic_email_action'),
-            $event->getCategoryColumns(),
-            $companyColumns
+            $event->getCategoryColumns()
         );
         $data = [
             'display_name' => 'mautic.email.emails',
@@ -266,6 +270,8 @@ class ReportSubscriber extends CommonSubscriber
                 ],
             ];
 
+            $companyColumns = $this->companyReportData->getCompanyData();
+
             $data = [
                 'display_name' => 'mautic.email.stats.report.table',
                 'columns'      => array_merge(
@@ -273,7 +279,8 @@ class ReportSubscriber extends CommonSubscriber
                     $statColumns,
                     $event->getCampaignByChannelColumns(),
                     $event->getLeadColumns(),
-                    $event->getIpColumn()
+                    $event->getIpColumn(),
+                    $companyColumns
                 ),
             ];
             $event->addTable(self::CONTEXT_EMAIL_STATS, $data, self::CONTEXT_EMAILS);
@@ -404,10 +411,11 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         $qb       = $event->getQueryBuilder();
-        $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
+        $statRepo = $this->em->getRepository(Stat::class);
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
+            /** @var ChartQuery $chartQuery */
             $chartQuery   = clone $options['chartQuery'];
             $origQuery    = clone $queryBuilder;
             // just limit date for contacts emails
@@ -604,11 +612,17 @@ class ReportSubscriber extends CommonSubscriber
      */
     private function addDNCTable(QueryBuilder $qb)
     {
+        if ($this->dncWasAddedToQb) {
+            return;
+        }
+
         $qb->leftJoin(
-                'e',
-                MAUTIC_TABLE_PREFIX.'lead_donotcontact',
-                'dnc',
-                'e.id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
-            );
+            'e',
+            MAUTIC_TABLE_PREFIX.'lead_donotcontact',
+            'dnc',
+            'e.id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
+        );
+
+        $this->dncWasAddedToQb = true;
     }
 }

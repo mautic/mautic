@@ -298,7 +298,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
             ->addLifecycleEvent('checkAttributionDate', 'prePersist')
-            ->addIndex(['date_added'], 'lead_date_added');
+            ->addLifecycleEvent('checkDateAdded', 'prePersist')
+            ->addIndex(['date_added'], 'lead_date_added')
+            ->addIndex(['date_identified'], 'date_identified');
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()
@@ -1590,6 +1592,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         if ($this->wasAnonymous()) {
             $this->dateIdentified            = new \DateTime();
             $this->changes['dateIdentified'] = ['', $this->dateIdentified];
+        }
+    }
+
+    /**
+     * Set date added if not already set.
+     */
+    public function checkDateAdded()
+    {
+        if (null === $this->getDateAdded()) {
+            $this->setDateAdded(new \DateTime());
         }
     }
 
