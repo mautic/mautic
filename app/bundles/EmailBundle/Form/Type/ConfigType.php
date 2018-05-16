@@ -64,6 +64,7 @@ class ConfigType extends AbstractType
                     'unsubscribe_message'    => 'html',
                     'resubscribe_message'    => 'html',
                     'webview_text'           => 'html',
+                    // Encode special chars to keep congruent with Email entity custom headers
                     'mailer_custom_headers'  => 'clean',
                 ]
             )
