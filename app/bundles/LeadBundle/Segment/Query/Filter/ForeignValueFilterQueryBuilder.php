@@ -107,19 +107,21 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($expression, 'and');
                 break;
             case 'neq':
-                $expression = $queryBuilder->expr()->eq(
-                    $tableAlias.'.'.$filter->getField(),
-                    $filterParametersHolder
+                $expression = $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(),$filterParametersHolder),
+                    $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                 );
+
 
                 $queryBuilder->addJoinCondition($tableAlias, $expression);
                 $queryBuilder->setParametersPairs($parameters, $filterParameters);
                 break;
             case 'notLike':
-                $expression = $queryBuilder->expr()->like(
-                    $tableAlias.'.'.$filter->getField(),
-                    $filterParametersHolder
-                );
+                $expression = $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
+                    $queryBuilder->expr()->like($tableAlias.'.'.$filter->getField(),$filterParametersHolder)
+                ) ;
+
                 $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
                 $queryBuilder->setParametersPairs($parameters, $filterParameters);
                 break;

@@ -65,7 +65,8 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             foreach ($filterParameters as $filterParameter) {
                 $parameters[] = $this->generateRandomParameterName();
             }
-        } else {
+        }
+        else {
             $parameters = $this->generateRandomParameterName();
         }
 
@@ -81,77 +82,80 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         if (!$tableAlias) {
             $tableAlias = $this->generateRandomParameterName();
             if ($filterAggr) {
-                if ($filter->getTable() != MAUTIC_TABLE_PREFIX.'leads') {
+                if ($filter->getTable() != MAUTIC_TABLE_PREFIX . 'leads') {
                     throw new InvalidUseException('You should use ForeignFuncFilterQueryBuilder instead.');
                 }
                 $queryBuilder->leftJoin(
-                            $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
-                            $filter->getTable(),
-                            $tableAlias,
-                            sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
-                        );
-            } else {
-                if ($filter->getTable() == MAUTIC_TABLE_PREFIX.'companies') {
+                    $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX . 'leads'),
+                    $filter->getTable(),
+                    $tableAlias,
+                    sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX . 'leads'), $tableAlias)
+                );
+            }
+            else {
+                if ($filter->getTable() == MAUTIC_TABLE_PREFIX . 'companies') {
                     $relTable = $this->generateRandomParameterName();
-                    $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = l.id');
-                    $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
-                } else {
+                    $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX . 'companies_leads', $relTable, $relTable . '.lead_id = l.id');
+                    $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias . '.id = ' . $relTable . '.company_id');
+                }
+                else {
                     $queryBuilder->leftJoin(
-                                $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
-                                $filter->getTable(),
-                                $tableAlias,
-                                sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
-                            );
+                        $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX . 'leads'),
+                        $filter->getTable(),
+                        $tableAlias,
+                        sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX . 'leads'), $tableAlias)
+                    );
                 }
             }
         }
 
         switch ($filterOperator) {
             case 'empty':
-                $expression = $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField());
-
+                $expression = $queryBuilder->expr()->isNull($tableAlias . '.' . $filter->getField());
                 break;
             case 'notEmpty':
-                $expression = $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField());
+                $expression = $queryBuilder->expr()->isNotNull($tableAlias . '.' . $filter->getField());
                 break;
             case 'neq':
-                if ($filter->isColumnTypeBoolean() && $filter->getParameterValue() == 1) {
-                    $expression = $queryBuilder->expr()->orX(
-                        $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
-                        $queryBuilder->expr()->$filterOperator(
-                            $tableAlias.'.'.$filter->getField(),
-                            $filterParametersHolder
-                        )
-                    );
-                    break;  // Break will be performed only if the condition above matches
-                }
+                $expression = $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->isNull($tableAlias . '.' . $filter->getField()),
+                    $queryBuilder->expr()->$filterOperator(
+                        $tableAlias . '.' . $filter->getField(),
+                        $filterParametersHolder
+                    )
+                );
+                break;
             case 'startsWith':
             case 'endsWith':
             case 'gt':
             case 'eq':
             case 'gte':
             case 'like':
-            case 'notLike':
             case 'lt':
             case 'lte':
-            case 'notIn':
             case 'in':
             case 'regexp':
+                $expression = $queryBuilder->expr()->$filterOperator(
+                    $tableAlias . '.' . $filter->getField(),
+                    $filterParametersHolder
+                );
+                break;
+            case 'notLike':
+            case 'notIn':
             case 'between':
             case 'notBetween':
             case 'notRegexp':
-                    $expression = $queryBuilder->expr()->$filterOperator(
-                        $tableAlias.'.'.$filter->getField(),
-                        $filterParametersHolder
-                    );
+                $expression = $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->$filterOperator($tableAlias . '.' . $filter->getField(),$filterParametersHolder)
+                    , $queryBuilder->expr()->isNull($tableAlias . '.' . $filter->getField()));
 
                 break;
             default:
-                throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
+                throw new \Exception('Dunno how to handle operator "' . $filterOperator . '"');
         }
 
         if ($queryBuilder->isJoinTable($filter->getTable())) {
-            $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
+            $queryBuilder->addJoinCondition($tableAlias, ' (' . $expression . ')');
         }
 
         $queryBuilder->addLogic($expression, $filterGlue);
