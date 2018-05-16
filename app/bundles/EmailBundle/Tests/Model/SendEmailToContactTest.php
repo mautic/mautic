@@ -65,6 +65,34 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
+    private $copyRepoMock;
+
+    private $mockDispatcher;
+
+    private $emailModelMock;
+
+    private $factoryMock;
+
+    private $routerMock;
+
+    private $statRepository;
+
+    private $dncModel;
+
+    private $mockEm;
+
+    protected function setUp()
+    {
+        $this->copyRepoMock   = $this->createMock(CopyRepository::class);
+        $this->mockDispatcher = $this->createMock(EventDispatcher::class);
+        $this->emailModelMock = $this->createMock(EmailModel::class);
+        $this->factoryMock    =  $this->createMock(MauticFactory::class);
+        $this->routerMock     = $this->createMock(Router::class);
+        $this->statRepository = $this->createMock(StatRepository::class);
+        $this->dncModel       = $this->createMock(DoNotContact::class);
+        $this->mockEm         = $this->createMock(EntityManager::class);
+    }
+
     /**
      * @testdox Tests that all contacts are temporarily failed if an Email entity happens to be incorrectly configured
      *
@@ -726,33 +754,31 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $errorMessages);
     }
 
-    public function testSetSampleMailerByTemporaryMailer()
+    public function testSetSampleMailerByTemporaryMailerSpoolFile()
+    {
+        $this->testSetSampleMailerByTemporaryMailerSpoolMemory('file');
+    }
+
+    public function testSetSampleMailerByTemporaryMailerSpoolMemory($type = 'memory')
     {
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(true, 1);
         $mailer    = new \Swift_Mailer($transport);
 
         // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
-        $factoryMock = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
-        $factoryMock->expects($this->at(3))->method('getParameter')->with('mailer_spool_type')->willReturn('memory');
-        $factoryMock->expects($this->at(1))->method('getParameter')->willReturn('');
+        $this->factoryMock->expects($this->at(3))->method('getParameter')->with('mailer_spool_type')->willReturn($type);
+        $this->factoryMock->expects($this->at(1))->method('getParameter')->willReturn('');
 
-        $factoryMock->method('getLogger')
+        $this->factoryMock->method('getLogger')
             ->willReturn(
                 new NullLogger()
             );
 
-        $mockEm = $this->createMock(EntityManager::class);
+        $this->factoryMock->method('getEntityManager')
+            ->willReturn($this->mockEm);
 
-        $factoryMock->method('getEntityManager')
-            ->willReturn($mockEm);
-
-        $mockDispatcher = $this->getMockBuilder(EventDispatcher::class)
-            ->getMock();
-        $mockDispatcher->method('dispatch')
+        $this->mockDispatcher->method('dispatch')
             ->willReturnCallback(
                 function ($eventName, EmailSendEvent $event) {
                     $lead = $event->getLead();
@@ -766,38 +792,27 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
                     $event->addTokens($tokens);
                 }
             );
-        $factoryMock->method('getDispatcher')
-            ->willReturn($mockDispatcher);
-        $routerMock = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $factoryMock->method('getRouter')
-            ->willReturn($routerMock);
+        $this->factoryMock->method('getDispatcher')
+            ->willReturn($this->mockDispatcher);
 
-        $copyRepoMock = $this->getMockBuilder(CopyRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailModelMock = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailModelMock->method('getCopyRepository')
-            ->willReturn($copyRepoMock);
+        $this->factoryMock->method('getRouter')
+            ->willReturn($this->routerMock);
 
-        $factoryMock->method('getModel')
-            ->willReturn($emailModelMock);
+        $this->emailModelMock->method('getCopyRepository')
+            ->willReturn($this->copyRepoMock);
+
+        $this->factoryMock->method('getModel')
+            ->willReturn($this->emailModelMock);
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer])
+            ->setConstructorArgs([$this->factoryMock, $mailer])
             ->setMethods(null)
             ->getMock();
 
         // Enable queueing
         $mailHelper->enableQueue();
 
-        $statRepository = $this->getMockBuilder(StatRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $statRepository->method('saveEntity')
+        $this->statRepository->method('saveEntity')
             ->willReturnCallback(
                 function (Stat $stat) {
                     $tokens = $stat->getTokens();
@@ -806,17 +821,11 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $dncModel = $this->getMockBuilder(DoNotContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(Translator::class);
 
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $statHelper = new StatHelper($this->statRepository);
 
-        $statHelper = new StatHelper($statRepository);
-
-        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
+        $model = new SendEmailToContact($mailHelper, $statHelper, $this->dncModel, $translator);
         $model->setSampleMailer();
         $this->assertNotNull($model->getTemporaryMailer());
 
