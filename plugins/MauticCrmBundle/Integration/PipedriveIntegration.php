@@ -221,6 +221,20 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'required'    => false,
                 ]
             );
+
+            $builder->add(
+                'realtimeImport',
+                'yesno_button_group',
+                [
+                    'label'      => $this->translator->trans('mautic.pipedrive.add.edit.contact.import'),
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'data'     => !empty($data['realtimeImport']) ? true : false,
+                    'required' => false,
+                ]
+            );
         }
     }
 

@@ -74,7 +74,7 @@ class LeadSubscriber extends CommonSubscriber
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
+        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getSupportedFeatures()['realtimeImport'])) {
             return;
         }
 
@@ -103,7 +103,7 @@ class LeadSubscriber extends CommonSubscriber
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
+        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getSupportedFeatures()['realtimeImport'])) {
             return;
         }
 
@@ -125,7 +125,7 @@ class LeadSubscriber extends CommonSubscriber
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
+        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getSupportedFeatures()['realtimeImport'])) {
             return;
         }
 
