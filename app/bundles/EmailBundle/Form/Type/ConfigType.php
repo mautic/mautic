@@ -54,7 +54,20 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['mailer_custom_headers' => 'clean']));
+        $builder->addEventSubscriber(
+            new CleanFormSubscriber(
+                [
+                    'mailer_from_email'      => 'email',
+                    'mailer_return_path'     => 'email',
+                    'default_signature_text' => 'html',
+                    'unsubscribe_text'       => 'html',
+                    'unsubscribe_message'    => 'html',
+                    'resubscribe_message'    => 'html',
+                    'webview_text'           => 'html',
+                    'mailer_custom_headers'  => 'clean',
+                ]
+            )
+        );
 
         $builder->add(
             'unsubscribe_text',
