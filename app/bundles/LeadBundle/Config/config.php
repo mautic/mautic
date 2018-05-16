@@ -811,10 +811,7 @@ return [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel',
             ],
             'mautic.lead.model.device' => [
-                'class'     => Mautic\LeadBundle\Model\DeviceModel::class,
-                'arguments' => [
-                    'mautic.lead.repository.lead_device',
-                ],
+                'class' => Mautic\LeadBundle\Model\DeviceModel::class,
             ],
             'mautic.lead.model.company' => [
                 'class'     => 'Mautic\LeadBundle\Model\CompanyModel',

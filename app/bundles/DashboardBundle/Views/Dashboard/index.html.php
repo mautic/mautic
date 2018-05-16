@@ -28,7 +28,7 @@ $buttons = [
         'attr' => [
             'class'       => 'btn btn-default btn-nospin',
             'href'        => 'javascript:void()',
-            'onclick'     => "Mautic.saveDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}');",
+            'onclick'     => "Mautic.exportDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}', '{$view['router']->path('mautic_dashboard_action', ['objectAction' => 'export'])}', true);",
             'data-toggle' => '',
         ],
         'iconClass' => 'fa fa-save',
@@ -38,7 +38,7 @@ $buttons = [
         'attr' => [
             'class'       => 'btn btn-default btn-nospin',
             'href'        => 'javascript:void()',
-            'onclick'     => "Mautic.exportDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}', '{$view['router']->path('mautic_dashboard_action', ['objectAction' => 'export'])}');",
+            'onclick'     => "Mautic.exportDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}', '{$view['router']->path('mautic_dashboard_action', ['objectAction' => 'export'])}', false);",
             'data-toggle' => '',
         ],
         'iconClass' => 'fa fa-cloud-download',

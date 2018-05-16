@@ -57,6 +57,7 @@ class WidgetType extends AbstractType
             'label'       => 'mautic.dashboard.widget.form.type',
             'choices'     => $event->getTypes(),
             'label_attr'  => ['class' => 'control-label'],
+            'attr'        => ['class' => 'form-control'],
             'empty_value' => 'mautic.core.select',
             'attr'        => [
                 'class'    => 'form-control',
@@ -93,8 +94,10 @@ class WidgetType extends AbstractType
             'required'   => false,
         ]);
 
+        $ff = $builder->getFormFactory();
+
         // function to add a form for specific widget type dynamically
-        $func = function (FormEvent $e) use ($dispatcher) {
+        $func = function (FormEvent $e) use ($ff, $dispatcher) {
             $data   = $e->getData();
             $form   = $e->getForm();
             $event  = new WidgetFormEvent();

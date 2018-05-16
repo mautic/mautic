@@ -279,10 +279,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
         if ($this->hasColumn($cmpName)
             || $this->hasFilter($cmpName)
-            || $this->hasGroupByColumn($cmpName)
             || $this->hasColumn($cmpId)
             || $this->hasFilter($cmpId)
-            || $this->hasGroupByColumn($cmpId)
             || (!empty($options['order'][0]
                     && ($options['order'][0] === $cmpName
                         || $options['order'][0] === $cmpId)))) {
@@ -380,15 +378,25 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Check if the report has a specific column.
      *
-     * @param array|string $column
+     * @param $column
      *
      * @return bool
      */
     public function hasColumn($column)
     {
+        static $sorted;
+
+        if (null === $sorted) {
+            $columns = $this->getReport()->getColumns();
+
+            foreach ($columns as $field) {
+                $sorted[$field] = true;
+            }
+        }
+
         if (is_array($column)) {
             foreach ($column as $checkMe) {
-                if (in_array($checkMe, $this->getReport()->getColumns(), true)) {
+                if (isset($sorted[$checkMe])) {
                     return true;
                 }
             }
@@ -396,13 +404,13 @@ class ReportGeneratorEvent extends AbstractReportEvent
             return false;
         }
 
-        return in_array($column, $this->getReport()->getColumns(), true);
+        return isset($sorted[$column]);
     }
 
     /**
      * Check if the report has a specific filter.
      *
-     * @param array|string $column
+     * @param $column
      *
      * @return bool
      */
@@ -444,18 +452,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         return false;
-    }
-
-    /**
-     * Check if the report has a specific column.
-     *
-     * @param string $column
-     *
-     * @return bool
-     */
-    private function hasGroupByColumn($column)
-    {
-        return in_array($column, $this->getReport()->getGroupBy(), true);
     }
 
     /**

@@ -73,7 +73,6 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
-                    'symfony.filesystem',
                 ],
             ],
         ],

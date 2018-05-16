@@ -37,10 +37,6 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
 
 $isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
 
-if (!isset($previewUrl)) {
-    $previewUrl = '';
-}
-
 ?>
 
 <?php echo $view['form']->start($form, ['attr' => $attr]); ?>
@@ -132,5 +128,4 @@ if (!isset($previewUrl)) {
     'slots'         => $slots,
     'sections'      => $sections,
     'objectId'      => $activePage->getSessionId(),
-    'previewUrl'    => $previewUrl,
 ]); ?>

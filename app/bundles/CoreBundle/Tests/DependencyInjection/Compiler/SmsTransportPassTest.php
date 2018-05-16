@@ -8,7 +8,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SmsBundle\DependencyInjection\Compiler;
+namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\SmsBundle\Sms\TransportChain;
@@ -24,7 +24,7 @@ class SmsTransportPassTest extends AbstractMauticTestCase
             ->register('foo')
             ->setPublic(true)
             ->setAbstract(true)
-            ->addTag('mautic.sms_transport', ['alias'=>'fakeAliasDefault', 'integrationAlias' => 'fakeIntegrationDefault']);
+            ->addTag('mautic.sms_transport', ['alias'=>'fakeAliasDefault', 'fakeIntegrationDefault']);
 
         $container
             ->register('chocolate')
@@ -35,7 +35,7 @@ class SmsTransportPassTest extends AbstractMauticTestCase
             ->register('bar')
             ->setPublic(true)
             ->setAbstract(true)
-            ->addTag('mautic.sms_transport');
+            ->addTag('mautic.sms_transport', ['alias'=>'fakeAlias', 'fakeIntegration']);
 
         $transport = $this->getMockBuilder(TransportChain::class)
                           ->disableOriginalConstructor()
@@ -55,17 +55,7 @@ class SmsTransportPassTest extends AbstractMauticTestCase
 
         $this->assertEquals(2, count($container->findTaggedServiceIds('mautic.sms_transport')));
 
-        $methodCalls = $container->getDefinition('mautic.sms.transport_chain')->getMethodCalls();
-        $this->assertCount(count($methodCalls), $container->findTaggedServiceIds('mautic.sms_transport'));
-
-        // Translation string
-        $this->assertEquals('fakeAliasDefault', $methodCalls[0][1][2]);
-        // Integration name/alias
-        $this->assertEquals('fakeIntegrationDefault', $methodCalls[0][1][3]);
-
-        // Translation string is set as service ID by default
-        $this->assertEquals('bar', $methodCalls[1][1][2]);
-        // Integration name/alias is set to service ID by default
-        $this->assertEquals('bar', $methodCalls[1][1][3]);
+        $this->assertCount(count($container->getDefinition('mautic.sms.transport_chain')->getMethodCalls()),
+                           $container->findTaggedServiceIds('mautic.sms_transport'));
     }
 }

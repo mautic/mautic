@@ -566,18 +566,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Creates new entity from provided params.
-     *
-     * @param array $params
-     *
-     * @return object
-     */
-    public function getNewEntity(array $params)
-    {
-        return $this->model->checkForDuplicateContact($params);
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
@@ -585,12 +573,6 @@ class LeadApiController extends CommonApiController
         // Unset the tags from params to avoid a validation error
         if (isset($parameters['tags'])) {
             unset($parameters['tags']);
-        }
-
-        if (count($entity->getTags()) > 0) {
-            foreach ($entity->getTags() as $tag) {
-                $parameters['tags'][] = $tag->getId();
-            }
         }
 
         return $parameters;
@@ -606,11 +588,10 @@ class LeadApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        if ('edit' === $action) {
-            // Merge existing duplicate contact based on unique fields if exist
-            // new endpoints will leverage getNewEntity in order to return the correct status codes
-            $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
-        }
+        $originalParams = $this->request->request->all();
+
+        // Merge existing duplicate contact based on unique fields if exist
+        $entity = $this->model->checkForDuplicateContact($originalParams, $entity);
 
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
@@ -629,26 +610,26 @@ class LeadApiController extends CommonApiController
             unset($parameters['stage']);
         }
 
-        if (isset($this->entityRequestParameters['tags'])) {
-            $this->model->modifyTags($entity, $this->entityRequestParameters['tags'], null, false);
+        if (isset($originalParams['tags'])) {
+            $this->model->modifyTags($entity, $originalParams['tags'], null, false);
         }
 
         //Since the request can be from 3rd party, check for an IP address if included
-        if (isset($this->entityRequestParameters['ipAddress'])) {
-            $ipAddress = $this->get('mautic.helper.ip_lookup')->getIpAddress($this->entityRequestParameters['ipAddress']);
+        if (isset($originalParams['ipAddress'])) {
+            $ipAddress = $this->factory->getIpAddress($originalParams['ipAddress']);
 
             if (!$entity->getIpAddresses()->contains($ipAddress)) {
                 $entity->addIpAddress($ipAddress);
             }
 
-            unset($this->entityRequestParameters['ipAddress']);
+            unset($originalParams['ipAddress']);
         }
 
         // Check for lastActive date
-        if (isset($this->entityRequestParameters['lastActive'])) {
-            $lastActive = new DateTimeHelper($this->entityRequestParameters['lastActive']);
+        if (isset($originalParams['lastActive'])) {
+            $lastActive = new DateTimeHelper($originalParams['lastActive']);
             $entity->setLastActive($lastActive->getDateTime());
-            unset($this->entityRequestParameters['lastActive']);
+            unset($originalParams['lastActive']);
         }
 
         if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {

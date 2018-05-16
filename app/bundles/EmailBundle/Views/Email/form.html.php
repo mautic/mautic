@@ -62,10 +62,6 @@ $attr = $form->vars['attr'];
 
 $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
 
-if (!isset($previewUrl)) {
-    $previewUrl = '';
-}
-
 ?>
 
 <?php echo $view['form']->start($form, ['attr' => $attr]); ?>
@@ -280,9 +276,7 @@ if (!isset($previewUrl)) {
     'slots'         => $slots,
     'sections'      => $sections,
     'objectId'      => $email->getSessionId(),
-    'previewUrl'    => $previewUrl,
-]);
-?>
+]); ?>
 
 <?php
 $type = $email->getEmailType();

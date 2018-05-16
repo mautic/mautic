@@ -12,7 +12,6 @@
 namespace Mautic\ConfigBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class SysinfoController.

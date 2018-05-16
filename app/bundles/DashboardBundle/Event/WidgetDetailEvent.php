@@ -254,7 +254,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the Translator object.
      *
-     * @return TranslatorInterface
+     * @return Translator $translator
      */
     public function getTranslator()
     {

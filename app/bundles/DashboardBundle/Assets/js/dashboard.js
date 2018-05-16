@@ -193,26 +193,30 @@ Mautic.initWidgetRemoveButtons = function (scope) {
 
 };
 
-Mautic.exportDashboardLayout = function(text, baseUrl) {
+Mautic.exportDashboardLayout = function(text, baseUrl, save) {
     var name = prompt(text, "");
 
     if (name !== null) {
         if (name) {
-            baseUrl = baseUrl + "?name=" + encodeURIComponent(name);
+            baseUrl = baseUrl + "?name=" + encodeURIComponent(name) + (save ? '&save=1' : '');
+        } else if (save) {
+            baseUrl = baseUrl + "?save=1";
         }
 
         window.location = baseUrl;
     }
 };
 
-Mautic.saveDashboardLayout = function(text) {
+Mautic.confirmDeleteDashboard = function(text, baseUrl, save) {
     var name = prompt(text, "");
 
-    if (name) {
-        mQuery.ajax({
-            type: 'POST',
-            url: mauticBaseUrl+'s/dashboard/save',
-            data: {name: name}
-        });
+    if (name !== null) {
+        if (name) {
+            baseUrl = baseUrl + "?name=" + encodeURIComponent(name) + (save ? '&save=1' : '');
+        } else if (save) {
+            baseUrl = baseUrl + "?save=1";
+        }
+
+        window.location = baseUrl;
     }
 };

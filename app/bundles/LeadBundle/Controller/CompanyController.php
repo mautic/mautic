@@ -351,12 +351,24 @@ class CompanyController extends FormController
                     $data = $this->request->request->get('company');
                     //pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
-                        $data[$f->getName()] = $f->getData();
+                        $name = $f->getName();
+                        if (strpos($name, 'field_') === 0) {
+                            $data[$name] = $f->getData();
+                        }
+                    }
+                    $model->setFieldValues($entity, $data, true);
+                    //form is valid so process the data
+                    $data = $this->request->request->get('company');
+
+                    //pull the data from the form in order to apply the form's formatting
+                    foreach ($form as $f) {
+                        $name = $f->getName();
+                        if (strpos($name, 'field_') === 0) {
+                            $data[$name] = $f->getData();
+                        }
                     }
 
                     $model->setFieldValues($entity, $data, true);
-
-                    //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                     $this->addFlash(

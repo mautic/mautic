@@ -618,7 +618,6 @@ class LeadListRepository extends CommonRepository
                     } else {
                         continue;
                     }
-                    // no break
                 case is_bool($v):
                     $paramType = 'boolean';
                     break;
@@ -1618,32 +1617,6 @@ class LeadListRepository extends CommonRepository
 
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
 
-                    break;
-                case 'utm_campaign':
-                case 'utm_content':
-                case 'utm_medium':
-                case 'utm_source':
-                case 'utm_term':
-                    // Special handling of lead lists and utmtags
-                    $func = in_array($func, ['eq', 'in']) ? 'EXISTS' : 'NOT EXISTS';
-
-                    $ignoreAutoFilter = true;
-
-                    $table  = 'lead_utmtags';
-                    $column = $details['field'];
-
-                    $subQb = $this->createFilterExpressionSubQuery(
-                        $table,
-                        $alias,
-                        $column,
-                        $details['filter'],
-                        $parameters,
-                        $leadId
-                    );
-
-                    $groupExpr->add(
-                        sprintf('%s (%s)', $func, $subQb->getSQL())
-                    );
                     break;
                 default:
                     if (!$column) {
