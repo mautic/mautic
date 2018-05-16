@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
@@ -1379,104 +1380,201 @@ class EmailController extends FormController
         );
     }
 
-    /**
-     * Generating the modal box content for
-     * the send multiple example email option.
-     */
     public function sendExampleAction($objectId)
     {
-        $model  = $this->getModel('email');
-        $entity = $model->getEntity($objectId);
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
+        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+        $emailModel = $this->getModel('email');
+        $email      = $emailModel->getEntity($objectId);
 
-        //not found or not allowed
-        if ($entity === null
-            || (!$this->get('mautic.security')->hasEntityAccess(
-                'email:emails:viewown',
-                'email:emails:viewother',
-                $entity->getCreatedBy()
-            ))
-        ) {
+        $cookieVar = md5('mautic.email.send.example.form');
+
+        //set the return URL
+        $returnUrl = $this->generateUrl('mautic_email_action', ['objectId' => $objectId, 'objectAction' => 'view']);
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['objectId' => $objectId, 'objectAction' => 'view'],
+            'contentTemplate' => 'MauticEmailBundle:Email:action',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_email_action',
+                'mauticContent' => 'email',
+            ],
+        ];
+
+        if ($email === null) {
             return $this->postActionRedirect(
-                [
-                    'passthroughVars' => [
-                        'closeModal' => 1,
-                        'route'      => false,
-                    ],
-                ]
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.lead.lead.error.notfound',
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
+                    ]
+                )
             );
         }
 
-        // Get the quick add form
+        //do some default filtering
+        $savedData = unserialize($this->request->cookies->get($cookieVar));
+        if (!is_array($savedData)) {
+            $savedData = [];
+        }
+        $search    = $this->request->get('search', !empty($savedData['search']) ? $savedData['search'] : '');
+        $this->get('mautic.helper.cookie')->setCookie(
+            $cookieVar,
+            serialize(array_merge($savedData, ['search' => $search])),
+            3600 * 24 * 31
+        );
+        $leads = [];
+
+        if (!empty($search)) {
+            $filter = [
+                'string' => $search,
+            ];
+
+            $leads = $leadModel->getEntities(
+                [
+                    'limit'          => 25,
+                    'filter'         => $filter,
+                    'orderBy'        => 'l.firstname,l.lastname,l.company,l.email',
+                    'orderByDir'     => 'ASC',
+                    'withTotalCount' => false,
+                ]
+            );
+        }
+        $leadChoices = [];
+        foreach ($leads as $l) {
+            $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
+        }
+
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'sendExample', 'objectId' => $objectId]);
         $user   = $this->get('mautic.helper.user')->getUser();
 
-        $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);
-        /* @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $form = $this->createForm(
+            ExampleSendType::class,
+            [
+                'emails'          => !empty($savedData['emails']) ? $savedData['emails'] : ['list' => [$user->getEmail()]],
+                'lead_to_example' => !empty($savedData['lead_to_example']) ? $savedData['lead_to_example'] : '',
+            ],
+            [
+                'action' => $action,
+                'leads'  => $leadChoices,
+            ]
+        );
 
         if ($this->request->getMethod() == 'POST') {
-            $isCancelled = $this->isFormCancelled($form);
-            $isValid     = $this->isFormValid($form);
-            if (!$isCancelled && $isValid) {
-                $emails = $form['emails']->getData()['list'];
+            $valid = true;
+            if (!$this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $data      = $form->getData();
+                    $secLeadId = $data['lead_to_example'];
+                    $secLead   = $leadModel->getEntity($secLeadId);
 
-                // Prepare a fake lead
-                /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-                $fieldModel = $this->getModel('lead.field');
-                $fields     = $fieldModel->getFieldList(false, false);
-                array_walk(
-                    $fields,
-                    function (&$field) {
-                        $field = "[$field]";
+                    if ($secLead === null) {
+                        return $this->postActionRedirect(
+                            array_merge(
+                                $postActionVars,
+                                [
+                                    'flashes' => [
+                                        [
+                                            'type'    => 'error',
+                                            'msg'     => 'mautic.lead.lead.error.notfound',
+                                            'msgVars' => ['%id%' => $secLead->getId()],
+                                        ],
+                                    ],
+                                ]
+                            )
+                        );
+                    } elseif ($emailModel->isLocked($email)) {
+                        //deny access if the entity is locked
+                        return $this->isLocked($postActionVars, $secLead, 'lead');
+                    } elseif ($emailModel->isLocked($secLead)) {
+                        //deny access if the entity is locked
+                        return $this->isLocked($postActionVars, $secLead, 'lead');
                     }
-                );
-                $fields['id'] = 0;
 
-                $errors = [];
-                foreach ($emails as $email) {
-                    if (!empty($email)) {
-                        $users = [
-                            [
-                                // Setting the id, firstname and lastname to null as this is a unknown user
-                                'id'        => '',
-                                'firstname' => '',
-                                'lastname'  => '',
-                                'email'     => $email,
-                            ],
+                    $data   = array_merge($data, ['search' => $search]);
+                    $config = ['to'=>implode(',', $data['emails']['list']), 'useremail'=>['email'=>$objectId]];
+                    $this->get('mautic.helper.cookie')->setCookie($cookieVar, serialize($data), 3600 * 24 * 31);
+                    try {
+                        $this->get('mautic.email.model.send_email_to_user')->sendEmailToUsers($config, $secLead);
+                    } catch (EmailCouldNotBeSentException $e) {
+                        $viewParameters = [
+                            'objectId'     => $email->getId(),
+                            'objectAction' => 'view',
                         ];
 
-                        // Send to current user
-                        $error = $model->sendSampleEmailToUser($entity, $users, $fields, [], [], false);
-                        if (count($error)) {
-                            array_push($errors, $error[0]);
-                        }
+                        return $this->postActionRedirect(
+                            [
+                                'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
+                                'viewParameters'  => $viewParameters,
+                                'contentTemplate' => 'MauticEmailBundle:Email:view',
+                                'flashes'         => [
+                                    [
+                                        'type'    => 'error',
+                                        'msg'     => $e->getMessage(),
+                                    ],
+                                ],
+                            ]
+                        );
                     }
-                }
-
-                if (count($errors) != 0) {
-                    $this->addFlash(implode('; ', $errors));
-                } else {
-                    $this->addFlash('mautic.email.notice.test_sent_multiple.success');
                 }
             }
 
-            if ($isValid || $isCancelled) {
+            if ($valid) {
+                $viewParameters = [
+                    'objectId'     => $email->getId(),
+                    'objectAction' => 'view',
+                ];
+
                 return $this->postActionRedirect(
                     [
+                        'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => 'MauticEmailBundle:Email:view',
                         'passthroughVars' => [
                             'closeModal' => 1,
-                            'route'      => false,
+                        ],
+                        'flashes' => [
+                            [
+                                'type'    => 'notice',
+                                'msg'     => $this->translator->trans('mautic.email.notice.test_sent_multiple.success'),
+                            ],
                         ],
                     ]
                 );
             }
         }
 
+        $tmpl = $this->request->get('tmpl', 'index');
+
         return $this->delegateView(
             [
-                'viewParameters' => [
-                    'form' => $form->createView(),
+                'viewParameters'  => [
+                    'tmpl'         => $tmpl,
+                    'leads'        => $leads,
+                    'searchValue'  => $search,
+                    'action'       => $action,
+                    'form'         => $form->createView(),
+                    'currentRoute' => $this->generateUrl(
+                        'mautic_email_action',
+                        [
+                            'objectAction' => 'sendExample',
+                            'objectId'     => $objectId,
+                        ]
+                    ),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:recipients.html.php',
+                'passthroughVars' => [
+                    'route'  => false,
+                    'target' => ($tmpl == 'update') ? '.contact-example-options' : null,
+                ],
             ]
         );
     }
