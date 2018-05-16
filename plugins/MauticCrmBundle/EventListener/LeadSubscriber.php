@@ -70,11 +70,11 @@ class LeadSubscriber extends CommonSubscriber
             // Don't export what was just imported
             return;
         }
-
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
+        die(print_r($integrationObject->getIntegrationSettings()->getFeatureSettings()));
 
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getSupportedFeatures()['realtimeImport'])) {
+        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getIntegrationSettings()->getFeatureSettings()['import'])) {
             return;
         }
 
@@ -103,7 +103,7 @@ class LeadSubscriber extends CommonSubscriber
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getSupportedFeatures()['realtimeImport'])) {
+        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getIntegrationSettings()->getFeatureSettings()['import'])) {
             return;
         }
 
@@ -125,7 +125,7 @@ class LeadSubscriber extends CommonSubscriber
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getSupportedFeatures()['realtimeImport'])) {
+        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getIntegrationSettings()->getFeatureSettings()['import'])) {
             return;
         }
 
