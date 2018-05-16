@@ -736,25 +736,17 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $factoryMock = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $factoryMock->method('getParameter')
-            ->willReturnCallback(
-                function ($param) {
-                    switch ($param) {
-                        case 'mailer_spool_type':
-                            return 'memory';
-                        default:
-                            return '';
-                    }
-                }
-            );
+
+        $factoryMock->expects($this->at(3))->method('getParameter')->with('mailer_spool_type')->willReturn('memory');
+        $factoryMock->expects($this->at(1))->method('getParameter')->willReturn('');
+
         $factoryMock->method('getLogger')
             ->willReturn(
                 new NullLogger()
             );
 
-        $mockEm = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockEm = $this->createMock(EntityManager::class);
+
         $factoryMock->method('getEntityManager')
             ->willReturn($mockEm);
 
@@ -827,6 +819,7 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
         $model->setSampleMailer();
         $this->assertNotNull($model->getTemporaryMailer());
+
         $model->reset();
         $this->assertNull($model->getTemporaryMailer());
     }
