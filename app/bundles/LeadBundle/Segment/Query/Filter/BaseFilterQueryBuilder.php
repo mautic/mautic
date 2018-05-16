@@ -131,6 +131,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             case 'lt':
             case 'lte':
             case 'in':
+            case 'between':
             case 'regexp':
                 $expression = $queryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
@@ -139,7 +140,6 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 break;
             case 'notLike':
             case 'notIn':
-            case 'between':
             case 'notBetween':
             case 'notRegexp':
                 $expression = $queryBuilder->expr()->orX(
