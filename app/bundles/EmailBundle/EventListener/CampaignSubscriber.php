@@ -315,7 +315,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $event->passWithError(
                     $pending->get($logId),
                     $this->translator->trans(
-                        'mautic.email.contact_already_received_marketing_email',
+                        'mautic.email.contact_has_no_email',
                         ['%contact%' => $contact->getPrimaryIdentifier()]
                     )
                 );
