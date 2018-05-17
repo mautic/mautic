@@ -320,6 +320,8 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * @deprecated in 2.14, to be removed in Mautic 3 - Use methods in the ContactSegmentService class
+     *
      * @param        $lists
      * @param array  $args
      * @param Logger $logger

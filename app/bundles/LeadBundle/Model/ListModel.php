@@ -30,7 +30,6 @@ use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
-use Monolog\Logger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -852,8 +851,7 @@ class ListModel extends FormModel
                 'countOnly'     => true,
                 'newOnly'       => true,
                 'batchLimiters' => $batchLimiters,
-            ],
-            $this->logger
+            ]
         );
 
         $return = array_shift($newLeadsCount);
@@ -1323,18 +1321,19 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param        $lists
-     * @param bool   $idOnly
-     * @param array  $args
-     * @param Logger $logger
+     * @deprecated in 2.14, to be removed in Mautic 3 - Use methods in the ContactSegmentService class
+     *
+     * @param       $lists
+     * @param bool  $idOnly
+     * @param array $args
      *
      * @return array
      */
-    public function getLeadsByList($lists, $idOnly = false, array $args = [], Logger $logger)
+    public function getLeadsByList($lists, $idOnly = false, array $args = [])
     {
         $args['idOnly'] = $idOnly;
 
-        return $this->getRepository()->getLeadsByList($lists, $args, $logger);
+        return $this->getRepository()->getLeadsByList($lists, $args, $this->logger);
     }
 
     /**
