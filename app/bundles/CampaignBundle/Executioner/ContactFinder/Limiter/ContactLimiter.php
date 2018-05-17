@@ -61,22 +61,22 @@ class ContactLimiter
     /**
      * ContactLimiter constructor.
      *
-     * @param       $batchLimit
-     * @param       $contactId
-     * @param       $minContactId
-     * @param       $maxContactId
-     * @param array $contactIdList
-     * @param       $threadId
-     * @param       $maxThreadId
+     * @param int      $batchLimit
+     * @param int      $contactId
+     * @param int|null $minContactId
+     * @param int|null $maxContactId
+     * @param array    $contactIdList
+     * @param int|null $threadId
+     * @param int|null $maxThreadId
      */
     public function __construct(
         $batchLimit,
         $contactId,
-        $minContactId,
-        $maxContactId,
+        $minContactId = null,
+        $maxContactId = null,
         array $contactIdList = [],
-        $threadId,
-        $maxThreadId
+        $threadId = null,
+        $maxThreadId = null
     ) {
         $this->batchLimit    = ($batchLimit) ? (int) $batchLimit : 100;
         $this->contactId     = ($contactId) ? (int) $contactId : null;

@@ -262,6 +262,12 @@ class TriggerCampaignCommand extends ModeratedCommand
         $threadId     = $input->getOption('thread-id');
         $maxThreadId  = $input->getOption('max-thread-id');
 
+        if ($threadId && $maxThreadId && (int) $threadId > (int) $maxThreadId) {
+            $this->output->writeln('--thread-id cannot be larger than --max-thread-id');
+
+            return 1;
+        }
+
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreadId);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
