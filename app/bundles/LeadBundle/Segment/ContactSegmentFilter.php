@@ -196,21 +196,4 @@ class ContactSegmentFilter
     {
         return new DoNotContactParts($this->contactSegmentFilterCrate->getField());
     }
-
-    /**
-     * @return mixed
-     *
-     * @throws QueryException
-     */
-    public function __toString()
-    {
-        $data = [
-            'column'       => $this->getTable().'.'.$this->getField(),
-            'operator'     => $this->getOperator(),
-            'glue'         => $this->getGlue(),
-            'queryBuilder' => get_class($this->getFilterQueryBuilder()),
-        ];
-
-        return print_r($data, true);
-    }
 }
