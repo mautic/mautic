@@ -682,12 +682,6 @@ class ListController extends FormController
      */
     public function viewAction($objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-        $listModel = $this->get('mautic.lead.model.list');
-
-        $list      = $listModel->getEntity($objectId);
-        $processed = $listModel->rebuildListLeads($list);
-
         /** @var \Mautic\LeadBundle\Model\ListModel $model */
         $model    = $this->getModel('lead.list');
         $security = $this->get('mautic.security');
