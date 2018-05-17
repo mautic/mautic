@@ -131,19 +131,21 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
             case 'lt':
             case 'lte':
             case 'in':
+            case 'between':   //Used only for date with week combination (EQUAL [this week, next week, last week])
             case 'regexp':
+            case 'notIn':     //Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
+            case 'notRegexp': //Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
                 $expression = $queryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );
                 break;
             case 'notLike':
-            case 'notIn':
-            case 'between':
-            case 'notBetween':
-            case 'notRegexp':
+            case 'notBetween': //Used only for date with week combination (NOT EQUAL [this week, next week, last week])
                 $expression = $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->$filterOperator($tableAlias.'.'.$filter->getField(), $filterParametersHolder), $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()));
+                    $queryBuilder->expr()->$filterOperator($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
+                    $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
+                );
 
                 break;
             default:
