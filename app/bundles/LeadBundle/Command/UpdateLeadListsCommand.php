@@ -59,7 +59,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             if ($list !== null) {
                 $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $id]).'</info>');
                 try {
-                    $processed = $listModel->updateLeadList($list, $batch, $max, $output);
+                    $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
                 } catch (QueryException $e) {
                     $this->getContainer()->get('mautic.logger')->error('Query Builder Exception: '.$e->getMessage());
                 }
@@ -83,7 +83,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                 $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $l->getId()]).'</info>');
 
-                $processed = $listModel->updateLeadList($l, $batch, $max, $output);
+                $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
                 $output->writeln(
                     '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
                 );

@@ -872,7 +872,7 @@ class ListModel extends FormModel
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function updateLeadList(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null)
+    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null)
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
@@ -1058,11 +1058,6 @@ class ListModel extends FormModel
         }
 
         return $leadsProcessed;
-    }
-
-    public function rebuildListLeads()
-    {
-        throw new  \Exception('Deprecated function, use updateLeadList instead');
     }
 
     /**

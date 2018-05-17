@@ -865,7 +865,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         $manager->flush();
 
         if ($listConfig['populate']) {
-            $this->container->get('mautic.lead.model.list')->updateLeadList($list);
+            $this->container->get('mautic.lead.model.list')->rebuildListLeads($list);
         }
 
         if (!empty($listConfig['manually_add'])) {
