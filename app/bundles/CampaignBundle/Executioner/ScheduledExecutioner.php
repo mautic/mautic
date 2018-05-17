@@ -206,6 +206,9 @@ class ScheduledExecutioner implements ExecutionerInterface
         $scheduledLogCount = $totalLogsFound - $logs->count();
         $this->progressBar->advance($scheduledLogCount);
 
+        // Hydrate contacts with custom field data
+        $this->scheduledContactFinder->hydrateContacts($logs);
+
         // Organize the logs by event ID
         $organized = $this->organizeByEvent($logs);
         foreach ($organized as $organizedLogs) {

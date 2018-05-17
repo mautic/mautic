@@ -189,6 +189,10 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->executioner->expects($this->exactly(1))
             ->method('executeLogs');
 
+        $this->contactFinder->expects($this->once())
+            ->method('hydrateContacts')
+            ->with($logs);
+
         $counter = $this->getExecutioner()->executeByIds([1, 2]);
 
         // Two events were evaluated
