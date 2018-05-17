@@ -551,21 +551,7 @@ class CampaignRepository extends CommonRepository
             )
             ->setParameter('false', false, 'boolean');
 
-        if ($leadId = $limiter->getContactId()) {
-            $q->andWhere(
-                $q->expr()->eq('cl.lead_id', (int) $leadId)
-            );
-        } elseif ($minContactId = $limiter->getMinContactId()) {
-            $q->andWhere(
-                'cl.lead_id BETWEEN :minContactId AND :maxContactId'
-            )
-                ->setParameter('minContactId', $minContactId)
-                ->setParameter('maxContactId', $limiter->getMaxContactId());
-        } elseif ($contactIds = $limiter->getContactIdList()) {
-            $q->andWhere(
-                $q->expr()->in('cl.lead_id', $contactIds)
-            );
-        }
+        $this->updateQueryFromContactLimiter('cl', $q, $limiter, true);
 
         if (count($pendingEvents) > 0) {
             $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();

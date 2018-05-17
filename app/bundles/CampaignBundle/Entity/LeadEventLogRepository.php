@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
+    use ContactLimiterTrait;
 
     public function getEntities(array $args = [])
     {
@@ -415,26 +416,7 @@ class LeadEventLogRepository extends CommonRepository
             ->setParameter('now', $now)
             ->setParameter('true', true, Type::BOOLEAN);
 
-        if ($contactId = $limiter->getContactId()) {
-            $q->andWhere(
-                $q->expr()->eq('IDENTITY(o.lead)', ':contactId')
-            )
-                ->setParameter('contactId', (int) $contactId);
-        } elseif ($minContactId = $limiter->getMinContactId()) {
-            $q->andWhere(
-                $q->expr()->between('IDENTITY(o.lead)', ':minContactId', ':maxContactId')
-            )
-                ->setParameter('minContactId', $minContactId)
-                ->setParameter('maxContactId', $limiter->getMaxContactId());
-        } elseif ($contactIds = $limiter->getContactIdList()) {
-            $q->andWhere(
-                $q->expr()->in('IDENTITY(o.lead)', $contactIds)
-            );
-        }
-
-        if ($limit = $limiter->getBatchLimit()) {
-            $q->setMaxResults($limit);
-        }
+        $this->updateOrmQueryFromContactLimiter('o', $q, $limiter);
 
         return new ArrayCollection($q->getQuery()->getResult());
     }
@@ -486,22 +468,7 @@ class LeadEventLogRepository extends CommonRepository
             $q->expr()->eq('c.is_published', 1)
         );
 
-        if ($contactId = $limiter->getContactId()) {
-            $expr->add(
-                $q->expr()->eq('l.lead_id', ':contactId')
-            );
-            $q->setParameter('contactId', (int) $contactId);
-        } elseif ($minContactId = $limiter->getMinContactId()) {
-            $expr->add(
-                'l.lead_id BETWEEN :minContactId AND :maxContactId'
-            );
-            $q->setParameter('minContactId', $minContactId)
-                ->setParameter('maxContactId', $limiter->getMaxContactId());
-        } elseif ($contactIds = $limiter->getContactIdList()) {
-            $expr->add(
-                $q->expr()->in('l.lead_id', $contactIds)
-            );
-        }
+        $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
 
         $results = $q->select('COUNT(*) as event_count, l.event_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')

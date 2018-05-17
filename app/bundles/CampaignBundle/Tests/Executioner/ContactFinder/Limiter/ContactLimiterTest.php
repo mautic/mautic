@@ -71,4 +71,11 @@ class ContactLimiterTest extends \PHPUnit_Framework_TestCase
         $limiter = new ContactLimiter(1, 2, 3, 10, [1, 2, 3]);
         $limiter->setBatchMinContactId(10);
     }
+
+    public function testExceptionThrownIfThreadIdLargerThanMaxThreads()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new ContactLimiter(1, null, null, null, [], 5, 3);
+    }
 }

@@ -207,6 +207,7 @@ class LeadRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.lead_id, l.date_added')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
+            ->where($q->expr()->eq('l.campaign_id', ':campaignId'))
             // Order by ID so we can query by greater than X contact ID when batching
             ->orderBy('l.lead_id')
             ->setMaxResults($limiter->getBatchLimit())
@@ -215,11 +216,6 @@ class LeadRepository extends CommonRepository
 
         // Contact IDs
         $this->updateQueryFromContactLimiter('l', $q, $limiter);
-
-        // Limit to specific campaign
-        $q->andWhere(
-            $q->expr()->eq('l.campaign_id', ':campaignId')
-        );
 
         // Limit to events that have not been executed or scheduled yet
         $eventQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -277,35 +273,13 @@ class LeadRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('count(*)')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
+            ->where($q->expr()->eq('l.campaign_id', ':campaignId'))
             // Order by ID so we can query by greater than X contact ID when batching
             ->orderBy('l.lead_id')
             ->setParameter('campaignId', (int) $campaignId);
 
         // Contact IDs
-        $expr = $q->expr()->andX();
-        if ($specificContactId = $limiter->getContactId()) {
-            // Still query for this ID in case the ID fed to the command no longer exists
-            $expr->add(
-                $q->expr()->eq('l.lead_id', ':contactId')
-            );
-            $q->setParameter('contactId', $specificContactId);
-        } elseif ($minContactId = $limiter->getMinContactId()) {
-            // Still query for this ID in case the ID fed to the command no longer exists
-            $expr->add(
-                'l.lead_id BETWEEN :minContactId AND :maxContactId'
-            );
-            $q->setParameter('minContactId', $limiter->getMinContactId())
-                ->setParameter('maxContactId', $limiter->getMaxContactId());
-        } elseif ($contactIds = $limiter->getContactIdList()) {
-            $expr->add(
-                $q->expr()->in('l.lead_id', $contactIds)
-            );
-        }
-
-        // Limit to specific campaign
-        $expr->add(
-            $q->expr()->eq('l.campaign_id', ':campaignId')
-        );
+        $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
 
         // Limit to events that have not been executed or scheduled yet
         $eventQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -318,11 +292,9 @@ class LeadRepository extends CommonRepository
                     $eventQb->expr()->eq('log.rotation', 'l.rotation')
                 )
             );
-        $expr->add(
+        $q->andWhere(
             sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
         );
-
-        $q->where($expr);
 
         return (int) $q->execute()->fetchColumn();
     }

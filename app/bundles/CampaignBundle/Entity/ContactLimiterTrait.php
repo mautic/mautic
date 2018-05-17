@@ -12,17 +12,19 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 
 trait ContactLimiterTrait
 {
     /**
-     * @param string         $alias
-     * @param QueryBuilder   $qb
-     * @param ContactLimiter $contactLimiter
+     * @param string           $alias
+     * @param DbalQueryBuilder $qb
+     * @param ContactLimiter   $contactLimiter
+     * @param bool             $isCount
      */
-    private function updateQueryFromContactLimiter($alias, QueryBuilder $qb, ContactLimiter $contactLimiter)
+    private function updateQueryFromContactLimiter($alias, DbalQueryBuilder $qb, ContactLimiter $contactLimiter, $isCount = false)
     {
         $minContactId = $contactLimiter->getMinContactId();
         $maxContactId = $contactLimiter->getMaxContactId();
@@ -54,15 +56,64 @@ trait ContactLimiterTrait
                 ->setParameter('maxContactId', $maxContactId);
         }
 
-        if ($threadId = $contactLimiter->getThreadId() && $maxThreadId = $contactLimiter->getMaxThreadId()) {
-            if ($threadId <= $maxThreadId) {
-                $qb->andWhere("MOD(($alias.lead_id + :threadShift), :maxThreadId) = 0")
+        if ($threadId = $contactLimiter->getThreadId() && $maxThreads = $contactLimiter->getMaxThreads()) {
+            if ($threadId <= $maxThreads) {
+                $qb->andWhere("MOD(($alias.lead_id + :threadShift), :maxThreads) = 0")
                     ->setParameter('threadShift', $threadId - 1)
-                    ->setParameter('maxThreadId', $maxThreadId);
+                    ->setParameter('maxThreads', $maxThreads);
             }
         }
 
-        if ($limit = $contactLimiter->getBatchLimit()) {
+        if (!$isCount && $limit = $contactLimiter->getBatchLimit()) {
+            $qb->setMaxResults($limit);
+        }
+    }
+
+    /**
+     * @param string          $alias
+     * @param OrmQueryBuilder $qb
+     * @param ContactLimiter  $contactLimiter
+     * @param bool            $isCount
+     */
+    private function updateOrmQueryFromContactLimiter($alias, OrmQueryBuilder $qb, ContactLimiter $contactLimiter, $isCount = false)
+    {
+        $minContactId = $contactLimiter->getMinContactId();
+        $maxContactId = $contactLimiter->getMaxContactId();
+        if ($contactId = $contactLimiter->getContactId()) {
+            $qb->andWhere(
+                $qb->expr()->eq("IDENTITY($alias.lead)", ':contact')
+            )
+                ->setParameter('contact', $contactId);
+        } elseif ($contactIds = $contactLimiter->getContactIdList()) {
+            $qb->andWhere(
+                $qb->expr()->in("IDENTITY($alias.lead)", ':contactIds')
+            )
+                ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
+        } elseif ($minContactId && $maxContactId) {
+            $qb->andWhere(
+                "IDENTITY($alias.lead) BETWEEN :minContactId AND :maxContactId"
+            )
+                ->setParameter('minContactId', $minContactId)
+                ->setParameter('maxContactId', $maxContactId);
+        } elseif ($minContactId) {
+            $qb->andWhere(
+                $qb->expr()->gte("IDENTITY($alias.lead)", ':minContactId')
+            )
+                ->setParameter('minContactId', $minContactId);
+        } elseif ($maxContactId) {
+            $qb->andWhere(
+                $qb->expr()->lte("IDENTITY($alias.lead)", ':maxContactId')
+            )
+                ->setParameter('maxContactId', $maxContactId);
+        }
+
+        if ($threadId = $contactLimiter->getThreadId() && $maxThreads = $contactLimiter->getMaxThreads()) {
+            $qb->andWhere("MOD((IDENTITY($alias.lead) + :threadShift), :maxThreads) = 0")
+                ->setParameter('threadShift', $threadId - 1)
+                ->setParameter('maxThreads', $maxThreads);
+        }
+
+        if (!$isCount && $limit = $contactLimiter->getBatchLimit()) {
             $qb->setMaxResults($limit);
         }
     }
