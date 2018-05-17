@@ -326,7 +326,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return array
      */
-    public function getLeadsByList($lists, $args = [], Logger $logger)
+    public function getLeadsByList($lists, $args = [], Logger $logger = null)
     {
         // Return only IDs
         $idOnly = (!array_key_exists('idOnly', $args)) ? false : $args['idOnly']; //Always TRUE
@@ -528,11 +528,15 @@ class LeadListRepository extends CommonRepository
                     $sqlT                    = str_replace(":{$key}", $val, $sqlT);
                 }
 
-                $logger->debug(sprintf('Old version SQL: %s', $sqlT));
+                if (null !== $logger) {
+                    $logger->debug(sprintf('Old version SQL: %s', $sqlT));
+                }
                 $timer   = microtime(true);
                 $results = $q->execute()->fetchAll();
                 $timer   = microtime(true) - $timer;
-                $logger->debug(sprintf('Old version SQL took: %s', $this->format_period($timer)));
+                if (null !== $logger) {
+                    $logger->debug(sprintf('Old version SQL took: %s', $this->format_period($timer)));
+                }
 
                 foreach ($results as $r) {
                     if ($countOnly) {
