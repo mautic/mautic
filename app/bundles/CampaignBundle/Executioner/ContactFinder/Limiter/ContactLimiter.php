@@ -56,7 +56,7 @@ class ContactLimiter
     /**
      * @var int|null
      */
-    private $maxThreadId;
+    private $maxThreads;
 
     /**
      * ContactLimiter constructor.
@@ -67,7 +67,7 @@ class ContactLimiter
      * @param int|null $maxContactId
      * @param array    $contactIdList
      * @param int|null $threadId
-     * @param int|null $maxThreadId
+     * @param int|null $maxThreads
      */
     public function __construct(
         $batchLimit,
@@ -76,15 +76,22 @@ class ContactLimiter
         $maxContactId = null,
         array $contactIdList = [],
         $threadId = null,
-        $maxThreadId = null
+        $maxThreads = null
     ) {
         $this->batchLimit    = ($batchLimit) ? (int) $batchLimit : 100;
         $this->contactId     = ($contactId) ? (int) $contactId : null;
         $this->minContactId  = ($minContactId) ? (int) $minContactId : null;
         $this->maxContactId  = ($maxContactId) ? (int) $maxContactId : null;
         $this->contactIdList = $contactIdList;
-        $this->threadId      = ($threadId) ? (int) $threadId : null;
-        $this->maxThreadId   = ($maxThreadId && $this->threadId) ? (int) $maxThreadId : null;
+
+        if ($threadId && $maxThreads) {
+            $this->threadId     = (int) $threadId;
+            $this->maxThreads   = (int) $maxThreads;
+
+            if ($threadId > $maxThreads) {
+                throw new \InvalidArgumentException('$threadId cannot be larger than $maxThreads');
+            }
+        }
     }
 
     /**
@@ -130,6 +137,8 @@ class ContactLimiter
     /**
      * @param int $id
      *
+     * @return $this
+     *
      * @throws NoContactsFoundException
      */
     public function setBatchMinContactId($id)
@@ -150,14 +159,26 @@ class ContactLimiter
         }
 
         $this->batchMinContactId = (int) $id;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetBatchMinContactId()
+    {
+        $this->batchMinContactId =  null;
+
+        return $this;
     }
 
     /**
      * @return int|null
      */
-    public function getMaxThreadId()
+    public function getMaxThreads()
     {
-        return $this->maxThreadId;
+        return $this->maxThreads;
     }
 
     /**

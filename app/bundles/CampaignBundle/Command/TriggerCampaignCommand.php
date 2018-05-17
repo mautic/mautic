@@ -198,7 +198,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                 'The number of this current process if running multiple in parallel.'
             )
             ->addOption(
-                '--max-thread-id',
+                '--max-threads',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'The maximum number of processes you intend to run in parallel.'
@@ -260,15 +260,15 @@ class TriggerCampaignCommand extends ModeratedCommand
         $contactId    = $input->getOption('contact-id');
         $contactIds   = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
         $threadId     = $input->getOption('thread-id');
-        $maxThreadId  = $input->getOption('max-thread-id');
+        $maxThreads   = $input->getOption('max-threads');
 
-        if ($threadId && $maxThreadId && (int) $threadId > (int) $maxThreadId) {
-            $this->output->writeln('--thread-id cannot be larger than --max-thread-id');
+        if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
+            $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
             return 1;
         }
 
-        $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreadId);
+        $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
@@ -345,14 +345,26 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         try {
             $this->output->writeln('<info>'.$this->translator->trans('mautic.campaign.trigger.triggering', ['%id%' => $campaign->getId()]).'</info>');
+            // Reset batch limiter
+            $this->limiter->resetBatchMinContactId();
+
+            // Execute starting events
             if (!$this->inactiveOnly && !$this->scheduleOnly) {
                 $this->executeKickoff();
             }
 
+            // Reset batch limiter
+            $this->limiter->resetBatchMinContactId();
+
+            // Execute scheduled events
             if (!$this->inactiveOnly && !$this->kickoffOnly) {
                 $this->executeScheduled();
             }
 
+            // Reset batch limiter
+            $this->limiter->resetBatchMinContactId();
+
+            // Execute inactive events
             if (!$this->scheduleOnly && !$this->kickoffOnly) {
                 $this->executeInactive();
             }

@@ -223,6 +223,7 @@ class InactiveExecutioner implements ExecutionerInterface
         }
 
         $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
+
         $this->output->writeln(
             $this->translator->trans(
                 'mautic.campaign.trigger.decision_count_analyzed',
@@ -258,9 +259,6 @@ class InactiveExecutioner implements ExecutionerInterface
         /** @var Event $decisionEvent */
         foreach ($this->decisions as $decisionEvent) {
             try {
-                // Ensure the batch min is reset from the last decision event
-                $this->limiter->setBatchMinContactId(null);
-
                 // We need the parent ID of the decision in order to fetch the time the contact executed this event
                 $parentEvent   = $decisionEvent->getParent();
                 $parentEventId = ($parentEvent) ? $parentEvent->getId() : null;
@@ -310,6 +308,9 @@ class InactiveExecutioner implements ExecutionerInterface
                 // On to the next decision
                 $this->logger->debug('CAMPAIGN: No more contacts to process for decision ID #'.$decisionEvent->getId());
             }
+
+            // Ensure the batch min is reset from the last decision event
+            $this->limiter->resetBatchMinContactId();
         }
     }
 
