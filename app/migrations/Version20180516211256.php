@@ -10,9 +10,9 @@
 
 namespace Mautic\Migrations;
 
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
+use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
  * Add indexes to speed up campaign view rendering.
