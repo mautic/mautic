@@ -925,8 +925,8 @@ class LeadModel extends FormModel
     public function checkForDuplicateContact(array $queryFields, Lead $lead = null, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
     {
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
-        if (null == $this->availableLeadFields) {
-            $filter = ['isPublished' => true];
+        if (empty($this->availableLeadFields)) {
+            $filter = ['isPublished' => true, 'object' => 'lead'];
 
             if ($onlyPubliclyUpdateable) {
                 $filter['isPubliclyUpdatable'] = true;
@@ -943,13 +943,14 @@ class LeadModel extends FormModel
             $lead = new Lead();
         }
 
-        // Run values through setFieldValues to clean them first
-        $this->setFieldValues($lead, $queryFields, false, false);
-        $cleanFields = $lead->getFields();
-
         $uniqueFields    = $this->leadFieldModel->getUniqueIdentifierFields();
         $uniqueFieldData = [];
         $inQuery         = array_intersect_key($queryFields, $this->availableLeadFields);
+        $values          = $onlyPubliclyUpdateable ? $inQuery : $queryFields;
+
+        // Run values through setFieldValues to clean them first
+        $this->setFieldValues($lead, $values, false, false);
+        $cleanFields = $lead->getFields();
 
         foreach ($inQuery as $k => $v) {
             if (empty($queryFields[$k])) {
