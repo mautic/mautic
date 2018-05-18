@@ -18,5 +18,6 @@ echo $view->render(
         'type'          => 'checkbox',
         'formName'      => (isset($formName)) ? $formName : '',
         'contactFields' => (isset($contactFields)) ? $contactFields : [],
+        'companyFields' => (isset($companyFields)) ? $companyFields : [],
     ]
 );
