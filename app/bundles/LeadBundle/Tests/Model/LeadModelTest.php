@@ -13,6 +13,9 @@ use Mautic\UserBundle\Entity\User;
 
 class LeadModelTest extends \PHPUnit_Framework_TestCase
 {
+    private $fieldModelMock;
+    private $leadRepositoryMock;
+
     protected function setUp()
     {
         parent::setUp();
