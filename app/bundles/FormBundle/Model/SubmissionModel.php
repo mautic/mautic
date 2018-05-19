@@ -333,7 +333,7 @@ class SubmissionModel extends CommonFormModel
             if (!empty($leadField)) {
                 $leadValue = $value;
 
-                $leadFieldMatches[$leadField] = $value;
+                $leadFieldMatches[$leadField] = $leadValue;
             }
 
             //convert array from checkbox groups and multiple selects
