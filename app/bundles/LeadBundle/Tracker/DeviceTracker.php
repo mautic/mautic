@@ -130,4 +130,9 @@ class DeviceTracker
     {
         return $this->deviceWasChanged;
     }
+
+    public function clearTrackingCookies()
+    {
+        $this->deviceTrackingService->clearTrackingCookies();
+    }
 }
