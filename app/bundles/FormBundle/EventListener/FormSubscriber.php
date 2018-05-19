@@ -171,7 +171,6 @@ class FormSubscriber extends CommonSubscriber
         if (!$event->checkContext('form.email')) {
             return;
         }
-
         // replace line brakes with <br> for textarea values
         if ($tokens = $event->getTokens()) {
             foreach ($tokens as $token => &$value) {

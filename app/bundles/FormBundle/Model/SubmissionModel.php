@@ -221,7 +221,7 @@ class SubmissionModel extends CommonFormModel
         $submission->setReferer($referer);
 
         // Create an event to be dispatched through the processes
-        $submissionEvent = new SubmissionEvent($submission, $post, $server, $request);
+        $submissionEvent = new SubmissionEvent($submission, $post, $server, $request, $this->router);
 
         // Get a list of components to build custom fields from
         $components = $this->formModel->getCustomComponents();
@@ -342,7 +342,7 @@ class SubmissionModel extends CommonFormModel
             if (!empty($leadField)) {
                 $leadValue = $value;
 
-                $leadFieldMatches[$leadField] = $this->processValueBeforeDisplay($f, $leadValue);
+                $leadFieldMatches[$leadField] = $value;
             }
 
             //convert array from checkbox groups and multiple selects
@@ -350,7 +350,7 @@ class SubmissionModel extends CommonFormModel
                 $value = implode(', ', $value);
             }
 
-            $tokens["{formfield={$alias}}"] = $this->processValueBeforeDisplay($f, $value);
+            $tokens["{formfield={$alias}}"] = $value;
 
             //save the result
             if ($f->getSaveResult() !== false) {
@@ -460,21 +460,6 @@ class SubmissionModel extends CommonFormModel
         // made it to the end so return the submission event to give the calling method access to tokens, results, etc
         // otherwise return false that no errors were encountered (to keep BC really)
         return ($returnEvent) ? ['submission' => $submissionEvent] : false;
-    }
-
-    /**
-     * @param Field  $field
-     * @param string $value
-     */
-    public function processValueBeforeDisplay(Field $field, $value)
-    {
-        switch ($field->getType()) {
-            case 'file':
-                return $this->assetsHelper->getUrl($this->formUploader->getRelativeFilePath($field, $value), null, null, true);
-                break;
-        }
-
-        return $value;
     }
 
     /**

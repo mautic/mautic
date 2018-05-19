@@ -13,7 +13,9 @@ namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Event\Service\SubmissionTokensProcessService;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class SubmissionEvent.
@@ -97,19 +99,29 @@ class SubmissionEvent extends CommonEvent
     private $request;
 
     /**
+     * @var
+     */
+    private $router;
+
+    private $submisssionTokenProcess;
+
+    /**
      * SubmissionEvent constructor.
      *
-     * @param Submission $submission
-     * @param            $post
-     * @param            $server
-     * @param Request    $request
+     * @param Submission           $submission
+     * @param                      $post
+     * @param                      $server
+     * @param Request              $request
+     * @param RouterInterface|null $router
      */
-    public function __construct(Submission $submission, $post, $server, Request $request)
+    public function __construct(Submission $submission, $post, $server, Request $request, $router)
     {
-        $this->entity  = $submission;
-        $this->post    = $post;
-        $this->server  = $server;
-        $this->request = $request;
+        $this->entity                  = $submission;
+        $this->post                    = $post;
+        $this->server                  = $server;
+        $this->request                 = $request;
+        $this->router                  = $router;
+        $this->submisssionTokenProcess = new SubmissionTokensProcessService();
     }
 
     /**
@@ -199,7 +211,7 @@ class SubmissionEvent extends CommonEvent
      */
     public function getTokens()
     {
-        return $this->tokens;
+        return $this->submisssionTokenProcess->process($this, $this->tokens);
     }
 
     /**
@@ -338,5 +350,21 @@ class SubmissionEvent extends CommonEvent
         $this->callbackResponses[$key] = $callbackResponse;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
+
+    /**
+     * @param mixed $router
+     */
+    public function setRouter($router)
+    {
+        $this->router = $router;
     }
 }
