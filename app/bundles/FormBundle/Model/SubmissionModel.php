@@ -20,7 +20,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\FormBundle\Crate\UploadFileCrate;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
@@ -120,11 +119,6 @@ class SubmissionModel extends CommonFormModel
     private $deviceTrackingService;
 
     /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
      * @param IpLookupHelper                 $ipLookupHelper
      * @param TemplatingHelper               $templatingHelper
      * @param FormModel                      $formModel
@@ -137,7 +131,6 @@ class SubmissionModel extends CommonFormModel
      * @param UploadFieldValidator           $uploadFieldValidator
      * @param FormUploader                   $formUploader
      * @param DeviceTrackingServiceInterface $deviceTrackingService
-     * @param AssetsHelper                   $assetsHelper
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -151,8 +144,7 @@ class SubmissionModel extends CommonFormModel
         FormFieldHelper $fieldHelper,
         UploadFieldValidator $uploadFieldValidator,
         FormUploader $formUploader,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        AssetsHelper $assetsHelper
+        DeviceTrackingServiceInterface $deviceTrackingService
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->templatingHelper       = $templatingHelper;
@@ -166,7 +158,6 @@ class SubmissionModel extends CommonFormModel
         $this->uploadFieldValidator   = $uploadFieldValidator;
         $this->formUploader           = $formUploader;
         $this->deviceTrackingService  = $deviceTrackingService;
-        $this->assetsHelper           = $assetsHelper;
     }
 
     /**
