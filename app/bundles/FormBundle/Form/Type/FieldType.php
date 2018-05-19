@@ -127,7 +127,7 @@ class FieldType extends AbstractType
                     $cleanMasks['properties']['optionlist']['list']['label'] = 'strict_html';
                     break;
                 case 'file':
-                    $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
+                    $addShowLabel = $addDefaultValue = $addLeadFieldList = $addBehaviorFields = false;
                     break;
             }
         }
