@@ -80,19 +80,6 @@ class FormUploader
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName;
     }
 
-    /**
-     * @param Field  $field
-     * @param string $fileName
-     *
-     * @return string
-     */
-    public function getRelativeFilePath(Field $field, $fileName)
-    {
-        $completeFilePath = $this->getCompleteFilePath($field, $fileName);
-
-        return str_replace($this->coreParametersHelper->getParameter('kernel.root_dir'), '', $completeFilePath);
-    }
-
     public function deleteAllFilesOfFormField(Field $field)
     {
         if (!$field->isFileType()) {
