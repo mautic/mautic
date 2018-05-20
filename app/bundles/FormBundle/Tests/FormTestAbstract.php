@@ -363,6 +363,17 @@ class FormTestAbstract extends WebTestCase
                 'id'           => $fieldSession,
             ];
 
+        $fields['file'] =
+            [
+                'label'        => 'File',
+                'showLabel'    => 1,
+                'saveResult'   => 1,
+                'defaultValue' => false,
+                'alias'        => 'file',
+                'type'         => 'file',
+                'id'           => 'file',
+            ];
+
         return $fields;
     }
 

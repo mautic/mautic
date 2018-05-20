@@ -40,7 +40,40 @@ class SubmissionModelTest extends FormTestAbstract
         $formModel->setFields($form, $fields);
 
         $submissionModel = $this->getSubmissionModel();
+
         $this->assertFalse($submissionModel->saveSubmission($post, $server, $form, $request));
-        $this->assertInstanceOf(SubmissionEvent::class, $submissionModel->saveSubmission($post, $server, $form, $request, true)['submission']);
+        /** @var SubmissionEvent $submissionEvent */
+        $submissionEvent = $submissionModel->saveSubmission($post, $server, $form, $request, true)['submission'];
+        $this->assertInstanceOf(SubmissionEvent::class, $submissionEvent);
+
+        $alias              = 'var_name_1';
+        $tokenFile          = '{formfield='.$alias.'}';
+        $tokens[$tokenFile] = $formData[$alias];
+        $submissionEvent->setTokens($tokens);
+
+        $this->assertEquals($tokens[$tokenFile], $submissionEvent->getTokens()[$tokenFile]);
+
+        $uploadDir = 'path/to/file';
+
+        $fileUploaderMock = $this->getMockBuilder(FileUploader::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $coreParametersHelperMock->expects($this->exactly(2))
+            ->method('getParameter')
+            ->with('form_upload_dir')
+            ->willReturn($uploadDir);
+
+        $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
+
+        $alias              = $this->getTestFormFields()['file']['alias'];
+        $tokenFile          = '{formfield='.$alias.'}';
+        $tokens[$tokenFile] = $formData[$alias];
+        $submissionEvent->setTokens($tokens);
+
+        $this->assertNotEquals($tokens[$tokenFile], $submissionEvent->getTokens()[$tokenFile]);
     }
 }

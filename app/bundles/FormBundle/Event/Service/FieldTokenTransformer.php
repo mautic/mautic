@@ -10,28 +10,31 @@ namespace Mautic\FormBundle\Event\Service;
 
 use Mautic\FormBundle\Event\SubmissionEvent;
 
-class SubmissionTokensProcessService
+class FieldTokenTransformer extends FieldValueTransformer
 {
-    public function process(SubmissionEvent $submissionEvent, $tokens)
+    private $fieldValueTransformer;
+
+    public function __construct()
+    {
+        $this->fieldValueTransformer = new FieldValueTransformer();
+    }
+
+    public function transformTokens(SubmissionEvent $submissionEvent, $tokens)
     {
         if ($submissionEvent->getSubmission()->getId()) {
             $fields = $submissionEvent->getForm()->getFields();
             foreach ($fields as $field) {
                 switch ($field->getType()) {
                     case 'file':
-                        $tokens["{formfield={$field->getType()}}"] = $submissionEvent->getRouter()->generate(
-                            'mautic_form_file_download',
-                            [
-                                'submissionId' => $submissionEvent->getSubmission()->getId(),
-                                'field'        => $field->getAlias(),
-                            ],
-                            true
+                        $tokens["{formfield={$field->getAlias()}}"] = $this->fieldValueTransformer->get(
+                            $submissionEvent,
+                            $field,
+                            $tokens["{formfield={$field->getAlias()}}"]
                         );
                         break;
                 }
             }
         }
-
         return $tokens;
     }
 }
