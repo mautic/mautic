@@ -47,17 +47,17 @@ class SubmissionModelTest extends FormTestAbstract
         $this->assertInstanceOf(SubmissionEvent::class, $submissionEvent);
 
         $alias              = 'var_name_1';
-        $tokenFile          = '{formfield='.$alias.'}';
-        $tokens[$tokenFile] = $formData[$alias];
+        $token              = '{formfield='.$alias.'}';
+        $tokens[$token]     = $formData[$alias];
         $submissionEvent->setTokens($tokens);
 
-        $this->assertEquals($tokens[$tokenFile], $submissionEvent->getTokens()[$tokenFile]);
+        $this->assertEquals($tokens[$token], $submissionEvent->getTokens()[$token]);
 
         $alias              = $this->getTestFormFields()['file']['alias'];
-        $tokenFile          = '{formfield='.$alias.'}';
-        $tokens[$tokenFile] = $formData[$alias];
+        $token              = '{formfield='.$alias.'}';
+        $tokens[$token]     = $formData[$alias];
         $submissionEvent->setTokens($tokens);
 
-        $this->assertNotEquals($tokens[$tokenFile], $submissionEvent->getTokens()[$tokenFile]);
+        $this->assertNotEquals($tokens[$token], $submissionEvent->getTokens()[$token]);
     }
 }
