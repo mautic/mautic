@@ -53,22 +53,6 @@ class SubmissionModelTest extends FormTestAbstract
 
         $this->assertEquals($tokens[$tokenFile], $submissionEvent->getTokens()[$tokenFile]);
 
-        $uploadDir = 'path/to/file';
-
-        $fileUploaderMock = $this->getMockBuilder(FileUploader::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $coreParametersHelperMock->expects($this->exactly(2))
-            ->method('getParameter')
-            ->with('form_upload_dir')
-            ->willReturn($uploadDir);
-
-        $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
-
         $alias              = $this->getTestFormFields()['file']['alias'];
         $tokenFile          = '{formfield='.$alias.'}';
         $tokens[$tokenFile] = $formData[$alias];
