@@ -13,7 +13,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 
 class FieldValueTransformer
 {
-    public function get(SubmissionEvent $submissionEvent, Field $field, $value)
+    public function transform(SubmissionEvent $submissionEvent, Field $field, $value)
     {
         if ($submissionEvent->getSubmission()->getId()) {
             switch ($field->getType()) {

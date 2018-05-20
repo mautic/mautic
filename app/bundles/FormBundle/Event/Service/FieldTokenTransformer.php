@@ -12,13 +12,6 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 
 class FieldTokenTransformer extends FieldValueTransformer
 {
-    private $fieldValueTransformer;
-
-    public function __construct()
-    {
-        $this->fieldValueTransformer = new FieldValueTransformer();
-    }
-
     public function transformTokens(SubmissionEvent $submissionEvent, $tokens)
     {
         if ($submissionEvent->getSubmission()->getId()) {
@@ -26,7 +19,7 @@ class FieldTokenTransformer extends FieldValueTransformer
             foreach ($fields as $field) {
                 switch ($field->getType()) {
                     case 'file':
-                        $tokens["{formfield={$field->getAlias()}}"] = $this->fieldValueTransformer->get(
+                        $tokens["{formfield={$field->getAlias()}}"] = $this->transform(
                             $submissionEvent,
                             $field,
                             $tokens["{formfield={$field->getAlias()}}"]
@@ -35,6 +28,7 @@ class FieldTokenTransformer extends FieldValueTransformer
                 }
             }
         }
+
         return $tokens;
     }
 }
