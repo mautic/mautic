@@ -40,7 +40,6 @@ class SubmissionModelTest extends FormTestAbstract
         $formModel->setFields($form, $fields);
 
         $submissionModel = $this->getSubmissionModel();
-
         $this->assertFalse($submissionModel->saveSubmission($post, $server, $form, $request));
         /** @var SubmissionEvent $submissionEvent */
         $submissionEvent = $submissionModel->saveSubmission($post, $server, $form, $request, true)['submission'];
