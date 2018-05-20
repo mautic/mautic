@@ -359,12 +359,4 @@ class SubmissionEvent extends CommonEvent
     {
         return $this->router;
     }
-
-    /**
-     * @param mixed $router
-     */
-    public function setRouter($router)
-    {
-        $this->router = $router;
-    }
 }
