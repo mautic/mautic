@@ -25,7 +25,7 @@ class FieldValueTransformer
      */
     public function transform(SubmissionEvent $submissionEvent, Field $field, $value)
     {
-        if ($submissionEvent->getSubmission()->getId()) {
+        if (method_exists($submissionEvent->getSubmission(), 'getId')) {
             switch ($field->getType()) {
                 case 'file':
                     return $submissionEvent->getRouter()->generate(

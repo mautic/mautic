@@ -39,6 +39,7 @@ use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class FormTestAbstract extends WebTestCase
@@ -312,10 +313,22 @@ class FormTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $file1Mock = $this->getMockBuilder(UploadedFile::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $file1Mock->expects($this->any())
+            ->method('getClientOriginalName')
+            ->willReturn('test.jpg');
+
         $uploadFieldValidatorMock = $this
             ->getMockBuilder(UploadFieldValidator::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $uploadFieldValidatorMock->expects($this->any())
+            ->method('processFileValidation')
+            ->willReturn($file1Mock);
 
         $formUploaderMock = $this
             ->getMockBuilder(FormUploader::class)
@@ -323,8 +336,7 @@ class FormTestAbstract extends WebTestCase
             ->getMock();
 
         $deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
-
-        $submissionModel = new SubmissionModel(
+        $submissionModel       = new SubmissionModel(
             $ipLookupHelper,
             $templatingHelperMock,
             $formModel,
@@ -338,6 +350,7 @@ class FormTestAbstract extends WebTestCase
             $formUploaderMock,
             $deviceTrackingService
         );
+        $submissionModel->setRouter($this->container->get('router'));
 
         $submissionModel->setDispatcher($dispatcher);
         $submissionModel->setTranslator($translator);
@@ -365,13 +378,15 @@ class FormTestAbstract extends WebTestCase
 
         $fields['file'] =
             [
-                'label'        => 'File',
-                'showLabel'    => 1,
-                'saveResult'   => 1,
-                'defaultValue' => false,
-                'alias'        => 'file',
-                'type'         => 'file',
-                'id'           => 'file',
+                'label'                   => 'File',
+                'showLabel'               => 1,
+                'saveResult'              => 1,
+                'defaultValue'            => false,
+                'alias'                   => 'file',
+                'type'                    => 'file',
+                'id'                      => 'file',
+                'allowed_file_size'       => 1,
+                'allowed_file_extensions' => ['jpg', 'gif'],
             ];
 
         return $fields;
