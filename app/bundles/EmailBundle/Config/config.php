@@ -313,8 +313,11 @@ return [
                 'alias'     => 'monitored_email',
             ],
             'mautic.form.type.email_dashboard_emails_in_time_widget' => [
-                'class' => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
-                'alias' => 'email_dashboard_emails_in_time_widget',
+                'class'     => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
+                'alias'     => 'email_dashboard_emails_in_time_widget',
+                'arguments' => [
+                    'mautic.lead.repository.company',
+                ],
             ],
             'mautic.form.type.email_to_user' => [
                 'class' => Mautic\EmailBundle\Form\Type\EmailToUserType::class,

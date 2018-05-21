@@ -86,6 +86,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
             if (isset($params['flag'])) {
                 $params['filter']['flag'] = $params['flag'];
             }
+            if (isset($params['companyId'])) {
+                $params['filter']['companyId'] = $params['companyId'];
+            }
 
             if (!$event->isCached()) {
                 $event->setTemplateData([

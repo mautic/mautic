@@ -725,6 +725,13 @@ return [
             ],
         ],
         'repositories' => [
+            'mautic.lead.repository.company' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\Company::class,
+                ],
+            ],
             'mautic.lead.repository.dnc' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],

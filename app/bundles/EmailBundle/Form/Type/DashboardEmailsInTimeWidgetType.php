@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -19,6 +20,21 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class DashboardEmailsInTimeWidgetType extends AbstractType
 {
+    /**
+     * @var CompanyRepository
+     */
+    private $companyRepository;
+
+    /**
+     * DashboardEmailsInTimeWidgetType constructor.
+     *
+     * @param CompanyRepository $companyRepository
+     */
+    public function __construct(CompanyRepository $companyRepository)
+    {
+        $this->companyRepository = $companyRepository;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -40,6 +56,19 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
                 'required'   => false,
             ]
         );
+        $companies        = $this->companyRepository->getCompanies();
+        $companiesChoises = [];
+        foreach ($companies as $company) {
+            $companiesChoises[$company['id']] = $company['companyname'];
+        }
+        $builder->add('companyId', 'choice', [
+            'label'      => 'mautic.email.companyId.filter',
+            'choices'    => $companiesChoises,
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'empty_data' => '',
+            'required'   => false,
+        ]);
     }
 
     /**

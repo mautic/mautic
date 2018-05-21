@@ -1713,11 +1713,16 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
-        $flag = null;
+        $flag      = null;
+        $companyId = null;
 
         if (isset($filter['flag'])) {
             $flag = $filter['flag'];
             unset($filter['flag']);
+        }
+        if (isset($filter['companyId'])) {
+            $companyId = $filter['companyId'];
+            unset($filter['companyId']);
         }
 
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -1728,6 +1733,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
+            if ($companyId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', 't.lead_id = company_lead.lead_id')
+                    ->andWhere('company_lead.company_id = :companyId')
+                    ->setParameter('companyId', $companyId);
+            }
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.email.sent.emails'), $data);
         }
@@ -1736,6 +1746,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $q = $query->prepareTimeDataQuery('email_stats', 'date_read', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
+            }
+            if ($companyId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', 't.lead_id = company_lead.lead_id')
+                    ->andWhere('company_lead.company_id = :companyId')
+                    ->setParameter('companyId', $companyId);
             }
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.email.read.emails'), $data);
@@ -1748,6 +1763,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
             $q->andWhere($q->expr()->eq('t.is_failed', ':true'))
                 ->setParameter('true', true, 'boolean');
+            if ($companyId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', 't.lead_id = company_lead.lead_id')
+                    ->andWhere('company_lead.company_id = :companyId')
+                    ->setParameter('companyId', $companyId);
+            }
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.email.failed.emails'), $data);
         }
@@ -1770,18 +1790,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
+            if ($companyId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', 't.lead_id = company_lead.lead_id')
+                    ->andWhere('company_lead.company_id = :companyId')
+                    ->setParameter('companyId', $companyId);
+            }
             $data = $query->loadAndBuildTimeData($q);
 
             $chart->setDataset($this->translator->trans('mautic.email.clicked'), $data);
         }
 
         if ($flag == 'all' || $flag == 'unsubscribed') {
-            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers);
+            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers, $companyId);
             $chart->setDataset($this->translator->trans('mautic.email.unsubscribed'), $data);
         }
 
         if ($flag == 'all' || $flag == 'bounced') {
-            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::BOUNCED, $canViewOthers);
+            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::BOUNCED, $canViewOthers, $companyId);
             $chart->setDataset($this->translator->trans('mautic.email.bounced'), $data);
         }
 
@@ -1795,10 +1820,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param array      $filter
      * @param            $reason
      * @param            $canViewOthers
+     * @param int|null   $companyId
      *
      * @return array
      */
-    public function getDncLineChartDataset(ChartQuery &$query, array $filter, $reason, $canViewOthers)
+    public function getDncLineChartDataset(ChartQuery &$query, array $filter, $reason, $canViewOthers, $companyId = null)
     {
         $dncFilter = isset($filter['email_id']) ? ['channel_id' => $filter['email_id']] : [];
         $q         = $query->prepareTimeDataQuery('lead_donotcontact', 'date_added', $dncFilter);
@@ -1809,6 +1835,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);
+        }
+        if ($companyId !== null) {
+            $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', 't.lead_id = company_lead.lead_id')
+                ->andWhere('company_lead.company_id = :companyId')
+                ->setParameter('companyId', $companyId);
         }
 
         return $data = $query->loadAndBuildTimeData($q);
