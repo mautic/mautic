@@ -16,6 +16,8 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 
 class FieldValueTransformer
 {
+    private $fieldsFormTransformation = ['file'];
+
     /**
      * @param SubmissionEvent $submissionEvent
      * @param Field           $field
@@ -41,5 +43,20 @@ class FieldValueTransformer
         }
 
         return $value;
+    }
+
+    /**
+     * @param array $fields
+     */
+    public function findFieldsForTransformation(array $fields)
+    {
+        /** @var Field $field */
+        foreach ($fields as $key => $field) {
+            if (!in_array($field->getType(), $this->fieldsFormTransformation)) {
+                unset($fields[$key]);
+            }
+        }
+
+        return $fields;
     }
 }

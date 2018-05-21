@@ -25,6 +25,7 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\Exception\FileValidationException;
@@ -432,6 +433,12 @@ class SubmissionModel extends CommonFormModel
                 foreach ($campaigns as $campaign) {
                     $this->campaignModel->addLead($campaign, $lead);
                 }
+            }
+        }
+        $submissionEvent->getContactFieldMatches();
+        $fieldsForUpdateLead = new FieldValueTransformer($fieldArray);
+        if (!empty($fieldsForUpdateLead)) {
+            foreach ($fieldsForUpdateLead as $fieldForUpdateLead) {
             }
         }
 
