@@ -72,8 +72,6 @@ class ContactSegmentService
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
         $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
-        // I really the following line should be enabled; but it doesn't match with the old results
-        //$queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $segment->getId());
 
         return $queryBuilder;
     }
@@ -125,12 +123,10 @@ class ContactSegmentService
 
         $qb = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
 
-        if (isset($batchLimiters['minId'])) {
-            $qb->andWhere($qb->expr()->gte('l.id', $qb->expr()->literal((int) $batchLimiters['minId'])));
-        }
+        $this->addMinMaxLimiters($qb, $batchLimiters);
 
-        if (isset($batchLimiters['maxId'])) {
-            $qb->andWhere($qb->expr()->lte('l.id', $qb->expr()->literal((int) $batchLimiters['maxId'])));
+        if (!empty($batchLimiters['excludeVisitors'])) {
+            $this->excludeVisitors($qb);
         }
 
         $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
@@ -192,21 +188,17 @@ class ContactSegmentService
 
         $queryBuilder->setMaxResults($limit);
 
-        if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->comparison('l.id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
-            );
-        } elseif (!empty($batchLimiters['maxId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->lte('l.id', $batchLimiters['maxId'])
-            );
-        }
+        $this->addMinMaxLimiters($queryBuilder, $batchLimiters);
 
         if (!empty($batchLimiters['dateTime'])) {
             // Only leads in the list at the time of count
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->lte('l.date_added', $queryBuilder->expr()->literal($batchLimiters['dateTime']))
             );
+        }
+
+        if (!empty($batchLimiters['excludeVisitors'])) {
+            $this->excludeVisitors($queryBuilder);
         }
 
         $result = $this->timedFetchAll($queryBuilder, $segment->getId());
@@ -347,5 +339,34 @@ class ContactSegmentService
         }
 
         return $result;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param array        $batchLimiters
+     */
+    private function addMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters)
+    {
+        if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->comparison('l.id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
+            );
+        } elseif (!empty($batchLimiters['maxId'])) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->lte('l.id', $batchLimiters['maxId'])
+            );
+        } elseif (!empty($batchLimiters['minId'])) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->gte('l.id', $queryBuilder->expr()->literal((int) $batchLimiters['minId']))
+            );
+        }
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     */
+    private function excludeVisitors(QueryBuilder $queryBuilder)
+    {
+        $queryBuilder->where($queryBuilder->expr()->isNotNull('l.date_identified'));
     }
 }
