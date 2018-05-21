@@ -99,22 +99,22 @@ class Lead
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
         $metadata->setGroupPrefix('campaignLead')
-                 ->addListProperties(
-                     [
-                         'dateAdded',
-                         'manuallyRemoved',
-                         'manuallyAdded',
-                         'rotation',
-                         'dateLastExited',
-                     ]
-                 )
-                ->addProperties(
-                    [
-                        'lead',
-                        'campaign',
-                    ]
-                )
-                 ->build();
+            ->addListProperties(
+                [
+                    'dateAdded',
+                    'manuallyRemoved',
+                    'manuallyAdded',
+                    'rotation',
+                    'dateLastExited',
+                ]
+            )
+            ->addProperties(
+                [
+                    'lead',
+                    'campaign',
+                ]
+            )
+            ->build();
     }
 
     /**
@@ -234,6 +234,17 @@ class Lead
     }
 
     /**
+     * @return $this
+     */
+    public function startNewRotation()
+    {
+        $this->rotation += 1;
+        $this->dateAdded = new \DateTime();
+
+        return $this;
+    }
+
+    /**
      * @return \DateTime
      */
     public function getDateLastExited()
@@ -242,11 +253,11 @@ class Lead
     }
 
     /**
-     * @param \DateTime $dateLastExited
+     * @param \DateTime|null $dateLastExited
      *
      * @return Lead
      */
-    public function setDateLastExited(\DateTime $dateLastExited)
+    public function setDateLastExited(\DateTime $dateLastExited = null)
     {
         $this->dateLastExited = $dateLastExited;
 

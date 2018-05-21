@@ -518,4 +518,33 @@ class LeadEventLogRepository extends CommonRepository
 
         return $dates;
     }
+
+    /**
+     * @param int $contactId
+     * @param int $campaignId
+     * @param int $rotation
+     *
+     * @return bool
+     */
+    public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('log.rotation')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('log.lead_id', ':contactId'),
+                    $qb->expr()->eq('log.campaign_id', ':campaignId'),
+                    $qb->expr()->in('log.rotation', ':rotation')
+                )
+            )
+            ->setParameter('contactId', (int) $contactId)
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('rotation', (int) $rotation)
+            ->setMaxResults(1);
+
+        $results = $qb->execute()->fetchAll();
+
+        return !empty($results);
+    }
 }

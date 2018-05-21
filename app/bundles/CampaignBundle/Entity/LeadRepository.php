@@ -307,4 +307,9 @@ class LeadRepository extends CommonRepository
 
         return $totalCount;
     }
+
+    public function getCampaignMembers(array $contactIds, Campaign $campaign)
+    {
+        return $this->createQueryBuilder('l');
+    }
 }
