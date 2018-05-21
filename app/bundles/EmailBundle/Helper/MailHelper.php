@@ -1264,13 +1264,7 @@ class MailHelper
     public function setIdHash($idHash = null, $statToBeGenerated = true)
     {
         if ($idHash === null) {
-            /*
-            18.05.2018 - hammad-tfg: 
-                         fixed issue # 6093 by using more_entropy parameter to PHP uniqid. 
-                         Read more here: http://php.net/manual/en/function.uniqid.php
-                         Issue link: https://github.com/mautic/mautic/issues/6093
-            */
-            $idHash = str_replace('.','',uniqid('',true));//uniqid();
+            $idHash = str_replace('.','',uniqid('',true));
         }
 
         $this->idHash      = $idHash;
