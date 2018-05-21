@@ -17,7 +17,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
-        // Wait 15 seconds then execute the campaign again to send scheduled events
+        // Wait 20 seconds then execute the campaign again to send scheduled events
         sleep(20);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
@@ -25,7 +25,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $byEvent = $this->getCampaignEventLogs([3]);
         $this->assertCount(0, $byEvent[3]);
 
-        // Wait 15 seconds to go beyond the inaction timeframe
+        // Wait 20 seconds to go beyond the inaction timeframe
         sleep(20);
 
         // Now they should be inactive
@@ -41,7 +41,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
-        // Wait 15 seconds then execute the campaign again to send scheduled events
+        // Wait 20 seconds then execute the campaign again to send scheduled events
         sleep(20);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
@@ -49,7 +49,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $byEvent = $this->getCampaignEventLogs([3]);
         $this->assertCount(0, $byEvent[3]);
 
-        // Wait 15 seconds to go beyond the inaction timeframe
+        // Wait 20 seconds to go beyond the inaction timeframe
         sleep(20);
 
         // Now they should be inactive

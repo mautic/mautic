@@ -60,7 +60,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 15 seconds then execute the campaign again to send scheduled events
+        // Wait 20 seconds then execute the campaign again to send scheduled events
         sleep(20);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
@@ -103,7 +103,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(25, $byEvent[3]);
         $this->assertCount(25, $byEvent[10]);
 
-        // Wait 15 seconds to go beyond the inaction timeframe
+        // Wait 20 seconds to go beyond the inaction timeframe
         sleep(20);
 
         // Execute the command again to trigger inaction related events
@@ -221,7 +221,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 15 seconds then execute the campaign again to send scheduled events
+        // Wait 20 seconds then execute the campaign again to send scheduled events
         sleep(20);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
@@ -264,7 +264,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(1, $byEvent[3]);
         $this->assertCount(1, $byEvent[10]);
 
-        // Wait 15 seconds to go beyond the inaction timeframe
+        // Wait 20 seconds to go beyond the inaction timeframe
         sleep(20);
 
         // Execute the command again to trigger inaction related events
@@ -376,7 +376,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 15 seconds then execute the campaign again to send scheduled events
+        // Wait 20 seconds then execute the campaign again to send scheduled events
         sleep(20);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
@@ -419,7 +419,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(2, $byEvent[3]);
         $this->assertCount(2, $byEvent[10]);
 
-        // Wait 15 seconds to go beyond the inaction timeframe
+        // Wait 20 seconds to go beyond the inaction timeframe
         sleep(20);
 
         // Execute the command again to trigger inaction related events
