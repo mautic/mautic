@@ -120,6 +120,11 @@ class SubmissionModel extends CommonFormModel
     private $deviceTrackingService;
 
     /**
+     * @var FieldValueTransformer
+     */
+    private $fieldValueTransformer;
+
+    /**
      * @param IpLookupHelper                 $ipLookupHelper
      * @param TemplatingHelper               $templatingHelper
      * @param FormModel                      $formModel
@@ -132,6 +137,7 @@ class SubmissionModel extends CommonFormModel
      * @param UploadFieldValidator           $uploadFieldValidator
      * @param FormUploader                   $formUploader
      * @param DeviceTrackingServiceInterface $deviceTrackingService
+     * @param FieldValueTransformer          $fieldValueTransformer
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -145,7 +151,8 @@ class SubmissionModel extends CommonFormModel
         FormFieldHelper $fieldHelper,
         UploadFieldValidator $uploadFieldValidator,
         FormUploader $formUploader,
-        DeviceTrackingServiceInterface $deviceTrackingService
+        DeviceTrackingServiceInterface $deviceTrackingService,
+        FieldValueTransformer $fieldValueTransformer
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->templatingHelper       = $templatingHelper;
@@ -159,6 +166,7 @@ class SubmissionModel extends CommonFormModel
         $this->uploadFieldValidator   = $uploadFieldValidator;
         $this->formUploader           = $formUploader;
         $this->deviceTrackingService  = $deviceTrackingService;
+        $this->fieldValueTransformer  = $fieldValueTransformer;
     }
 
     /**
@@ -213,7 +221,7 @@ class SubmissionModel extends CommonFormModel
         $submission->setReferer($referer);
 
         // Create an event to be dispatched through the processes
-        $submissionEvent = new SubmissionEvent($submission, $post, $server, $request, $this->router);
+        $submissionEvent = new SubmissionEvent($submission, $post, $server, $request);
 
         // Get a list of components to build custom fields from
         $components = $this->formModel->getCustomComponents();
@@ -411,7 +419,7 @@ class SubmissionModel extends CommonFormModel
 
         // Save the submission
         $this->saveEntity($submission);
-
+        $this->fieldValueTransformer->transformValuesAfterSubmit($submissionEvent);
         // Now handle post submission actions
         try {
             $this->executeFormActions($submissionEvent);
@@ -426,6 +434,12 @@ class SubmissionModel extends CommonFormModel
             return ['errors' => [$exception->getMessage()]];
         }
 
+        // update contact fields with transform values
+        if (!empty($this->fieldValueTransformer->getContactFieldsToUpdate())) {
+            $this->leadModel->setFieldValues($lead, $this->fieldValueTransformer->getContactFieldsToUpdate());
+            $this->leadModel->saveEntity($lead, false);
+        }
+
         if (!$form->isStandalone()) {
             // Find and add the lead to the associated campaigns
             $campaigns = $this->campaignModel->getCampaignsByForm($form);
@@ -433,12 +447,6 @@ class SubmissionModel extends CommonFormModel
                 foreach ($campaigns as $campaign) {
                     $this->campaignModel->addLead($campaign, $lead);
                 }
-            }
-        }
-        $submissionEvent->getContactFieldMatches();
-        $fieldsForUpdateLead = new FieldValueTransformer($fieldArray);
-        if (!empty($fieldsForUpdateLead)) {
-            foreach ($fieldsForUpdateLead as $fieldForUpdateLead) {
             }
         }
 

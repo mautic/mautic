@@ -47,7 +47,6 @@ class SubmissionModelTest extends FormTestAbstract
         /** @var SubmissionEvent $submissionEvent */
         $submissionEvent = $submissionModel->saveSubmission($post, $server, $form, $request, true)['submission'];
         $this->assertInstanceOf(SubmissionEvent::class, $submissionEvent);
-
         $alias              = 'email';
         $token              = '{formfield='.$alias.'}';
         $tokens[$token]     = $formData[$alias];

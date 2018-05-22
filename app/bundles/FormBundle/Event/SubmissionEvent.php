@@ -13,9 +13,7 @@ namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Submission;
-use Mautic\FormBundle\Event\Service\FieldTokenTransformer;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class SubmissionEvent.
@@ -99,29 +97,19 @@ class SubmissionEvent extends CommonEvent
     private $request;
 
     /**
-     * @var
-     */
-    private $router;
-
-    private $fieldTokenTransformer;
-
-    /**
      * SubmissionEvent constructor.
      *
-     * @param Submission           $submission
-     * @param                      $post
-     * @param                      $server
-     * @param Request              $request
-     * @param RouterInterface|null $router
+     * @param Submission $submission
+     * @param            $post
+     * @param            $server
+     * @param Request    $request
      */
-    public function __construct(Submission $submission, $post, $server, Request $request, $router)
+    public function __construct(Submission $submission, $post, $server, Request $request)
     {
         $this->entity                = $submission;
         $this->post                  = $post;
         $this->server                = $server;
         $this->request               = $request;
-        $this->router                = $router;
-        $this->fieldTokenTransformer = new FieldTokenTransformer();
     }
 
     /**
@@ -211,7 +199,7 @@ class SubmissionEvent extends CommonEvent
      */
     public function getTokens()
     {
-        return $this->fieldTokenTransformer->transformTokens($this, $this->tokens);
+        return $this->tokens;
     }
 
     /**
@@ -350,13 +338,5 @@ class SubmissionEvent extends CommonEvent
         $this->callbackResponses[$key] = $callbackResponse;
 
         return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRouter()
-    {
-        return $this->router;
     }
 }

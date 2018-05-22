@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\ActionModel;
@@ -348,9 +349,9 @@ class FormTestAbstract extends WebTestCase
             $fieldHelper,
             $uploadFieldValidatorMock,
             $formUploaderMock,
-            $deviceTrackingService
+            $deviceTrackingService,
+            new FieldValueTransformer($this->container->get('router'))
         );
-        $submissionModel->setRouter($this->container->get('router'));
 
         $submissionModel->setDispatcher($dispatcher);
         $submissionModel->setTranslator($translator);

@@ -13,24 +13,55 @@ namespace Mautic\FormBundle\Event\Service;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 class FieldValueTransformer
 {
-    private $fieldsFormTransformation = ['file'];
+    /**
+     * @var RouterInterface
+     */
+    private $router;
 
     /**
-     * @param SubmissionEvent $submissionEvent
-     * @param Field           $field
-     * @param string          $value
-     *
-     * @return string
+     * @var array
      */
-    public function transform(SubmissionEvent $submissionEvent, Field $field, $value)
+    private $contactFieldsToUpdate = [];
+
+    /**
+     * @var array
+     */
+    private $tokensToUpdate = [];
+
+    /**
+     * @var bool
+     */
+    private $isTransformed = false;
+
+    /**
+     * FieldValueTransformer constructor.
+     *
+     * @param RouterInterface $router
+     */
+    public function __construct(RouterInterface $router)
     {
-        if (method_exists($submissionEvent->getSubmission(), 'getId')) {
+        $this->router = $router;
+    }
+
+    public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent)
+    {
+        if ($this->isIsTransformed()) {
+            return;
+        }
+        $fields              = $submissionEvent->getForm()->getFields();
+        $contactFieldMatches = $submissionEvent->getContactFieldMatches();
+        $tokens              = $submissionEvent->getTokens();
+
+        /** @var Field $field */
+        foreach ($fields as $field) {
             switch ($field->getType()) {
                 case 'file':
-                    return $submissionEvent->getRouter()->generate(
+
+                    $newValue = $this->router->generate(
                         'mautic_form_file_download',
                         [
                             'submissionId' => $submissionEvent->getSubmission()->getId(),
@@ -38,25 +69,48 @@ class FieldValueTransformer
                         ],
                         true
                     );
+
+                    $tokenAlias = "{formfield={$field->getAlias()}}";
+
+                    if (!empty($tokens[$tokenAlias])) {
+                        $this->tokensToUpdate[$tokenAlias] = $tokens[$tokenAlias] = $newValue;
+                    }
+
+                    $contactFieldAlias = $field->getLeadField();
+                    if (!empty($contactFieldMatches[$contactFieldAlias])) {
+                        $this->contactFieldsToUpdate[$contactFieldAlias] = $contactFieldMatches[$contactFieldAlias] = $newValue;
+                    }
+
                     break;
             }
         }
 
-        return $value;
+        $submissionEvent->setTokens($tokens);
+        $submissionEvent->setContactFieldMatches($contactFieldMatches);
+        $this->isIsTransformed(true);
     }
 
     /**
-     * @param array $fields
+     * @return array
      */
-    public function findFieldsForTransformation(array $fields)
+    public function getContactFieldsToUpdate()
     {
-        /** @var Field $field */
-        foreach ($fields as $key => $field) {
-            if (!in_array($field->getType(), $this->fieldsFormTransformation)) {
-                unset($fields[$key]);
-            }
-        }
+        return $this->contactFieldsToUpdate;
+    }
 
-        return $fields;
+    /**
+     * @return array
+     */
+    public function getTokensToUpdate()
+    {
+        return $this->tokensToUpdate;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIsTransformed()
+    {
+        return $this->isTransformed;
     }
 }
