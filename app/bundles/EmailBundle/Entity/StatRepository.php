@@ -47,7 +47,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param           $limit
+     * @param int       $limit
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param int|null  $createdByUserId

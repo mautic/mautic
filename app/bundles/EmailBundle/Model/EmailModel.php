@@ -43,6 +43,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -131,6 +132,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $companyRepository;
 
     /**
+     * @var RedirectRepository
+     */
+    private $redirectRepository;
+
+    /**
      * EmailModel constructor.
      *
      * @param IpLookupHelper     $ipLookupHelper
@@ -145,6 +151,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param SendEmailToContact $sendModel
      * @param DeviceTracker      $deviceTracker
      * @param CompanyRepository  $companyRepository
+     * @param RedirectRepository $redirectRepository
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -158,7 +165,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         MessageQueueModel $messageQueueModel,
         SendEmailToContact $sendModel,
         DeviceTracker $deviceTracker,
-        CompanyRepository $companyRepository
+        CompanyRepository $companyRepository,
+        RedirectRepository $redirectRepository
     ) {
         $this->ipLookupHelper        = $ipLookupHelper;
         $this->themeHelper           = $themeHelper;
@@ -172,6 +180,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->sendModel             = $sendModel;
         $this->deviceTracker         = $deviceTracker;
         $this->companyRepository     = $companyRepository;
+        $this->redirectRepository    = $redirectRepository;
     }
 
     /**
@@ -590,6 +599,25 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         return $data;
+    }
+
+    /**
+     * @param           $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array     $options
+     * @param int|null  $companyId
+     *
+     * @return array
+     */
+    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null)
+    {
+        $createdByUserId = null;
+        if (!empty($options['canViewOthers'])) {
+            $createdByUserId = $this->userHelper->getUser()->getId();
+        }
+
+        return $this->redirectRepository->getMostHitEmailRedirects($limit, $dateFrom, $dateTo, $createdByUserId, $companyId);
     }
 
     /**

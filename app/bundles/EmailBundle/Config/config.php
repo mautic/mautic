@@ -323,6 +323,13 @@ return [
                     'mautic.lead.repository.company',
                 ],
             ],
+            'mautic.form.type.email_dashboard_most_hit_email_redirects_widget' => [
+                'class'     => \Mautic\EmailBundle\Form\Type\DashboardMostHitEmailRedirectsWidgetType::class,
+                'alias'     => 'email_dashboard_most_hit_email_redirects_widget',
+                'arguments' => [
+                    'mautic.lead.repository.company',
+                ],
+            ],
             'mautic.form.type.email_to_user' => [
                 'class' => Mautic\EmailBundle\Form\Type\EmailToUserType::class,
                 'alias' => 'email_to_user',
@@ -597,6 +604,7 @@ return [
                     'mautic.email.model.send_email_to_contacts',
                     'mautic.tracker.device',
                     'mautic.lead.repository.company',
+                    'mautic.page.repository.redirect',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [

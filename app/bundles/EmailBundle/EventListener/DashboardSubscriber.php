@@ -39,6 +39,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'sent.email.to.contacts' => [
             'formAlias' => 'email_dashboard_sent_email_to_contacts_widget',
         ],
+        'most.hit.email.redirects' => [
+            'formAlias' => 'email_dashboard_most_hit_email_redirects_widget',
+        ],
         'ignored.vs.read.emails'   => [],
         'upcoming.emails'          => [],
         'most.sent.emails'         => [],
@@ -124,21 +127,60 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 if (isset($params['companyId'])) {
                     $companyId = $params['companyId'];
                 }
+                $event->setTemplateData(
+                    [
+                        'headItems' => [
+                            'mautic.dashboard.label.contact.id',
+                            'mautic.dashboard.label.contact.email.address',
+                            'mautic.dashboard.label.contact.open',
+                            'mautic.dashboard.label.contact.click',
+                            'mautic.dashboard.label.contact.links.clicked',
+                            'mautic.dashboard.label.email.id',
+                            'mautic.dashboard.label.email.name',
+                            'mautic.dashboard.label.segment.id',
+                            'mautic.dashboard.label.segment.name',
+                            'mautic.dashboard.label.contact.company.id',
+                            'mautic.dashboard.label.contact.company.name',
+                        ],
+                        'bodyItems' => $this->emailModel->getSentEmailToContactData(
+                            $limit,
+                            $params['dateFrom'],
+                            $params['dateTo'],
+                            ['groupBy' => 'sends', 'canViewOthers' => $canViewOthers],
+                            $companyId
+                        ),
+                    ]
+                );
+            }
+
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'most.hit.email.redirects') {
+            $widget = $event->getWidget();
+            $params = $widget->getParams();
+
+            if (!$event->isCached()) {
+                if (empty($params['limit'])) {
+                    // Count the emails limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+                $companyId = null;
+                if (isset($params['companyId'])) {
+                    $companyId = $params['companyId'];
+                }
                 $event->setTemplateData([
                     'headItems' => [
-                        'mautic.dashboard.label.contact.id',
-                        'mautic.dashboard.label.contact.email.address',
-                        'mautic.dashboard.label.contact.open',
-                        'mautic.dashboard.label.contact.click',
-                        'mautic.dashboard.label.contact.links.clicked',
+                        'mautic.dashboard.label.url',
+                        'mautic.dashboard.label.unique.hit.count',
+                        'mautic.dashboard.label.total.hit.count',
                         'mautic.dashboard.label.email.id',
                         'mautic.dashboard.label.email.name',
-                        'mautic.dashboard.label.segment.id',
-                        'mautic.dashboard.label.segment.name',
-                        'mautic.dashboard.label.contact.company.id',
-                        'mautic.dashboard.label.contact.company.name',
                     ],
-                    'bodyItems' => $this->emailModel->getSentEmailToContactData(
+                    'bodyItems' => $this->emailModel->getMostHitEmailRedirects(
                         $limit,
                         $params['dateFrom'],
                         $params['dateTo'],
