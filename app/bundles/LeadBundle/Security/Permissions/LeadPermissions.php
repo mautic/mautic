@@ -80,7 +80,6 @@ class LeadPermissions extends AbstractPermissions
         $builder->add('lead:batch', 'permissionlist', [
             'choices' => [
                 'export'   => 'mautic.core.permissions.export',
-                'import'   => 'mautic.core.permissions.import',
             ],
             'label'  => 'mautic.lead.permissions.batch',
             'data'   => (!empty($data['batch']) ? $data['batch'] : []),
