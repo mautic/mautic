@@ -367,6 +367,6 @@ class ContactSegmentService
      */
     private function excludeVisitors(QueryBuilder $queryBuilder)
     {
-        $queryBuilder->where($queryBuilder->expr()->isNotNull('l.date_identified'));
+        $queryBuilder->andWhere($queryBuilder->expr()->isNotNull('l.date_identified'));
     }
 }
