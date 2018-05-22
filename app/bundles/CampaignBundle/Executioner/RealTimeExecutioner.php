@@ -223,6 +223,16 @@ class RealTimeExecutioner
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId().' for contact ID '.$this->contact->getId());
 
+        if ($event->getEventType() !== Event::TYPE_DECISION) {
+            @trigger_error(
+                "{$event->getType()} is not assigned to a decision and no longer supported. ".
+                'Check that you are executing RealTimeExecutioner::execute for an event registered as a decision.',
+                E_USER_DEPRECATED
+            );
+
+            throw new DecisionNotApplicableException("Event {$event->getId()} is not a decision.");
+        }
+
         // If channels do not match up, there's no need to go further
         if ($channel && $event->getChannel() && $channel !== $event->getChannel()) {
             throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");

@@ -303,6 +303,38 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $responses->containsResponses());
     }
 
+    public function testNonDecisionEventsAreIgnored()
+    {
+        $lead = $this->getMockBuilder(Lead::class)
+            ->getMock();
+        $lead->expects($this->exactly(5))
+            ->method('getId')
+            ->willReturn(10);
+        $lead->expects($this->once())
+            ->method('getChanges')
+            ->willReturn(['notempty' => true]);
+
+        $this->contactTracker->expects($this->once())
+            ->method('getContact')
+            ->willReturn($lead);
+
+        $event = $this->getMockBuilder(Event::class)
+            ->getMock();
+        $event->method('getEventType')
+            ->willReturn(Event::TYPE_CONDITION);
+
+        $event->expects($this->never())
+            ->method('getPositiveChildren');
+
+        $this->eventRepository->expects($this->once())
+            ->method('getContactPendingEvents')
+            ->willReturn([$event]);
+
+        $responses = $this->getExecutioner()->execute('something');
+
+        $this->assertEquals(0, $responses->containsResponses());
+    }
+
     /**
      * @return RealTimeExecutioner
      */
