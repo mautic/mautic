@@ -106,10 +106,10 @@ class SubmissionEvent extends CommonEvent
      */
     public function __construct(Submission $submission, $post, $server, Request $request)
     {
-        $this->entity                = $submission;
-        $this->post                  = $post;
-        $this->server                = $server;
-        $this->request               = $request;
+        $this->entity  = $submission;
+        $this->post    = $post;
+        $this->server  = $server;
+        $this->request = $request;
     }
 
     /**
