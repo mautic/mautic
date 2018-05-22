@@ -316,6 +316,13 @@ return [
                 'class' => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
                 'alias' => 'email_dashboard_emails_in_time_widget',
             ],
+            'mautic.form.type.email_dashboard_sent_email_to_contacts_widget' => [
+                'class'     => \Mautic\EmailBundle\Form\Type\DashboardSentEmailToContactsWidgetType::class,
+                'alias'     => 'email_dashboard_sent_email_to_contacts_widget',
+                'arguments' => [
+                    'mautic.lead.repository.company',
+                ],
+            ],
             'mautic.form.type.email_to_user' => [
                 'class' => Mautic\EmailBundle\Form\Type\EmailToUserType::class,
                 'alias' => 'email_to_user',
@@ -589,6 +596,7 @@ return [
                     'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_contacts',
                     'mautic.tracker.device',
+                    'mautic.lead.repository.company',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [

@@ -47,6 +47,46 @@ class StatRepository extends CommonRepository
     }
 
     /**
+     * @param           $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param int|null  $createdByUserId
+     * @param int|null  $companyId
+     *
+     * @return array
+     */
+    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $createdByUserId = null, $companyId = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('s.*')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
+            ->innerJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
+            ->addSelect('e.name AS email_name')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 's.email_id = ph.email_id AND s.lead_id = ph.lead_id')
+            ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'pr', 'ph.redirect_id = pr.redirect_id')
+            ->addSelect('pr.url AS link_url')
+            ->addSelect('pr.hits AS link_hits');
+        if ($createdByUserId !== null) {
+            $q->andWhere('e.created_by = :userId')
+                ->setParameter('userId', $createdByUserId);
+        }
+        $q->andWhere('s.date_sent BETWEEN :dateFrom AND :dateTo')
+            ->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'))
+            ->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
+        if ($companyId !== null) {
+            $q->innerJoin('s', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 's.lead_id = cl.lead_id')
+                ->andWhere('cl.company_id = :companyId')
+                ->setParameter('companyId', $companyId)
+                ->innerJoin('s', MAUTIC_TABLE_PREFIX.'companies', 'c', 'cl.company_id = c.id')
+                ->addSelect('c.id AS company_id')
+                ->addSelect('c.companyname AS company_name');
+        }
+        $q->setMaxResults($limit);
+
+        return $q->execute()->fetchAll();
+    }
+
+    /**
      * @param      $emailId
      * @param null $listId
      *
