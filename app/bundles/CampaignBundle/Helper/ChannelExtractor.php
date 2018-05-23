@@ -38,18 +38,33 @@ class ChannelExtractor
             return;
         }
 
-        $properties = $event->getProperties();
-        if (!empty($properties['properties'][$channelIdField])) {
-            if (is_array($properties['properties'][$channelIdField])) {
-                if (count($properties['properties'][$channelIdField]) === 1) {
-                    // Only store channel ID if a single item was selected
-                    $entity->setChannelId($properties['properties'][$channelIdField]);
-                }
+        $entity->setChannelId(
+            self::getChannelId($event->getProperties()['properties'], $channelIdField)
+        );
+    }
 
-                return;
-            }
-
-            $entity->setChannelId($properties['properties'][$channelIdField]);
+    /**
+     * @param array  $properties
+     * @param string $channelIdField
+     *
+     * @return null|int
+     */
+    private static function getChannelId(array $properties, $channelIdField)
+    {
+        if (empty($properties[$channelIdField])) {
+            return null;
         }
+
+        $channelId = $properties[$channelIdField];
+        if (is_array($channelId) && (count($channelId) === 1)) {
+            // Only store channel ID if a single item was selected
+            $channelId = reset($channelId);
+        }
+
+        if (!is_numeric($channelId)) {
+            return null;
+        }
+
+        return (int) $channelId;
     }
 }
