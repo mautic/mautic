@@ -263,8 +263,9 @@ trait CustomFieldRepositoryTrait
             $fields = array_diff_key($fields, $changes);
         }
 
+        $this->prepareDbalFieldsForSave($fields);
+
         if (!empty($fields)) {
-            $this->prepareDbalFieldsForSave($fields);
             $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
         }
 
