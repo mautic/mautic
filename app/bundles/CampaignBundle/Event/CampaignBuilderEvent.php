@@ -11,9 +11,9 @@
 
 namespace Mautic\CampaignBundle\Event;
 
+use Mautic\CampaignBundle\Event\Exception\KeyAlreadyRegisteredException;
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -83,7 +83,7 @@ class CampaignBuilderEvent extends Event
     public function addDecision($key, array $decision)
     {
         if (array_key_exists($key, $this->decisions)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another contact action. Please use a different key.");
+            throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
         //check for required keys and that given functions are callable
@@ -153,7 +153,7 @@ class CampaignBuilderEvent extends Event
     public function addCondition($key, array $event)
     {
         if (array_key_exists($key, $this->conditions)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another contact action. Please use a different key.");
+            throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
         //check for required keys and that given functions are callable
@@ -224,7 +224,7 @@ class CampaignBuilderEvent extends Event
     public function addAction($key, array $action)
     {
         if (array_key_exists($key, $this->actions)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
+            throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
         //check for required keys and that given functions are callable
