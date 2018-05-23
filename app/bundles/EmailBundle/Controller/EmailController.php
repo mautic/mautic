@@ -1403,7 +1403,11 @@ class EmailController extends FormController
             ],
         ];
 
-        if ($email === null) {
+        if ($email === null || (!$this->get('mautic.security')->hasEntityAccess(
+                'email:emails:viewown',
+                'email:emails:viewother',
+                $email->getCreatedBy()
+            ))) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -1492,9 +1496,6 @@ class EmailController extends FormController
                             )
                         );
                     } elseif ($emailModel->isLocked($email)) {
-                        //deny access if the entity is locked
-                        return $this->isLocked($postActionVars, $secLead, 'lead');
-                    } elseif ($emailModel->isLocked($secLead)) {
                         //deny access if the entity is locked
                         return $this->isLocked($postActionVars, $secLead, 'lead');
                     }
