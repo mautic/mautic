@@ -34,11 +34,6 @@ class ContactSegmentService
     private $logger;
 
     /**
-     * @var QueryBuilder
-     */
-    private $preparedQB;
-
-    /**
      * @param ContactSegmentFilterFactory $contactSegmentFilterFactory
      * @param ContactSegmentQueryBuilder  $queryBuilder
      * @param Logger                      $logger
@@ -64,10 +59,6 @@ class ContactSegmentService
      */
     private function getNewSegmentContactsQuery(LeadList $segment, $batchLimiters)
     {
-        if (!is_null($this->preparedQB)) {
-            return $this->preparedQB;
-        }
-
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
@@ -86,10 +77,6 @@ class ContactSegmentService
      */
     private function getTotalSegmentContactsQuery(LeadList $segment)
     {
-        if (!is_null($this->preparedQB)) {
-            return $this->preparedQB;
-        }
-
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
