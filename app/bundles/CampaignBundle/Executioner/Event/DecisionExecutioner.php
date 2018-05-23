@@ -102,6 +102,9 @@ class DecisionExecutioner implements EventInterface
                 /* @var DecisionAccessor $config */
                 $this->dispatchEvent($config, $log);
                 $evaluatedContacts->pass($log->getLead());
+
+                // Update the date triggered timestamp
+                $log->setDateTriggered(new \DateTime());
             } catch (DecisionNotApplicableException $exception) {
                 // Fail the contact but remove the log from being processed upstream
                 // active/positive/green path while letting the InactiveExecutioner handle the inactive/negative/red paths

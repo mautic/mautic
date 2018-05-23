@@ -62,6 +62,9 @@ class ConditionExecutioner implements EventInterface
                 $evaluatedContacts->fail($log->getLead());
                 $log->setNonActionPathTaken(true);
             }
+
+            // Unschedule the condition and update date triggered timestamp
+            $log->setDateTriggered(new \DateTime());
         }
 
         return $evaluatedContacts;
