@@ -187,6 +187,10 @@ trait CustomFieldEntityTrait
      */
     public function getFieldValue($field, $group = null)
     {
+        if (property_exists($this, $field)) {
+            return $this->{'get'.ucfirst($field)}();
+        }
+
         if (array_key_exists($field, $this->updatedFields)) {
             return $this->updatedFields[$field];
         }
