@@ -32,6 +32,25 @@ class RemovedContactTracker
     }
 
     /**
+     * @param int   $campaignId
+     * @param array $contacts
+     */
+    public function addRemovedContacts($campaignId, array $contactIds)
+    {
+        foreach ($contactIds as $contactId) {
+            $this->addRemovedContact($campaignId, $contactId);
+        }
+    }
+
+    /**
+     * @param int $campaignId
+     */
+    public function clearRemovedContact($campaignId, $contactId)
+    {
+        unset($this->removedContacts[$campaignId][$contactId]);
+    }
+
+    /**
      * @param int $campaignId
      */
     public function wasContactRemoved($campaignId, $contactId)

@@ -183,8 +183,6 @@ class EventExecutioner
 
         $config = $this->collector->getEventConfig($event);
 
-        $this->checkForRemovedContacts($logs);
-
         if ($counter) {
             // Must pass $counter around rather than setting it as a class property as this class is used
             // circularly to process children of parent events thus counter must be kept track separately
@@ -285,6 +283,8 @@ class EventExecutioner
             $this->responses->setFromLogs($logs);
         }
 
+        $this->checkForRemovedContacts($logs);
+
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
             ->clear();
@@ -300,12 +300,17 @@ class EventExecutioner
          * @var LeadEventLog $log
          */
         foreach ($logs as $key => $log) {
-            $contactId  = $log->getLead()->getId();
+            // Use the deleted ID if the contact was removed by the delete contact action
+            $contact    = $log->getLead();
+            $contactId  = (!empty($contact->deletedId)) ? $contact->deletedId : $contact->getId();
             $campaignId = $log->getCampaign()->getId();
 
             if ($this->removedContactTracker->wasContactRemoved($campaignId, $contactId)) {
                 $this->logger->debug("CAMPAIGN: Contact ID# $contactId has been removed from campaign ID $campaignId");
                 $logs->remove($key);
+
+                // Clear out removed contacts to prevent a memory leak
+                $this->removedContactTracker->clearRemovedContact($campaignId, $contactId);
             }
         }
     }
