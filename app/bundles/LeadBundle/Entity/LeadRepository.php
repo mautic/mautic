@@ -27,7 +27,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class LeadRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
-    use CustomFieldRepositoryTrait;
+    use CustomFieldRepositoryTrait {
+        prepareDbalFieldsForSave as defaultPrepareDbalFieldsForSave;
+    }
+
     use ExpressionHelperTrait;
     use OperatorListTrait;
 
@@ -1168,5 +1171,16 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $entity->setChanges($changes);
             }
         }
+    }
+
+    /**
+     * @param $fields
+     */
+    protected function prepareDbalFieldsForSave(&$fields)
+    {
+        // Do not save points as they are handled by postSaveEntity
+        unset($fields['points']);
+
+        $this->defaultPrepareDbalFieldsForSave($fields);
     }
 }
