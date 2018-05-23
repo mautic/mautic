@@ -1501,7 +1501,7 @@ class EmailController extends FormController
                     }
 
                     $data   = array_merge($data, ['search' => $search]);
-                    $config = ['to'=>implode(',', $data['emails']['list']), 'useremail'=>['email'=>$objectId]];
+                    $config = ['to' => implode(',', $data['emails']['list']), 'useremail' => ['email'=>$objectId]];
                     $this->get('mautic.helper.cookie')->setCookie($cookieVar, serialize($data), 3600 * 24 * 31);
                     try {
                         $this->get('mautic.email.model.send_email_to_user')->sendEmailToUsers($config, $secLead);
