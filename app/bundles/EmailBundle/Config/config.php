@@ -363,6 +363,63 @@ return [
                     'setPassword' => ['%mautic.mailer_password%'],
                 ],
             ],
+            'mautic.transport.momentum' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Transport\MomentumTransport::class,
+                'arguments' => [
+                    'mautic.transport.momentum.callback',
+                    'mautic.transport.momentum.facade',
+                ],
+                'tag'          => 'mautic.email_transport',
+                'tagArguments' => [
+                    \Mautic\EmailBundle\Model\TransportType::TRANSPORT_ALIAS => 'mautic.email.config.mailer_transport.momentum',
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_HOST      => true,
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_PORT      => true,
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_API_KEY   => true,
+                ],
+            ],
+            'mautic.transport.momentum.adapter' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\Adapter::class,
+                'arguments' => [
+                    'mautic.transport.momentum.sparkpost',
+                ],
+            ],
+            'mautic.transport.momentum.service.swift_message' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageService::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.transport.momentum.validator.swift_message' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator\SwiftMessageValidator::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.transport.momentum.callback' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallback::class,
+                'arguments' => [
+                    'mautic.email.model.transport_callback',
+                ],
+            ],
+            'mautic.transport.momentum.facade' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Facade\MomentumFacade::class,
+                'arguments' => [
+                    'mautic.transport.momentum.adapter',
+                    'mautic.transport.momentum.service.swift_message',
+                    'mautic.transport.momentum.validator.swift_message',
+                    'mautic.transport.momentum.callback',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.transport.momentum.sparkpost' => [
+                'class'     => \SparkPost\SparkPost::class,
+                'factory'   => ['@mautic.sparkpost.factory', 'create'],
+                'arguments' => [
+                    '%mautic.mailer_host%',
+                    '%mautic.mailer_api_key%',
+                    '%mautic.mailer_port%',
+                ],
+            ],
             'mautic.transport.sendgrid' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
@@ -464,6 +521,19 @@ return [
                     'translator',
                     'mautic.email.model.transport_callback',
                 ],
+            ],
+            'mautic.sparkpost.factory' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactory::class,
+                'arguments' => [
+                    'mautic.guzzle.client',
+                ],
+            ],
+            'mautic.guzzle.client.factory' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\Guzzle\ClientFactory::class,
+            ],
+            'mautic.guzzle.client' => [
+                'class'     => \Http\Adapter\Guzzle6\Client::class,
+                'factory'   => ['@mautic.guzzle.client.factory', 'create'],
             ],
             'mautic.helper.mailbox' => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
@@ -654,6 +724,7 @@ return [
         'mailer_encryption'            => null, //tls or ssl,
         'mailer_auth_mode'             => null, //plain, login or cram-md5
         'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
+        'mailer_custom_headers'        => [],
         'mailer_spool_type'            => 'memory', //memory = immediate; file = queue
         'mailer_spool_path'            => '%kernel.root_dir%/spool',
         'mailer_spool_msg_limit'       => null,

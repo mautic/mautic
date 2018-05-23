@@ -63,6 +63,23 @@ class TokenHelper
     }
 
     /**
+     * Returns correct token value from provided list of tokens and the concrete token.
+     *
+     * @param array  $tokens like ['{contactfield=website}' => 'https://mautic.org']
+     * @param string $token  like '{contactfield=website|https://default.url}'
+     *
+     * @return string empty string if no match
+     */
+    public static function getValueFromTokens(array $tokens, $token)
+    {
+        $token   = str_replace(['{', '}'], '', $token);
+        $alias   = self::getFieldAlias($token);
+        $default = self::getTokenDefaultValue($token);
+
+        return empty($tokens["{{$alias}}"]) ? $default : $tokens["{{$alias}}"];
+    }
+
+    /**
      * @param array $lead
      * @param       $alias
      * @param       $defaultValue
