@@ -12,14 +12,14 @@
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class LeadModelFunctionalTest extends MauticWebTestCase
+class LeadModelFunctionalTest extends MauticMysqlTestCase
 {
     private $pointsAdded = false;
 
@@ -75,6 +75,7 @@ class LeadModelFunctionalTest extends MauticWebTestCase
 
     public function testMergedContactsPointsAreAccurate()
     {
+        /** @var LeadModel $model */
         $model = $this->container->get('mautic.lead.model.lead');
         /** @var EntityManager $em */
         $em   = $this->container->get('doctrine.orm.entity_manager');
@@ -85,7 +86,9 @@ class LeadModelFunctionalTest extends MauticWebTestCase
             ->setLastname('Smith')
             ->setEmail('jane.smith@test.com')
             ->setPoints(50);
+
         $model->saveEntity($jane);
+
         $em->clear(Lead::class);
         $jane = $model->getEntity($jane->getId());
         $this->assertEquals(50, $jane->getPoints());
