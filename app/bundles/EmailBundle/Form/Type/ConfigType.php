@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\Form\AbstractType;
@@ -53,6 +54,22 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber(
+            new CleanFormSubscriber(
+                [
+                    'mailer_from_email'      => 'email',
+                    'mailer_return_path'     => 'email',
+                    'default_signature_text' => 'html',
+                    'unsubscribe_text'       => 'html',
+                    'unsubscribe_message'    => 'html',
+                    'resubscribe_message'    => 'html',
+                    'webview_text'           => 'html',
+                    // Encode special chars to keep congruent with Email entity custom headers
+                    'mailer_custom_headers'  => 'clean',
+                ]
+            )
+        );
+
         $builder->add(
             'unsubscribe_text',
             'textarea',

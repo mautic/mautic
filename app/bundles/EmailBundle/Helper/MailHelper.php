@@ -369,9 +369,6 @@ class MailHelper
 
         if (empty($this->fatal)) {
             if (!$isQueueFlush) {
-                // Only add unsubscribe header to one-off sends as tokenized sends are built by the transport
-                $this->addUnsubscribeHeader();
-
                 // Search/replace tokens if this is not a queue flush
 
                 // Generate tokens from listeners
@@ -390,6 +387,8 @@ class MailHelper
                 $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
             }
             $this->setMessagePlainText();
+
+            $this->setMessageHeaders();
 
             if (!$isQueueFlush) {
                 // Replace token content
@@ -436,8 +435,6 @@ class MailHelper
                     }
                 }
             }
-
-            $this->setMessageHeaders();
 
             try {
                 $failures = [];
@@ -678,6 +675,7 @@ class MailHelper
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
             $this->headers             = [];
+            $this->systemHeaders       = [];
             $this->source              = [];
             $this->assets              = [];
             $this->globalTokens        = [];
@@ -1434,6 +1432,9 @@ class MailHelper
 
         // Set custom headers
         if ($headers = $email->getHeaders()) {
+            // HTML decode headers
+            $headers = array_map('html_entity_decode', $headers);
+
             foreach ($headers as $name => $value) {
                 $this->addCustomHeader($name, $value);
             }
@@ -1473,21 +1474,37 @@ class MailHelper
      */
     public function getCustomHeaders()
     {
-        $headers       = $this->headers;
-        $systemHeaders = $this->getSystemHeaders();
+        $headers = array_merge($this->headers, $this->getSystemHeaders());
 
-        return array_merge($headers, $systemHeaders);
+        $listUnsubscribeHeader = $this->getUnsubscribeHeader();
+        if ($listUnsubscribeHeader) {
+            if (!empty($headers['List-Unsubscribe'])) {
+                // Ensure Mautic's is always part of this header
+                $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
+            } else {
+                $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
+            }
+        }
+
+        return $headers;
     }
 
     /**
-     * Generate and insert List-Unsubscribe header.
+     * @return bool|string
      */
-    private function addUnsubscribeHeader()
+    private function getUnsubscribeHeader()
     {
-        if (isset($this->idHash)) {
-            $unsubscribeLink                   = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], true);
-            $this->headers['List-Unsubscribe'] = "<$unsubscribeLink>";
+        if ($this->idHash) {
+            $url = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], true);
+
+            return "<$url>";
         }
+
+        if (!empty($this->queuedRecipients) || !empty($this->lead)) {
+            return '<{unsubscribe_url}>';
+        }
+
+        return false;
     }
 
     /**
@@ -2081,6 +2098,9 @@ class MailHelper
         if (!$systemHeaders = $this->factory->getParameter('mailer_custom_headers', [])) {
             return [];
         }
+
+        // HTML decode headers
+        $systemHeaders = array_map('html_entity_decode', $systemHeaders);
 
         return $systemHeaders;
     }
