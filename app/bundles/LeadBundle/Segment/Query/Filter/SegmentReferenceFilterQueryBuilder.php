@@ -114,6 +114,8 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->setParameter($key, $value);
             }
 
+            $this->leadSegmentQueryBuilder->queryBuilderGenerated($contactSegment, $segmentQueryBuilder);
+
             $segmentAlias = $this->generateRandomParameterName();
             if ($exclusion) {
                 $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');

@@ -64,6 +64,8 @@ class ContactSegmentService
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
         $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
 
+        $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
+
         return $queryBuilder;
     }
 

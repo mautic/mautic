@@ -535,6 +535,16 @@ final class LeadEvents
     const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
 
     /**
+     * The mautic.list_filters_querybuilder_generated event is dispatched when the queryBuilder for segment was generated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent instance.
+     *
+     * @var string
+     */
+    const LIST_FILTERS_QUERYBUILDER_GENERATED = 'mautic.list_filters_querybuilder_generated';
+
+    /**
      * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.
      *
      * The event listener receives a

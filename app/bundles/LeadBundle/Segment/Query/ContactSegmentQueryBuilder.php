@@ -12,7 +12,9 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
+use Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilters;
@@ -83,7 +85,7 @@ class ContactSegmentQueryBuilder
 
             $queryBuilder = $filter->applyQuery($queryBuilder);
 
-            if ($this->dispatcher && $this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
+            if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
                 $alias = $this->generateRandomParameterName();
                 $event = new LeadListFilteringEvent($filterCrate, null, $alias, $filterCrate['operator'], $queryBuilder, $this->entityManager);
                 $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
@@ -236,6 +238,20 @@ class ContactSegmentQueryBuilder
         $queryBuilder->andWhere($queryBuilder->expr()->isNull($tableAlias.'.lead_id'));
 
         return $queryBuilder;
+    }
+
+    /**
+     * @param LeadList     $segment
+     * @param QueryBuilder $queryBuilder
+     */
+    public function queryBuilderGenerated(LeadList $segment, QueryBuilder $queryBuilder)
+    {
+        if (!$this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED)) {
+            return;
+        }
+
+        $event = new LeadListQueryBuilderGeneratedEvent($segment, $queryBuilder);
+        $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED, $event);
     }
 
     /**
