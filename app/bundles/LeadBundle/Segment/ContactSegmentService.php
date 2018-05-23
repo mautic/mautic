@@ -50,46 +50,6 @@ class ContactSegmentService
 
     /**
      * @param LeadList $segment
-     * @param          $batchLimiters
-     *
-     * @return QueryBuilder
-     *
-     * @throws Exception\SegmentQueryException
-     * @throws \Exception
-     */
-    private function getNewSegmentContactsQuery(LeadList $segment, $batchLimiters)
-    {
-        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
-
-        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
-        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
-
-        $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
-
-        return $queryBuilder;
-    }
-
-    /**
-     * @param LeadList $segment
-     *
-     * @return QueryBuilder
-     *
-     * @throws Exception\SegmentQueryException
-     * @throws \Exception
-     */
-    private function getTotalSegmentContactsQuery(LeadList $segment)
-    {
-        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
-
-        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
-        $queryBuilder = $this->contactSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $segment->getId());
-        $queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $segment->getId());
-
-        return $queryBuilder;
-    }
-
-    /**
-     * @param LeadList $segment
      * @param array    $batchLimiters
      *
      * @return array
@@ -198,33 +158,6 @@ class ContactSegmentService
     /**
      * @param LeadList $segment
      *
-     * @return QueryBuilder
-     *
-     * @throws Exception\SegmentQueryException
-     * @throws \Exception
-     */
-    private function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment)
-    {
-        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
-
-        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
-
-        $qbO = new QueryBuilder($queryBuilder->getConnection());
-        $qbO->select('orp.lead_id as id, orp.leadlist_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
-        $qbO->leftJoin('orp', '('.$queryBuilder->getSQL().')', 'members', 'members.id=orp.lead_id');
-        $qbO->setParameters($queryBuilder->getParameters());
-        $qbO->andWhere($qbO->expr()->eq('orp.leadlist_id', ':orpsegid'));
-        $qbO->andWhere($qbO->expr()->isNull('members.id'));
-        $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));
-        $qbO->setParameter(':orpsegid', $segment->getId());
-
-        return $qbO;
-    }
-
-    /**
-     * @param LeadList $segment
-     *
      * @return array
      *
      * @throws Exception\SegmentQueryException
@@ -260,6 +193,104 @@ class ContactSegmentService
 
         return [$segment->getId() => $result];
     }
+
+    /**
+     * @param LeadList $segment
+     * @param          $batchLimiters
+     *
+     * @return QueryBuilder
+     *
+     * @throws Exception\SegmentQueryException
+     * @throws \Exception
+     */
+    private function getNewSegmentContactsQuery(LeadList $segment, $batchLimiters)
+    {
+        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+
+        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
+        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
+
+        $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param LeadList $segment
+     *
+     * @return QueryBuilder
+     *
+     * @throws Exception\SegmentQueryException
+     * @throws \Exception
+     */
+    private function getTotalSegmentContactsQuery(LeadList $segment)
+    {
+        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+
+        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
+        $queryBuilder = $this->contactSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $segment->getId());
+        $queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $segment->getId());
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param LeadList $segment
+     *
+     * @return QueryBuilder
+     *
+     * @throws Exception\SegmentQueryException
+     * @throws \Exception
+     */
+    private function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment)
+    {
+        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+
+        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
+
+        $qbO = new QueryBuilder($queryBuilder->getConnection());
+        $qbO->select('orp.lead_id as id, orp.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
+        $qbO->leftJoin('orp', '('.$queryBuilder->getSQL().')', 'members', 'members.id=orp.lead_id');
+        $qbO->setParameters($queryBuilder->getParameters());
+        $qbO->andWhere($qbO->expr()->eq('orp.leadlist_id', ':orpsegid'));
+        $qbO->andWhere($qbO->expr()->isNull('members.id'));
+        $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));
+        $qbO->setParameter(':orpsegid', $segment->getId());
+
+        return $qbO;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param array        $batchLimiters
+     */
+    private function addMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters)
+    {
+        if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->comparison('l.id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
+            );
+        } elseif (!empty($batchLimiters['maxId'])) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->lte('l.id', $batchLimiters['maxId'])
+            );
+        } elseif (!empty($batchLimiters['minId'])) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->gte('l.id', $queryBuilder->expr()->literal((int) $batchLimiters['minId']))
+            );
+        }
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     */
+    private function excludeVisitors(QueryBuilder $queryBuilder)
+    {
+        $queryBuilder->andWhere($queryBuilder->expr()->isNotNull('l.date_identified'));
+    }
+
+    /***** DEBUG *****/
 
     /**
      * Formatting helper.
@@ -328,34 +359,5 @@ class ContactSegmentService
         }
 
         return $result;
-    }
-
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param array        $batchLimiters
-     */
-    private function addMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters)
-    {
-        if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->comparison('l.id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
-            );
-        } elseif (!empty($batchLimiters['maxId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->lte('l.id', $batchLimiters['maxId'])
-            );
-        } elseif (!empty($batchLimiters['minId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->gte('l.id', $queryBuilder->expr()->literal((int) $batchLimiters['minId']))
-            );
-        }
-    }
-
-    /**
-     * @param QueryBuilder $queryBuilder
-     */
-    private function excludeVisitors(QueryBuilder $queryBuilder)
-    {
-        $queryBuilder->andWhere($queryBuilder->expr()->isNotNull('l.date_identified'));
     }
 }
