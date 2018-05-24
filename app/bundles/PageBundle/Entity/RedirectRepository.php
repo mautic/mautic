@@ -97,11 +97,20 @@ class RedirectRepository extends CommonRepository
      * @param \DateTime $dateTo
      * @param int|null  $createdByUserId
      * @param int|null  $companyId
+     * @param int|null  $campaignId
+     * @param int|null  $segmentId
      *
      * @return array
      */
-    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $createdByUserId = null, $companyId = null)
-    {
+    public function getMostHitEmailRedirects(
+        $limit,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        $createdByUserId = null,
+        $companyId = null,
+        $campaignId = null,
+        $segmentId = null
+    ) {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->addSelect('pr.id')
             ->addSelect('pr.url')
@@ -123,6 +132,22 @@ class RedirectRepository extends CommonRepository
             $q->innerJoin('ph', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'ph.lead_id = cl.lead_id')
                 ->andWhere('cl.company_id = :companyId')
                 ->setParameter('companyId', $companyId);
+        }
+
+        if ($campaignId !== null) {
+            $q->innerJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source_id = ce.id AND s.source = "campaign.event"')
+                ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+                ->andWhere('ce.campaign_id = :campaignId')
+                ->setParameter('campaignId', $campaignId)
+                ->addSelect('campaign.id AS campaign_id')
+                ->addSelect('campaign.name AS campaign_name');
+        }
+        if ($segmentId !== null) {
+            $q->innerJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 's.list_id = ll.id')
+                ->andWhere('s.list_id = :segmentId')
+                ->setParameter('segmentId', $segmentId)
+                ->addSelect('ll.id AS segment_id')
+                ->addSelect('ll.name AS segment_name');
         }
         $q->setMaxResults($limit);
 

@@ -127,16 +127,24 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 if (isset($params['companyId'])) {
                     $companyId = $params['companyId'];
                 }
+                $campaignId = null;
+                if (isset($params['campaignId'])) {
+                    $campaignId = $params['campaignId'];
+                }
+                $segmentId = null;
+                if (isset($params['segmentId'])) {
+                    $segmentId = $params['segmentId'];
+                }
                 $event->setTemplateData(
                     [
                         'headItems' => [
                             'mautic.dashboard.label.contact.id',
                             'mautic.dashboard.label.contact.email.address',
                             'mautic.dashboard.label.contact.open',
-                            'mautic.dashboard.label.contact.click',
-                            'mautic.dashboard.label.contact.links.clicked',
                             'mautic.dashboard.label.email.id',
                             'mautic.dashboard.label.email.name',
+                            'mautic.dashboard.label.contact.click',
+                            'mautic.dashboard.label.contact.links.clicked',
                             'mautic.dashboard.label.segment.id',
                             'mautic.dashboard.label.segment.name',
                             'mautic.dashboard.label.contact.company.id',
@@ -147,7 +155,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
                             $params['dateFrom'],
                             $params['dateTo'],
                             ['groupBy' => 'sends', 'canViewOthers' => $canViewOthers],
-                            $companyId
+                            $companyId,
+                            $segmentId,
+                            $campaignId
                         ),
                     ]
                 );
@@ -172,6 +182,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 if (isset($params['companyId'])) {
                     $companyId = $params['companyId'];
                 }
+                $campaignId = null;
+                if (isset($params['campaignId'])) {
+                    $campaignId = $params['campaignId'];
+                }
+                $segmentId = null;
+                if (isset($params['segmentId'])) {
+                    $segmentId = $params['segmentId'];
+                }
                 $event->setTemplateData([
                     'headItems' => [
                         'mautic.dashboard.label.url',
@@ -185,7 +203,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFrom'],
                         $params['dateTo'],
                         ['groupBy' => 'sends', 'canViewOthers' => $canViewOthers],
-                        $companyId
+                        $companyId,
+                        $campaignId,
+                        $segmentId
                     ),
                 ]);
             }

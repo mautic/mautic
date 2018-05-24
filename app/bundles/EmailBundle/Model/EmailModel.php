@@ -557,16 +557,18 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param \DateTime $dateTo
      * @param array     $options
      * @param int|null  $companyId
+     * @param int|null  $campaignId
+     * @param int|null  $segmentId
      *
      * @return array
      */
-    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null)
+    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
     {
         $createdByUserId = null;
         if (!empty($options['canViewOthers'])) {
             $createdByUserId = $this->userHelper->getUser()->getId();
         }
-        $stats = $this->getStatRepository()->getSentEmailToContactData($limit, $dateFrom, $dateTo, $createdByUserId, $companyId);
+        $stats = $this->getStatRepository()->getSentEmailToContactData($limit, $dateFrom, $dateTo, $createdByUserId, $companyId, $campaignId, $segmentId);
         $data  = [];
         foreach ($stats as $stat) {
             $statId = $stat['id'];
@@ -583,7 +585,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 if ($stat['link_url'] !== null) {
                     $item['links_clicked'][] = $stat['link_url'];
                 }
-                if (isset($stat['companyId'])) {
+                /*if (isset($stat['campaign_id'])) {
+                    $item['campaign_id']   = $stat['campaign_id'];
+                    $item['campaign_name'] = $stat['campaign_name'];
+                }*/
+                if (isset($stat['segment_id'])) {
+                    $item['segment_id']   = $stat['segment_id'];
+                    $item['segment_name'] = $stat['segment_name'];
+                }
+                if (isset($stat['company_id'])) {
                     $item['company_id']   = $stat['company_id'];
                     $item['company_name'] = $stat['company_name'];
                 }
@@ -607,17 +617,31 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param \DateTime $dateTo
      * @param array     $options
      * @param int|null  $companyId
+     * @param int|null  $campaignId
+     * @param int|null  $segmentId
      *
      * @return array
      */
-    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null)
+    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
     {
         $createdByUserId = null;
         if (!empty($options['canViewOthers'])) {
             $createdByUserId = $this->userHelper->getUser()->getId();
         }
 
-        return $this->redirectRepository->getMostHitEmailRedirects($limit, $dateFrom, $dateTo, $createdByUserId, $companyId);
+        $redirects = $this->redirectRepository->getMostHitEmailRedirects($limit, $dateFrom, $dateTo, $createdByUserId, $companyId, $campaignId, $segmentId);
+        $data      = [];
+        foreach ($redirects as $redirect) {
+            $data[] = [
+                'url'         => $redirect['url'],
+                'unique_hits' => $redirect['unique_hits'],
+                'hits'        => $redirect['hits'],
+                'email_id'    => $redirect['email_id'],
+                'email_name'  => $redirect['email_name'],
+            ];
+        }
+
+        return $data;
     }
 
     /**

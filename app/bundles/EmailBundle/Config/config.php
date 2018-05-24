@@ -320,14 +320,18 @@ return [
                 'class'     => \Mautic\EmailBundle\Form\Type\DashboardSentEmailToContactsWidgetType::class,
                 'alias'     => 'email_dashboard_sent_email_to_contacts_widget',
                 'arguments' => [
+                    'mautic.campaign.repository.campaign',
                     'mautic.lead.repository.company',
+                    'mautic.lead.repository.lead_list',
                 ],
             ],
             'mautic.form.type.email_dashboard_most_hit_email_redirects_widget' => [
                 'class'     => \Mautic\EmailBundle\Form\Type\DashboardMostHitEmailRedirectsWidgetType::class,
                 'alias'     => 'email_dashboard_most_hit_email_redirects_widget',
                 'arguments' => [
+                    'mautic.campaign.repository.campaign',
                     'mautic.lead.repository.company',
+                    'mautic.lead.repository.lead_list',
                 ],
             ],
             'mautic.form.type.email_to_user' => [

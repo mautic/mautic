@@ -238,6 +238,15 @@ return [
                 ],
             ],
         ],
+        'repositories' => [
+            'mautic.campaign.repository.campaign' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\CampaignBundle\Entity\Campaign::class,
+                ],
+            ],
+        ],
     ],
     'parameters' => [
         'campaign_time_wait_on_event_false' => 'PT1H',

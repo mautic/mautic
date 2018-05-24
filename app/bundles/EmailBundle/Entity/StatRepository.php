@@ -52,11 +52,20 @@ class StatRepository extends CommonRepository
      * @param \DateTime $dateTo
      * @param int|null  $createdByUserId
      * @param int|null  $companyId
+     * @param int|null  $campaignId
+     * @param int|null  $segmentId
      *
      * @return array
      */
-    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $createdByUserId = null, $companyId = null)
-    {
+    public function getSentEmailToContactData(
+        $limit,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        $createdByUserId = null,
+        $companyId = null,
+        $campaignId = null,
+        $segmentId = null
+    ) {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.*')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
@@ -80,6 +89,21 @@ class StatRepository extends CommonRepository
                 ->innerJoin('s', MAUTIC_TABLE_PREFIX.'companies', 'c', 'cl.company_id = c.id')
                 ->addSelect('c.id AS company_id')
                 ->addSelect('c.companyname AS company_name');
+        }
+        if ($campaignId !== null) {
+            $q->innerJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source_id = ce.id AND s.source = "campaign.event"')
+                ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+                ->andWhere('ce.campaign_id = :campaignId')
+                ->setParameter('campaignId', $campaignId)
+                ->addSelect('campaign.id AS campaign_id')
+                ->addSelect('campaign.name AS campaign_name');
+        }
+        if ($segmentId !== null) {
+            $q->innerJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 's.list_id = ll.id')
+                ->andWhere('s.list_id = :segmentId')
+                ->setParameter('segmentId', $segmentId)
+                ->addSelect('ll.id AS segment_id')
+                ->addSelect('ll.name AS segment_name');
         }
         $q->setMaxResults($limit);
 
