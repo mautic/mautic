@@ -31,6 +31,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\EmailBundle\Swiftmailer\Exception\AmazonSesQuotaExceedException;
 
 /**
  * Class AmazonTransport.
@@ -99,7 +100,7 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
     }
 
     /**
-     * @return mixed
+     * @return string $region
      */
     public function getRegion()
     {
@@ -162,7 +163,7 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
                 $this->getPassword()
             ),
             'region'  => $this->getRegion(),
-            'version' => 'latest',
+            'version' => '2010-12-01',
         ]);
 
         /**
@@ -175,7 +176,7 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
         if ($emailQuoteRemaining > 0) {
             $this->started = true;
         } else {
-            throw new \Exception('Your AWS SES quota is exceeded');
+            throw new AmazonSesQuotaExceedException('Your AWS SES quota is exceeded');
         }
 
         return $client;
@@ -249,10 +250,10 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
     }
 
     /**
-     * @param type $evt
-     * @param type $failedRecipients
+     * @param \Swift_Events_SendEvent $evt
+     * @param array $failedRecipients
      */
-    private function triggerSendError($evt, $failedRecipients)
+    private function triggerSendError(\Swift_Events_SendEvent $evt, $failedRecipients)
     {
         $failedRecipients = array_merge(
             $failedRecipients,
@@ -343,11 +344,12 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
 
     /**
      * @param \Swift_Mime_Message $message
+     * @param \Swift_Events_SendEvent @evt
      * @param null                $failedRecipients
      *
      * @return array
      */
-    public function sendRawEmail(\Swift_Mime_Message $message, $evt, &$failedRecipients = null)
+    public function sendRawEmail(\Swift_Mime_Message $message, \Swift_Events_SendEvent $evt, &$failedRecipients = null)
     {
         try {
             $client   = $this->start();
