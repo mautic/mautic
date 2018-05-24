@@ -148,6 +148,8 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->exactly(3))
             ->method('getChannel')
             ->willReturn('email');
+        $event->method('getEventType')
+            ->willReturn(Event::TYPE_DECISION);
 
         $this->eventRepository->expects($this->once())
             ->method('getContactPendingEvents')
@@ -181,6 +183,8 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->exactly(3))
             ->method('getChannelId')
             ->willReturn(3);
+        $event->method('getEventType')
+            ->willReturn(Event::TYPE_DECISION);
 
         $this->eventRepository->expects($this->once())
             ->method('getContactPendingEvents')
@@ -217,6 +221,8 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->once())
             ->method('getPositiveChildren')
             ->willReturn(new ArrayCollection());
+        $event->method('getEventType')
+            ->willReturn(Event::TYPE_DECISION);
 
         $this->eventRepository->expects($this->once())
             ->method('getContactPendingEvents')
@@ -265,6 +271,8 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->exactly(2))
             ->method('getChannelId')
             ->willReturn(3);
+        $event->method('getEventType')
+            ->willReturn(Event::TYPE_DECISION);
         $event->expects($this->once())
             ->method('getPositiveChildren')
             ->willReturn(new ArrayCollection([$action1, $action2]));
