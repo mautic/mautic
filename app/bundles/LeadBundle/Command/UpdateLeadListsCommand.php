@@ -61,7 +61,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 try {
                     $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
                 } catch (QueryException $e) {
-                    $this->getContainer()->get('mautic.logger')->error('Query Builder Exception: '.$e->getMessage());
+                    $this->getContainer()->get('monolog.logger.mautic')->error('Query Builder Exception: '.$e->getMessage());
                 }
 
                 $output->writeln(
