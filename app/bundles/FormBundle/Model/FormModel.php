@@ -788,24 +788,31 @@ class FormModel extends CommonFormModel
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
         $formName = $form->generateFormName();
-        $lead     = $this->leadModel->getCurrentLead();
+        $fields   = $form->getFields();
+        /** @var \Mautic\FormBundle\Entity\Field $f */
+        foreach ($fields as $key=> $f) {
+            $leadField  = $f->getLeadField();
+            $isAutoFill = $f->getIsAutoFill();
 
+            if (!isset($leadField) || !$isAutoFill) {
+                unset($fields[$key]);
+            }
+        }
+        // no fields for populate
+        if (empty($fields)) {
+            return;
+        }
+
+        $lead     = $this->leadModel->getCurrentLead();
         if (!$lead instanceof Lead) {
             return;
         }
 
-        $fields = $form->getFields();
-        /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
-            $leadField  = $f->getLeadField();
-            $isAutoFill = $f->getIsAutoFill();
+            $value = $lead->getFieldValue($leadField);
 
-            if (isset($leadField) && $isAutoFill) {
-                $value = $lead->getFieldValue($leadField);
-
-                if (!empty($value)) {
-                    $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
-                }
+            if (!empty($value)) {
+                $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
             }
         }
     }
