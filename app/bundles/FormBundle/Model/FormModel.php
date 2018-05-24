@@ -799,7 +799,7 @@ class FormModel extends CommonFormModel
             }
         }
         // no fields for populate
-        if (empty($fields)) {
+        if (!count($fields)) {
             return;
         }
 
