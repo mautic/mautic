@@ -135,21 +135,26 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 if (isset($params['segmentId'])) {
                     $segmentId = $params['segmentId'];
                 }
+                $headItems = [
+                    'mautic.dashboard.label.contact.id',
+                    'mautic.dashboard.label.contact.email.address',
+                    'mautic.dashboard.label.contact.open',
+                    'mautic.dashboard.label.email.id',
+                    'mautic.dashboard.label.email.name',
+                    'mautic.dashboard.label.contact.click',
+                    'mautic.dashboard.label.contact.links.clicked',
+                ];
+                if ($segmentId !== null) {
+                    $headItems[] = 'mautic.dashboard.label.segment.id';
+                    $headItems[] = 'mautic.dashboard.label.segment.name';
+                }
+                if ($companyId !== null) {
+                    $headItems[] = 'mautic.dashboard.label.company.id';
+                    $headItems[] = 'mautic.dashboard.label.company.name';
+                }
                 $event->setTemplateData(
                     [
-                        'headItems' => [
-                            'mautic.dashboard.label.contact.id',
-                            'mautic.dashboard.label.contact.email.address',
-                            'mautic.dashboard.label.contact.open',
-                            'mautic.dashboard.label.email.id',
-                            'mautic.dashboard.label.email.name',
-                            'mautic.dashboard.label.contact.click',
-                            'mautic.dashboard.label.contact.links.clicked',
-                            'mautic.dashboard.label.segment.id',
-                            'mautic.dashboard.label.segment.name',
-                            'mautic.dashboard.label.contact.company.id',
-                            'mautic.dashboard.label.contact.company.name',
-                        ],
+                        'headItems' => $headItems,
                         'bodyItems' => $this->emailModel->getSentEmailToContactData(
                             $limit,
                             $params['dateFrom'],
