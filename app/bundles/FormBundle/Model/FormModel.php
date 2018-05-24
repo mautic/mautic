@@ -613,8 +613,6 @@ class FormModel extends CommonFormModel
     public function deleteEntity($entity)
     {
         /* @var Form $entity */
-        parent::deleteEntity($entity);
-
         $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
@@ -623,6 +621,7 @@ class FormModel extends CommonFormModel
             $schemaHelper->deleteTable('form_results_'.$entity->deletedId.'_'.$entity->getAlias());
             $schemaHelper->executeChanges();
         }
+        parent::deleteEntity($entity);
     }
 
     /**
@@ -788,31 +787,24 @@ class FormModel extends CommonFormModel
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
         $formName = $form->generateFormName();
-        $fields   = $form->getFields();
-        /** @var \Mautic\FormBundle\Entity\Field $f */
-        foreach ($fields as $key=> $f) {
-            $leadField  = $f->getLeadField();
-            $isAutoFill = $f->getIsAutoFill();
-
-            if (!isset($leadField) || !$isAutoFill) {
-                unset($fields[$key]);
-            }
-        }
-        // no fields for populate
-        if (!count($fields)) {
-            return;
-        }
-
         $lead     = $this->leadModel->getCurrentLead();
+
         if (!$lead instanceof Lead) {
             return;
         }
 
-        foreach ($fields as $f) {
-            $value = $lead->getFieldValue($leadField);
+        $fields = $form->getFields();
+        /** @var \Mautic\FormBundle\Entity\Field $field */
+        foreach ($fields as $field) {
+            $leadField  = $field->getLeadField();
+            $isAutoFill = $field->getIsAutoFill();
 
-            if (!empty($value)) {
-                $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
+            if (isset($leadField) && $isAutoFill) {
+                $value = $lead->getFieldValue($leadField);
+
+                if (!empty($value)) {
+                    $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
+                }
             }
         }
     }
