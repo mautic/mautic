@@ -135,7 +135,7 @@ class RedirectRepository extends CommonRepository
         }
 
         if ($campaignId !== null) {
-            $q->innerJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source_id = ce.id AND s.source = "campaign.event"')
+            $q->innerJoin('ph', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'ph.source_id = ce.id AND ph.source = "campaign.event"')
                 ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
                 ->andWhere('ce.campaign_id = :campaignId')
                 ->setParameter('campaignId', $campaignId)
@@ -143,8 +143,9 @@ class RedirectRepository extends CommonRepository
                 ->addSelect('campaign.name AS campaign_name');
         }
         if ($segmentId !== null) {
-            $q->innerJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 's.list_id = ll.id')
-                ->andWhere('s.list_id = :segmentId')
+            $q->innerJoin('ph', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'ph.lead_id = lll.lead_id')
+                ->innerJoin('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'lll.leadlist_id = ll.id')
+                ->andWhere('lll.leadlist_id = :segmentId')
                 ->setParameter('segmentId', $segmentId)
                 ->addSelect('ll.id AS segment_id')
                 ->addSelect('ll.name AS segment_name');
