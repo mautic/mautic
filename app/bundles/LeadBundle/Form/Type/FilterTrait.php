@@ -73,10 +73,10 @@ trait FilterTrait
                     $data['filter'] = [$data['filter']];
                 }
 
-                $customOptions['choices']  = $options['assets'];
-                $customOptions['multiple'] = true;
+                $customOptions['choices']                   = $options['assets'];
+                $customOptions['multiple']                  = true;
                 $customOptions['choice_translation_domain'] = false;
-                $type                      = 'choice';
+                $type                                       = 'choice';
                 break;
             case 'leadlist':
                 if (!isset($data['filter'])) {
