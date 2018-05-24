@@ -248,6 +248,8 @@ class ContactSegmentService
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
 
+        $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
+
         $qbO = new QueryBuilder($queryBuilder->getConnection());
         $qbO->select('orp.lead_id as id, orp.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
