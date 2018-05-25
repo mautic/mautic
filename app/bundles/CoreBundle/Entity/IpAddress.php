@@ -91,6 +91,16 @@ class IpAddress
     }
 
     /**
+     * IpAddress constructor.
+     *
+     * @param null $ipAddress
+     */
+    public function __construct($ipAddress = null)
+    {
+        $this->ipAddress = $ipAddress;
+    }
+
+    /**
      * Get id.
      *
      * @return int

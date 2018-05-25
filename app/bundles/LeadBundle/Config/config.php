@@ -730,6 +730,23 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.lead.merger' => [
+                'class'     => \Mautic\LeadBundle\Deduplicate\ContactMerger::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.repository.merged_records',
+                    'event_dispatcher',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.lead.deduper' => [
+                'class'     => \Mautic\LeadBundle\Deduplicate\ContactDeduper::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.merger',
+                    'mautic.lead.repository.lead',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.dnc' => [
@@ -799,6 +816,15 @@ return [
                     'mautic.user.provider',
                     'mautic.tracker.contact',
                     'mautic.tracker.device',
+                    'mautic.lead.model.legacy_lead',
+                ],
+            ],
+
+            // Deprecated support for circular dependency
+            'mautic.lead.model.legacy_lead' => [
+                'class'     => \Mautic\LeadBundle\Model\LegacyLeadModel::class,
+                'arguments' => [
+                    'service_container',
                 ],
             ],
             'mautic.lead.model.field' => [
@@ -914,6 +940,16 @@ return [
                     'mautic.lead.service.device_tracking_service',
                     'monolog.logger.mautic',
                 ],
+            ],
+        ],
+        'command' => [
+            'mautic.lead.command.deduplicate' => [
+                'class'     => \Mautic\LeadBundle\Command\DeduplicateCommand::class,
+                'arguments' => [
+                    'mautic.lead.deduper',
+                    'translator',
+                ],
+                'tag' => 'console.command',
             ],
         ],
     ],
