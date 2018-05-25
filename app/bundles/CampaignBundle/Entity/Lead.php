@@ -134,7 +134,7 @@ class Lead
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\Lead
      */
     public function getLead()
     {
@@ -142,9 +142,9 @@ class Lead
     }
 
     /**
-     * @param mixed $lead
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
      */
-    public function setLead($lead)
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
         $this->lead = $lead;
     }
@@ -160,7 +160,7 @@ class Lead
     /**
      * @param Campaign $campaign
      */
-    public function setCampaign($campaign)
+    public function setCampaign(Campaign $campaign)
     {
         $this->campaign = $campaign;
     }

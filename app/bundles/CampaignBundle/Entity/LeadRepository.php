@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -308,8 +309,64 @@ class LeadRepository extends CommonRepository
         return $totalCount;
     }
 
+    /**
+     * @param array    $contactIds
+     * @param Campaign $campaign
+     *
+     * @return array
+     */
     public function getCampaignMembers(array $contactIds, Campaign $campaign)
     {
-        return $this->createQueryBuilder('l');
+        $qb = $this->createQueryBuilder('l');
+
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('l.campaign', ':campaign'),
+                $qb->expr()->in('IDENTITY(l.lead)', ':contactIds')
+            )
+        )
+            ->setParameter('campaign', $campaign)
+            ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
+
+        $results = $qb->getQuery()->getResult();
+
+        $campaignMembers = [];
+
+        /** @var Lead $result */
+        foreach ($results as $result) {
+            $campaignMembers[$result->getLead()->getId()] = $result;
+        }
+
+        return $campaignMembers;
+    }
+
+    /**
+     * @param array $contactIds
+     * @param       $campaignId
+     *
+     * @return array
+     */
+    public function getContactRotations(array $contactIds, $campaignId)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('cl.lead_id, cl.rotation')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('cl.campaign_id', ':campaignId'),
+                    $qb->expr()->in('cl.lead_id', ':contactIds')
+                )
+            )
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
+
+        $results = $qb->execute()->fetchAll();
+
+        $contactRotations = [];
+        foreach ($results as $result) {
+            $contactRotations[$result['lead_id']] = $result['rotation'];
+        }
+
+        return $contactRotations;
     }
 }
