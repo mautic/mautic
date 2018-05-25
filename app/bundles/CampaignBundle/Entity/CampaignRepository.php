@@ -560,6 +560,7 @@ class CampaignRepository extends CommonRepository
                 ->where(
                     $sq->expr()->andX(
                         $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
+                        $sq->expr()->eq('e.rotation', 'cl.rotation'),
                         $sq->expr()->in('e.event_id', $pendingEvents)
                     )
                 );
