@@ -54,18 +54,6 @@ if (class_exists('PHPExcel')) {
     ];
 }
 
-$buttons[] = [
-    'attr' => [
-        'data-toggle' => 'index',
-        'data-toggle' => '',
-        'class'       => 'btn btn-default btn-nospin',
-        'href'        => $view['router']->path('mautic_form_export', ['objectId' => $form->getId(), 'format' => 'xlsx']),
-    ],
-    'btnText'   => $view['translator']->trans('mautic.form.result.export.xlsx'),
-    'iconClass' => 'fa fa-file-excel-o',
-    'primary'   => true,
-];
-
 $buttons[] =
     [
         'attr' => [
