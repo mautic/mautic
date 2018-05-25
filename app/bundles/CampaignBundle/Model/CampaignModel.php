@@ -19,6 +19,7 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
+use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -75,6 +76,11 @@ class CampaignModel extends CommonFormModel
     private $removedContactTracker;
 
     /**
+     * @var MembershipManager
+     */
+    private $membershipManager;
+
+    /**
      * CampaignModel constructor.
      *
      * @param CoreParametersHelper  $coreParametersHelper
@@ -83,6 +89,7 @@ class CampaignModel extends CommonFormModel
      * @param FormModel             $formModel
      * @param EventCollector        $eventCollector
      * @param RemovedContactTracker $removedContactTracker
+     * @param MembershipManager     $membershipManager
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
@@ -90,7 +97,8 @@ class CampaignModel extends CommonFormModel
         ListModel $leadListModel,
         FormModel $formModel,
         EventCollector $eventCollector,
-        RemovedContactTracker $removedContactTracker
+        RemovedContactTracker $removedContactTracker,
+        MembershipManager $membershipManager
     ) {
         $this->leadModel              = $leadModel;
         $this->leadListModel          = $leadListModel;
@@ -99,6 +107,7 @@ class CampaignModel extends CommonFormModel
         $this->batchCampaignSleepTime = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
         $this->eventCollector         = $eventCollector;
         $this->removedContactTracker  = $removedContactTracker;
+        $this->membershipManager      = $membershipManager;
     }
 
     /**
@@ -647,88 +656,31 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * Add lead(s) to a campaign.
-     *
      * @param Campaign $campaign
      * @param array    $leads
      * @param bool     $manuallyAdded
      * @param bool     $batchProcess
-     * @param int      $searchListLead
-     *
-     * @throws \Doctrine\ORM\ORMException
      */
-    public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
+    public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false)
     {
-        foreach ($leads as $lead) {
-            if ($lead instanceof Lead) {
-                $leadId = $lead->getId();
-            } else {
-                $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+        @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead');
+
+        if (!reset($leads) instanceof Lead) {
+            $leadIds = [];
+
+            // This is an array of lead IDs but we now need Lead entities
+            foreach ($leads as $lead) {
+                $leadIds[] = (is_array($lead) && isset($lead['id'])) ? (int) $lead['id'] : (int) $lead;
             }
 
-            if ($searchListLead == -1) {
-                $campaignLead = null;
-            } elseif ($searchListLead) {
-                $campaignLead = $this->getCampaignLeadRepository()->findOneBy(
-                    [
-                        'lead'     => $lead,
-                        'campaign' => $campaign,
-                    ]
-                );
-            } else {
-                $campaignLead = $this->em->getReference(
-                    'MauticCampaignBundle:Lead',
-                    [
-                        'lead'     => $leadId,
-                        'campaign' => $campaign->getId(),
-                    ]
-                );
-            }
-
-            $dispatchEvent = true;
-            if ($campaignLead != null) {
-                if ($campaignLead->wasManuallyRemoved()) {
-                    $campaignLead->setManuallyRemoved(false);
-                    $campaignLead->setManuallyAdded($manuallyAdded);
-
-                    $dispatchEvent = $this->saveCampaignLead($campaignLead);
-                } else {
-                    $this->em->detach($campaignLead);
-                    if ($batchProcess) {
-                        $this->em->detach($lead);
-                    }
-
-                    unset($campaignLead, $lead);
-
-                    continue;
-                }
-            } else {
-                $campaignLead = new CampaignLead();
-                $campaignLead->setCampaign($campaign);
-                $campaignLead->setDateAdded(new \DateTime());
-                $campaignLead->setLead($lead);
-                $campaignLead->setManuallyAdded($manuallyAdded);
-
-                $dispatchEvent = $this->saveCampaignLead($campaignLead);
-            }
-
-            if ($dispatchEvent && $this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
-                $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'added');
-                $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
-
-                unset($event);
-            }
-
-            // Detach CampaignLead to save memory
-            $this->em->detach($campaignLead);
-            if ($batchProcess) {
-                $this->em->detach($lead);
-            }
-            unset($campaignLead, $lead);
+            $leads = $this->leadModel->getRepository()->getEntities(['ids' => $leadIds, 'ignore_paginator' => true]);
         }
 
-        unset($leadModel, $campaign, $leads);
+        $this->membershipManager->addContacts($leads, $campaign, $manuallyAdded);
+
+        if ($batchProcess) {
+            $this->leadModel->getRepository()->detachEntities($leads);
+        }
     }
 
     /**
@@ -766,88 +718,30 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * Remove lead(s) from the campaign.
-     *
-     * @param Campaign   $campaign
-     * @param array      $leads
-     * @param bool|false $manuallyRemoved
-     * @param bool|false $batchProcess
-     * @param bool|false $skipFindOne
-     *
-     * @throws \Doctrine\ORM\ORMException
+     * @param Campaign $campaign
+     * @param array    $leads
+     * @param bool     $manuallyRemoved @deprecated No longer used
+     * @param bool     $batchProcess
      */
-    public function removeLeads(Campaign $campaign, array $leads, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
+    public function removeLeads(Campaign $campaign, array $leads, $manuallyRemoved = false, $batchProcess = false)
     {
-        foreach ($leads as $lead) {
-            $dispatchEvent = false;
-            if ($lead instanceof Lead) {
-                $leadId = $lead->getId();
-            } else {
-                $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+        @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead');
+
+        if (!reset($leads) instanceof Lead) {
+            $leadIds = [];
+
+            // This is an array of lead IDs but we now need Lead entities
+            foreach ($leads as $lead) {
+                $leadIds[] = (is_array($lead) && isset($lead['id'])) ? (int) $lead['id'] : (int) $lead;
             }
 
-            $this->removedContactTracker->addRemovedContact($campaign->getId(), $leadId);
-            $campaignLead = (!$skipFindOne)
-                ?
-                $this->getCampaignLeadRepository()->findOneBy(
-                    [
-                        'lead'     => $lead,
-                        'campaign' => $campaign,
-                    ]
-                )
-                :
-                $this->em->getReference(
-                    'MauticCampaignBundle:Lead',
-                    [
-                        'lead'     => $leadId,
-                        'campaign' => $campaign->getId(),
-                    ]
-                );
+            $leads = $this->leadModel->getRepository()->getEntities(['ids' => $leadIds, 'ignore_paginator' => true]);
+        }
 
-            if ($campaignLead == null) {
-                if ($batchProcess) {
-                    $this->em->detach($lead);
-                    unset($lead);
-                }
+        $this->membershipManager->removeContacts($leads, $campaign);
 
-                continue;
-            }
-
-            if (($manuallyRemoved && $campaignLead->wasManuallyAdded()) || (!$manuallyRemoved && !$campaignLead->wasManuallyAdded())) {
-                //lead was manually added and now manually removed or was not manually added and now being removed
-
-                // Manually added and manually removed so chuck it
-                $dispatchEvent = true;
-
-                $this->getEventRepository()->deleteEntity($campaignLead);
-            } elseif ($manuallyRemoved) {
-                $dispatchEvent = true;
-
-                $campaignLead->setManuallyRemoved(true);
-                $this->getEventRepository()->saveEntity($campaignLead);
-            }
-
-            if ($dispatchEvent) {
-                //remove scheduled events if the lead was removed
-                $this->removeScheduledEvents($campaign, $lead);
-
-                if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
-                    $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');
-                    $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
-
-                    unset($event);
-                }
-            }
-
-            // Detach CampaignLead to save memory
-            $this->em->detach($campaignLead);
-
-            if ($batchProcess) {
-                $this->em->detach($lead);
-            }
-
-            unset($campaignLead, $lead);
+        if ($batchProcess) {
+            $this->leadModel->getRepository()->detachEntities($leads);
         }
     }
 
