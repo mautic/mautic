@@ -188,7 +188,10 @@ return [
             ],
             'mautic.campaign.type.campaignlist'         => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.campaign.model.campaign',
+                    'translator',
+                ],
                 'alias'     => 'campaign_list',
             ],
             'mautic.campaign.type.trigger.leadchange'   => [

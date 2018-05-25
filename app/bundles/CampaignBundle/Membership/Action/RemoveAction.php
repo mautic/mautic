@@ -53,7 +53,7 @@ class RemoveAction
         $campaignMember->setManuallyAdded(false);
 
         if ($isExit) {
-            // Contact was removed by the change campaign action
+            // Contact was removed by the change campaign action or a segment
             $campaignMember->setDateLastExited(new \DateTime());
         } else {
             $campaignMember->setDateLastExited(null);

@@ -642,48 +642,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * Add lead to the campaign.
-     *
-     * @param Campaign  $campaign
-     * @param           $lead
-     * @param bool|true $manuallyAdded
-     */
-    public function addLead(Campaign $campaign, $lead, $manuallyAdded = true)
-    {
-        $this->addLeads($campaign, [$lead], $manuallyAdded);
-
-        unset($campaign, $lead);
-    }
-
-    /**
-     * @param Campaign $campaign
-     * @param array    $leads
-     * @param bool     $manuallyAdded
-     * @param bool     $batchProcess
-     */
-    public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false)
-    {
-        @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead');
-
-        if (!reset($leads) instanceof Lead) {
-            $leadIds = [];
-
-            // This is an array of lead IDs but we now need Lead entities
-            foreach ($leads as $lead) {
-                $leadIds[] = (is_array($lead) && isset($lead['id'])) ? (int) $lead['id'] : (int) $lead;
-            }
-
-            $leads = $this->leadModel->getRepository()->getEntities(['ids' => $leadIds, 'ignore_paginator' => true]);
-        }
-
-        $this->membershipManager->addContacts($leads, $campaign, $manuallyAdded);
-
-        if ($batchProcess) {
-            $this->leadModel->getRepository()->detachEntities($leads);
-        }
-    }
-
-    /**
      * Saves a campaign lead, logs the error if saving fails.
      *
      * @param CampaignLead $campaignLead
@@ -700,48 +658,6 @@ class CampaignModel extends CommonFormModel
             $this->logger->log('error', $exception->getMessage());
 
             return false;
-        }
-    }
-
-    /**
-     * Remove lead from the campaign.
-     *
-     * @param Campaign $campaign
-     * @param          $lead
-     * @param bool     $manuallyRemoved
-     */
-    public function removeLead(Campaign $campaign, $lead, $manuallyRemoved = true)
-    {
-        $this->removeLeads($campaign, [$lead], $manuallyRemoved);
-
-        unset($campaign, $lead);
-    }
-
-    /**
-     * @param Campaign $campaign
-     * @param array    $leads
-     * @param bool     $manuallyRemoved @deprecated No longer used
-     * @param bool     $batchProcess
-     */
-    public function removeLeads(Campaign $campaign, array $leads, $manuallyRemoved = false, $batchProcess = false)
-    {
-        @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead');
-
-        if (!reset($leads) instanceof Lead) {
-            $leadIds = [];
-
-            // This is an array of lead IDs but we now need Lead entities
-            foreach ($leads as $lead) {
-                $leadIds[] = (is_array($lead) && isset($lead['id'])) ? (int) $lead['id'] : (int) $lead;
-            }
-
-            $leads = $this->leadModel->getRepository()->getEntities(['ids' => $leadIds, 'ignore_paginator' => true]);
-        }
-
-        $this->membershipManager->removeContacts($leads, $campaign);
-
-        if ($batchProcess) {
-            $this->leadModel->getRepository()->detachEntities($leads);
         }
     }
 
@@ -1206,5 +1122,97 @@ class CampaignModel extends CommonFormModel
     public function getRemovedLeads()
     {
         return  $this->removedContactTracker->getRemovedContacts();
+    }
+
+    /**
+     * @deprecated 2.14 to be removed in 3.0
+     *
+     * Add lead to the campaign.
+     *
+     * @param Campaign  $campaign
+     * @param           $lead
+     * @param bool|true $manuallyAdded
+     */
+    public function addLead(Campaign $campaign, $lead, $manuallyAdded = true)
+    {
+        $this->addLeads($campaign, [$lead], $manuallyAdded);
+
+        unset($campaign, $lead);
+    }
+
+    /**
+     * @deprecated 2.14 to be removed in 3.0
+     *
+     * @param Campaign $campaign
+     * @param array    $leads
+     * @param bool     $manuallyAdded
+     * @param bool     $batchProcess
+     */
+    public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false)
+    {
+        @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead', E_USER_DEPRECATED);
+
+        if (!reset($leads) instanceof Lead) {
+            $leadIds = [];
+
+            // This is an array of lead IDs but we now need Lead entities
+            foreach ($leads as $lead) {
+                $leadIds[] = (is_array($lead) && isset($lead['id'])) ? (int) $lead['id'] : (int) $lead;
+            }
+
+            $leads = $this->leadModel->getRepository()->getEntities(['ids' => $leadIds, 'ignore_paginator' => true]);
+        }
+
+        $this->membershipManager->addContacts($leads, $campaign, $manuallyAdded);
+
+        if ($batchProcess) {
+            $this->leadModel->getRepository()->detachEntities($leads);
+        }
+    }
+
+    /**
+     * @deprecated 2.14 to be removed in 3.0
+     *
+     * Remove lead from the campaign.
+     *
+     * @param Campaign $campaign
+     * @param          $lead
+     * @param bool     $manuallyRemoved
+     */
+    public function removeLead(Campaign $campaign, $lead, $manuallyRemoved = true)
+    {
+        $this->removeLeads($campaign, [$lead], $manuallyRemoved);
+
+        unset($campaign, $lead);
+    }
+
+    /**
+     * @deprecated 2.14 to be removed in 3.0
+     *
+     * @param Campaign $campaign
+     * @param array    $leads
+     * @param bool     $manuallyRemoved @deprecated No longer used
+     * @param bool     $batchProcess
+     */
+    public function removeLeads(Campaign $campaign, array $leads, $manuallyRemoved = false, $batchProcess = false)
+    {
+        @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead', E_USER_DEPRECATED);
+
+        if (!reset($leads) instanceof Lead) {
+            $leadIds = [];
+
+            // This is an array of lead IDs but we now need Lead entities
+            foreach ($leads as $lead) {
+                $leadIds[] = (is_array($lead) && isset($lead['id'])) ? (int) $lead['id'] : (int) $lead;
+            }
+
+            $leads = $this->leadModel->getRepository()->getEntities(['ids' => $leadIds, 'ignore_paginator' => true]);
+        }
+
+        $this->membershipManager->removeContacts($leads, $campaign, !$manuallyRemoved);
+
+        if ($batchProcess) {
+            $this->leadModel->getRepository()->detachEntities($leads);
+        }
     }
 }

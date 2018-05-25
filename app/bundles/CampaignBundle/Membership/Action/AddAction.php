@@ -71,13 +71,15 @@ class AddAction
     /**
      * @param CampaignMember $campaignMember
      * @param bool           $isManualAction
+     * @param bool           $allowRestart
      *
      * @throws ContactAlreadyInCampaignException
      * @throws ContactCannotBeAddedToCampaignException
      */
-    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction)
+    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction, $allowRestart)
     {
-        if (!$campaignMember->wasManuallyRemoved()) {
+        $wasRemoved = $campaignMember->wasManuallyRemoved();
+        if (!$wasRemoved && !$allowRestart) {
             // Contact is already in this campaign
 
             if ($campaignMember->wasManuallyAdded() !== $isManualAction) {
@@ -90,15 +92,14 @@ class AddAction
             throw new ContactAlreadyInCampaignException();
         }
 
-        if (!$isManualAction) {
-            // This shouldn't happen because manually removed contact should not be automatically added back
-            // but just in case, let's prevent it
+        if ($wasRemoved && !$isManualAction && null === $campaignMember->getDateLastExited()) {
+            // Prevent contacts from being added back if they were manually removed but automatically added back
             throw new ContactCannotBeAddedToCampaignException();
         }
 
         // Contact exited but has been added back to the campaign
         $campaignMember->setManuallyRemoved(false);
-        $campaignMember->setManuallyAdded(true);
+        $campaignMember->setManuallyAdded($isManualAction);
         $campaignMember->setDateLastExited(null);
         $campaignMember->startNewRotation();
 
