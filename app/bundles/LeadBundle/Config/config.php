@@ -916,6 +916,7 @@ return [
                     'mautic.lead.repository.lead_device',
                     'mautic.helper.random',
                     'request_stack',
+                    'mautic.security',
                 ],
             ],
             'mautic.tracker.contact' => [

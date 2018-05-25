@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Tests\Tracker\Service\DeviceTrackingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
@@ -51,6 +52,11 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
      */
     private $requestStackMock;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $security;
+
     protected function setUp()
     {
         $this->cookieHelperMock            = $this->createMock(CookieHelper::class);
@@ -58,6 +64,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
         $this->randomHelperMock            = $this->createMock(RandomHelperInterface::class);
         $this->leadDeviceRepositoryMock    = $this->createMock(LeadDeviceRepository::class);
         $this->requestStackMock            = $this->createMock(RequestStack::class);
+        $this->security                    = $this->createMock(CorePermissions::class);
     }
 
     public function testIsTrackedTrue()
@@ -363,6 +370,21 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test that a user is not tracked.
+     */
+    public function testUserIsNotTracked()
+    {
+        $this->leadDeviceRepositoryMock->expects($this->never())
+            ->method('getByTrackingId');
+
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(false);
+
+        $this->getDeviceTrackingService()->getTrackedDevice();
+    }
+
+    /**
      * @return DeviceTrackingService
      */
     private function getDeviceTrackingService()
@@ -372,7 +394,8 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
             $this->entityManagerMock,
             $this->leadDeviceRepositoryMock,
             $this->randomHelperMock,
-            $this->requestStackMock
+            $this->requestStackMock,
+            $this->security
         );
     }
 }
