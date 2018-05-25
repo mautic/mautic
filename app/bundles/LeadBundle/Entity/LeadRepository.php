@@ -180,10 +180,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param     $uniqueFieldsWithData
      * @param int $leadId
      * @param int $limit
+     * @param bool $viewOther
      *
      * @return array
      */
-    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null)
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null,$viewOther = true)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.*')
@@ -199,6 +200,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         if (!empty($leadId)) {
             // make sure that its not the id we already have
             $q->andWhere('l.id != '.$leadId);
+        }
+
+        if (!$viewOther) {
+            $q->andWhere('l.created_by = '.$this->currentUser->getId());
         }
 
         if ($limit) {
