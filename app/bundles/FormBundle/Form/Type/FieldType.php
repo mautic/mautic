@@ -510,6 +510,9 @@ class FieldType extends AbstractType
                     );
                     break;
                 case 'file':
+                    if (!isset($propertiesData['public'])) {
+                        $propertiesData['public'] = false;
+                    }
                     $builder->add(
                         'properties',
                         FormFieldFileType::class,
