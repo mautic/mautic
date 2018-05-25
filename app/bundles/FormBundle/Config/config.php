@@ -66,10 +66,6 @@ return [
                 'path'       => '/forms/results/{objectId}/{page}',
                 'controller' => 'MauticFormBundle:Result:index',
             ],
-            'mautic_form_file_download' => [
-                'path'       => '/forms/results/file/{submissionId}/{field}',
-                'controller' => 'MauticFormBundle:Result:downloadFile',
-            ],
             'mautic_form_export' => [
                 'path'       => '/forms/results/{objectId}/export/{format}',
                 'controller' => 'MauticFormBundle:Result:export',
@@ -120,6 +116,10 @@ return [
             ],
         ],
         'public' => [
+            'mautic_form_file_download' => [
+                'path'       => '/forms/results/file/{submissionId}/{field}',
+                'controller' => 'MauticFormBundle:Result:downloadFile',
+            ],
             'mautic_form_postresults' => [
                 'path'       => '/form/submit',
                 'controller' => 'MauticFormBundle:Public:submit',
