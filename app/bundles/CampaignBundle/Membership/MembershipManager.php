@@ -14,11 +14,11 @@ namespace Mautic\CampaignBundle\Membership;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadRepository;
+use Mautic\CampaignBundle\Membership\Action\AddAction;
+use Mautic\CampaignBundle\Membership\Action\RemoveAction;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyInCampaignException;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaignException;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
-use Mautic\CoreBundle\Membership\Action\AddAction;
-use Mautic\CoreBundle\Membership\Action\RemoveAction;
 use Mautic\LeadBundle\Entity\Lead;
 use Monolog\Logger;
 
@@ -78,9 +78,9 @@ class MembershipManager
     /**
      * @param Lead     $contact
      * @param Campaign $campaign
-     * @param bool     $manuallyAdded
+     * @param bool     $isManualAction
      */
-    public function addContact(Lead $contact, Campaign $campaign, $manuallyAdded = true)
+    public function addContact(Lead $contact, Campaign $campaign, $isManualAction = true)
     {
         // Validate that contact is not already in the Campaign
         /** @var CampaignMember $campaignMember */
@@ -93,7 +93,7 @@ class MembershipManager
 
         if ($campaignMember) {
             try {
-                $this->adder->updateExistingMembership($campaignMember, $manuallyAdded);
+                $this->adder->updateExistingMembership($campaignMember, $isManualAction);
 
                 // Notify listeners
                 $this->eventDispatcher->dispatchMembershipChange($campaignMember->getLead(), $campaignMember->getCampaign(), AddAction::NAME);
@@ -107,7 +107,7 @@ class MembershipManager
         }
 
         // Contact is not already in the campaign so create a new entry
-        $this->adder->createNewMembership($contact, $campaign, $manuallyAdded);
+        $this->adder->createNewMembership($contact, $campaign, $isManualAction);
 
         // Notify listeners the contact has been added
         $this->eventDispatcher->dispatchMembershipChange($contact, $campaign, AddAction::NAME);
@@ -116,9 +116,9 @@ class MembershipManager
     /**
      * @param Lead[]   $contacts
      * @param Campaign $campaign
-     * @param bool     $manuallyAdded
+     * @param bool     $isManualAction
      */
-    public function addContacts(array $contacts, Campaign $campaign, $manuallyAdded = true)
+    public function addContacts(array $contacts, Campaign $campaign, $isManualAction = true)
     {
         $keyById = $this->organizeContactsById($contacts);
 
@@ -129,7 +129,7 @@ class MembershipManager
         foreach ($contacts as $contact) {
             if (isset($campaignMembers[$contact->getId()])) {
                 try {
-                    $this->adder->updateExistingMembership($campaignMembers[$contact->getId()], $manuallyAdded);
+                    $this->adder->updateExistingMembership($campaignMembers[$contact->getId()], $isManualAction);
                 } catch (ContactAlreadyInCampaignException $exception) {
                     // Remove them from the keyById array so they are not included in the dispatched event
                     unset($keyById[$contact->getId()]);
@@ -139,7 +139,7 @@ class MembershipManager
             }
 
             // Existing membership does not exist so create a new one
-            $this->adder->execute($contact, $campaign, $manuallyAdded);
+            $this->adder->createNewMembership($contact, $campaign, $isManualAction);
         }
 
         if (count($keyById)) {
@@ -154,9 +154,9 @@ class MembershipManager
     /**
      * @param Lead     $contact
      * @param Campaign $campaign
-     * @param bool     $manuallyRemoved
+     * @param bool     $isExit
      */
-    public function removeContact(Lead $contact, Campaign $campaign, $manuallyRemoved = true)
+    public function removeContact(Lead $contact, Campaign $campaign, $isExit = false)
     {
         // Validate that contact is not already in the Campaign
         /** @var CampaignMember $campaignMember */
@@ -173,7 +173,7 @@ class MembershipManager
         }
 
         try {
-            $this->remover->updateExistingMembership($campaignMember, $manuallyRemoved);
+            $this->remover->updateExistingMembership($campaignMember, $isExit);
 
             // Notify listeners
             $this->eventDispatcher->dispatchMembershipChange($contact, $campaign, RemoveAction::NAME);
@@ -185,9 +185,9 @@ class MembershipManager
     /**
      * @param array    $contacts
      * @param Campaign $campaign
-     * @param bool     $manuallyRemoved
+     * @param bool     $isExit
      */
-    public function removeContacts(array $contacts, Campaign $campaign, $manuallyRemoved = true)
+    public function removeContacts(array $contacts, Campaign $campaign, $isExit = false)
     {
         $keyById = $this->organizeContactsById($contacts);
 
@@ -207,7 +207,7 @@ class MembershipManager
             $campaignMember = $campaignMembers[$contact->getId()];
 
             try {
-                $this->remover->updateExistingMembership($campaignMember, $manuallyRemoved);
+                $this->remover->updateExistingMembership($campaignMember, $isExit);
 
                 $this->eventDispatcher->dispatchMembershipChange($contact, $campaign, RemoveAction::NAME);
             } catch (ContactAlreadyRemovedFromCampaignException $exception) {

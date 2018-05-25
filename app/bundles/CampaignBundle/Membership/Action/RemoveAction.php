@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Membership\Action;
+namespace Mautic\CampaignBundle\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
@@ -37,11 +37,11 @@ class RemoveAction
 
     /**
      * @param CampaignMember $campaignMember
-     * @param bool           $isManualAction
+     * @param bool           $isExit
      *
      * @throws ContactAlreadyRemovedFromCampaignException
      */
-    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction)
+    public function updateExistingMembership(CampaignMember $campaignMember, $isExit)
     {
         if ($campaignMember->wasManuallyRemoved()) {
             // Contact was already removed from this campaign
@@ -50,12 +50,12 @@ class RemoveAction
 
         // Remove this contact from the campaign
         $campaignMember->setManuallyRemoved(true);
+        $campaignMember->setManuallyAdded(false);
 
-        if ($isManualAction) {
-            // Forced out
+        if ($isExit) {
+            // Contact was removed by the change campaign action
             $campaignMember->setDateLastExited(new \DateTime());
         } else {
-            // Filtered out
             $campaignMember->setDateLastExited(null);
         }
 

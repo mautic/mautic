@@ -168,6 +168,13 @@ return [
                     'mautic.lead.model.company_report_data',
                 ],
             ],
+            'mautic.campaign.action.change_membership.subscriber' => [
+                'class'     => \Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.membership_manager',
+                    'mautic.campaign.model.campaign',
+                ],
+            ],
         ],
         'forms'        => [
             'mautic.campaign.type.form'                 => [
@@ -209,7 +216,7 @@ return [
         ],
         'models'       => [
             'mautic.campaign.model.campaign'  => [
-                'class'     => 'Mautic\CampaignBundle\Model\CampaignModel',
+                'class'     => \Mautic\CampaignBundle\Model\CampaignModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.lead',
@@ -217,6 +224,7 @@ return [
                     'mautic.form.model.form',
                     'mautic.campaign.event_collector',
                     'mautic.campaign.helper.removed_contact_tracker',
+                    'mautic.campaign.membership_manager',
                 ],
             ],
             'mautic.campaign.model.event'     => [
@@ -330,6 +338,7 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.tracker.contact',
                     'mautic.campaign.repository.lead_event_log',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
             'mautic.campaign.event_collector' => [
@@ -473,6 +482,37 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.campaign.helper.notification',
                     'mautic.factory',
+                ],
+            ],
+        ],
+        'membership' => [
+            'mautic.campaign.membership.adder' => [
+                'class'     => \Mautic\CampaignBundle\Membership\Action\AddAction::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead',
+                    'mautic.campaign.repository.lead_event_log',
+                ],
+            ],
+            'mautic.campaign.membership.remover' => [
+                'class'     => \Mautic\CampaignBundle\Membership\Action\RemoveAction::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead',
+                ],
+            ],
+            'mautic.campaign.membership.event_dispatcher' => [
+                'class'     => \Mautic\CampaignBundle\Membership\EventDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.campaign.membership_manager' => [
+                'class'     => \Mautic\CampaignBundle\Membership\MembershipManager::class,
+                'arguments' => [
+                    'mautic.campaign.membership.adder',
+                    'mautic.campaign.membership.remover',
+                    'mautic.campaign.membership.event_dispatcher',
+                    'mautic.campaign.repository.lead',
+                    'monolog.logger.mautic',
                 ],
             ],
         ],
