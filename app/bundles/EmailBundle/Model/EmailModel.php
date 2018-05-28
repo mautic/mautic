@@ -37,7 +37,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
-use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -127,11 +126,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $deviceTracker;
 
     /**
-     * @var CompanyRepository
-     */
-    private $companyRepository;
-
-    /**
      * @var RedirectRepository
      */
     private $redirectRepository;
@@ -150,7 +144,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param MessageQueueModel  $messageQueueModel
      * @param SendEmailToContact $sendModel
      * @param DeviceTracker      $deviceTracker
-     * @param CompanyRepository  $companyRepository
      * @param RedirectRepository $redirectRepository
      */
     public function __construct(
@@ -165,7 +158,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         MessageQueueModel $messageQueueModel,
         SendEmailToContact $sendModel,
         DeviceTracker $deviceTracker,
-        CompanyRepository $companyRepository,
         RedirectRepository $redirectRepository
     ) {
         $this->ipLookupHelper        = $ipLookupHelper;
@@ -179,7 +171,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->messageQueueModel     = $messageQueueModel;
         $this->sendModel             = $sendModel;
         $this->deviceTracker         = $deviceTracker;
-        $this->companyRepository     = $companyRepository;
         $this->redirectRepository    = $redirectRepository;
     }
 
