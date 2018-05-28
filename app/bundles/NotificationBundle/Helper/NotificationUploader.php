@@ -62,21 +62,23 @@ class NotificationUploader
      */
     public function uploadFiles(Notification $notification, $request, Form $form)
     {
-        if (!isset($request->files->all()['notification'])) {
-            return;
+        $files = [];
+        if (isset($request->files->all()['notification'])) {
+            $files = $request->files->all()['notification'];
         }
-
-        $files         = $request->files->all()['notification'];
 
         foreach ($this->getUploadFilesName() as $fileName) {
             $uploadDir    = $this->getUploadDir($notification);
 
             // Delete file
             if (!empty($form->get($fileName.'_delete')->getData())) {
-                $this->fileUploader->delete($uploadDir.DIRECTORY_SEPARATOR.$this->getEntityVar($notification, $fileName));
+                if ($fileNameFromEntity = $this->getEntityVar($notification, $fileName)) {
+                    $this->fileUploader->delete(
+                        $uploadDir.DIRECTORY_SEPARATOR.$fileNameFromEntity
+                    );
+                }
                 $this->getEntityVar($notification, $fileName, 'set', '');
             }
-
             /* @var UploadedFile $file */
             if (empty($files[$fileName])) {
                 continue;
@@ -87,7 +89,6 @@ class NotificationUploader
                 $uploadedFile = $this->fileUploader->upload($uploadDir, $file);
                 $this->getEntityVar($notification, $fileName, 'set', $uploadedFile);
             } catch (FileUploadException $e) {
-                $this->fileUploader->delete($uploadDir.DIRECTORY_SEPARATOR.$uploadedFile);
             }
         }
     }
