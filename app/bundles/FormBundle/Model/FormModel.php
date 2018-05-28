@@ -789,10 +789,10 @@ class FormModel extends CommonFormModel
     {
         $formName = $form->generateFormName();
         $fields   = $form->getFields();
-        /** @var \Mautic\FormBundle\Entity\Field $f */
-        foreach ($fields as $key=> $f) {
-            $leadField  = $f->getLeadField();
-            $isAutoFill = $f->getIsAutoFill();
+        /** @var \Mautic\FormBundle\Entity\Field $field */
+        foreach ($fields as $key=> $field) {
+            $leadField  = $field->getLeadField();
+            $isAutoFill = $field->getIsAutoFill();
 
             if (!isset($leadField) || !$isAutoFill) {
                 unset($fields[$key]);
@@ -808,11 +808,11 @@ class FormModel extends CommonFormModel
             return;
         }
 
-        foreach ($fields as $f) {
+        foreach ($fields as $field) {
             $value = $lead->getFieldValue($leadField);
 
             if (!empty($value)) {
-                $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
+                $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }
     }
