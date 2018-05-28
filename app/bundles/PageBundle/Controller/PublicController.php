@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
@@ -422,14 +423,15 @@ class PublicController extends CommonFormController
         $redirectModel = $this->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
-        if (empty($redirect) || !$redirect->isPublished(false)) {
-            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
-        }
         /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
         $pageModel = $this->getModel('page');
         $pageModel->hitPage($redirect, $this->request);
 
         $url = $redirect->getUrl();
+
+        if (empty($redirect) || !$redirect->isPublished(false)) {
+            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
+        }
 
         // Ensure the URL does not have encoded ampersands
         $url = str_replace('&amp;', '&', $url);
@@ -437,7 +439,8 @@ class PublicController extends CommonFormController
         // Get query string
         $query = $this->request->query->all();
 
-        // Unset the clickthrough
+        // Unset the clickthrough from the URL query
+        $ct = $query['ct'];
         unset($query['ct']);
 
         // Tak on anything left to the URL
@@ -449,9 +452,14 @@ class PublicController extends CommonFormController
         // Search replace lead fields in the URL
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
-        $lead      = $leadModel->getCurrentLead();
+        $lead      = $leadModel->getContactFromRequest([$ct]);
         $leadArray = ($lead) ? $lead->getProfileFields() : [];
         $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
+        $url       = UrlHelper::sanitizeAbsoluteUrl($url);
+
+        if (false === filter_var($url, FILTER_VALIDATE_URL)) {
+            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
+        }
 
         return $this->redirect($url);
     }

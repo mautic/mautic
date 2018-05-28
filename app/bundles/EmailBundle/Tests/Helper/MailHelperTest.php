@@ -467,6 +467,99 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGlobalHeadersAreSet()
+    {
+        $parameterMap = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport   = new SmtpTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->setBody('{signature}');
+        $mailer->addTo($this->contacts[0]['email']);
+        $mailer->send();
+
+        $customHeadersFounds = [];
+
+        /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
+        $headers = $mailer->message->getHeaders()->getAll();
+        foreach ($headers as $header) {
+            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
+                $customHeadersFounds[] = $header->getFieldName();
+
+                $this->assertEquals('test', $header->getValue());
+            }
+        }
+
+        $this->assertCount(2, $customHeadersFounds);
+    }
+
+    public function testGlobalHeadersAreIgnoredIfEmailEntityIsSet()
+    {
+        $parameterMap = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport   = new SmtpTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('{signature}');
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
+        $headers = $mailer->message->getHeaders()->getAll();
+        foreach ($headers as $header) {
+            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
+                $this->fail('System headers were not supposed to be set');
+            }
+        }
+    }
+
+    public function testEmailHeadersAreSet()
+    {
+        $parameterMap = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport   = new SmtpTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('{signature}');
+        $email->setHeaders(['X-Mautic-Test3' => 'test2', 'X-Mautic-Test4' => 'test2']);
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        $customHeadersFounds = [];
+
+        /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
+        $headers = $mailer->message->getHeaders()->getAll();
+        foreach ($headers as $header) {
+            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
+                $customHeadersFounds[] = $header->getFieldName();
+
+                $this->assertEquals('test2', $header->getValue());
+            }
+        }
+
+        $this->assertCount(2, $customHeadersFounds);
+    }
+
     protected function mockEmptyMailHelper($useSmtp = true)
     {
         $mockFactory = $this->getMockFactory();
@@ -476,7 +569,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         return new MailHelper($mockFactory, $swiftMailer);
     }
 
-    protected function getMockFactory($mailIsOwner = true)
+    protected function getMockFactory($mailIsOwner = true, $parameterMap = [])
     {
         $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
@@ -502,15 +595,19 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $parameterMap = array_merge(
+            [
+                ['mailer_return_path', false, null],
+                ['mailer_spool_type', false, 'memory'],
+                ['mailer_is_owner', false, $mailIsOwner],
+            ],
+            $parameterMap
+        );
+
         $mockFactory->method('getParameter')
             ->will(
-                $this->returnValueMap(
-                    [
-                        ['mailer_return_path', false, null],
-                        ['mailer_spool_type', false, 'memory'],
-                        ['mailer_is_owner', false, $mailIsOwner],
-                    ]
-                )
+                $this->returnValueMap($parameterMap)
             );
         $mockFactory->method('getModel')
             ->will(

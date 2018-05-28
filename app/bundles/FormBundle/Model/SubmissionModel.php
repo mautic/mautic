@@ -885,6 +885,8 @@ class SubmissionModel extends CommonFormModel
         // Closure to get data and unique fields
         $getCompanyData = function ($currentFields) use ($companyFields) {
             $companyData = [];
+            // force add company contact field to company fields check
+            $companyFields = array_merge($companyFields, ['company'=> 'company']);
             foreach ($companyFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {
                     $value               = $currentFields[$alias];
@@ -1035,6 +1037,9 @@ class SubmissionModel extends CommonFormModel
             list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+            } elseif ($companyEntity instanceof Company) {
+                $this->companyModel->setFieldValues($companyEntity, $companyFieldMatches);
+                $this->companyModel->saveEntity($companyEntity);
             }
 
             if (!empty($company) and $companyEntity instanceof Company) {
