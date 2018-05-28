@@ -1713,8 +1713,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
-        $flag      = null;
-        $companyId = null;
+        $flag       = null;
+        $companyId  = null;
+        $campaignId = null;
+        $segmentId  = null;
 
         if (isset($filter['flag'])) {
             $flag = $filter['flag'];
@@ -1723,6 +1725,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if (isset($filter['companyId'])) {
             $companyId = $filter['companyId'];
             unset($filter['companyId']);
+        }
+        if (isset($filter['campaignId'])) {
+            $campaignId = $filter['campaignId'];
+            unset($filter['campaignId']);
+        }
+        if (isset($filter['segmentId'])) {
+            $segmentId = $filter['segmentId'];
+            unset($filter['segmentId']);
         }
 
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -1738,6 +1748,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     ->andWhere('company_lead.company_id = :companyId')
                     ->setParameter('companyId', $companyId);
             }
+            if ($campaignId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 't.source_id = ce.id AND t.source = "campaign.event"')
+                    ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+                    ->andWhere('ce.campaign_id = :campaignId')
+                    ->setParameter('campaignId', $campaignId);
+            }
+            if ($segmentId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 't.list_id = ll.id')
+                    ->andWhere('t.list_id = :segmentId')
+                    ->setParameter('segmentId', $segmentId);
+            }
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.email.sent.emails'), $data);
         }
@@ -1751,6 +1772,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', 't.lead_id = company_lead.lead_id')
                     ->andWhere('company_lead.company_id = :companyId')
                     ->setParameter('companyId', $companyId);
+            }
+            if ($campaignId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 't.source_id = ce.id AND t.source = "campaign.event"')
+                    ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+                    ->andWhere('ce.campaign_id = :campaignId')
+                    ->setParameter('campaignId', $campaignId);
+            }
+            if ($segmentId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 't.list_id = ll.id')
+                    ->andWhere('t.list_id = :segmentId')
+                    ->setParameter('segmentId', $segmentId);
             }
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.email.read.emails'), $data);
@@ -1767,6 +1799,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', 't.lead_id = company_lead.lead_id')
                     ->andWhere('company_lead.company_id = :companyId')
                     ->setParameter('companyId', $companyId);
+            }
+            if ($campaignId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 't.source_id = ce.id AND t.source = "campaign.event"')
+                    ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+                    ->andWhere('ce.campaign_id = :campaignId')
+                    ->setParameter('campaignId', $campaignId);
+            }
+            if ($segmentId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 't.list_id = ll.id')
+                    ->andWhere('t.list_id = :segmentId')
+                    ->setParameter('segmentId', $segmentId);
             }
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.email.failed.emails'), $data);
@@ -1795,18 +1838,29 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     ->andWhere('company_lead.company_id = :companyId')
                     ->setParameter('companyId', $companyId);
             }
+            if ($campaignId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 't.source_id = ce.id AND t.source = "campaign.event"')
+                    ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+                    ->andWhere('ce.campaign_id = :campaignId')
+                    ->setParameter('campaignId', $campaignId);
+            }
+            if ($segmentId !== null) {
+                $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 't.list_id = ll.id')
+                    ->andWhere('t.list_id = :segmentId')
+                    ->setParameter('segmentId', $segmentId);
+            }
             $data = $query->loadAndBuildTimeData($q);
 
             $chart->setDataset($this->translator->trans('mautic.email.clicked'), $data);
         }
 
         if ($flag == 'all' || $flag == 'unsubscribed') {
-            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers, $companyId);
+            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers, $companyId, $campaignId, $segmentId);
             $chart->setDataset($this->translator->trans('mautic.email.unsubscribed'), $data);
         }
 
         if ($flag == 'all' || $flag == 'bounced') {
-            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::BOUNCED, $canViewOthers, $companyId);
+            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::BOUNCED, $canViewOthers, $companyId, $campaignId, $segmentId);
             $chart->setDataset($this->translator->trans('mautic.email.bounced'), $data);
         }
 
@@ -1821,10 +1875,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param            $reason
      * @param            $canViewOthers
      * @param int|null   $companyId
+     * @param int|null   $campaignId
+     * @param int|null   $segmentId
      *
      * @return array
      */
-    public function getDncLineChartDataset(ChartQuery &$query, array $filter, $reason, $canViewOthers, $companyId = null)
+    public function getDncLineChartDataset(ChartQuery &$query, array $filter, $reason, $canViewOthers, $companyId = null, $campaignId = null, $segmentId = null)
     {
         $dncFilter = isset($filter['email_id']) ? ['channel_id' => $filter['email_id']] : [];
         $q         = $query->prepareTimeDataQuery('lead_donotcontact', 'date_added', $dncFilter);
@@ -1840,6 +1896,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', 't.lead_id = company_lead.lead_id')
                 ->andWhere('company_lead.company_id = :companyId')
                 ->setParameter('companyId', $companyId);
+        }
+        if ($campaignId !== null) {
+            $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 't.source_id = ce.id AND t.source = "campaign.event"')
+                ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+                ->andWhere('ce.campaign_id = :campaignId')
+                ->setParameter('campaignId', $campaignId);
+        }
+        if ($segmentId !== null) {
+            $q->innerJoin('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 't.list_id = ll.id')
+                ->andWhere('t.list_id = :segmentId')
+                ->setParameter('segmentId', $segmentId);
         }
 
         return $data = $query->loadAndBuildTimeData($q);
