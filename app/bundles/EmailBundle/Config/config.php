@@ -677,7 +677,6 @@ return [
                     'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_contacts',
                     'mautic.tracker.device',
-                    'mautic.lead.repository.company',
                     'mautic.page.repository.redirect',
                 ],
             ],
