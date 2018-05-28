@@ -126,12 +126,12 @@ class Notification extends FormEntity
     /**
      * @var int
      */
-    private $ttl;
+    private $ttl = 72;
 
     /**
      * @var int
      */
-    private $priority;
+    private $priority = 5;
 
     /**
      * @var string

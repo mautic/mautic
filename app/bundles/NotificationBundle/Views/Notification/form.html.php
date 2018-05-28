@@ -86,6 +86,24 @@ if ($notification->getId()) {
                             </div>
                             <br>
                             <h4>
+                                <?php echo $view['translator']->trans('mautic.notification.form.images'); ?>               <small><a href="https://documentation.onesignal.com/docs/web-push-notification-icons" target="_blank"><?php echo $view['translator']->trans('mautic.notification.read.docs'); ?></a></small></h4>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form['icon']); ?>
+                                    <?php if (!empty($notification->getIcon())): ?>
+                                        <?php echo $view['form']->row($form['icon_delete']); ?>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form['image']); ?>
+                                    <?php if (!empty($notification->getImage())): ?>
+                                        <?php echo $view['form']->row($form['image_delete']); ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <br>
+                            <h4>
                                 <?php echo $view['translator']->trans('mautic.notification.form.action.button'); ?> 1                  <small><a href="https://documentation.onesignal.com/docs/action-buttons" target="_blank"><?php echo $view['translator']->trans('mautic.notification.read.docs'); ?></a></small></h4>
                             <hr>
                             <div class="row">
@@ -113,24 +131,6 @@ if ($notification->getId()) {
                                     <?php echo $view['form']->row($form['actionButtonIcon2']); ?>
                                     <?php if (!empty($notification->getActionButtonIcon2())): ?>
                                         <?php echo $view['form']->row($form['actionButtonIcon2_delete']); ?>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <br>
-                            <h4>
-                                <?php echo $view['translator']->trans('mautic.notification.form.images'); ?> 2                  <small><a href="https://documentation.onesignal.com/docs/web-push-notification-icons" target="_blank"><?php echo $view['translator']->trans('mautic.notification.read.docs'); ?></a></small></h4>
-                            <hr>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <?php echo $view['form']->row($form['icon']); ?>
-                                    <?php if (!empty($notification->getIcon())): ?>
-                                        <?php echo $view['form']->row($form['icon_delete']); ?>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="col-md-6">
-                                    <?php echo $view['form']->row($form['image']); ?>
-                                    <?php if (!empty($notification->getImage())): ?>
-                                        <?php echo $view['form']->row($form['image_delete']); ?>
                                     <?php endif; ?>
                                 </div>
                             </div>

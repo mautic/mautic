@@ -511,8 +511,6 @@ class NotificationType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => 'Mautic\NotificationBundle\Entity\Notification',
-                'priority'   => 5,
-                'ttl'        => 72,
             ]
         );
 
