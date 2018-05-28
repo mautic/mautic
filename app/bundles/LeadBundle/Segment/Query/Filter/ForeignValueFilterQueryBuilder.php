@@ -72,7 +72,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'neq':
             case 'notLike':
                 $tableAlias   = $this->generateRandomParameterName();
-                $queryBuilder = $queryBuilder->leftJoin(
+                $queryBuilder->leftJoin(
                     $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
                     $filter->getTable(),
                     $tableAlias,
@@ -82,12 +82,8 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->isNull($tableAlias.'.lead_id'), 'and');
                 break;
             default:
-                $tableAlias = $queryBuilder->getTableAlias($filter->getTable(), 'left');
-
-                if (!$tableAlias) {
-                    $tableAlias = $this->generateRandomParameterName();
-                }
-                $queryBuilder = $queryBuilder->leftJoin(
+                $tableAlias = $this->generateRandomParameterName();
+                $queryBuilder->leftJoin(
                     $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
                     $filter->getTable(),
                     $tableAlias,
