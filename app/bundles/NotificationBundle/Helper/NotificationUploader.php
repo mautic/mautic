@@ -15,6 +15,7 @@ use GuzzleHttp\Psr7\UploadedFile;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\NotificationBundle\Entity\Notification;
 use Symfony\Component\Form\Form;
 
@@ -35,10 +36,23 @@ class NotificationUploader
      */
     private $uploadFilesName = ['actionButtonIcon1', 'actionButtonIcon2', 'icon', 'image'];
 
-    public function __construct(FileUploader $fileUploader, CoreParametersHelper $coreParametersHelper)
+    /**
+     * @var PathsHelper
+     */
+    private $pathsHelper;
+
+    /**
+     * NotificationUploader constructor.
+     *
+     * @param FileUploader         $fileUploader
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param PathsHelper          $pathsHelper
+     */
+    public function __construct(FileUploader $fileUploader, CoreParametersHelper $coreParametersHelper, PathsHelper $pathsHelper)
     {
         $this->fileUploader         = $fileUploader;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->pathsHelper          = $pathsHelper;
     }
 
     /**
@@ -48,10 +62,12 @@ class NotificationUploader
      */
     public function uploadFiles(Notification $notification, $request, Form $form)
     {
+        if (!isset($request->files->all()['notification'])) {
+            return;
+        }
+
         $files         = $request->files->all()['notification'];
 
-        $uploadedFiles = [];
-        $deteledFiles  = [];
         foreach ($this->getUploadFilesName() as $fileName) {
             $uploadDir    = $this->getUploadDir($notification);
 
@@ -106,7 +122,7 @@ class NotificationUploader
     public function getFullUrl($notification, $key)
     {
         if ($fileName = $this->getEntityVar($notification, $key)) {
-            return $this->coreParametersHelper->getParameter('site_url').DIRECTORY_SEPARATOR.$this->coreParametersHelper->getParameter('notification_upload_dir').DIRECTORY_SEPARATOR.$notification->getId().DIRECTORY_SEPARATOR.$fileName;
+            return $this->coreParametersHelper->getParameter('site_url').DIRECTORY_SEPARATOR.$this->getNotificationImagePath().$notification->getId().DIRECTORY_SEPARATOR.$fileName;
         }
     }
 
@@ -132,7 +148,17 @@ class NotificationUploader
      */
     private function getUploadDir(Notification $notification)
     {
-        return $this->coreParametersHelper->getParameter('kernel.root_dir').DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.$this->coreParametersHelper->getParameter('notification_upload_dir').DIRECTORY_SEPARATOR.$notification->getId();
+        return $this->getNotificationImagePath(true).$notification->getId();
+    }
+
+    /**
+     * @param bool $fullPath
+     *
+     * @return string
+     */
+    private function getNotificationImagePath($fullPath = false)
+    {
+        return $this->pathsHelper->getSystemPath('images', $fullPath).DIRECTORY_SEPARATOR.$this->coreParametersHelper->getParameter('notification_image_directory').DIRECTORY_SEPARATOR;
     }
 
     /**

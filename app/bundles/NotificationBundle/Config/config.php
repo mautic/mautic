@@ -149,6 +149,7 @@ return [
                 'arguments' => [
                     'mautic.helper.file_uploader',
                     'mautic.helper.core_parameters',
+                    'mautic.helper.paths',
                 ],
             ],
         ],
@@ -290,6 +291,6 @@ return [
         'gcm_sender_id'                      => '482941778795',
         'notification_subdomain_name'        => null,
         'welcomenotification_enabled'        => true,
-        'notification_upload_dir'            => 'media/images/notifications',
+        'notification_image_directory'       => 'notifications',
     ],
 ];

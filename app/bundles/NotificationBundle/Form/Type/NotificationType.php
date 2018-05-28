@@ -11,7 +11,6 @@
 
 namespace Mautic\NotificationBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\NotificationBundle\Helper\NotificationUploader;
@@ -22,6 +21,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -48,11 +48,11 @@ class NotificationType extends AbstractType
     protected $notificationModel;
 
     /**
-     * @param Translator           $translator
+     * @param TranslatorInterface  $translator
      * @param NotificationUploader $notificationUploader
      * @param NotificationModel    $notificationModel
      */
-    public function __construct(Translator $translator, NotificationUploader $notificationUploader, NotificationModel $notificationModel)
+    public function __construct(TranslatorInterface $translator, NotificationUploader $notificationUploader, NotificationModel $notificationModel)
     {
         $this->translator           = $translator;
         $this->notificationUploader = $notificationUploader;
@@ -65,7 +65,6 @@ class NotificationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('notification.notification', $options));
 
         $builder->add(
@@ -147,7 +146,12 @@ class NotificationType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.notification.form.url.tooltip',
                 ],
-                'required' => false,
+                'required'    => true,
+                'constraints' => [
+                    new NotBlank(
+                        ['message' => 'mautic.core.value.required']
+                    ),
+                ],
             ]
         );
 
