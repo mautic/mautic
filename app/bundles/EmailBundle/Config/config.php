@@ -320,6 +320,13 @@ return [
                 'class' => Mautic\EmailBundle\Form\Type\EmailToUserType::class,
                 'alias' => 'email_to_user',
             ],
+            'mautic.form.type.email.example_send' => [
+                'class'     => Mautic\EmailBundle\Form\Type\ExampleSendType::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ],
+                'alias' => 'email_example_send',
+            ],
         ],
         'other' => [
             // Mailers

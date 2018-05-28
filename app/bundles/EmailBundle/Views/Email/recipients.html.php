@@ -11,7 +11,7 @@
 ?>
 
 <?php if ($tmpl == 'index'): ?>
-    <div class="lead-merge-form">
+    <div class="send-example-form">
     <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', [
         'searchId'    => (empty($searchId)) ? null : $searchId,
         'searchValue' => $searchValue,

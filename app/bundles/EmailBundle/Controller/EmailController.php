@@ -1435,26 +1435,12 @@ class EmailController extends FormController
             serialize(array_merge($savedData, ['search' => $search])),
             3600 * 24 * 31
         );
-        $leads = [];
 
+        $filter = [];
         if (!empty($search)) {
             $filter = [
                 'string' => $search,
             ];
-
-            $leads = $leadModel->getEntities(
-                [
-                    'limit'          => 25,
-                    'filter'         => $filter,
-                    'orderBy'        => 'l.firstname,l.lastname,l.company,l.email',
-                    'orderByDir'     => 'ASC',
-                    'withTotalCount' => false,
-                ]
-            );
-        }
-        $leadChoices = [];
-        foreach ($leads as $l) {
-            $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
         }
 
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'sendExample', 'objectId' => $objectId]);
@@ -1467,8 +1453,8 @@ class EmailController extends FormController
                 'lead_to_example' => !empty($savedData['lead_to_example']) ? $savedData['lead_to_example'] : '',
             ],
             [
-                'action' => $action,
-                'leads'  => $leadChoices,
+                'action'  => $action,
+                'filter'  => $filter,
             ]
         );
 
@@ -1559,7 +1545,7 @@ class EmailController extends FormController
             [
                 'viewParameters'  => [
                     'tmpl'         => $tmpl,
-                    'leads'        => $leads,
+                    'filter'       => $filter,
                     'searchValue'  => $search,
                     'action'       => $action,
                     'form'         => $form->createView(),

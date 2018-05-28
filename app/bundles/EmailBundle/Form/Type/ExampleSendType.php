@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,13 +20,43 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ExampleSendType extends AbstractType
 {
+    /**
+     * @var LeadModel
+     */
+    private $leadModel;
+
+    /**
+     * ExampleSendType constructor.
+     *
+     * @param LeadModel $leadModel
+     */
+    public function __construct(LeadModel $leadModel)
+    {
+        $this->leadModel = $leadModel;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $leads = $this->leadModel->getEntities(
+            [
+                'limit'          => 25,
+                'filter'         => $options['filter'],
+                'orderBy'        => 'l.firstname,l.lastname,l.company,l.email',
+                'orderByDir'     => 'ASC',
+                'withTotalCount' => false,
+            ]
+        );
+
+        $leadChoices = [];
+        foreach ($leads as $l) {
+            $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
+        }
+
         $builder->add(
             'lead_to_example',
             'choice',
             [
-                'choices'     => $options['leads'],
+                'choices'     => $leadChoices,
                 'label'       => 'mautic.email.send.example.contact',
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
@@ -74,6 +105,14 @@ class ExampleSendType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(['leads']);
+        $resolver->setOptional(['filter']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'email_example_send';
     }
 }
