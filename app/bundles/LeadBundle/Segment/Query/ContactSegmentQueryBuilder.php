@@ -182,7 +182,10 @@ class ContactSegmentQueryBuilder
 
         $expression = $queryBuilder->expr()->andX(
             $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId),
-            $queryBuilder->expr()->lte($tableAlias.'.date_added', "'".$batchRestrictions['dateTime']."'")
+            $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->isNull($tableAlias.'.date_added'),
+                $queryBuilder->expr()->lte($tableAlias.'.date_added', "'".$batchRestrictions['dateTime']."'")
+            )
         );
 
         $queryBuilder->addJoinCondition($tableAlias, $expression);
