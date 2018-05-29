@@ -196,6 +196,11 @@ class MailHelper
     /**
      * @var array
      */
+    private $systemHeaders = [];
+
+    /**
+     * @var array
+     */
     protected $body = [
         'content'     => '',
         'contentType' => 'text/html',
@@ -364,9 +369,6 @@ class MailHelper
 
         if (empty($this->fatal)) {
             if (!$isQueueFlush) {
-                // Only add unsubscribe header to one-off sends as tokenized sends are built by the transport
-                $this->addUnsubscribeHeader();
-
                 // Search/replace tokens if this is not a queue flush
 
                 // Generate tokens from listeners
@@ -385,6 +387,8 @@ class MailHelper
                 $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
             }
             $this->setMessagePlainText();
+
+            $this->setMessageHeaders();
 
             if (!$isQueueFlush) {
                 // Replace token content
@@ -432,25 +436,11 @@ class MailHelper
                 }
             }
 
-            // Set custom headers
-            if (!empty($this->headers)) {
-                $headers = $this->message->getHeaders();
-                foreach ($this->headers as $headerKey => $headerValue) {
-                    if ($headers->has($headerKey)) {
-                        $header = $headers->get($headerKey);
-                        $header->setFieldBodyModel($headerValue);
-                    } else {
-                        $headers->addTextHeader($headerKey, $headerValue);
-                    }
-                }
-            }
-
             try {
-                $failures = [];
-
                 if (!$this->transport->isStarted()) {
                     $this->transportStartTime = time();
                 }
+
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
@@ -461,11 +451,16 @@ class MailHelper
                 // Clear the log so that previous output is not associated with new errors
                 $this->logger->clear();
             } catch (\Exception $e) {
+                $failures = $this->tokenizationEnabled ? array_keys($this->message->getMetadata()) : [];
+
                 // Exception encountered when sending so all recipients are considered failures
-                $this->errors['failures'] = array_merge(
-                    array_keys((array) $this->message->getTo()),
-                    array_keys((array) $this->message->getCc()),
-                    array_keys((array) $this->message->getBcc())
+                $this->errors['failures'] = array_unique(
+                    array_merge(
+                        $failures,
+                        array_keys((array) $this->message->getTo()),
+                        array_keys((array) $this->message->getCc()),
+                        array_keys((array) $this->message->getBcc())
+                    )
                 );
 
                 $this->logError($e, 'send');
@@ -684,6 +679,7 @@ class MailHelper
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
             $this->headers             = [];
+            $this->systemHeaders       = [];
             $this->source              = [];
             $this->assets              = [];
             $this->globalTokens        = [];
@@ -1270,7 +1266,7 @@ class MailHelper
     public function setIdHash($idHash = null, $statToBeGenerated = true)
     {
         if ($idHash === null) {
-            $idHash = uniqid();
+            $idHash = str_replace('.', '', uniqid('', true));
         }
 
         $this->idHash      = $idHash;
@@ -1438,6 +1434,16 @@ class MailHelper
             }
         }
 
+        // Set custom headers
+        if ($headers = $email->getHeaders()) {
+            // HTML decode headers
+            $headers = array_map('html_entity_decode', $headers);
+
+            foreach ($headers as $name => $value) {
+                $this->addCustomHeader($name, $value);
+            }
+        }
+
         return empty($this->errors);
     }
 
@@ -1445,9 +1451,16 @@ class MailHelper
      * Set custom headers.
      *
      * @param array $headers
+     * @param bool  $merge
      */
-    public function setCustomHeaders(array $headers)
+    public function setCustomHeaders(array $headers, $merge = true)
     {
+        if ($merge) {
+            $this->headers = array_merge($this->headers, $headers);
+
+            return;
+        }
+
         $this->headers = $headers;
     }
 
@@ -1465,18 +1478,37 @@ class MailHelper
      */
     public function getCustomHeaders()
     {
-        return $this->headers;
+        $headers = array_merge($this->headers, $this->getSystemHeaders());
+
+        $listUnsubscribeHeader = $this->getUnsubscribeHeader();
+        if ($listUnsubscribeHeader) {
+            if (!empty($headers['List-Unsubscribe'])) {
+                // Ensure Mautic's is always part of this header
+                $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
+            } else {
+                $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
+            }
+        }
+
+        return $headers;
     }
 
     /**
-     * Generate and insert List-Unsubscribe header.
+     * @return bool|string
      */
-    private function addUnsubscribeHeader()
+    private function getUnsubscribeHeader()
     {
-        if (isset($this->idHash)) {
-            $unsubscribeLink                   = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], true);
-            $this->headers['List-Unsubscribe'] = "<$unsubscribeLink>";
+        if ($this->idHash) {
+            $url = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], true);
+
+            return "<$url>";
         }
+
+        if (!empty($this->queuedRecipients) || !empty($this->lead)) {
+            return '<{unsubscribe_url}>';
+        }
+
+        return false;
     }
 
     /**
@@ -2055,6 +2087,47 @@ class MailHelper
             : EmojiHelper::toHtml(
                 str_replace('|FROM_NAME|', $owner['first_name'].' '.$owner['last_name'], nl2br($owner['signature']))
             );
+    }
+
+    /**
+     * @return array
+     */
+    private function getSystemHeaders()
+    {
+        if ($this->email) {
+            // We are purposively ignoring system headers if using an Email entity
+            return [];
+        }
+
+        if (!$systemHeaders = $this->factory->getParameter('mailer_custom_headers', [])) {
+            return [];
+        }
+
+        // HTML decode headers
+        $systemHeaders = array_map('html_entity_decode', $systemHeaders);
+
+        return $systemHeaders;
+    }
+
+    /**
+     * Merge system headers into custom headers if applicable.
+     */
+    private function setMessageHeaders()
+    {
+        $headers = $this->getCustomHeaders();
+
+        // Set custom headers
+        if (!empty($headers)) {
+            $messageHeaders = $this->message->getHeaders();
+            foreach ($headers as $headerKey => $headerValue) {
+                if ($messageHeaders->has($headerKey)) {
+                    $header = $messageHeaders->get($headerKey);
+                    $header->setFieldBodyModel($headerValue);
+                } else {
+                    $messageHeaders->addTextHeader($headerKey, $headerValue);
+                }
+            }
+        }
     }
 
     /**

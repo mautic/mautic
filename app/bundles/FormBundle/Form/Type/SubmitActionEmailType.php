@@ -100,7 +100,7 @@ class SubmitActionEmailType extends AbstractType
         );
 
         if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
-            $default = (isset($options['data']['immediately'])) ? $options['data']['immediately'] : false;
+            $default = isset($options['data']['immediately']) ? $options['data']['immediately'] : false;
             $builder->add(
                 'immediately',
                 YesNoButtonGroupType::class,
@@ -122,7 +122,7 @@ class SubmitActionEmailType extends AbstractType
             );
         }
 
-        $default = (isset($options['data']['copy_lead'])) ? $options['data']['copy_lead'] : true;
+        $default = isset($options['data']['copy_lead']) ? $options['data']['copy_lead'] : false;
         $builder->add(
             'copy_lead',
             YesNoButtonGroupType::class,
@@ -132,7 +132,7 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        $default = (isset($options['data']['set_replyto'])) ? $options['data']['set_replyto'] : true;
+        $default = isset($options['data']['set_replyto']) ? $options['data']['set_replyto'] : true;
         $builder->add(
             'set_replyto',
             'yesno_button_group',
@@ -145,7 +145,7 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        $default = (isset($options['data']['email_to_owner'])) ? $options['data']['email_to_owner'] : false;
+        $default = isset($options['data']['email_to_owner']) ? $options['data']['email_to_owner'] : false;
         $builder->add(
             'email_to_owner',
             YesNoButtonGroupType::class,

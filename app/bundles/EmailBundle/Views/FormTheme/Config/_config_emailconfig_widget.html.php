@@ -43,7 +43,10 @@ $template  = '<div class="col-md-6">{content}</div>';
                             <?php echo $view['form']->widget($fields['mailer_test_send_button']); ?>
                             <span class="fa fa-spinner fa-spin hide"></span>
                         </div>
-                        <div class="col-md-9 help-block"></div>
+                        <div class="col-md-9 help-block">
+                            <div class="status-msg"></div>
+                            <div class="save-config-msg hide text-danger"><?php echo $view['translator']->trans('mautic.email.config.save_to_test'); ?></div>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>
@@ -73,6 +76,10 @@ $template  = '<div class="col-md-6">{content}</div>';
                     <?php echo $view['form']->rowIfExists($fields, 'mailer_mailjet_sandbox_default_mail', $template); ?>
                 </div>
             <?php endif; ?>
+
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_custom_headers', $template); ?>
+            </div>
 
             <?php if (isset($fields['mailer_transport'])): ?>
                 <hr class="text-muted" />
