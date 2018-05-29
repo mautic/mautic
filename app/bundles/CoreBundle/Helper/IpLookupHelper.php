@@ -146,7 +146,7 @@ class IpLookupHelper
             if ($ipAddress === null) {
                 $ipAddress = new IpAddress();
                 if ($this->coreParametersHelper->getParameter('anonymize_ip')) {
-                    $ip = preg_replace('/(?!\d{1,3}\.\d{1,3}\.)\d/', '*', $ip);
+                    $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
                 }
                 $ipAddress->setIpAddress($ip);
             }
