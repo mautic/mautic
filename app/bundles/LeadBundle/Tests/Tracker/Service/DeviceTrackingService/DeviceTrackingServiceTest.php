@@ -85,6 +85,10 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
             ->willReturn($trackingId);
         $leadDeviceMock = $this->createMock(LeadDevice::class);
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         $this->leadDeviceRepositoryMock->expects($this->at(0))
             ->method('getByTrackingId')
             ->with($trackingId)
@@ -111,6 +115,10 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
             ->with('mautic_device_id', null)
             ->willReturn($trackingId);
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         $this->leadDeviceRepositoryMock->expects($this->at(0))
             ->method('getByTrackingId')
             ->with($trackingId)
@@ -136,6 +144,10 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getCookie')
             ->with('mautic_device_id', null)
             ->willReturn($trackingId);
+
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
 
         $leadDeviceMock = $this->createMock(LeadDevice::class);
         $this->leadDeviceRepositoryMock->expects($this->at(0))
@@ -168,6 +180,10 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
             ->with('mautic_device_id', null)
             ->willReturn($trackingId);
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         $leadDeviceMock = $this->createMock(LeadDevice::class);
         $this->leadDeviceRepositoryMock->expects($this->at(0))
             ->method('getByTrackingId')
@@ -195,6 +211,10 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with('mautic_device_id', null)
             ->willReturn(null);
+
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
 
         $this->leadDeviceRepositoryMock->expects($this->never())
             ->method('getByTrackingId');
@@ -237,6 +257,10 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
             ->with('mautic_device_id', null)
             ->willReturn($trackingId);
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         $this->leadDeviceRepositoryMock->expects($this->at(0))
             ->method('getByTrackingId')
             ->with($trackingId)
@@ -270,6 +294,10 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getCookie')
             ->with('mautic_device_id', null)
             ->willReturn($trackingId);
+
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
 
         $this->leadDeviceRepositoryMock->expects($this->at(0))
             ->method('getByTrackingId')
@@ -345,6 +373,10 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
             ->with(23)
             ->willReturn($uniqueTrackingIdentifier);
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         // index 0-3 for leadDeviceRepository::findOneBy
         $leadDeviceMock->expects($this->at(4))
             ->method('getTrackingId')
@@ -376,6 +408,11 @@ final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->leadDeviceRepositoryMock->expects($this->never())
             ->method('getByTrackingId');
+
+        $requestMock = $this->createMock(Request::class);
+        $this->requestStackMock->expects($this->at(0))
+            ->method('getCurrentRequest')
+            ->willReturn($requestMock);
 
         $this->security->expects($this->once())
             ->method('isAnonymous')
