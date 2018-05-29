@@ -85,7 +85,7 @@ class MembershipManager
     {
         // Validate that contact is not already in the Campaign
         /** @var CampaignMember $campaignMember */
-        $campaignMember = $this->leadRepository()->findOneBy(
+        $campaignMember = $this->leadRepository->findOneBy(
             [
                 'lead'     => $contact,
                 'campaign' => $campaign,
@@ -177,7 +177,7 @@ class MembershipManager
     {
         // Validate that contact is not already in the Campaign
         /** @var CampaignMember $campaignMember */
-        $campaignMember = $this->leadRepository()->findOneBy(
+        $campaignMember = $this->leadRepository->findOneBy(
             [
                 'lead'     => $contact,
                 'campaign' => $campaign,
