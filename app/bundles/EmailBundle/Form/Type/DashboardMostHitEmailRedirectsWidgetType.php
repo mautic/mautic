@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -31,20 +32,28 @@ class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
     private $segmentsRepository;
 
     /**
+     * @var UserHelper
+     */
+    private $userHelper;
+
+    /**
      * DashboardMostHitEmailRedirectsWidgetType constructor.
      *
      * @param CampaignRepository $campaignRepository
      * @param CompanyRepository  $companyRepository
      * @param LeadListRepository $leadListRepository
+     * @param UserHelper         $userHelper
      */
     public function __construct(
         CampaignRepository $campaignRepository,
         CompanyRepository $companyRepository,
-        LeadListRepository $leadListRepository
+        LeadListRepository $leadListRepository,
+        UserHelper $userHelper
     ) {
         $this->campaignRepository = $campaignRepository;
         $this->companyRepository  = $companyRepository;
         $this->segmentsRepository = $leadListRepository;
+        $this->userHelper         = $userHelper;
     }
 
     /**
@@ -53,7 +62,8 @@ class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $companies        = $this->companyRepository->getCompanies();
+        $user             = $this->userHelper->getUser();
+        $companies        = $this->companyRepository->getCompanies($user);
         $companiesChoises = [];
         foreach ($companies as $company) {
             $companiesChoises[$company['id']] = $company['companyname'];
@@ -83,7 +93,7 @@ class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
             ]
         );
         /** @var LeadList[] $segments */
-        $segments        = $this->segmentsRepository->findAll();
+        $segments        = $this->segmentsRepository->getLists($user);
         $segmentsChoices = [];
         foreach ($segments as $segment) {
             $segmentsChoices[$segment->getId()] = $segment->getName();

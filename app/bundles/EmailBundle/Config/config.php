@@ -323,6 +323,7 @@ return [
                     'mautic.campaign.repository.campaign',
                     'mautic.lead.repository.company',
                     'mautic.lead.repository.lead_list',
+                    'mautic.helper.user',
                 ],
             ],
             'mautic.form.type.email_dashboard_most_hit_email_redirects_widget' => [
@@ -332,6 +333,7 @@ return [
                     'mautic.campaign.repository.campaign',
                     'mautic.lead.repository.company',
                     'mautic.lead.repository.lead_list',
+                    'mautic.helper.user',
                 ],
             ],
             'mautic.form.type.email_to_user' => [
