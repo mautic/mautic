@@ -20,8 +20,11 @@ $eventLogic = '';
 <div id="CampaignEvent_<?php echo $event['id'] ?>" data-type="<?php echo $event['eventType']; ?>" class="draggable list-campaign-event list-campaign-<?php echo $event['eventType']; ?>" data-event="<?php echo $event['type']; ?>">
 <?php endif; ?>
     <div class="campaign-event-content">
-        <div><span class="campaign-event-name ellipsis"><?php echo $event['name']; ?></span></div>
-        <span class="campaign-event-logic"><?php echo $view['translator']->trans('mautic.campaign.'.$event['type']); ?></span>
+        <div>
+            <span class="campaign-event-name ellipsis">
+                <i class="fa fa-info-circle" title="<?php echo $view['translator']->trans('mautic.campaign.'.$event['type']); ?>"></i>&emsp;<?php echo $event['name']; ?>
+            </span>
+        </div>
     </div>
 <?php if (empty($update)): ?>
     <div class="campaign-event-buttons hide">
