@@ -820,7 +820,7 @@ class ListModel extends FormModel
     {
         $id       = $entity->getId();
         $list     = ['id' => $id, 'filters' => $entity->getFilters()];
-        $dtHelper = new DateTimeHelper('2017-10-01 00:00:00');
+        $dtHelper = new DateTimeHelper();
 
         $batchLimiters = [
             'dateTime' => $dtHelper->toUtcString(),
@@ -838,7 +838,7 @@ class ListModel extends FormModel
     {
         $id       = $entity->getId();
         $list     = ['id' => $id, 'filters' => $entity->getFilters()];
-        $dtHelper = new DateTimeHelper('2017-10-01 00:00:00');
+        $dtHelper = new DateTimeHelper();
 
         $batchLimiters = [
             'dateTime' => $dtHelper->toUtcString(),
