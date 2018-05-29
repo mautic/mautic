@@ -168,6 +168,29 @@ class FormatterHelper extends Helper
     }
 
     /**
+     * Takes a simple csv list like 1,2,3,4 and returns as an array.
+     *
+     * @param $csv
+     *
+     * @return array
+     */
+    public function simpleCsvToArray($csv, $type = null)
+    {
+        if (!$csv) {
+            return [];
+        }
+
+        return array_map(
+            function ($value) use ($type) {
+                $value = trim($value);
+
+                return $this->_($value, $type);
+            },
+            explode(',', $csv)
+        );
+    }
+
+    /**
      * @return string
      */
     public function getName()

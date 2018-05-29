@@ -56,13 +56,8 @@ class DynamicContentApiController extends CommonController
         $pageModel = $this->getModel('page');
 
         /** @var Lead $lead */
-        $lead    = $model->getContactFromRequest($pageModel->getHitQuery($this->request));
-        $content = $helper->getDynamicContentForLead($objectAlias, $lead);
-
-        if (empty($content)) {
-            $content = $helper->getDynamicContentSlotForLead($objectAlias, $lead);
-        }
-
+        $lead          = $model->getContactFromRequest($pageModel->getHitQuery($this->request));
+        $content       = $helper->getDynamicContentForLead($objectAlias, $lead);
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
         $deviceId      = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
 
