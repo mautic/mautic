@@ -1147,8 +1147,9 @@ class CampaignModel extends CommonFormModel
      * @param array    $leads
      * @param bool     $manuallyAdded
      * @param bool     $batchProcess
+     * @param int      $searchListLead
      */
-    public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false)
+    public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
     {
         @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead', E_USER_DEPRECATED);
 
@@ -1191,10 +1192,11 @@ class CampaignModel extends CommonFormModel
      *
      * @param Campaign $campaign
      * @param array    $leads
-     * @param bool     $manuallyRemoved @deprecated No longer used
+     * @param bool     $manuallyRemoved
      * @param bool     $batchProcess
+     * @param bool     $skipFindOne
      */
-    public function removeLeads(Campaign $campaign, array $leads, $manuallyRemoved = false, $batchProcess = false)
+    public function removeLeads(Campaign $campaign, array $leads, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
     {
         @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead', E_USER_DEPRECATED);
 
