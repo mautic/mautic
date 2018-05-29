@@ -142,7 +142,10 @@ class ContactSegmentService
         if (!empty($batchLimiters['dateTime'])) {
             // Only leads in the list at the time of count
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->lte('l.date_added', $queryBuilder->expr()->literal($batchLimiters['dateTime']))
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->lte('l.date_added', $queryBuilder->expr()->literal($batchLimiters['dateTime'])),
+                    $queryBuilder->expr()->isNull('l.date_added')
+                )
             );
         }
 
