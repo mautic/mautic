@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
+use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
@@ -195,5 +196,10 @@ class ContactSegmentFilter
     public function getDoNotContactParts()
     {
         return new DoNotContactParts($this->contactSegmentFilterCrate->getField());
+    }
+
+    public function getIntegrationCampaignParts()
+    {
+        return new IntegrationCampaignParts($this->getParameterValue());
     }
 }

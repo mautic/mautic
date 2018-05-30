@@ -784,6 +784,10 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
+            'mautic.lead.query.builder.special.integration' => [
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
+            ],
             'mautic.lead.query.builder.special.sessions' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],

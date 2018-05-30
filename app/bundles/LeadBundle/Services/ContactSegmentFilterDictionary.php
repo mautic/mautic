@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
 
@@ -185,6 +186,10 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
 
         $this->translations['sessions'] = [
             'type' => SessionsFilterQueryBuilder::getServiceId(),
+        ];
+
+        $this->translations['integration_campaigns'] = [
+            'type' => IntegrationCampaignFilterQueryBuilder::getServiceId(),
         ];
 
         $this->translations['utm_campaign'] = [
