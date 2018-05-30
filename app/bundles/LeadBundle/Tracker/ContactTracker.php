@@ -199,6 +199,15 @@ class ContactTracker
      */
     public function setSystemContact(Lead $lead = null)
     {
+        if (null !== $lead) {
+            $this->logger->addDebug("LEAD: {$lead->getId()} set as system lead.");
+
+            $fields = $lead->getFields();
+            if (empty($fields)) {
+                $this->hydrateCustomFieldData($lead);
+            }
+        }
+
         $this->systemContact = $lead;
     }
 

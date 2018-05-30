@@ -144,13 +144,14 @@ return [
                 'class' => 'Mautic\EmailBundle\EventListener\TokenSubscriber',
             ],
             'mautic.email.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
                     'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_user',
+                    'translator',
                 ],
             ],
             'mautic.email.campaignbundle.condition_subscriber' => [
@@ -363,6 +364,63 @@ return [
                     'setPassword' => ['%mautic.mailer_password%'],
                 ],
             ],
+            'mautic.transport.momentum' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Transport\MomentumTransport::class,
+                'arguments' => [
+                    'mautic.transport.momentum.callback',
+                    'mautic.transport.momentum.facade',
+                ],
+                'tag'          => 'mautic.email_transport',
+                'tagArguments' => [
+                    \Mautic\EmailBundle\Model\TransportType::TRANSPORT_ALIAS => 'mautic.email.config.mailer_transport.momentum',
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_HOST      => true,
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_PORT      => true,
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_API_KEY   => true,
+                ],
+            ],
+            'mautic.transport.momentum.adapter' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\Adapter::class,
+                'arguments' => [
+                    'mautic.transport.momentum.sparkpost',
+                ],
+            ],
+            'mautic.transport.momentum.service.swift_message' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageService::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.transport.momentum.validator.swift_message' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator\SwiftMessageValidator::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.transport.momentum.callback' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallback::class,
+                'arguments' => [
+                    'mautic.email.model.transport_callback',
+                ],
+            ],
+            'mautic.transport.momentum.facade' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Facade\MomentumFacade::class,
+                'arguments' => [
+                    'mautic.transport.momentum.adapter',
+                    'mautic.transport.momentum.service.swift_message',
+                    'mautic.transport.momentum.validator.swift_message',
+                    'mautic.transport.momentum.callback',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.transport.momentum.sparkpost' => [
+                'class'     => \SparkPost\SparkPost::class,
+                'factory'   => ['@mautic.sparkpost.factory', 'create'],
+                'arguments' => [
+                    '%mautic.mailer_host%',
+                    '%mautic.mailer_api_key%',
+                    '%mautic.mailer_port%',
+                ],
+            ],
             'mautic.transport.sendgrid' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
@@ -402,9 +460,6 @@ return [
             'mautic.transport.sendgrid_api.mail.attachment' => [
                 'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment::class,
             ],
-            'mautic.transport.sendgrid_api.mail.header' => [
-                'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailHeader::class,
-            ],
             'mautic.transport.sendgrid_api.message' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage::class,
                 'arguments' => [
@@ -412,7 +467,6 @@ return [
                     'mautic.transport.sendgrid_api.mail.personalization',
                     'mautic.transport.sendgrid_api.mail.metadata',
                     'mautic.transport.sendgrid_api.mail.attachment',
-                    'mautic.transport.sendgrid_api.mail.header',
                 ],
             ],
             'mautic.transport.sendgrid_api.response' => [
@@ -468,6 +522,19 @@ return [
                     'translator',
                     'mautic.email.model.transport_callback',
                 ],
+            ],
+            'mautic.sparkpost.factory' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactory::class,
+                'arguments' => [
+                    'mautic.guzzle.client',
+                ],
+            ],
+            'mautic.guzzle.client.factory' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\Guzzle\ClientFactory::class,
+            ],
+            'mautic.guzzle.client' => [
+                'class'     => \Http\Adapter\Guzzle6\Client::class,
+                'factory'   => ['@mautic.guzzle.client.factory', 'create'],
             ],
             'mautic.helper.mailbox' => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',

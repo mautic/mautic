@@ -11,6 +11,9 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -21,6 +24,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
+    use ContactLimiterTrait;
 
     public function getEntities(array $args = [])
     {
@@ -64,9 +68,6 @@ class LeadEventLogRepository extends CommonRepository
      * @param array    $options
      *
      * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getLeadLogs($leadId = null, array $options = [])
     {
@@ -140,9 +141,6 @@ class LeadEventLogRepository extends CommonRepository
      * @param array $options
      *
      * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getUpcomingEvents(array $options = null)
     {
@@ -387,5 +385,137 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         return $chartQuery->fetchTimeData('('.$query.')', 'date_triggered');
+    }
+
+    /**
+     * @param int            $eventId
+     * @param \DateTime      $now
+     * @param ContactLimiter $limiter
+     *
+     * @return ArrayCollection
+     *
+     * @throws \Doctrine\ORM\Query\QueryException
+     */
+    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter)
+    {
+        $q = $this->createQueryBuilder('o');
+
+        $q->select('o, e, c')
+            ->indexBy('o', 'o.id')
+            ->innerJoin('o.event', 'e')
+            ->innerJoin('o.campaign', 'c')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('IDENTITY(o.event)', ':eventId'),
+                    $q->expr()->eq('o.isScheduled', ':true'),
+                    $q->expr()->lte('o.triggerDate', ':now'),
+                    $q->expr()->eq('c.isPublished', 1)
+                )
+            )
+            ->setParameter('eventId', (int) $eventId)
+            ->setParameter('now', $now)
+            ->setParameter('true', true, Type::BOOLEAN);
+
+        $this->updateOrmQueryFromContactLimiter('o', $q, $limiter);
+
+        return new ArrayCollection($q->getQuery()->getResult());
+    }
+
+    /**
+     * @param array $ids
+     *
+     * @return ArrayCollection
+     *
+     * @throws \Doctrine\ORM\Query\QueryException
+     */
+    public function getScheduledByIds(array $ids)
+    {
+        $q = $this->createQueryBuilder('o');
+
+        $q->select('o, e, c')
+            ->indexBy('o', 'o.id')
+            ->innerJoin('o.event', 'e')
+            ->innerJoin('o.campaign', 'c')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('o.id', $ids),
+                    $q->expr()->eq('o.isScheduled', 1),
+                    $q->expr()->eq('c.isPublished', 1)
+                )
+            );
+
+        return new ArrayCollection($q->getQuery()->getResult());
+    }
+
+    /**
+     * @param int            $campaignId
+     * @param \DateTime      $date
+     * @param ContactLimiter $limiter
+     *
+     * @return array
+     */
+    public function getScheduledCounts($campaignId, \DateTime $date, ContactLimiter $limiter)
+    {
+        $now = clone $date;
+        $now->setTimezone(new \DateTimeZone('UTC'));
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $expr = $q->expr()->andX(
+            $q->expr()->eq('l.campaign_id', ':campaignId'),
+            $q->expr()->eq('l.is_scheduled', ':true'),
+            $q->expr()->lte('l.trigger_date', ':now'),
+            $q->expr()->eq('c.is_published', 1)
+        );
+
+        $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
+
+        $results = $q->select('COUNT(*) as event_count, l.event_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
+            ->join('l', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'l.campaign_id = c.id')
+            ->where($expr)
+            ->setParameter('campaignId', $campaignId)
+            ->setParameter('now', $now->format('Y-m-d H:i:s'))
+            ->setParameter('true', true, \PDO::PARAM_BOOL)
+            ->groupBy('l.event_id')
+            ->execute()
+            ->fetchAll();
+
+        $events = [];
+
+        foreach ($results as $result) {
+            $events[$result['event_id']] = (int) $result['event_count'];
+        }
+
+        return $events;
+    }
+
+    /**
+     * @param       $eventId
+     * @param array $contactIds
+     *
+     * @return array
+     */
+    public function getDatesExecuted($eventId, array $contactIds)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('log.lead_id, log.date_triggered')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('log.event_id', $eventId),
+                    $qb->expr()->eq('log.is_scheduled', 0),
+                    $qb->expr()->in('log.lead_id', $contactIds)
+                )
+            );
+
+        $results = $qb->execute()->fetchAll();
+
+        $dates = [];
+        foreach ($results as $result) {
+            $dates[$result['lead_id']] = new \DateTime($result['date_triggered'], new \DateTimeZone('UTC'));
+        }
+
+        return $dates;
     }
 }

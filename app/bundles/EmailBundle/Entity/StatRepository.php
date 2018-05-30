@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -541,7 +542,7 @@ class StatRepository extends CommonRepository
 
     /**
      * @param $contacts
-     * @param $emailId
+     * @param   $emailId
      *
      * @return mixed
      */
@@ -550,14 +551,43 @@ class StatRepository extends CommonRepository
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
         $query->select('id, lead_id')
-        ->where('s.email_id = :email')
-        ->andWhere('s.lead_id in (:contacts)')
+            ->where('s.email_id = :email')
+            ->andWhere('s.lead_id in (:contacts)')
             ->andWhere('is_failed = 0')
-        ->setParameter(':email', $emailId)
-        ->setParameter(':contacts', $contacts);
+            ->setParameter(':email', $emailId)
+            ->setParameter(':contacts', $contacts);
 
         $results = $query->execute()->fetch();
 
         return $results;
+    }
+
+    /**
+     * @param array $contacts
+     * @param       $emailId
+     * @param bool  $organizeByContact
+     *
+     * @return array Formatted as [contactId => sentCount]
+     */
+    public function getSentCountForContacts(array $contacts, $emailId)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+        $query->select('count(s.id) as sent_count, s.lead_id')
+            ->where('s.email_id = :email')
+            ->andWhere('s.lead_id in (:contacts)')
+            ->andWhere('s.is_failed = 0')
+            ->setParameter(':email', $emailId)
+            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->groupBy('s.lead_id');
+
+        $results = $query->execute()->fetchAll();
+
+        $contacts = [];
+        foreach ($results as $result) {
+            $contacts[$result['lead_id']] = $result['sent_count'];
+        }
+
+        return $contacts;
     }
 }

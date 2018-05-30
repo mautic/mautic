@@ -234,11 +234,11 @@ class DashboardModel extends FormModel
      * @param Widget $widget
      * @param array  $filter
      */
-    public function populateWidgetContent(Widget &$widget, $filter = [])
+    public function populateWidgetContent(Widget $widget, $filter = [])
     {
         $cacheDir = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
 
-        if ($widget->getCacheTimeout() == null || $widget->getCacheTimeout() == -1) {
+        if ($widget->getCacheTimeout() === null || $widget->getCacheTimeout() === -1) {
             $widget->setCacheTimeout($this->coreParametersHelper->getParameter('cached_data_timeout'));
         }
 
@@ -262,7 +262,6 @@ class DashboardModel extends FormModel
 
         $event = new WidgetDetailEvent($this->translator);
         $event->setWidget($widget);
-
         $event->setCacheDir($cacheDir, $this->userHelper->getUser()->getId());
         $event->setSecurity($this->security);
         $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
