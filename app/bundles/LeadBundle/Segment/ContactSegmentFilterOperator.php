@@ -67,6 +67,10 @@ class ContactSegmentFilterOperator
         $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE, $event);
         $options = $event->getOperators();
 
+        if (empty($options[$operator])) {
+            return $operator;
+        }
+
         $operatorDetails = $options[$operator];
 
         return $operatorDetails['expr'];

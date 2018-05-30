@@ -140,6 +140,15 @@ class BaseDecorator implements FilterDecoratorInterface
             case 'regexp':
             case '!regexp':
                 return $this->prepareRegex($filter);
+            case 'multiselect':
+            case '!multiselect':
+                $filter = (array) $filter;
+
+                foreach ($filter as $key => $value) {
+                    $filter[$key] = sprintf('(([|]|^)%s([|]|$))', $value);
+                }
+
+                return $filter;
         }
 
         return $filter;

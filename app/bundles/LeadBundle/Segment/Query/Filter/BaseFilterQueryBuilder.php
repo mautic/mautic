@@ -146,7 +146,16 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                     $queryBuilder->expr()->$filterOperator($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                 );
+                break;
+            case 'multiselect':
+            case '!multiselect':
+                $operator    = $filterOperator === 'multiselect' ? 'regexp' : 'notRegexp';
+                $expressions = [];
+                foreach ($filterParametersHolder as $parameter) {
+                    $expressions[] = $queryBuilder->expr()->$operator($tableAlias.'.'.$filter->getField(), $parameter);
+                }
 
+                $expression = $queryBuilder->expr()->andX($expressions);
                 break;
             default:
                 throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');

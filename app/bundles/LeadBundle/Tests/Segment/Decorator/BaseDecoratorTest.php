@@ -397,6 +397,35 @@ class BaseDecoratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
+     */
+    public function testGetParameterValueMultiselect()
+    {
+        $baseDecorator = $this->getDecorator();
+
+        $expected = [
+            '(([|]|^)2([|]|$))',
+            '(([|]|^)4([|]|$))',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'multiselect',
+            'filter'   => [2, 4],
+            'operator' => 'in',
+        ]);
+
+        $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'multiselect',
+            'filter'   => [2, 4],
+            'operator' => '!in',
+        ]);
+
+        $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
      * @return BaseDecorator
      */
     private function getDecorator()

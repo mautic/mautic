@@ -62,9 +62,10 @@ class ContactSegmentFilterCrate
         $this->field       = isset($filter['field']) ? $filter['field'] : null;
         $this->object      = isset($filter['object']) ? $filter['object'] : self::CONTACT_OBJECT;
         $this->type        = isset($filter['type']) ? $filter['type'] : null;
-        $this->operator    = isset($filter['operator']) ? $filter['operator'] : null;
         $this->filter      = isset($filter['filter']) ? $filter['filter'] : null;
         $this->sourceArray = $filter;
+
+        $this->setOperator($filter);
     }
 
     /**
@@ -178,5 +179,22 @@ class ContactSegmentFilterCrate
     public function getArray()
     {
         return $this->sourceArray;
+    }
+
+    /**
+     * @param array $filter
+     */
+    private function setOperator(array $filter)
+    {
+        $operator = isset($filter['operator']) ? $filter['operator'] : null;
+
+        if ($this->getType() === 'multiselect') {
+            $neg            = strpos($operator, '!') === false ? '' : '!';
+            $this->operator = $neg.$this->getType();
+
+            return;
+        }
+
+        $this->operator = $operator;
     }
 }

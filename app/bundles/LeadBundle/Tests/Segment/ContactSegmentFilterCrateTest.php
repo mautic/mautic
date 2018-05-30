@@ -143,4 +143,60 @@ class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($contactSegmentFilterCrate->isContactType());
         $this->assertTrue($contactSegmentFilterCrate->isCompanyType());
     }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
+     */
+    public function testMultiselectFilter()
+    {
+        $filter = [
+            'glue'     => 'and',
+            'field'    => 'multiselect_cf',
+            'object'   => 'lead',
+            'type'     => 'multiselect',
+            'filter'   => [2, 4],
+            'display'  => null,
+            'operator' => 'in',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $this->assertSame('and', $contactSegmentFilterCrate->getGlue());
+        $this->assertSame('multiselect_cf', $contactSegmentFilterCrate->getField());
+        $this->assertTrue($contactSegmentFilterCrate->isContactType());
+        $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
+        $this->assertSame([2, 4], $contactSegmentFilterCrate->getFilter());
+        $this->assertSame('multiselect', $contactSegmentFilterCrate->getOperator());
+        $this->assertFalse($contactSegmentFilterCrate->isBooleanType());
+        $this->assertFalse($contactSegmentFilterCrate->isDateType());
+        $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
+     */
+    public function testNotMultiselectFilter()
+    {
+        $filter = [
+            'glue'     => 'and',
+            'field'    => 'multiselect_cf',
+            'object'   => 'lead',
+            'type'     => 'multiselect',
+            'filter'   => [2, 4],
+            'display'  => null,
+            'operator' => '!in',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $this->assertSame('and', $contactSegmentFilterCrate->getGlue());
+        $this->assertSame('multiselect_cf', $contactSegmentFilterCrate->getField());
+        $this->assertTrue($contactSegmentFilterCrate->isContactType());
+        $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
+        $this->assertSame([2, 4], $contactSegmentFilterCrate->getFilter());
+        $this->assertSame('!multiselect', $contactSegmentFilterCrate->getOperator());
+        $this->assertFalse($contactSegmentFilterCrate->isBooleanType());
+        $this->assertFalse($contactSegmentFilterCrate->isDateType());
+        $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
+    }
 }
