@@ -112,8 +112,7 @@ class RedirectRepository extends CommonRepository
         $segmentId = null
     ) {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->addSelect('pr.id')
-            ->addSelect('pr.url')
+        $q->addSelect('pr.url')
             ->addSelect('pr.hits')
             ->addSelect('pr.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'pr')
