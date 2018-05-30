@@ -56,6 +56,8 @@ class LeadSubscriber extends CommonSubscriber
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject('RabbitMQ');
         $lead = $event->getLead()->convertToArray();
+        $settings = $integrationObject->getIntegrationSettings();
+
 
         if (false === $integrationObject || !$settings->getIsPublished()) {
             return;
