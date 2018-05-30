@@ -288,7 +288,9 @@ class DateTimeHelper
      * @param int    $interval
      * @param string $unit
      *
-     * @return DateInterval
+     * @return \DateInterval
+     *
+     * @throws \Exception
      */
     public function buildInterval($interval, $unit)
     {
