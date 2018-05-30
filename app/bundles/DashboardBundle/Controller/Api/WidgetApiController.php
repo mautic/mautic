@@ -67,6 +67,7 @@ class WidgetApiController extends CommonApiController
         $to         = InputHelper::clean($this->request->get('dateTo', null));
         $dataFormat = InputHelper::clean($this->request->get('dataFormat', null));
         $unit       = InputHelper::clean($this->request->get('timeUnit', 'Y'));
+        $dataset    = InputHelper::clean($this->request->get('dataset', []));
         $response   = ['success' => 0];
 
         try {
@@ -90,6 +91,7 @@ class WidgetApiController extends CommonApiController
             'dateTo'     => $toDate,
             'limit'      => (int) $this->request->get('limit', null),
             'filter'     => $this->request->get('filter', []),
+            'dataset'    => $dataset,
         ];
 
         $cacheTimeout = (int) $this->request->get('cacheTimeout', null);
