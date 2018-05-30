@@ -84,6 +84,11 @@ class Campaign extends FormEntity
     private $canvasSettings = [];
 
     /**
+     * @var bool
+     */
+    private $isCloned = false;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -96,11 +101,12 @@ class Campaign extends FormEntity
 
     public function __clone()
     {
-        $this->leads  = new ArrayCollection();
-        $this->events = new ArrayCollection();
-        $this->lists  = new ArrayCollection();
-        $this->forms  = new ArrayCollection();
-        $this->id     = null;
+        $this->leads    = new ArrayCollection();
+        $this->events   = new ArrayCollection();
+        $this->lists    = new ArrayCollection();
+        $this->forms    = new ArrayCollection();
+        $this->id       = null;
+        $this->isCloned = true;
 
         parent::__clone();
     }
@@ -514,6 +520,14 @@ class Campaign extends FormEntity
     public function getLists()
     {
         return $this->lists;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCloned()
+    {
+        return $this->isCloned;
     }
 
     /**
