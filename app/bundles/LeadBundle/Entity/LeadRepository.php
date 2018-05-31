@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -366,16 +367,23 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $entity = null;
         }
 
-        if ($entity != null) {
-            if (!empty($this->triggerModel)) {
-                $entity->setColor($this->triggerModel->getColorForLeadPoints($entity->getPoints()));
-            }
-
-            $fieldValues = $this->getFieldValues($id);
-            $entity->setFields($fieldValues);
-
-            $entity->setAvailableSocialFields($this->availableSocialFields);
+        if (null === $entity) {
+            return $entity;
         }
+
+        if ($entity->getFields()) {
+            // Pulled from Doctrine memory so don't make unnecessary queries as this has already happened
+            return $entity;
+        }
+
+        if (!empty($this->triggerModel)) {
+            $entity->setColor($this->triggerModel->getColorForLeadPoints($entity->getPoints()));
+        }
+
+        $fieldValues = $this->getFieldValues($id);
+        $entity->setFields($fieldValues);
+
+        $entity->setAvailableSocialFields($this->availableSocialFields);
 
         return $entity;
     }
@@ -1065,6 +1073,34 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return [];
+    }
+
+    /**
+     * @param array $ids
+     *
+     * @return ArrayCollection
+     */
+    public function getContactCollection(array $ids)
+    {
+        $contacts = $this->getEntities(
+            [
+                'filter'             => [
+                    'force' => [
+                        [
+                            'column' => 'l.id',
+                            'expr'   => 'in',
+                            'value'  => $ids,
+                        ],
+                    ],
+                ],
+                'orderBy'            => 'l.id',
+                'orderByDir'         => 'asc',
+                'withPrimaryCompany' => true,
+                'withChannelRules'   => true,
+            ]
+        );
+
+        return new ArrayCollection($contacts);
     }
 
     /**

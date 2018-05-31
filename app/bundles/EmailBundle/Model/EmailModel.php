@@ -1272,10 +1272,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             return false;
         }
 
+        // Ensure $sendTo is indexed by lead ID
+        $leadIds     = [];
         $singleEmail = false;
         if (isset($leads['id'])) {
-            $singleEmail = $leads['id'];
-            $leads       = [$leads['id'] => $leads];
+            $singleEmail           = $leads['id'];
+            $leadIds[$leads['id']] = $leads['id'];
+            $leads                 = [$leads['id'] => $leads];
+            $sendTo                = $leads;
+        } else {
+            $sendTo = [];
+            foreach ($leads as $lead) {
+                $sendTo[$lead['id']]  = $lead;
+                $leadIds[$lead['id']] = $lead['id'];
+            }
         }
 
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
@@ -1283,10 +1293,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         //get email settings such as templates, weights, etc
         $emailSettings = &$this->getEmailSettings($email);
-
-        $sendTo  = $leads;
-        $leadIds = array_keys($sendTo);
-        $leadIds = array_combine($leadIds, $leadIds);
 
         if (!$ignoreDNC) {
             $dnc = $emailRepo->getDoNotEmailList($leadIds);
@@ -1418,7 +1424,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->sendModel->finalFlush();
 
         // Get the errors to return
-        $errorMessages  = $this->sendModel->getErrors();
+        $errorMessages  = array_merge($errors, $this->sendModel->getErrors());
         $failedContacts = $this->sendModel->getFailedContacts();
 
         // Get sent counts to update email stats
@@ -2157,7 +2163,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if (!empty($fetchCompanies)) {
-            $companies = $this->companyModel->getRepository()->getCompaniesForContacts($fetchCompanies); // Simple dbal query that fetches lead_id IN $fetchCompanies and returns as array
+            // Simple dbal query that fetches lead_id IN $fetchCompanies and returns as array
+            $companies = $this->companyModel->getRepository()->getCompaniesForContacts(array_keys($fetchCompanies));
 
             foreach ($companies as $contactId => $contactCompanies) {
                 $key                       = $fetchCompanies[$contactId];

@@ -378,6 +378,13 @@ return [
                     'mautic.campaign.model.campaign',
                 ],
             ],
+            'mautic.lead.campaignbundle.action_delete_contacts.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber::class,
+                'arguments' => [
+                   'mautic.lead.model.lead',
+                   'mautic.campaign.helper.removed_contact_tracker',
+                ],
+            ],
             'mautic.lead.reportbundle.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
