@@ -809,7 +809,8 @@ class FormModel extends CommonFormModel
         }
 
         foreach ($fields as $field) {
-            $value = $lead->getFieldValue($leadField);
+            $leadField  = $field->getLeadField();
+            $value      = $lead->getFieldValue($leadField);
 
             if (!empty($value)) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
