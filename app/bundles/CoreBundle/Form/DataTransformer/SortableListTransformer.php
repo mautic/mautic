@@ -30,14 +30,22 @@ class SortableListTransformer implements DataTransformerInterface
     private $withLabels = true;
 
     /**
+     * @var bool
+     */
+    private $useKeyValuePairs = false;
+
+    /**
      * SortableListTransformer constructor.
      *
      * @param bool $removeEmpty
+     * @param bool $withLabels
+     * @param bool $atRootLevel
      */
-    public function __construct($removeEmpty = true, $withLabels = true)
+    public function __construct($removeEmpty = true, $withLabels = true, $useKeyValuePairs = false)
     {
-        $this->removeEmpty = $removeEmpty;
-        $this->withLabels  = $withLabels;
+        $this->removeEmpty      = $removeEmpty;
+        $this->withLabels       = $withLabels;
+        $this->useKeyValuePairs = $useKeyValuePairs;
     }
 
     /**
@@ -47,6 +55,10 @@ class SortableListTransformer implements DataTransformerInterface
      */
     public function transform($array)
     {
+        if ($this->useKeyValuePairs) {
+            return $this->transformKeyValuePair($array);
+        }
+
         return $this->formatList($array);
     }
 
@@ -57,6 +69,10 @@ class SortableListTransformer implements DataTransformerInterface
      */
     public function reverseTransform($array)
     {
+        if ($this->useKeyValuePairs) {
+            return $this->reverseTransformKeyValuePair($array);
+        }
+
         return $this->formatList($array);
     }
 
@@ -81,5 +97,51 @@ class SortableListTransformer implements DataTransformerInterface
         $array['list'] = AbstractFormFieldHelper::formatList($format, $array['list']);
 
         return $array;
+    }
+
+    /**
+     * @param $array
+     *
+     * @return array
+     */
+    private function transformKeyValuePair($array)
+    {
+        if ($array === null) {
+            return ['list' => []];
+        }
+
+        $formattedArray = [];
+
+        foreach ($array as $label => $value) {
+            $formattedArray[] = [
+                'label' => $label,
+                'value' => $value,
+            ];
+        }
+
+        return ['list' => $formattedArray];
+    }
+
+    /**
+     * @param $array
+     *
+     * @return array
+     */
+    private function reverseTransformKeyValuePair($array)
+    {
+        if ($array === null || !isset($array['list'])) {
+            return [];
+        }
+
+        $pairs = [];
+        foreach ($array['list'] as $pair) {
+            if (!isset($pair['label'])) {
+                continue;
+            }
+
+            $pairs[$pair['label']] = $pair['value'];
+        }
+
+        return $pairs;
     }
 }
