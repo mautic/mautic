@@ -112,7 +112,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 $expression = new CompositeExpression(CompositeExpression::TYPE_OR,
                     [
                         $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
-                        $queryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $queryBuilder->expr()->literal(''))
+                        $queryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $queryBuilder->expr()->literal('')),
                     ]
                 );
                 break;
@@ -120,7 +120,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 $expression = new CompositeExpression(CompositeExpression::TYPE_AND,
                     [
                         $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()),
-                        $queryBuilder->expr()->neq($tableAlias.'.'.$filter->getField(), $queryBuilder->expr()->literal(''))
+                        $queryBuilder->expr()->neq($tableAlias.'.'.$filter->getField(), $queryBuilder->expr()->literal('')),
                     ]
                 );
 

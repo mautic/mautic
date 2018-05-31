@@ -206,7 +206,6 @@ class ContactSegmentFilter
         return new DoNotContactParts($this->contactSegmentFilterCrate->getField());
     }
 
-
     public function getIntegrationCampaignParts()
     {
         return new IntegrationCampaignParts($this->getParameterValue());
