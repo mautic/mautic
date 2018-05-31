@@ -157,6 +157,8 @@ class RedirectRepository extends CommonRepository
         }
 
         $q->setMaxResults($limit);
+        $q->groupBy('pr.id');
+        $q->orderBy('pr.hits', 'DESC');
 
         return $q->execute()->fetchAll();
     }
