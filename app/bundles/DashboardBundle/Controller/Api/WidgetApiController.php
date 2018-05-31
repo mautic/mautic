@@ -90,7 +90,7 @@ class WidgetApiController extends CommonApiController
             'dateFrom'   => $fromDate,
             'dateTo'     => $toDate,
             'limit'      => (int) $this->request->get('limit', null),
-            'filter'     => $this->request->get('filter', []),
+            'filter'     => InputHelper::clean($this->request->get('filter', [])),
             'dataset'    => $dataset,
         ];
 
