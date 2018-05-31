@@ -162,7 +162,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
             $lists = $listModel->getLeadsByList(['id'=>$l->getId()]);
             $real = count($lists[$l->getId()]);
 
-            if ($expected!=$real) {
+            if ($expected!=$real and count($l->getFilters())) {
                 echo "ERROR: database contains $real records but query proposes $expected results\n";
                 $failed = true;
             }
