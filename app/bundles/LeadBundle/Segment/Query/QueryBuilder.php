@@ -1646,7 +1646,7 @@ class QueryBuilder
      *
      * @return $this
      */
-    public function addLogicStack($expression)
+    private function addLogicStack($expression)
     {
         $this->logicStack[] = $expression;
 
@@ -1655,55 +1655,48 @@ class QueryBuilder
 
     /**
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
-     *  as they need to be kept).
+     *  as they need to be kept). You may not use andWhere in filters!!!
      *
      * @param $expression
      * @param $glue
-     *
-     * @return $this
      */
-    public function addLogic($expression, $glue)
-    {
-        if ($this->hasLogicStack() && $glue == 'and') {
-            $this->addLogicStack($expression);
-        } elseif ($this->hasLogicStack()) {
-            if ($glue == 'or') {
-                $this->applyStackLogic();
-            }
-            $this->addLogicStack($expression);
-        } elseif ($glue == 'or') {
-            $this->addLogicStack($expression);
-        } else {
-            $this->andWhere($expression);
-        }
+    public function addLogic($expression, $glue) {
+        // little setup
+        $glue = strtolower($glue);
 
-        return $this;
+        //  Different handling
+        if ($glue == 'or') {
+            //  Is this the first condition in query builder?
+            if (!is_null($this->sqlParts['where'])) {
+                // Are the any queued conditions?
+                if ($this->hasLogicStack()) {
+                    // We need to apply current stack to the query builder
+                    $this->applyStackLogic();
+                }
+                // We queue current expression to stack
+                $this->addLogicStack($expression);
+            } else {
+                $this->andWhere($expression);
+            }
+        } else {
+            //  Glue is AND
+            if ($this->hasLogicStack()) {
+                $this->addLogicStack($expression);
+            } else {
+                $this->andWhere($expression);
+            }
+        }
     }
 
     /**
-     * Convert stored logic into regular where condition.
+     * Apply content of stack
      *
      * @return $this
      */
-    public function applyStackLogic()
-    {
+    public function applyStackLogic() {
         if ($this->hasLogicStack()) {
-            $parts = $this->getQueryParts();
-
-            if (!is_null($parts['where']) && !is_null($parts['having'])) {
-                $where  = $parts['where'];
-
-                $whereConditionAlias = 'wh_'.substr(md5($where->__toString()), 0, 10);
-                $selectCondition     = sprintf('(%s) AS %s', $where->__toString(), $whereConditionAlias);
-
-                $this->orHaving($whereConditionAlias);
-
-                $this->addSelect($selectCondition);
-
-                $this->resetQueryPart('where');
-            } else {
-                $this->orWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack()));
-            }
+            $stackGroupExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack());
+            $this->orWhere($stackGroupExpression);
         }
 
         return $this;

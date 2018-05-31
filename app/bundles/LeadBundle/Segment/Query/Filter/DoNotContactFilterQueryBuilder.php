@@ -53,7 +53,7 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
             $queryType = $filter->getParameterValue() ? 'isNull' : 'isNotNull';
         }
 
-        $queryBuilder->andWhere($queryBuilder->expr()->$queryType($tableAlias.'.id'));
+        $queryBuilder->addLogic($queryBuilder->expr()->$queryType($tableAlias.'.id'),'and');
 
         $queryBuilder->setParameter($exprParameter, $doNotContactParts->getParameterType());
         $queryBuilder->setParameter($channelParameter, $doNotContactParts->getChannel());
