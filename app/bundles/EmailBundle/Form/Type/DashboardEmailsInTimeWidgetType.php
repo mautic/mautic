@@ -51,7 +51,7 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
                 'label'       => 'mautic.email.companyId.filter',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
-                'empty_data'  => '',
+                'empty_value' => '',
                 'required'    => false,
                 'multiple'    => false,
                 'modal_route' => null,
@@ -62,12 +62,12 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
             'campaignId',
             'campaign_list',
             [
-                'label'      => 'mautic.email.campaignId.filter',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'empty_data' => '',
-                'required'   => false,
-                'multiple'   => false,
+                'label'       => 'mautic.email.campaignId.filter',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'empty_value' => '',
+                'required'    => false,
+                'multiple'    => false,
             ]
         );
 
@@ -75,11 +75,11 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
             'segmentId',
             'leadlist_choices',
             [
-                'label'      => 'mautic.email.segmentId.filter',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'empty_data' => '',
-                'required'   => false,
+                'label'       => 'mautic.email.segmentId.filter',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'empty_value' => '',
+                'required'    => false,
             ]
         );
     }
