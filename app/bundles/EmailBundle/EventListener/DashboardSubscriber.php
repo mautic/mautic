@@ -143,15 +143,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'mautic.dashboard.label.email.name',
                     'mautic.dashboard.label.contact.click',
                     'mautic.dashboard.label.contact.links.clicked',
+                    'mautic.dashboard.label.segment.id',
+                    'mautic.dashboard.label.segment.name',
+                    'mautic.dashboard.label.company.id',
+                    'mautic.dashboard.label.company.name',
+                    'mautic.dashboard.label.campaign.id',
+                    'mautic.dashboard.label.campaign.name',
                 ];
-                if ($segmentId !== null) {
-                    $headItems[] = 'mautic.dashboard.label.segment.id';
-                    $headItems[] = 'mautic.dashboard.label.segment.name';
-                }
-                if ($companyId !== null) {
-                    $headItems[] = 'mautic.dashboard.label.company.id';
-                    $headItems[] = 'mautic.dashboard.label.company.name';
-                }
+
                 $event->setTemplateData(
                     [
                         'headItems' => $headItems,

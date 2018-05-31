@@ -568,26 +568,22 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     'contact_id'    => $stat['lead_id'],
                     'contact_email' => $stat['email_address'],
                     'open'          => $stat['is_read'],
+                    'click'         => ($stat['link_hits'] !== null) ? $stat['link_hits'] : 0,
+                    'links_clicked' => [],
                     'email_id'      => $stat['email_id'],
                     'email_name'    => $stat['email_name'],
+                    'campaign_id'   => $stat['campaign_id'],
+                    'campaign_name' => $stat['campaign_name'],
+                    'segment_id'    => $stat['segment_id'],
+                    'segment_name'  => $stat['segment_name'],
+                    'company_id'    => $stat['company_id'],
+                    'company_name'  => $stat['company_name'],
                 ];
-                $item['click']         = ($stat['link_hits'] !== null) ? $stat['link_hits'] : 0;
-                $item['links_clicked'] = [];
+
                 if ($stat['link_url'] !== null) {
                     $item['links_clicked'][] = $stat['link_url'];
                 }
-                if (isset($stat['campaign_id'])) {
-                    $item['campaign_id']   = $stat['campaign_id'];
-                    $item['campaign_name'] = $stat['campaign_name'];
-                }
-                if (isset($stat['segment_id'])) {
-                    $item['segment_id']   = $stat['segment_id'];
-                    $item['segment_name'] = $stat['segment_name'];
-                }
-                if (isset($stat['company_id'])) {
-                    $item['company_id']   = $stat['company_id'];
-                    $item['company_name'] = $stat['company_name'];
-                }
+
                 $data[$statId] = $item;
             } else {
                 if ($stat['link_hits'] !== null) {

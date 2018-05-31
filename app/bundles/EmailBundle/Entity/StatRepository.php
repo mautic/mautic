@@ -76,36 +76,45 @@ class StatRepository extends CommonRepository
             ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'pr', 'ph.redirect_id = pr.redirect_id')
             ->addSelect('pr.url AS link_url')
             ->addSelect('pr.hits AS link_hits');
+
         if ($createdByUserId !== null) {
             $q->andWhere('e.created_by = :userId')
                 ->setParameter('userId', $createdByUserId);
         }
+
         $q->andWhere('s.date_sent BETWEEN :dateFrom AND :dateTo')
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 's.lead_id = cl.lead_id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies', 'c', 'cl.company_id = c.id')
+            ->addSelect('c.id AS company_id')
+            ->addSelect('c.companyname AS company_name');
+
         if ($companyId !== null) {
-            $q->innerJoin('s', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 's.lead_id = cl.lead_id')
-                ->andWhere('cl.company_id = :companyId')
-                ->setParameter('companyId', $companyId)
-                ->innerJoin('s', MAUTIC_TABLE_PREFIX.'companies', 'c', 'cl.company_id = c.id')
-                ->addSelect('c.id AS company_id')
-                ->addSelect('c.companyname AS company_name');
+            $q->andWhere('cl.company_id = :companyId')
+                ->setParameter('companyId', $companyId);
         }
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source_id = ce.id AND s.source = "campaign.event"')
+            ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+            ->addSelect('campaign.id AS campaign_id')
+            ->addSelect('campaign.name AS campaign_name');
+
         if ($campaignId !== null) {
-            $q->innerJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source_id = ce.id AND s.source = "campaign.event"')
-                ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
-                ->andWhere('ce.campaign_id = :campaignId')
-                ->setParameter('campaignId', $campaignId)
-                ->addSelect('campaign.id AS campaign_id')
-                ->addSelect('campaign.name AS campaign_name');
+            $q->andWhere('ce.campaign_id = :campaignId')
+                ->setParameter('campaignId', $campaignId);
         }
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 's.list_id = ll.id')
+            ->addSelect('ll.id AS segment_id')
+            ->addSelect('ll.name AS segment_name');
+
         if ($segmentId !== null) {
-            $q->innerJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 's.list_id = ll.id')
-                ->andWhere('s.list_id = :segmentId')
-                ->setParameter('segmentId', $segmentId)
-                ->addSelect('ll.id AS segment_id')
-                ->addSelect('ll.name AS segment_name');
+            $q->andWhere('s.list_id = :segmentId')
+                ->setParameter('segmentId', $segmentId);
         }
+
         $q->setMaxResults($limit);
 
         return $q->execute()->fetchAll();
