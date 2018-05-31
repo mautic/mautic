@@ -576,10 +576,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 if ($stat['link_url'] !== null) {
                     $item['links_clicked'][] = $stat['link_url'];
                 }
-                /*if (isset($stat['campaign_id'])) {
+                if (isset($stat['campaign_id'])) {
                     $item['campaign_id']   = $stat['campaign_id'];
                     $item['campaign_name'] = $stat['campaign_name'];
-                }*/
+                }
                 if (isset($stat['segment_id'])) {
                     $item['segment_id']   = $stat['segment_id'];
                     $item['segment_name'] = $stat['segment_name'];
