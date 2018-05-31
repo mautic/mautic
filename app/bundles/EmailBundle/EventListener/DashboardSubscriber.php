@@ -139,10 +139,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'mautic.dashboard.label.contact.id',
                     'mautic.dashboard.label.contact.email.address',
                     'mautic.dashboard.label.contact.open',
-                    'mautic.dashboard.label.email.id',
-                    'mautic.dashboard.label.email.name',
                     'mautic.dashboard.label.contact.click',
                     'mautic.dashboard.label.contact.links.clicked',
+                    'mautic.dashboard.label.email.id',
+                    'mautic.dashboard.label.email.name',
                     'mautic.dashboard.label.segment.id',
                     'mautic.dashboard.label.segment.name',
                     'mautic.dashboard.label.company.id',
@@ -167,7 +167,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 );
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticEmailBundle:SubscribedEvents:Dashboard/Sent.email.to.contacts.html.php');
             $event->stopPropagation();
         }
 

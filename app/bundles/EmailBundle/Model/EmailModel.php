@@ -561,6 +561,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
         $stats = $this->getStatRepository()->getSentEmailToContactData($limit, $dateFrom, $dateTo, $createdByUserId, $companyId, $campaignId, $segmentId);
         $data  = [];
+
         foreach ($stats as $stat) {
             $statId = $stat['id'];
             if (!array_key_exists($statId, $data)) {
@@ -572,16 +573,16 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     'links_clicked' => [],
                     'email_id'      => $stat['email_id'],
                     'email_name'    => $stat['email_name'],
-                    'campaign_id'   => $stat['campaign_id'],
-                    'campaign_name' => $stat['campaign_name'],
                     'segment_id'    => $stat['segment_id'],
                     'segment_name'  => $stat['segment_name'],
                     'company_id'    => $stat['company_id'],
                     'company_name'  => $stat['company_name'],
+                    'campaign_id'   => $stat['campaign_id'],
+                    'campaign_name' => $stat['campaign_name'],
                 ];
 
-                if ($stat['link_url'] !== null) {
-                    $item['links_clicked'][] = $stat['link_url'];
+                if ($item['click'] && $item['email_id'] && $item['contact_id']) {
+                    $item['links_clicked'] = $this->getStatRepository()->getUniqueClickedLinksPerContactAndEmail($item['contact_id'], $item['email_id']);
                 }
 
                 $data[$statId] = $item;

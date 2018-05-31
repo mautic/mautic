@@ -48,6 +48,35 @@ class StatRepository extends CommonRepository
     }
 
     /**
+     * @param int $contactId
+     * @param int $emailId
+     *
+     * @return array
+     */
+    public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('ph.url')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+            ->where('ph.email_id = :emailId')
+            ->andWhere('ph.lead_id = :leadId')
+            ->setParameter('leadId', $contactId)
+            ->setParameter('emailId', $emailId)
+            ->groupBy('ph.url');
+
+        $result = $q->execute()->fetchAll();
+        $data   = [];
+
+        if ($result) {
+            foreach ($result as $row) {
+                $data[] = $row['url'];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * @param int       $limit
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
@@ -68,14 +97,12 @@ class StatRepository extends CommonRepository
         $segmentId = null
     ) {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('s.*')
+        $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
-            ->innerJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
             ->addSelect('e.name AS email_name')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 's.email_id = ph.email_id AND s.lead_id = ph.lead_id')
-            ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'pr', 'ph.redirect_id = pr.redirect_id')
-            ->addSelect('pr.url AS link_url')
-            ->addSelect('pr.hits AS link_hits');
+            ->addSelect('COUNT(ph.id) AS link_hits');
 
         if ($createdByUserId !== null) {
             $q->andWhere('e.created_by = :userId')
@@ -116,6 +143,8 @@ class StatRepository extends CommonRepository
         }
 
         $q->setMaxResults($limit);
+        $q->groupBy('s.id');
+        $q->orderBy('s.id', 'DESC');
 
         return $q->execute()->fetchAll();
     }
