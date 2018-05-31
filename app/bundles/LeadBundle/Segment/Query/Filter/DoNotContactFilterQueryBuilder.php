@@ -33,12 +33,8 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
     {
         $doNotContactParts = $filter->getDoNotContactParts();
 
-        $tableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'left');
-
-        if (!$tableAlias) {
-            $tableAlias = $this->generateRandomParameterName();
-            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_donotcontact', $tableAlias, $tableAlias.'.lead_id = l.id');
-        }
+        $tableAlias = $this->generateRandomParameterName();
+        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_donotcontact', $tableAlias, $tableAlias.'.lead_id = l.id');
 
         $exprParameter    = $this->generateRandomParameterName();
         $channelParameter = $this->generateRandomParameterName();
