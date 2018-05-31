@@ -23,16 +23,27 @@ class TagRepository extends CommonRepository
      */
     public function deleteOrphans()
     {
-        $qb       = $this->_em->getConnection()->createQueryBuilder();
-        $havingQb = $this->_em->getConnection()->createQueryBuilder();
+        $qb                 = $this->_em->getConnection()->createQueryBuilder();
+        $havingLeadsQb      = $this->_em->getConnection()->createQueryBuilder();
+        $havingCampaignsQb  = $this->_em->getConnection()->createQueryBuilder();
 
-        $havingQb->select('count(x.lead_id) as the_count')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x')
-            ->where('x.tag_id = t.id');
+        $havingLeadsQb->select('count(xl.lead_id) as lead_count')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'xl')
+            ->where('xl.tag_id = t.id');
+
+        $havingCampaignsQb->select('count(xc.campaign_id) as campaign_count')
+            ->from(MAUTIC_TABLE_PREFIX.'cmapaign_tags_xref', 'xc')
+            ->where('xc.campaign_id = t.id');
 
         $qb->select('t.id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
-            ->having(sprintf('(%s)', $havingQb->getSQL()).' = 0');
+            ->having(
+                $qb->expr()->andX(
+                    sprintf('(%s)', $havingLeadsQb->getSQL()).' = 0',
+                    sprintf('(%s)', $havingCampaignsQb->getSQL()).' = 0'
+                )
+            );
+
         $delete = $qb->execute()->fetch();
 
         if (count($delete)) {
@@ -113,6 +124,37 @@ class TagRepository extends CommonRepository
             )
             ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
             ->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
+    }
+
+    /**
+     * Check Campaign tags by Ids.
+     *
+     * @param Lead $lead
+     * @param $tags
+     *
+     * @return bool
+     */
+    public function checkCampaignByTags(Campaign $campaign, $tags)
+    {
+        if (empty($tags)) {
+            return false;
+        }
+
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('c.id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
+            ->join('l', MAUTIC_TABLE_PREFIX.'campaign_tags_xref', 'x', 'c.id = x.campaign_id')
+            ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('t.tag', ':tags'),
+                    $q->expr()->eq('c.id', ':campaignId')
+                )
+            )
+            ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+            ->setParameter('campaignId', $campaign->getId());
 
         return (bool) $q->execute()->fetchColumn();
     }
