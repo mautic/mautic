@@ -316,12 +316,6 @@ return [
             'mautic.form.type.email_dashboard_emails_in_time_widget' => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
                 'alias'     => 'email_dashboard_emails_in_time_widget',
-                'arguments' => [
-                    'mautic.campaign.repository.campaign',
-                    'mautic.lead.repository.company',
-                    'mautic.lead.repository.lead_list',
-                    'mautic.helper.user',
-                ],
             ],
             'mautic.form.type.email_to_user' => [
                 'class' => Mautic\EmailBundle\Form\Type\EmailToUserType::class,
