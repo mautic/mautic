@@ -191,12 +191,21 @@ class ContactSegmentFilter
     }
 
     /**
+     * @return mixed
+     */
+    public function getNullValue()
+    {
+        return $this->contactSegmentFilterCrate->getNullValue();
+    }
+
+    /**
      * @return DoNotContactParts
      */
     public function getDoNotContactParts()
     {
         return new DoNotContactParts($this->contactSegmentFilterCrate->getField());
     }
+
 
     public function getIntegrationCampaignParts()
     {

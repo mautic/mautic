@@ -52,6 +52,11 @@ class ContactSegmentFilterCrate
     private $sourceArray;
 
     /**
+     * @var
+     */
+    private $nullValue;
+
+    /**
      * ContactSegmentFilterCrate constructor.
      *
      * @param array $filter
@@ -63,6 +68,7 @@ class ContactSegmentFilterCrate
         $this->object      = isset($filter['object']) ? $filter['object'] : self::CONTACT_OBJECT;
         $this->type        = isset($filter['type']) ? $filter['type'] : null;
         $this->filter      = isset($filter['filter']) ? $filter['filter'] : null;
+        $this->nullValue   = isset($filter['null_value']) ? $filter['null_value'] : null;
         $this->sourceArray = $filter;
 
         $this->setOperator($filter);
@@ -196,5 +202,13 @@ class ContactSegmentFilterCrate
         }
 
         $this->operator = $operator;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNullValue()
+    {
+        return $this->nullValue;
     }
 }
