@@ -587,6 +587,14 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
+     * Get array of available lead tags.
+     */
+    public function getTagList()
+    {
+        return $this->getTagRepository()->getSimpleList(null, [], 'tag', 'id');
+    }
+
+    /**
      * @param mixed $form
      *
      * @return array
