@@ -128,6 +128,16 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
+     * Get the tags repository.
+     *
+     * @return \Mautic\LeadBundle\Entity\TagRepository
+     */
+    public function getTagRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:Tag');
+    }
+
+    /**
      * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
      */
     public function getCampaignLeadEventLogRepository()
