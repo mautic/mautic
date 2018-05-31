@@ -90,6 +90,16 @@ switch (true) {
                                 'MauticCoreBundle:Helper:details.html.php',
                                 ['entity' => $campaign]
                             ); ?>
+                            <?php if (!empty($tags)): ?>
+                                <tr>
+                                    <td width="20%"><span class="fw-b">
+                                    <?php echo $view['translator']->trans('mautic.campaign.campaign.tags'); ?>
+                                    </td>
+                                    <td>
+                                        <?php echo implode(', ', array_map(function ($ele) { return $ele['label']; }, $tags)); ?>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
                             <?php foreach ($sources as $sourceType => $typeNames): ?>
                             <?php if (!empty($typeNames)): ?>
                             <tr>
