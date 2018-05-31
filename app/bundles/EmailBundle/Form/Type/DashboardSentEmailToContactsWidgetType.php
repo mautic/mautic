@@ -39,6 +39,7 @@ class DashboardSentEmailToContactsWidgetType extends AbstractType
                 'attr'       => ['class' => 'form-control'],
                 'empty_data' => '',
                 'required'   => false,
+                'multiple'   => false,
             ]
         );
 

@@ -16,7 +16,10 @@ class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('companyId', 'company_list', [
+        $builder->add(
+            'companyId',
+            'company_list',
+            [
                 'label'       => 'mautic.email.companyId.filter',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
@@ -27,16 +30,23 @@ class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
             ]
         );
 
-        $builder->add('campaignId', 'campaign_list', [
+        $builder->add(
+            'campaignId',
+            'campaign_list',
+            [
                 'label'      => 'mautic.email.campaignId.filter',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
                 'empty_data' => '',
                 'required'   => false,
+                'multiple'   => false,
             ]
         );
 
-        $builder->add('segmentId', 'leadlist_choices', [
+        $builder->add(
+            'segmentId',
+            'leadlist_choices',
+            [
                 'label'      => 'mautic.email.segmentId.filter',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
