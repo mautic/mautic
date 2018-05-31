@@ -716,6 +716,7 @@ class CampaignController extends AbstractStandardFormController
                         'stats'           => $stats,
                         'events'          => $sortedEvents,
                         'eventSettings'   => $this->getCampaignModel()->getEvents(),
+                        'tags'            => $this->getCampaignModel()->getTagList(),
                         'sources'         => $this->getCampaignModel()->getLeadSources($entity),
                         'dateRangeForm'   => $dateRangeForm->createView(),
                         'campaignSources' => $this->campaignSources,
