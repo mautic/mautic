@@ -16,7 +16,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
     private $apiHelper;
 
     private $requiredFields = [
-        'company' => ['name'],
+        'contacts' => ['firstname', 'lastname', 'email'],
+        'company'  => ['name'],
     ];
 
     /**
@@ -123,7 +124,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
             $settings                                = $this->settings->getFeatureSettings();
             $settings['feature_settings']['objects'] = $pipedriveObjects = isset($settings['objects']) ? $settings['objects'] : [];
         }
-
         try {
             if ($this->isAuthorized()) {
                 if (!empty($pipedriveObjects) && is_array($pipedriveObjects)) {
@@ -134,7 +134,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                         }
 
                         // The object key for contacts should be 0 for some BC reasons
-                        if ($object == 'contacts') {
+                        if ($object === 'contacts') {
                             $object = 0;
                         }
 
@@ -148,11 +148,10 @@ class PipedriveIntegration extends CrmAbstractIntegration
                         if (!isset($pipedriveFields[$object])) {
                             $pipedriveFields[$object] = [];
                         }
-
                         $leadFields           = $this->getApiHelper()->getFields($pipeDriveObject);
                         if (isset($leadFields)) {
                             // handle fields with are available in Pipedrive, but not listed
-                            if ($object == 'contacts') {
+                            if ($object === 0) {
                                 $pipedriveFields[$object]['first_name'] = [
                                     'type'     => 'string',
                                     'label'    => $this->translator->trans('mautic.core.firstname'),
