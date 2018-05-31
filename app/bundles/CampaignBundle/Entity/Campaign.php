@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\Tag;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -79,6 +80,11 @@ class Campaign extends FormEntity
     private $forms;
 
     /**
+     * @var ArrayCollection
+     */
+    private $tags;
+
+    /**
      * @var array
      */
     private $canvasSettings = [];
@@ -92,6 +98,7 @@ class Campaign extends FormEntity
         $this->leads  = new ArrayCollection();
         $this->lists  = new ArrayCollection();
         $this->forms  = new ArrayCollection();
+        $this->tags   = new ArrayCollection();
     }
 
     public function __clone()
@@ -100,6 +107,7 @@ class Campaign extends FormEntity
         $this->events = new ArrayCollection();
         $this->lists  = new ArrayCollection();
         $this->forms  = new ArrayCollection();
+        $this->tags   = new ArrayCollection();
         $this->id     = null;
 
         parent::__clone();
@@ -149,6 +157,18 @@ class Campaign extends FormEntity
             ->addJoinColumn('campaign_id', 'id', true, false, 'CASCADE')
             ->build();
 
+        $builder->createManyToMany('tags', 'Mautic\LeadBundle\Entity\Tag')
+            ->setJoinTable('campaign_tags_xref')
+            ->addInverseJoinColumn('tag_id', 'id', false)
+            ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
+            ->setOrderBy(['tag' => 'ASC'])
+            ->setIndexBy('tag')
+            ->fetchLazy()
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
+            ->build();
+
         $builder->createField('canvasSettings', 'array')
             ->columnName('canvas_settings')
             ->nullable()
@@ -192,6 +212,7 @@ class Campaign extends FormEntity
                     'publishDown',
                     'events',
                     'forms',
+                    'tags',
                     'lists', // @deprecated, will be renamed to 'segments' in 3.0.0
                     'canvasSettings',
                 ]
@@ -605,10 +626,56 @@ class Campaign extends FormEntity
     {
         return $this->leads->matching(
             Criteria::create()
-                    ->where(
-                        Criteria::expr()->eq('lead', $contact)
-                    )
-                    ->orderBy(['dateAdded' => Criteria::DESC])
+                ->where(
+                    Criteria::expr()->eq('lead', $contact)
+                )
+                ->orderBy(['dateAdded' => Criteria::DESC])
         );
+    }
+
+    /**
+     * Add tag.
+     *
+     * @param Tag $tag
+     *
+     * @return Campaign
+     */
+    public function addTag(Tag $tag)
+    {
+        $this->isChanged('tags', $tag);
+        $this->tags[$tag->getTag()] = $tag;
+
+        return $this;
+    }
+
+    /**
+     * Remove tag.
+     *
+     * @param Tag $tag
+     */
+    public function removeTag(Tag $tag)
+    {
+        $this->isChanged('tags', $tag->getTag());
+        $this->tags->removeElement($tag);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param ArrayCollection $tags
+     *
+     * @return Campaign
+     */
+    public function setTags(ArrayCollection $tags)
+    {
+        $this->tags = $tags;
+
+        return $this;
     }
 }
