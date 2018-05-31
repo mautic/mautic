@@ -199,4 +199,32 @@ class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($contactSegmentFilterCrate->isDateType());
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
+     */
+    public function testOldEqualInsteadOfInOperator()
+    {
+        $filter = [
+            'glue'     => 'and',
+            'field'    => 'tags',
+            'object'   => 'lead',
+            'type'     => 'tags',
+            'filter'   => [3],
+            'display'  => null,
+            'operator' => '=',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $this->assertSame('and', $contactSegmentFilterCrate->getGlue());
+        $this->assertSame('tags', $contactSegmentFilterCrate->getField());
+        $this->assertTrue($contactSegmentFilterCrate->isContactType());
+        $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
+        $this->assertSame([3], $contactSegmentFilterCrate->getFilter());
+        $this->assertSame('in', $contactSegmentFilterCrate->getOperator());
+        $this->assertFalse($contactSegmentFilterCrate->isBooleanType());
+        $this->assertFalse($contactSegmentFilterCrate->isDateType());
+        $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
+    }
 }
