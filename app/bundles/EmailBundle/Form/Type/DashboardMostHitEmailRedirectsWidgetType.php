@@ -96,7 +96,7 @@ class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
         $segments        = $this->segmentsRepository->getLists($user);
         $segmentsChoices = [];
         foreach ($segments as $segment) {
-            $segmentsChoices[$segment->getId()] = $segment->getName();
+            $segmentsChoices[$segment['id']] = $segment['name'];
         }
         $builder->add('segmentId', 'choice', [
                 'label'      => 'mautic.email.segmentId.filter',
