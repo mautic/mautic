@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Exception\InvalidUseException;
+use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -108,10 +109,21 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
         switch ($filterOperator) {
             case 'empty':
-                $expression = $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField());
+                $expression = new CompositeExpression(CompositeExpression::TYPE_OR,
+                    [
+                        $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
+                        $queryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $queryBuilder->expr()->literal(''))
+                    ]
+                );
                 break;
             case 'notEmpty':
-                $expression = $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField());
+                $expression = new CompositeExpression(CompositeExpression::TYPE_AND,
+                    [
+                        $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()),
+                        $queryBuilder->expr()->neq($tableAlias.'.'.$filter->getField(), $queryBuilder->expr()->literal(''))
+                    ]
+                );
+
                 break;
             case 'neq':
                 $expression = $queryBuilder->expr()->orX(

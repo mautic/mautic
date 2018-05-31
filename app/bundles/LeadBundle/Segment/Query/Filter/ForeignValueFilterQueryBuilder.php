@@ -79,7 +79,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $tableAlias.'.lead_id = l.id'
                 );
 
-                $queryBuilder->addLogic($queryBuilder->expr()->isNull($tableAlias.'.lead_id'), 'and');
+                $queryBuilder->addLogic($queryBuilder->expr()->isNull($tableAlias.'.lead_id'), $filter->getGlue());
                 break;
             default:
                 $tableAlias = $this->generateRandomParameterName();
@@ -90,7 +90,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $tableAlias.'.lead_id = l.id'
                 );
 
-                $queryBuilder->addLogic($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'), 'and');
+                $queryBuilder->addLogic($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'), $filter->getGlue());
         }
 
         switch ($filterOperator) {
