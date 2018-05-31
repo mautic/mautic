@@ -75,6 +75,20 @@ class CampaignType extends AbstractType
             $data     = false;
         }
 
+        $builder->add(
+            'tags',
+            'lead_tag',
+            [
+                'by_reference' => false,
+                'attr'         => [
+                    'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
+                    'data-allow-add'       => 'true',
+                    'onchange'             => 'Mautic.createLeadTag(this)',
+                ],
+            ]
+        );
+
         $builder->add('isPublished', 'yesno_button_group', [
             'read_only' => $readonly,
             'data'      => $data,
