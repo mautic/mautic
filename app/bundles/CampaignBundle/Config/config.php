@@ -206,6 +206,25 @@ return [
                 'arguments' => 'translator',
                 'alias'     => 'campaignconfig',
             ],
+            'mautic.form.type.campaign_tags' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\TagListType',
+                'alias'     => 'lead_tags',
+                'arguments' => ['translator'],
+            ],
+            'mautic.form.type.campaign_tag' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\TagType',
+                'alias'     => 'lead_tag',
+                'arguments' => ['doctrine.orm.entity_manager'],
+            ],
+            'mautic.form.type.modify_campaign_tags' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ModifyLeadTagsType',
+                'alias'     => 'modify_lead_tags',
+                'arguments' => ['translator'],
+            ],
+            'mautic.form.type.campaign_entity_tag' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\TagEntityType',
+                'alias' => 'Mautic\LeadBundle\Form\Type\TagEntityType',
+            ],
         ],
         'models'       => [
             'mautic.campaign.model.campaign'  => [
@@ -245,6 +264,9 @@ return [
                     'mautic.campaign.model.campaign',
                     'mautic.helper.ip_lookup',
                 ],
+            ],
+            'mautic.campaign.model.tag' => [
+                'class' => 'Mautic\LeadBundle\Model\TagModel',
             ],
         ],
         'repositories' => [
