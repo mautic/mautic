@@ -794,6 +794,7 @@ class FormModel extends CommonFormModel
             $leadField  = $field->getLeadField();
             $isAutoFill = $field->getIsAutoFill();
 
+            // we want work just with matched autofill fields
             if (!isset($leadField) || !$isAutoFill) {
                 unset($fields[$key]);
             }
@@ -809,8 +810,7 @@ class FormModel extends CommonFormModel
         }
 
         foreach ($fields as $field) {
-            $leadField  = $field->getLeadField();
-            $value      = $lead->getFieldValue($leadField);
+            $value      = $lead->getFieldValue($field->getLeadField());
 
             if (!empty($value)) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
