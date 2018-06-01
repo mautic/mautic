@@ -2124,7 +2124,7 @@ class MailHelper
             'name'        => $name,
             'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
             'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
-            'emailName'   => $this->email->getName(),
+            'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
             'hashId'      => $this->idHash,
             'hashIdState' => $this->idHashState,
             'source'      => $this->source,
