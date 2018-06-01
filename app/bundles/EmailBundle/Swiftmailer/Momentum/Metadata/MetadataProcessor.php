@@ -106,11 +106,12 @@ class MetadataProcessor
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getCampaignId()
     {
-        return $this->campaignId;
+        // Sparkpost/Momentum only supports 64 bytes
+        return $this->campaignId ? mb_strcut($this->campaignId, 0, 64) : null;
     }
 
     private function buildSubstitutionData()
