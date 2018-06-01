@@ -144,6 +144,10 @@ class MetadataProcessor
             return;
         }
 
-        $this->campaignId = $metadataSample['emailName'];
+        if (empty($metadataSample['emailId'])) {
+            return;
+        }
+
+        $this->campaignId = $metadataSample['emailId'].':'.$metadataSample['emailName'];
     }
 }

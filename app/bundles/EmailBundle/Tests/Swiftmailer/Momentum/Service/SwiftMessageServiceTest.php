@@ -141,6 +141,7 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
         $mauticMessage->addMetadata(
             'to1@test.local',
             [
+                'emailId'   => 1,
                 'emailName' => 'Email Name',
                 'tokens'    => [
                     '{hashId}' => '1234',
@@ -150,6 +151,7 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
         $mauticMessage->addMetadata(
             'to2@test.local',
             [
+                'emailId'   => 1,
                 'emailName' => 'Email Name',
                 'tokens'    => [
                     '{hashId}' => '4321',
@@ -180,6 +182,7 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
                         "header_to":"to1@test.local"
                      },
                      "metadata":{
+                        "emailId":1,
                         "emailName":"Email Name"
                      },
                      "substitution_data":{
@@ -193,6 +196,7 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
                         "header_to":"to2@test.local"
                      },
                      "metadata":{
+                        "emailId":1,
                         "emailName":"Email Name"
                      },
                      "substitution_data":{
@@ -244,7 +248,7 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
                      }
                   ]
                },
-               "campaign_id":"Email Name"
+               "campaign_id":"1:Email Name"
             }
         ';
 
