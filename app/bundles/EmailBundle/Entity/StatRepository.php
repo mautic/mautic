@@ -342,6 +342,8 @@ class StatRepository extends CommonRepository
                     $query->expr()->eq('s.is_read', 1)
                 );
             } elseif ('sent' == $state) {
+                // Inconsistency between api and dashboard
+
                 // Get only those that have not been read yet
                 $query->andWhere(
                     $query->expr()->eq('s.is_read', 0)
