@@ -180,14 +180,15 @@ class ContactSegmentQueryBuilder
         $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias, $tableAlias.'.lead_id = l.id');
         $queryBuilder->addSelect($tableAlias.'.lead_id AS '.$tableAlias.'_lead_id');
 
-        $expression = $queryBuilder->expr()->andX(
-            $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId),
-            $queryBuilder->expr()->orX(
-                $queryBuilder->expr()->isNull($tableAlias.'.date_added'),
-                $queryBuilder->expr()->lte($tableAlias.'.date_added', "'".$batchRestrictions['dateTime']."'")
-            )
-        );
-
+        if (isset($batchRestrictions['dateTime'])) {
+            $expression = $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId),
+                $queryBuilder->expr()->lte('l.date_added', "'".$batchRestrictions['dateTime']."'")
+            );
+        } else {
+            $expression = $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId);
+        }
+        
         $queryBuilder->addJoinCondition($tableAlias, $expression);
 
         if ($setHaving) {

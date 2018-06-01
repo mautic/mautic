@@ -163,7 +163,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
             $real = count($lists[$l->getId()]);
 
             if ($expected!=$real and count($l->getFilters())) {
-                echo "ERROR: database contains $real records but query proposes $expected results\n";
+                echo "ERROR: database contains $real records but query suggests $expected records\n";
                 $failed = true;
             }
         }
