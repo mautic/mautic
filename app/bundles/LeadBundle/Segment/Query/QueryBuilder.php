@@ -1660,7 +1660,8 @@ class QueryBuilder
      * @param $expression
      * @param $glue
      */
-    public function addLogic($expression, $glue) {
+    public function addLogic($expression, $glue)
+    {
         // little setup
         $glue = strtolower($glue);
 
@@ -1689,11 +1690,12 @@ class QueryBuilder
     }
 
     /**
-     * Apply content of stack
+     * Apply content of stack.
      *
      * @return $this
      */
-    public function applyStackLogic() {
+    public function applyStackLogic()
+    {
         if ($this->hasLogicStack()) {
             $stackGroupExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack());
             $this->orWhere($stackGroupExpression);

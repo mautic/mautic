@@ -95,7 +95,7 @@ class ContactSegmentFilterCrate
      */
     public function isContactType()
     {
-        return $this->object === self::CONTACT_OBJECT;
+        return self::CONTACT_OBJECT === $this->object;
     }
 
     /**
@@ -103,7 +103,7 @@ class ContactSegmentFilterCrate
      */
     public function isCompanyType()
     {
-        return $this->object === self::COMPANY_OBJECT;
+        return self::COMPANY_OBJECT === $this->object;
     }
 
     /**
@@ -134,7 +134,7 @@ class ContactSegmentFilterCrate
      */
     public function isBooleanType()
     {
-        return $this->getType() === 'boolean';
+        return 'boolean' === $this->getType();
     }
 
     /**
@@ -142,7 +142,7 @@ class ContactSegmentFilterCrate
      */
     public function isNumberType()
     {
-        return $this->getType() === 'number';
+        return 'number' === $this->getType();
     }
 
     /**
@@ -150,7 +150,7 @@ class ContactSegmentFilterCrate
      */
     public function isDateType()
     {
-        return $this->getType() === 'date' || $this->hasTimeParts();
+        return 'date' === $this->getType() || $this->hasTimeParts();
     }
 
     /**
@@ -158,7 +158,7 @@ class ContactSegmentFilterCrate
      */
     public function hasTimeParts()
     {
-        return $this->getType() === 'datetime';
+        return 'datetime' === $this->getType();
     }
 
     /**
@@ -194,11 +194,15 @@ class ContactSegmentFilterCrate
     {
         $operator = isset($filter['operator']) ? $filter['operator'] : null;
 
-        if ($this->getType() === 'multiselect') {
+        if ('multiselect' === $this->getType()) {
             $neg            = strpos($operator, '!') === false ? '' : '!';
             $this->operator = $neg.$this->getType();
 
             return;
+        }
+
+        if ('=' === $operator && is_array($this->getFilter())) { //Fix for old segments which can have stored = instead on in operator
+            $operator = 'in';
         }
 
         $this->operator = $operator;

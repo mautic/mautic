@@ -33,7 +33,7 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'table_field'         => 'id',
             'func'                => 'sum',
             'field'               => 'open_count',
-            'null_value'          => 0
+            'null_value'          => 0,
         ];
 
         $this->translations['lead_email_received'] = [

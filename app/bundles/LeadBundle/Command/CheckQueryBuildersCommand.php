@@ -155,15 +155,14 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
         $failed = ((intval($processed['count']) != intval($processed2['count'])) or (intval($processed['maxId']) != intval($processed2['maxId'])));
 
-        if (!$failed) {
-            $result = $listModel->getSegmentTotal($l);
-            $expected = $result[$l->getId()]['count'];
+        $result   = $listModel->getSegmentTotal($l);
+        $expected = $result[$l->getId()]['count'];
 
             $lists = $listModel->getLeadsByList(['id'=>$l->getId()]);
             $real = count($lists[$l->getId()]);
 
             if ($expected!=$real and count($l->getFilters())) {
-                echo "ERROR: database contains $real records but query suggests $expected records\n";
+                echo "ERROR: database contains $real records but query proposes $expected results\n";
                 $failed = true;
             }
         }
