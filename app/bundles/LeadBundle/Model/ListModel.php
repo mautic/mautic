@@ -845,7 +845,8 @@ class ListModel extends FormModel
         $dtHelper = new DateTimeHelper();
 
         $batchLimiters = [
-            'dateTime' => $dtHelper->toUtcString(),
+            'dateTime'        => $dtHelper->toUtcString(),
+            'excludeVisitors' => true,
         ];
 
         return $this->leadSegmentService->getTotalLeadListLeadsCount($entity, $batchLimiters);

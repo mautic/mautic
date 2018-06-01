@@ -88,13 +88,14 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
+     * @param LeadList   $segment
+     * @param array|null $batchLimiters for debug purpose only
      *
      * @return array
      *
      * @throws \Exception
      */
-    public function getTotalLeadListLeadsCount(LeadList $segment)
+    public function getTotalLeadListLeadsCount(LeadList $segment, array $batchLimiters = null)
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
@@ -109,6 +110,10 @@ class ContactSegmentService
         }
 
         $qb = $this->getTotalSegmentContactsQuery($segment);
+
+        if (!empty($batchLimiters['excludeVisitors'])) {
+            $this->excludeVisitors($qb);
+        }
 
         $qb = $this->contactSegmentQueryBuilder->wrapInCount($qb);
 
