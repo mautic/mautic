@@ -427,7 +427,7 @@ class LeadListRepository extends CommonRepository
                     if (!empty($batchLimiters['dateTime'])) {
                         // Only leads in the list at the time of count
                         $listOnExpr->add(
-                            $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
+                            $q->expr()->lte('l.date_added', $q->expr()->literal($batchLimiters['dateTime']))
                         );
                     }
 
