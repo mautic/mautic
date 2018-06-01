@@ -571,14 +571,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     'open'          => $stat['is_read'],
                     'click'         => ($stat['link_hits'] !== null) ? $stat['link_hits'] : 0,
                     'links_clicked' => [],
-                    'email_id'      => $stat['email_id'],
-                    'email_name'    => $stat['email_name'],
-                    'segment_id'    => $stat['segment_id'],
-                    'segment_name'  => $stat['segment_name'],
-                    'company_id'    => $stat['company_id'],
-                    'company_name'  => $stat['company_name'],
-                    'campaign_id'   => $stat['campaign_id'],
-                    'campaign_name' => $stat['campaign_name'],
+                    'email_id'      => (string) $stat['email_id'],
+                    'email_name'    => (string) $stat['email_name'],
+                    'segment_id'    => (string) $stat['segment_id'],
+                    'segment_name'  => (string) $stat['segment_name'],
+                    'company_id'    => (string) $stat['company_id'],
+                    'company_name'  => (string) $stat['company_name'],
+                    'campaign_id'   => (string) $stat['campaign_id'],
+                    'campaign_name' => (string) $stat['campaign_name'],
                 ];
 
                 if ($item['click'] && $item['email_id'] && $item['contact_id']) {
@@ -621,11 +621,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $data      = [];
         foreach ($redirects as $redirect) {
             $data[] = [
-                'url'         => $redirect['url'],
-                'unique_hits' => $redirect['unique_hits'],
-                'hits'        => $redirect['hits'],
-                'email_id'    => $redirect['email_id'],
-                'email_name'  => $redirect['email_name'],
+                'url'         => (string) $redirect['url'],
+                'unique_hits' => (string) $redirect['unique_hits'],
+                'hits'        => (string) $redirect['hits'],
+                'email_id'    => (string) $redirect['email_id'],
+                'email_name'  => (string) $redirect['email_name'],
             ];
         }
 
