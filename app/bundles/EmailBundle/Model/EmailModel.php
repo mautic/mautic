@@ -1866,9 +1866,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     private function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't')
     {
-        $q->leftJoin($fromAlias, MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', $fromAlias.'.lead_id = company_lead.lead_id');
         if ($companyId !== null) {
-            $q->andWhere('company_lead.company_id = :companyId')
+            $q->innerJoin($fromAlias, MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', $fromAlias.'.lead_id = company_lead.lead_id')
+                ->andWhere('company_lead.company_id = :companyId')
                 ->setParameter('companyId', $companyId);
         }
     }
@@ -1880,10 +1880,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     private function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
     {
-        $q->leftJoin($fromAlias, MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', $fromAlias.'.source_id = ce.id AND '.$fromAlias.'.source = "campaign.event"')
-            ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id');
         if ($campaignId !== null) {
-            $q->andWhere('ce.campaign_id = :campaignId')
+            $q->innerJoin($fromAlias, MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', $fromAlias.'.source_id = ce.id AND '.$fromAlias.'.source = "campaign.event"')
+                ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+                ->andWhere('ce.campaign_id = :campaignId')
                 ->setParameter('campaignId', $campaignId);
         }
     }
@@ -1895,9 +1895,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     private function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't')
     {
-        $q->leftJoin($fromAlias, MAUTIC_TABLE_PREFIX.'lead_lists', 'll', $fromAlias.'.list_id = ll.id');
         if ($segmentId !== null) {
-            $q->andWhere($fromAlias.'.list_id = :segmentId')
+            $q->innerJoin($fromAlias, MAUTIC_TABLE_PREFIX.'lead_lists', 'll', $fromAlias.'.list_id = ll.id')
+                ->andWhere($fromAlias.'.list_id = :segmentId')
                 ->setParameter('segmentId', $segmentId);
         }
     }
