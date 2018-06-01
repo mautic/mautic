@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
