@@ -124,16 +124,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
                 $companyId = null;
-                if (isset($params['companyId'])) {
-                    $companyId = $params['companyId'];
+                if (isset($params['filter']['companyId'])) {
+                    $companyId = $params['filter']['companyId'];
                 }
                 $campaignId = null;
-                if (isset($params['campaignId'])) {
-                    $campaignId = $params['campaignId'];
+                if (isset($params['filter']['campaignId'])) {
+                    $campaignId = $params['filter']['campaignId'];
                 }
                 $segmentId = null;
-                if (isset($params['segmentId'])) {
-                    $segmentId = $params['segmentId'];
+                if (isset($params['filter']['segmentId'])) {
+                    $segmentId = $params['filter']['segmentId'];
                 }
                 $headItems = [
                     'mautic.dashboard.label.contact.id',
@@ -183,16 +183,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
                 $companyId = null;
-                if (isset($params['companyId'])) {
-                    $companyId = $params['companyId'];
+                if (isset($params['filter']['companyId'])) {
+                    $companyId = $params['filter']['companyId'];
                 }
                 $campaignId = null;
-                if (isset($params['campaignId'])) {
-                    $campaignId = $params['campaignId'];
+                if (isset($params['filter']['campaignId'])) {
+                    $campaignId = $params['filter']['campaignId'];
                 }
                 $segmentId = null;
-                if (isset($params['segmentId'])) {
-                    $segmentId = $params['segmentId'];
+                if (isset($params['filter']['segmentId'])) {
+                    $segmentId = $params['filter']['segmentId'];
                 }
                 $event->setTemplateData([
                     'headItems' => [
