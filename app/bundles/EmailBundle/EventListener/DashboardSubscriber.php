@@ -135,6 +135,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 if (isset($params['filter']['segmentId'])) {
                     $segmentId = $params['filter']['segmentId'];
                 }
+
                 $headItems = [
                     'mautic.dashboard.label.contact.id',
                     'mautic.dashboard.label.contact.email.address',
@@ -160,8 +161,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                             $params['dateTo'],
                             ['groupBy' => 'sends', 'canViewOthers' => $canViewOthers],
                             $companyId,
-                            $segmentId,
-                            $campaignId
+                            $campaignId,
+                            $segmentId
                         ),
                     ]
                 );
