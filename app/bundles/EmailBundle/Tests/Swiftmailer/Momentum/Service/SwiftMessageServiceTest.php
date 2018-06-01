@@ -39,6 +39,8 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
     {
         return [
             $this->geTransformToTransmissionComplexData(),
+            $this->geTransformToTransmissionComplexDataWithEmailName(),
+            $this->geTransformToTransmissionComplexDataWithUtmTag(),
         ];
     }
 
@@ -47,7 +49,8 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
      */
     private function geTransformToTransmissionComplexData()
     {
-        $mauticMessage   = new MauticMessage();
+        $mauticMessage = new MauticMessage();
+
         $mauticMessage->setSubject('Test subject')
             ->setReturnPath('return-path@test.local')
             ->setSender('sender@test.local', 'Sender test')
@@ -61,68 +64,323 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
             ->addBcc('bcc2@test.local', 'BCC2 test')
             ->addAttachment(__DIR__.'/data/attachments/sample.txt');
         $json = '
-            {
-                "return_path":"return-path@test.local",
-                "recipients": [
-                    {
-                        "address": {
-                            "email": "to1@test.local",
-                            "name": "To1 test",
-                            "header_to": "to1@test.local"
-                        }
-                    },
-                    {
-                        "address": {
-                            "email": "to2@test.local",
-                            "name": "To2 test",
-                            "header_to": "to2@test.local"
-                        }
-                    },
-                    {
-                        "address": {
-                            "email": "cc1@test.local",
-                            "name": "CC1 test",
-                            "header_to": "cc1@test.local"
-                        }
-                    },
-                    {
-                        "address": {
-                            "email": "cc2@test.local",
-                            "name": "CC2 test",
-                            "header_to": "cc2@test.local"
-                        }
-                    },
-                    {
-                        "address": {
-                            "email": "bcc1@test.local",
-                            "name": "BCC1 test"
-                        }
-                    },
-                    {
-                        "address": {
-                            "email": "bcc2@test.local",
-                            "name": "BCC2 test"
-                        }
-                    }
+           {
+               "return_path":"return-path@test.local",
+               "recipients":[
+                  {
+                     "address":{
+                        "email":"to1@test.local",
+                        "name":"To1 test",
+                        "header_to":"to1@test.local"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"to2@test.local",
+                        "name":"To2 test",
+                        "header_to":"to2@test.local"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"cc1@test.local",
+                        "name":"CC1 test",
+                        "header_to":"cc1@test.local"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"cc2@test.local",
+                        "name":"CC2 test",
+                        "header_to":"cc2@test.local"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"bcc1@test.local",
+                        "name":"BCC1 test"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"bcc2@test.local",
+                        "name":"BCC2 test"
+                     }
+                  }
+               ],
+               "content":{
+                  "subject":"Test subject",
+                  "from":{
+                     "email":"from@test.local",
+                     "name":"From test"
+                  },
+                  "html":"<html><\/html>",
+                  "headers":{
+                     "CC":"cc1@test.local,cc2@test.local"
+                  },
+                  "attachments":[
+                     {
+                        "type":"text\/plain",
+                        "name":"sample.txt",
+                        "data":"VGhpcyBpcyBzYW1wbGUgYXR0YWNobWVudAo="
+                     }
+                  ]
+               }
+            }
+        ';
+
+        return [$mauticMessage, $json];
+    }
+
+    /**
+     * @return array
+     */
+    private function geTransformToTransmissionComplexDataWithEmailName()
+    {
+        $mauticMessage = new MauticMessage();
+        $mauticMessage->addMetadata(
+            'to1@test.local',
+            [
+                'emailName' => 'Email Name',
+                'tokens'    => [
+                    '{hashId}' => '1234',
                 ],
-                "content": {
-                    "subject": "Test subject",
-                    "from": {
-                        "email": "from@test.local",
-                        "name": "From test"
-                    },
-                    "html": "<html><\/html>",
-                    "attachments": [
-                        {
-                            "type": "text\/plain",
-                            "name": "sample.txt",
-                            "data": "VGhpcyBpcyBzYW1wbGUgYXR0YWNobWVudAo="
-                        }
+            ]
+        );
+        $mauticMessage->addMetadata(
+            'to2@test.local',
+            [
+                'emailName' => 'Email Name',
+                'tokens'    => [
+                    '{hashId}' => '4321',
+                ],
+            ]
+        );
+
+        $mauticMessage->setSubject('Test subject')
+            ->setReturnPath('return-path@test.local')
+            ->setSender('sender@test.local', 'Sender test')
+            ->setFrom('from@test.local', 'From test')
+            ->setBody('<html></html>')
+            ->addTo('to1@test.local', 'To1 test')
+            ->addTo('to2@test.local', 'To2 test')
+            ->addCc('cc1@test.local', 'CC1 test')
+            ->addCc('cc2@test.local', 'CC2 test')
+            ->addBcc('bcc1@test.local', 'BCC1 test')
+            ->addBcc('bcc2@test.local', 'BCC2 test')
+            ->addAttachment(__DIR__.'/data/attachments/sample.txt');
+        $json = '
+           {
+               "return_path":"return-path@test.local",
+               "recipients":[
+                  {
+                     "address":{
+                        "email":"to1@test.local",
+                        "name":"To1 test",
+                        "header_to":"to1@test.local"
+                     },
+                     "metadata":{
+                        "emailName":"Email Name"
+                     },
+                     "substitution_data":{
+                        "HASHID":"1234"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"to2@test.local",
+                        "name":"To2 test",
+                        "header_to":"to2@test.local"
+                     },
+                     "metadata":{
+                        "emailName":"Email Name"
+                     },
+                     "substitution_data":{
+                        "HASHID":"4321"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"cc1@test.local",
+                        "name":"CC1 test",
+                        "header_to":"cc1@test.local"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"cc2@test.local",
+                        "name":"CC2 test",
+                        "header_to":"cc2@test.local"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"bcc1@test.local",
+                        "name":"BCC1 test"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"bcc2@test.local",
+                        "name":"BCC2 test"
+                     }
+                  }
+               ],
+               "content":{
+                  "subject":"Test subject",
+                  "from":{
+                     "email":"from@test.local",
+                     "name":"From test"
+                  },
+                  "html":"<html><\/html>",
+                  "headers":{
+                     "CC":"cc1@test.local,cc2@test.local"
+                  },
+                  "attachments":[
+                     {
+                        "type":"text\/plain",
+                        "name":"sample.txt",
+                        "data":"VGhpcyBpcyBzYW1wbGUgYXR0YWNobWVudAo="
+                     }
+                  ]
+               },
+               "campaign_id":"Email Name"
+            }
+        ';
+
+        return [$mauticMessage, $json];
+    }
+
+    /**
+     * @return array
+     */
+    private function geTransformToTransmissionComplexDataWithUtmTag()
+    {
+        $metadata = [
+            'emailName' => 'Email Name',
+            'utmTags'   => [
+                'utmCampaign' => 'Custom Name',
+            ],
+        ];
+
+        $mauticMessage = new MauticMessage();
+        $mauticMessage->addMetadata(
+            'to1@test.local',
+            array_merge(
+                $metadata,
+                [
+                    'tokens' => [
+                        '{hashId}' => '1234',
                     ],
-                    "headers": {
-                        "CC": "cc1@test.local,cc2@test.local"
-                    }
-                }
+                ]
+            )
+        );
+        $mauticMessage->addMetadata(
+            'to2@test.local',
+            array_merge(
+                $metadata,
+                [
+                    'tokens' => [
+                        '{hashId}' => '4321',
+                    ],
+                ]
+            )
+        );
+
+        $mauticMessage->setSubject('Test subject')
+            ->setReturnPath('return-path@test.local')
+            ->setSender('sender@test.local', 'Sender test')
+            ->setFrom('from@test.local', 'From test')
+            ->setBody('<html></html>')
+            ->addTo('to1@test.local', 'To1 test')
+            ->addTo('to2@test.local', 'To2 test')
+            ->addCc('cc1@test.local', 'CC1 test')
+            ->addCc('cc2@test.local', 'CC2 test')
+            ->addBcc('bcc1@test.local', 'BCC1 test')
+            ->addBcc('bcc2@test.local', 'BCC2 test')
+            ->addAttachment(__DIR__.'/data/attachments/sample.txt');
+        $json = '
+           {
+               "return_path":"return-path@test.local",
+               "recipients":[
+                  {
+                     "address":{
+                        "email":"to1@test.local",
+                        "name":"To1 test",
+                        "header_to":"to1@test.local"
+                     },
+                     "metadata":{
+                        "emailName":"Email Name",
+                        "utmTags":{
+                            "utmCampaign": "Custom Name"
+                        }
+                     },
+                     "substitution_data":{
+                        "HASHID":"1234"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"to2@test.local",
+                        "name":"To2 test",
+                        "header_to":"to2@test.local"
+                     },
+                     "metadata":{
+                        "emailName":"Email Name",
+                         "utmTags":{
+                            "utmCampaign": "Custom Name"
+                        }
+                     },
+                     "substitution_data":{
+                        "HASHID":"4321"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"cc1@test.local",
+                        "name":"CC1 test",
+                        "header_to":"cc1@test.local"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"cc2@test.local",
+                        "name":"CC2 test",
+                        "header_to":"cc2@test.local"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"bcc1@test.local",
+                        "name":"BCC1 test"
+                     }
+                  },
+                  {
+                     "address":{
+                        "email":"bcc2@test.local",
+                        "name":"BCC2 test"
+                     }
+                  }
+               ],
+               "content":{
+                  "subject":"Test subject",
+                  "from":{
+                     "email":"from@test.local",
+                     "name":"From test"
+                  },
+                  "html":"<html><\/html>",
+                  "headers":{
+                     "CC":"cc1@test.local,cc2@test.local"
+                  },
+                  "attachments":[
+                     {
+                        "type":"text\/plain",
+                        "name":"sample.txt",
+                        "data":"VGhpcyBpcyBzYW1wbGUgYXR0YWNobWVudAo="
+                     }
+                  ]
+               },
+               "campaign_id":"Custom Name"
             }
         ';
 

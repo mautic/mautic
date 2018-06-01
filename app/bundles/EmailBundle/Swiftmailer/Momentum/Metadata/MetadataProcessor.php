@@ -42,6 +42,11 @@ class MetadataProcessor
     private $message;
 
     /**
+     * @var string
+     */
+    private $campaignId;
+
+    /**
      * MetadataProcessor constructor.
      *
      * @param \Swift_Message $message
@@ -100,16 +105,45 @@ class MetadataProcessor
         return $substitutionData;
     }
 
+    /**
+     * @return string
+     */
+    public function getCampaignId()
+    {
+        return $this->campaignId;
+    }
+
     private function buildSubstitutionData()
     {
         // Sparkpost uses {{ name }} for tokens so Mautic's need to be converted; although using their {{{ }}} syntax to prevent HTML escaping
-        $metadataSet        = reset($this->metadata);
-        $tokens             = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
+        $metadataSample = reset($this->metadata);
+        if (!$metadataSample) {
+            return;
+        }
+
+        $tokens             = (!empty($metadataSample['tokens'])) ? $metadataSample['tokens'] : [];
         $this->mauticTokens = array_keys($tokens);
 
         foreach ($this->mauticTokens as $token) {
             $this->substitutionKeys[$token]      = strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
             $this->substitutionMergeVars[$token] = '{{{ '.$this->substitutionKeys[$token].' }}}';
         }
+
+        $this->extractCampaignId($metadataSample);
+    }
+
+    /**
+     * @param array $metadataSample
+     */
+    private function extractCampaignId(array $metadataSample)
+    {
+        // Extract and build a campaign ID from the metadata sample
+        if (!empty($metadataSample['utmTags']['utmCampaign'])) {
+            $this->campaignId = $metadataSample['utmTags']['utmCampaign'];
+
+            return;
+        }
+
+        $this->campaignId = $metadataSample['emailName'];
     }
 }
