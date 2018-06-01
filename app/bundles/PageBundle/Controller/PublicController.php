@@ -640,4 +640,25 @@ class PublicController extends CommonFormController
 
         return new JsonResponse($data);
     }
+
+    /**
+     * @param array $companies
+     * @param array $profileFields
+     *
+     * @return array
+     */
+    private function mergePrimaryCompany(array $companies, array $profileFields)
+    {
+        foreach ($companies as $company) {
+            if (empty($company['is_primary'])) {
+                continue;
+            }
+
+            unset($company['score'], $company['date_added'], $company['date_associated'], $company['is_primary']);
+
+            return array_merge($profileFields, $company);
+        }
+
+        return $profileFields;
+    }
 }
