@@ -94,6 +94,8 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         }
 
         $total = $ok + $failed;
+        $total = $total ?: 1; //prevent division be zero error
+
         $output->writeln('');
         $output->writeln(sprintf('<info>Total success rate: %d%%, %d succeeded: and <error>%s</error>%s failed...</info> ', round(($ok / $total) * 100), $ok, ($failed ? $failed : ''), (!$failed ? $failed : '')));
 
