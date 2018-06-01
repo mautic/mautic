@@ -39,14 +39,14 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
+        $container    = $this->getContainer();
         $this->logger = $container->get('monolog.logger.mautic');
 
         /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
         $listModel = $container->get('mautic.lead.model.list');
 
-        $id = $input->getOption('segment-id');
-        $verbose = $input->getOption('verbose');
+        $id            = $input->getOption('segment-id');
+        $verbose       = $input->getOption('verbose');
         $this->skipOld = $input->getOption('skip-old');
 
         $failed = $ok = 0;
@@ -55,7 +55,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
             $list = $listModel->getEntity($id);
 
             if (!$list) {
-                $output->writeln('<error>Segment with id "' . $id . '" not found');
+                $output->writeln('<error>Segment with id "'.$id.'" not found');
 
                 return 1;
             }
@@ -69,7 +69,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
             $lists = $listModel->getEntities(
                 [
                     'iterator_mode' => true,
-                    'orderBy' => 'l.id',
+                    'orderBy'       => 'l.id',
                 ]
             );
 
@@ -109,24 +109,24 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
     private function runSegment($output, $verbose, $l, ListModel $listModel)
     {
-        $output->write('<info>Running segment ' . $l->getId() . '...');
+        $output->write('<info>Running segment '.$l->getId().'...');
 
         if (!$this->skipOld) {
             $this->logger->info(sprintf('Running OLD segment #%d', $l->getId()));
 
-            $timer1 = microtime(true);
+            $timer1    = microtime(true);
             $processed = $listModel->getVersionOld($l);
-            $timer1 = microtime(true) - $timer1;
+            $timer1    = microtime(true) - $timer1;
         } else {
             $processed = ['count' => -1, 'maxId' => -1];
-            $timer1 = 0;
+            $timer1    = 0;
         }
 
         $this->logger->info(sprintf('Running NEW segment #%d', $l->getId()));
 
-        $timer2 = microtime(true);
+        $timer2     = microtime(true);
         $processed2 = $listModel->getVersionNew($l);
-        $timer2 = microtime(true) - $timer2;
+        $timer2     = microtime(true) - $timer2;
 
         $processed2 = array_shift($processed2);
 
@@ -155,11 +155,11 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
         $failed = ((intval($processed['count']) != intval($processed2['count'])) or (intval($processed['maxId']) != intval($processed2['maxId'])));
 
-        $result = $listModel->getSegmentTotal($l);
+        $result   = $listModel->getSegmentTotal($l);
         $expected = $result[$l->getId()]['count'];
 
         $lists = $listModel->getLeadsByList(['id' => $l->getId()]);
-        $real = count($lists[$l->getId()]);
+        $real  = count($lists[$l->getId()]);
 
         if ($expected != $real and count($l->getFilters())) {
             echo "ERROR: database contains $real records but query proposes $expected results\n";
