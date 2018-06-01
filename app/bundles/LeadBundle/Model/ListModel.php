@@ -830,29 +830,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @deprecated this method will be removed very soon, do not use it
-     *
-     * @param LeadList $entity
-     *
-     * @return array
-     *
-     * @throws \Exception
-     */
-    public function getSegmentTotal(LeadList $entity)
-    {
-        $id       = $entity->getId();
-        $list     = ['id' => $id, 'filters' => $entity->getFilters()];
-        $dtHelper = new DateTimeHelper();
-
-        $batchLimiters = [
-            'dateTime'        => $dtHelper->toUtcString(),
-            'excludeVisitors' => true,
-        ];
-
-        return $this->leadSegmentService->getTotalLeadListLeadsCount($entity, $batchLimiters);
-    }
-
-    /**
      * @param LeadList $entity
      *
      * @return mixed
