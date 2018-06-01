@@ -188,7 +188,7 @@ class ContactSegmentQueryBuilder
         } else {
             $expression = $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId);
         }
-        
+
         $queryBuilder->addJoinCondition($tableAlias, $expression);
 
         if ($setHaving) {
