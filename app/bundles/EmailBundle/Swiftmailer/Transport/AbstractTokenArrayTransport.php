@@ -37,6 +37,23 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
     protected $started = false;
 
     /**
+     * @var array
+     */
+    protected $standardHeaderKeys = [
+        'MIME-Version',
+        'received',
+        'dkim-signature',
+        'Content-Type',
+        'Content-Transfer-Encoding',
+        'To',
+        'From',
+        'Subject',
+        'Reply-To',
+        'CC',
+        'BCC',
+    ];
+
+    /**
      * @var MauticFactory
      *
      * @deprecated 2.13.0 to be removed in 3.0; register transport as a service and pass dependencies
@@ -254,7 +271,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
         $headers            = $this->message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
-            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT) {
+            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT && !in_array($header->getFieldName(), $this->standardHeaderKeys)) {
                 $message['headers'][$header->getFieldName()] = $header->getFieldBodyModel();
             }
         }

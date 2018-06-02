@@ -42,17 +42,26 @@ class StatsApiController extends CommonApiController
         // Ensure internal flag is not spoofed
         $this->sanitizeWhereClauseArrayFromRequest($where);
 
-        $event = new StatsEvent($table, $start, $limit, $order, $where, $this->get('mautic.helper.user')->getUser());
-        $this->get('event_dispatcher')->dispatch(CoreEvents::LIST_STATS, $event);
+        try {
+            $event = new StatsEvent($table, $start, $limit, $order, $where, $this->get('mautic.helper.user')->getUser());
+            $this->get('event_dispatcher')->dispatch(CoreEvents::LIST_STATS, $event);
 
-        // Return available tables if no result was set
-        if (!$event->hasResults()) {
-            $response['availableTables'] = $event->getTables();
-            $response['tableColumns']    = $event->getTableColumns();
-        } else {
-            $results              = $event->getResults();
-            $response['total']    = $results['total'];
-            $response[$itemsName] = $results['results'];
+            // Return available tables if no result was set
+            if (!$event->hasResults()) {
+                $response['availableTables'] = $event->getTables();
+                $response['tableColumns']    = $event->getTableColumns();
+            } else {
+                $results              = $event->getResults();
+                $response['total']    = $results['total'];
+                $response[$itemsName] = $results['results'];
+            }
+        } catch (\Exception $e) {
+            $response['errors'] = [
+                [
+                    'message' => $e->getMessage(),
+                    'code'    => $e->getCode(),
+                ],
+            ];
         }
 
         $view = $this->view($response);

@@ -395,6 +395,13 @@ return [
                     'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
+            'mautic.lead.reportbundle.report_utm_tag_subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ReportUtmTagSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.reportbundle.fields_builder',
+                    'mautic.lead.model.company_report_data',
+                ],
+            ],
             'mautic.lead.calendarbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\CalendarSubscriber',
             ],
@@ -811,7 +818,10 @@ return [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel',
             ],
             'mautic.lead.model.device' => [
-                'class' => Mautic\LeadBundle\Model\DeviceModel::class,
+                'class'     => Mautic\LeadBundle\Model\DeviceModel::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_device',
+                ],
             ],
             'mautic.lead.model.company' => [
                 'class'     => 'Mautic\LeadBundle\Model\CompanyModel',

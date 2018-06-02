@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
+use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
 use Monolog\Logger;
@@ -177,17 +178,16 @@ class ContactTracker
 
         // If for whatever reason this contact has not been saved yet, don't generate tracking cookies
         if (!$trackedContact->getId()) {
-            return;
-        }
-
-        if (!$previouslyTrackedContact) {
-            // New lead, set the tracking cookie
-            $this->generateTrackingCookies();
+            // Delete existing cookies to prevent tracking as someone else
+            $this->deviceTracker->clearTrackingCookies();
 
             return;
         }
 
-        if ($previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
+        // Generate cookies for the newly tracked contact
+        $this->generateTrackingCookies();
+
+        if ($previouslyTrackedContact && $previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
             $this->dispatchContactChangeEvent($previouslyTrackedContact, $previouslyTrackedId);
         }
     }
@@ -320,10 +320,15 @@ class ContactTracker
             $lead->addIpAddress($ip);
         }
 
-        if ($persist) {
-            // Purposively ignoring events for new visitors
+        if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
+            // Dispatch events for new lead to write create log, ip address change, etc
+            $event = new LeadEvent($lead, true);
+            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_SAVE, $event);
+
             $this->leadRepository->saveEntity($lead);
             $this->hydrateCustomFieldData($lead);
+
+            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
 
             $this->logger->addDebug("LEAD: New lead created with ID# {$lead->getId()}.");
         }
