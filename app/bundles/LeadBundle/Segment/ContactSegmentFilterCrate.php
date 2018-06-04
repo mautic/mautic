@@ -200,6 +200,9 @@ class ContactSegmentFilterCrate
 
             return;
         }
+        if ('page_id' === $this->getField() || 'email_id' === $this->getField() || 'redirect_id' === $this->getField() || 'notification' === $this->getField()) {
+            $operator = ($operator === '=') === $this->getFilter() ? 'notEmpty' : 'empty';
+        }
 
         if ('=' === $operator && is_array($this->getFilter())) { //Fix for old segments which can have stored = instead on in operator
             $operator = 'in';
