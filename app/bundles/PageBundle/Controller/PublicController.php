@@ -14,6 +14,7 @@ namespace Mautic\PageBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
@@ -453,11 +454,13 @@ class PublicController extends CommonFormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
         $lead      = $leadModel->getContactFromRequest([$ct]);
-        $leadArray = ($lead) ? $lead->getProfileFields() : [];
-        $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
-        $url       = $this->replacePageTokenUrl($url);
-        $url       = $this->replaceAssetTokenUrl($url);
-        $url       = UrlHelper::sanitizeAbsoluteUrl($url);
+
+        /** @var PrimaryCompanyHelper $primaryCompanyHelper */
+        $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
+        $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+
+        $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+        $url = UrlHelper::sanitizeAbsoluteUrl($url);
 
         if (false === filter_var($url, FILTER_VALIDATE_URL)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
@@ -639,26 +642,5 @@ class PublicController extends CommonFormController
         }
 
         return new JsonResponse($data);
-    }
-
-    /**
-     * @param array $companies
-     * @param array $profileFields
-     *
-     * @return array
-     */
-    private function mergePrimaryCompany(array $companies, array $profileFields)
-    {
-        foreach ($companies as $company) {
-            if (empty($company['is_primary'])) {
-                continue;
-            }
-
-            unset($company['score'], $company['date_added'], $company['date_associated'], $company['is_primary']);
-
-            return array_merge($profileFields, $company);
-        }
-
-        return $profileFields;
     }
 }
