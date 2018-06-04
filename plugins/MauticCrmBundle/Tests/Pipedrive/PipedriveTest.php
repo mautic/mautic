@@ -61,6 +61,14 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $integration = new Integration();
         $integration->setName('Pipedrive');
         $integration->setIsPublished($published);
+        $settings = array_merge(
+            [
+                'import' => [
+                    'enabled',
+                ],
+            ],
+            $settings
+        );
         $integration->setFeatureSettings($settings);
         $integration->setSupportedFeatures($features);
         $integration->setPlugin($plugin);
@@ -198,6 +206,8 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     protected function getIntegrationObject()
     {
         $integrationHelper = $this->container->get('mautic.helper.integration');
+
+        $integration = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
         return $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
     }
