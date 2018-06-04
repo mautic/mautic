@@ -68,7 +68,10 @@ class LeadImport extends AbstractImport
         }
         $this->leadModel->saveEntity($lead);
 
-        $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $data['id'], $lead->getId());
+        $integrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $data['id']]);
+        if (!$integrationEntity) {
+            $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $data['id'], $lead->getId());
+        }
 
         $this->em->persist($integrationEntity);
         $this->em->flush();
@@ -110,7 +113,7 @@ class LeadImport extends AbstractImport
         $lastSyncDate      = $integrationEntity->getLastSyncDate();
         $leadDateModified  = $lead->getDateModified();
 
-        if ($lastSyncDate >= $leadDateModified) {
+        if ($lastSyncDate->format('Y-m-d H:i:s') >= $data['update_time']) {
             return false;
         } //Do not push lead if contact was modified in Mautic, and we don't wanna mofify it
 

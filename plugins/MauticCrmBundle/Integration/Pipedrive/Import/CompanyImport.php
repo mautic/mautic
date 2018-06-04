@@ -61,7 +61,11 @@ class CompanyImport extends AbstractImport
         $this->companyModel->setFieldValues($company, $mappedData);
         $this->companyModel->saveEntity($company);
 
-        $integrationEntity = $this->createIntegrationCompanyEntity(new \DateTime(), $data['id'], $company->getId());
+        $integrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $data['id']]);
+
+        if ($integrationEntity) {
+            $integrationEntity = $this->createIntegrationCompanyEntity(new \DateTime(), $data['id'], $company->getId());
+        }
         $this->em->persist($integrationEntity);
         $this->em->flush();
 
