@@ -143,6 +143,7 @@ class PublicController extends CommonFormController
         $email      = null;
         $lead       = null;
         $template   = null;
+        $isPrefCenter = false;
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
@@ -214,8 +215,9 @@ class PublicController extends CommonFormController
                 }
 
                 $formView = $form->createView();
+                $isPrefCenter = ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter());
                 /** @var Page $prefCenter */
-                if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
+                if ($email && $isPrefCenter) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
                     $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
@@ -289,7 +291,12 @@ class PublicController extends CommonFormController
             }
         }
 
-        return $this->render($contentTemplate, $viewParams);
+        if ($isPrefCenter) {
+            return new Response($message);
+        } else {
+            return $this->render($contentTemplate, $viewParams);
+        }
+
     }
 
     /**
