@@ -1750,7 +1750,7 @@ class LeadListRepository extends CommonRepository
                                     }
 
                                     $groupExpr->add(
-                                        $field." $operator '\\\\|?$filter\\\\|?'"
+                                        $field." $operator '(([|]|^)$filter([|]|$))'"
                                     );
                                 }
                             } else {
