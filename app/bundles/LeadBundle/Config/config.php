@@ -792,6 +792,10 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
+            'mautic.lead.query.builder.complex_relation.value' => [
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
+            ],
             'mautic.lead.query.builder.special.leadlist' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder::class,
                 'arguments' => [
@@ -903,6 +907,7 @@ return [
                     'mautic.lead.model.lead_segment_decorator_base',
                     'mautic.lead.model.lead_segment_decorator_custom_mapped',
                     'mautic.lead.model.lead_segment.decorator.date.optionFactory',
+                    'mautic.lead.model.lead_segment_decorator_company',
                 ],
             ],
             'mautic.lead.model.lead_segment_decorator_base' => [
@@ -914,6 +919,13 @@ return [
             ],
             'mautic.lead.model.lead_segment_decorator_custom_mapped' => [
                 'class'     => \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_company' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\CompanyDecorator::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_operator',
                     'mautic.lead.repository.lead_segment_filter_descriptor',

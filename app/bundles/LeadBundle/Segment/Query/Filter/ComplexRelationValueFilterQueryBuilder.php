@@ -11,52 +11,31 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Mautic\LeadBundle\Segment\Query\QueryException;
-use Mautic\LeadBundle\Segment\RandomParameterName;
 
 /**
- * Class BaseFilterQueryBuilder.
+ * Class ComplexRelationValueFilterQueryBuilder is used to connect foreign tables using third table.
+ *
+ * Currently only company decorator uses this functionality but it may be used by plugins in the future
+ *
+ * filter decorator must implement methods:
+ *  $filter->getRelationJoinTable()
+ *  $filter->getRelationJoinTableField()
+ *
+ * @see \Mautic\LeadBundle\Segment\Decorator\CompanyDecorator
  */
-class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
+class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /** @var RandomParameterName */
-    private $parameterNameGenerator;
-
-    /**
-     * BaseFilterQueryBuilder constructor.
-     *
-     * @param RandomParameterName $randomParameterNameService
-     */
-    public function __construct(RandomParameterName $randomParameterNameService)
-    {
-        $this->parameterNameGenerator = $randomParameterNameService;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     public static function getServiceId()
     {
-        return 'mautic.lead.query.builder.basic';
+        return 'mautic.lead.query.builder.complex_relation.value';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         $filterOperator = $filter->getOperator();
-        $filterGlue     = $filter->getGlue();
-        $filterAggr     = $filter->getAggregateFunction();
-
-        try {
-            $filter->getColumn();
-        } catch (QueryException $e) {
-            // We do ignore not found fields as they may be just removed custom field
-            return $queryBuilder;
-        }
 
         $filterParameters = $filter->getParameterValue();
 
@@ -73,26 +52,13 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
         $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
 
-        // for aggregate function we need to create new alias and not reuse the old one
-        if ($filterAggr) {
-            $tableAlias = false;
-        }
-
         if (!$tableAlias) {
             $tableAlias = $this->generateRandomParameterName();
 
-            if ($filter->getTable() == MAUTIC_TABLE_PREFIX.'companies') {
-                $relTable = $this->generateRandomParameterName();
-                $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = l.id');
-                $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
-            } else {
-                $queryBuilder->leftJoin(
-                        $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
-                        $filter->getTable(),
-                        $tableAlias,
-                        sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
-                    );
-            }
+            $relTable = $this->generateRandomParameterName();
+            $queryBuilder->leftJoin('l', $filter->getRelationJoinTable(), $relTable, $relTable.'.lead_id = l.id');
+            $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.'
+                .$filter->getRelationJoinTableField());
         }
 
         switch ($filterOperator) {
@@ -161,34 +127,10 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
         }
 
-        if ($queryBuilder->isJoinTable($filter->getTable())) {
-            $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
-        }
-
-        $queryBuilder->addLogic($expression, $filterGlue);
+        $queryBuilder->addLogic($expression, $filter->getGlue());
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 
         return $queryBuilder;
-    }
-
-    /**
-     * @param RandomParameterName $parameterNameGenerator
-     *
-     * @return BaseFilterQueryBuilder
-     */
-    public function setParameterNameGenerator($parameterNameGenerator)
-    {
-        $this->parameterNameGenerator = $parameterNameGenerator;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    protected function generateRandomParameterName()
-    {
-        return $this->parameterNameGenerator->generateRandomParameterName();
     }
 }

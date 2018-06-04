@@ -36,6 +36,11 @@ class DecoratorFactory
     private $customMappedDecorator;
 
     /**
+     * @var CompanyDecorator
+     */
+    private $companyDecorator;
+
+    /**
      * @var DateOptionFactory
      */
     private $dateOptionFactory;
@@ -47,17 +52,20 @@ class DecoratorFactory
      * @param BaseDecorator                  $baseDecorator
      * @param CustomMappedDecorator          $customMappedDecorator
      * @param DateOptionFactory              $dateOptionFactory
+     * @param CompanyDecorator               $companyDecorator
      */
     public function __construct(
         ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
         BaseDecorator $baseDecorator,
         CustomMappedDecorator $customMappedDecorator,
-        DateOptionFactory $dateOptionFactory
+        DateOptionFactory $dateOptionFactory,
+        CompanyDecorator $companyDecorator
     ) {
         $this->baseDecorator                  = $baseDecorator;
         $this->customMappedDecorator          = $customMappedDecorator;
         $this->dateOptionFactory              = $dateOptionFactory;
         $this->contactSegmentFilterDictionary = $contactSegmentFilterDictionary;
+        $this->companyDecorator               = $companyDecorator;
     }
 
     /**
@@ -74,6 +82,10 @@ class DecoratorFactory
         $originalField = $contactSegmentFilterCrate->getField();
 
         if (empty($this->contactSegmentFilterDictionary[$originalField])) {
+            if ($contactSegmentFilterCrate->getArray()['object'] == 'company') {
+                return $this->companyDecorator;
+            }
+
             return $this->baseDecorator;
         }
 

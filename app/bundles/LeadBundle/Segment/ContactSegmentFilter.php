@@ -206,8 +206,36 @@ class ContactSegmentFilter
         return new DoNotContactParts($this->contactSegmentFilterCrate->getField());
     }
 
+    /**
+     * @return IntegrationCampaignParts
+     */
     public function getIntegrationCampaignParts()
     {
         return new IntegrationCampaignParts($this->getParameterValue());
+    }
+
+    public function __toString()
+    {
+        $debug = sprintf(
+            'table: %s,  %s on %s %s %s',
+                $this->getTable(),
+            $this->getField(),
+            $this->getQueryType(),
+            $this->getOperator(),
+            json_encode($this->getParameterValue())
+        );
+
+        return $debug;
+    }
+
+    public function getRelationJoinTable()
+    {
+        return method_exists($this->filterDecorator, 'getRelationJoinTable') ? $this->filterDecorator->getRelationJoinTable() : null;
+    }
+
+    public function getRelationJoinTableField()
+    {
+        return method_exists($this->filterDecorator, 'getRelationJoinTableField') ?
+            $this->filterDecorator->getRelationJoinTableField() : null;
     }
 }
