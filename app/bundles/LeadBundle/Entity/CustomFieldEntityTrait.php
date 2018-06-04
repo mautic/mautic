@@ -264,6 +264,14 @@ trait CustomFieldEntityTrait
     }
 
     /**
+     * @return bool
+     */
+    public function hasFields()
+    {
+        return !empty($this->fields);
+    }
+
+    /**
      * @param $key
      */
     public function getEventData($key)
