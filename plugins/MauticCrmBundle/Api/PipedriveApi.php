@@ -131,6 +131,28 @@ class PipedriveApi extends CrmApi
     }
 
     /**
+     * @param  $email
+     *
+     * @return array
+     */
+    public function findCompanyByName($name, $start = 0, $limit = 10)
+    {
+        $url = sprintf('%s/%s/find', $this->integration->getApiUrl(), self::ORGANIZATIONS_API_ENDPOINT);
+
+        $params = [
+            'query' => array_merge($this->getAuthQuery(), [
+                'term'            => $name,
+                'start'           => $start,
+                'limit'           => $limit,
+            ]),
+        ];
+
+        $response = $this->transport->get($url, $params);
+
+        return $this->getResponseData($response);
+    }
+
+    /**
      * @return array
      */
     public function getDataByEndpoint(array $query, $endpoint)

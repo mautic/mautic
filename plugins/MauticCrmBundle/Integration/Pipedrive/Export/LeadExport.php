@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
@@ -10,6 +11,23 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class LeadExport extends AbstractPipedrive
 {
+    /**
+     * @var CompanyExport
+     */
+    private $companyExport;
+
+    /**
+     * LeadExport constructor.
+     *
+     * @param EntityManager $em
+     * @param CompanyExport $companyExport
+     */
+    public function __construct(EntityManager $em, CompanyExport $companyExport)
+    {
+        $this->em            = $em;
+        $this->companyExport = $companyExport;
+    }
+
     public function create(Lead $lead)
     {
         // stop for anynomouse
@@ -134,6 +152,22 @@ class LeadExport extends AbstractPipedrive
         $leadCompany = array_pop($leadCompanies);
 
         $integrationEntityCompany = $this->getCompanyIntegrationEntity(['internalEntityId' => $leadCompany->getCompany()->getId()]);
+
+        if (!$integrationEntityCompany) {
+            // check if company already exist on Pipedrive
+            $companyData = $this->getIntegration()->getApiHelper()->findCompanyByName($leadCompany->getCompany()->getName(), 0, 1);
+            if (!empty($companyData)) {
+                $integrationEntityCompany = $this->createIntegrationLeadEntity(new \DateTime(), $companyData[0]['id'], $leadCompany->getCompany()->getId());
+                $this->em->persist($integrationEntityCompany);
+                $this->em->flush();
+            } else {
+                // create new company on Pipedrive
+                $this->companyExport->setIntegration($this->getIntegration());
+                if ($this->companyExport->pushCompany($leadCompany->getCompany())) {
+                    $integrationEntityCompany = $this->getCompanyIntegrationEntity(['internalEntityId' => $leadCompany->getCompany()->getId()]);
+                }
+            }
+        }
 
         if (!$integrationEntityCompany) {
             return 0;
