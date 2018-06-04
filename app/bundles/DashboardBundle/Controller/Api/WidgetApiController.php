@@ -94,7 +94,7 @@ class WidgetApiController extends CommonApiController
             'dataset'    => $dataset,
         ];
 
-        $cacheTimeout = (int) $this->request->get('cacheTimeout', null);
+        $cacheTimeout = (int) $this->request->get('cacheTimeout', 0);
         $widgetHeight = (int) $this->request->get('height', 300);
 
         $widget = new Widget();
