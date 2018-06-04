@@ -370,7 +370,7 @@ class LeadListRepository extends CommonRepository
             if ($dynamic && count($filters)) {
                 $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 if ($countOnly) {
-                    $count  = ($this->hasCompanyFilter) ? 'count(distinct(l.id))' : 'count(l.id)';
+                    $count  = 'count(distinct(l.id))';
                     $select = $count.' as lead_count, max(l.id) as max_id';
                     if ($withMinId) {
                         $select .= ', min(l.id) as min_id';
