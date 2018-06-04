@@ -42,6 +42,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -125,6 +126,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $deviceTracker;
 
     /**
+     * @var RedirectRepository
+     */
+    private $redirectRepository;
+
+    /**
      * EmailModel constructor.
      *
      * @param IpLookupHelper     $ipLookupHelper
@@ -138,6 +144,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param MessageQueueModel  $messageQueueModel
      * @param SendEmailToContact $sendModel
      * @param DeviceTracker      $deviceTracker
+     * @param RedirectRepository $redirectRepository
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -150,7 +157,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         UserModel $userModel,
         MessageQueueModel $messageQueueModel,
         SendEmailToContact $sendModel,
-        DeviceTracker $deviceTracker
+        DeviceTracker $deviceTracker,
+        RedirectRepository $redirectRepository
     ) {
         $this->ipLookupHelper        = $ipLookupHelper;
         $this->themeHelper           = $themeHelper;
@@ -163,6 +171,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->messageQueueModel     = $messageQueueModel;
         $this->sendModel             = $sendModel;
         $this->deviceTracker         = $deviceTracker;
+        $this->redirectRepository    = $redirectRepository;
     }
 
     /**
@@ -531,6 +540,96 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_BUILD, $event);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
+    }
+
+    /**
+     * @param           $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array     $options
+     * @param int|null  $companyId
+     * @param int|null  $campaignId
+     * @param int|null  $segmentId
+     *
+     * @return array
+     */
+    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
+    {
+        $createdByUserId = null;
+        if (!empty($options['canViewOthers'])) {
+            $createdByUserId = $this->userHelper->getUser()->getId();
+        }
+        $stats = $this->getStatRepository()->getSentEmailToContactData($limit, $dateFrom, $dateTo, $createdByUserId, $companyId, $campaignId, $segmentId);
+        $data  = [];
+
+        foreach ($stats as $stat) {
+            $statId = $stat['id'];
+            if (!array_key_exists($statId, $data)) {
+                $item = [
+                    'contact_id'    => $stat['lead_id'],
+                    'contact_email' => $stat['email_address'],
+                    'open'          => $stat['is_read'],
+                    'click'         => ($stat['link_hits'] !== null) ? $stat['link_hits'] : 0,
+                    'links_clicked' => [],
+                    'email_id'      => (string) $stat['email_id'],
+                    'email_name'    => (string) $stat['email_name'],
+                    'segment_id'    => (string) $stat['segment_id'],
+                    'segment_name'  => (string) $stat['segment_name'],
+                    'company_id'    => (string) $stat['company_id'],
+                    'company_name'  => (string) $stat['company_name'],
+                    'campaign_id'   => (string) $stat['campaign_id'],
+                    'campaign_name' => (string) $stat['campaign_name'],
+                ];
+
+                if ($item['click'] && $item['email_id'] && $item['contact_id']) {
+                    $item['links_clicked'] = $this->getStatRepository()->getUniqueClickedLinksPerContactAndEmail($item['contact_id'], $item['email_id']);
+                }
+
+                $data[$statId] = $item;
+            } else {
+                if ($stat['link_hits'] !== null) {
+                    $data[$statId]['click'] += $stat['link_hits'];
+                }
+                if ($stat['link_url'] !== null && !in_array($stat['link_url'], $data[$statId]['links_clicked'])) {
+                    $data[$statId]['links_clicked'][] = $stat['link_url'];
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param int       $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array     $options
+     * @param int|null  $companyId
+     * @param int|null  $campaignId
+     * @param int|null  $segmentId
+     *
+     * @return array
+     */
+    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
+    {
+        $createdByUserId = null;
+        if (!empty($options['canViewOthers'])) {
+            $createdByUserId = $this->userHelper->getUser()->getId();
+        }
+
+        $redirects = $this->redirectRepository->getMostHitEmailRedirects($limit, $dateFrom, $dateTo, $createdByUserId, $companyId, $campaignId, $segmentId);
+        $data      = [];
+        foreach ($redirects as $redirect) {
+            $data[] = [
+                'url'         => (string) $redirect['url'],
+                'unique_hits' => (string) $redirect['unique_hits'],
+                'hits'        => (string) $redirect['hits'],
+                'email_id'    => (string) $redirect['email_id'],
+                'email_name'  => (string) $redirect['email_name'],
+            ];
+        }
+
+        return $data;
     }
 
     /**
