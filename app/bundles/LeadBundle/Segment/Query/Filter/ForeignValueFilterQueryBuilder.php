@@ -104,7 +104,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'empty':
             case 'notEmpty':
             case 'notIn':
-                $queryBuilder->addSelect($tableAlias.'.lead_id');
+                $queryBuilder->addSelect($tableAlias.'.lead_id as '.$tableAlias.'_id');
                 $expression = $queryBuilder->expr()->isNull(
                     $tableAlias.'.lead_id');
                 $queryBuilder->addLogic($expression, 'and');
