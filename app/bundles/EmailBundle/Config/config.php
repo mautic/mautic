@@ -314,8 +314,8 @@ return [
                 'alias'     => 'monitored_email',
             ],
             'mautic.form.type.email_dashboard_emails_in_time_widget' => [
-                'class' => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
-                'alias' => 'email_dashboard_emails_in_time_widget',
+                'class'     => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
+                'alias'     => 'email_dashboard_emails_in_time_widget',
             ],
             'mautic.form.type.email_dashboard_sent_email_to_contacts_widget' => [
                 'class'     => \Mautic\EmailBundle\Form\Type\DashboardSentEmailToContactsWidgetType::class,

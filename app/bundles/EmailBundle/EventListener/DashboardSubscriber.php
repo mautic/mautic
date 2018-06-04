@@ -92,6 +92,18 @@ class DashboardSubscriber extends MainDashboardSubscriber
             if (isset($params['flag'])) {
                 $params['filter']['flag'] = $params['flag'];
             }
+            if (isset($params['dataset'])) {
+                $params['filter']['dataset'] = $params['dataset'];
+            }
+            if (isset($params['companyId'])) {
+                $params['filter']['companyId'] = $params['companyId'];
+            }
+            if (isset($params['campaignId'])) {
+                $params['filter']['campaignId'] = $params['campaignId'];
+            }
+            if (isset($params['segmentId'])) {
+                $params['filter']['segmentId'] = $params['segmentId'];
+            }
 
             if (!$event->isCached()) {
                 $event->setTemplateData([
