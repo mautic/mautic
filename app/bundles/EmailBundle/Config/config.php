@@ -141,7 +141,11 @@ return [
                 ],
             ],
             'mautic.emailtoken.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\TokenSubscriber',
+                'class'     => 'Mautic\EmailBundle\EventListener\TokenSubscriber',
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.lead.helper.primary_company',
+                ],
             ],
             'mautic.email.campaignbundle.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\CampaignSubscriber::class,
