@@ -36,35 +36,39 @@ class ButtonSubscriber extends CommonSubscriber
                 ['objectAction' => 'batchExport']
             );
 
-            $event->addButton(
-                [
-                    'attr' => [
-                        'data-toggle'           => 'confirmation',
-                        'href'                  => $exportRoute,
-                        'data-precheck'         => 'batchActionPrecheck',
-                        'data-message'          => $this->translator->trans('mautic.core.export.items', ['%items%' => 'contacts']),
-                        'data-confirm-text'     => $this->translator->trans('mautic.core.export'),
-                        'data-confirm-callback' => 'executeBatchAction',
-                        'data-cancel-text'      => $this->translator->trans('mautic.core.form.cancel'),
-                        'data-cancel-callback'  => 'dismissConfirmation',
-                    ],
-                    'btnText'   => $this->translator->trans('mautic.core.export'),
-                    'iconClass' => 'fa fa-download',
-                ],
-                ButtonHelper::LOCATION_BULK_ACTIONS
-            );
+            $permissions = $this->security->isGranted('lead:batch:export');
 
-            $event->addButton(
-                [
-                    'attr' => [
-                        'href'        => $exportRoute,
-                        'data-toggle' => null,
+            if ($permissions) {
+                $event->addButton(
+                    [
+                        'attr' => [
+                            'data-toggle'           => 'confirmation',
+                            'href'                  => $exportRoute,
+                            'data-precheck'         => 'batchActionPrecheck',
+                            'data-message'          => $this->translator->trans('mautic.core.export.items', ['%items%' => 'contacts']),
+                            'data-confirm-text'     => $this->translator->trans('mautic.core.export'),
+                            'data-confirm-callback' => 'executeBatchAction',
+                            'data-cancel-text'      => $this->translator->trans('mautic.core.form.cancel'),
+                            'data-cancel-callback'  => 'dismissConfirmation',
+                        ],
+                        'btnText'   => $this->translator->trans('mautic.core.export'),
+                        'iconClass' => 'fa fa-download',
                     ],
-                    'btnText'   => $this->translator->trans('mautic.core.export'),
-                    'iconClass' => 'fa fa-download',
-                ],
-                ButtonHelper::LOCATION_PAGE_ACTIONS
-            );
+                    ButtonHelper::LOCATION_BULK_ACTIONS
+                );
+
+                $event->addButton(
+                    [
+                        'attr' => [
+                            'href'        => $exportRoute,
+                            'data-toggle' => null,
+                        ],
+                        'btnText'   => $this->translator->trans('mautic.core.export'),
+                        'iconClass' => 'fa fa-download',
+                    ],
+                    ButtonHelper::LOCATION_PAGE_ACTIONS
+                );
+            }
         }
     }
 }
