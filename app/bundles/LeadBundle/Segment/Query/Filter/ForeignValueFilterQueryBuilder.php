@@ -83,11 +83,18 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             default:
                 $tableAlias = $this->generateRandomParameterName();
+
+                if (!is_null($filter->getWhere())) {
+                    $where = ' AND '.str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere());
+                } else {
+                    $where = '';
+                }
+
                 $queryBuilder->leftJoin(
                     $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
                     $filter->getTable(),
                     $tableAlias,
-                    $tableAlias.'.lead_id = l.id'
+                    $tableAlias.'.lead_id = l.id'.$where
                 );
 
                 $queryBuilder->addLogic($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'), $filter->getGlue());
