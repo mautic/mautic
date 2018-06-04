@@ -81,6 +81,26 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $queryBuilder->addLogic($queryBuilder->expr()->isNull($tableAlias.'.lead_id'), $filter->getGlue());
                 break;
+            case 'empty':
+            case 'notEmpty':
+                $tableAlias = $this->generateRandomParameterName();
+
+                $queryBuilder->leftJoin(
+                    $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
+                    $filter->getTable(),
+                    $tableAlias,
+                    $tableAlias.'.lead_id = l.id'
+                );
+
+                if ($filterOperator == 'empty') {
+                    $queryBuilder->addJoinCondition($tableAlias, $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
+                        $filter->getGlue());
+                } else {
+                    $queryBuilder->addJoinCondition($tableAlias, $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()),
+                        $filter->getGlue());
+                }
+
+                break;
             default:
                 $tableAlias = $this->generateRandomParameterName();
 
@@ -103,10 +123,11 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         switch ($filterOperator) {
             case 'empty':
             case 'notEmpty':
+                $expression = $queryBuilder->expr()->isNotNull($tableAlias.'.lead_id');
+                $queryBuilder->addLogic($expression, 'and');
+                break;
             case 'notIn':
-                $queryBuilder->addSelect($tableAlias.'.lead_id as '.$tableAlias.'_id');
-                $expression = $queryBuilder->expr()->isNull(
-                    $tableAlias.'.lead_id');
+                $expression = $queryBuilder->expr()->isNull($tableAlias.'.lead_id');
                 $queryBuilder->addLogic($expression, 'and');
                 break;
             case 'neq':
