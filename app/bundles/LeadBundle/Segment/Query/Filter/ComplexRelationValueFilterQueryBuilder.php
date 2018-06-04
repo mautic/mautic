@@ -11,6 +11,7 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
