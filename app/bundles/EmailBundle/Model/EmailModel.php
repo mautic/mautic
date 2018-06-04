@@ -1881,7 +1881,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
     {
         if ($campaignId !== null) {
-            $q->innerJoin($fromAlias, MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', $fromAlias.'.source_id = ce.id AND '.$fromAlias.'.source = "campaign.event"')
+            $q->innerJoin($fromAlias, MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'ce', $fromAlias.'.source_id = ce.event_id AND '.$fromAlias.'.source = "campaign.event" AND '.$fromAlias.'.lead_id = ce.lead_id')
                 ->innerJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
                 ->andWhere('ce.campaign_id = :campaignId')
                 ->setParameter('campaignId', $campaignId);
