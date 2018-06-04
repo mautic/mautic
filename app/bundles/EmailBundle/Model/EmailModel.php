@@ -1847,7 +1847,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             ->andWhere($q->expr()->eq('t.reason', ':reason'))
             ->setParameter('reason', $reason);
 
-        $q->leftJoin('t', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 't.channel_id = es.email_id AND t.channel = "email"');
+        $q->leftJoin('t', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 't.channel_id = es.email_id AND t.channel = "email" AND t.lead_id = es.lead_id');
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);
