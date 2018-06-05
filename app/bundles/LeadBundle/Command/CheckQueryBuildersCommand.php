@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use Monolog\Logger;
 use Symfony\Component\Console\Input\InputInterface;
@@ -109,8 +110,16 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         return $now->format('H:i:s.u');
     }
 
-    private function runSegment($output, $verbose, $l, ListModel $listModel)
+    private function runSegment(OutputInterface $output, $verbose, LeadList $l, ListModel $listModel)
     {
+        if (!$l->isPublished()) {
+            $msg = sprintf('Segment #%d is not published', $l->getId());
+            $output->writeln($msg);
+            $this->logger->info($msg);
+
+            return true;
+        }
+
         $output->write('<info>Running segment '.$l->getId().'...');
 
         if (!$this->skipOld) {
