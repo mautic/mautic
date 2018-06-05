@@ -181,7 +181,7 @@ class PublicController extends CommonFormController
             if ($lead) {
                 // Set the lead as current lead
                 $leadModel->setCurrentLead($lead);
-            
+
                 // Set lead lang
                 if ($lead->getPreferredLocale()) {
                     $translator->setLocale($lead->getPreferredLocale());
