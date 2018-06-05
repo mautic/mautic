@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
+use Mautic\LeadBundle\Segment\Decorator\CompanyDecorator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
@@ -65,10 +66,11 @@ class DecoratorFactoryTest extends \PHPUnit_Framework_TestCase
         $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary();
         $baseDecorator                  = $this->createMock(BaseDecorator::class);
         $customMappedDecorator          = $this->createMock(CustomMappedDecorator::class);
+        $companyDecorator               = $this->createMock(CompanyDecorator::class);
         $dateOptionFactory              = $this->createMock(DateOptionFactory::class);
         $filterDecoratorInterface       = $this->createMock(FilterDecoratorInterface::class);
 
-        $decoratorFactory = new DecoratorFactory($contactSegmentFilterDictionary, $baseDecorator, $customMappedDecorator, $dateOptionFactory);
+        $decoratorFactory = new DecoratorFactory($contactSegmentFilterDictionary, $baseDecorator, $customMappedDecorator, $dateOptionFactory, $companyDecorator);
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
             'type'     => 'date',
@@ -93,8 +95,9 @@ class DecoratorFactoryTest extends \PHPUnit_Framework_TestCase
         $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary();
         $baseDecorator                  = $this->createMock(BaseDecorator::class);
         $customMappedDecorator          = $this->createMock(CustomMappedDecorator::class);
+        $companyDecorator               = $this->createMock(CompanyDecorator::class);
         $dateOptionFactory              = $this->createMock(DateOptionFactory::class);
 
-        return new DecoratorFactory($contactSegmentFilterDictionary, $baseDecorator, $customMappedDecorator, $dateOptionFactory);
+        return new DecoratorFactory($contactSegmentFilterDictionary, $baseDecorator, $customMappedDecorator, $dateOptionFactory, $companyDecorator);
     }
 }
