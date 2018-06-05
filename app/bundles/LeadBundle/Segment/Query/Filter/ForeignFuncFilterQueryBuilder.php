@@ -109,7 +109,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                 if ($filterAggr) {
                     if (!is_null($filter)) {
                         $expression = $queryBuilder->expr()->$filterOperator(
-                            sprintf('%s(ifnull(%s,%s))', $filterAggr, $tableAlias.'.'.$filter->getField(),
+                            sprintf('%s(distinct %s,%s)', $filterAggr, $tableAlias.'.'.$filter->getField(),
                             ((intval($filter->getNullValue()) == $filter->getNullValue() && is_numeric($filter->getNullValue())) ? $filter->getNullValue() : "'".$filter->getNullValue()."'")),
                             $filterParametersHolder
                         );
