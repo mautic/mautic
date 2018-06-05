@@ -86,12 +86,11 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
-     *
-     * @return mixed
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $lead  = $event->getLead();
+
         $smsId = (int) $event->getConfig()['sms'];
         $sms   = $this->smsModel->getEntity($smsId);
 
