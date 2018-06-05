@@ -777,13 +777,6 @@ return [
                     \Mautic\LeadBundle\Entity\Lead::class,
                 ],
             ],
-            'mautic.lead.repository.lead_list' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\LeadList::class,
-                ],
-            ],
             'mautic.lead.repository.lead_event_log' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
