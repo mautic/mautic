@@ -82,7 +82,7 @@ class DecoratorFactory
         $originalField = $contactSegmentFilterCrate->getField();
 
         if (empty($this->contactSegmentFilterDictionary[$originalField])) {
-            if ($contactSegmentFilterCrate->getArray()['object'] == 'company') {
+            if ($contactSegmentFilterCrate->isCompanyType()) {
                 return $this->companyDecorator;
             }
 
