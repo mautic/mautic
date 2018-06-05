@@ -510,7 +510,39 @@ class TrackableModel extends AbstractCommonModel
             return false;
         }
 
-        $trackableUrl = $this->httpBuildUrl($urlParts);
+        // Check if URL is trackable
+        $tokenizedHost = (!isset($urlParts['host']) && isset($urlParts['path'])) ? $urlParts['path'] : $urlParts['host'];
+        if (preg_match('/^(\{\S+?\})/', $tokenizedHost, $match)) {
+            $token = $match[1];
+
+            // Tokenized hosts that are standalone tokens shouldn't use a scheme since the token value should contain it
+            if ($token === $tokenizedHost && $scheme = (!empty($urlParts['scheme'])) ? $urlParts['scheme'] : false) {
+                // Token has a schema so let's get rid of it before replacing tokens
+                $this->contentReplacements['first_pass'][$scheme.'://'.$tokenizedHost] = $tokenizedHost;
+                unset($urlParts['scheme']);
+            }
+
+            // Validate that the token is something that can be trackable
+            if (!$this->validateTokenIsTrackable($token, $tokenizedHost)) {
+                return false;
+            }
+
+            // Do not convert contact tokens
+            if (!$this->isContactFieldToken($token)) {
+                $trackableUrl = (!empty($urlParts['query'])) ? $this->contentTokens[$token].'?'.$urlParts['query'] : $this->contentTokens[$token];
+                $trackableKey = $trackableUrl;
+
+                // Replace the URL token with the actual URL
+                $this->contentReplacements['first_pass'][$url] = $trackableUrl;
+            }
+        } else {
+            // Regular URL without a tokenized host
+            $trackableUrl = $this->httpBuildUrl($urlParts);
+
+            if ($this->isInDoNotTrack($trackableUrl)) {
+                return false;
+            }
+        }
 
         if ($this->isInDoNotTrack($trackableUrl)) {
             return false;
@@ -553,11 +585,22 @@ class TrackableModel extends AbstractCommonModel
             return false;
         }
 
+        if ($this->isContactFieldToken($token)) {
+            // Assume it's true as the redirect methods should handle this dynamically
+            return true;
+        }
+
         $tokenValue = TokenHelper::getValueFromTokens($this->contentTokens, $token);
 
         // Validate that the token is available
         if (!$tokenValue) {
             return false;
+        }
+
+        if ($tokenizedHost) {
+            $url = str_ireplace($token, $tokenValue, $tokenizedHost);
+
+            return $this->isValidUrl($url, false);
         }
 
         if (!$this->isValidUrl($tokenValue)) {
@@ -840,5 +883,15 @@ class TrackableModel extends AbstractCommonModel
         );
 
         return $query;
+    }
+
+    /**
+     * @param $token
+     *
+     * @return bool
+     */
+    private function isContactFieldToken($token)
+    {
+        return strpos($token, '{contactfield') !== false || strpos($token, '{leadfield') !== false;
     }
 }
