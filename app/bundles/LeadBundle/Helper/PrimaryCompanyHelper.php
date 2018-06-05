@@ -69,7 +69,7 @@ class PrimaryCompanyHelper
                 continue;
             }
 
-            unset($company['score'], $company['date_added'], $company['date_associated'], $company['is_primary']);
+            unset($company['id'], $company['score'], $company['date_added'], $company['date_associated'], $company['is_primary']);
 
             return array_merge($profileFields, $company);
         }
