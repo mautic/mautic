@@ -16,7 +16,6 @@ use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AjaxController.
@@ -142,11 +141,11 @@ class AjaxController extends CommonAjaxController
     /**
      * @param Request $request
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @throws \Exception
      */
     protected function toggleCampaignTabDataAction(Request $request)
     {
-        $events     = [];
         $mode       = $request->request->get('mode');
         $campaignId = $request->request->get('campaignId');
         $fromDate   = $request->request->get('fromDate');
@@ -206,22 +205,29 @@ class AjaxController extends CommonAjaxController
 
             $sortedEvents[$event['eventType']][] = $event;
         }
-        //return $this->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events]);
 
-        $decisions  = trim(
-            $this->renderView('MauticCampaignBundle:Campaign:events.html.php', ['events' => $sortedEvents['decision']])
-        );
-        $actions    = trim(
-            $this->renderView('MauticCampaignBundle:Campaign:events.html.php', ['events' => $sortedEvents['action']])
-        );
-        $conditions = trim(
-            $this->renderView('MauticCampaignBundle:Campaign:events.html.php', ['events' => $sortedEvents['condition']])
-        );
+        $dataArray = [
+            'success'    => 1,
+            'decisions'  => trim(
+                $this->renderView(
+                    'MauticCampaignBundle:Campaign:events.html.php',
+                    ['events' => $sortedEvents['decision']]
+                )
+            ),
+            'actions'    => trim(
+                $this->renderView(
+                    'MauticCampaignBundle:Campaign:events.html.php',
+                    ['events' => $sortedEvents['action']]
+                )
+            ),
+            'conditions' => trim(
+                $this->renderView(
+                    'MauticCampaignBundle:Campaign:events.html.php',
+                    ['events' => $sortedEvents['condition']]
+                )
+            ),
+        ];
 
-        $finalHTML = ['decisions' => $decisions, 'actions' => $actions, 'conditions' => $conditions];
-
-        $response =  new Response(json_encode($finalHTML));
-
-        return $response;
+        return $this->sendJsonResponse($dataArray);
     }
 }

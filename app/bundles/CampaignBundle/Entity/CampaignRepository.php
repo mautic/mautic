@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Class CampaignRepository.
@@ -657,21 +658,16 @@ class CampaignRepository extends CommonRepository
                 $q->expr()->eq('cl.lead_id', (int) $leadId)
             );
         }
+
         if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
-            $fromDate = $dateRangeValues['date_from'];
-            $fromDate->setTimeZone(new \DateTimeZone('UTC'));
-            $fromDate = $fromDate->format('Y-m-d H:i:s');
-            $toDate   = $dateRangeValues['date_to'];
-            $toDate->add(new \DateInterval('P1D'))
-                ->sub(new \DateInterval('PT1S'))
-                ->setTimeZone(new \DateTimeZone('UTC'));
-            $toDate = $toDate->format('Y-m-d H:i:s');
+            $dateFrom = new DateTimeHelper($dateRangeValues['date_from']);
+            $dateTo = new DateTimeHelper($dateRangeValues['date_to']);
             $q->andWhere(
-                $q->expr()->gte('cl.date_added', ':fromDate'),
-                $q->expr()->lte('cl.date_added', ':toDate')
+                $q->expr()->gte('cl.date_added', ':dateFrom'),
+                $q->expr()->lte('cl.date_added', ':dateTo')
             );
-            $q->setParameter(':fromDate', $fromDate);
-            $q->setParameter(':toDate', $toDate);
+            $q->setParameter('dateFrom', $dateFrom->toUtcString());
+            $q->setParameter('dateTo', $dateTo->toUtcString());
         }
 
         if (count($pendingEvents) > 0) {

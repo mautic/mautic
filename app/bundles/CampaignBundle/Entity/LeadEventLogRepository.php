@@ -16,6 +16,7 @@ use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -217,6 +218,11 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $dateRangeValues = null)
     {
+        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
+            $dateFrom = new DateTimeHelper($dateRangeValues['date_from']);
+            $dateTo = new DateTimeHelper($dateRangeValues['date_to']);
+        }
+
         $q = $this->_em->getConnection()->createQueryBuilder()
                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
                        ->innerJoin(
@@ -225,17 +231,6 @@ class LeadEventLogRepository extends CommonRepository
                            'l',
                            'l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0 and o.lead_id = l.lead_id and l.rotation = o.rotation'
                        );
-
-        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
-            $fromDate = $dateRangeValues['date_from'];
-            $fromDate->setTimeZone(new \DateTimeZone('UTC'));
-            $fromDate = $fromDate->format('Y-m-d H:i:s');
-            $toDate   = $dateRangeValues['date_to'];
-            $toDate->add(new \DateInterval('P1D'))
-                ->sub(new \DateInterval('PT1S'))
-                ->setTimeZone(new \DateTimeZone('UTC'));
-            $toDate = $toDate->format('Y-m-d H:i:s');
-        }
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId)
@@ -268,14 +263,16 @@ class LeadEventLogRepository extends CommonRepository
             ->where(
                 $failedSq->expr()->eq('fe.log_id', 'o.id')
             );
-        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
+
+        if (isset($dateFrom) && isset($dateTo)) {
             $failedSq->andWhere(
-                $failedSq->expr()->gte('fe.date_added', ':fromDate'),
-                $failedSq->expr()->lte('fe.date_added', ':toDate')
-            )
-                ->setParameter(':fromDate', $fromDate)
-                ->setParameter(':toDate', $toDate);
+                $failedSq->expr()->gte('fe.date_added', ':dateFrom'),
+                $failedSq->expr()->lte('fe.date_added', ':dateTo')
+            );
+            $failedSq->setParameter('dateFrom', $dateFrom->toUtcString());
+            $failedSq->setParameter('dateTo', $dateTo->toUtcString());
         }
+
         $expr->add(
             sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
         );
@@ -284,13 +281,13 @@ class LeadEventLogRepository extends CommonRepository
           ->setParameter('false', false, 'boolean')
           ->groupBy($groupBy);
 
-        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
+        if (isset($dateFrom) && isset($dateTo)) {
             $q->andWhere(
-                $q->expr()->gte('o.date_triggered', ':fromDate'),
-                $q->expr()->lte('o.date_triggered', ':toDate')
-            )
-                ->setParameter(':fromDate', $fromDate)
-                ->setParameter(':toDate', $toDate);
+                $q->expr()->gte('o.date_triggered', ':dateFrom'),
+                $q->expr()->lte('o.date_triggered', ':dateTo')
+            );
+            $q->setParameter('dateFrom', $dateFrom->toUtcString());
+            $q->setParameter('dateTo', $dateTo->toUtcString());
         }
 
         $results = $q->execute()->fetchAll();

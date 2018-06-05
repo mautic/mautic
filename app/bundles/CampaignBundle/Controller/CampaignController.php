@@ -246,12 +246,7 @@ class CampaignController extends AbstractStandardFormController
             $this->connections = $this->getCampaignModel()->setCanvasSettings($entity, $this->connections);
         } else {
             // Just update and add to entity
-            $this->connections = $this->getCampaignModel()->setCanvasSettings(
-                $entity,
-                $this->connections,
-                false,
-                $this->modifiedEvents
-            );
+            $this->connections = $this->getCampaignModel()->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
         }
     }
 
@@ -288,10 +283,7 @@ class CampaignController extends AbstractStandardFormController
         list($this->modifiedEvents, $this->deletedEvents, $this->campaignEvents) = $this->getSessionEvents($sessionId);
 
         //set added/updated sources
-        list($this->addedSources, $this->deletedSources, $campaignSources) = $this->getSessionSources(
-            $sessionId,
-            $isClone
-        );
+        list($this->addedSources, $this->deletedSources, $campaignSources) = $this->getSessionSources($sessionId, $isClone);
         $this->connections = $this->getSessionCanvasSettings($sessionId);
 
         if ($isPost) {
