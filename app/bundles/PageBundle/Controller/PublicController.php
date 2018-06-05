@@ -453,7 +453,7 @@ class PublicController extends CommonFormController
         // Search replace lead fields in the URL
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
-        $lead      = $leadModel->getContactFromRequest([$ct]);
+        $lead      = $leadModel->getContactFromRequest(['ct' => $ct]);
 
         /** @var PrimaryCompanyHelper $primaryCompanyHelper */
         $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');

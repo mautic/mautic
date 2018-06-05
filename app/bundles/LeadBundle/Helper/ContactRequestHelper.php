@@ -145,7 +145,7 @@ class ContactRequestHelper
     {
         // Check for a lead requested through clickthrough query parameter
         if (isset($this->queryFields['ct'])) {
-            $clickthrough = $this->queryFields['ct'];
+            $clickthrough = (is_array($this->queryFields['ct'])) ? $this->queryFields['ct'] : ClickthroughHelper::decodeArrayFromUrl($this->queryFields['ct']);
         } elseif ($clickthrough = $this->request->get('ct', [])) {
             $clickthrough = ClickthroughHelper::decodeArrayFromUrl($clickthrough);
         }
