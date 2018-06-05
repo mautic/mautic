@@ -10,17 +10,18 @@ Mautic.campaignOnLoad = function (container, response) {
     }
 
     // hide or show data toggle selector on tab content
-    mQuery('ul.nav-tabs>li>a').on('click', function(){
-        var showTabs = ['#actions-container', '#decisions-container', '#conditions-container']
-        if (showTabs.indexOf(this.hash) != -1){
-            mQuery('#campaignTabDataToggle').show()
-        } else {
-            mQuery('#campaignTabDataToggle').hide()
+    mQuery('ul.nav-tabs > li > a').on('click', function () {
+        var showTabs = ['#actions-container', '#decisions-container', '#conditions-container'];
+        if (showTabs.indexOf(this.hash) !== -1) {
+            mQuery('#campaignTabDataToggle').show();
+        }
+        else {
+            mQuery('#campaignTabDataToggle').hide();
         }
     });
 
     // register click event to reload tab data using ajax
-    mQuery("input[name=tabDataMode]").change(function(){
+    mQuery('input[name=tabDataMode]').change(function(){
         Mautic.toggleCampaignTabData(this);
     });
 
@@ -154,7 +155,8 @@ Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy)
 }
 
 /**
- * Delete the builder instance so it's regenerated when reopening the campaign event builder
+ * Delete the builder instance so it's regenerated when reopening the campaign
+ * event builder
  */
 Mautic.campaignOnUnload = function(container) {
     delete Mautic.campaignBuilderInstance;
@@ -437,7 +439,18 @@ Mautic.launchCampaignPreview = function() {
 
 /**
  *
- * @type {{source: {leadsource: {source: Array, action: [*], condition: [*], decision: [*]}, leadsourceleft: {source: [*], action: Array, condition: Array, decision: Array}, leadsourceright: {source: [*], action: Array, condition: Array, decision: Array}}, action: {top: {source: [*], action: Array, condition: [*], decision: [*]}, bottom: {source: Array, action: Array, condition: [*], decision: [*]}}, condition: {top: {source: [*], action: [*], condition: [*], decision: [*]}, yes: {source: Array, action: [*], condition: [*], decision: [*]}, no: {source: Array, action: [*], condition: [*], decision: [*]}}, decision: {top: {action: [*], source: [*], condition: [*], decision: Array}, yes: {source: Array, action: [*], condition: [*], decision: Array}, no: {source: Array, action: [*], condition: [*], decision: Array}}}}
+ * @type {{source: {leadsource: {source: Array, action: [*], condition: [*],
+ *     decision: [*]}, leadsourceleft: {source: [*], action: Array, condition:
+ *     Array, decision: Array}, leadsourceright: {source: [*], action: Array,
+ *     condition: Array, decision: Array}}, action: {top: {source: [*], action:
+ *     Array, condition: [*], decision: [*]}, bottom: {source: Array, action:
+ *     Array, condition: [*], decision: [*]}}, condition: {top: {source: [*],
+ *     action: [*], condition: [*], decision: [*]}, yes: {source: Array,
+ *     action: [*], condition: [*], decision: [*]}, no: {source: Array, action:
+ *     [*], condition: [*], decision: [*]}}, decision: {top: {action: [*],
+ *     source: [*], condition: [*], decision: Array}, yes: {source: Array,
+ *     action: [*], condition: [*], decision: Array}, no: {source: Array,
+ *     action: [*], condition: [*], decision: Array}}}}
  */
 Mautic.campaignBuilderConnectionsMap = {
     // source
@@ -561,7 +574,8 @@ Mautic.campaignEndpointDefinitions = {
 /**
  * Push callbacks to these events
  *
- * @type {{connection: Array, connectionDetached: Array, connectionMoved: Array, beforeDrop: Array}}
+ * @type {{connection: Array, connectionDetached: Array, connectionMoved:
+ *     Array, beforeDrop: Array}}
  */
 Mautic.campaignConnectionCallbacks = {
     // sourceEndpoint, targetEndpoint, connection
@@ -957,7 +971,8 @@ Mautic.campaignHoverCallback = function(sourceEndpoint, endpoint, event) {
 };
 
 /**
- * Enable/Disable timeframe settings if the toggle for immediate trigger is changed
+ * Enable/Disable timeframe settings if the toggle for immediate trigger is
+ * changed
  */
 Mautic.campaignToggleTimeframes = function() {
     if (mQuery('#campaignevent_triggerMode_2').length) {
@@ -1879,18 +1894,16 @@ Mautic.cancelScheduledCampaignEvent = function(eventId, contactId) {
  * @param elem
  */
 Mautic.toggleCampaignTabData = function (elem) {
-    var $elem = mQuery(elem);
+    var $elem = mQuery(elem),
+        mode = $elem.data('mode'),
+        cid = $elem.data('campaignid'),
+        daterangeForm = '';
+
     $elem.parent('label').siblings('label.btn-success').removeClass('btn-success');
     $elem.parent('label').addClass('btn-success');
-    var mode = $elem.data('mode');
-    var cid = $elem.data('campaignid');
-    var daterangeForm = '';
 
     if (mode === 'byDate') {
-        // get daterange form values to add to action url
-        var toDate = mQuery('#daterange_date_to').val();
-        var fromDate = mQuery('#daterange_date_from').val();
-        var daterangeForm = '&fromDate=' + fromDate + '&toDate=' + toDate;
+        daterangeForm = '&fromDate=' + mQuery('#daterange_date_from').val() + '&toDate=' + mQuery('#daterange_date_to').val();
     }
 
     Mautic.activateBackdrop();
@@ -1901,16 +1914,19 @@ Mautic.toggleCampaignTabData = function (elem) {
         data: 'action=campaign:toggleCampaignTabData&mode=' + mode + '&campaignId=' + cid + daterangeForm,
         dataType: 'json',
         success: function (response) {
-            console.log(response);
-            if(mQuery('#decisions-container').length>0) { mQuery('#decisions-container').html(response.decisions); }
-            if(mQuery('#actions-container').length>0) { mQuery('#actions-container').html(response.actions); }
-            if(mQuery('#conditions-container').length>0) { mQuery('#conditions-container').html(response.conditions); }
+            if (mQuery('#decisions-container').length > 0 && typeof response.decisions !== 'undefined') {
+                mQuery('#decisions-container').html(response.decisions);
+            }
+            if (mQuery('#actions-container').length > 0 && typeof response.actions !== 'undefined') {
+                mQuery('#actions-container').html(response.actions);
+            }
+            if (mQuery('#conditions-container').length > 0 && typeof response.conditions !== 'undefined') {
+                mQuery('#conditions-container').html(response.conditions);
+            }
             mQuery('#mautic-backdrop').hide();
         },
         error: function (request, textStatus, errorThrown) {
-            //mQuery(elem).removeClass('fa-spin fa-spinner');
             Mautic.processAjaxError(request, textStatus, errorThrown);
         }
     });
-
 };
