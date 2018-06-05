@@ -295,6 +295,10 @@ class QueryBuilder
      */
     public function setParameter($key, $value, $type = null)
     {
+        if (is_bool($value)) {
+            $value = (int) $value;
+        }
+
         if ($type !== null) {
             $this->paramTypes[$key] = $type;
         }
