@@ -116,6 +116,7 @@ $view['slots']->set(
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
 
             <!-- tabs controls -->
             <?php if (!empty($trackables)): ?>
