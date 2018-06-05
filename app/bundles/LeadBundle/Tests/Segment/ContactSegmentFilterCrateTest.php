@@ -227,4 +227,74 @@ class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($contactSegmentFilterCrate->isDateType());
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
+     *
+     * @dataProvider specialFieldsToConvertToEmptyProvider
+     */
+    public function testSpecialFieldsToConvertToNotEmpty($field)
+    {
+        $filter = [
+            'glue'     => 'and',
+            'field'    => $field,
+            'object'   => 'lead',
+            'type'     => 'boolean',
+            'filter'   => 1,
+            'display'  => null,
+            'operator' => '=',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $this->assertSame('and', $contactSegmentFilterCrate->getGlue());
+        $this->assertSame($field, $contactSegmentFilterCrate->getField());
+        $this->assertTrue($contactSegmentFilterCrate->isContactType());
+        $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
+        $this->assertTrue($contactSegmentFilterCrate->getFilter());
+        $this->assertSame('notEmpty', $contactSegmentFilterCrate->getOperator());
+        $this->assertTrue($contactSegmentFilterCrate->isBooleanType());
+        $this->assertFalse($contactSegmentFilterCrate->isDateType());
+        $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
+     *
+     * @dataProvider specialFieldsToConvertToEmptyProvider
+     */
+    public function testSpecialFieldsToConvertToEmpty($field)
+    {
+        $filter = [
+            'glue'     => 'and',
+            'field'    => $field,
+            'object'   => 'lead',
+            'type'     => 'boolean',
+            'filter'   => 0,
+            'display'  => null,
+            'operator' => '=',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $this->assertSame('and', $contactSegmentFilterCrate->getGlue());
+        $this->assertSame($field, $contactSegmentFilterCrate->getField());
+        $this->assertTrue($contactSegmentFilterCrate->isContactType());
+        $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
+        $this->assertFalse($contactSegmentFilterCrate->getFilter());
+        $this->assertSame('empty', $contactSegmentFilterCrate->getOperator());
+        $this->assertTrue($contactSegmentFilterCrate->isBooleanType());
+        $this->assertFalse($contactSegmentFilterCrate->isDateType());
+        $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
+    }
+
+    public function specialFieldsToConvertToEmptyProvider()
+    {
+        return [
+            ['page_id'],
+            ['email_id'],
+            ['redirect_id'],
+            ['notification'],
+        ];
+    }
 }
