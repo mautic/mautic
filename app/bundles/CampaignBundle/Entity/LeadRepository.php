@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -18,6 +19,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class LeadRepository extends CommonRepository
 {
+    use ContactLimiterTrait;
+
     /**
      * Get the details of leads added to a campaign.
      *
@@ -188,5 +191,120 @@ class LeadRepository extends CommonRepository
         $q->setParameter('leadId', $lead->getId());
 
         return (bool) $q->execute()->fetchColumn();
+    }
+
+    /**
+     * @param int            $campaignId
+     * @param int            $decisionId
+     * @param int            $parentDecisionId
+     * @param ContactLimiter $limiter
+     *
+     * @return array
+     */
+    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter)
+    {
+        // Main query
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('l.lead_id, l.date_added')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
+            ->where($q->expr()->eq('l.campaign_id', ':campaignId'))
+            // Order by ID so we can query by greater than X contact ID when batching
+            ->orderBy('l.lead_id')
+            ->setMaxResults($limiter->getBatchLimit())
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('decisionId', (int) $decisionId);
+
+        // Contact IDs
+        $this->updateQueryFromContactLimiter('l', $q, $limiter);
+
+        // Limit to events that have not been executed or scheduled yet
+        $eventQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $eventQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->where(
+                $eventQb->expr()->andX(
+                    $eventQb->expr()->eq('log.event_id', ':decisionId'),
+                    $eventQb->expr()->eq('log.lead_id', 'l.lead_id'),
+                    $eventQb->expr()->eq('log.rotation', 'l.rotation')
+                )
+            );
+        $q->andWhere(
+            sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
+        );
+
+        if ($parentDecisionId) {
+            // Limit to events that have no grandparent or whose grandparent has already been executed
+            $grandparentQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $grandparentQb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'grandparent_log')
+                ->where(
+                    $grandparentQb->expr()->eq('grandparent_log.event_id', ':grandparentId'),
+                    $grandparentQb->expr()->eq('grandparent_log.lead_id', 'l.lead_id'),
+                    $grandparentQb->expr()->eq('grandparent_log.rotation', 'l.rotation')
+                );
+            $q->setParameter('grandparentId', (int) $parentDecisionId);
+
+            $q->andWhere(
+                sprintf('EXISTS (%s)', $grandparentQb->getSQL())
+            );
+        }
+
+        $results  = $q->execute()->fetchAll();
+        $contacts = [];
+        foreach ($results as $result) {
+            $contacts[$result['lead_id']] = new \DateTime($result['date_added'], new \DateTimeZone('UTC'));
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * This is approximate because the query that fetches contacts per decision is based on if the grandparent has been executed or not.
+     *
+     * @param int  $decisionId
+     * @param int  $parentDecisionId
+     * @param null $specificContactId
+     *
+     * @return int
+     */
+    public function getInactiveContactCount($campaignId, array $decisionIds, ContactLimiter $limiter)
+    {
+        // We have to loop over each decision to get a count or else any contact that has executed any single one of the decision IDs
+        // will not be included potentially resulting in not having the inactive path analyzed
+
+        $totalCount = 0;
+
+        foreach ($decisionIds as $decisionId) {
+            // Main query
+            $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $q->select('count(*)')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
+                ->where($q->expr()->eq('l.campaign_id', ':campaignId'))
+                // Order by ID so we can query by greater than X contact ID when batching
+                ->orderBy('l.lead_id')
+                ->setParameter('campaignId', (int) $campaignId);
+
+            // Contact IDs
+            $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
+
+            // Limit to events that have not been executed or scheduled yet
+            $eventQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $eventQb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+                ->where(
+                    $eventQb->expr()->andX(
+                        $eventQb->expr()->eq('log.event_id', $decisionId),
+                        $eventQb->expr()->eq('log.lead_id', 'l.lead_id'),
+                        $eventQb->expr()->eq('log.rotation', 'l.rotation')
+                    )
+                );
+            $q->andWhere(
+                sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
+            );
+
+            $totalCount += (int) $q->execute()->fetchColumn();
+        }
+
+        return $totalCount;
     }
 }

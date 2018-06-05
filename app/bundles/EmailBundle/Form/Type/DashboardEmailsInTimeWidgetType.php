@@ -25,9 +25,12 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('flag', 'choice', [
-                'label'   => 'mautic.email.flag.filter',
-                'choices' => [
+        $builder->add(
+            'flag',
+            'choice',
+            [
+                'label'      => 'mautic.email.flag.filter',
+                'choices'    => [
                     ''                           => 'mautic.email.flag.sent',
                     'opened'                     => 'mautic.email.flag.opened',
                     'failed'                     => 'mautic.email.flag.failed',
@@ -38,6 +41,45 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
                 'attr'       => ['class' => 'form-control'],
                 'empty_data' => '',
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'companyId',
+            'company_list',
+            [
+                'label'       => 'mautic.email.companyId.filter',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'empty_value' => '',
+                'required'    => false,
+                'multiple'    => false,
+                'modal_route' => null,
+            ]
+        );
+
+        $builder->add(
+            'campaignId',
+            'campaign_list',
+            [
+                'label'       => 'mautic.email.campaignId.filter',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'empty_value' => '',
+                'required'    => false,
+                'multiple'    => false,
+            ]
+        );
+
+        $builder->add(
+            'segmentId',
+            'leadlist_choices',
+            [
+                'label'       => 'mautic.email.segmentId.filter',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'empty_value' => '',
+                'required'    => false,
             ]
         );
     }
