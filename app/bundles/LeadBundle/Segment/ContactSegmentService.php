@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Bridge\Monolog\Logger;
@@ -71,12 +70,7 @@ class ContactSegmentService
             ];
         }
 
-        try {
-            $qb = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
-        } catch (FieldNotFoundException $e) {
-            // The field does not exist anymore. Return 0 so the segment won't rebuild
-            return [$segment->getId() => 0];
-        }
+        $qb = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
 
         $this->addMinMaxLimiters($qb, $batchLimiters);
 
@@ -179,13 +173,7 @@ class ContactSegmentService
      */
     public function getOrphanedLeadListLeadsCount(LeadList $segment)
     {
-        try {
-            $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment);
-        } catch (FieldNotFoundException $e) {
-            // The field does not exist anymore. Return 0 so the segment won't rebuild
-            return [$segment->getId() => 0];
-        }
-
+        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment);
         $queryBuilder = $this->contactSegmentQueryBuilder->wrapInCount($queryBuilder);
 
         $this->logger->debug('Segment QB: Orphan Leads Count SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);

@@ -27,6 +27,8 @@ use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
+use Mautic\LeadBundle\Exception\FieldNotFoundException;
+use Mautic\LeadBundle\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
@@ -883,8 +885,16 @@ class ListModel extends FormModel
             LeadEvents::LIST_PRE_PROCESS_LIST, new ListPreProcessListEvent($list, false)
         );
 
-        // Get a count of leads to add
-        $newLeadsCount = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
+        try {
+            // Get a count of leads to add
+            $newLeadsCount = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
+        } catch (FieldNotFoundException $e) {
+            // A field from filter does not exist anymore. Do not rebuild.
+            return 0;
+        } catch (SegmentNotFoundException $e) {
+            // A segment from filter does not exist anymore. Do not rebuild.
+            return 0;
+        }
 
         // Ensure the same list is used each batch <- would love to know how
         $batchLimiters['maxId'] = (int) $newLeadsCount[$leadList->getId()]['maxId'];

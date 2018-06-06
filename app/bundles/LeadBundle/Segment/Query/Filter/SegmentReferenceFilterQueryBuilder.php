@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
@@ -94,7 +95,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             /** @var LeadList $contactSegment */
             $contactSegment = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->find($segmentId);
             if (!$contactSegment) {
-                continue;
+                throw new SegmentNotFoundException(sprintf('Segment %d used in the filter does not exist anymore.', $segmentId));
             }
 
             $filters = $this->leadSegmentFilterFactory->getSegmentFilters($contactSegment);
