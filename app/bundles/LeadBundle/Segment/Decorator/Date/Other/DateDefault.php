@@ -85,6 +85,20 @@ class DateDefault implements FilterDecoratorInterface
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
+        $filter = $this->originalValue;
+
+        switch ($contactSegmentFilterCrate->getOperator()) {
+            case 'like':
+            case '!like':
+                return strpos($filter, '%') === false ? '%'.$filter.'%' : $filter;
+            case 'contains':
+                return '%'.$filter.'%';
+            case 'startsWith':
+                return $filter.'%';
+            case 'endsWith':
+                return '%'.$filter;
+        }
+
         return $this->originalValue;
     }
 
