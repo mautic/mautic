@@ -426,9 +426,12 @@ class LeadListRepository extends CommonRepository
 
                     if (!empty($batchLimiters['dateTime'])) {
                         // Only leads in the list at the time of count
-                        $listOnExpr->add(
-                            $q->expr()->lte('l.date_added', $q->expr()->literal($batchLimiters['dateTime']))
-                        );
+
+                        // This is causing contacts that are already in the segment to be included to be added again leading
+                        // to never ending loops while building the segment
+                        // $listOnExpr->add(
+                        //    $q->expr()->lte('l.date_added', $q->expr()->literal($batchLimiters['dateTime']))
+                        // );
                     }
 
                     $q->leftJoin(
