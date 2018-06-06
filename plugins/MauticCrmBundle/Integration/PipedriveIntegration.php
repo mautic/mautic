@@ -206,7 +206,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
     {
         if ($formArea == 'keys') {
             $builder->add(
-                'username',
+                'user',
                 TextType::class,
                 [
                     'label'       => 'mautic.pipedrive.webhook_user',
