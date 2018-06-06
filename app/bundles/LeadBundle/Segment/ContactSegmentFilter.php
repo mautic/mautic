@@ -10,12 +10,12 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+use Mautic\LeadBundle\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Mautic\LeadBundle\Segment\Query\QueryException;
 
 /**
  * Class ContactSegmentFilter is used for accessing $filter as an object and to keep logic in an object.
@@ -63,7 +63,7 @@ class ContactSegmentFilter
     /**
      * @return \Doctrine\DBAL\Schema\Column
      *
-     * @throws QueryException
+     * @throws FieldNotFoundException
      */
     public function getColumn()
     {
@@ -74,7 +74,7 @@ class ContactSegmentFilter
         $columns = $this->schemaCache->getColumns($table);
 
         if (!isset($columns[$this->getField()])) {
-            throw new QueryException(sprintf('Database schema does not contain field %s.%s', $this->getTable(), $this->getField()));
+            throw new FieldNotFoundException(sprintf('Database schema does not contain field %s.%s', $this->getTable(), $this->getField()));
         }
 
         return $columns[$this->getField()];
