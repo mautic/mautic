@@ -130,6 +130,13 @@ trait CustomFieldEntityTrait
         $field    = $this->getField($alias);
         $setter   = 'set'.ucfirst($property);
 
+        if (null == $oldValue) {
+            $oldValue = $this->getFieldValue($alias);
+        } elseif ($field) {
+            $oldValue = CustomFieldHelper::fixValueType($field['type'], $oldValue);
+        }
+
+        // Run setter after retreiving the old value.
         if (property_exists($this, $property) && method_exists($this, $setter)) {
             // Fixed custom field so use the setter but don't get caught in a loop such as a custom field called "notes"
             // Set empty value as null
@@ -137,12 +144,6 @@ trait CustomFieldEntityTrait
                 $value = null;
             }
             $this->$setter($value);
-        }
-
-        if (null == $oldValue) {
-            $oldValue = $this->getFieldValue($alias);
-        } elseif ($field) {
-            $oldValue = CustomFieldHelper::fixValueType($field['type'], $oldValue);
         }
 
         if (is_string($value)) {
