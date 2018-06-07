@@ -14,6 +14,8 @@ namespace Mautic\LeadBundle\Command;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
+use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Monolog\Logger;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -98,7 +100,15 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         $total = $total ?: 1; //prevent division be zero error
 
         $output->writeln('');
-        $output->writeln(sprintf('<info>Total success rate: %d%%, %d succeeded: and <error>%s</error>%s failed...</info> ', round(($ok / $total) * 100), $ok, ($failed ? $failed : ''), (!$failed ? $failed : '')));
+        $output->writeln(
+            sprintf(
+                '<info>Total success rate: %d%%, %d succeeded: and <error>%s</error>%s failed...</info> ',
+                round(($ok / $total) * 100),
+                $ok,
+                ($failed ? $failed : ''),
+                (!$failed ? $failed : '')
+            )
+        );
 
         return $failed ? 1 : 0;
     }
@@ -135,9 +145,29 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
         $this->logger->info(sprintf('Running NEW segment #%d', $l->getId()));
 
-        $timer2     = microtime(true);
-        $processed2 = $listModel->getVersionNew($l);
-        $timer2     = microtime(true) - $timer2;
+        $timer2 = microtime(true);
+        try {
+            $processed2 = $listModel->getVersionNew($l);
+        } catch (SegmentNotFoundException $exception) {
+            $processed2 = [
+                [
+                    'count' => -1,
+                    'maxId' => -1,
+                ],
+            ];
+            $output->write('<error>'.$exception->getMessage().' </error>');
+        } catch (FieldNotFoundException $exception) {
+            $processed2 = [
+                [
+                    'count' => -1,
+                    'maxId' => -1,
+                ],
+            ];
+
+            $output->write('<error>'.$exception->getMessage().' </error>');
+        }
+
+        $timer2 = microtime(true) - $timer2;
 
         $processed2 = array_shift($processed2);
 
@@ -148,7 +178,8 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         }
 
         $output->write(
-            sprintf('old: c: %d, m: %d, time: %s(est)  <--> new: c: %d, m: %s, time: %s',
+            sprintf(
+                'old: c: %d, m: %d, time: %s(est)  <--> new: c: %d, m: %s, time: %s',
                 $processed['count'],
                 $processed['maxId'],
                 $this->format_period($timer1),
