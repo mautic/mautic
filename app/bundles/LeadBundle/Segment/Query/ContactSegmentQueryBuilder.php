@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilters;
+use Mautic\LeadBundle\Segment\Exception\PluginHandledFilterException;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -67,35 +68,18 @@ class ContactSegmentQueryBuilder
 
         $queryBuilder->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        $references = [];
-
         /** @var ContactSegmentFilter $filter */
         foreach ($contactSegmentFilters as $filter) {
-            $segmentIdArray = is_array($filter->getParameterValue()) ? $filter->getParameterValue() : [$filter->getParameterValue()];
-
             //  We will handle references differently than regular segments
-            if ($filter->isContactSegmentReference()) {
-                if (!is_null($backReference) || in_array($backReference, $this->getContactSegmentRelations($segmentIdArray))) {
-                    throw new SegmentQueryException('Circular reference detected.');
-                }
-                $references = $references + $segmentIdArray;
-            }
-            //  This has to run for every filter
-            $filterCrate = $filter->contactSegmentFilterCrate->getArray();
+            $this->checkForCircularDependencies($filter, $backReference);
 
-            $handledByPlugin = false;
-            if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
-                $alias = $this->generateRandomParameterName();
-                $event = new LeadListFilteringEvent($filterCrate, null, $alias, $filterCrate['operator'], $queryBuilder, $this->entityManager);
-                $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
-                if ($handledByPlugin = $event->isFilteringDone()) {
-                    $queryBuilder->andWhere($event->getSubQuery());
-                }
+            try {
+                $this->dispatchPluginFilteringEvent($filter, $queryBuilder);
+            } catch (PluginHandledFilterException $exception) {
+                continue;
             }
 
-            if (!$handledByPlugin) {
-                $queryBuilder = $filter->applyQuery($queryBuilder);
-            }
+            $queryBuilder = $filter->applyQuery($queryBuilder);
         }
 
         $queryBuilder->applyStackLogic();
@@ -271,5 +255,45 @@ class ContactSegmentQueryBuilder
     private function generateRandomParameterName()
     {
         return $this->randomParameterName->generateRandomParameterName();
+    }
+
+    /**
+     * @param ContactSegmentFilter $filter
+     * @param QueryBuilder         $queryBuilder
+     *
+     * @throws PluginHandledFilterException
+     */
+    private function dispatchPluginFilteringEvent(ContactSegmentFilter $filter, QueryBuilder $queryBuilder)
+    {
+        if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
+            //  This has to run for every filter
+            $filterCrate = $filter->contactSegmentFilterCrate->getArray();
+
+            $alias = $this->generateRandomParameterName();
+            $event = new LeadListFilteringEvent($filterCrate, null, $alias, $filterCrate['operator'], $queryBuilder, $this->entityManager);
+            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
+            if ($event->isFilteringDone()) {
+                $queryBuilder->addLogic($event->getSubQuery(), $filter->getGlue());
+
+                throw new PluginHandledFilterException();
+            }
+        }
+    }
+
+    /**
+     * @param ContactSegmentFilter $filter
+     * @param                      $backReference
+     *
+     * @throws SegmentQueryException
+     */
+    private function checkForCircularDependencies(ContactSegmentFilter $filter, $backReference)
+    {
+        if ($filter->isContactSegmentReference()) {
+            $segmentIdArray = is_array($filter->getParameterValue()) ? $filter->getParameterValue() : [$filter->getParameterValue()];
+
+            if (!is_null($backReference) || in_array($backReference, $this->getContactSegmentRelations($segmentIdArray))) {
+                throw new SegmentQueryException('Circular reference detected.');
+            }
+        }
     }
 }
