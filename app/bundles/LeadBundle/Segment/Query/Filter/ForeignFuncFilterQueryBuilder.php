@@ -12,7 +12,6 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Mautic\LeadBundle\Segment\Query\QueryException;
 
 /**
  * Class ForeignFuncFilterQueryBuilder.
@@ -47,12 +46,8 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
             $parameters = $this->generateRandomParameterName();
         }
 
-        try {
-            $filter->getColumn();
-        } catch (QueryException $e) {
-            // We do ignore not found fields as they may be just removed custom field, it's bad!
-            return $queryBuilder;
-        }
+        // Check if the column exists in the table
+        $filter->getColumn();
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
 

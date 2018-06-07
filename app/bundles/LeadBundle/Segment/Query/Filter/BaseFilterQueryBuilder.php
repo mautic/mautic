@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Mautic\LeadBundle\Segment\Query\QueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 
 /**
@@ -51,12 +50,8 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         $filterGlue     = $filter->getGlue();
         $filterAggr     = $filter->getAggregateFunction();
 
-        try {
-            $filter->getColumn();
-        } catch (QueryException $e) {
-            // We do ignore not found fields as they may be just removed custom field
-            return $queryBuilder;
-        }
+        // Check if the column exists in the table
+        $filter->getColumn();
 
         $filterParameters = $filter->getParameterValue();
 
