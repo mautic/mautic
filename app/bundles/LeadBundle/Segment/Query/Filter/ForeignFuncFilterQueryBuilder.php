@@ -103,15 +103,17 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
             default:
                 if ($filterAggr) {
                     if (!is_null($filter)) {
-                        $useDistinct = 'distinct';
                         if ($filterAggr === 'sum') {
-                            $useDistinct = '';
+                            $expression = $queryBuilder->expr()->$filterOperator(
+                                sprintf('COALESCE(SUM(%s), 0)', $tableAlias.'.'.$filter->getField()),
+                                $filterParametersHolder
+                            );
+                        } else {
+                            $expression = $queryBuilder->expr()->$filterOperator(
+                                sprintf('%s(DISTINCT %s)', $filterAggr, $tableAlias.'.'.$filter->getField()),
+                                $filterParametersHolder
+                            );
                         }
-
-                        $expression = $queryBuilder->expr()->$filterOperator(
-                            sprintf('%s(%s %s)', $filterAggr, $useDistinct, $tableAlias.'.'.$filter->getField()),
-                            $filterParametersHolder
-                        );
                     } else {
                         $expression = $queryBuilder->expr()->$filterOperator(
                             sprintf('%s(%s)', $filterAggr, $tableAlias.'.'.$filter->getField()),
