@@ -295,6 +295,11 @@ class QueryBuilder
      */
     public function setParameter($key, $value, $type = null)
     {
+        if (substr($key, 0, 1) === ':') {
+            // For consistency sake, remove the :
+            $key = substr($key, 1);
+        }
+
         if (is_bool($value)) {
             $value = (int) $value;
         }
