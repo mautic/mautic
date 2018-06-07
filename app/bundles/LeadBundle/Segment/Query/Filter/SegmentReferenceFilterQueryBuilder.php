@@ -12,9 +12,10 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
+use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
+use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -77,7 +78,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
      *
      * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Exception
-     * @throws \Mautic\LeadBundle\Segment\Exception\SegmentQueryException
+     * @throws SegmentQueryException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
