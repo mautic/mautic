@@ -83,15 +83,18 @@ class ContactSegmentQueryBuilder
             //  This has to run for every filter
             $filterCrate = $filter->contactSegmentFilterCrate->getArray();
 
-            $queryBuilder = $filter->applyQuery($queryBuilder);
-
+            $handledByPlugin = false;
             if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
                 $alias = $this->generateRandomParameterName();
                 $event = new LeadListFilteringEvent($filterCrate, null, $alias, $filterCrate['operator'], $queryBuilder, $this->entityManager);
                 $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
-                if ($event->isFilteringDone()) {
+                if ($handledByPlugin = $event->isFilteringDone()) {
                     $queryBuilder->andWhere($event->getSubQuery());
                 }
+            }
+
+            if (!$handledByPlugin) {
+                $queryBuilder = $filter->applyQuery($queryBuilder);
             }
         }
 
