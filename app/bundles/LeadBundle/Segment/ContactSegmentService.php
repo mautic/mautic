@@ -139,7 +139,11 @@ class ContactSegmentService
     public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000)
     {
         $queryBuilder = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
-        $queryBuilder->select('DISTINCT l.*');
+
+        // Prepend the DISTINCT to the beginning of the select array
+        $select = $queryBuilder->getQueryPart('select');
+        array_unshift($select, 'DISTINCT l.*');
+        $queryBuilder->setQueryPart('select', $select);
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
