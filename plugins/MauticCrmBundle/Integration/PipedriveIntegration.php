@@ -131,7 +131,9 @@ class PipedriveIntegration extends CrmAbstractIntegration
     public function getFormLeadFields($settings = [])
     {
         $fields = $this->getAvailableLeadFields(self::PERSON_ENTITY_TYPE);
-
+        if (isset($fields['org_id'])) {
+            unset($fields['org_id']);
+        }
         // handle fields with are available in Pipedrive, but not listed
         return array_merge($fields, [
             'last_name' => [
