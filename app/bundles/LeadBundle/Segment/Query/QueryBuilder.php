@@ -40,7 +40,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Jan Kozak <galvani78@gmail.com>
  */
-class QueryBuilder
+class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 {
     /*
      * The query types.
