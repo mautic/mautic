@@ -24,7 +24,6 @@ if ($tmpl == 'index') {
 
     $buttons = [];
     if ($canExport) {
-
         if (!empty($data) || !empty($graphs)) {
             $buttons[] = [
                 'attr' => [
@@ -44,13 +43,13 @@ if ($tmpl == 'index') {
                 $buttons[] = [
                     'attr' => [
                         'data-toggle' => 'download',
-                        'class' => 'btn btn-default btn-nospin',
-                        'href' => $view['router']->path(
+                        'class'       => 'btn btn-default btn-nospin',
+                        'href'        => $view['router']->path(
                             'mautic_report_export',
                             ['objectId' => $report->getId(), 'format' => 'csv']
                         ),
                     ],
-                    'btnText' => $view['translator']->trans('mautic.form.result.export.csv'),
+                    'btnText'   => $view['translator']->trans('mautic.form.result.export.csv'),
                     'iconClass' => 'fa fa-file-text-o',
                 ];
 
@@ -58,13 +57,13 @@ if ($tmpl == 'index') {
                     $buttons[] = [
                         'attr' => [
                             'data-toggle' => 'download',
-                            'class' => 'btn btn-default btn-nospin',
-                            'href' => $view['router']->path(
+                            'class'       => 'btn btn-default btn-nospin',
+                            'href'        => $view['router']->path(
                                 'mautic_report_export',
                                 ['objectId' => $report->getId(), 'format' => 'xlsx']
                             ),
                         ],
-                        'btnText' => $view['translator']->trans('mautic.form.result.export.xlsx'),
+                        'btnText'   => $view['translator']->trans('mautic.form.result.export.xlsx'),
                         'iconClass' => 'fa fa-file-excel-o',
                     ];
                 }

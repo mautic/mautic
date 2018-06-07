@@ -769,7 +769,7 @@ class ReportController extends FormController
         $entity   = $model->getEntity($objectId);
         $security = $this->container->get('mautic.security');
 
-        if(!$this->get('mautic.security')->isGranted('report:batch:export')) {
+        if (!$this->get('mautic.security')->isGranted('report:batch:export')) {
             return $this->accessDenied();
         }
 

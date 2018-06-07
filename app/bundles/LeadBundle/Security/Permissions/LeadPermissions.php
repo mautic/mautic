@@ -26,7 +26,7 @@ class LeadPermissions extends AbstractPermissions
         $this->permissions = [
             'batch' => [
                 'export' => 4,
-                'full'=> 1024,
+                'full'   => 1024,
             ],
             'lists' => [
                 'viewother'   => 2,

@@ -258,7 +258,7 @@ class ResultController extends CommonFormController
         $formPage  = $session->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
 
-        if( !$this->get('mautic.security')->isGranted('form:batch:export')) {
+        if (!$this->get('mautic.security')->isGranted('form:batch:export')) {
             return $this->accessDenied();
         }
 

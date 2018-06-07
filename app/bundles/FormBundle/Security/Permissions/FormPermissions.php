@@ -28,8 +28,8 @@ class FormPermissions extends AbstractPermissions
         $this->permissions= [
             'batch' => [
                 'export' => 4,
-                'full'=> 1024,
-            ],];
+                'full'   => 1024,
+            ], ];
 
         $this->addExtendedPermissions('forms');
         $this->addStandardPermissions('categories');

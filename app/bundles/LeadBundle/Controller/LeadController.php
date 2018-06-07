@@ -1985,7 +1985,7 @@ class LeadController extends FormController
             'RETURN_ARRAY'
         );
 
-        if (!$permissions['lead:batch:export']){
+        if (!$permissions['lead:batch:export']) {
             return $this->accessDenied();
         }
 
