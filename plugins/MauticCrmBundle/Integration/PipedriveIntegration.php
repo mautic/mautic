@@ -16,7 +16,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
     private $apiHelper;
 
     private $requiredFields = [
-        'organization' => ['name'],
+        'contacts' => ['firstname', 'lastname', 'email'],
+        'company'  => ['name'],
     ];
 
     /**
@@ -111,75 +112,79 @@ class PipedriveIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Get available company fields for choices in the config UI.
-     *
-     * @param array $settings
-     *
-     * @return array
-     */
-    public function getFormCompanyFields($settings = [])
-    {
-        $fields = $this->getAvailableLeadFields(self::ORGANIZATION_ENTITY_TYPE);
-
-        return $fields;
-    }
-
-    /**
-     * @param array $settings
-     *
      * @return array|mixed
      */
-    public function getFormLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = [])
     {
-        $fields = $this->getAvailableLeadFields(self::PERSON_ENTITY_TYPE);
-
-        // handle fields with are available in Pipedrive, but not listed
-        return array_merge($fields, [
-            'last_name' => [
-                'label'    => 'Last Name',
-                'required' => true,
-            ],
-            'first_name' => [
-                'label'    => 'First Name',
-                'required' => true,
-            ],
-        ]);
-    }
-
-    /**
-     * @return array|mixed
-     */
-    public function getAvailableLeadFields($object = null)
-    {
-        $integrationFields = [];
-
-        /**
-         * $object as Array comes from clicking "Apply" button on Plugins Configuration form.
-         * I dont't know why its calling again pipedrive API to get fields which are already inside form...
-         * Also i have no idea why is trying to pass some strange object...
-         */
-        if (!$this->isAuthorized() || !$object || is_array($object)) {
-            return $integrationFields;
+        $pipedriveFields      = [];
+        $silenceExceptions    = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        if (isset($settings['feature_settings']['objects'])) {
+            $pipedriveObjects = $settings['feature_settings']['objects'];
+        } else {
+            $settings                                = $this->settings->getFeatureSettings();
+            $settings['feature_settings']['objects'] = $pipedriveObjects = isset($settings['objects']) ? $settings['objects'] : [];
         }
-
         try {
-            $leadFields = $this->getApiHelper()->getFields($object);
+            if ($this->isAuthorized()) {
+                if (!empty($pipedriveObjects) && is_array($pipedriveObjects)) {
+                    foreach ($pipedriveObjects as $object) {
+                        $pipeDriveObject = self::PERSON_ENTITY_TYPE;
+                        if ($object == 'company') {
+                            $pipeDriveObject = self::ORGANIZATION_ENTITY_TYPE;
+                        }
 
-            if (!isset($leadFields)) {
-                return $integrationFields;
-            }
+                        // The object key for contacts should be 0 for some BC reasons
+                        if ($object === 'contacts') {
+                            $object = 0;
+                        }
 
-            foreach ($leadFields as $fieldInfo) {
-                $integrationFields[$fieldInfo['key']] = [
-                    'label'    => $fieldInfo['name'],
-                    'required' => isset($this->requiredFields[$object]) && in_array($fieldInfo['key'], $this->requiredFields[$object]),
-                ];
+                        // Check the cache first
+                        $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
+                        if ($fields = parent::getAvailableLeadFields($settings) && !empty($fields)) {
+                            $pipedriveFields[$object] = $fields;
+                            continue;
+                        }
+                        // Create the array if it doesn't exist to prevent PHP notices
+                        if (!isset($pipedriveFields[$object])) {
+                            $pipedriveFields[$object] = [];
+                        }
+                        $leadFields           = $this->getApiHelper()->getFields($pipeDriveObject);
+                        if (isset($leadFields)) {
+                            // handle fields with are available in Pipedrive, but not listed
+                            if ($object === 0) {
+                                $pipedriveFields[$object]['first_name'] = [
+                                    'type'     => 'string',
+                                    'label'    => $this->translator->trans('mautic.core.firstname'),
+                                    'required' => true,
+                                ];
+                                $pipedriveFields[$object]['last_name'] = [
+                                    'type'     => 'string',
+                                    'label'    => $this->translator->trans('mautic.core.lastname'),
+                                    'required' => true,
+                                ];
+                            }
+                            foreach ($leadFields as $fieldInfo) {
+                                $pipedriveFields[$object][$fieldInfo['key']] = [
+                                        'type'     => 'string',
+                                        'label'    => $fieldInfo['name'],
+                                        'required' => isset($this->requiredFields[$object]) && in_array($fieldInfo['key'], $this->requiredFields[$object]),
+                                ];
+                            }
+                        }
+
+                        $this->cache->set('leadFields'.$cacheSuffix, $pipedriveFields[$object]);
+                    }
+                }
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
+
+            if (!$silenceExceptions) {
+                throw $e;
+            }
         }
 
-        return $integrationFields;
+        return $pipedriveFields;
     }
 
     /**
@@ -211,7 +216,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices' => [
-                        'company' => 'mautic.pipedrive.object.organization',
+                        'contacts' => 'mautic.pipedrive.object.contacts',
+                        'company'  => 'mautic.pipedrive.object.organization',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -222,13 +228,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 ]
             );
         }
-    }
-
-    public function isCompanySupportEnabled()
-    {
-        $supportedFeatures = $this->getIntegrationSettings()->getFeatureSettings();
-
-        return isset($supportedFeatures['objects']) && in_array('company', $supportedFeatures['objects']);
     }
 
     public function pushLead($lead, $config = [])
@@ -256,5 +255,24 @@ class PipedriveIntegration extends CrmAbstractIntegration
         }
 
         return parent::getFormNotes($section);
+    }
+
+    public function isCompanySupportEnabled()
+    {
+        $supportedFeatures = $this->getIntegrationSettings()->getFeatureSettings();
+
+        return isset($supportedFeatures['objects']) && in_array('company', $supportedFeatures['objects']);
+    }
+
+    /**
+     * Get available company fields for choices in the config UI.
+     *
+     * @param array $settings
+     *
+     * @return array
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
     }
 }
