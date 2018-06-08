@@ -134,13 +134,13 @@ class ContactTracker
         }
 
         if ($this->request) {
-            $this->logger->addDebug('LEAD: Tracking session for contact ID# '.$this->trackedContact->getId().' through '.$this->request->getMethod().' '.$this->request->getRequestUri());
+            $this->logger->addDebug('CONTACT: Tracking session for contact ID# '.$this->trackedContact->getId().' through '.$this->request->getMethod().' '.$this->request->getRequestUri());
         }
 
         // Log last active for the tracked contact
-        if (!defined('MAUTIC_LEAD_LASTACTIVE_LOGGED')) {
+        if (!defined('MAUTIC_CONTACT_LASTACTIVE_LOGGED')) {
             $this->leadRepository->updateLastActive($this->trackedContact->getId());
-            define('MAUTIC_LEAD_LASTACTIVE_LOGGED', 1);
+            define('MAUTIC_CONTACT_LASTACTIVE_LOGGED', 1);
         }
 
         return $this->trackedContact;
@@ -153,7 +153,7 @@ class ContactTracker
      */
     public function setTrackedContact(Lead $trackedContact)
     {
-        $this->logger->addDebug("LEAD: {$trackedContact->getId()} set as current lead.");
+        $this->logger->addDebug("CONTACT: {$trackedContact->getId()} set as current lead.");
 
         if ($this->useSystemContact()) {
             // Overwrite system current lead
@@ -223,19 +223,14 @@ class ContactTracker
      */
     private function getSystemContact()
     {
-        if ($this->isUserSession()) {
-            $this->logger->addDebug('LEAD: In a Mautic user session');
-
-            return null;
-        }
-
-        if ($this->useSystemContact()) {
-            $this->logger->addDebug('LEAD: System lead is being used');
-            if (null === $this->systemContact) {
-                $this->systemContact = new Lead();
-            }
+        if ($this->useSystemContact() && $this->systemContact) {
+            $this->logger->addDebug('CONTACT: System lead is being used');
 
             return $this->systemContact;
+        }
+
+        if ($this->isUserSession()) {
+            $this->logger->addDebug('CONTACT: In a Mautic user session');
         }
 
         return null;
@@ -274,7 +269,7 @@ class ContactTracker
         }
 
         if ($lead) {
-            $this->logger->addDebug("LEAD: Existing lead found with ID# {$lead->getId()}.");
+            $this->logger->addDebug("CONTACT: Existing lead found with ID# {$lead->getId()}.");
         }
 
         return $lead;
@@ -297,7 +292,7 @@ class ContactTracker
             $leads = $this->leadRepository->getLeadsByIp($ip->getIpAddress());
             if (count($leads)) {
                 $lead = $leads[0];
-                $this->logger->addDebug("LEAD: Existing lead found with ID# {$lead->getId()}.");
+                $this->logger->addDebug("CONTACT: Existing lead found with ID# {$lead->getId()}.");
 
                 return $lead;
             }
@@ -325,14 +320,14 @@ class ContactTracker
         if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
             // Dispatch events for new lead to write create log, ip address change, etc
             $event = new LeadEvent($lead, true);
-            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_SAVE, $event);
+            $this->dispatcher->dispatch(LeadEvents::CONTACT_PRE_SAVE, $event);
 
             $this->leadRepository->saveEntity($lead);
             $this->hydrateCustomFieldData($lead);
 
-            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
+            $this->dispatcher->dispatch(LeadEvents::CONTACT_POST_SAVE, $event);
 
-            $this->logger->addDebug("LEAD: New lead created with ID# {$lead->getId()}.");
+            $this->logger->addDebug("CONTACT: New lead created with ID# {$lead->getId()}.");
         }
 
         return $lead;
@@ -376,13 +371,13 @@ class ContactTracker
     {
         $newTrackingId = $this->getTrackingId();
         $this->logger->addDebug(
-            "LEAD: Tracking code changed from $previouslyTrackedId for contact ID# {$previouslyTrackedContact->getId()} to $newTrackingId for contact ID# {$this->trackedContact->getId()}"
+            "CONTACT: Tracking code changed from $previouslyTrackedId for contact ID# {$previouslyTrackedContact->getId()} to $newTrackingId for contact ID# {$this->trackedContact->getId()}"
         );
 
         if ($previouslyTrackedId !== null) {
-            if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
+            if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_CONTACT_CHANGED)) {
                 $event = new LeadChangeEvent($previouslyTrackedContact, $previouslyTrackedId, $this->trackedContact, $newTrackingId);
-                $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
+                $this->dispatcher->dispatch(LeadEvents::CURRENT_CONTACT_CHANGED, $event);
             }
         }
     }
