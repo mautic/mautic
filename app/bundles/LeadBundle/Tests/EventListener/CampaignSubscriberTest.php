@@ -14,9 +14,9 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
-use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -32,7 +32,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $configTo = [
         'companyname'       => 'Mautic2',
-        'companemail'       => 'mautic@mautic2.com',
+        'companemail'       => 'mautic@mauticsecond.com',
     ];
 
     public function testOnCampaignTriggerActiononUpdateCompany()
@@ -65,13 +65,14 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $lead = new Lead();
         $lead->setId(54);
+
         $mockLeadModel->expects($this->once())->method('saveEntity')->with($lead);
 
-        $helper     = new IdentifyCompanyHelper();
-        $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method     = $reflection->getMethod('identifyLeadsCompany');
-        $method->setAccessible(true);
-        list($company, $leadAdded, $companyEntity)  = $method->invokeArgs($helper, [$this->configFrom, $lead, $mockCompanyModel]);
+        $companyEntity = new Company();
+        $companyEntity->setName($this->configFrom['companyname']);
+        $companyEntity->setEmail($this->configFrom['companemail']);
+        $mockCompanyModel->expects($this->once())->method('saveEntity')->with($companyEntity);
+
         $mockCompanyModel->expects($this->once())->method('addLeadToCompany')->with($companyEntity, $lead);
 
         $args = [
@@ -85,9 +86,9 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             'eventSettings'   => [],
         ];
 
-        $event = new CampaignExecutionEvent($args, false);
+        $event = new CampaignExecutionEvent($args, true);
         $subscriber->onCampaignTriggerActionUpdateCompany($event);
-        $this->assertFalse($event->getResult());
+        $this->assertTrue($event->getResult());
 
         $primaryCompany = $event->getLead()->getPrimaryCompany();
 
