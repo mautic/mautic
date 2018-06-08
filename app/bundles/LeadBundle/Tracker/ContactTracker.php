@@ -124,6 +124,8 @@ class ContactTracker
     {
         if ($systemContact = $this->getSystemContact()) {
             return $systemContact;
+        } elseif ($this->isUserSession()) {
+            return null;
         }
 
         if (empty($this->trackedContact)) {
