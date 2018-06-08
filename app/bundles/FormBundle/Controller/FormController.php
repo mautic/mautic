@@ -241,12 +241,12 @@ class FormController extends CommonFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'activeForm'  => $activeForm,
+                    'activeForm'       => $activeForm,
                     'submissionCounts' => $submissionCounts,
-                    'page'        => $page,
-                    'logs'        => $logs,
-                    'permissions' => $permissions,
-                    'stats'       => [
+                    'page'             => $page,
+                    'logs'             => $logs,
+                    'permissions'      => $permissions,
+                    'stats'            => [
                         'submissionsInTime' => $timeStats,
                     ],
                     'dateRangeForm'     => $dateRangeForm->createView(),

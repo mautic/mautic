@@ -105,7 +105,7 @@ $showActions = count($activeFormActions);
                                     <span class="fw-b"><?php echo $view['translator']->trans('mautic.form.stats.submission_counts'); ?></span>
                                 </td>
                                 <td>
-                                    <?php echo $submissionCounts['unique'] . ' / ' . $submissionCounts['total'] ?>
+                                    <?php echo $submissionCounts['unique'].' / '.$submissionCounts['total'] ?>
                                 </td>
                             </tr>
                             </tbody>

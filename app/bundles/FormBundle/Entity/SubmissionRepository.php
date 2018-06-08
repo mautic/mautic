@@ -466,7 +466,7 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * @param Form  $form
+     * @param Form $form
      */
     public function getSubmissionCounts($form)
     {
@@ -483,6 +483,7 @@ EOQ;
         $stmt = $this->_em->getConnection()->prepare($q);
         $stmt->bindValue('id', $form->getId());
         $stmt->execute();
+
         return $stmt->fetch();
     }
 
