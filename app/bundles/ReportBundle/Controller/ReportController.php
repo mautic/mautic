@@ -680,6 +680,7 @@ class ReportController extends FormController
                     'totalResults' => $reportData['totalResults'],
                     'debug'        => $reportData['debug'],
                     'report'       => $entity,
+                    'canExport'    => $this->get('mautic.security')->isGranted('report:batch:export'),
                     'reportPage'   => $reportPage,
                     'graphs'       => $reportData['graphs'],
                     'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
@@ -767,6 +768,10 @@ class ReportController extends FormController
         $model    = $this->getModel('report');
         $entity   = $model->getEntity($objectId);
         $security = $this->container->get('mautic.security');
+
+        if (!$this->get('mautic.security')->isGranted('report:batch:export')) {
+            return $this->accessDenied();
+        }
 
         if ($entity === null) {
             $page = $this->container->get('session')->get('mautic.report.page', 1);

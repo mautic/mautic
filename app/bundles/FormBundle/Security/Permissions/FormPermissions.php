@@ -25,6 +25,12 @@ class FormPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
+        $this->permissions= [
+            'batch' => [
+                'export' => 4,
+                'full'   => 1024,
+            ], ];
+
         $this->addExtendedPermissions('forms');
         $this->addStandardPermissions('categories');
     }
@@ -44,5 +50,15 @@ class FormPermissions extends AbstractPermissions
     {
         $this->addStandardFormFields('form', 'categories', $builder, $data);
         $this->addExtendedFormFields('form', 'forms', $builder, $data);
+
+        $builder->add('form:batch', 'permissionlist', [
+            'choices' => [
+                'export'   => 'mautic.core.permissions.export',
+            ],
+            'label'  => 'mautic.form.permissions.batch',
+            'data'   => (!empty($data['batch']) ? $data['batch'] : []),
+            'bundle' => 'form',
+            'level'  => 'batch',
+        ]);
     }
 }
