@@ -138,9 +138,9 @@ class ContactTracker
         }
 
         // Log last active for the tracked contact
-        if (!defined('MAUTIC_CONTACT_LASTACTIVE_LOGGED')) {
+        if (!defined('MAUTIC_LEAD_LASTACTIVE_LOGGED')) {
             $this->leadRepository->updateLastActive($this->trackedContact->getId());
-            define('MAUTIC_CONTACT_LASTACTIVE_LOGGED', 1);
+            define('MAUTIC_LEAD_LASTACTIVE_LOGGED', 1);
         }
 
         return $this->trackedContact;
@@ -320,12 +320,12 @@ class ContactTracker
         if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
             // Dispatch events for new lead to write create log, ip address change, etc
             $event = new LeadEvent($lead, true);
-            $this->dispatcher->dispatch(LeadEvents::CONTACT_PRE_SAVE, $event);
+            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_SAVE, $event);
 
             $this->leadRepository->saveEntity($lead);
             $this->hydrateCustomFieldData($lead);
 
-            $this->dispatcher->dispatch(LeadEvents::CONTACT_POST_SAVE, $event);
+            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
 
             $this->logger->addDebug("CONTACT: New lead created with ID# {$lead->getId()}.");
         }
@@ -375,9 +375,9 @@ class ContactTracker
         );
 
         if ($previouslyTrackedId !== null) {
-            if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_CONTACT_CHANGED)) {
+            if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
                 $event = new LeadChangeEvent($previouslyTrackedContact, $previouslyTrackedId, $this->trackedContact, $newTrackingId);
-                $this->dispatcher->dispatch(LeadEvents::CURRENT_CONTACT_CHANGED, $event);
+                $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
             }
         }
     }
