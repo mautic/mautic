@@ -402,6 +402,9 @@ return [
             'mautic.transport.sendgrid_api.mail.attachment' => [
                 'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment::class,
             ],
+            'mautic.transport.sendgrid_api.mail.header' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailHeader::class,
+            ],
             'mautic.transport.sendgrid_api.message' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage::class,
                 'arguments' => [
@@ -409,6 +412,7 @@ return [
                     'mautic.transport.sendgrid_api.mail.personalization',
                     'mautic.transport.sendgrid_api.mail.metadata',
                     'mautic.transport.sendgrid_api.mail.attachment',
+                    'mautic.transport.sendgrid_api.mail.header',
                 ],
             ],
             'mautic.transport.sendgrid_api.response' => [
@@ -588,6 +592,7 @@ return [
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_contacts',
+                    'mautic.tracker.device',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
@@ -653,6 +658,7 @@ return [
         'mailer_encryption'            => null, //tls or ssl,
         'mailer_auth_mode'             => null, //plain, login or cram-md5
         'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
+        'mailer_custom_headers'        => [],
         'mailer_spool_type'            => 'memory', //memory = immediate; file = queue
         'mailer_spool_path'            => '%kernel.root_dir%/spool',
         'mailer_spool_msg_limit'       => null,
