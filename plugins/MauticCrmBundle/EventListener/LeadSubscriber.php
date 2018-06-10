@@ -72,14 +72,12 @@ class LeadSubscriber extends CommonSubscriber
         }
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getIntegrationSettings()->getFeatureSettings()['import'])) {
+        if (!$integrationObject->importDataToPipedrive()) {
             return;
         }
-
         $this->leadExport->setIntegration($integrationObject);
 
         $changes = $lead->getChanges(true);
-
         if (!empty($changes['dateIdentified'])) {
             $this->leadExport->create($lead);
         } else {
@@ -100,11 +98,9 @@ class LeadSubscriber extends CommonSubscriber
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getIntegrationSettings()->getFeatureSettings()['import'])) {
+        if (!$integrationObject->importDataToPipedrive()) {
             return;
         }
-
         $this->leadExport->setIntegration($integrationObject);
         $this->leadExport->delete($lead);
     }
@@ -122,11 +118,9 @@ class LeadSubscriber extends CommonSubscriber
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished() || empty($integrationObject->getIntegrationSettings()->getFeatureSettings()['import'])) {
+        if (!$integrationObject->importDataToPipedrive()) {
             return;
         }
-
         $this->leadExport->setIntegration($integrationObject);
         $this->leadExport->update($lead);
     }

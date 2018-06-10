@@ -351,4 +351,16 @@ class PipedriveIntegration extends CrmAbstractIntegration
     {
         return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
     }
+
+    /**
+     * @return bool
+     */
+    public function importDataToPipedrive()
+    {
+        if (!$this->getIntegrationSettings()->getIsPublished() || empty($this->getIntegrationSettings()->getFeatureSettings()['import'])) {
+            return false;
+        }
+
+        return true;
+    }
 }
