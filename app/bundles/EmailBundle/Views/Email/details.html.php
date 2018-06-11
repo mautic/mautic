@@ -204,12 +204,12 @@ if (!$isEmbedded) {
                             <?php endif; ?>
 
                             <?php if (!empty($pending)): ?>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b"><?php echo $view['translator']->trans('Pending'); ?></span>
-                                    </td>
-                                    <td><?php echo $pending; ?></td>
-                                </tr>
+                            <tr>
+                                <td width="20%">
+                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.pending'); ?></span>
+                                </td>
+                                <td><?php echo $pending; ?></td>
+                            </tr>
                             <?php endif; ?>
                             <tr>
                                 <td width="20%">
