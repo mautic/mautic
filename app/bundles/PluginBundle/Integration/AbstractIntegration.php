@@ -1726,6 +1726,7 @@ abstract class AbstractIntegration
                 // Remove those fields
                 $removeFields = array_merge($removeFields, array_keys($nonExistentFields));
             }
+
             foreach ($removeFields as $field) {
                 unset($mappedFields[$field]);
 
