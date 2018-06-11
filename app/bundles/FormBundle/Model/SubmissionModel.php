@@ -666,6 +666,7 @@ class SubmissionModel extends CommonFormModel
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         $this->setChartDataSubmissionsCount($chart, $query, $filter, $canViewOthers);
+        $this->setChartDataUniqueSubmissionsCount($chart, $query, $filter, $canViewOthers);
 
         return $chart->render();
     }
@@ -775,6 +776,30 @@ class SubmissionModel extends CommonFormModel
 
         $data = $query->loadAndBuildTimeData($q);
         $chart->setDataset($this->translator->trans('mautic.form.submission.count'), $data);
+    }
+
+    /**
+     * Get unique submissions count chart data.
+     *
+     * @param LineChart  $chart
+     * @param ChartQuery $query
+     * @param array      $filter
+     * @param array      $canViewOthers
+     */
+    protected function setChartDataUniqueSubmissionsCount(
+        LineChart $chart,
+        ChartQuery $query,
+        $filter = [],
+        $canViewOthers = true
+    ) {
+        $q = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter, 'distinct(t.lead_id)');
+
+        if (!$canViewOthers) {
+            $this->limitQueryToCreator($q);
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset($this->translator->trans('mautic.form.submission.unique_count'), $data);
     }
 
     /**
