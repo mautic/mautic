@@ -50,7 +50,7 @@ abstract class AbstractPipedrive
         // Pipedrive webhook return IDs not labels, but  Mautic to Pipedrive sync labels
         if (!empty($objectFields)) {
             foreach ($objectFields as $field) {
-                if ($field['field_type'] == 'set' && in_array($field['key'], array_keys($data))) {
+                if (in_array($field['field_type'], ['set', 'enum']) && in_array($field['key'], array_keys($data))) {
                     $pipedriveContactFieldOptions = array_flip(explode(',', $data[$field['key']]));
                     $pipedriveAllFieldOptions     = array_combine(array_values(array_column($field['options'], 'id')),
                         array_column($field['options'], 'label'));
