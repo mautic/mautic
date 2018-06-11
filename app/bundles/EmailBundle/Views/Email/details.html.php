@@ -213,13 +213,13 @@ if (!$isEmbedded) {
                             <?php endif; ?>
                             <tr>
                                 <td width="20%">
-                                    <span class="fw-b"><?php echo $view['translator']->trans('Sent'); ?></span>
+                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.sent'); ?></span>
                                 </td>
                                 <td><?php echo $email->getSentCount(); ?></td>
                             </tr>
                             <tr>
                                 <td width="20%">
-                                    <span class="fw-b"><?php echo $view['translator']->trans('Read'); ?></span>
+                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.read'); ?></span>
                                 </td>
                                 <td><?php echo $email->getReadCount(); ?></td>
                             </tr>
