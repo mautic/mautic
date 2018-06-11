@@ -51,11 +51,7 @@ class CsvHelper
      */
     public static function sanitizeHeaders(array $headers)
     {
-        array_walk($headers, function (&$val) {
-            $val = trim($val);
-        });
-
-        return $headers;
+        return array_map('trim', $headers);
     }
 
     /**
