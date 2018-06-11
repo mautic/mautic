@@ -664,16 +664,8 @@ class SubmissionModel extends CommonFormModel
     ) {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $q     = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
 
-        if (!$canViewOthers) {
-            $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
-                ->andWhere('f.created_by = :userId')
-                ->setParameter('userId', $this->userHelper->getUser()->getId());
-        }
-
-        $data = $query->loadAndBuildTimeData($q);
-        $chart->setDataset($this->translator->trans('mautic.form.submission.count'), $data);
+        $this->setChartDataSubmissionsCount($chart, $query, $filter, $canViewOthers);
 
         return $chart->render();
     }
@@ -759,6 +751,30 @@ class SubmissionModel extends CommonFormModel
         $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
             ->andWhere('f.created_by = :userId')
             ->setParameter('userId', $this->userHelper->getUser()->getId());
+    }
+
+    /**
+     * Get submissions count chart data.
+     *
+     * @param LineChart  $chart
+     * @param ChartQuery $query
+     * @param array      $filter
+     * @param bool       $canViewOthers
+     */
+    protected function setChartDataSubmissionsCount(
+        LineChart $chart,
+        ChartQuery $query,
+        $filter = [],
+        $canViewOthers = true
+    ) {
+        $q = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
+
+        if (!$canViewOthers) {
+            $this->limitQueryToCreator($q);
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset($this->translator->trans('mautic.form.submission.count'), $data);
     }
 
     /**
