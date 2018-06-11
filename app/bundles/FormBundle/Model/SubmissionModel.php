@@ -11,6 +11,7 @@
 
 namespace Mautic\FormBundle\Model;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -746,6 +747,18 @@ class SubmissionModel extends CommonFormModel
         $results = $q->execute()->fetchAll();
 
         return $results;
+    }
+
+    /**
+     * Restrict results to those created by the current user.
+     *
+     * @param QueryBuilder $q
+     */
+    protected function limitQueryToCreator(QueryBuilder &$q)
+    {
+        $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
+            ->andWhere('f.created_by = :userId')
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
     /**
