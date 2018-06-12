@@ -302,6 +302,15 @@ return [
                 ],
             ],
         ],
+        'repositories' => [
+            'mautic.page.repository.redirect' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\PageBundle\Entity\Redirect::class,
+                ],
+            ],
+        ],
         'other' => [
             'mautic.page.helper.token' => [
                 'class'     => 'Mautic\PageBundle\Helper\TokenHelper',

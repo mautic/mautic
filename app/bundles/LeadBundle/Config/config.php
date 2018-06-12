@@ -756,6 +756,13 @@ return [
             ],
         ],
         'repositories' => [
+            'mautic.lead.repository.company' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\Company::class,
+                ],
+            ],
             'mautic.lead.repository.dnc' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
@@ -782,6 +789,13 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\LeadDevice::class,
+                ],
+            ],
+            'mautic.lead.repository.lead_list' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\LeadList::class,
                 ],
             ],
             'mautic.lead.repository.merged_records' => [
