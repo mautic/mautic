@@ -727,11 +727,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @param bool $useOwnerAsMailer
      *
-     * @return Email
+     * @return $this
      */
     public function setUseOwnerAsMailer($useOwnerAsMailer)
     {
         $this->useOwnerAsMailer = $useOwnerAsMailer;
+
+        return $this;
     }
 
     /**

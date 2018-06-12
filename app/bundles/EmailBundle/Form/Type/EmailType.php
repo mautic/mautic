@@ -54,7 +54,7 @@ class EmailType extends AbstractType
         $this->defaultTheme               = $factory->getParameter('theme');
         $this->em                         = $factory->getEntityManager();
         $this->request                    = $factory->getRequest();
-        $this->configOwnerAsMailerSetting = $factory->getSystemParameters()['mailer_is_owner'];
+        $this->configOwnerAsMailerSetting = $factory->getParameter('mailer_is_owner');
 
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
@@ -170,7 +170,7 @@ class EmailType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.use.owner.as.mailer.tooltip',
                 ],
-                'data'     => empty($options['data']->getId()) ? (bool) $this->configOwnerAsMailerSetting : $options['data']->getUseOwnerAsMailer(),
+                'data'     => (bool) empty($options['data']->getId()) ? (bool) $this->configOwnerAsMailerSetting : $options['data']->getUseOwnerAsMailer(),
                 'required' => false,
             ]
         );
