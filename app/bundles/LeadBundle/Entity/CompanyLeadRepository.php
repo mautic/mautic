@@ -68,7 +68,7 @@ class CompanyLeadRepository extends CommonRepository
         )->setParameter('false', false, 'boolean');
 
         if ($companyId) {
-            $q->where(
+            $q->andWhere(
                 $q->expr()->eq('cl.company_id', ':companyId')
             )->setParameter('companyId', $companyId);
         }

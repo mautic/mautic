@@ -280,6 +280,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                             'sent'   => false,
                             'status' => 'mautic.sms.campaign.failed.missing_number',
                         ];
+
+                        continue;
                     }
 
                     $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
