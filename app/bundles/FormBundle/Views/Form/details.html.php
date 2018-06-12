@@ -172,16 +172,12 @@ $firstTab    = $showActions ? 'actions' : 'fields';
                         </a>
                     </li>
                 <?php endif; ?>
-                <li class="<?php if ('fields' === $firstTab) {
-                                    echo 'active';
-                                } ?>">
+                <li class="<?php if ('fields' === $firstTab): echo 'active'; endif; ?>">
                     <a href="#fields-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.form.tab.fields'); ?>
                     </a>
                 </li>
-                <li class="<?php if ('leads' === $firstTab) {
-                                    echo 'active';
-                                }?>">
+                <li class="">
                     <a href="#leads-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.form.tab.leads'); ?>
                     </a>
@@ -194,7 +190,7 @@ $firstTab    = $showActions ? 'actions' : 'fields';
         <div class="tab-content pa-md">
             <?php if ($showActions): ?>
                 <!-- #actions-container -->
-                <div class="tab-pane active fade in bdr-w-0" id="actions-container">
+                <div class="tab-pane fade in active bdr-w-0" id="actions-container">
                     <?php foreach ($activeFormActions as $group => $groupActions) : ?>
                         <h5 class="fw-sb mb-xs"><?php echo ucfirst($group); ?></h5>
                         <ul class="list-group">
@@ -238,9 +234,7 @@ $firstTab    = $showActions ? 'actions' : 'fields';
             <?php endif; ?>
 
             <!-- #fields-container -->
-            <div class="tab-pane fade<?php if ('fields' === $firstTab) {
-                                            echo ' active in';
-                                        } ?> bdr-w-0" id="fields-container">
+            <div class="tab-pane fade <?php if ('fields' === $firstTab): echo 'in active'; endif; ?> bdr-w-0" id="fields-container">
                 <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.form.field'); ?></h5>
                 <ul class="list-group mb-xs">
                     <?php /** @var \Mautic\FormBundle\Entity\Field $field */
@@ -272,7 +266,7 @@ $firstTab    = $showActions ? 'actions' : 'fields';
             </div>
             <!--/ #fields-container -->
             <!-- #leads-container -->
-            <div id="leads-container" class="<?php if ('leads' === $firstTab): echo 'active '; endif; ?>tab-pane fade page-list in bdr-w-0">
+            <div class="tab-pane fade bdr-w-0" id="leads-container">
                 <?php echo $formLeads; ?>
                 <div class="clearfix"></div>
             </div>
