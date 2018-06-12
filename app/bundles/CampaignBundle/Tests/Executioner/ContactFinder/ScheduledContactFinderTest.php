@@ -12,10 +12,13 @@
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Psr\Log\NullLogger;
 
 class ScheduledContactFinderTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,9 +27,18 @@ class ScheduledContactFinderTest extends \PHPUnit_Framework_TestCase
      */
     private $leadRepository;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|CampaignRepository
+     */
+    private $campaignRepository;
+
     protected function setUp()
     {
         $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->campaignRepository = $this->getMockBuilder(CampaignRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -82,13 +94,25 @@ class ScheduledContactFinderTest extends \PHPUnit_Framework_TestCase
         $this->getContactFinder()->hydrateContacts($logs);
     }
 
+    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound()
+    {
+        $this->leadRepository->expects($this->once())
+            ->method('getContactCollection')
+            ->willReturn([]);
+
+        $this->expectException(NoContactsFoundException::class);
+
+        $this->getContactFinder()->hydrateContacts(new ArrayCollection());
+    }
+
     /**
      * @return ScheduledContactFinder
      */
     private function getContactFinder()
     {
         return new ScheduledContactFinder(
-            $this->leadRepository
+            $this->leadRepository,
+            new NullLogger()
         );
     }
 }

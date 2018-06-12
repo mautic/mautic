@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Psr\Log\LoggerInterface;
 
 class ScheduledContactFinder
 {
@@ -24,13 +25,20 @@ class ScheduledContactFinder
     private $leadRepository;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * ScheduledContactFinder constructor.
      *
-     * @param LeadRepository $leadRepository
+     * @param LeadRepository  $leadRepository
+     * @param LoggerInterface $logger
      */
-    public function __construct(LeadRepository $leadRepository)
+    public function __construct(LeadRepository $leadRepository, LoggerInterface $logger)
     {
         $this->leadRepository = $leadRepository;
+        $this->logger         = $logger;
     }
 
     /**
