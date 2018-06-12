@@ -113,7 +113,7 @@
         "ramsey/uuid": "^3.7",
         "sendgrid/sendgrid": "~6.0",
 
-        "plokko/firebase-php": "¬0.1.1" 
+        "plokko/firebase-php": "~0.1.1" 
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
