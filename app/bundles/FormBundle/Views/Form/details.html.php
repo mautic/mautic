@@ -266,7 +266,7 @@ $firstTab    = $showActions ? 'actions' : 'fields';
             </div>
             <!--/ #fields-container -->
             <!-- #leads-container -->
-            <div class="tab-pane fade bdr-w-0" id="leads-container">
+            <div class="tab-pane page-list fade bdr-w-0" id="leads-container">
                 <?php echo $formLeads; ?>
                 <div class="clearfix"></div>
             </div>

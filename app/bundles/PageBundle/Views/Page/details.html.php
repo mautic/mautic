@@ -240,7 +240,7 @@ $view['slots']->set(
         <?php endif; ?>
 
             <!-- #leads-container -->
-            <div class="tab-pane bdr-w-0" id="leads-container">
+            <div class="tab-pane page-list bdr-w-0" id="leads-container">
                 <?php echo $pageLeads; ?>
                 <div class="clearfix"></div>
             </div>
