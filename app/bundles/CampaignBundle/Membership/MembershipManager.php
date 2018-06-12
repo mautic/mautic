@@ -14,13 +14,13 @@ namespace Mautic\CampaignBundle\Membership;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadRepository;
-use Mautic\CampaignBundle\Membership\Action\AddAction;
-use Mautic\CampaignBundle\Membership\Action\RemoveAction;
+use Mautic\CampaignBundle\Membership\Action\Adder;
+use Mautic\CampaignBundle\Membership\Action\Remover;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyInCampaignException;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaignException;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 class MembershipManager
 {
@@ -28,12 +28,12 @@ class MembershipManager
     const ACTION_REMOVED = 'removed';
 
     /**
-     * @var AddAction
+     * @var Adder
      */
     private $adder;
 
     /**
-     * @var RemoveAction
+     * @var Remover
      */
     private $remover;
 
@@ -48,25 +48,25 @@ class MembershipManager
     private $leadRepository;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
     /**
      * MembershipManager constructor.
      *
-     * @param AddAction       $adder
-     * @param RemoveAction    $remover
+     * @param Adder           $adder
+     * @param Remover         $remover
      * @param EventDispatcher $eventDispatcher
      * @param LeadRepository  $leadRepository
-     * @param Logger          $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        AddAction $adder,
-        RemoveAction $remover,
+        Adder $adder,
+        Remover $remover,
         EventDispatcher $eventDispatcher,
         LeadRepository $leadRepository,
-        Logger $logger
+        LoggerInterface $logger
     ) {
         $this->adder           = $adder;
         $this->remover         = $remover;
@@ -95,16 +95,20 @@ class MembershipManager
         if ($campaignMember) {
             try {
                 $this->adder->updateExistingMembership($campaignMember, $isManualAction, $allowRestart);
-                $this->logger->debug("CAMPAIGN: Membership for contact ID {$contact->getId()} in campaign ID {$campaign->getId()} was updated to be included.");
+                $this->logger->debug(
+                    "CAMPAIGN: Membership for contact ID {$contact->getId()} in campaign ID {$campaign->getId()} was updated to be included."
+                );
 
                 // Notify listeners
-                $this->eventDispatcher->dispatchMembershipChange($campaignMember->getLead(), $campaignMember->getCampaign(), AddAction::NAME);
+                $this->eventDispatcher->dispatchMembershipChange($campaignMember->getLead(), $campaignMember->getCampaign(), Adder::NAME);
             } catch (ContactAlreadyInCampaignException $exception) {
                 // Do nothing
                 $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} is already in campaign ID {$campaign->getId()}.");
             } catch (ContactCannotBeAddedToCampaignException $exception) {
                 // Do nothing
-                $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} could not be added campaign ID {$campaign->getId()} because they were manually removed.");
+                $this->logger->debug(
+                    "CAMPAIGN: Contact ID {$contact->getId()} could not be added campaign ID {$campaign->getId()} because they were manually removed."
+                );
             }
 
             return;
@@ -116,7 +120,7 @@ class MembershipManager
         $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was added to campaign ID {$campaign->getId()} as a new member.");
 
         // Notify listeners the contact has been added
-        $this->eventDispatcher->dispatchMembershipChange($contact, $campaign, AddAction::NAME);
+        $this->eventDispatcher->dispatchMembershipChange($contact, $campaign, Adder::NAME);
     }
 
     /**
@@ -137,7 +141,9 @@ class MembershipManager
             if (isset($campaignMembers[$contact->getId()])) {
                 try {
                     $this->adder->updateExistingMembership($campaignMembers[$contact->getId()], $isManualAction, $allowRestart);
-                    $this->logger->debug("CAMPAIGN: Membership for contact ID {$contact->getId()} in campaign ID {$campaign->getId()} was updated to be included.");
+                    $this->logger->debug(
+                        "CAMPAIGN: Membership for contact ID {$contact->getId()} in campaign ID {$campaign->getId()} was updated to be included."
+                    );
                 } catch (ContactAlreadyInCampaignException $exception) {
                     // Remove them from the keyById array so they are not included in the dispatched event
                     unset($keyById[$contact->getId()]);
@@ -147,7 +153,9 @@ class MembershipManager
                     // Remove them from the keyById array so they are not included in the dispatched event
                     unset($keyById[$contact->getId()]);
 
-                    $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} could not be added campaign ID {$campaign->getId()} because they were manually removed.");
+                    $this->logger->debug(
+                        "CAMPAIGN: Contact ID {$contact->getId()} could not be added campaign ID {$campaign->getId()} because they were manually removed."
+                    );
                 }
 
                 continue;
@@ -161,7 +169,7 @@ class MembershipManager
 
         if (count($keyById)) {
             // Notifiy listeners
-            $this->eventDispatcher->dispatchBatchMembershipChange($keyById, $campaign, AddAction::NAME);
+            $this->eventDispatcher->dispatchBatchMembershipChange($keyById, $campaign, Adder::NAME);
         }
 
         // Clear entities from RAM
@@ -196,7 +204,7 @@ class MembershipManager
             $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was removed from campaign ID {$campaign->getId()}.");
 
             // Notify listeners
-            $this->eventDispatcher->dispatchMembershipChange($contact, $campaign, RemoveAction::NAME);
+            $this->eventDispatcher->dispatchMembershipChange($contact, $campaign, Remover::NAME);
         } catch (ContactAlreadyRemovedFromCampaignException $exception) {
             // Do nothing
 
@@ -231,8 +239,6 @@ class MembershipManager
             try {
                 $this->remover->updateExistingMembership($campaignMember, $isExit);
                 $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was removed from campaign ID {$campaign->getId()}.");
-
-                $this->eventDispatcher->dispatchMembershipChange($contact, $campaign, RemoveAction::NAME);
             } catch (ContactAlreadyRemovedFromCampaignException $exception) {
                 // Contact was already removed from this campaign
                 unset($keyById[$contact->getId()]);
@@ -243,7 +249,7 @@ class MembershipManager
 
         if (count($keyById)) {
             // Notify listeners
-            $this->eventDispatcher->dispatchBatchMembershipChange($keyById, $campaign, RemoveAction::NAME);
+            $this->eventDispatcher->dispatchBatchMembershipChange($keyById, $campaign, Remover::NAME);
         }
 
         // Clear entities from RAM

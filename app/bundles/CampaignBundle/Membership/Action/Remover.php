@@ -11,12 +11,11 @@
 
 namespace Mautic\CampaignBundle\Membership\Action;
 
-use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaignException;
 
-class RemoveAction
+class Remover
 {
     const NAME = 'removed';
 
@@ -26,7 +25,7 @@ class RemoveAction
     private $leadRepository;
 
     /**
-     * AddAction constructor.
+     * Adder constructor.
      *
      * @param LeadRepository $leadRepository
      */
@@ -43,7 +42,16 @@ class RemoveAction
      */
     public function updateExistingMembership(CampaignMember $campaignMember, $isExit)
     {
+        if ($isExit) {
+            // Contact was removed by the change campaign action or a segment
+            $campaignMember->setDateLastExited(new \DateTime());
+        } else {
+            $campaignMember->setDateLastExited(null);
+        }
+
         if ($campaignMember->wasManuallyRemoved()) {
+            $this->saveCampaignMember($campaignMember);
+
             // Contact was already removed from this campaign
             throw new ContactAlreadyRemovedFromCampaignException();
         }
@@ -51,13 +59,6 @@ class RemoveAction
         // Remove this contact from the campaign
         $campaignMember->setManuallyRemoved(true);
         $campaignMember->setManuallyAdded(false);
-
-        if ($isExit) {
-            // Contact was removed by the change campaign action or a segment
-            $campaignMember->setDateLastExited(new \DateTime());
-        } else {
-            $campaignMember->setDateLastExited(null);
-        }
 
         $this->saveCampaignMember($campaignMember);
     }

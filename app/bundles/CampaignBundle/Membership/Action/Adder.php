@@ -19,7 +19,7 @@ use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyInCampaignException
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
 
-class AddAction
+class Adder
 {
     const NAME = 'added';
 
@@ -34,7 +34,7 @@ class AddAction
     private $leadEventLogRepository;
 
     /**
-     * AddAction constructor.
+     * Adder constructor.
      *
      * @param LeadRepository         $leadRepository
      * @param LeadEventLogRepository $leadEventLogRepository
@@ -48,7 +48,9 @@ class AddAction
     /**
      * @param Lead     $contact
      * @param Campaign $campaign
-     * @param          $isManualAction
+     * @param bool     $isManualAction
+     *
+     * @return CampaignMember
      */
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction)
     {
@@ -66,6 +68,8 @@ class AddAction
         }
 
         $this->saveCampaignMember($campaignMember);
+
+        return $campaignMember;
     }
 
     /**

@@ -490,14 +490,14 @@ return [
         ],
         'membership' => [
             'mautic.campaign.membership.adder' => [
-                'class'     => \Mautic\CampaignBundle\Membership\Action\AddAction::class,
+                'class'     => \Mautic\CampaignBundle\Membership\Action\Adder::class,
                 'arguments' => [
                     'mautic.campaign.repository.lead',
                     'mautic.campaign.repository.lead_event_log',
                 ],
             ],
             'mautic.campaign.membership.remover' => [
-                'class'     => \Mautic\CampaignBundle\Membership\Action\RemoveAction::class,
+                'class'     => \Mautic\CampaignBundle\Membership\Action\Remover::class,
                 'arguments' => [
                     'mautic.campaign.repository.lead',
                 ],
