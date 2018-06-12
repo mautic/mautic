@@ -59,7 +59,7 @@
 
         "sensio/distribution-bundle": "~5.0",
 
-        "symfony/twig-bundle": "<2.8.40",
+        "symfony/twig-bundle": "^2.8.39",
 
         "doctrine/dbal": "~2.5.4",
         "doctrine/common": "~2.5.3",
