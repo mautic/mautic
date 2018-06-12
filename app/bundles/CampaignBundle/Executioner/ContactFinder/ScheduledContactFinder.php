@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
 class ScheduledContactFinder
@@ -46,6 +47,13 @@ class ScheduledContactFinder
         }
 
         $contacts = $this->leadRepository->getContactCollection($contactIds);
+
+        if (!count($contacts)) {
+            // Just a precaution in case non-existent contacts are lingering in the campaign leads table
+            $this->logger->debug('CAMPAIGN: No contact entities found.');
+
+            throw new NoContactsFoundException();
+        }
 
         foreach ($logs as $log) {
             $contactId = $log->getLead()->getId();
