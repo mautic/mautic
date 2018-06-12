@@ -72,7 +72,7 @@ class LeadSubscriber extends CommonSubscriber
         }
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (!$integrationObject->importDataToPipedrive()) {
+        if (false === $integrationObject || !$integrationObject->importDataToPipedrive()) {
             return;
         }
         $this->leadExport->setIntegration($integrationObject);
@@ -98,7 +98,7 @@ class LeadSubscriber extends CommonSubscriber
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (!$integrationObject->importDataToPipedrive()) {
+        if (false === $integrationObject || !$integrationObject->importDataToPipedrive()) {
             return;
         }
         $this->leadExport->setIntegration($integrationObject);
@@ -118,7 +118,7 @@ class LeadSubscriber extends CommonSubscriber
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (!$integrationObject->importDataToPipedrive()) {
+        if (false === $integrationObject || !$integrationObject->importDataToPipedrive()) {
             return;
         }
         $this->leadExport->setIntegration($integrationObject);
