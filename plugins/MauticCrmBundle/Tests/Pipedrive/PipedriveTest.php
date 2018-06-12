@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -72,7 +73,6 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $integration->setFeatureSettings($settings);
         $integration->setSupportedFeatures($features);
         $integration->setPlugin($plugin);
-
         $this->em->persist($integration);
         $this->em->flush();
 
@@ -165,7 +165,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function createLeadIntegrationEntity($integrationEntityId, $internalEntityId)
     {
-        $date = new \DateTime();
+        $date = (new DateTimeHelper('-3 years'))->getDateTime();
 
         $integrationEntity = new IntegrationEntity();
 
@@ -185,7 +185,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function createCompanyIntegrationEntity($integrationEntityId, $internalEntityId)
     {
-        $date = new \DateTime();
+        $date = (new DateTimeHelper('-3 years'))->getDateTime();
 
         $integrationEntity = new IntegrationEntity();
 
@@ -207,9 +207,10 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     {
         $integrationHelper = $this->container->get('mautic.helper.integration');
 
+        /** @var Integration $integration */
         $integration = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
-        return $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
+        return $integration;
     }
 
     protected function addPipedriveOwner($pipedriveOwnerId, $email)
