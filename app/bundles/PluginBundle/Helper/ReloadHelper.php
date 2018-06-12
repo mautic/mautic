@@ -12,6 +12,7 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PluginBundle\Entity\Plugin;
 
 /**
  * Caution: none of the methods persist data.
@@ -94,25 +95,17 @@ class ReloadHelper
 
         foreach ($installedPlugins as $bundle => $plugin) {
             if (isset($allPlugins[$bundle])) {
-                $file = $allPlugins[$bundle]['directory'].'/Config/config.php';
-
-                if (!file_exists($file)) {
-                    continue;
-                }
-
-                /** @var array $details */
-                $details = include $file;
+                $pluginConfig = $allPlugins[$bundle];
+                $oldVersion   = $plugin->getVersion();
+                $plugin       = $this->mapConfigToPluginEntity($plugin, $pluginConfig);
 
                 //compare versions to see if an update is necessary
-                $version = isset($details['version']) ? $details['version'] : '';
-                if (!empty($version) && version_compare($plugin->getVersion(), $version) == -1) {
-                    ++$updated;
-
+                if (!empty($oldVersion) && version_compare($oldVersion, $plugin->getVersion()) == -1) {
                     //call the update callback
-                    $callback = $allPlugins[$bundle]['bundleClass'];
-                    $metadata = (isset($pluginMetadata[$allPlugins[$bundle]['namespace']]))
-                        ? $pluginMetadata[$allPlugins[$bundle]['namespace']] : null;
-                    $installedSchema = (isset($installedPluginsSchemas[$allPlugins[$bundle]['namespace']]))
+                    $callback = $pluginConfig['bundleClass'];
+                    $metadata = isset($pluginMetadata[$pluginConfig['namespace']])
+                        ? $pluginMetadata[$pluginConfig['namespace']] : null;
+                    $installedSchema = isset($installedPluginsSchemas[$pluginConfig['namespace']])
                         ? $installedPluginsSchemas[$allPlugins[$bundle]['namespace']] : null;
 
                     $callback::onPluginUpdate($plugin, $this->factory, $metadata, $installedSchema);
@@ -120,20 +113,6 @@ class ReloadHelper
                     unset($metadata, $installedSchema);
 
                     $updatedPlugins[$plugin->getBundle()] = $plugin;
-                }
-
-                $plugin->setVersion($version);
-
-                $plugin->setName(
-                    isset($details['name']) ? $details['name'] : $allPlugins[$bundle]['base']
-                );
-
-                if (isset($details['description'])) {
-                    $plugin->setDescription($details['description']);
-                }
-
-                if (isset($details['author'])) {
-                    $plugin->setAuthor($details['author']);
                 }
             }
         }
@@ -145,50 +124,26 @@ class ReloadHelper
      * Installs plugins that does not exist in the database yet.
      *
      * @param array $allPlugins
-     * @param array $installedPlugins
+     * @param array $existingPlugins
      * @param array $pluginMetadata
      * @param array $installedPluginsSchemas
      *
      * @return array
      */
-    public function installPlugins(array $allPlugins, array $installedPlugins, array $pluginMetadata, array $installedPluginsSchemas)
+    public function installPlugins(array $allPlugins, array $existingPlugins, array $pluginMetadata, array $installedPluginsSchemas)
     {
         $installedPlugins = [];
 
-        foreach ($installedPlugins as $bundle => $plugin) {
-            if (!isset($allPlugins[$bundle])) {
-                $entity = new Plugin();
-                $entity->setBundle($plugin['bundle']);
-
-                $file = $plugin['directory'].'/Config/config.php';
-
-                //update details of the bundle
-                if (file_exists($file)) {
-                    $details = include $file;
-
-                    if (isset($details['version'])) {
-                        $entity->setVersion($details['version']);
-                    }
-
-                    $entity->setName(
-                        isset($details['name']) ? $details['name'] : $plugin['base']
-                    );
-
-                    if (isset($details['description'])) {
-                        $entity->setDescription($details['description']);
-                    }
-
-                    if (isset($details['author'])) {
-                        $entity->setAuthor($details['author']);
-                    }
-                }
+        foreach ($allPlugins as $bundle => $pluginConfig) {
+            if (!isset($existingPlugins[$bundle])) {
+                $entity = $this->mapConfigToPluginEntity(new Plugin(), $pluginConfig);
 
                 // Call the install callback
-                $callback        = $plugin['bundleClass'];
-                $metadata        = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
+                $callback        = $pluginConfig['bundleClass'];
+                $metadata        = isset($pluginMetadata[$pluginConfig['namespace']]) ? $pluginMetadata[$pluginConfig['namespace']] : null;
                 $installedSchema = null;
 
-                if (isset($installedPluginsSchemas[$plugin['namespace']]) && count($installedPluginsSchemas[$plugin['namespace']]->getTables()) !== 0) {
+                if (isset($installedPluginsSchemas[$pluginConfig['namespace']]) && count($installedPluginsSchemas[$pluginConfig['namespace']]->getTables()) !== 0) {
                     $installedSchema = true;
                 }
 
@@ -199,5 +154,38 @@ class ReloadHelper
         }
 
         return $installedPlugins;
+    }
+
+    /**
+     * @param Plugin $plugin
+     * @param array  $config
+     *
+     * @return Plugin
+     */
+    private function mapConfigToPluginEntity(Plugin $plugin, array $config)
+    {
+        $plugin->setBundle($config['bundle']);
+
+        if (isset($config['config'])) {
+            $details = $config['config'];
+
+            if (isset($details['version'])) {
+                $plugin->setVersion($details['version']);
+            }
+
+            $plugin->setName(
+                isset($details['name']) ? $details['name'] : $config['base']
+            );
+
+            if (isset($details['description'])) {
+                $plugin->setDescription($details['description']);
+            }
+
+            if (isset($details['author'])) {
+                $plugin->setAuthor($details['author']);
+            }
+        }
+
+        return $plugin;
     }
 }
