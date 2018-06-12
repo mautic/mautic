@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$firstTab = 'preview';
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'asset');
 $view['slots']->set('headerTitle', $activeAsset->getTitle());
@@ -153,16 +153,12 @@ $view['slots']->set(
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
-                <li class="<?php if ('preview' === $firstTab) {
-                            echo 'active';
-                        }?>">
+                <li class="active">
                     <a href="#preview-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.asset.asset.preview'); ?>
                     </a>
                 </li>
-                <li class="<?php if ('contacts' === $firstTab) {
-                            echo 'active';
-                        }?>">
+                <li class="">
                     <a href="#leads-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.asset.asset.leads'); ?>
                     </a>
@@ -174,7 +170,7 @@ $view['slots']->set(
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md preview-detail">
-            <div class="tab-pane active fade in bdr-w-0" id="preview-container">
+            <div class="tab-pane fade in active bdr-w-0" id="preview-container">
                 <?php echo $view->render(
                     'MauticAssetBundle:Asset:preview.html.php',
                     ['activeAsset' => $activeAsset, 'assetDownloadUrl' => $view['router']->url(
@@ -183,7 +179,7 @@ $view['slots']->set(
                     )]
                 ); ?>
             </div>
-            <div id="leads-container" class="tab-pane page-list fade in bdr-w-0" id="leads-container">
+            <div class="tab-pane page-list fade bdr-w-0" id="leads-container">
                 <?php echo $assetLeads; ?>
                 <div class="clearfix"></div>
             </div>
