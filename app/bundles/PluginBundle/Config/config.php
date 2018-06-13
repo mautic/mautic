@@ -139,7 +139,7 @@ return [
                 'alias' => 'integration_campaign_status',
             ],
         ],
-        'helpers' => [
+        'other' => [
             'mautic.helper.integration' => [
                 'class'     => \Mautic\PluginBundle\Helper\IntegrationHelper::class,
                 'arguments' => [
