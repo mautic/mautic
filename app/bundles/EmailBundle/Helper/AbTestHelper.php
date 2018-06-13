@@ -139,6 +139,9 @@ class AbTestHelper
 
                 $parentId = $parent->getId();
                 foreach ($clickthroughCounts as $id => $count) {
+                    if ($id !== $parentId && !array_key_exists($id, $children)) {
+                        continue;
+                    }
                     if (!isset($sentCounts[$id])) {
                         $sentCounts[$id] = 0;
                     }
