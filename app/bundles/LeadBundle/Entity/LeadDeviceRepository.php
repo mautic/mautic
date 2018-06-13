@@ -157,4 +157,43 @@ class LeadDeviceRepository extends CommonRepository
 
         return $device ? $device : null;
     }
+
+    /**
+     * @param string $trackingId
+     *
+     * @return LeadDevice|null
+     */
+    public function getByTrackingId($trackingId)
+    {
+        /** @var LeadDevice $leadDevice */
+        $leadDevice = $this->findOneBy([
+            'trackingId' => $trackingId,
+        ]);
+
+        return $leadDevice;
+    }
+
+    /**
+     * Check if there is at least one device with filled tracking code assigned to Lead.
+     *
+     * @param Lead $lead
+     *
+     * @return bool
+     */
+    public function isAnyLeadDeviceTracked(Lead $lead)
+    {
+        $alias = $this->getTableAlias();
+        $qb    = $this->createQueryBuilder($alias);
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq($alias.'.lead', ':lead'),
+                $qb->expr()->isNotNull($alias.'.trackingId')
+            )
+        )
+            ->setParameter('lead', $lead);
+
+        $devices = $qb->getQuery()->getResult();
+
+        return !empty($devices);
+    }
 }

@@ -56,6 +56,13 @@ class LeadSubscriber extends CommonSubscriber
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject('RabbitMQ');
         $lead = $event->getLead()->convertToArray();
+        $settings = $integrationObject->getIntegrationSettings();
+
+
+        if (false === $integrationObject || !$settings->getIsPublished()) {
+            return;
+        }
+
 
         // The main array contains only the defaults fields, the custom ones will be listed in the 'field' key
         $leadData = array();
@@ -73,7 +80,7 @@ class LeadSubscriber extends CommonSubscriber
 
         $leadData = $integrationObject->formatData($leadData);
 
-        // There is a solution for sending only the changed data.        
+        // There is a solution for sending only the changed data.
         // $changes = $event->getChanges();
 
         // if(isset($changes['fields']) && !empty($changes['fields'])){
@@ -132,9 +139,9 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         $connection = new AMQPSSLConnection(
-            $integrationObject->getLocation(), 
-            5672, 
-            $integrationObject->getUser(), 
+            $integrationObject->getLocation(),
+            5672,
+            $integrationObject->getUser(),
             $integrationObject->getPassword(),
             '/',
             [
@@ -149,7 +156,7 @@ class LeadSubscriber extends CommonSubscriber
         $channel->exchange_declare('kiazaki', 'topic', false, true, false);
 
         $msg = new AMQPMessage($data);
-        
+
         $channel->basic_publish($msg, 'kiazaki', 'mautic.contact');
 
         $channel->close();
