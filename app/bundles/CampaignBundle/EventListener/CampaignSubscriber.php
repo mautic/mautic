@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
+use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -52,6 +53,7 @@ class CampaignSubscriber extends CommonSubscriber
         return [
             CampaignEvents::CAMPAIGN_POST_SAVE   => ['onCampaignPostSave', 0],
             CampaignEvents::CAMPAIGN_POST_DELETE => ['onCampaignDelete', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD    => ['onCampaignBuild', 0],
         ];
     }
 
@@ -98,5 +100,21 @@ class CampaignSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * Add event triggers and actions.
+     *
+     * @param Events\CampaignBuilderEvent $event
+     */
+    public function onCampaignBuild(Events\CampaignBuilderEvent $event)
+    {
+        // Add action to jump to another event in the campaign flow.
+        $event->addAction('campaign.jump_to_event', [
+            'label'          => 'mautic.campaign.event.jump_to_event',
+            'description'    => 'mautic.campaign.event.jump_to_event_descr',
+            'formType'       => CampaignEventJumpToEventType::class,
+            'batchEventName' => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
+        ]);
     }
 }

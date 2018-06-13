@@ -202,6 +202,10 @@ return [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType',
                 'alias' => 'campaignevent_addremovelead',
             ],
+            'mautic.campaign.type.action.jump_to_event' => [
+                'class' => \Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType::class,
+                'alias' => 'campaignevent_jump_to_event',
+            ],
             'mautic.campaign.type.canvassettings'       => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
                 'alias' => 'campaignevent_canvassettings',
