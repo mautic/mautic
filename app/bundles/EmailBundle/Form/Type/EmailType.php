@@ -171,7 +171,7 @@ class EmailType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.use.owner.as.mailer.tooltip',
                 ],
-                'data'     => (bool) empty($options['data']->getId()) ? (bool) $this->configOwnerAsMailerSetting : $options['data']->getUseOwnerAsMailer(),
+                'data'     => (bool) empty($options['data']->getId()) ? $this->configOwnerAsMailerSetting : $options['data']->getUseOwnerAsMailer(),
                 'required' => false,
             ]
         );

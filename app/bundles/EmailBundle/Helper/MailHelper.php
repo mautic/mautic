@@ -322,7 +322,6 @@ class MailHelper
      *
      * @param bool $dispatchSendEvent
      * @param bool $isQueueFlush      (a tokenized/batch send via API such as Mandrill)
-     * @param bool $useOwnerAsMailer
      *
      * @return bool
      */
@@ -588,7 +587,6 @@ class MailHelper
      * Send batched mail to mailer.
      *
      * @param array $resetEmailTypes  Array of email types to clear after flusing the queue
-     * @param bool  $useOwnerAsMailer
      *
      * @return bool
      */
@@ -1234,7 +1232,6 @@ class MailHelper
      *
      * @param string|array $fromEmail
      * @param string       $fromName
-     * @param bool|null    $isGlobal
      */
     public function setFrom($fromEmail, $fromName = null)
     {
