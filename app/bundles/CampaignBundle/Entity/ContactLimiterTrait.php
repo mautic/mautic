@@ -56,11 +56,13 @@ trait ContactLimiterTrait
                 ->setParameter('maxContactId', $maxContactId);
         }
 
-        if ($threadId = $contactLimiter->getThreadId() && $maxThreads = $contactLimiter->getMaxThreads()) {
-            if ($threadId <= $maxThreads) {
-                $qb->andWhere("MOD(($alias.lead_id + :threadShift), :maxThreads) = 0")
-                    ->setParameter('threadShift', $threadId - 1)
-                    ->setParameter('maxThreads', $maxThreads);
+        if ($threadId = $contactLimiter->getThreadId()) {
+            if ($maxThreads = $contactLimiter->getMaxThreads()) {
+                if ($threadId <= $maxThreads) {
+                    $qb->andWhere("MOD(($alias.lead_id + :threadShift), :maxThreads) = 0")
+                        ->setParameter('threadShift', $threadId - 1)
+                        ->setParameter('maxThreads', $maxThreads);
+                }
             }
         }
 
