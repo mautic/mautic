@@ -71,6 +71,7 @@
 !/plugins/MauticSocialBundle
 !/plugins/RabbitMQBundle
 !/plugins/MauticZapierBundle
+!/plugins/FCMNotificationBundle
 !/plugins/index.html
 
 /themes/*

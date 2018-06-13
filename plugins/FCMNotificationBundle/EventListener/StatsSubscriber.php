@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\NotificationBundle\EventListener;
+namespace MauticPlugin\FCMNotificationBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
@@ -20,7 +20,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
  */
 class StatsSubscriber extends CommonStatsSubscriber
 {
-    /**
+     /**
      * @var integrationHelper
      */
     protected $integrationHelper;
@@ -34,7 +34,7 @@ class StatsSubscriber extends CommonStatsSubscriber
     {
         $this->integrationHelper = $integrationHelper;
 
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }

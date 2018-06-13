@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\NotificationBundle\EventListener;
+namespace MauticPlugin\FCMNotificationBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\NotificationBundle\Event\NotificationEvent;
-use Mautic\NotificationBundle\NotificationEvents;
+use MauticPlugin\FCMNotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -62,7 +62,7 @@ class NotificationSubscriber extends CommonSubscriber
      * @param PageTokenHelper  $pageTokenHelper
      * @param AssetTokenHelper $assetTokenHelper
      */
-    public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper, integrationHelper $integrationHelper)
+    public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper, IntegrationHelper $integrationHelper)
     {
         $this->auditLogModel    = $auditLogModel;
         $this->trackableModel   = $trackableModel;
@@ -90,7 +90,7 @@ class NotificationSubscriber extends CommonSubscriber
      */
     public function onPostSave(NotificationEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
@@ -115,11 +115,10 @@ class NotificationSubscriber extends CommonSubscriber
      */
     public function onDelete(NotificationEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
-
 
         $entity = $event->getNotification();
         $log    = [
@@ -137,7 +136,7 @@ class NotificationSubscriber extends CommonSubscriber
      */
     public function onTokenReplacement(TokenReplacementEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
