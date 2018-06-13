@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\NotificationBundle\EventListener;
+namespace MauticPlugin\FCMNotificationBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -22,8 +22,8 @@ use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
 use Mautic\NotificationBundle\Form\Type\NotificationSendType;
-use Mautic\NotificationBundle\Model\NotificationModel;
-use Mautic\NotificationBundle\NotificationEvents;
+use MauticPlugin\FCMNotificationBundle\Model\NotificationModel;
+use MauticPlugin\FCMNotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
@@ -87,31 +87,13 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
-
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
 
         $features = $integration->getSupportedFeatures();
         $settings = $integration->getIntegrationSettings();
-
-        if (in_array('mobile', $features)) {
-            $event->addAction(
-                'notification.send_mobile_notification',
-                [
-                    'label'            => 'mautic.notification.campaign.send_mobile_notification',
-                    'description'      => 'mautic.notification.campaign.send_mobile_notification.tooltip',
-                    'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                    'formType'         => MobileNotificationSendType::class,
-                    'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
-                    'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
-                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
-                    'channel'          => 'mobile_notification',
-                    'channelIdField'   => 'mobile_notification',
-                ]
-            );
-        }
 
         $event->addAction(
             'notification.send_notification',
@@ -136,13 +118,12 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
-
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
 
-        
+
 
         $lead = $event->getLead();
 
@@ -165,12 +146,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         $playerID = [];
 
-        foreach ($pushIDs as $pushID) {
-            // Skip non-mobile PushIDs if this is a mobile event
-            if ($event->checkContext('notification.send_mobile_notification') && $pushID->isMobile() == false) {
-                continue;
-            }
-
+        foreach ($pushIDs as $pushID) {            
             // Skip mobile PushIDs if this is a non-mobile event
             if ($event->checkContext('notification.send_notification') && $pushID->isMobile() == true) {
                 continue;
@@ -216,6 +192,7 @@ class CampaignSubscriber extends CommonSubscriber
         $sendNotification->setMessage($sendEvent->getMessage());
         $sendNotification->setHeading($sendEvent->getHeading());
 
+        
         $response = $this->notificationApi->sendNotification(
             $playerID,
             $sendNotification,
@@ -224,8 +201,15 @@ class CampaignSubscriber extends CommonSubscriber
 
         $event->setChannel('notification', $notification->getId());
 
+        /*
         // If for some reason the call failed, tell mautic to try again by return false
         if ($response->code !== 200) {
+            return $event->setResult(false);
+        }
+        */
+       
+        /* FCM PHP API uses Guzzlehttp instead of joomla/http therefore response is different */        
+        if ($response) {
             return $event->setResult(false);
         }
 
@@ -239,7 +223,7 @@ class CampaignSubscriber extends CommonSubscriber
             'name'    => $notification->getName(),
             'heading' => $sendEvent->getHeading(),
             'content' => $sendEvent->getMessage(),
-        ];
+        ];        
 
         $event->setResult($result);
     }

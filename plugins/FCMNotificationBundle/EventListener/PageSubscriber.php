@@ -9,11 +9,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\NotificationBundle\EventListener;
+namespace MauticPlugin\FCMNotificationBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 
@@ -50,7 +51,7 @@ class PageSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
+            PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],            
         ];
     }
 
@@ -59,18 +60,17 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageDisplay(PageDisplayEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $integrationObject = $this->integrationHelper->getIntegrationObject('FCM');
+        $settings          = $integrationObject->getIntegrationSettings();
+        $features          = $settings->getSupportedFeatures();
+    
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
-        
-        $integrationObject = $this->integrationHelper->getIntegrationObject('OneSignal');
-        $settings          = $integrationObject->getIntegrationSettings();
-        $features          = $settings->getFeatureSettings();
-
+    
         $script = '';
         if (!in_array('landing_page_enabled', $features)) {
-            $script = 'disable_notification = true;';
+            $script = 'var disable_fcm_notification = true;';
         }
 
         $this->assetsHelper->addScriptDeclaration($script, 'onPageDisplay_headClose');

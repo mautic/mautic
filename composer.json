@@ -111,7 +111,10 @@
         "leezy/pheanstalk-bundle": "^3.2",
         "simshaun/recurr": "^3.0",
         "ramsey/uuid": "^3.7",
-        "sendgrid/sendgrid": "~6.0"
+        "sendgrid/sendgrid": "~6.0",
+
+        "plokko/firebase-php": "~0.1.1",
+        "twig/twig": "~1.35"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",

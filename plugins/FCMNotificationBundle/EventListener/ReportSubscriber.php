@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\NotificationBundle\EventListener;
+namespace MauticPlugin\FCMNotificationBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -50,7 +50,7 @@ class ReportSubscriber extends CommonSubscriber
      * @param Connection        $db
      * @param CompanyReportData $companyReportData
      */
-    public function __construct(Connection $db, CompanyReportData $companyReportData, integrationHelper $integrationHelper)
+    public function __construct(Connection $db, CompanyReportData $companyReportData, IntegrationHelper $integrationHelper)
     {
         $this->db                = $db;
         $this->companyReportData = $companyReportData;
@@ -76,7 +76,7 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
@@ -213,7 +213,7 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
@@ -229,7 +229,7 @@ class ReportSubscriber extends CommonSubscriber
         $clickColumns = ['hits', 'unique_hits', 'hits_ratio', 'unique_ratio'];
 
         // Ensure this only stats mobile notifications
-        $qb->andWhere('pn.mobile = 1');
+        //$qb->andWhere('pn.mobile = 1');
 
         switch ($event->getContext()) {
             case self::MOBILE_NOTIFICATIONS:
@@ -288,7 +288,7 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->integrationHelper->getIntegrationObject('FCM');
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }

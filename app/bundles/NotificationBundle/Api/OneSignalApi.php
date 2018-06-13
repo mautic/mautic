@@ -68,7 +68,7 @@ class OneSignalApi extends AbstractNotificationApi
      *
      * @throws \Exception
      */
-    public function sendNotification($playerId, Notification $notification)
+    public function sendNotification($playerId, Notification $notification, $notificationId)
     {
         $data = [];
 
