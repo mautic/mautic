@@ -219,7 +219,7 @@ class LeadEventLogRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
-                       ->innerJoin(
+                       ->leftJoin(
                            'o',
                            MAUTIC_TABLE_PREFIX.'campaign_leads',
                            'l',
