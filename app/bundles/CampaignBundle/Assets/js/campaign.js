@@ -1873,11 +1873,15 @@ Mautic.updateJumpToEventOptions = function() {
         var event = Mautic.campaignBuilderCanvasEvents[eventId];
 
         if (event.type !== 'campaign.jump_to_event') {
-            jumpToEventSelectNode.append(
-                mQuery("<option />")
-                    .attr("value", event.id)
-                    .text(event.name)
-            );
+            var opt = mQuery("<option />")
+                .attr("value", event.id)
+                .text(event.name)
+
+            if (event.id == jumpToEventSelectNode.data("selected")) {
+                opt.attr("selected", "selected");
+            }
+
+            jumpToEventSelectNode.append(opt);
         }
     }
 

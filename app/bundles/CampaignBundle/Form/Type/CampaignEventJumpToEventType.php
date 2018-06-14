@@ -26,6 +26,9 @@ class CampaignEventJumpToEventType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $jumpProps = $builder->getData()['properties'];
+        $selected  = isset($jumpProps['jumpToEvent']) ? $jumpProps['jumpToEvent'] : null;
+
         $builder->add(
             'jumpToEvent',
             'choice',
@@ -37,6 +40,7 @@ class CampaignEventJumpToEventType extends AbstractType
                 'attr'       => [
                     'class'                => 'form-control',
                     'data-onload-callback' => 'updateJumpToEventOptions',
+                    'data-selected'        => $selected,
                 ],
                 'constraints' => [
                     new NotBlank(
@@ -48,6 +52,7 @@ class CampaignEventJumpToEventType extends AbstractType
             ]
         );
 
+        // Allows additional values (new events) to be selected before persisting
         $builder->get('jumpToEvent')->resetViewTransformers();
     }
 
