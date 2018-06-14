@@ -101,7 +101,7 @@ class ReportExporter
             }
 
             $this->reportExportOptions->setDateFrom($dateFrom);
-            $this->reportExportOptions->setDateTo($dateTo);
+            $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
         }
 
         $this->reportExportOptions->beginExport();
