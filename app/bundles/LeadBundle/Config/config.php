@@ -818,6 +818,13 @@ return [
                     \Mautic\LeadBundle\Entity\MergeRecord::class,
                 ],
             ],
+            'mautic.lead.repository.field' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\LeadField::class,
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
