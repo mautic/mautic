@@ -210,6 +210,8 @@ class CampaignSubscriber extends CommonSubscriber
        
         /* FCM PHP API uses Guzzlehttp instead of joomla/http therefore response is different */        
         if ($response) {
+            var_dump($response);
+            var_dump($playerID,$notificationId);
             return $event->setResult(false);
         }
 
