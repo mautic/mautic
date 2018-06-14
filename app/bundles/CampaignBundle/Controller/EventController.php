@@ -144,6 +144,7 @@ class EventController extends CommonFormController
             $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
                 : $event['settings']['template'];
 
+            $passthroughVars['event']     = $event;
             $passthroughVars['eventId']   = $keyId;
             $passthroughVars['eventHtml'] = $this->renderView(
                 $template,

@@ -35,7 +35,8 @@ class CampaignEventJumpToEventType extends AbstractType
                 'label'      => 'mautic.campaign.form.jump_to_event',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class'                => 'form-control',
+                    'data-onload-callback' => 'updateJumpToEventOptions',
                 ],
                 'constraints' => [
                     new NotBlank(

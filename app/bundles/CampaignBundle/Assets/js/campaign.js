@@ -166,6 +166,10 @@ Mautic.campaignEventOnLoad = function (container, response) {
 
     Mautic.campaignBuilderUpdateLabel(domEventId);
 
+    if (response.hasOwnProperty("event")) {
+        Mautic.campaignBuilderCanvasEvents[response.event.id] = response.event;
+    }
+
     if (response.deleted) {
         Mautic.campaignBuilderInstance.remove(document.getElementById(domEventId));
         delete Mautic.campaignBuilderEventPositions[domEventId];
@@ -1855,4 +1859,25 @@ Mautic.cancelScheduledCampaignEvent = function(eventId, contactId) {
             }
         }, false
     );
+};
+
+/**
+ * Update the "Jump to Event" select list to be available events.
+ */
+Mautic.updateJumpToEventOptions = function() {
+    var jumpToEventSelectNode = mQuery("#campaignevent_properties_jumpToEvent");
+
+    jumpToEventSelectNode.children().remove();
+
+    for (var eventId in Mautic.campaignBuilderCanvasEvents) {
+        var event = Mautic.campaignBuilderCanvasEvents[eventId];
+
+        jumpToEventSelectNode.append(
+            mQuery("<option />")
+              .attr("value", event.id)
+              .text(event.name)
+        );
+    }
+
+    jumpToEventSelectNode.trigger("chosen:updated");
 };
