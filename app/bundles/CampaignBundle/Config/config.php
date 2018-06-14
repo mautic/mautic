@@ -514,5 +514,6 @@ return [
     ],
     'parameters' => [
         'campaign_time_wait_on_event_false' => 'PT1H',
+        'event_log_date_toggle'             => 1,
     ],
 ];

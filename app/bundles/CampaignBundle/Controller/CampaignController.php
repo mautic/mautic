@@ -284,7 +284,7 @@ class CampaignController extends AbstractStandardFormController
 
         //set added/updated sources
         list($this->addedSources, $this->deletedSources, $campaignSources) = $this->getSessionSources($sessionId, $isClone);
-        $this->connections = $this->getSessionCanvasSettings($sessionId);
+        $this->connections                                                 = $this->getSessionCanvasSettings($sessionId);
 
         if ($isPost) {
             $this->getCampaignModel()->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
@@ -640,8 +640,9 @@ class CampaignController extends AbstractStandardFormController
                 $entity   = $args['entity'];
                 $objectId = $args['objectId'];
                 // Init the date range filter form
-                $dateRangeValues = $this->request->get('daterange', []);
-                $tabDataMode     = empty($dateRangeValues) ?
+                $tabDataToggleDefault = $this->coreParametersHelper->getParameter('event_log_date_toggle');
+                $dateRangeValues      = $this->request->get('daterange', []);
+                $tabDataMode          = empty($dateRangeValues) && $tabDataToggleDefault ?
                     [
                         'toDate' => ['class' => 'btn-success', 'checked' => 'checked="checked"'],
                         'byDate' => ['class' => '', 'checked' => ''],
@@ -758,7 +759,7 @@ class CampaignController extends AbstractStandardFormController
                 );
                 break;
 
-            case 'new':
+            case 'new' :
             case 'edit':
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
