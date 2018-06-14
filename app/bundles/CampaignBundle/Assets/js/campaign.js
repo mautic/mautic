@@ -173,7 +173,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
     if (response.deleted) {
         Mautic.campaignBuilderInstance.remove(document.getElementById(domEventId));
         delete Mautic.campaignBuilderEventPositions[domEventId];
-
+        delete Mautic.campaignBuilderCanvasEvents[response.event.id];
     } else if (response.updateHtml) {
         mQuery(eventId + " .campaign-event-content").html(response.updateHtml);
     } else if (response.eventHtml) {
@@ -1872,11 +1872,13 @@ Mautic.updateJumpToEventOptions = function() {
     for (var eventId in Mautic.campaignBuilderCanvasEvents) {
         var event = Mautic.campaignBuilderCanvasEvents[eventId];
 
-        jumpToEventSelectNode.append(
-            mQuery("<option />")
-              .attr("value", event.id)
-              .text(event.name)
-        );
+        if (event.type !== 'campaign.jump_to_event') {
+            jumpToEventSelectNode.append(
+                mQuery("<option />")
+                    .attr("value", event.id)
+                    .text(event.name)
+            );
+        }
     }
 
     jumpToEventSelectNode.trigger("chosen:updated");

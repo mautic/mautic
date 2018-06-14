@@ -114,6 +114,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'          => 'mautic.campaign.event.jump_to_event',
             'description'    => 'mautic.campaign.event.jump_to_event_descr',
             'formType'       => CampaignEventJumpToEventType::class,
+            'template'       => 'MauticCampaignBundle:Event:jump.html.php',
             'batchEventName' => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
         ]);
     }

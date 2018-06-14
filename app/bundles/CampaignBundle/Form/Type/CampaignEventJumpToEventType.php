@@ -30,7 +30,7 @@ class CampaignEventJumpToEventType extends AbstractType
             'jumpToEvent',
             'choice',
             [
-                'choices'    => $this->getEventsForCampaign(),
+                'choices'    => [],
                 'multiple'   => false,
                 'label'      => 'mautic.campaign.form.jump_to_event',
                 'label_attr' => ['class' => 'control-label'],
@@ -47,6 +47,8 @@ class CampaignEventJumpToEventType extends AbstractType
                 ],
             ]
         );
+
+        $builder->get('jumpToEvent')->resetViewTransformers();
     }
 
     /**
@@ -55,17 +57,5 @@ class CampaignEventJumpToEventType extends AbstractType
     public function getName()
     {
         return 'campaignevent_jump_to_event';
-    }
-
-    /**
-     * @TODO: Get events for the current campaign from session
-     * https://github.com/mautic/mautic/blob/4b46c63e08ce8907c195e0cbb7c20d41dadf5f77/app/bundles/CampaignBundle/Controller/EventController.php#L106
-     */
-    private function getEventsForCampaign()
-    {
-        return [
-            'event1' => 'Event 1',
-            'event2' => 'Event 2',
-        ];
     }
 }
