@@ -612,8 +612,8 @@ class ReportSubscriber extends CommonSubscriber
     private function addDNCTable(QueryBuilder $qb)
     {
         $fromAlias = 'e';
-        $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
-        $alias = 'dnc';
+        $table     = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
+        $alias     = 'dnc';
 
         if (!self::isJoined($qb, $table, $fromAlias, $alias)) {
 
