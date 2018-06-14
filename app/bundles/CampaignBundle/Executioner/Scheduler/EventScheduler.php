@@ -150,6 +150,7 @@ class EventScheduler
 
     /**
      * @param LeadEventLog $log
+     * @param \DateTime    $toBeExecutedOn
      */
     public function reschedule(LeadEventLog $log, \DateTime $toBeExecutedOn)
     {
@@ -167,17 +168,51 @@ class EventScheduler
      */
     public function rescheduleFailure(LeadEventLog $log)
     {
-        if ($interval = $this->coreParametersHelper->getParameter('campaign_time_wait_on_event_false')) {
-            try {
-                $date = new \DateTime();
-                $date->add(new \DateInterval($interval));
-            } catch (\Exception $exception) {
-                // Bad interval
-                return;
-            }
+        if (!$interval = $this->coreParametersHelper->getParameter('campaign_time_wait_on_event_false')) {
+            return;
+        }
 
+        try {
+            $date = new \DateTime();
+            $date->add(new \DateInterval($interval));
+        } catch (\Exception $exception) {
+            // Bad interval
+            return;
+        }
+
+        $this->reschedule($log, $date);
+    }
+
+    /**
+     * @param ArrayCollection $logs
+     */
+    public function rescheduleFailures(ArrayCollection $logs)
+    {
+        if (!$interval = $this->coreParametersHelper->getParameter('campaign_time_wait_on_event_false')) {
+            return;
+        }
+
+        if (!$logs->count()) {
+            return;
+        }
+
+        try {
+            $date = new \DateTime();
+            $date->add(new \DateInterval($interval));
+        } catch (\Exception $exception) {
+            // Bad interval
+            return;
+        }
+
+        foreach ($logs as $log) {
             $this->reschedule($log, $date);
         }
+
+        // Send out a batch event
+        $event  = $logs->first()->getEvent();
+        $config = $this->collector->getEventConfig($event);
+
+        $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
     }
 
     /**
@@ -293,12 +328,17 @@ class EventScheduler
      * @param AbstractEventAccessor $config
      * @param Event                 $event
      * @param ArrayCollection       $logs
+     * @param bool                  $isReschedule
      */
-    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $isReschedule = false)
     {
+        if (!$logs->count()) {
+            return;
+        }
+
         $this->dispatcher->dispatch(
             CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
-            new ScheduledBatchEvent($config, $event, $logs)
+            new ScheduledBatchEvent($config, $event, $logs, $isReschedule)
         );
     }
 }
