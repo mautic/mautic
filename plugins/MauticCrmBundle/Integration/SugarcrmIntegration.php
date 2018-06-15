@@ -1636,7 +1636,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             foreach ($keys as $key) {
                 if (strpos($key, '__'.$obj)) {
-
                     $newKey = str_replace('__'.$obj, '', $key);
                     if ('Id' === $newKey) {
                         // Don't map Id for push
