@@ -247,6 +247,7 @@ return [
                     'mautic.campaign.dispatcher.action',
                     'mautic.campaign.dispatcher.condition',
                     'mautic.campaign.dispatcher.decision',
+                    'mautic.campaign.repository.lead_event_log',
                 ],
             ],
             'mautic.campaign.model.event_log' => [

@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
@@ -121,22 +122,28 @@ class LegacyEventModel extends CommonFormModel
     protected $notificationModel;
 
     /**
+     * @var LeadEventLogRepository
+     */
+    protected $leadEventLogRepository;
+
+    /**
      * LegacyEventModel constructor.
      *
-     * @param UserModel            $userModel
-     * @param NotificationModel    $notificationModel
-     * @param CampaignModel        $campaignModel
-     * @param LeadModel            $leadModel
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param RealTimeExecutioner  $realTimeExecutioner
-     * @param KickoffExecutioner   $kickoffExecutioner
-     * @param ScheduledExecutioner $scheduledExecutioner
-     * @param InactiveExecutioner  $inactiveExecutioner
-     * @param EventExecutioner     $eventExecutioner
-     * @param EventCollector       $eventCollector
-     * @param ActionDispatcher     $actionDispatcher
-     * @param ConditionDispatcher  $conditionDispatcher
-     * @param DecisionDispatcher   $decisionDispatcher
+     * @param UserModel              $userModel
+     * @param NotificationModel      $notificationModel
+     * @param CampaignModel          $campaignModel
+     * @param LeadModel              $leadModel
+     * @param IpLookupHelper         $ipLookupHelper
+     * @param RealTimeExecutioner    $realTimeExecutioner
+     * @param KickoffExecutioner     $kickoffExecutioner
+     * @param ScheduledExecutioner   $scheduledExecutioner
+     * @param InactiveExecutioner    $inactiveExecutioner
+     * @param EventExecutioner       $eventExecutioner
+     * @param EventCollector         $eventCollector
+     * @param ActionDispatcher       $actionDispatcher
+     * @param ConditionDispatcher    $conditionDispatcher
+     * @param DecisionDispatcher     $decisionDispatcher
+     * @param LeadEventLogRepository $leadEventLogRepository
      */
     public function __construct(
         UserModel $userModel,
@@ -152,22 +159,24 @@ class LegacyEventModel extends CommonFormModel
         EventCollector $eventCollector,
         ActionDispatcher $actionDispatcher,
         ConditionDispatcher $conditionDispatcher,
-        DecisionDispatcher $decisionDispatcher
+        DecisionDispatcher $decisionDispatcher,
+        LeadEventLogRepository $leadEventLogRepository
     ) {
-        $this->userModel            = $userModel;
-        $this->notificationModel    = $notificationModel;
-        $this->campaignModel        = $campaignModel;
-        $this->leadModel            = $leadModel;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->realTimeExecutioner  = $realTimeExecutioner;
-        $this->kickoffExecutioner   = $kickoffExecutioner;
-        $this->scheduledExecutioner = $scheduledExecutioner;
-        $this->inactiveExecutioner  = $inactiveExecutioner;
-        $this->eventExecutioner     = $eventExecutioner;
-        $this->eventCollector       = $eventCollector;
-        $this->actionDispatcher     = $actionDispatcher;
-        $this->conditionDispatcher  = $conditionDispatcher;
-        $this->decisionDispatcher   = $decisionDispatcher;
+        $this->userModel              = $userModel;
+        $this->notificationModel      = $notificationModel;
+        $this->campaignModel          = $campaignModel;
+        $this->leadModel              = $leadModel;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->realTimeExecutioner    = $realTimeExecutioner;
+        $this->kickoffExecutioner     = $kickoffExecutioner;
+        $this->scheduledExecutioner   = $scheduledExecutioner;
+        $this->inactiveExecutioner    = $inactiveExecutioner;
+        $this->eventExecutioner       = $eventExecutioner;
+        $this->eventCollector         = $eventCollector;
+        $this->actionDispatcher       = $actionDispatcher;
+        $this->conditionDispatcher    = $conditionDispatcher;
+        $this->decisionDispatcher     = $decisionDispatcher;
+        $this->leadEventLogRepository = $leadEventLogRepository;
     }
 
     /**
@@ -433,7 +442,7 @@ class LegacyEventModel extends CommonFormModel
      * @param int            $executedEventCount
      * @param int            $totalEventCount
      *
-     * @return array|bool|mixed
+     * @return bool
      *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
@@ -453,7 +462,6 @@ class LegacyEventModel extends CommonFormModel
         &$executedEventCount = 0,
         &$totalEventCount = 0
     ) {
-        $counter   = new Counter();
         $responses = new Responses();
 
         if (is_array($event)) {
@@ -461,21 +469,34 @@ class LegacyEventModel extends CommonFormModel
             $event = $this->getEntity($event['id']);
         }
 
-        $this->eventExecutioner->executeForContact($event, $lead, $responses, $counter);
+        if ($logExists) {
+            // Get a list of logs
+            $scheduled = $this->leadEventLogRepository->findBy(
+                [
+                    'event'       => $event,
+                    'lead'        => $lead,
+                    'rotation'    => 1,
+                    'isScheduled' => true,
+                ]
+            );
+
+            $scheduledIds = [];
+            /** @var LeadEventLog $log */
+            foreach ($scheduled as $log) {
+                $scheduledIds[] = $log->getId();
+            }
+
+            $counter = $this->scheduledExecutioner->executeByIds($scheduledIds);
+        } else {
+            $counter = new Counter();
+            $this->eventExecutioner->executeForContact($event, $lead, $responses, $counter);
+        }
 
         $evaluatedEventCount += $counter->getTotalEvaluated();
         $executedEventCount += $counter->getTotalExecuted();
         $totalEventCount += $counter->getEventCount();
 
-        if (Event::TYPE_ACTION === $event->getEventType()) {
-            return $responses->getActionResponses();
-        }
-
-        if (Event::TYPE_CONDITION === $event->getEventType()) {
-            return $responses->getConditionResponses();
-        }
-
-        return true;
+        return (bool) $executedEventCount;
     }
 
     /**
