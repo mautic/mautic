@@ -175,7 +175,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
         delete Mautic.campaignBuilderEventPositions[domEventId];
         delete Mautic.campaignBuilderCanvasEvents[response.event.id];
     } else if (response.updateHtml) {
-        mQuery(eventId + " .campaign-event-content").html(response.updateHtml);
+        mQuery(eventId + " .campaign-event-content").replaceWith(response.updateHtml);
     } else if (response.eventHtml) {
         var newHtml = response.eventHtml;
 

@@ -216,19 +216,19 @@ class EventController extends CommonFormController
     {
         $session    = $this->get('session');
         $method     = $this->request->getMethod();
-        $campaignId = ($method == 'POST')
+        $campaignId = $method === 'POST'
             ? $this->request->request->get('campaignevent[campaignId]', '', true)
-            : $this->request->query->get(
-                'campaignId'
-            );
+            : $this->request->query->get('campaignId');
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
         $success        = 0;
-        $valid          = $cancelled          = false;
-        $event          = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $valid          = $cancelled = false;
+        $event          = array_key_exists($objectId, $modifiedEvents) ? $modifiedEvents[$objectId] : [];
 
-        if ($method == 'POST') {
-            $event['anchor']          = $this->request->request->get('campaignevent[anchor]', '', true);
-            $event['anchorEventType'] = $this->request->request->get('campaignevent[anchorEventType]', '', true);
+        if ($method === 'POST') {
+            $event = array_merge($event, [
+                'anchor'          => $this->request->request->get('campaignevent[anchor]', '', true),
+                'anchorEventtype' => $this->request->request->get('campaignevent[anchorEventType]', '', true),
+            ]);
         } else {
             if (!isset($event['anchor'])) {
                 // Used to generate label
@@ -246,161 +246,162 @@ class EventController extends CommonFormController
             }
         }
 
-        if ($event !== null) {
-            $type      = $event['type'];
-            $eventType = $event['eventType'];
-            if (!in_array($eventType, $this->supportedEventTypes)) {
-                return $this->modalAccessDenied();
-            }
-
-            //ajax only for form fields
-            if (!$type || !$this->request->isXmlHttpRequest()
-                || !$this->get('mautic.security')->isGranted(
+        /*
+         * If we don't have an event, don't support the event type, this is not
+         * an AJAX request, or are not granted campaign edit/create, deny access.
+         */
+        if (empty($event)
+            || !in_array($event['eventType'], $this->supportedEventTypes)
+            || !isset($type)
+            || !$this->request->isXmlHttpRequest()
+            || !$this->get('mautic.security')->isGranted(
                     [
-                        'campaign:campaigns:edit',
-                        'campaign:campaigns:create',
-                    ],
-                    'MATCH_ONE'
-                )
-            ) {
-                return $this->modalAccessDenied();
+                    'campaign:campaigns:edit',
+                    'campaign:campaigns:create',
+                ],
+                'MATCH_ONE'
+            )
+        ) {
+            return $this->modalAccessDenied();
+        }
+
+        $type      = $event['type'];
+        $eventType = $event['eventType'];
+
+        // fire the builder event
+        $events = $this->getModel('campaign')->getEvents();
+        $form   = $this->get('form.factory')->create(
+            'campaignevent',
+            $event,
+            [
+                'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
+                'settings' => $events[$eventType][$type],
+            ]
+        );
+        $event['settings'] = $events[$eventType][$type];
+
+        $form->get('campaignId')->setData($campaignId);
+
+        //Check for a submitted form and process it
+        if ($method === 'POST') {
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $success  = 1;
+                    $formData = $form->getData();
+                    $event    = array_merge($event, $formData);
+
+                    // Set the name to the event default if not known.
+                    if (empty($event['name'])) {
+                        $event['name'] = $this->translator->trans($event['settings']['label']);
+                    }
+
+                    $modifiedEvents[$objectId] = $event;
+
+                    // Save the modified event properties to session
+                    $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
+                }
+            }
+        }
+
+        $viewParams = ['type' => $type];
+
+        if ($cancelled || $valid) {
+            $closeModal = true;
+        } else {
+            $closeModal = false;
+            $formThemes = ['MauticCampaignBundle:FormTheme\Event'];
+
+            if (isset($event['settings']['formTheme'])) {
+                $formThemes[] = $event['settings']['formTheme'];
             }
 
-            //fire the builder event
-            $events = $this->getModel('campaign')->getEvents();
-            $form   = $this->get('form.factory')->create(
-                'campaignevent',
-                $event,
+            $viewParams = array_merge($viewParams, [
+                'form'             => $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes),
+                'eventHeader'      => $event['settings']['label'],
+                'eventDescription' => $event['settings']['description'],
+            ]);
+        }
+
+        $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];
+
+        $passthroughVars = [
+            'mauticContent' => 'campaignEvent',
+            'success'       => $success,
+            'route'         => false,
+        ];
+
+        if ($closeModal === false) {
+            return $this->ajaxAction(
                 [
-                    'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
-                    'settings' => $events[$eventType][$type],
+                    'contentTemplate' => 'MauticCampaignBundle:Event:form.html.php',
+                    'viewParameters'  => $viewParams,
+                    'passthroughVars' => $passthroughVars,
                 ]
             );
-            $event['settings'] = $events[$eventType][$type];
+        }
 
-            $form->get('campaignId')->setData($campaignId);
+        if ($success) {
+            //prevent undefined errors
+            $entity = new Event();
+            $blank  = $entity->convertToArray();
+            $event  = array_merge($blank, $event);
 
-            //Check for a submitted form and process it
-            if ($method == 'POST') {
-                if (!$cancelled = $this->isFormCancelled($form)) {
-                    if ($valid = $this->isFormValid($form)) {
-                        $success = 1;
+            $template = empty($event['settings']['template'])
+                ? 'MauticCampaignBundle:Event:generic.html.php'
+                : $event['settings']['template'];
 
-                        //save the properties to session
-                        $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified');
-                        $formData       = $form->getData();
-                        $event          = array_merge($event, $formData);
-
-                        if (empty($event['name'])) {
-                            //set it to the event default
-                            $event['name'] = $this->get('translator')->trans($event['settings']['label']);
-                        }
-                        $modifiedEvents[$objectId] = $event;
-
-                        $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
-                    } else {
-                        $success = 0;
-                    }
-                }
-            }
-
-            $viewParams = ['type' => $type];
-            if ($cancelled || $valid) {
-                $closeModal = true;
-            } else {
-                $closeModal = false;
-                $formThemes = ['MauticCampaignBundle:FormTheme\Event'];
-                if (isset($event['settings']['formTheme'])) {
-                    $formThemes[] = $event['settings']['formTheme'];
-                }
-                $viewParams['form']             = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);
-                $viewParams['eventHeader']      = $this->get('translator')->trans($event['settings']['label']);
-                $viewParams['eventDescription'] = (!empty($event['settings']['description'])) ? $this->get('translator')->trans(
-                    $event['settings']['description']
-                ) : '';
-            }
-
-            $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];
-
-            $passthroughVars = [
-                'mauticContent' => 'campaignEvent',
-                'success'       => $success,
-                'route'         => false,
-            ];
-
-            if ($closeModal) {
-                if ($success) {
-                    //prevent undefined errors
-                    $entity = new Event();
-                    $blank  = $entity->convertToArray();
-                    $event  = array_merge($blank, $event);
-
-                    $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
-                        : $event['settings']['template'];
-
-                    $passthroughVars['event']      = $event;
-                    $passthroughVars['eventId']    = $objectId;
-                    $passthroughVars['updateHtml'] = $this->renderView(
-                        $template,
-                        [
-                            'event'      => $event,
-                            'id'         => $objectId,
-                            'update'     => true,
-                            'campaignId' => $campaignId,
-                        ]
-                    );
-                    $passthroughVars['eventType'] = $eventType;
-
-                    $translator = $this->translator;
-                    if ($event['triggerMode'] == 'interval') {
-                        $label = 'mautic.campaign.connection.trigger.interval.label';
-                        if ($event['anchor'] == 'no') {
-                            $label .= '_inaction';
-                        }
-                        $passthroughVars['label'] = $translator->trans(
-                            $label,
-                            [
-                                '%number%' => $event['triggerInterval'],
-                                '%unit%'   => $translator->transChoice(
-                                    'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                                    $event['triggerInterval']
-                                ),
-                            ]
-                        );
-                    } elseif ($event['triggerMode'] == 'date') {
-                        $label = 'mautic.campaign.connection.trigger.date.label';
-                        if ($event['anchor'] == 'no') {
-                            $label .= '_inaction';
-                        }
-                        /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
-                        $dh                       = $this->factory->getHelper('template.date');
-                        $passthroughVars['label'] = $translator->trans(
-                            $label,
-                            [
-                                '%full%' => $dh->toFull($event['triggerDate']),
-                                '%time%' => $dh->toTime($event['triggerDate']),
-                                '%date%' => $dh->toShort($event['triggerDate']),
-                            ]
-                        );
-                    }
-                }
-                //just close the modal
-                $passthroughVars['closeModal'] = 1;
-                $response                      = new JsonResponse($passthroughVars);
-
-                return $response;
-            } else {
-                return $this->ajaxAction(
+            $passthroughVars = array_merge($passthroughVars, [
+                'event'      => $event,
+                'eventId'    => $objectId,
+                'eventType'  => $eventType,
+                'updateHtml' => $this->renderView(
+                    $template,
                     [
-                        'contentTemplate' => 'MauticCampaignBundle:Event:form.html.php',
-                        'viewParameters'  => $viewParams,
-                        'passthroughVars' => $passthroughVars,
+                        'event'      => $event,
+                        'id'         => $objectId,
+                        'update'     => true,
+                        'campaignId' => $campaignId,
+                    ]
+                ),
+            ]);
+
+            if ($event['triggerMode'] == 'interval') {
+                $label = 'mautic.campaign.connection.trigger.interval.label';
+                if ($event['anchor'] == 'no') {
+                    $label .= '_inaction';
+                }
+                $passthroughVars['label'] = $this->translator->trans(
+                    $label,
+                    [
+                        '%number%' => $event['triggerInterval'],
+                        '%unit%'   => $this->translator->transChoice(
+                            'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
+                            $event['triggerInterval']
+                        ),
+                    ]
+                );
+            } elseif ($event['triggerMode'] == 'date') {
+                $label = 'mautic.campaign.connection.trigger.date.label';
+                if ($event['anchor'] == 'no') {
+                    $label .= '_inaction';
+                }
+                /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
+                $dh                       = $this->get('mautic.helper.template.date');
+                $passthroughVars['label'] = $this->translator->trans(
+                    $label,
+                    [
+                        '%full%' => $dh->toFull($event['triggerDate']),
+                        '%time%' => $dh->toTime($event['triggerDate']),
+                        '%date%' => $dh->toShort($event['triggerDate']),
                     ]
                 );
             }
-        } else {
-            return $this->modalAccessDenied();
         }
+        //just close the modal
+        $passthroughVars['closeModal'] = 1;
+        $response                      = new JsonResponse($passthroughVars);
+
+        return $response;
     }
 
     /**
