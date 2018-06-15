@@ -110,7 +110,7 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param  $email
+     * @param string $email
      *
      * @return array
      */
@@ -131,7 +131,9 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param  $email
+     * @param     $name
+     * @param int $start
+     * @param int $limit
      *
      * @return array
      */
@@ -153,7 +155,10 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @return array
+     * @param array  $query
+     * @param string $endpoint
+     *
+     * @return mixed
      */
     public function getDataByEndpoint(array $query, $endpoint)
     {

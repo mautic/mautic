@@ -238,7 +238,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices'     => [
-                        //'contacts' => 'mautic.pipedrive.object.contacts',
                         'company'  => 'mautic.pipedrive.object.organization',
                     ],
                     'expanded'    => true,
@@ -312,7 +311,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
     /**
      * @return bool
      */
-    public function importDataToPipedrive()
+    public function shouldImportDataToPipedrive()
     {
         if (!$this->getIntegrationSettings()->getIsPublished() || empty($this->getIntegrationSettings()->getFeatureSettings()['import'])) {
             return false;

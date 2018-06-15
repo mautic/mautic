@@ -49,8 +49,9 @@ abstract class AbstractPipedrive
         // Convert multiselect data
         // Pipedrive webhook return IDs not labels, but  Mautic to Pipedrive sync labels
         if (!empty($objectFields)) {
+            $keys = array_keys($data);
             foreach ($objectFields as $field) {
-                if (in_array($field['field_type'], ['set', 'enum']) && in_array($field['key'], array_keys($data))) {
+                if (in_array($field['field_type'], ['set', 'enum']) && in_array($field['key'], $keys)) {
                     $pipedriveContactFieldOptions = array_flip(explode(',', $data[$field['key']]));
                     $pipedriveAllFieldOptions     = array_combine(array_values(array_column($field['options'], 'id')),
                         array_column($field['options'], 'label'));

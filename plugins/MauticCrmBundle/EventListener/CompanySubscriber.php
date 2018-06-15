@@ -68,7 +68,7 @@ class CompanySubscriber extends CommonSubscriber
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (false === $integrationObject || !$integrationObject->importDataToPipedrive()) {
+        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
             return;
         }
 
@@ -89,7 +89,7 @@ class CompanySubscriber extends CommonSubscriber
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (false === $integrationObject || !$integrationObject->importDataToPipedrive()) {
+        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
             return;
         }
 
