@@ -616,7 +616,6 @@ class ReportSubscriber extends CommonSubscriber
         $alias     = 'dnc';
 
         if (!self::isJoined($qb, $table, $fromAlias, $alias)) {
-
             $qb->leftJoin(
                 $fromAlias,
                 $table,
