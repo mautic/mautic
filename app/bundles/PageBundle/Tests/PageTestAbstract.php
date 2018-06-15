@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -57,6 +58,11 @@ class PageTestAbstract extends WebTestCase
 
         $ipLookupHelper = $this
             ->getMockBuilder(IpLookupHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $coreParametersHelper = $this
+            ->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -149,6 +155,7 @@ class PageTestAbstract extends WebTestCase
         $pageModel->setTranslator($translator);
         $pageModel->setEntityManager($entityManager);
         $pageModel->setRouter($router);
+        $pageModel->setCoreParametersHelper($coreParametersHelper);
 
         return $pageModel;
     }

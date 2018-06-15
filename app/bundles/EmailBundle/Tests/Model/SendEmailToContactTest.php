@@ -255,6 +255,12 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $factoryMock->method('getRouter')
             ->willReturn($routerMock);
 
+        $emailModelMock = $this->getMockBuilder(EmailModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $factoryMock->method('getModel')
+            ->willReturn($emailModelMock);
+
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
             ->setMethods(['createEmailStat'])
@@ -517,6 +523,12 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $factoryMock->method('getRouter')
             ->willReturn($routerMock);
 
+        $emailModelMock = $this->getMockBuilder(EmailModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $factoryMock->method('getModel')
+            ->willReturn($emailModelMock);
+
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
             ->setMethods(['createEmailStat'])
@@ -653,6 +665,12 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $factoryMock->method('getRouter')
             ->willReturn($routerMock);
+
+        $emailModelMock = $this->getMockBuilder(EmailModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $factoryMock->method('getModel')
+            ->willReturn($emailModelMock);
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])

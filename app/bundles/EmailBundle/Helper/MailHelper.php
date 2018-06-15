@@ -23,7 +23,6 @@ use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class MailHelper.
@@ -1500,7 +1499,9 @@ class MailHelper
     private function getUnsubscribeHeader()
     {
         if ($this->idHash) {
-            $url = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], UrlGeneratorInterface::ABSOLUTE_URL);
+            /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+            $emailModel = $this->factory->getModel('email');
+            $url        = $emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $this->idHash], true);
 
             return "<$url>";
         }
@@ -1543,12 +1544,14 @@ class MailHelper
 
         // Include the tracking pixel token as it's auto appended to the body
         if ($this->appendTrackingPixel) {
-            $tokens['{tracking_pixel}'] = $this->factory->getRouter()->generate(
+            /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+            $emailModel                 = $this->factory->getModel('email');
+            $tokens['{tracking_pixel}'] = $emailModel->buildUrl(
                 'mautic_email_tracker',
                 [
                     'idHash' => $this->idHash,
                 ],
-                UrlGeneratorInterface::ABSOLUTE_URL
+                true
             );
         } else {
             $tokens['{tracking_pixel}'] = self::getBlankPixel();
