@@ -119,8 +119,8 @@ class Form extends FormEntity
     private $formType;
 
     /**
-    * @var bool
-    */
+     * @var bool
+     */
     private $noIndex;
 
     /**

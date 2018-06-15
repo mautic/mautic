@@ -348,7 +348,7 @@ class PublicController extends CommonFormController
                 'content'     => $html,
                 'stylesheets' => $customStylesheets,
                 'name'        => $form->getName(),
-                'metaRobots'  => '<meta name="robots" content="index">'
+                'metaRobots'  => '<meta name="robots" content="index">',
             ];
 
             if ($form->getNoIndex()) {
