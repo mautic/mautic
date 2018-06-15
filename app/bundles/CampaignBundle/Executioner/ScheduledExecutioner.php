@@ -306,7 +306,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     private function executeScheduled($eventId, \DateTime $now)
     {
         $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
-        while ($logs->count()) {
+        while ($logs && $logs->count()) {
             $this->scheduledContactFinder->hydrateContacts($logs);
 
             $event = $logs->first()->getEvent();
