@@ -403,4 +403,49 @@ class ExpressionBuilder
     {
         return $this->connection->quote($input, $type);
     }
+
+    /**
+     * Puts argument into EXISTS mysql function.
+     *
+     * @param $input
+     *
+     * @return string
+     */
+    public function exists($input)
+    {
+        return $this->func('EXISTS', $input);
+    }
+
+    /**
+     * Puts argument into NOT EXISTS mysql function.
+     *
+     * @param $input
+     *
+     * @return string
+     */
+    public function notExists($input)
+    {
+        return $this->func('NOT EXISTS', $input);
+    }
+
+    /**
+     * Creates a functional expression.
+     *
+     * @param string       $func any function to be applied on $x
+     * @param mixed        $x    the left expression
+     * @param string|array $y    the placeholder or the array of values to be used by IN() comparison
+     *
+     * @return string
+     */
+    public function func($func, $x, $y = null)
+    {
+        $functionArguments = func_get_args();
+        $additionArguments = array_splice($functionArguments, 2);
+
+        foreach ($additionArguments as $k=> $v) {
+            $additionArguments[$k] = is_numeric($v) && intval($v) === $v ? $v : $this->literal($v);
+        }
+
+        return  $func.'('.$x.(count($additionArguments) ? ', ' : '').join(',', $additionArguments).')';
+    }
 }

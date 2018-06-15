@@ -12,8 +12,6 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
-use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Bridge\Monolog\Logger;
@@ -56,8 +54,8 @@ class ContactSegmentService
      *
      * @return array
      *
-     * @throws FieldNotFoundException
-     * @throws SegmentNotFoundException
+     * @throws Exception\SegmentQueryException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function getNewLeadListLeadsCount(LeadList $segment, array $batchLimiters)
     {
