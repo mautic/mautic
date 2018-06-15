@@ -1887,3 +1887,27 @@ Mautic.updateJumpToEventOptions = function() {
 
     jumpToEventSelectNode.trigger("chosen:updated");
 };
+
+Mautic.highlightJumpTarget = function(event, el) {
+    var element = mQuery(el);
+    var parentEventElement = element.parent().parent();
+    var highlightedAlready = parentEventElement.data('highlighted');
+    var jumpTargetID = '#CampaignEvent_' + element.data('jumpTarget');
+    var jumpTarget = mQuery(jumpTargetID);
+    var overlay = mQuery('#EventJumpOverlay');
+
+    if (highlightedAlready) {
+        parentEventElement.data('highlighted', false);
+        overlay.hide();
+        parentEventElement.css("z-index", 1010);
+        jumpTarget.css("z-index", 1010);
+    } else {
+        parentEventElement.data('highlighted', true);
+        overlay.show();
+        parentEventElement.css("z-index", 2010);
+        jumpTarget.css("z-index", 2010);
+    }
+};
+
+
+

@@ -52,8 +52,8 @@
                 ]
             );
             ?>
-
         </div>
+        <div id="EventJumpOverlay"></div>
     </div>
 </div>
 <!-- dropped coordinates -->
