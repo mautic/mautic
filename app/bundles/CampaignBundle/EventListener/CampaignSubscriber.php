@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -111,11 +112,18 @@ class CampaignSubscriber extends CommonSubscriber
     {
         // Add action to jump to another event in the campaign flow.
         $event->addAction('campaign.jump_to_event', [
-            'label'          => 'mautic.campaign.event.jump_to_event',
-            'description'    => 'mautic.campaign.event.jump_to_event_descr',
-            'formType'       => CampaignEventJumpToEventType::class,
-            'template'       => 'MauticCampaignBundle:Event:jump.html.php',
-            'batchEventName' => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
+            'label'                  => 'mautic.campaign.event.jump_to_event',
+            'description'            => 'mautic.campaign.event.jump_to_event_descr',
+            'formType'               => CampaignEventJumpToEventType::class,
+            'template'               => 'MauticCampaignBundle:Event:jump.html.php',
+            'batchEventName'         => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
+            'connectionRestrictions' => [
+                'target' => [
+                    Event::TYPE_DECISION  => ['none'],
+                    Event::TYPE_ACTION    => ['none'],
+                    Event::TYPE_CONDITION => ['none'],
+                ],
+            ],
         ]);
     }
 }

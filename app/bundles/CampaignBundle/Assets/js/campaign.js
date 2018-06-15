@@ -152,7 +152,12 @@ Mautic.campaignOnUnload = function(container) {
  * @param response
  */
 Mautic.campaignEventOnLoad = function (container, response) {
-    //new action created so append it to the form
+    if (!response.hasOwnProperty('eventId')) {
+        // There's nothing for us to do, so bail
+        return;
+    }
+    
+    // New action created so append it to the form
     var domEventId = 'CampaignEvent_' + response.eventId;
     var eventId = '#' + domEventId;
 
@@ -163,12 +168,8 @@ Mautic.campaignEventOnLoad = function (container, response) {
         Mautic.campaignBuilderInstance.detach(Mautic.campaignBuilderLastConnection);
     }
     Mautic.campaignBuilderConnectionRequiresUpdate = false;
-
     Mautic.campaignBuilderUpdateLabel(domEventId);
-
-    if (response.hasOwnProperty("event")) {
-        Mautic.campaignBuilderCanvasEvents[response.event.id] = response.event;
-    }
+    Mautic.campaignBuilderCanvasEvents[response.event.id] = response.event;
 
     if (response.deleted) {
         Mautic.campaignBuilderInstance.remove(document.getElementById(domEventId));
@@ -192,12 +193,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
 
         mQuery(eventId).css({'left': x + 'px', 'top': y + 'px'});
 
-        if (response.eventType == 'decision' || response.eventType == 'condition') {
-            Mautic.campaignBuilderRegisterAnchors(['top', 'yes', 'no'], eventId);
-        } else {
-            Mautic.campaignBuilderRegisterAnchors(['top', 'bottom'], eventId);
-        }
-
+        Mautic.campaignBuilderRegisterAnchors(Mautic.getAnchorsForEvent(response.event), eventId);
         Mautic.campaignBuilderInstance.draggable(domEventId, Mautic.campaignDragOptions);
 
         //activate new stuff
@@ -238,6 +234,36 @@ Mautic.campaignEventOnLoad = function (container, response) {
     }
 
     Mautic.campaignBuilderInstance.repaintEverything();
+};
+
+/**
+ * Determine anchors to set up for the given event.
+ *
+ * This inspects the `connectionRestrictions` property
+ * within the event's settings that were passed when
+ * registering the event in your bundle's CampaignEventListener.
+ *
+ * @param event
+ */
+Mautic.getAnchorsForEvent = function (event) {
+    if (event.settings.hasOwnProperty('connectionRestrictions')) {
+        var restrictions = event.settings.connectionRestrictions.target;
+
+        // If all connections are restricted, only anchor the top
+        if (
+            restrictions.hasOwnProperty('decision') && restrictions.decision.length === 1 && restrictions.decision[0] === "none" &&
+            restrictions.hasOwnProperty('action') && restrictions.action.length === 1 && restrictions.action[0] === "none" &&
+            restrictions.hasOwnProperty('condition') && restrictions.condition.length === 1 && restrictions.condition[0] === "none"
+        ) {
+            return ['top'];
+        }
+    }
+
+    if (event.eventType === 'decision' || event.eventType === 'condition') {
+        return ['top', 'yes', 'no'];
+    }
+
+    return ['top', 'bottom'];
 };
 
 /**
