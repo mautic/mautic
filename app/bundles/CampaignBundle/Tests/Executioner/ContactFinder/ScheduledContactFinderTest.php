@@ -96,9 +96,8 @@ class ScheduledContactFinderTest extends \PHPUnit_Framework_TestCase
 
     public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound()
     {
-        $this->leadRepository->expects($this->once())
-            ->method('getContactCollection')
-            ->willReturn([]);
+        $this->leadRepository->expects($this->never())
+            ->method('getContactCollection');
 
         $this->expectException(NoContactsFoundException::class);
 

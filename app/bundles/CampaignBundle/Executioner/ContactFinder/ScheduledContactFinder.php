@@ -54,14 +54,14 @@ class ScheduledContactFinder
             $contactIds[] = $log->getLead()->getId();
         }
 
-        $contacts = $this->leadRepository->getContactCollection($contactIds);
-
-        if (!count($contacts)) {
+        if (!count($contactIds)) {
             // Just a precaution in case non-existent contacts are lingering in the campaign leads table
             $this->logger->debug('CAMPAIGN: No contact entities found.');
 
             throw new NoContactsFoundException();
         }
+
+        $contacts = $this->leadRepository->getContactCollection($contactIds);
 
         foreach ($logs as $log) {
             $contactId = $log->getLead()->getId();
