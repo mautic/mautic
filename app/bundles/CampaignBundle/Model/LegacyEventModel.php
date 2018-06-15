@@ -496,7 +496,7 @@ class LegacyEventModel extends CommonFormModel
         $executedEventCount += $counter->getTotalExecuted();
         $totalEventCount += $counter->getEventCount();
 
-        return (bool) $executedEventCount;
+        return (bool) $counter->getTotalExecuted();
     }
 
     /**
