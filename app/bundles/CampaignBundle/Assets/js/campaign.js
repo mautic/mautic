@@ -1898,7 +1898,7 @@ Mautic.updateJumpToEventOptions = function() {
     for (var eventId in Mautic.campaignBuilderCanvasEvents) {
         var event = Mautic.campaignBuilderCanvasEvents[eventId];
 
-        if (event.type !== 'campaign.jump_to_event') {
+        if (event.type !== 'campaign.jump_to_event' && event.eventType !== 'decision') {
             var opt = mQuery("<option />")
                 .attr("value", event.id)
                 .text(event.name)
