@@ -194,8 +194,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
     {
         if (empty($this->apiHelper)) {
             $client          = $this->factory->get('mautic_integration.service.transport');
-            $class           = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName(
-                ).'Api'; //TODO replace with service
+            $class           = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName().'Api'; //TODO replace with service
             $this->apiHelper = new $class($this, $client);
         }
 
