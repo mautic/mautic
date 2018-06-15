@@ -33,7 +33,7 @@ class TagRepository extends CommonRepository
             ->where('xl.tag_id = t.id');
 
         $havingCampaignsQb->select('count(xc.campaign_id) as campaign_count')
-            ->from(MAUTIC_TABLE_PREFIX.'cmapaign_tags_xref', 'xc')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_tags_xref', 'xc')
             ->where('xc.campaign_id = t.id');
 
         $qb->select('t.id')
