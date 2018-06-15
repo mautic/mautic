@@ -161,7 +161,13 @@ class KickoffExecutioner implements ExecutionerInterface
 
         $this->rootEvents = $this->campaign->getRootEvents();
         $totalRootEvents  = $this->rootEvents->count();
+        if (!$totalRootEvents) {
+            throw new NoEventsFoundException();
+        }
         $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
+        if ($this->output instanceof NullOutput) {
+            return;
+        }
 
         $totalContacts      = $this->kickoffContactFinder->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
         $totalKickoffEvents = $totalRootEvents * $totalContacts;
@@ -204,7 +210,9 @@ class KickoffExecutioner implements ExecutionerInterface
 
             /** @var Event $event */
             foreach ($this->rootEvents as $event) {
-                $this->progressBar->advance($contacts->count());
+                if ($this->progressBar) {
+                    $this->progressBar->advance($contacts->count());
+                }
                 $this->counter->advanceEvaluated($contacts->count());
 
                 // Check if the event should be scheduled (let the schedulers do the debug logging)

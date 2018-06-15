@@ -197,14 +197,18 @@ class ScheduledExecutioner implements ExecutionerInterface
             return $this->counter;
         }
 
-        $this->progressBar = ProgressBarHelper::init($this->output, $totalLogsFound);
-        $this->progressBar->start();
+        if (!($this->output instanceof NullOutput)) {
+            $this->progressBar = ProgressBarHelper::init($this->output, $totalLogsFound);
+            $this->progressBar->start();
+        }
 
         // Validate that the schedule is still appropriate
         $now = new \DateTime();
         $this->validateSchedule($logs, $now);
         $scheduledLogCount = $totalLogsFound - $logs->count();
-        $this->progressBar->advance($scheduledLogCount);
+        if ($this->progressBar) {
+            $this->progressBar->advance($scheduledLogCount);
+        }
 
         // Hydrate contacts with custom field data
         $this->scheduledContactFinder->hydrateContacts($logs);
@@ -212,13 +216,17 @@ class ScheduledExecutioner implements ExecutionerInterface
         // Organize the logs by event ID
         $organized = $this->organizeByEvent($logs);
         foreach ($organized as $organizedLogs) {
-            $this->progressBar->advance($organizedLogs->count());
+            if ($this->progressBar) {
+                $this->progressBar->advance($organizedLogs->count());
+            }
 
             $event = $organizedLogs->first()->getEvent();
             $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
         }
 
-        $this->progressBar->finish();
+        if ($this->progressBar) {
+            $this->progressBar->finish();
+        }
 
         return $this->counter;
     }
@@ -230,6 +238,9 @@ class ScheduledExecutioner implements ExecutionerInterface
     {
         $this->progressBar = null;
         $this->now         = new \Datetime();
+        if ($this->output instanceof NullOutput) {
+            return;
+        }
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
@@ -292,7 +303,9 @@ class ScheduledExecutioner implements ExecutionerInterface
             $this->scheduledContactFinder->hydrateContacts($logs);
 
             $event = $logs->first()->getEvent();
-            $this->progressBar->advance($logs->count());
+            if ($this->progressBar) {
+                $this->progressBar->advance($logs->count());
+            }
             $this->counter->advanceEvaluated($logs->count());
 
             // Validate that the schedule is still appropriate

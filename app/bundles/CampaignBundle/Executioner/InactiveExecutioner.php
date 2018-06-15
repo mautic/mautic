@@ -221,6 +221,9 @@ class InactiveExecutioner implements ExecutionerInterface
         if (!$totalDecisions) {
             throw new NoEventsFoundException();
         }
+        if ($this->output instanceof NullOutput) {
+            return;
+        }
 
         $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
 
@@ -271,7 +274,9 @@ class InactiveExecutioner implements ExecutionerInterface
                     // Get the max contact ID before any are removed
                     $batchMinContactId = max($contacts->getKeys()) + 1;
 
-                    $this->progressBar->advance($contacts->count());
+                    if ($this->progressBar) {
+                        $this->progressBar->advance($contacts->count());
+                    }
                     $this->counter->advanceEvaluated($contacts->count());
 
                     $inactiveEvents = $decisionEvent->getNegativeChildren();
