@@ -242,7 +242,7 @@ class ScheduledExecutioner implements ExecutionerInterface
         // If counts are not needed, just get the event list.
         if ($this->output instanceof NullOutput) {
             $scheduledEvents = $this->campaign->getScheduleEvents();
-            if (!$scheduledEvents->count()) {
+            if (!$scheduledEvents || !$scheduledEvents->count()) {
                 throw new NoEventsFoundException();
             }
             $this->scheduledEvents = $scheduledEvents->getKeys();

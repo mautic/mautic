@@ -205,7 +205,7 @@ class KickoffExecutioner implements ExecutionerInterface
 
         // Loop over contacts until the entire campaign is executed
         $contacts = $this->kickoffContactFinder->getContacts($this->campaign->getId(), $this->limiter);
-        while ($contacts->count()) {
+        while ($contacts && $contacts->count()) {
             $batchMinContactId = max($contacts->getKeys()) + 1;
 
             /** @var Event $event */
