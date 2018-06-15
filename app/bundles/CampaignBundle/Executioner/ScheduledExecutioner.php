@@ -213,7 +213,7 @@ class ScheduledExecutioner implements ExecutionerInterface
         } catch (NoContactsFoundException $e) {
             $this->progressBar->clear();
 
-            return;
+            return $this->counter;
         }
 
         // Organize the logs by event ID
