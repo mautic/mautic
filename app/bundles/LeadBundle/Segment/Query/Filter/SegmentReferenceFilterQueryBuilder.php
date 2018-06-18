@@ -101,7 +101,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 
             $filters = $this->leadSegmentFilterFactory->getSegmentFilters($contactSegment);
 
-            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($filters);
+            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($contactSegment->getId(), $filters);
 
             //  If the segment contains no filters; it means its for manually subscribed only
             if (count($filters)) {

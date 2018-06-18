@@ -218,9 +218,9 @@ class ContactSegmentService
      */
     private function getNewSegmentContactsQuery(LeadList $segment, $batchLimiters)
     {
-        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(),
+            $this->contactSegmentFilterFactory->getSegmentFilters($segment));
 
-        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
         $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
@@ -240,7 +240,7 @@ class ContactSegmentService
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
-        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
+        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(), $segmentFilters);
         $queryBuilder = $this->contactSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $segment->getId());
         $queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $segment->getId());
 
@@ -259,7 +259,7 @@ class ContactSegmentService
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
-        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segmentFilters);
+        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(), $segmentFilters);
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 

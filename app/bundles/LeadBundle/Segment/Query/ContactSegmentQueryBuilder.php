@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\Exception\PluginHandledFilterException;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -34,10 +33,11 @@ class ContactSegmentQueryBuilder
     /** @var RandomParameterName */
     private $randomParameterName;
 
-    /**
-     * @var EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface */
     private $dispatcher;
+
+    /** @var array Contains segment edges mapping */
+    private $dependencyMap = [];
 
     /**
      * ContactSegmentQueryBuilder constructor.
@@ -54,25 +54,29 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param ContactSegmentFilters $contactSegmentFilters
-     * @param null                  $backReference
+     * @param $segmentId
+     * @param $segmentFilters
      *
      * @return QueryBuilder
      *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder(ContactSegmentFilters $contactSegmentFilters, $backReference = null)
+    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters)
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
 
         $queryBuilder->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        /** @var ContactSegmentFilter $filter */
-        foreach ($contactSegmentFilters as $filter) {
-            //  We will handle references differently than regular segments
-            $this->checkForCircularDependencies($filter, $backReference);
+        /**
+         * Validate the plan, check for circular dependencies.
+         *
+         * the bigger count($plan), the higher complexity of query
+         */
+        $plan = $this->getResolutionPlan($segmentId);
 
+        /** @var ContactSegmentFilter $filter */
+        foreach ($segmentFilters as $filter) {
             try {
                 $this->dispatchPluginFilteringEvent($filter, $queryBuilder);
             } catch (PluginHandledFilterException $exception) {
@@ -141,7 +145,7 @@ class ContactSegmentQueryBuilder
         }
 
         $queryBuilder->select('count(leadIdPrimary) count, max(leadIdPrimary) maxId, min(leadIdPrimary) minId')
-                     ->from('('.$qb->getSQL().')', 'sss');
+            ->from('('.$qb->getSQL().')', 'sss');
         $queryBuilder->setParameters($qb->getParameters());
 
         return $queryBuilder;
@@ -203,11 +207,11 @@ class ContactSegmentQueryBuilder
     {
         $tableAlias = $this->generateRandomParameterName();
         $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias,
-                                'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId));
+            'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId));
         $queryBuilder->addJoinCondition($tableAlias,
-                                        $queryBuilder->expr()->andX(
-                                            $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1)
-                                        )
+            $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1)
+            )
         );
         $queryBuilder->orWhere($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'));
 
@@ -226,7 +230,7 @@ class ContactSegmentQueryBuilder
     {
         $tableAlias = $this->generateRandomParameterName();
         $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias,
-                                'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId));
+            'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId));
         $queryBuilder->addJoinCondition($tableAlias, $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 1));
         $queryBuilder->andWhere($queryBuilder->expr()->isNull($tableAlias.'.lead_id'));
 
@@ -295,5 +299,60 @@ class ContactSegmentQueryBuilder
                 throw new SegmentQueryException('Circular reference detected.');
             }
         }
+    }
+
+    /**
+     * def dep_resolve(node, resolved, seen):.
+    print node.name
+    seen.append(node)
+    for edge in node.edges:
+    if edge not in resolved:
+    if edge in seen:
+    raise Exception('Circular reference detected: %s -> %s' % (node.name, edge.name))
+    dep_resolve(edge, resolved, seen)
+    resolved.append(node)
+     */
+    private function getResolutionPlan($segmentId, $seen = [], &$resolved = [])
+    {
+        $seen[] = $segmentId;
+
+        if (!isset($this->dependencyMap[$segmentId])) {
+            $this->dependencyMap[$segmentId] = $this->getSegmentEdges($segmentId);
+        }
+
+        $edges = $this->dependencyMap[$segmentId];
+
+        foreach ($edges as $edge) {
+            if (!in_array($edge, $resolved)) {
+                if (in_array($edge, $seen)) {
+                    throw new SegmentQueryException('Circular reference detected.');
+                }
+                $this->getResolutionPlan($edge, $seen, $resolved);
+            }
+        }
+
+        $resolved[] = $segmentId;
+
+        return $resolved;
+    }
+
+    private function getSegmentEdges($segment)
+    {
+        if (!$segment instanceof LeadList) {
+            $segment = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->find($segment);
+        }
+
+        $segmentFilters = $segment->getFilters();
+        $segmentEdges   = [];
+
+        foreach ($segmentFilters as $segmentFilter) {
+            /** @var ContactSegmentFilter $segmentFilter */
+            if (isset($segmentFilter['field']) && $segmentFilter['field'] == 'leadlist') {
+                $filterEdges  = $segmentFilter['filter'];
+                $segmentEdges = array_merge($segmentEdges, $filterEdges);
+            }
+        }
+
+        return $segmentEdges;
     }
 }
