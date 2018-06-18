@@ -153,6 +153,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function __construct(Connection $connection)
     {
+        parent::__construct($connection);
         $this->connection = $connection;
     }
 
