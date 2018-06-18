@@ -224,13 +224,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             return [];
         }
 
-        if (!isset($settings['feature_settings']['objects'])) {
-            $settings['feature_settings']['objects'] = [];
+        if (isset($settings['feature_settings']['objects'])) {
+            // combine keys with values
+            $settings['feature_settings']['objects'] = array_combine(
+                array_values($settings['feature_settings']['objects']),
+                $settings['feature_settings']['objects']
+            );
         }
-
-        // combine keys with values
-        $settings['feature_settings']['objects'] = array_combine(array_values($settings['feature_settings']['objects']),
-            $settings['feature_settings']['objects']);
 
         // unset company object
         if (isset($settings['feature_settings']['objects']['company'])) {
