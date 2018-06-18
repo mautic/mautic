@@ -305,6 +305,22 @@ class Campaign extends FormEntity
     }
 
     /**
+     * Calls $this->addEvent on every item in the collection.
+     *
+     * @param array $events
+     *
+     * @return Campaign
+     */
+    public function addEvents(array $events)
+    {
+        foreach ($events as $id => $event) {
+            $this->addEvent($id, $event);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add events.
      *
      * @param                                     $key

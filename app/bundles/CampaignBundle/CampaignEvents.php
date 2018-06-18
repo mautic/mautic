@@ -170,7 +170,11 @@ final class CampaignEvents
     const ON_EVENT_CONDITION_EVALUATION = 'mautic.campaign_on_event_decision_evaluation';
 
     /**
-     * The mautic.campaign_on_event_jump_to_event event is dispatched when the jump to action is processed.
+     * The mautic.campaign_on_event_jump_to_event event is dispatched when a campaign jump to event is triggered.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent instance.
+     *
+     * @var string
      */
     const ON_EVENT_JUMP_TO_EVENT = 'mautic.campaign_on_event_jump_to_event';
 

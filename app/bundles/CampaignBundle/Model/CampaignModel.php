@@ -370,9 +370,9 @@ class CampaignModel extends CommonFormModel
                 // Remove decision so that it doesn't affect execution
                 $events[$id]->setDecisionPath(null);
             }
-
-            $entity->addEvent($id, $events[$id]);
         }
+
+        $entity->addEvents($events);
 
         //set event order used when querying the events
         $this->buildOrder($hierarchy, $events, $entity);

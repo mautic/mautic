@@ -246,17 +246,15 @@ Mautic.campaignEventOnLoad = function (container, response) {
  * @param event
  */
 Mautic.getAnchorsForEvent = function (event) {
-    if (event.settings.hasOwnProperty('connectionRestrictions')) {
-        var restrictions = event.settings.connectionRestrictions.target;
+    var restrictions = Mautic.campaignBuilderConnectionRestrictions[event.type].target;
 
-        // If all connections are restricted, only anchor the top
-        if (
-            restrictions.hasOwnProperty('decision') && restrictions.decision.length === 1 && restrictions.decision[0] === "none" &&
-            restrictions.hasOwnProperty('action') && restrictions.action.length === 1 && restrictions.action[0] === "none" &&
-            restrictions.hasOwnProperty('condition') && restrictions.condition.length === 1 && restrictions.condition[0] === "none"
-        ) {
-            return ['top'];
-        }
+    // If all connections are restricted, only anchor the top
+    if (
+        restrictions.decision.length === 1 && restrictions.decision[0] === "none" &&
+        restrictions.action.length === 1 && restrictions.action[0] === "none" &&
+        restrictions.condition.length === 1 && restrictions.condition[0] === "none"
+    ) {
+        return ['top'];
     }
 
     if (event.eventType === 'decision' || event.eventType === 'condition') {
@@ -761,16 +759,16 @@ Mautic.prepareCampaignCanvas = function() {
             callback();
         });
 
-        mQuery("#CampaignCanvas div.list-campaign-event").each(function () {
-            Mautic.campaignBuilderRegisterAnchors(['top'], this);
+        mQuery("#CampaignCanvas div[data-event-id]").each(function () {
+            var event = Mautic.campaignBuilderCanvasEvents[mQuery(this).data('eventId')];
+
+console.log(event);
+
+            Mautic.campaignBuilderRegisterAnchors(Mautic.getAnchorsForEvent(event), this);
         });
 
-        mQuery("#CampaignCanvas div.list-campaign-event.list-campaign-action, #CampaignCanvas div.list-campaign-event.list-campaign-source").not('#CampaignEvent_newsource').not('#CampaignEvent_newsource_hide').each(function () {
-            Mautic.campaignBuilderRegisterAnchors(['bottom'], this);
-        });
-
-        mQuery("#CampaignCanvas div.list-campaign-decision, #CampaignCanvas div.list-campaign-condition").each(function () {
-            Mautic.campaignBuilderRegisterAnchors(['yes', 'no'], this);
+        mQuery("#CampaignCanvas div.list-campaign-event.list-campaign-source").not('#CampaignEvent_newsource').not('#CampaignEvent_newsource_hide').each(function () {
+                Mautic.campaignBuilderRegisterAnchors(['bottom'], this);
         });
 
         mQuery("#CampaignCanvas div.list-campaign-leadsource").not('#CampaignEvent_newsource').not('#CampaignEvent_newsource_hide').each(function () {
