@@ -399,7 +399,8 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter)
     {
-        $q = $this->getSlaveConnection()->createQueryBuilder('o');
+        $this->getSlaveConnection();
+        $q = $this->createQueryBuilder('o');
 
         $q->select('o, e, c')
             ->indexBy('o', 'o.id')
@@ -431,6 +432,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getScheduledByIds(array $ids)
     {
+        $this->getSlaveConnection();
         $q = $this->createQueryBuilder('o');
 
         $q->select('o, e, c')
@@ -499,7 +501,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getDatesExecuted($eventId, array $contactIds)
     {
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb = $this->getSlaveConnection()->createQueryBuilder();
         $qb->select('log.lead_id, log.date_triggered')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
