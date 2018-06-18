@@ -340,7 +340,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                         if (isset($fieldInfo['name']) && empty($fieldInfo['readonly'])
                                             && (!in_array(
                                                     $fieldInfo['type'],
-                                                    ['id', 'team_list', 'bool', 'link', 'relate']
+                                                    ['id', 'team_list', 'link', 'relate']
                                                 )
                                                 ||
                                                 ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
