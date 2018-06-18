@@ -1131,15 +1131,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Send an email to lead(s).
      *
-     * @param   $email
-     * @param   $leads
-     * @param   $options = array()
-     *                   array source array('model', 'id')
-     *                   array emailSettings
-     *                   int   listId
-     *                   bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
-     *                   bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
-     *                   array assetAttachments Array of optional Asset IDs to attach
+     * @param $email
+     * @param $leads
+     * @param $options = array()
+     *                  array source array('model', 'id')
+     *                  array emailSettings
+     *                  int   listId
+     *                  bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
+     *                  bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
+     *                  array assetAttachments Array of optional Asset IDs to attach
      *
      * @return mixed
      *
@@ -1854,7 +1854,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $read   = $query->fetchCount($readQ);
         $failed = $query->fetchCount($failedQ);
 
-        $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.ignored'), ($sent - $read));
+        $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.ignored'), ($sent - $read - $failed));
         $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.read'), $read);
         $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.failed'), $failed);
 
@@ -1864,8 +1864,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get pie chart data of ignored vs opened emails.
      *
-     * @param   $dateFrom
-     * @param   $dateTo
+     * @param $dateFrom
+     * @param $dateTo
      *
      * @return array
      */

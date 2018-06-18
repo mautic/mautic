@@ -341,25 +341,13 @@ class StatRepository extends CommonRepository
                 $query->andWhere(
                     $query->expr()->eq('s.is_read', 1)
                 );
-            } elseif ('sent' == $state) {
-                // Inconsistency between api and dashboard
-
-                // Get only those that have not been read yet
-                $query->andWhere(
-                    $query->expr()->eq('s.is_read', 0)
-                );
-                $query->andWhere(
-                    $query->expr()->eq('s.is_failed', 0)
-                );
             } elseif ('failed' == $state) {
                 $query->andWhere(
                     $query->expr()->eq('s.is_failed', 1)
                 );
-                $state = 'sent';
             }
-        } else {
-            $state = 'sent';
         }
+        $state = 'sent';
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
@@ -544,7 +532,7 @@ class StatRepository extends CommonRepository
 
     /**
      * @param $contacts
-     * @param   $emailId
+     * @param $emailId
      *
      * @return mixed
      */
