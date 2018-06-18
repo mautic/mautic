@@ -25,6 +25,7 @@ class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
     use ContactLimiterTrait;
+    use SlaveConnectionTrait;
 
     public function getEntities(array $args = [])
     {
@@ -217,7 +218,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getSlaveConnection()->createQueryBuilder()
                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
                        ->innerJoin(
                            'o',
@@ -251,7 +252,7 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         // Exclude failed events
-        $failedSq = $this->_em->getConnection()->createQueryBuilder();
+        $failedSq = $this->getSlaveConnection()->createQueryBuilder();
         $failedSq->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fe')
             ->where(
@@ -350,10 +351,10 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getChartQuery($options)
     {
-        $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $options['dateFrom'], $options['dateTo']);
+        $chartQuery = new ChartQuery($this->getSlaveConnection(), $options['dateFrom'], $options['dateTo']);
 
         // Load points for selected period
-        $query = $this->_em->getConnection()->createQueryBuilder();
+        $query = $this->getSlaveConnection()->createQueryBuilder();
         $query->select('ll.id, ll.date_triggered')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
             ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id');
@@ -398,7 +399,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter)
     {
-        $q = $this->createQueryBuilder('o');
+        $q = $this->getSlaveConnection()->createQueryBuilder('o');
 
         $q->select('o, e, c')
             ->indexBy('o', 'o.id')
@@ -459,7 +460,7 @@ class LeadEventLogRepository extends CommonRepository
         $now = clone $date;
         $now->setTimezone(new \DateTimeZone('UTC'));
 
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q = $this->getSlaveConnection()->createQueryBuilder();
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('l.campaign_id', ':campaignId'),

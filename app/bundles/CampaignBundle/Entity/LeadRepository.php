@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class LeadRepository extends CommonRepository
 {
     use ContactLimiterTrait;
+    use SlaveConnectionTrait;
 
     /**
      * Get the details of leads added to a campaign.
@@ -204,7 +205,7 @@ class LeadRepository extends CommonRepository
     public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter)
     {
         // Main query
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q = $this->getSlaveConnection()->createQueryBuilder();
         $q->select('l.lead_id, l.date_added')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
             ->where($q->expr()->eq('l.campaign_id', ':campaignId'))
@@ -218,7 +219,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('l', $q, $limiter);
 
         // Limit to events that have not been executed or scheduled yet
-        $eventQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $eventQb = $this->getSlaveConnection()->createQueryBuilder();
         $eventQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
@@ -234,7 +235,7 @@ class LeadRepository extends CommonRepository
 
         if ($parentDecisionId) {
             // Limit to events that have no grandparent or whose grandparent has already been executed
-            $grandparentQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $grandparentQb = $this->getSlaveConnection()->createQueryBuilder();
             $grandparentQb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'grandparent_log')
                 ->where(
@@ -276,7 +277,7 @@ class LeadRepository extends CommonRepository
 
         foreach ($decisionIds as $decisionId) {
             // Main query
-            $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $q = $this->getSlaveConnection()->createQueryBuilder();
             $q->select('count(*)')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
                 ->where($q->expr()->eq('l.campaign_id', ':campaignId'))
@@ -288,7 +289,7 @@ class LeadRepository extends CommonRepository
             $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
 
             // Limit to events that have not been executed or scheduled yet
-            $eventQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $eventQb = $this->getSlaveConnection()->createQueryBuilder();
             $eventQb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
                 ->where(
