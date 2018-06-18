@@ -910,15 +910,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param Campaign $campaign
-     * @param          $lead
-     */
-    public function removeScheduledEvents($campaign, $lead)
-    {
-        $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->removeScheduledEvents($campaign->getId(), $lead->getId());
-    }
-
-    /**
      * @param $id
      *
      * @return array
@@ -1216,5 +1207,16 @@ class CampaignModel extends CommonFormModel
         if ($batchProcess) {
             $this->leadModel->getRepository()->detachEntities($leads);
         }
+    }
+
+    /**
+     * @deprecated 2.14 to be removed in 3.0
+     *
+     * @param Campaign $campaign
+     * @param          $lead
+     */
+    public function removeScheduledEvents($campaign, $lead)
+    {
+        $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->removeScheduledEvents($campaign->getId(), $lead->getId());
     }
 }

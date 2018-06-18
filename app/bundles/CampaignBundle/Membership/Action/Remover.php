@@ -12,8 +12,11 @@
 namespace Mautic\CampaignBundle\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaignException;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class Remover
 {
@@ -25,13 +28,34 @@ class Remover
     private $leadRepository;
 
     /**
-     * Adder constructor.
-     *
-     * @param LeadRepository $leadRepository
+     * @var LeadEventLogRepository
      */
-    public function __construct(LeadRepository $leadRepository)
-    {
-        $this->leadRepository = $leadRepository;
+    private $leadEventLogRepository;
+
+    /**
+     * @var string
+     */
+    private $unscheduledMessage;
+
+    /**
+     * Remover constructor.
+     *
+     * @param LeadRepository         $leadRepository
+     * @param LeadEventLogRepository $leadEventLogRepository
+     * @param TranslatorInterface    $translator
+     * @param DateHelper             $dateHelper
+     */
+    public function __construct(
+        LeadRepository $leadRepository,
+        LeadEventLogRepository $leadEventLogRepository,
+        TranslatorInterface $translator,
+        DateHelper $dateHelper
+    ) {
+        $this->leadRepository         = $leadRepository;
+        $this->leadEventLogRepository = $leadEventLogRepository;
+
+        $dateRemoved              = $dateHelper->toFull(new \DateTime());
+        $this->unscheduledMessage = $translator->trans('mautic.campaign.member.removed', ['%date%' => $dateRemoved]);
     }
 
     /**
@@ -55,6 +79,9 @@ class Remover
             // Contact was already removed from this campaign
             throw new ContactAlreadyRemovedFromCampaignException();
         }
+
+        // Unschedule any scheduled events
+        $this->leadEventLogRepository->unscheduleEvents($campaignMember, $this->unscheduledMessage);
 
         // Remove this contact from the campaign
         $campaignMember->setManuallyRemoved(true);

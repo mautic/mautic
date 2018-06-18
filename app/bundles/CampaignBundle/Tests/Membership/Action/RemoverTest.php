@@ -12,9 +12,12 @@
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Action\Remover;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaignException;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class RemoverTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,15 +26,24 @@ class RemoverTest extends \PHPUnit_Framework_TestCase
      */
     private $leadRepository;
 
+    /**
+     * @var LeadEventLogRepository|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $leadEventLogRepository;
+
     protected function setUp()
     {
-        $this->leadRepository = $this->createMock(LeadRepository::class);
+        $this->leadRepository         = $this->createMock(LeadRepository::class);
+        $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
     }
 
     public function testMemberHasDateExitedSetWithForcedExit()
     {
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(false);
+
+        $this->leadEventLogRepository->expects($this->once())
+            ->method('unscheduleEvents');
 
         $this->getRemover()->updateExistingMembership($campaignMember, true);
 
@@ -42,6 +54,9 @@ class RemoverTest extends \PHPUnit_Framework_TestCase
     {
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(false);
+
+        $this->leadEventLogRepository->expects($this->once())
+            ->method('unscheduleEvents');
 
         $this->getRemover()->updateExistingMembership($campaignMember, false);
 
@@ -63,6 +78,9 @@ class RemoverTest extends \PHPUnit_Framework_TestCase
      */
     private function getRemover()
     {
-        return new Remover($this->leadRepository);
+        $translator     = $this->createMock(TranslatorInterface::class);
+        $dateTimeHelper = $this->createMock(DateHelper::class);
+
+        return new Remover($this->leadRepository, $this->leadEventLogRepository, $translator, $dateTimeHelper);
     }
 }

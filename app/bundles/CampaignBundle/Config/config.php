@@ -500,6 +500,9 @@ return [
                 'class'     => \Mautic\CampaignBundle\Membership\Action\Remover::class,
                 'arguments' => [
                     'mautic.campaign.repository.lead',
+                    'mautic.campaign.repository.lead_event_log',
+                    'translator',
+                    'mautic.helper.template.date',
                 ],
             ],
             'mautic.campaign.membership.event_dispatcher' => [
