@@ -60,7 +60,7 @@ class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
             $queryType = $filter->getParameterValue() ? 'isNull' : 'isNotNull';
         }
 
-        $queryBuilder->andWhere($queryBuilder->expr()->$queryType($tableAlias.'.id'));
+        $queryBuilder->addLogic($queryBuilder->expr()->$queryType($tableAlias.'.id'), $filter->getGlue());
 
         $queryBuilder->setParameter($integrationNameParameter, $integrationCampaignParts->getIntegrationName());
         $queryBuilder->setParameter($campaignIdParameter, $integrationCampaignParts->getCampaignId());
