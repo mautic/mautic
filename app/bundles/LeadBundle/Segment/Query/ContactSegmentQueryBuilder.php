@@ -302,15 +302,15 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * def dep_resolve(node, resolved, seen):.
-    print node.name
-    seen.append(node)
-    for edge in node.edges:
-    if edge not in resolved:
-    if edge in seen:
-    raise Exception('Circular reference detected: %s -> %s' % (node.name, edge.name))
-    dep_resolve(edge, resolved, seen)
-    resolved.append(node)
+     * Returns array with plan for processing.
+     *
+     * @param       $segmentId
+     * @param array $seen
+     * @param array $resolved
+     *
+     * @return array
+     *
+     * @throws SegmentQueryException
      */
     private function getResolutionPlan($segmentId, $seen = [], &$resolved = [])
     {
