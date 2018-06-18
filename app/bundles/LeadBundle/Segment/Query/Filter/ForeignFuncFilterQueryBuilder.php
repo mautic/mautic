@@ -135,7 +135,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
         } else {
             if ($filterAggr) {
                 $expression = $queryBuilder->expr()->exists('SELECT '.$expressionArg.' FROM '.$filter->getTable().' '.
-                    $tableAlias.' HAVING '.$expression);
+                    $tableAlias.' WHERE l.id='.$tableAlias.'.lead_id HAVING '.$expression);
             } else { // This should never happen
                 $queryBuilder->addGroupBy('l.id');
             }
