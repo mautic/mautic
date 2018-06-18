@@ -202,7 +202,7 @@ class ContactRequestHelper
             throw new ContactNotFoundException();
         }
 
-        if ((int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
+        if ($stat->getEmail() && (int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
             // Email ID mismatch - fishy so use tracked lead
             throw new ContactNotFoundException();
         }
