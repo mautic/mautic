@@ -762,13 +762,11 @@ Mautic.prepareCampaignCanvas = function() {
         mQuery("#CampaignCanvas div[data-event-id]").each(function () {
             var event = Mautic.campaignBuilderCanvasEvents[mQuery(this).data('eventId')];
 
-console.log(event);
-
             Mautic.campaignBuilderRegisterAnchors(Mautic.getAnchorsForEvent(event), this);
         });
 
         mQuery("#CampaignCanvas div.list-campaign-event.list-campaign-source").not('#CampaignEvent_newsource').not('#CampaignEvent_newsource_hide').each(function () {
-                Mautic.campaignBuilderRegisterAnchors(['bottom'], this);
+            Mautic.campaignBuilderRegisterAnchors(['bottom'], this);
         });
 
         mQuery("#CampaignCanvas div.list-campaign-leadsource").not('#CampaignEvent_newsource').not('#CampaignEvent_newsource_hide').each(function () {
