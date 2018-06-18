@@ -154,6 +154,67 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(4, $counter->getTotalEvaluated());
     }
 
+    public function testEventsAreExecutedInQuietMode()
+    {
+        $event  = new Event();
+        $event2 = new Event();
+        $event->setEventType(Event::TYPE_ACTION);
+
+        $campaign = $this->getMockBuilder(Campaign::class)
+            ->getMock();
+
+        $campaign->expects($this->once())
+            ->method('getScheduleEvents')
+            ->willReturn(new ArrayCollection([$event, $event2]));
+
+        $event->setCampaign($campaign);
+        $event2->setCampaign($campaign);
+
+        $log1 = new LeadEventLog();
+        $log1->setEvent($event);
+        $log1->setCampaign($campaign);
+
+        $log2 = new LeadEventLog();
+        $log2->setEvent($event);
+        $log2->setCampaign($campaign);
+
+        $log3 = new LeadEventLog();
+        $log3->setEvent($event2);
+        $log3->setCampaign($campaign);
+
+        $log4 = new LeadEventLog();
+        $log4->setEvent($event2);
+        $log4->setCampaign($campaign);
+
+        $this->repository->expects($this->exactly(4))
+            ->method('getScheduled')
+            ->willReturnOnConsecutiveCalls(
+                new ArrayCollection(
+                    [
+                        $log1,
+                        $log2,
+                    ]
+                ),
+                new ArrayCollection(),
+                new ArrayCollection(
+                    [
+                        $log3,
+                        $log4,
+                    ]
+                ),
+                new ArrayCollection()
+            );
+
+        $this->executioner->expects($this->exactly(2))
+            ->method('executeLogs');
+
+        $limiter = new ContactLimiter(0, 0, 0, 0);
+
+        $counter = $this->getExecutioner()->execute($campaign, $limiter);
+
+        $this->assertEquals(4, $counter->getTotalEvaluated());
+    }
+
     public function testSpecificEventsAreExecuted()
     {
         $campaign = $this->getMockBuilder(Campaign::class)
