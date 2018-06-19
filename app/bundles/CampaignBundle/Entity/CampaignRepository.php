@@ -540,7 +540,11 @@ class CampaignRepository extends CommonRepository
      */
     public function getPendingEventContactCount($campaignId, array $pendingEvents, ContactLimiter $limiter)
     {
-        $q = $this->getSlaveConnection()->createQueryBuilder();
+        if ($limiter->getContactIdList() || $limiter->getContactId()) {
+            $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        } else {
+            $q = $this->getSlaveConnection()->createQueryBuilder();
+        }
 
         $q->select('count(cl.lead_id) as lead_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
