@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
@@ -169,8 +170,8 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param $campaign
-     * @param $oldCampaign
+     * @param Campaign $campaign
+     * @param Campaign $oldCampaign
      */
     protected function afterEntityClone($campaign, $oldCampaign)
     {
@@ -183,10 +184,12 @@ class CampaignController extends AbstractStandardFormController
         $campaign->setIsPublished(false);
 
         // Clone the campaign's events
+        /** @var Event $event */
         foreach ($events as $event) {
             $tempEventId = 'new'.$event->getId();
 
             $clone = clone $event;
+            $clone->nullId();
             $clone->setCampaign($campaign);
             $clone->setTempId($tempEventId);
 

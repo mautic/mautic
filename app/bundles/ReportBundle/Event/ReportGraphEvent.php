@@ -124,4 +124,12 @@ class ReportGraphEvent extends AbstractReportEvent
     {
         return $this->queryBuilder;
     }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     */
+    public function setQueryBuilder(QueryBuilder $queryBuilder)
+    {
+        $this->queryBuilder = $queryBuilder;
+    }
 }
