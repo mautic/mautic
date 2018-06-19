@@ -121,11 +121,12 @@ return [
     'services'   => [
         'events'       => [
             'mautic.campaign.subscriber'                => [
-                'class'     => 'Mautic\CampaignBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.campaign.model.event',
+                    'mautic.campaign.event_executioner',
                 ],
             ],
             'mautic.campaign.leadbundle.subscriber'     => [
