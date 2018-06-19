@@ -399,7 +399,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter)
     {
-        $this->getSlaveConnection();
+        $this->getSlaveConnection($limiter);
         $q = $this->createQueryBuilder('o');
 
         $q->select('o, e, c')
@@ -462,7 +462,7 @@ class LeadEventLogRepository extends CommonRepository
         $now = clone $date;
         $now->setTimezone(new \DateTimeZone('UTC'));
 
-        $q = $this->getSlaveConnection()->createQueryBuilder();
+        $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('l.campaign_id', ':campaignId'),
