@@ -586,7 +586,7 @@ class MailHelper
     /**
      * Send batched mail to mailer.
      *
-     * @param array $resetEmailTypes  Array of email types to clear after flusing the queue
+     * @param array $resetEmailTypes Array of email types to clear after flusing the queue
      *
      * @return bool
      */
