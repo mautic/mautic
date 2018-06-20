@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\TypeNotFoundException;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\ActionExecutioner;
@@ -90,6 +91,7 @@ class EventExecutioner
      * @param DecisionExecutioner  $decisionExecutioner
      * @param LoggerInterface      $logger
      * @param EventScheduler       $scheduler
+     * @param LeadRepository       $leadRepository
      */
     public function __construct(
         EventCollector $eventCollector,
@@ -99,7 +101,8 @@ class EventExecutioner
         DecisionExecutioner $decisionExecutioner,
         LoggerInterface $logger,
         EventScheduler $scheduler,
-        RemovedContactTracker $removedContactTracker
+        RemovedContactTracker $removedContactTracker,
+        LeadRepository $leadRepository
     ) {
         $this->actionExecutioner     = $actionExecutioner;
         $this->conditionExecutioner  = $conditionExecutioner;
@@ -109,6 +112,7 @@ class EventExecutioner
         $this->logger                = $logger;
         $this->scheduler             = $scheduler;
         $this->removedContactTracker = $removedContactTracker;
+        $this->leadRepository        = $leadRepository;
 
         // Be sure that all events are compared using the exact same \DateTime
         $this->executionDate = new \DateTime();
@@ -226,6 +230,39 @@ class EventExecutioner
             return;
         }
 
+        $jumpEvents = $events->filter(function (Event $event) {
+            return $event->getType() === 'campaign.jump_to_event';
+        });
+
+        $otherEvents = $events->filter(function (Event $event) {
+            return $event->getType() !== 'campaign.jump_to_event';
+        });
+
+        $this->performEventLoop($otherEvents, $contacts, $childrenCounter);
+
+        if ($jumpEvents->count()) {
+            // Increment the campaign rotation for the given contacts and current campaign
+            $this->leadRepository->incrementCampaignRotationForContacts(
+                $contacts->getKeys(),
+                $jumpEvents->first()->getCampaign()->getId()
+            );
+
+            $this->performEventLoop($jumpEvents, $contacts, $childrenCounter);
+        }
+    }
+
+    /**
+     * @param ArrayCollection $children
+     * @param ArrayCollection $contacts
+     * @param Counter         $childrenCounter
+     *
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
+     */
+    private function performEventLoop(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter)
+    {
         foreach ($events as $event) {
             // Ignore decisions
             if (Event::TYPE_DECISION == $event->getEventType()) {
