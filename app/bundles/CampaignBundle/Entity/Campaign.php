@@ -328,11 +328,37 @@ class Campaign extends FormEntity
     }
 
     /**
-     * Get events.
+     * Get pub;ished events.
      *
      * @return \Doctrine\Common\Collections\ArrayCollection
      */
     public function getEvents()
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('isPublished', true));
+        $events   = $this->events->matching($criteria);
+
+        return $events;
+    }
+
+    /**
+     * Get unpublished events.
+     *
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getUnpublishedEvents()
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('isPublished', false));
+        $events   = $this->events->matching($criteria);
+
+        return $events;
+    }
+
+    /**
+     * Get published and unpublished events.
+     *
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getAllEvents()
     {
         return $this->events;
     }

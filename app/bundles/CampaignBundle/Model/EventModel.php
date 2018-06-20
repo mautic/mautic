@@ -109,7 +109,16 @@ class EventModel extends LegacyEventModel
             $this->getRepository()->nullEventRelationships($deletedKeys);
 
             // delete the events
-            $this->deleteEntities($deletedEvents);
+            //  $this->deleteEntities($deletedEvents);
+
+            // soft delete the events in a loop using togglePublishStatus
+            foreach ($deletedKeys as $deletedKey) {
+                $entityToDelete = $this->getEntity($deletedKey);
+                $event          = $this->dispatchEvent('pre_delete', $entityToDelete);
+                $this->togglePublishStatus($entityToDelete);
+                $entityToDelete->deletedId = $deletedKey;
+                $this->dispatchEvent('post_delete', $entityToDelete, false, $event);
+            }
         }
     }
 

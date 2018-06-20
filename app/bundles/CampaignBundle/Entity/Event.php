@@ -40,6 +40,11 @@ class Event implements ChannelInterface
     private $id;
 
     /**
+     * @var bool
+     */
+    private $isPublished = true;
+
+    /**
      * @var string
      */
     private $name;
@@ -172,6 +177,11 @@ class Event implements ChannelInterface
             ->addIndex(['channel', 'channel_id'], 'campaign_event_channel');
 
         $builder->addIdColumns();
+
+        $builder->createField('isPublished', 'boolean')
+            ->columnName('is_published')
+            ->option('default', true)
+            ->build();
 
         $builder->createField('type', 'string')
             ->length(50)
@@ -414,6 +424,48 @@ class Event implements ChannelInterface
     public function getOrder()
     {
         return $this->order;
+    }
+
+    /**
+     * Set isPublished.
+     *
+     * @param bool $isPublished
+     *
+     * @return Event
+     */
+    public function setIsPublished($isPublished)
+    {
+        $this->isChanged('isPublished', $isPublished);
+
+        $this->isPublished = $isPublished;
+
+        return $this;
+    }
+
+    /**
+     * Get isPublished.
+     *
+     * @return bool
+     */
+    public function getIsPublished()
+    {
+        return $this->isPublished;
+    }
+
+    /**
+     * Check the publish status of an entity based on publish up and down datetimes.
+     *
+     * @return string early|expired|published|unpublished
+     *
+     * @throws \BadMethodCallException
+     */
+    public function getPublishStatus()
+    {
+        if ($this->getIsPublished()) {
+            return 'published';
+        }
+
+        return 'unpublished';
     }
 
     /**
@@ -882,7 +934,9 @@ class Event implements ChannelInterface
     /**
      * Used by the API.
      *
-     * @return Event
+     * @param $contactLog
+     *
+     * @return $this
      */
     public function addContactLog($contactLog)
     {
