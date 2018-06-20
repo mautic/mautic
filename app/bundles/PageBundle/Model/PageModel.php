@@ -662,8 +662,13 @@ class PageModel extends FormModel
 
                     // If this is a trackable, up the trackable counts as well
                     if (!empty($clickthrough['channel'])) {
-                        $channelId = reset($clickthrough['channel']);
-                        $channel   = key($clickthrough['channel']);
+                        if (count($clickthrough['channel']) === 1) {
+                            $channelId = reset($clickthrough['channel']);
+                            $channel   = key($clickthrough['channel']);
+                        } else {
+                            $channel   = $clickthrough['channel'][0];
+                            $channelId = (int) $clickthrough['channel'][1];
+                        }
 
                         $this->pageTrackableModel->getRepository()->upHitCount($page->getId(), $channel, $channelId, 1, $isUnique);
                     }
