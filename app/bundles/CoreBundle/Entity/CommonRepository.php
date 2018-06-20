@@ -204,6 +204,16 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * @param array $entities
+     */
+    public function detachEntities(array $entities)
+    {
+        foreach ($entities as $entity) {
+            $this->getEntityManager()->detach($entity);
+        }
+    }
+
+    /**
      * @param      $alias
      * @param null $catAlias
      * @param null $lang
@@ -308,7 +318,7 @@ class CommonRepository extends EntityRepository
      *
      * @param array $args
      *
-     * @return Paginator
+     * @return array|\Doctrine\ORM\Internal\Hydration\IterableResult|Paginator
      */
     public function getEntities(array $args = [])
     {

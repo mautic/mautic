@@ -12,6 +12,8 @@
 namespace Mautic\CampaignBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -80,7 +82,11 @@ class CampaignTestAbstract extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($formRepository));
 
-        $campaignModel = new CampaignModel($coreParametersHelper, $leadModel, $leadListModel, $formModel);
+        $eventCollector = $this->createMock(EventCollector::class);
+
+        $removedContactTracker = $this->createMock(RemovedContactTracker::class);
+
+        $campaignModel = new CampaignModel($coreParametersHelper, $leadModel, $leadListModel, $formModel, $eventCollector, $removedContactTracker);
 
         $leadModel->setEntityManager($entityManager);
         $leadListModel->setEntityManager($entityManager);
