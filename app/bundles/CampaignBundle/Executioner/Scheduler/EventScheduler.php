@@ -115,6 +115,9 @@ class EventScheduler
     {
         $config = $this->collector->getEventConfig($event);
 
+        // Load the rotations for creating new log entries
+        $this->eventLogger->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
+
         foreach ($contacts as $contact) {
             // Create the entry
             $log = $this->eventLogger->buildLogEntry($event, $contact, $isInactiveEvent);

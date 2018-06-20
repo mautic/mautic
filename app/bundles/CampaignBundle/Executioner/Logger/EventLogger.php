@@ -55,6 +55,11 @@ class EventLogger
     private $logs;
 
     /**
+     * @var array
+     */
+    private $contactRotations = [];
+
+    /**
      * EventLogger constructor.
      *
      * @param IpLookupHelper         $ipLookupHelper
@@ -104,7 +109,7 @@ class EventLogger
      *
      * @return LeadEventLog
      */
-    public function buildLogEntry(Event $event, Lead $lead = null, $isInactiveEvent = false)
+    public function buildLogEntry(Event $event, Lead $contact = null, $isInactiveEvent = false)
     {
         $log = new LeadEventLog();
 
@@ -113,10 +118,10 @@ class EventLogger
         $log->setEvent($event);
         $log->setCampaign($event->getCampaign());
 
-        if (null === $lead) {
-            $lead = $this->contactTracker->getContact();
+        if (null === $contact) {
+            $contact = $this->contactTracker->getContact();
         }
-        $log->setLead($lead);
+        $log->setLead($contact);
 
         if ($isInactiveEvent) {
             $log->setNonActionPathTaken(true);
@@ -124,6 +129,14 @@ class EventLogger
 
         $log->setDateTriggered(new \DateTime());
         $log->setSystemTriggered(defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'));
+
+        if (isset($this->contactRotations[$contact->getId()])) {
+            $log->setRotation($this->contactRotations[$contact->getId()]);
+        } else {
+            // Likely a single contact handle such as decision processing
+            $rotations = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
+            $log->setRotation($rotations[$contact->getId()]);
+        }
 
         return $log;
     }
@@ -237,15 +250,14 @@ class EventLogger
      */
     public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry = false)
     {
-        $isDecision       = Event::TYPE_DECISION === $event->getEventType();
-        $contactRotations = $this->leadRepository->getContactRotations($contacts->getKeys(), $event->getCampaign()->getId());
+        $isDecision = Event::TYPE_DECISION === $event->getEventType();
+        $this->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
             $log = $this->buildLogEntry($event, $contact, $isInactiveEntry);
             $log->setIsScheduled(false);
             $log->setDateTriggered(new \DateTime());
-            $log->setRotation($contactRotations[$contact->getId()]);
             ChannelExtractor::setChannel($log, $event, $config);
 
             if ($isDecision) {
@@ -259,5 +271,14 @@ class EventLogger
         $this->persistQueuedLogs();
 
         return $this->logs;
+    }
+
+    /**
+     * @param array $contactIds
+     * @param       $campaignId
+     */
+    public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
+    {
+        $this->contactRotations = $this->leadRepository->getContactRotations($contactIds, $campaignId);
     }
 }
