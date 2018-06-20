@@ -202,6 +202,8 @@ class CommonController extends Controller implements MauticController
             ];
         }
 
+        $args['viewParameters']['whitelabelBrandingName'] = $this->coreParametersHelper->getParameter('whitelabel_branding_name','Mautic');
+
         if (!isset($args['viewParameters']['currentRoute']) && isset($args['passthroughVars']['route'])) {
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
         }
