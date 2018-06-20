@@ -248,6 +248,10 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             'subject' => $message['subject'],
         ];
 
+        if (!empty($message['headers'])) {
+            $content['headers'] = $message['headers'];
+        }
+
         // Sparkpost will set parts regardless if they are empty or not
         if (!empty($message['html'])) {
             $content['html'] = $message['html'];
@@ -276,7 +280,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         $sparkPostMessage = [
             'content'    => $content,
             'recipients' => $recipients,
-            'headers'    => $message['headers'],
             'inline_css' => $inlineCss,
             'tags'       => $tags,
         ];

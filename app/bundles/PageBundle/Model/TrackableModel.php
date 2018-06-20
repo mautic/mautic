@@ -11,7 +11,9 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
@@ -428,12 +430,12 @@ class TrackableModel extends AbstractCommonModel
     protected function extractTrackablesFromText($text)
     {
         // Remove any HTML tags (such as img) that could contain href or src attributes prior to parsing for links
-        $text = strip_tags($text);
-
-        // Plaintext links
+        $text          = strip_tags($text);
+        $allUrls       = UrlHelper::getUrlsFromPlaintext($text);
         $trackableUrls = [];
-        if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\]"]+)?/i', $text, $matches)) {
-            foreach ($matches[0] as $url) {
+
+        if ($allUrls) {
+            foreach ($allUrls as $url) {
                 if ($preparedUrl = $this->prepareUrlForTracking($url)) {
                     list($urlKey, $urlValue) = $preparedUrl;
                     $trackableUrls[$urlKey]  = $urlValue;
@@ -441,7 +443,7 @@ class TrackableModel extends AbstractCommonModel
             }
         }
 
-        // Any tokens could potentially be a URL so extract and send through  prepareUrlForTracking() which will determine
+        // Any tokens could potentially be a URL so extract and send through prepareUrlForTracking() which will determine
         // if it's a valid URL or not
         if (preg_match_all('/{.*?}/i', $text, $matches)) {
             foreach ($matches[0] as $url) {
@@ -508,52 +510,10 @@ class TrackableModel extends AbstractCommonModel
             return false;
         }
 
-        // Extract any tokens that are part of the query
-        $tokenizedParams = $this->extractTokensFromQuery($urlParts);
+        $trackableUrl = $this->httpBuildUrl($urlParts);
 
-        // Check if URL is trackable
-        $tokenizedHost = (!isset($urlParts['host']) && isset($urlParts['path'])) ? $urlParts['path'] : $urlParts['host'];
-        if (preg_match('/^(\{\S+?\})/', $tokenizedHost, $match)) {
-            $token = $match[1];
-
-            // Tokenized hosts shouldn't use a scheme since the token value should contain it
-            if ($scheme = (!empty($urlParts['scheme'])) ? $urlParts['scheme'] : false) {
-                // Token has a schema so let's get rid of it before replacing tokens
-                $this->contentReplacements['first_pass'][$scheme.'://'.$tokenizedHost] = $tokenizedHost;
-                unset($urlParts['scheme']);
-            }
-
-            // Validate that the token is something that can be trackable
-            if (!$this->validateTokenIsTrackable($token, $tokenizedHost)) {
-                return false;
-            }
-
-            $trackableUrl = (!empty($urlParts['query'])) ? $this->contentTokens[$token].'?'.$urlParts['query'] : $this->contentTokens[$token];
-            $trackableKey = $trackableUrl;
-
-            // Replace the URL token with the actual URL
-            $this->contentReplacements['first_pass'][$url] = $trackableUrl;
-        } else {
-            // Regular URL without a tokenized host
-            $trackableUrl = $this->httpBuildUrl($urlParts);
-
-            if ($this->isInDoNotTrack($trackableUrl)) {
-                return false;
-            }
-        }
-
-        // Append tokenized params to the end of the URL as these will not be part of the stored redirect URL
-        // They'll be passed through as regular parameters outside the trackable token
-        // For example, {trackable=123}?foo={bar}
-        if ($tokenizedParams) {
-            // The URL to be tokenized is without the tokenized parameters
-            $trackableKey = $trackableUrl.($this->usingClickthrough || (strpos($trackableUrl, '?') !== false) ? '&' : '?').
-                $this->httpBuildQuery($tokenizedParams);
-
-            // Replace the original URL with the updated URL before replacing with tokens
-            if ($trackableKey !== $url) {
-                $this->contentReplacements['first_pass'][$url] = $trackableKey;
-            }
+        if ($this->isInDoNotTrack($trackableUrl)) {
+            return false;
         }
 
         return [$trackableKey, $trackableUrl];
@@ -588,20 +548,19 @@ class TrackableModel extends AbstractCommonModel
      */
     protected function validateTokenIsTrackable($token, $tokenizedHost = null)
     {
-        // Token as URL
-        if ($tokenizedHost && !preg_match('/^(\{\S+?\})$/', $tokenizedHost)) {
-            // Currently this does not apply to something like "{leadfield=firstname}.com" since that could result in URL per lead
-
-            return false;
-        }
-
         // Validate if this token is listed as not to be tracked
         if ($this->isInDoNotTrack($token)) {
             return false;
         }
 
-        // Validate that the token is available and is a URL
-        if (!isset($this->contentTokens[$token]) || !$this->isValidUrl($this->contentTokens[$token])) {
+        $tokenValue = TokenHelper::getValueFromTokens($this->contentTokens, $token);
+
+        // Validate that the token is available
+        if (!$tokenValue) {
+            return false;
+        }
+
+        if (!$this->isValidUrl($tokenValue)) {
             return false;
         }
 

@@ -59,7 +59,7 @@ class WebhookQueue
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
         $builder->addNullableField('dateAdded', Type::DATETIME, 'date_added');
-        $builder->addField('payload', Type::INTEGER);
+        $builder->addField('payload', Type::TEXT);
         $builder->createManyToOne('event', 'Event')
             ->inversedBy('queues')
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
