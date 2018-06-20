@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -638,6 +639,8 @@ class CampaignRepository extends CommonRepository
      * @param null  $dateRangeValues
      *
      * @return int
+     *
+     * @throws \Doctrine\DBAL\Cache\CacheException
      */
     public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], $dateRangeValues = null)
     {
@@ -659,9 +662,9 @@ class CampaignRepository extends CommonRepository
             );
         }
 
-        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
+        if (!empty($dateRangeValues)) {
             $dateFrom = new DateTimeHelper($dateRangeValues['date_from']);
-            $dateTo = new DateTimeHelper($dateRangeValues['date_to']);
+            $dateTo   = new DateTimeHelper($dateRangeValues['date_to']);
             $q->andWhere(
                 $q->expr()->gte('cl.date_added', ':dateFrom'),
                 $q->expr()->lte('cl.date_added', ':dateTo')
@@ -686,7 +689,16 @@ class CampaignRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        if ($q->getConnection()->getConfiguration()->getResultCacheImpl()) {
+            $results = $q->getConnection()->executeCacheQuery(
+                $q->getSQL(),
+                $q->getParameters(),
+                $q->getParameterTypes(),
+                new QueryCacheProfile(600, __METHOD__)
+            )->fetchAll();
+        } else {
+            $results = $q->execute()->fetchAll();
+        }
 
         return (int) $results[0]['lead_count'];
     }
