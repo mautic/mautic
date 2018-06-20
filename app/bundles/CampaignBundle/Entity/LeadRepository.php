@@ -13,8 +13,8 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
-use Mautic\CampaignBundle\Membership\Result\CountResult;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -385,7 +385,7 @@ class LeadRepository extends CommonRepository
         }
 
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->select('min(ll.lead_id) as min_id, max(ll.lead_id) as max_id, count(distinct(list_leads.lead_id)) as the_count')
+        $qb->select('min(ll.lead_id) as min_id, max(ll.lead_id) as max_id, count(distinct(ll.lead_id)) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->andX(
