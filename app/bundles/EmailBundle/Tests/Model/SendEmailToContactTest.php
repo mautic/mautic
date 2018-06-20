@@ -829,14 +829,8 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
 
         $model = new SendEmailToContact($mailHelper, $statHelper, $this->dncModel, $translator);
         $model->setSampleMailer();
-        $this->assertNotNull($model->getTemporaryMailer());
 
         $model->reset();
-        $this->assertNull($model->getTemporaryMailer());
-
-        $this->builder->expects($this->any())
-            ->method('getOptions')
-            ->will($this->returnValue(['with_immediately' => false]));
 
         $model  = new SendEmailToContact($mailHelper, $statHelper, $this->dncModel, $translator);
         $mailer = $mailHelper->getMailer();
