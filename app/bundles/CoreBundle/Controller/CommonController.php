@@ -203,6 +203,8 @@ class CommonController extends Controller implements MauticController
         }
 
         $args['viewParameters']['whitelabelBrandingName'] = $this->coreParametersHelper->getParameter('whitelabel_branding_name','Mautic');
+        $args['viewParameters']['whitelabelBrandingCopyright'] = $this->coreParametersHelper->getParameter('whitelabel_branding_copyright', 'Mautic '.MAUTIC_VERSION);        
+        $args['viewParameters']['whitelabelBrandingFavicon'] = $this->coreParametersHelper->getParameter('whitelabel_branding_favicon', 'media/images/favicon.ico');        
 
         if (!isset($args['viewParameters']['currentRoute']) && isset($args['passthroughVars']['route'])) {
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
@@ -734,11 +736,11 @@ class CommonController extends Controller implements MauticController
         if ($title !== null) {
             $title = $translator->trans($title);
         } else {
-            $title = 'Kiazaki';
+            $title = $this->coreParametersHelper->getParameter('whitelabel_branding_name','Mautic');;
         }
 
         if ($icon == null) {
-            $icon = 'media/images/favicon.ico';
+            $icon = $this->coreParametersHelper->getParameter('whitelabel_branding_favicon', 'media/images/favicon.ico');  
         }
 
         if (strpos($icon, 'http') !== 0) {
