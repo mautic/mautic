@@ -21,6 +21,7 @@ use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaign
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class MembershipManager
 {
@@ -51,6 +52,11 @@ class MembershipManager
      * @var LoggerInterface
      */
     private $logger;
+
+    /**
+     * @var ProgressBar
+     */
+    private $progressBar;
 
     /**
      * MembershipManager constructor.
@@ -254,6 +260,14 @@ class MembershipManager
 
         // Clear entities from RAM
         $this->leadRepository->clear();
+    }
+
+    /**
+     * @param ProgressBar $progressBar
+     */
+    public function setProgressBar(ProgressBar $progressBar = null)
+    {
+        $this->progressBar = $progressBar;
     }
 
     /**
