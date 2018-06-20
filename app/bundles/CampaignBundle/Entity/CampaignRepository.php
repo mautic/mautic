@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
+use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -345,11 +346,11 @@ class CampaignRepository extends CommonRepository
      *
      * @return int
      */
-    public function getPendingEventContactCount($campaignId, array $pendingEvents, ContactLimiter $limiter)
+    public function getCountsForPendingContacts($campaignId, array $pendingEvents, ContactLimiter $limiter)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->select('count(cl.lead_id) as lead_count')
+        $q->select('min(cl.lead_id) as min_id, max(cl.lead_id) as max_id, count(cl.lead_id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->andX(
@@ -378,9 +379,9 @@ class CampaignRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $result = $q->execute()->fetch();
 
-        return (int) $results[0]['lead_count'];
+        return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
 
     /**
