@@ -52,13 +52,12 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
 
             $companies = $em->getRepository(Company::class)->findAll();
             foreach ($companies as $company) {
-                if ($companyExport->create($company)) {
+                if ($companyExport->pushCompany($company)) {
                     ++$pushed;
                 }
             }
+            $this->io->text('Pushed '.$pushed);
         }
-
-        $this->io->text('Pushed '.$pushed);
 
         $leads = $em->getRepository(Lead::class)->findAll();
         $this->io->title('Pushing Leads');
