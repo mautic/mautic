@@ -21,7 +21,10 @@
     <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png') ?>" />
     <?php $view['assets']->outputSystemStylesheets(); ?>
     <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
-    <?php $view['assets']->outputHeadDeclarations(); ?>    
+    <?php $view['assets']->outputHeadDeclarations(); ?>
+    <?php 
+        var_dump($whitelabelBrandingName);
+    ?>
 </head>
 <body>
 <section id="main" role="main">
