@@ -443,7 +443,7 @@ class LeadRepository extends CommonRepository
      *
      * @return int
      */
-    public function getCountForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter)
+    public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter)
     {
         $segments = $this->getCampaignSegments($campaignId);
 

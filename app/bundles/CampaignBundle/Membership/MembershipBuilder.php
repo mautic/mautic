@@ -200,7 +200,7 @@ class MembershipBuilder
         $contactsProcessed = 0;
 
         if ($this->output) {
-            $countResult = $this->campaignMemberRepository->getCountForOrphanedContactsBySegments($this->campaign->getId(), $this->contactLimiter);
+            $countResult = $this->campaignMemberRepository->getCountsForOrphanedContactsBySegments($this->campaign->getId(), $this->contactLimiter);
 
             $this->output->writeln(
                 $this->translator->trans(
