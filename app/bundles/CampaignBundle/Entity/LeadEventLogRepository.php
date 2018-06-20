@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -218,11 +219,6 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $dateRangeValues = null)
     {
-        if (!is_null($dateRangeValues) && !empty($dateRangeValues)) {
-            $dateFrom = new DateTimeHelper($dateRangeValues['date_from']);
-            $dateTo = new DateTimeHelper($dateRangeValues['date_to']);
-        }
-
         $q = $this->_em->getConnection()->createQueryBuilder()
                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
                        ->leftJoin(
@@ -264,7 +260,9 @@ class LeadEventLogRepository extends CommonRepository
                 $failedSq->expr()->eq('fe.log_id', 'o.id')
             );
 
-        if (isset($dateFrom) && isset($dateTo)) {
+        if (!empty($dateRangeValues)) {
+            $dateFrom = new DateTimeHelper($dateRangeValues['date_from']);
+            $dateTo   = new DateTimeHelper($dateRangeValues['date_to']);
             $failedSq->andWhere(
                 $failedSq->expr()->gte('fe.date_added', ':dateFrom'),
                 $failedSq->expr()->lte('fe.date_added', ':dateTo')
@@ -290,7 +288,17 @@ class LeadEventLogRepository extends CommonRepository
             $q->setParameter('dateTo', $dateTo->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
+        // At large scale this can easily become the heaviest query in Mautic.
+        if ($q->getConnection()->getConfiguration()->getResultCacheImpl()) {
+            $results = $q->getConnection()->executeCacheQuery(
+                $q->getSQL(),
+                $q->getParameters(),
+                $q->getParameterTypes(),
+                new QueryCacheProfile(600, __METHOD__)
+            )->fetchAll();
+        } else {
+            $results = $q->execute()->fetchAll();
+        }
 
         $return = [];
 
