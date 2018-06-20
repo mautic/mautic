@@ -453,6 +453,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $qb->expr()->eq('cl.manually_removed', 0),
                     $qb->expr()->eq('cl.manually_added', 0)
                 )
             );
@@ -481,6 +482,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $qb->expr()->eq('cl.manually_removed', 0),
                     $qb->expr()->eq('cl.manually_added', 0)
                 )
             );
