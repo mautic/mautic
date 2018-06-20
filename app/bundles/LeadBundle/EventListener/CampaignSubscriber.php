@@ -394,20 +394,6 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerActionDeleteContact(CampaignExecutionEvent $event)
-    {
-        if (!$event->checkContext('lead.deletecontact')) {
-            return;
-        }
-
-        $this->leadModel->deleteEntity($event->getLead());
-
-        return $event->setResult(true);
-    }
-
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerActionUpdateCompany(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('lead.updatecompany')) {
