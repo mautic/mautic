@@ -536,13 +536,12 @@ return [
             'mautic.campaign.command.trigger' => [
                 'class'     => \Mautic\CampaignBundle\Command\TriggerCampaignCommand::class,
                 'arguments' => [
-                    'mautic.campaign.model.campaign',
+                    'mautic.campaign.repository.campaign',
                     'event_dispatcher',
                     'translator',
                     'mautic.campaign.executioner.kickoff',
                     'mautic.campaign.executioner.scheduled',
                     'mautic.campaign.executioner.inactive',
-                    'doctrine.orm.entity_manager',
                     'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
                 ],
@@ -562,6 +561,17 @@ return [
                 'arguments' => [
                     'mautic.campaign.executioner.inactive',
                     'translator',
+                    'mautic.helper.template.formatter',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.campaign.command.update' => [
+                'class'     => \Mautic\CampaignBundle\Command\UpdateLeadCampaignsCommand::class,
+                'arguments' => [
+                    'mautic.campaign.repository.campaign',
+                    'translator',
+                    'mautic.campaign.membership.builder',
+                    'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
                 ],
                 'tag' => 'console.command',

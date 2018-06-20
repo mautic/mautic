@@ -471,7 +471,7 @@ class LeadRepository extends CommonRepository
      *
      * @return array
      */
-    public function getOprhanedContacts($campaignId, ContactLimiter $limiter)
+    public function getOrphanedContacts($campaignId, ContactLimiter $limiter)
     {
         $segments = $this->getCampaignSegments($campaignId);
 
@@ -488,7 +488,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, true);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $results = $qb->execute()->fetch();
+        $results = $qb->execute()->fetchAll();
 
         $contacts = [];
         foreach ($results as $result) {

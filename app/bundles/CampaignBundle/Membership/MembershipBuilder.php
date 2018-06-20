@@ -217,7 +217,7 @@ class MembershipBuilder
             $this->startProgressBar($countResult->getCount());
         }
 
-        $contacts = $this->campaignMemberRepository->getCountForOrphanedContactsBySegments($this->campaign->getId(), $this->contactLimiter);
+        $contacts = $this->campaignMemberRepository->getOrphanedContacts($this->campaign->getId(), $this->contactLimiter);
         while (count($contacts)) {
             $contactCollection = $this->leadRepository->getContactCollection($contacts);
             $contactsProcessed += $contactCollection->count();
@@ -235,7 +235,7 @@ class MembershipBuilder
             }
 
             // Get next batch
-            $contacts = $this->campaignMemberRepository->getCountForOrphanedContactsBySegments($this->campaign->getId(), $this->contactLimiter);
+            $contacts = $this->campaignMemberRepository->getOrphanedContacts($this->campaign->getId(), $this->contactLimiter);
         }
 
         $this->finishProgressBar();
