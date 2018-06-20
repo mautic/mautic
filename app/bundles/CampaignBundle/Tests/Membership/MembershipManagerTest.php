@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Tests\Membership;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadRepository;
@@ -148,7 +149,7 @@ class MembershipManagerTest extends \PHPUnit_Framework_TestCase
             ->method('dispatchBatchMembershipChange')
             ->with([$contact->getId() => $contact, $contact2->getId() => $contact2], $campaign, Adder::NAME);
 
-        $this->getManager()->addContacts([$contact, $contact2], $campaign);
+        $this->getManager()->addContacts(new ArrayCollection([1 => $contact, 2 => $contact2]), $campaign);
     }
 
     public function testContactsAreRemoved()
@@ -178,7 +179,7 @@ class MembershipManagerTest extends \PHPUnit_Framework_TestCase
             ->method('dispatchBatchMembershipChange')
             ->with([$contact2->getId() => $contact2], $campaign, Remover::NAME);
 
-        $this->getManager()->removeContacts([$contact, $contact2], $campaign);
+        $this->getManager()->removeContacts(new ArrayCollection([1 => $contact, 2 => $contact2]), $campaign);
     }
 
     private function getManager()

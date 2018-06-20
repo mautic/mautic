@@ -26,6 +26,8 @@ class RunLimitReachedException extends \Exception
     public function __construct($contactsProcessed)
     {
         $this->contactsProcessed = (int) $contactsProcessed;
+
+        parent::__construct();
     }
 
     /**

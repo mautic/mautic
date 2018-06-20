@@ -39,7 +39,7 @@ class MembershipBuilderTest extends \PHPUnit_Framework_TestCase
     private $leadRepository;
 
     /**
-     * @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $eventDispatcher;
 
