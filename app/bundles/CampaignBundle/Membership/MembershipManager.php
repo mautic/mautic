@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Membership;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadRepository;
@@ -130,20 +131,20 @@ class MembershipManager
     }
 
     /**
-     * @param array    $contacts
-     * @param Campaign $campaign
-     * @param bool     $isManualAction
-     * @param bool     $allowRestart
+     * @param ArrayCollection $contacts
+     * @param Campaign        $campaign
+     * @param bool            $isManualAction
+     * @param bool            $allowRestart
      */
-    public function addContacts(array $contacts, Campaign $campaign, $isManualAction = true, $allowRestart = false)
+    public function addContacts(ArrayCollection $contacts, Campaign $campaign, $isManualAction = true, $allowRestart = false)
     {
-        $keyById = $this->organizeContactsById($contacts);
-
         // Get a list of existing campaign members
-        $campaignMembers = $this->leadRepository->getCampaignMembers(array_keys($keyById), $campaign);
+        $campaignMembers = $this->leadRepository->getCampaignMembers($contacts->getKeys(), $campaign);
 
         /** @var Lead $contact */
         foreach ($contacts as $contact) {
+            $this->advanceProgressBar();
+
             if (isset($campaignMembers[$contact->getId()])) {
                 try {
                     $this->adder->updateExistingMembership($campaignMembers[$contact->getId()], $isManualAction, $allowRestart);
@@ -151,13 +152,11 @@ class MembershipManager
                         "CAMPAIGN: Membership for contact ID {$contact->getId()} in campaign ID {$campaign->getId()} was updated to be included."
                     );
                 } catch (ContactAlreadyInCampaignException $exception) {
-                    // Remove them from the keyById array so they are not included in the dispatched event
-                    unset($keyById[$contact->getId()]);
+                    $contacts->remove($contact->getId());
 
                     $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} is already in campaign ID {$campaign->getId()}.");
                 } catch (ContactCannotBeAddedToCampaignException $exception) {
-                    // Remove them from the keyById array so they are not included in the dispatched event
-                    unset($keyById[$contact->getId()]);
+                    $contacts->remove($contact->getId());
 
                     $this->logger->debug(
                         "CAMPAIGN: Contact ID {$contact->getId()} could not be added campaign ID {$campaign->getId()} because they were manually removed."
@@ -173,9 +172,9 @@ class MembershipManager
             $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was added to campaign ID {$campaign->getId()} as a new member.");
         }
 
-        if (count($keyById)) {
+        if ($contacts->count()) {
             // Notifiy listeners
-            $this->eventDispatcher->dispatchBatchMembershipChange($keyById, $campaign, Adder::NAME);
+            $this->eventDispatcher->dispatchBatchMembershipChange($contacts->toArray(), $campaign, Adder::NAME);
         }
 
         // Clear entities from RAM
@@ -219,22 +218,22 @@ class MembershipManager
     }
 
     /**
-     * @param array    $contacts
-     * @param Campaign $campaign
-     * @param bool     $isExit
+     * @param ArrayCollection $contacts
+     * @param Campaign        $campaign
+     * @param bool            $isExit
      */
-    public function removeContacts(array $contacts, Campaign $campaign, $isExit = false)
+    public function removeContacts(ArrayCollection $contacts, Campaign $campaign, $isExit = false)
     {
-        $keyById = $this->organizeContactsById($contacts);
-
         // Get a list of existing campaign members
-        $campaignMembers = $this->leadRepository->getCampaignMembers(array_keys($keyById), $campaign);
+        $campaignMembers = $this->leadRepository->getCampaignMembers($contacts->getKeys(), $campaign);
 
         /** @var Lead $contact */
         foreach ($contacts as $contact) {
+            $this->advanceProgressBar();
+
             if (!isset($campaignMembers[$contact->getId()])) {
                 // Contact is not in the campaign
-                unset($keyById[$contact->getId()]);
+                $contacts->remove($contact->getId());
 
                 continue;
             }
@@ -247,15 +246,15 @@ class MembershipManager
                 $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was removed from campaign ID {$campaign->getId()}.");
             } catch (ContactAlreadyRemovedFromCampaignException $exception) {
                 // Contact was already removed from this campaign
-                unset($keyById[$contact->getId()]);
+                $contacts->remove($contact->getId());
 
                 $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.");
             }
         }
 
-        if (count($keyById)) {
+        if ($contacts->count()) {
             // Notify listeners
-            $this->eventDispatcher->dispatchBatchMembershipChange($keyById, $campaign, Remover::NAME);
+            $this->eventDispatcher->dispatchBatchMembershipChange($contacts->toArray(), $campaign, Remover::NAME);
         }
 
         // Clear entities from RAM
@@ -263,27 +262,17 @@ class MembershipManager
     }
 
     /**
-     * @param ProgressBar $progressBar
+     * @param ProgressBar|null $progressBar
      */
     public function setProgressBar(ProgressBar $progressBar = null)
     {
         $this->progressBar = $progressBar;
     }
 
-    /**
-     * @param array $contacts
-     *
-     * @return array
-     */
-    private function organizeContactsById(array $contacts)
+    private function advanceProgressBar()
     {
-        $keyById = [];
-
-        /** @var Lead $contact */
-        foreach ($contacts as $contact) {
-            $keyById[$contact->getId()] = $contact;
+        if ($this->progressBar) {
+            $this->progressBar->advance();
         }
-
-        return $keyById;
     }
 }

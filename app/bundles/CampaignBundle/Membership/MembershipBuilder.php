@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\Exception\RunLimitReachedException;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -69,6 +70,11 @@ class MembershipBuilder
     private $output;
 
     /**
+     * @var ProgressBar|null
+     */
+    private $progressBar;
+
+    /**
      * MembershipBuilder constructor.
      *
      * @param MembershipManager        $manager
@@ -97,7 +103,7 @@ class MembershipBuilder
      * @param int                  $runLimit
      * @param OutputInterface|null $output
      *
-     * @return int|void
+     * @return int
      */
     public function build(Campaign $campaign, ContactLimiter $contactLimiter, $runLimit, OutputInterface $output = null)
     {
@@ -111,27 +117,31 @@ class MembershipBuilder
         $contactsProcessed = 0;
 
         try {
-            $contactsProcessed += $this->addNewlyQualifiedMembers();
-        } catch (MaxContactsReachedException $exception) {
-            // We're done for now
+            $contactsProcessed += $this->addNewlyQualifiedMembers($contactsProcessed);
+        } catch (RunLimitReachedException $exception) {
             return $exception->getContactsProcessed();
         }
 
-        $contactsProcessed += $this->removeUnqualifiedMembers();
+        try {
+            $contactsProcessed += $this->removeUnqualifiedMembers($contactsProcessed);
+        } catch (RunLimitReachedException $exception) {
+            return $exception->getContactsProcessed();
+        }
 
         return $contactsProcessed;
     }
 
     /**
-     * @param $contactsProcessed
+     * @param $totalContactsProcessed
      *
      * @return int
      *
      * @throws RunLimitReachedException
      */
-    private function addNewlyQualifiedMembers($contactsProcessed)
+    private function addNewlyQualifiedMembers($totalContactsProcessed)
     {
-        $progress = null;
+        $progress          = null;
+        $contactsProcessed = 0;
 
         if ($this->output) {
             $countResult = $this->campaignMemberRepository->getCountsForCampaignContactsBySegment($this->campaign->getId(), $this->contactLimiter);
@@ -148,11 +158,7 @@ class MembershipBuilder
                 return 0;
             }
 
-            $progress = ProgressBarHelper::init($this->output, $countResult->getCount());
-            $progress->start();
-
-            // Notify the manager to increment progress as contacts are added
-            $this->manager->setProgressBar($progress);
+            $this->startProgressBar($countResult->getCount());
         }
 
         $contacts = $this->campaignMemberRepository->getCampaignContactsBySegments($this->campaign->getId(), $this->contactLimiter);
@@ -168,17 +174,99 @@ class MembershipBuilder
 
             // Have we hit the run limit?
             if ($this->runLimit && $contactsProcessed >= $this->runLimit) {
-                throw new RunLimitReachedException($contactsProcessed);
+                $this->finishProgressBar();
+                throw new RunLimitReachedException($contactsProcessed + $totalContactsProcessed);
             }
 
             // Get next batch
             $contacts = $this->campaignMemberRepository->getCampaignContactsBySegments($this->campaign->getId(), $this->contactLimiter);
         }
 
+        $this->finishProgressBar();
+
         return $contactsProcessed;
     }
 
-    private function removeUnqualifiedMembers()
+    /**
+     * @param $totalContactsProcessed
+     *
+     * @return int
+     *
+     * @throws RunLimitReachedException
+     */
+    private function removeUnqualifiedMembers($totalContactsProcessed)
     {
+        $progress          = null;
+        $contactsProcessed = 0;
+
+        if ($this->output) {
+            $countResult = $this->campaignMemberRepository->getCountsForOrphanedContactsBySegments($this->campaign->getId(), $this->contactLimiter);
+
+            $this->output->writeln(
+                $this->translator->trans(
+                    'mautic.lead.list.rebuild.to_be_removed',
+                    ['%leads%' => $countResult->getCount(), '%batch%' => $this->contactLimiter->getBatchLimit()]
+                )
+            );
+
+            if ($countResult->getCount() === 0) {
+                // No use continuing
+                return 0;
+            }
+
+            $this->startProgressBar($countResult->getCount());
+        }
+
+        $contacts = $this->campaignMemberRepository->getOrphanedContacts($this->campaign->getId(), $this->contactLimiter);
+        while (count($contacts)) {
+            $contactCollection = $this->leadRepository->getContactCollection($contacts);
+            $contactsProcessed += $contactCollection->count();
+
+            // Add the contacts to this segment
+            $this->manager->removeContacts($contactCollection, $this->campaign, false);
+
+            // Clear Lead entities from RAM
+            $this->leadRepository->clear();
+
+            // Have we hit the run limit?
+            if ($this->runLimit && $contactsProcessed >= $this->runLimit) {
+                $this->finishProgressBar();
+                throw new RunLimitReachedException($contactsProcessed + $totalContactsProcessed);
+            }
+
+            // Get next batch
+            $contacts = $this->campaignMemberRepository->getOrphanedContacts($this->campaign->getId(), $this->contactLimiter);
+        }
+
+        $this->finishProgressBar();
+
+        return $contactsProcessed;
+    }
+
+    /**
+     * @param $total
+     */
+    private function startProgressBar($total)
+    {
+        if (!$this->output) {
+            $this->progressBar = null;
+            $this->manager->setProgressBar($this->progressBar);
+
+            return;
+        }
+
+        $this->progressBar = ProgressBarHelper::init($this->output, $total);
+        $this->progressBar->start();
+
+        // Notify the manager to increment progress as contacts are added
+        $this->manager->setProgressBar($this->progressBar);
+    }
+
+    private function finishProgressBar()
+    {
+        if ($this->progressBar) {
+            $this->progressBar->finish();
+            $this->output->writeln('');
+        }
     }
 }

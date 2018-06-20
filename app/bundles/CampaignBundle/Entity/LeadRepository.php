@@ -13,8 +13,8 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
-use Mautic\CampaignBundle\Membership\Result\CountResult;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -385,7 +385,7 @@ class LeadRepository extends CommonRepository
         }
 
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->select('min(ll.lead_id) as min_id, max(ll.lead_id) as max_id, count(distinct(list_leads.lead_id)) as the_count')
+        $qb->select('min(ll.lead_id) as min_id, max(ll.lead_id) as max_id, count(distinct(ll.lead_id)) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->andX(
@@ -443,7 +443,7 @@ class LeadRepository extends CommonRepository
      *
      * @return int
      */
-    public function getCountForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter)
+    public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter)
     {
         $segments = $this->getCampaignSegments($campaignId);
 
@@ -453,6 +453,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $qb->expr()->eq('cl.manually_removed', 0),
                     $qb->expr()->eq('cl.manually_added', 0)
                 )
             );
@@ -471,7 +472,7 @@ class LeadRepository extends CommonRepository
      *
      * @return array
      */
-    public function getOprhanedContacts($campaignId, ContactLimiter $limiter)
+    public function getOrphanedContacts($campaignId, ContactLimiter $limiter)
     {
         $segments = $this->getCampaignSegments($campaignId);
 
@@ -481,6 +482,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $qb->expr()->eq('cl.manually_removed', 0),
                     $qb->expr()->eq('cl.manually_added', 0)
                 )
             );
@@ -488,7 +490,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, true);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $results = $qb->execute()->fetch();
+        $results = $qb->execute()->fetchAll();
 
         $contacts = [];
         foreach ($results as $result) {

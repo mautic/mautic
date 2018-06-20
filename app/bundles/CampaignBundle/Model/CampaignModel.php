@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -18,13 +19,12 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
+use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
@@ -40,16 +40,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class CampaignModel extends CommonFormModel
 {
-    /**
-     * @var mixed
-     */
-    protected $batchSleepTime;
-
-    /**
-     * @var mixed
-     */
-    protected $batchCampaignSleepTime;
-
     /**
      * @var LeadModel
      */
@@ -81,33 +71,37 @@ class CampaignModel extends CommonFormModel
     private $membershipManager;
 
     /**
+     * @var MembershipBuilder
+     */
+    private $membershipBuilder;
+
+    /**
      * CampaignModel constructor.
      *
-     * @param CoreParametersHelper  $coreParametersHelper
      * @param LeadModel             $leadModel
      * @param ListModel             $leadListModel
      * @param FormModel             $formModel
      * @param EventCollector        $eventCollector
      * @param RemovedContactTracker $removedContactTracker
      * @param MembershipManager     $membershipManager
+     * @param MembershipBuilder     $membershipBuilder
      */
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
         LeadModel $leadModel,
         ListModel $leadListModel,
         FormModel $formModel,
         EventCollector $eventCollector,
         RemovedContactTracker $removedContactTracker,
-        MembershipManager $membershipManager
+        MembershipManager $membershipManager,
+        MembershipBuilder $membershipBuilder
     ) {
-        $this->leadModel              = $leadModel;
-        $this->leadListModel          = $leadListModel;
-        $this->formModel              = $formModel;
-        $this->batchSleepTime         = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
-        $this->batchCampaignSleepTime = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
-        $this->eventCollector         = $eventCollector;
-        $this->removedContactTracker  = $removedContactTracker;
-        $this->membershipManager      = $membershipManager;
+        $this->leadModel             = $leadModel;
+        $this->leadListModel         = $leadListModel;
+        $this->formModel             = $formModel;
+        $this->eventCollector        = $eventCollector;
+        $this->removedContactTracker = $removedContactTracker;
+        $this->membershipManager     = $membershipManager;
+        $this->membershipBuilder     = $membershipBuilder;
     }
 
     /**
@@ -681,218 +675,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param Campaign        $campaign
-     * @param int             $limit
-     * @param bool            $maxLeads
-     * @param OutputInterface $output
-     *
-     * @return int
-     */
-    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
-    {
-        defined('MAUTIC_REBUILDING_CAMPAIGNS') or define('MAUTIC_REBUILDING_CAMPAIGNS', 1);
-
-        $repo = $this->getRepository();
-
-        // Get a list of lead lists this campaign is associated with
-        $lists = $repo->getCampaignListIds($campaign->getId());
-
-        $batchLimiters = [
-            'dateTime' => (new DateTimeHelper())->toUtcString(),
-        ];
-
-        if (count($lists)) {
-            // Get a count of new leads
-            $newLeadsCount = $repo->getCampaignLeadsFromLists(
-                $campaign->getId(),
-                $lists,
-                [
-                    'countOnly'     => true,
-                    'batchLimiters' => $batchLimiters,
-                ]
-            );
-
-            // Ensure the same list is used each batch
-            $batchLimiters['maxId'] = (int) $newLeadsCount['maxId'];
-
-            // Number of total leads to process
-            $leadCount = (int) $newLeadsCount['count'];
-        } else {
-            // No lists to base campaign membership off of so ignore
-            $leadCount = 0;
-        }
-
-        if ($output) {
-            $output->writeln($this->translator->trans('mautic.campaign.rebuild.to_be_added', ['%leads%' => $leadCount, '%batch%' => $limit]));
-        }
-
-        // Handle by batches
-        $start = $leadsProcessed = 0;
-
-        // Try to save some memory
-        gc_enable();
-
-        if ($leadCount) {
-            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
-
-            if ($output) {
-                $progress = ProgressBarHelper::init($output, $maxCount);
-                $progress->start();
-            }
-
-            // Add leads
-            while ($start < $leadCount) {
-                // Keep CPU down for large lists; sleep per $limit batch
-                $this->batchSleep();
-
-                // Get a count of new leads
-                $newLeadList = $repo->getCampaignLeadsFromLists(
-                    $campaign->getId(),
-                    $lists,
-                    [
-                        'limit'         => $limit,
-                        'batchLimiters' => $batchLimiters,
-                    ]
-                );
-
-                $start += $limit;
-
-                $processedLeads = [];
-                foreach ($newLeadList as $l) {
-                    $this->addLeads($campaign, [$l], false, true, -1);
-                    $processedLeads[] = $l;
-                    ++$leadsProcessed;
-                    if ($output && isset($progress) && $leadsProcessed < $maxCount) {
-                        $progress->setProgress($leadsProcessed);
-                    }
-
-                    unset($l);
-
-                    if ($maxLeads && $leadsProcessed >= $maxLeads) {
-                        break;
-                    }
-                }
-
-                // Dispatch batch event
-                if (count($processedLeads) && $this->dispatcher->hasListeners(CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE)) {
-                    $this->dispatcher->dispatch(
-                        CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE,
-                        new Events\CampaignLeadChangeEvent($campaign, $processedLeads, 'added')
-                    );
-                }
-
-                unset($newLeadList);
-
-                // Free some memory
-                gc_collect_cycles();
-
-                if ($maxLeads && $leadsProcessed >= $maxLeads) {
-                    // done for this round, bye bye
-                    if (isset($progress)) {
-                        $progress->finish();
-                    }
-
-                    return $leadsProcessed;
-                }
-            }
-
-            if ($output && isset($progress)) {
-                $progress->finish();
-                $output->writeln('');
-            }
-        }
-
-        // Get a count of leads to be removed
-        $removeLeadCount = $repo->getCampaignOrphanLeads(
-            $campaign->getId(),
-            $lists,
-            [
-                'countOnly'     => true,
-                'batchLimiters' => $batchLimiters,
-            ]
-        );
-
-        // Restart batching
-        $start                  = $lastRoundPercentage = 0;
-        $leadCount              = $removeLeadCount['count'];
-        $batchLimiters['maxId'] = $removeLeadCount['maxId'];
-
-        if ($output) {
-            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', ['%leads%' => $leadCount, '%batch%' => $limit]));
-        }
-
-        if ($leadCount) {
-            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
-
-            if ($output) {
-                $progress = ProgressBarHelper::init($output, $maxCount);
-                $progress->start();
-            }
-
-            // Remove leads
-            while ($start < $leadCount) {
-                // Keep CPU down for large lists; sleep per $limit batch
-                $this->batchSleep();
-
-                $removeLeadList = $repo->getCampaignOrphanLeads(
-                    $campaign->getId(),
-                    $lists,
-                    [
-                        'limit'         => $limit,
-                        'batchLimiters' => $batchLimiters,
-                    ]
-                );
-
-                $processedLeads = [];
-                foreach ($removeLeadList as $l) {
-                    $this->removeLeads($campaign, [$l], false, true, true);
-                    $processedLeads[] = $l;
-                    ++$leadsProcessed;
-                    if (isset($progress) && $leadsProcessed < $maxCount) {
-                        $progress->setProgress($leadsProcessed);
-                    }
-
-                    if ($maxLeads && $leadsProcessed >= $maxLeads) {
-                        break;
-                    }
-                }
-
-                // Dispatch batch event
-                if (count($processedLeads) && $this->dispatcher->hasListeners(CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE)) {
-                    $this->dispatcher->dispatch(
-                        CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE,
-                        new Events\CampaignLeadChangeEvent($campaign, $processedLeads, 'removed')
-                    );
-                }
-
-                $start += $limit;
-
-                unset($removeLeadList);
-
-                // Free some memory
-                gc_collect_cycles();
-
-                if ($maxLeads && $leadsProcessed >= $maxLeads) {
-                    // done for this round, bye bye
-
-                    if (isset($progress)) {
-                        $progress->finish();
-                    }
-
-                    return $leadsProcessed;
-                }
-            }
-
-            if ($output && isset($progress)) {
-                $progress->finish();
-                $output->writeln('');
-            }
-        }
-
-        return $leadsProcessed;
-    }
-
-    /**
      * Get leads for a campaign.  If $event is passed in, only leads who have not triggered the event are returned.
      *
      * @param Campaign $campaign
@@ -917,24 +699,6 @@ class CampaignModel extends CommonFormModel
     public function getCampaignListIds($id)
     {
         return $this->getRepository()->getCampaignListIds((int) $id);
-    }
-
-    /**
-     * Batch sleep according to settings.
-     */
-    protected function batchSleep()
-    {
-        $eventSleepTime = $this->batchCampaignSleepTime ? $this->batchCampaignSleepTime : ($this->batchSleepTime ? $this->batchSleepTime : 1);
-
-        if (empty($eventSleepTime)) {
-            return;
-        }
-
-        if ($eventSleepTime < 1) {
-            usleep($eventSleepTime * 1000000);
-        } else {
-            sleep($eventSleepTime);
-        }
     }
 
     /**
@@ -1059,7 +823,7 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @deprecated 2.13.0 to be removed in 3.0; use EventCollector instead
+     * @deprecated 2.14.0 to be removed in 3.0; use EventCollector instead
      *
      * Gets array of custom events from bundles subscribed CampaignEvents::CAMPAIGN_ON_BUILD.
      *
@@ -1073,7 +837,7 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @deprecated 2.13.0 to be removed in 3.0; use \Mautic\CampaignBundle\Helper\ChannelExtractor instead
+     * @deprecated 2.14.0 to be removed in 3.0; use \Mautic\CampaignBundle\Helper\ChannelExtractor instead
      *
      * @param $entity
      * @param $properties
@@ -1083,6 +847,8 @@ class CampaignModel extends CommonFormModel
      */
     public function setChannelFromEventProperties($entity, $properties, &$eventSettings)
     {
+        @trigger_error('Deprecated 2.14 to be removed in 3.0; use \Mautic\CampaignBundle\Helper\ChannelExtractor instead', E_USER_DEPRECATED);
+
         $channelSet = false;
         if (!$entity->getChannel() && !empty($eventSettings[$properties['type']]['channel'])) {
             $entity->setChannel($eventSettings[$properties['type']]['channel']);
@@ -1112,6 +878,8 @@ class CampaignModel extends CommonFormModel
      */
     public function getRemovedLeads()
     {
+        @trigger_error('Deprecated 2.14 to be removed in 3.0; use RemovedContactTracker instead', E_USER_DEPRECATED);
+
         return  $this->removedContactTracker->getRemovedContacts();
     }
 
@@ -1155,7 +923,9 @@ class CampaignModel extends CommonFormModel
             $leads = $this->leadModel->getRepository()->getEntities(['ids' => $leadIds, 'ignore_paginator' => true]);
         }
 
-        $this->membershipManager->addContacts($leads, $campaign, $manuallyAdded);
+        $arrayCollection = $this->getArrayCollectionOfContactsById($leads);
+
+        $this->membershipManager->addContacts($arrayCollection, $campaign, $manuallyAdded);
 
         if ($batchProcess) {
             $this->leadModel->getRepository()->detachEntities($leads);
@@ -1202,7 +972,9 @@ class CampaignModel extends CommonFormModel
             $leads = $this->leadModel->getRepository()->getEntities(['ids' => $leadIds, 'ignore_paginator' => true]);
         }
 
-        $this->membershipManager->removeContacts($leads, $campaign, !$manuallyRemoved);
+        $arrayCollection = $this->getArrayCollectionOfContactsById($leads);
+
+        $this->membershipManager->removeContacts($arrayCollection, $campaign, !$manuallyRemoved);
 
         if ($batchProcess) {
             $this->leadModel->getRepository()->detachEntities($leads);
@@ -1217,6 +989,50 @@ class CampaignModel extends CommonFormModel
      */
     public function removeScheduledEvents($campaign, $lead)
     {
+        @trigger_error('Deprecated 2.14 to be removed in 3.0', E_USER_DEPRECATED);
+
         $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->removeScheduledEvents($campaign->getId(), $lead->getId());
+    }
+
+    /**
+     * @param Campaign        $campaign
+     * @param int             $limit
+     * @param bool            $maxLeads
+     * @param OutputInterface $output
+     *
+     * @return int
+     */
+    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
+    {
+        $contactLimiter = new ContactLimiter($limit);
+
+        return $this->membershipBuilder->build($campaign, $contactLimiter, $maxLeads, $output);
+    }
+
+    /**
+     * Batch sleep according to settings.
+     *
+     * @deprecated 2.14.0 to be removed in 3.0
+     */
+    protected function batchSleep()
+    {
+        @trigger_error('Deprecated 2.14 to be removed in 3.0', E_USER_DEPRECATED);
+    }
+
+    /**
+     * @param array $contacts
+     *
+     * @return ArrayCollection
+     */
+    private function getArrayCollectionOfContactsById(array $contacts)
+    {
+        $keyById = [];
+
+        /** @var Lead $contact */
+        foreach ($contacts as $contact) {
+            $keyById[$contact->getId()] = $contact;
+        }
+
+        return new ArrayCollection($keyById);
     }
 }

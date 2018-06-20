@@ -62,7 +62,7 @@ class ContactLimiter
      * ContactLimiter constructor.
      *
      * @param int      $batchLimit
-     * @param int      $contactId
+     * @param int|null $contactId
      * @param int|null $minContactId
      * @param int|null $maxContactId
      * @param array    $contactIdList
@@ -71,7 +71,7 @@ class ContactLimiter
      */
     public function __construct(
         $batchLimit,
-        $contactId,
+        $contactId = null,
         $minContactId = null,
         $maxContactId = null,
         array $contactIdList = [],
