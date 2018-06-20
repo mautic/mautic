@@ -479,12 +479,4 @@ class SendEmailToContact
         // Now send but don't redispatch the event
         return $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
     }
-
-    /**
-     * @return MailHelper
-     */
-    public function getTemporaryMailer()
-    {
-        return $this->temporaryMailer;
-    }
 }

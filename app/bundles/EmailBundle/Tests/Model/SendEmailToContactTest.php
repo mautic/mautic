@@ -756,12 +756,7 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $errorMessages);
     }
 
-    public function testSetSampleMailerByTemporaryMailerSpoolFile()
-    {
-        $this->testSetSampleMailerByTemporaryMailerSpoolMemory('file');
-    }
-
-    public function testSetSampleMailerByTemporaryMailerSpoolMemory($type = 'memory')
+    public function testSetSampleMailerByTemporaryMailerSpoolMemory()
     {
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(true, 1);
@@ -769,7 +764,7 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
 
         // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
 
-        $this->factoryMock->expects($this->at(3))->method('getParameter')->with('mailer_spool_type')->willReturn($type);
+        $this->factoryMock->expects($this->at(3))->method('getParameter')->with('mailer_spool_type')->willReturn('file');
         $this->factoryMock->expects($this->at(1))->method('getParameter')->willReturn('');
 
         $this->factoryMock->method('getLogger')
@@ -806,6 +801,7 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         $this->factoryMock->method('getModel')
             ->willReturn($this->emailModelMock);
 
+        /** @var MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$this->factoryMock, $mailer])
             ->setMethods(null)
@@ -842,11 +838,11 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
             ->method('getOptions')
             ->will($this->returnValue(['with_immediately' => false]));
 
-        $model = new SendEmailToContact($mailHelper, $statHelper, $this->dncModel, $translator);
+        $model  = new SendEmailToContact($mailHelper, $statHelper, $this->dncModel, $translator);
+        $mailer = $mailHelper->getMailer();
         $model->setSampleMailer();
-        $this->assertNotNull($model->getTemporaryMailer());
-
+        $this->assertNotSame($mailer, $mailHelper->getMailer());
         $model->reset();
-        $this->assertNull($model->getTemporaryMailer());
+        $this->assertSame($mailer, $mailHelper->getMailer());
     }
 }
