@@ -270,7 +270,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $builder->createField('useOwnerAsMailer', 'boolean')
             ->columnName('use_owner_as_mailer')
-            ->nullable()
             ->build();
 
         $builder->createField('template', 'string')
