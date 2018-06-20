@@ -180,19 +180,24 @@ class ContactSegmentQueryBuilder
     public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
     {
         $tableAlias = $this->generateRandomParameterName();
-        $queryBuilder->leftJoin(
-            'l',
-            MAUTIC_TABLE_PREFIX.'lead_lists_leads',
-            $tableAlias,
-            'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId)
+
+        $existsQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
+
+        $existsQueryBuilder
+            ->select($tableAlias.'.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias)
+            ->where($tableAlias.'.lead_id = l.id')
+            ->andWhere($queryBuilder->expr()->eq($tableAlias.'.leadlist_id', intval($leadListId)))
+            ->andWhere(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1),
+                    $queryBuilder->expr()->eq($tableAlias.'.manually_removed', $queryBuilder->expr()->literal(''))
+                )
+            );
+
+        $queryBuilder->orWhere(
+            $queryBuilder->expr()->exists($existsQueryBuilder->getSQL())
         );
-        $queryBuilder->addJoinCondition(
-            $tableAlias,
-            $queryBuilder->expr()->andX(
-                $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1)
-            )
-        );
-        $queryBuilder->orWhere($queryBuilder->expr()->isNotNull($tableAlias.'.lead_id'));
 
         return $queryBuilder;
     }

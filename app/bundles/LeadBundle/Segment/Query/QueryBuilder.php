@@ -1436,7 +1436,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         foreach ($parts as $tbl => $joins) {
             foreach ($joins as $key => $join) {
                 if ($join['joinAlias'] == $alias) {
-                    $result[$tbl][$key]['joinCondition'] = $join['joinCondition'].' and '.$expr;
+                    $result[$tbl][$key]['joinCondition'] = $join['joinCondition'].' and ('.$expr.')';
                     $inserted                            = true;
                 }
             }

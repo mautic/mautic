@@ -109,7 +109,6 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             }
 
             $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
-            $segmentQueryBuilder->select('l.id');
 
             $parameters = $segmentQueryBuilder->getParameters();
             foreach ($parameters as $key => $value) {
