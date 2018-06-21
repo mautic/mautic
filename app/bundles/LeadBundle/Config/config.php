@@ -754,12 +754,6 @@ return [
                     'mautic.lead.repository.lead',
                 ],
             ],
-            'mautic.lead.helper.token' => [
-                'class'     => \Mautic\LeadBundle\Helper\TokenHelper::class,
-                'arguments' => [
-                    'mautic.helper.template.date',
-                ],
-            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [

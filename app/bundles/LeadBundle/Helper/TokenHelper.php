@@ -12,26 +12,29 @@
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\Middleware\ConfigAwareTrait;
 
 /**
  * Class TokenHelper.
  */
 class TokenHelper
 {
-    /**
-     * @var DateHelper
-     */
-    private $dateHelper;
+    use ConfigAwareTrait;
+
+    private $parameters = [];
 
     /**
-     * TokenHelper constructor.
+     * Load config parameters for static method.
      *
-     * @param DateHelper $dateHelper
+     * @return array
      */
-    public function __construct(DateHelper $dateHelper)
+    public function getParameters()
     {
-        $this->dateHelper = $dateHelper;
+        if (empty($this->parameters)) {
+            $this->parameters = $this->getConfig();
+        }
+
+        return $this->parameters;
     }
 
     public function findContactTokens($content, $lead, $replace)
@@ -52,6 +55,7 @@ class TokenHelper
         if (!$lead) {
             return $replace ? $content : [];
         }
+        $lead['firstname'] = '2010-05-05 11:11:11';
         // Search for bracket or bracket encoded
         // @deprecated BC support for leadfield
         $tokenRegex = [
@@ -117,11 +121,29 @@ class TokenHelper
         } elseif (isset($lead['companies'][0][$alias])) {
             $value = $lead['companies'][0][$alias];
         }
-        if ('true' === $defaultValue) {
-            $value = urlencode($value);
-        } elseif (false !== strpos($defaultValue, 'date_format') and count(explode('|', $match)) == 3) {
-            $dt    = new DateTimeHelper($value);
-            $value = $dt->getDateTime()->format(explode('|', $match)[2]);
+
+        switch ($defaultValue) {
+            case 'true':
+                $value = urlencode($value);
+                break;
+            case 'datetime':
+            case 'date':
+            case 'time':
+            $dt   = new DateTimeHelper($value);
+            $date = $dt->getDateTime()->format((new self())->getParameters()['date_format_dateonly']);
+            $time = $dt->getDateTime()->format((new self())->getParameters()['date_format_timeonly']);
+            switch ($defaultValue) {
+                case 'datetime':
+                    return $date.' '.$time;
+                    break;
+                case 'date':
+                    return $date;
+                    break;
+                case 'time':
+                    return $time;
+                    break;
+            }
+                break;
         }
 
         return $value ?: $defaultValue;
