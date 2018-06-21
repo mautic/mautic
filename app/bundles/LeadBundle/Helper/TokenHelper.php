@@ -32,7 +32,7 @@ class TokenHelper
         if (!$lead) {
             return $replace ? $content : [];
         }
-        $lead['firstname'] = '2010-05-05 11:11:11';
+
         // Search for bracket or bracket encoded
         // @deprecated BC support for leadfield
         $tokenRegex = [
