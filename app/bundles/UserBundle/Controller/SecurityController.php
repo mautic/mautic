@@ -107,7 +107,7 @@ class SecurityController extends CommonController
         return $this->delegateView([
             'viewParameters' => [
                 'last_username' => $session->get(Security::LAST_USERNAME),
-                'integrations'  => $integrations,
+                'integrations'  => $integrations,                
             ],
             'contentTemplate' => 'MauticUserBundle:Security:login.html.php',
             'passthroughVars' => [

@@ -18,7 +18,7 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl($whitelabelBrandingFavicon) ?>" />
-    <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png') ?>" />
+    <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl($whitelabelBrandingAppleFavicon) ?>" />
     <?php $view['assets']->outputSystemStylesheets(); ?>
     <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
     <?php $view['assets']->outputHeadDeclarations(); ?>    
@@ -31,6 +31,7 @@
                 <div class="panel" name="form-login">
                     <div class="panel-body">
                         <div class="mautic-logo img-circle mb-md text-center">
+                            <?php var_dump($whitelabelBrandingLogo); ?>
                             <img width="100%" height="100%" src="<?php echo $view['assets']->getUrl($whitelabelBrandingLogo) ?>" alt="" />                            
                         </div>
                         <div id="main-panel-flash-msgs">
