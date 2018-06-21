@@ -33,12 +33,18 @@ class CampaignListType extends AbstractType
     private $model;
 
     /**
+     * @var bool
+     */
+    private $canViewOther = false;
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->model      = $factory->getModel('campaign');
-        $this->thisString = $factory->getTranslator()->trans('mautic.campaign.form.thiscampaign');
+        $this->model        = $factory->getModel('campaign');
+        $this->thisString   = $factory->getTranslator()->trans('mautic.campaign.form.thiscampaign');
+        $this->canViewOther = $factory->getSecurity()->isGranted('campaign:campaigns:viewother');
     }
 
     /**
@@ -46,12 +52,14 @@ class CampaignListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $model = $this->model;
-        $msg   = $this->thisString;
+        $model        = $this->model;
+        $msg          = $this->thisString;
+        $canViewOther = $this->canViewOther;
+
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model, $msg) {
+            'choices' => function (Options $options) use ($model, $msg, $canViewOther) {
                 $choices = [];
-                $campaigns = $model->getRepository()->getPublishedCampaigns(null, null, true);
+                $campaigns = $model->getRepository()->getPublishedCampaigns(null, null, true, $canViewOther);
                 foreach ($campaigns as $campaign) {
                     $choices[$campaign['id']] = $campaign['name'];
                 }

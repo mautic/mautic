@@ -108,7 +108,10 @@ class CampaignModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:Campaign');
+        $repo = $this->em->getRepository('MauticCampaignBundle:Campaign');
+        $repo->setCurrentUser($this->userHelper->getUser());
+
+        return $repo;
     }
 
     /**

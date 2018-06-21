@@ -77,10 +77,11 @@ class CampaignRepository extends CommonRepository
      * @param null $specificId
      * @param null $leadId
      * @param bool $forList    If true, returns ID and name only
+     * @param bool $viewOther  If true, returns all the campaigns
      *
      * @return array
      */
-    public function getPublishedCampaigns($specificId = null, $leadId = null, $forList = false)
+    public function getPublishedCampaigns($specificId = null, $leadId = null, $forList = false, $viewOther = false)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
@@ -101,6 +102,11 @@ class CampaignRepository extends CommonRepository
 
         $q->leftJoin('c.lists', 'll')
             ->where($this->getPublishedByDateExpression($q));
+
+        if (!$viewOther) {
+            $q->andWhere($q->expr()->eq('c.createdBy', ':id'))
+                ->setParameter('id', $this->currentUser->getId());
+        }
 
         if (!empty($specificId)) {
             $q->andWhere(
