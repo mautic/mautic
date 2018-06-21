@@ -402,7 +402,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     'edit'
                 )
             );
-        } elseif (!$this->checkActionPermission('edit', $entity)) {
+        } elseif ((!$isClone && !$this->checkActionPermission('edit', $entity)) || ($isClone && !$this->checkActionPermission('create'))) {
+            //deny access if the entity is not a clone and don't have permission to edit or is a clone and don't have permission to create
             return $this->accessDenied();
         } elseif (!$isClone && $model->isLocked($entity)) {
             //deny access if the entity is locked
