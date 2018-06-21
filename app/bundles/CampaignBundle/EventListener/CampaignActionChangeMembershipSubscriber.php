@@ -80,7 +80,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
     public function changeMembership(PendingEvent $event)
     {
         $properties          = $event->getEvent()->getProperties();
-        $contacts            = $event->getContacts()->getValues();
+        $contacts            = $event->getContactsKeyedById();
         $executingCampaign   = $event->getEvent()->getCampaign();
 
         if (!empty($properties['addTo'])) {
