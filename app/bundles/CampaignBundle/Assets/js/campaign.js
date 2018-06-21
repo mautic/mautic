@@ -156,7 +156,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
         // There's nothing for us to do, so bail
         return;
     }
-    
+
     // New action created so append it to the form
     var domEventId = 'CampaignEvent_' + response.eventId;
     var eventId = '#' + domEventId;
@@ -1139,44 +1139,49 @@ Mautic.campaignBuilderReconnectEndpoints = function () {
         return;
     }
 
-    // Reposition events
-    var sourceFound = false;
-    mQuery.each(Mautic.campaignBuilderCanvasSettings.nodes, function (key, node) {
-        if (typeof Mautic.campaignBuilderCanvasSources[node.id] !== 'undefined') {
-            sourceFound = true;
-        }
+    if (typeof Mautic.campaignBuilderCanvasSettings.nodes !== 'undefined') {
+        // Reposition events
+        var sourceFound = false;
+        mQuery.each(Mautic.campaignBuilderCanvasSettings.nodes, function (key, node) {
+            if (typeof Mautic.campaignBuilderCanvasSources[node.id] !== 'undefined') {
+                sourceFound = true;
+            }
 
-        mQuery('#CampaignEvent_' + node.id).css({
-            position: 'absolute',
-            left: node.positionX + 'px',
-            top: node.positionY + 'px'
+            mQuery('#CampaignEvent_' + node.id).css({
+                position: 'absolute',
+                left: node.positionX + 'px',
+                top: node.positionY + 'px'
+            });
+
+            Mautic.campaignBuilderEventPositions['CampaignEvent_' + node.id] = {
+                left: parseInt(node.positionX),
+                top: parseInt(node.positionY)
+            };
         });
+    }
 
-        Mautic.campaignBuilderEventPositions['CampaignEvent_' + node.id] = {
-            left: parseInt(node.positionX),
-            top: parseInt(node.positionY)
-        };
-    });
+    if (typeof Mautic.campaignBuilderCanvasSettings.connections !== 'undefined') {
 
-    // Recreate jsPlumb connections and labels
-    mQuery.each(Mautic.campaignBuilderCanvasSettings.connections, function (key, connection) {
-        if (typeof Mautic.campaignBuilderCanvasEvents[connection.targetId] !== 'undefined') {
-            var targetEvent = Mautic.campaignBuilderCanvasEvents[connection.targetId];
-        } else if (typeof Mautic.campaignBuilderCanvasSources[connection.targetId] !== 'undefined') {
-            var targetEvent = Mautic.campaignBuilderCanvasSources[connection.targetId];
-        }
+        // Recreate jsPlumb connections and labels
+        mQuery.each(Mautic.campaignBuilderCanvasSettings.connections, function (key, connection) {
+            if (typeof Mautic.campaignBuilderCanvasEvents[connection.targetId] !== 'undefined') {
+                var targetEvent = Mautic.campaignBuilderCanvasEvents[connection.targetId];
+            } else if (typeof Mautic.campaignBuilderCanvasSources[connection.targetId] !== 'undefined') {
+                var targetEvent = Mautic.campaignBuilderCanvasSources[connection.targetId];
+            }
 
-        if (targetEvent && targetEvent.label) {
-            Mautic.campaignBuilderLabels["CampaignEvent_"+connection.targetId] = targetEvent.label;
-        }
+            if (targetEvent && targetEvent.label) {
+                Mautic.campaignBuilderLabels["CampaignEvent_" + connection.targetId] = targetEvent.label;
+            }
 
-        Mautic.campaignBuilderInstance.connect({
-            uuids: [
-                "CampaignEvent_" + connection.sourceId + '_' + connection.anchors.source,
-                "CampaignEvent_" + connection.targetId + '_' + connection.anchors.target
-            ]
+            Mautic.campaignBuilderInstance.connect({
+                uuids: [
+                    "CampaignEvent_" + connection.sourceId + '_' + connection.anchors.source,
+                    "CampaignEvent_" + connection.targetId + '_' + connection.anchors.target
+                ]
+            });
         });
-    });
+    }
 
     if (!sourceFound) {
         var topOffset = 25;
