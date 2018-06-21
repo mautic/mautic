@@ -20,8 +20,6 @@ use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
-use Mautic\CampaignBundle\Membership\MembershipManager;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
@@ -44,7 +42,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      */
     public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner)
     {
-        $this->eventRepository = $eventRepository;
+        $this->eventRepository  = $eventRepository;
         $this->eventExecutioner = $eventExecutioner;
     }
 
@@ -54,11 +52,11 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            CampaignEvents::CAMPAIGN_POST_SAVE     => ['processCampaignEventsAfterSave', 1],
             CampaignEvents::CAMPAIGN_ON_BUILD      => ['onCampaignBuild', 0],
             CampaignEvents::ON_EVENT_JUMP_TO_EVENT => ['onJumpToEvent', 0],
         ];
     }
-
 
     /**
      * Add event triggers and actions.

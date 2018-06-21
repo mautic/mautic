@@ -50,10 +50,7 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_POST_SAVE     => [
-                ['onCampaignPostSave', 0],
-                ['processCampaignEventsAfterSave', 1],
-            ],
+            CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
             CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
         ];
     }
