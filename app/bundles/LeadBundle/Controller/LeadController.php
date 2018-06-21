@@ -2080,8 +2080,8 @@ class LeadController extends FormController
         $export        = [];
         foreach ($contactFields as $alias=>$contactField) {
             $export[] = [
-                'type' => $alias,
-                'value'=> $contactField,
+                'alias' => $alias,
+                'value' => $contactField,
             ];
         }
 
