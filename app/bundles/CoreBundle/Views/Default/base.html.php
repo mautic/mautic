@@ -12,7 +12,7 @@
 <!DOCTYPE html>
 <html>
     <?php echo $view->render('MauticCoreBundle:Default:head.html.php', array(
-        'whitelabelBrandingName' => $$whitelabelBrandingName,
+        'whitelabelBrandingName' => $whitelabelBrandingName,
         'whitelabelBrandingFavicon' => $whitelabelBrandingFavicon,
         'whitelabelBrandingAppleFavicon' => $whitelabelBrandingAppleFavicon
     )); ?>
