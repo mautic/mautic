@@ -141,6 +141,28 @@ class EventExecutioner
     }
 
     /**
+     * @param ArrayCollection $events
+     * @param Lead            $contact
+     * @param Responses|null  $responses
+     * @param Counter|null    $counter
+     *
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
+     */
+    public function executeEventsForContact(ArrayCollection $events, Lead $contact, Responses $responses = null, Counter $counter = null)
+    {
+        if ($responses) {
+            $this->responses = $responses;
+        }
+
+        $contacts = new ArrayCollection([$contact->getId() => $contact]);
+
+        $this->executeEventsForContacts($events, $contacts, $counter);
+    }
+
+    /**
      * @param Event           $event
      * @param ArrayCollection $contacts
      * @param Counter|null    $counter
@@ -217,14 +239,14 @@ class EventExecutioner
     /**
      * @param ArrayCollection $children
      * @param ArrayCollection $contacts
-     * @param Counter         $childrenCounter
+     * @param Counter|null    $childrenCounter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter)
+    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null)
     {
         if (!$contacts->count()) {
             return;
@@ -254,14 +276,14 @@ class EventExecutioner
     /**
      * @param ArrayCollection $children
      * @param ArrayCollection $contacts
-     * @param Counter         $childrenCounter
+     * @param Counter|null    $childrenCounter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function performEventLoop(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter)
+    private function performEventLoop(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null)
     {
         foreach ($events as $event) {
             // Ignore decisions
@@ -278,7 +300,10 @@ class EventExecutioner
             );
 
             if ($this->scheduler->shouldSchedule($executionDate, $this->executionDate)) {
-                $childrenCounter->advanceTotalScheduled($contacts->count());
+                if ($childrenCounter) {
+                    $childrenCounter->advanceTotalScheduled($contacts->count());
+                }
+
                 $this->scheduler->schedule($event, $executionDate, $contacts);
                 continue;
             }

@@ -194,7 +194,7 @@ class RealTimeExecutioner
     private function executeAssociatedEvents(ArrayCollection $children, \DateTime $now)
     {
         /** @var Event $child */
-        foreach ($children as $child) {
+        foreach ($children as $key => $child) {
             $executionDate = $this->scheduler->getExecutionDateTime($child, $now);
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$child->getId().
@@ -203,10 +203,13 @@ class RealTimeExecutioner
 
             if ($this->scheduler->shouldSchedule($executionDate, $now)) {
                 $this->scheduler->scheduleForContact($child, $executionDate, $this->contact);
-                continue;
-            }
 
-            $this->executioner->executeForContact($child, $this->contact, $this->responses);
+                $children->remove($key);
+            }
+        }
+
+        if ($children->count()) {
+            $this->executioner->executeEventsForContact($children, $this->contact, $this->responses);
         }
     }
 

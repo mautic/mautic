@@ -203,7 +203,7 @@ class KickoffExecutioner implements ExecutionerInterface
             $batchMinContactId = max($contacts->getKeys()) + 1;
 
             /** @var Event $event */
-            foreach ($this->rootEvents as $event) {
+            foreach ($this->rootEvents as $key => $event) {
                 $this->progressBar->advance($contacts->count());
                 $this->counter->advanceEvaluated($contacts->count());
 
