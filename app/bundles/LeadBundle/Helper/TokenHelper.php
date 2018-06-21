@@ -53,7 +53,7 @@ class TokenHelper
 
                     $alias             = self::getFieldAlias($match);
                     $defaultValue      = self::getTokenDefaultValue($match);
-                    $tokenList[$token] = self::getTokenValue($lead, $alias, $defaultValue, $match);
+                    $tokenList[$token] = self::getTokenValue($lead, $alias, $defaultValue);
                 }
 
                 if ($replace) {
@@ -86,11 +86,10 @@ class TokenHelper
      * @param array $lead
      * @param       $alias
      * @param       $defaultValue
-     * @param array $match
      *
      * @return mixed
      */
-    private static function getTokenValue(array $lead, $alias, $defaultValue, $match = [])
+    private static function getTokenValue(array $lead, $alias, $defaultValue)
     {
         $value = '';
         if (isset($lead[$alias])) {
@@ -111,13 +110,13 @@ class TokenHelper
             $time = $dt->getDateTime()->format((new ParamsLoaderHelper())->getParameters()['date_format_timeonly']);
             switch ($defaultValue) {
                 case 'datetime':
-                    return $date.' '.$time;
+                    $value = $date.' '.$time;
                     break;
                 case 'date':
-                    return $date;
+                    $value =  $date;
                     break;
                 case 'time':
-                    return $time;
+                    $value = $time;
                     break;
             }
                 break;
