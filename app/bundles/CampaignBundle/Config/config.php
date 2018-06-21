@@ -125,8 +125,6 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
-                    'mautic.campaign.model.event',
-                    'mautic.campaign.event_executioner',
                 ],
             ],
             'mautic.campaign.leadbundle.subscriber'     => [
@@ -175,6 +173,13 @@ return [
                 'arguments' => [
                     'mautic.campaign.membership.manager',
                     'mautic.campaign.model.campaign',
+                ],
+            ],
+            'mautic.campaign.action.jump_to_event.subscriber' => [
+                'class'     => \Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.repository.event',
+                    'mautic.campaign.event_executioner',
                 ],
             ],
         ],
