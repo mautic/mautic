@@ -11,11 +11,34 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
+
 /**
  * Class TokenHelper.
  */
 class TokenHelper
 {
+    /**
+     * @var DateHelper
+     */
+    private $dateHelper;
+
+    /**
+     * TokenHelper constructor.
+     *
+     * @param DateHelper $dateHelper
+     */
+    public function __construct(DateHelper $dateHelper)
+    {
+        $this->dateHelper = $dateHelper;
+    }
+
+    public function findContactTokens($content, $lead, $replace)
+    {
+        //$this->dateHelper->getTimeFormat();
+    }
+
     /**
      * @param string $content
      * @param array  $lead
@@ -29,7 +52,6 @@ class TokenHelper
         if (!$lead) {
             return $replace ? $content : [];
         }
-
         // Search for bracket or bracket encoded
         // @deprecated BC support for leadfield
         $tokenRegex = [
@@ -50,7 +72,7 @@ class TokenHelper
 
                     $alias             = self::getFieldAlias($match);
                     $defaultValue      = self::getTokenDefaultValue($match);
-                    $tokenList[$token] = self::getTokenValue($lead, $alias, $defaultValue);
+                    $tokenList[$token] = self::getTokenValue($lead, $alias, $defaultValue, $match);
                 }
 
                 if ($replace) {
@@ -83,10 +105,11 @@ class TokenHelper
      * @param array $lead
      * @param       $alias
      * @param       $defaultValue
+     * @param array $match
      *
      * @return mixed
      */
-    private static function getTokenValue(array $lead, $alias, $defaultValue)
+    private static function getTokenValue(array $lead, $alias, $defaultValue, $match = [])
     {
         $value = '';
         if (isset($lead[$alias])) {
@@ -94,9 +117,11 @@ class TokenHelper
         } elseif (isset($lead['companies'][0][$alias])) {
             $value = $lead['companies'][0][$alias];
         }
-
         if ('true' === $defaultValue) {
             $value = urlencode($value);
+        } elseif (false !== strpos($defaultValue, 'date_format') and count(explode('|', $match)) == 3) {
+            $dt    = new DateTimeHelper($value);
+            $value = $dt->getDateTime()->format(explode('|', $match)[2]);
         }
 
         return $value ?: $defaultValue;

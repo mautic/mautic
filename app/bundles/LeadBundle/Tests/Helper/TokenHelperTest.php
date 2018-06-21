@@ -154,4 +154,44 @@ class TokenHelperTest extends \PHPUnit_Framework_TestCase
             TokenHelper::getValueFromTokens($tokens, $token)
         );
     }
+
+    public function testDateFormatValue()
+    {
+        $lead = [
+            'firstname' => 'Bob',
+            'lastname'  => 'Smith',
+            'country'   => '',
+            'date'      => '2000-05-05 12:45:50',
+            'companies' => [
+                [
+                    'companyzip' => '77008',
+                ],
+            ],
+        ];
+
+        $token = '{contactfield=date|date_format|d. m. Y}';
+
+        $tokenList = TokenHelper::findLeadTokens($token, $lead);
+        $this->assertEquals([$token => '05. 05. 2000'], $tokenList);
+    }
+
+    public function testDateTimeFormatValue()
+    {
+        $lead = [
+            'firstname' => 'Bob',
+            'lastname'  => 'Smith',
+            'country'   => '',
+            'date'      => '2000-05-05 12:45:50',
+            'companies' => [
+                [
+                    'companyzip' => '77008',
+                ],
+            ],
+        ];
+
+        $token = '{contactfield=date|date_format|d. m. Y H:i}';
+
+        $tokenList = TokenHelper::findLeadTokens($token, $lead);
+        $this->assertEquals([$token => '05. 05. 2000 12:45'], $tokenList);
+    }
 }
