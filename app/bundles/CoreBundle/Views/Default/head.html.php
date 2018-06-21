@@ -23,6 +23,8 @@
 
     <?php echo $view['assets']->outputSystemStylesheets(); ?>
 
-    <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
+    <?php echo $view->render('MauticCoreBundle:Default:script.html.php', array(
+        'whitelabelBrandingName' => $whitelabelBrandingName
+    )); ?>
     <?php $view['assets']->outputHeadDeclarations(); ?>
 </head>
