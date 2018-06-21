@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Service;
 
-use Mautic\EmailBundle\Helper\PlainTextMassageHelper;
+use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Metadata\MetadataProcessor;
@@ -78,7 +78,7 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
             }
         }
 
-        if ($messageText = PlainTextMassageHelper::getPlainTextFromMessage($message)) {
+        if ($messageText = PlainTextMessageHelper::getPlainTextFromMessage($message)) {
             $content->setText($messageText);
         }
 
