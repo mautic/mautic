@@ -12,36 +12,13 @@
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\Middleware\ConfigAwareTrait;
+use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
 
 /**
  * Class TokenHelper.
  */
 class TokenHelper
 {
-    use ConfigAwareTrait;
-
-    private $parameters = [];
-
-    /**
-     * Load config parameters for static method.
-     *
-     * @return array
-     */
-    public function getParameters()
-    {
-        if (empty($this->parameters)) {
-            $this->parameters = $this->getConfig();
-        }
-
-        return $this->parameters;
-    }
-
-    public function findContactTokens($content, $lead, $replace)
-    {
-        //$this->dateHelper->getTimeFormat();
-    }
-
     /**
      * @param string $content
      * @param array  $lead
@@ -130,8 +107,8 @@ class TokenHelper
             case 'date':
             case 'time':
             $dt   = new DateTimeHelper($value);
-            $date = $dt->getDateTime()->format((new self())->getParameters()['date_format_dateonly']);
-            $time = $dt->getDateTime()->format((new self())->getParameters()['date_format_timeonly']);
+            $date = $dt->getDateTime()->format((new ParamsLoaderHelper())->getParameters()['date_format_dateonly']);
+            $time = $dt->getDateTime()->format((new ParamsLoaderHelper())->getParameters()['date_format_timeonly']);
             switch ($defaultValue) {
                 case 'datetime':
                     return $date.' '.$time;
