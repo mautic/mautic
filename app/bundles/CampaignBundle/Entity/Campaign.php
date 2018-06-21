@@ -328,37 +328,34 @@ class Campaign extends FormEntity
     }
 
     /**
-     * Get pub;ished events.
+     * Get published events.
+     *
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getPublishedEvents()
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('isPublished', true));
+        $events   =  $this->events->matching($criteria);
+
+        // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
+        // @see https://github.com/doctrine/doctrine2/issues/4693
+        $keyedArrayCollection = new ArrayCollection();
+        /** @var Event $event */
+        foreach ($events as $event) {
+            $keyedArrayCollection->set($event->getId(), $event);
+        }
+
+        unset($events);
+
+        return $keyedArrayCollection;
+    }
+
+    /**
+     * Get All events.
      *
      * @return \Doctrine\Common\Collections\ArrayCollection
      */
     public function getEvents()
-    {
-        $criteria = Criteria::create()->where(Criteria::expr()->eq('isPublished', true));
-        $events   = $this->events->matching($criteria);
-
-        return $events;
-    }
-
-    /**
-     * Get unpublished events.
-     *
-     * @return \Doctrine\Common\Collections\ArrayCollection
-     */
-    public function getUnpublishedEvents()
-    {
-        $criteria = Criteria::create()->where(Criteria::expr()->eq('isPublished', false));
-        $events   = $this->events->matching($criteria);
-
-        return $events;
-    }
-
-    /**
-     * Get published and unpublished events.
-     *
-     * @return \Doctrine\Common\Collections\ArrayCollection
-     */
-    public function getAllEvents()
     {
         return $this->events;
     }
@@ -369,7 +366,7 @@ class Campaign extends FormEntity
     public function getRootEvents()
     {
         $criteria = Criteria::create()->where(Criteria::expr()->isNull('parent'));
-        $events   = $this->getEvents()->matching($criteria);
+        $events   = $this->getPublishedEvents()->matching($criteria);
 
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
         // @see https://github.com/doctrine/doctrine2/issues/4693
@@ -390,7 +387,7 @@ class Campaign extends FormEntity
     public function getInactionBasedEvents()
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', Event::PATH_INACTION));
-        $events   = $this->getEvents()->matching($criteria);
+        $events   = $this->getPublishedEvents()->matching($criteria);
 
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
         // @see https://github.com/doctrine/doctrine2/issues/4693
@@ -411,7 +408,7 @@ class Campaign extends FormEntity
     public function getEventsByType($type)
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
-        $events   = $this->getEvents()->matching($criteria);
+        $events   = $this->getPublishedEvents()->matching($criteria);
 
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
         // @see https://github.com/doctrine/doctrine2/issues/4693

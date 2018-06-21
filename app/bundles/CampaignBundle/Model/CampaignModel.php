@@ -260,7 +260,7 @@ class CampaignModel extends CommonFormModel
     public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents)
     {
         $eventSettings  = $this->getEvents();
-        $existingEvents = $entity->getEvents()->toArray();
+        $existingEvents = $entity->getPublishedEvents()->toArray();
         $events         =
         $hierarchy      =
         $parentUpdated  = [];
@@ -406,7 +406,7 @@ class CampaignModel extends CommonFormModel
     public function setCanvasSettings($entity, $settings, $persist = true, $events = null)
     {
         if ($events === null) {
-            $events = $entity->getEvents();
+            $events = $entity->getPublishedEvents();
         }
 
         $tempIds = [];

@@ -95,9 +95,9 @@ class EventModel extends LegacyEventModel
                 unset($deletedEvents[$k]);
             }
 
-            if (isset($currentEvents[$deleteMe])) {
-                unset($deletedEvents[$k]);
-            }
+            // if (isset($currentEvents[$deleteMe])) {
+            //     unset($deletedEvents[$k]);
+            // }
 
             if (isset($deletedEvents[$k])) {
                 $deletedKeys[] = $deleteMe;

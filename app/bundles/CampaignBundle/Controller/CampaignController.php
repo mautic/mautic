@@ -179,7 +179,7 @@ class CampaignController extends AbstractStandardFormController
         $objectId = $oldCampaign->getId();
 
         // Get the events that need to be duplicated as well
-        $events = $oldCampaign->getEvents()->toArray();
+        $events = $oldCampaign->getPublishedEvents()->toArray();
 
         $campaign->setIsPublished(false);
 
@@ -362,7 +362,7 @@ class CampaignController extends AbstractStandardFormController
             if (!empty($this->deletedEvents)) {
                 /** @var EventModel $eventModel */
                 $eventModel = $this->getModel('campaign.event');
-                $eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
+                $eventModel->deleteEvents($entity->getPublishedEvents()->toArray(), $this->deletedEvents);
             }
         }
 
@@ -742,7 +742,7 @@ class CampaignController extends AbstractStandardFormController
         //load existing events into session
         $campaignEvents = [];
 
-        $existingEvents = $entity->getEvents()->toArray();
+        $existingEvents = $entity->getPublishedEvents()->toArray();
         $translator     = $this->get('translator');
         $dateHelper     = $this->get('mautic.helper.template.date');
         foreach ($existingEvents as $e) {
