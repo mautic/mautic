@@ -19,7 +19,9 @@
 
             <!-- start: app-sidebar(left) -->
             <aside class="app-sidebar sidebar-left">
-                <?php echo $view->render('MauticCoreBundle:LeftPanel:index.html.php'); ?>
+                <?php echo $view->render('MauticCoreBundle:LeftPanel:index.html.php', array(
+                    'whitelabelBrandingLeftLogo' => $whitelabelBrandingLeftLogo
+                )); ?>
             </aside>
             <!--/ end: app-sidebar(left) -->
 
