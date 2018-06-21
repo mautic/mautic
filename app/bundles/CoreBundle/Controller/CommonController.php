@@ -203,6 +203,7 @@ class CommonController extends Controller implements MauticController
         }
 
         $args['viewParameters']['whitelabelBrandingName'] = $this->coreParametersHelper->getParameter('whitelabel_branding_name','Mautic');
+        $args['viewParameters']['whitelabelBrandingVersion'] = $this->coreParametersHelper->getParameter('whitelabel_branding_version',MAUTIC_VERSION);
         $args['viewParameters']['whitelabelBrandingCopyright'] = $this->coreParametersHelper->getParameter('whitelabel_branding_copyright', 'Mautic '.MAUTIC_VERSION);        
         $args['viewParameters']['whitelabelBrandingFavicon'] = $this->coreParametersHelper->getParameter('whitelabel_branding_favicon', 'media/images/favicon.ico');        
         $args['viewParameters']['whitelabelBrandingAppleFavicon'] = $this->coreParametersHelper->getParameter('whitelabel_branding_apple_favicon', 'media/images/apple-touch-icon.png');        

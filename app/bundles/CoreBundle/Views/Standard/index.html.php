@@ -18,7 +18,7 @@ if (!$view['slots']->get('mauticContent')) {
 
 if (!$view['slots']->get('headerTitle')) {
     if (!isset($headerTitle)) {
-        $headerTitle = 'Kiazaki';
+        $headerTitle = $whitelabelBrandingName;
     }
     $view['slots']->set('headerTitle', $view['translator']->trans($headerTitle));
 }

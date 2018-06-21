@@ -115,10 +115,10 @@ Mautic.generatePageTitle = function(route){
         // Encoded entites are decoded by this process and can cause a XSS
         currentModuleItem = mQuery('<div>'+currentModuleItem+'</div>').text();
 
-        mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Kiazaki' );
+        mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | ' + mauticWhitelabelBrandingName );
     } else {
         //loading basic title
-        mQuery('title').html( mQuery('.page-header h3').html() + ' | Kiazaki' );
+        mQuery('title').html( mQuery('.page-header h3').html() + ' | ' + mauticWhitelabelBrandingName );
     }
 };
 

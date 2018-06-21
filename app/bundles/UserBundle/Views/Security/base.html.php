@@ -30,8 +30,7 @@
             <div class="col-lg-4 col-lg-offset-4">
                 <div class="panel" name="form-login">
                     <div class="panel-body">
-                        <div class="mautic-logo img-circle mb-md text-center">
-                            <?php var_dump($whitelabelBrandingLogo); ?>
+                        <div class="mautic-logo img-circle mb-md text-center">                            
                             <img width="100%" height="100%" src="<?php echo $view['assets']->getUrl($whitelabelBrandingLogo) ?>" alt="" />                            
                         </div>
                         <div id="main-panel-flash-msgs">
