@@ -577,9 +577,10 @@ switch ($style) {
                 Focus.iframeResizerEnabled = true;
 
                 return true;
-                <?php endif; ?>
+                <?php else: ?>
 
                 return false;
+                <?php endif; ?>
             },
 
             // Disable iframe resizer

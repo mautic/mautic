@@ -76,8 +76,9 @@ trait PushToIntegrationTrait
         $services = static::$integrationHelper->getIntegrationObjects($integration);
         $success  = true;
 
-        /*
-         * @var AbstractIntegration
+        /**
+         * @var string
+         * @var AbstractIntegration $s
          */
         foreach ($services as $name => $s) {
             $settings = $s->getIntegrationSettings();
