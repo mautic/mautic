@@ -11,7 +11,11 @@
 ?>
 <!DOCTYPE html>
 <html>
-    <?php echo $view->render('MauticCoreBundle:Default:head.html.php'); ?>
+    <?php echo $view->render('MauticCoreBundle:Default:head.html.php', array(
+        '$whitelabelBrandingName' => $$whitelabelBrandingName,
+        'whitelabelBrandingFavicon' => $whitelabelBrandingFavicon,
+        'whitelabelBrandingAppleFavicon' => $whitelabelBrandingAppleFavicon
+    )); ?>
     <body class="header-fixed">
         <!-- start: app-wrapper -->
         <section id="app-wrapper">

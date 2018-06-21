@@ -13,8 +13,7 @@
     <meta charset="UTF-8" />
     <title><?php if (!empty($view['slots']->get('headerTitle', ''))): ?>
         <?php echo strip_tags(str_replace('<', ' <', $view['slots']->get('headerTitle', ''))); ?> | 
-    <?php endif; ?>
-    <?php var_dump('head.html.php - whitelabelBrandingName', $whitelabelBrandingName, $whitelabelBrandingCopyright, $view['slots']); ?>
+    <?php endif; ?>    
 	<?php echo $view['slots']->get('pageTitle', $whitelabelBrandingName); ?>
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
