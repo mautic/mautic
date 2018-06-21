@@ -297,8 +297,8 @@
 #EventJumpOverlay {
   display: none;
   background: rgba(0, 0, 0, 0.5);
-  width: 100%;
-  height: 100%;
+  width: 10000px;
+  height: 10000px;
   z-index: 2000;
   position: absolute;
   top: 0;
