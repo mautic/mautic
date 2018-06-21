@@ -180,7 +180,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * @param      $action
      * @param      $isPost
      * @param $objectId
-     * @param   $isClone
+     * @param $isClone
      */
     protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, $isClone = false)
     {
@@ -258,7 +258,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Clone an entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
