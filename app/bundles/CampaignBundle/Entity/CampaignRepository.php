@@ -344,7 +344,7 @@ class CampaignRepository extends CommonRepository
      * @param array          $pendingEvents
      * @param ContactLimiter $limiter
      *
-     * @return int
+     * @return CountResult
      */
     public function getCountsForPendingContacts($campaignId, array $pendingEvents, ContactLimiter $limiter)
     {
