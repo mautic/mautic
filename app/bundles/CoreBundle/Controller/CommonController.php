@@ -210,6 +210,8 @@ class CommonController extends Controller implements MauticController
         $args['viewParameters']['whitelabelBrandingLogo'] = $this->coreParametersHelper->getParameter('whitelabel_branding_logo', 'media/images/apple-touch-icon.png');        
         $args['viewParameters']['whitelabelBrandingLeftLogo'] = $this->coreParametersHelper->getParameter('whitelabel_branding_left_logo', 'media/images/apple-touch-icon.png');
 
+
+
         if (!isset($args['viewParameters']['currentRoute']) && isset($args['passthroughVars']['route'])) {
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
         }
@@ -236,6 +238,8 @@ class CommonController extends Controller implements MauticController
 
         $code     = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
         $response = new Response('', $code);
+
+        var_dump($parameters);
 
         return $this->render($template, $parameters, $response);
     }
