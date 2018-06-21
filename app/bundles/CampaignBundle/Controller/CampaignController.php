@@ -759,7 +759,7 @@ class CampaignController extends AbstractStandardFormController
                 );
                 break;
 
-            case 'new' :
+            case 'new':
             case 'edit':
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
