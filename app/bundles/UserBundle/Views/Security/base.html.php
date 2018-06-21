@@ -31,7 +31,7 @@
                 <div class="panel" name="form-login">
                     <div class="panel-body">
                         <div class="mautic-logo img-circle mb-md text-center">                            
-                            <img width="100%" height="100%" src="<?php echo $view['assets']->getUrl($whitelabelBrandingLogo) ?>" alt="" />                            
+                            <img width="100%" src="<?php echo $view['assets']->getUrl($whitelabelBrandingLogo) ?>" alt="" />                            
                         </div>
                         <div id="main-panel-flash-msgs">
                             <?php echo $view->render('MauticCoreBundle:Notification:flashes.html.php'); ?>
