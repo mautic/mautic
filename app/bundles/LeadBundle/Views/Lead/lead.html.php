@@ -130,6 +130,25 @@ if (($view['security']->hasEntityAccess(
         'iconClass' => 'fa fa-user',
     ];
 }
+if ($view['security']->hasEntityAccess(
+    $permissions['lead:leads:viewown'],
+    $permissions['lead:leads:viewother'],
+    $lead->getPermissionUser()
+)
+) {
+    $buttons[] = [
+        'attr' => [
+            'data-toggle'=> 'download',
+            'href'       => $view['router']->path(
+                'mautic_contact_export_action',
+                ['contactId' => $lead->getId()]
+            ),
+        ],
+        'btnText'   => $view['translator']->trans('mautic.core.export'),
+        'iconClass' => 'fa fa-download',
+        'priority'  => -1,
+    ];
+}
 
 $view['slots']->set(
     'actions',
