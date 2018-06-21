@@ -15,6 +15,7 @@ $extraMenu = $view['menu']->render('extra');
     <!-- brand -->
     <a class="mautic-brand<?php echo (!empty($extraMenu)) ? ' pull-left pl-0 pr-0' : ''; ?>" href="#">
         <!-- logo figure -->
+        <?php var_dump($mauticTemplateVars); ?>
         <img width="100%" src="<?php echo $view['assets']->getUrl($whitelabelBrandingLeftLogo) ?>" alt="" />    
         <!--/ logo text -->
     </a>
