@@ -241,15 +241,15 @@ class ScheduledExecutioner implements ExecutionerInterface
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
-        $totalScheduledCount   = array_sum($scheduledEvents);
+        $totalScheduledCount   = $scheduledEvents ? array_sum($scheduledEvents) : 0;
         if (!$totalScheduledCount) {
             throw new NoEventsFoundException();
         }
         $this->scheduledEvents = array_keys($scheduledEvents);
+        $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
         if ($this->output instanceof NullOutput) {
             return;
         }
-        $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
 
         $this->output->writeln(
             $this->translator->trans(

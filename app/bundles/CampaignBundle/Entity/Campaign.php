@@ -361,29 +361,6 @@ class Campaign extends FormEntity
     /**
      * @return ArrayCollection
      */
-    public function getScheduleEvents()
-    {
-        $criteria = Criteria::create()
-            ->where(Criteria::expr()->neq('eventType', Event::TYPE_DECISION))
-            ->andWhere(Criteria::expr()->neq('triggerMode', Event::TRIGGER_MODE_IMMEDIATE));
-        $events   = $this->getEvents()->matching($criteria);
-
-        // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
-        // @see https://github.com/doctrine/doctrine2/issues/4693
-        $keyedArrayCollection = new ArrayCollection();
-        /** @var Event $event */
-        foreach ($events as $event) {
-            $keyedArrayCollection->set($event->getId(), $event);
-        }
-
-        unset($events);
-
-        return $keyedArrayCollection;
-    }
-
-    /**
-     * @return ArrayCollection
-     */
     public function getInactionBasedEvents()
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', Event::PATH_INACTION));
