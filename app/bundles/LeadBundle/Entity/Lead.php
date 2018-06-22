@@ -1751,6 +1751,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         return $this;
     }
 
+	/**
+	 * @return string|null
+	 */
+	public function getLeadPhoneNumber()
+	{
+		return $this->getMobile() ?: $this->getPhone();
+    }
+
     /**
      * @return mixed
      */

@@ -270,10 +270,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 foreach ($contacts as $lead) {
                     $leadId = $lead->getId();
 
-                    $leadPhoneNumber = $lead->getMobile();
-                    if (empty($leadPhoneNumber)) {
-                        $leadPhoneNumber = $lead->getPhone();
-                    }
+                    $leadPhoneNumber = $lead->getLeadPhoneNumber();
 
                     if (empty($leadPhoneNumber)) {
                         $results[$leadId] = [
@@ -306,7 +303,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         'content' => $tokenEvent->getContent(),
                     ];
 
-                    $metadata = $this->transport->sendSms($leadPhoneNumber, $tokenEvent->getContent());
+                    $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent());
 
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;

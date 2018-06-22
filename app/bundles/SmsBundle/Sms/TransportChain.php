@@ -10,6 +10,7 @@
 
 namespace Mautic\SmsBundle\Sms;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Api\AbstractSmsApi;
 use Monolog\Logger;
@@ -86,16 +87,18 @@ class TransportChain
         return $enabled[$this->primaryTransport];
     }
 
-    /**
-     * @param $number
-     * @param $content
-     *
-     * @return mixed
-     *
-     * @throws \Exception
-     */
-    public function sendSms($number, $content)
+	/**
+	 * @param Lead 	 $lead
+	 * @param string $content
+	 *
+	 * @return mixed
+	 *
+	 * @throws \Exception
+	 */
+    public function sendSms(Lead $lead, $content)
     {
+    	$number = $lead->getLeadPhoneNumber();
+
         $this->logger->addInfo('Sending an SMS message using '
                             .$this->transports[$this->primaryTransport]['integrationAlias'].' to '
                             .(is_array($number) ? join(',', $number) : $number));
