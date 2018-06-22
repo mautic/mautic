@@ -239,17 +239,6 @@ class ScheduledExecutioner implements ExecutionerInterface
         $this->progressBar = null;
         $this->now         = new \Datetime();
 
-        // If counts are not needed, just get the event list.
-        if ($this->output instanceof NullOutput) {
-            $scheduledEvents = $this->campaign->getScheduleEvents();
-            if (!$scheduledEvents || !$scheduledEvents->count()) {
-                throw new NoEventsFoundException();
-            }
-            $this->scheduledEvents = $scheduledEvents->getKeys();
-
-            return;
-        }
-
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
         $totalScheduledCount   = array_sum($scheduledEvents);
@@ -257,6 +246,9 @@ class ScheduledExecutioner implements ExecutionerInterface
             throw new NoEventsFoundException();
         }
         $this->scheduledEvents = array_keys($scheduledEvents);
+        if ($this->output instanceof NullOutput) {
+            return;
+        }
         $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
 
         $this->output->writeln(
