@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -52,14 +53,21 @@ class CompanyImport extends AbstractImport
         // prevent listeners from exporting
         $company->setEventData('pipedrive.webhook', 1);
 
-        $data    = $this->convertPipedriveData($data);
+        $data       = $this->convertPipedriveData($data);
+        $mappedData = $this->getMappedCompanyData($data);
+
+        // find company exists
+        $findCompany = IdentifyCompanyHelper::findCompany($mappedData, $this->companyModel);
+        if (isset($findCompany[0]['id'])) {
+            throw new \Exception('Company already exist', Response::HTTP_CONFLICT);
+        }
+
+        $this->companyModel->setFieldValues($company, $mappedData);
+        $this->companyModel->saveEntity($company);
+
         if ($data['owner_id']) {
             $this->addOwnerToCompany($data['owner_id'], $company);
         }
-
-        $mappedData = $this->getMappedCompanyData($data);
-        $this->companyModel->setFieldValues($company, $mappedData);
-        $this->companyModel->saveEntity($company);
 
         $integrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $data['id']]);
 
@@ -89,6 +97,8 @@ class CompanyImport extends AbstractImport
         $integrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $data['id']]);
 
         if (!$integrationEntity) {
+            sleep(3);
+
             return $this->create($data);
         }
 
@@ -104,6 +114,7 @@ class CompanyImport extends AbstractImport
         }
 
         $mappedData = $this->getMappedCompanyData($data);
+
         $this->companyModel->setFieldValues($company, $mappedData);
         $this->companyModel->saveEntity($company);
 
