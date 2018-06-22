@@ -19,7 +19,7 @@ if (empty($route)) {
     <div class="campaign-event-content">
         <div><span class="campaign-event-name ellipsis"><?php echo $event['name']; ?></span></div>
         <a class="btn btn-primary btn-xs highlight-jump-target" href="javascript:void(0)" onClick="Mautic.highlightJumpTarget(event, this)" data-jump-target="<?php echo $event['properties']['jumpToEvent']; ?>">
-            <i class="fa fa-refresh" style="margin-top:3px;"></i>
+            <i class="fa fa-refresh btn-nospin" style="margin-top:3px;"></i>
         </a>
     </div>
 <?php if (empty($update)): ?>
