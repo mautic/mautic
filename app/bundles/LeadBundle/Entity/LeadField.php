@@ -206,17 +206,16 @@ class LeadField extends FormEntity
             'message' => 'mautic.lead.field.alias.unique',
         ]));
 
-        $metadata->addConstraint(new Assert\Callback([
-            'callback' => function (LeadField $field, ExecutionContextInterface $context) {
-                $violations = $context->getValidator()->validate($field, [new FieldAliasKeyword()]);
+        $callback = function (LeadField $field, ExecutionContextInterface $context) {
+            $violations = $context->getValidator()->validate($field, [new FieldAliasKeyword()]);
 
-                if ($violations->count() > 0) {
-                    $context->buildViolation($violations->get(0)->getMessage())
-                        ->atPath('alias')
-                        ->addViolation();
-                }
-            },
-        ]));
+            if ($violations->count() > 0) {
+                $context->buildViolation($violations->get(0)->getMessage())
+                    ->atPath('alias')
+                    ->addViolation();
+            }
+        };
+        $metadata->addConstraint(new Assert\Callback($callback));
     }
 
     /**
