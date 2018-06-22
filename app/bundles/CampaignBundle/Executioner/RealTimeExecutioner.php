@@ -193,6 +193,8 @@ class RealTimeExecutioner
      */
     private function executeAssociatedEvents(ArrayCollection $children, \DateTime $now)
     {
+        $children = clone $children;
+
         /** @var Event $child */
         foreach ($children as $key => $child) {
             $executionDate = $this->scheduler->getExecutionDateTime($child, $now);

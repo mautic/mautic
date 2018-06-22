@@ -349,18 +349,29 @@ class ScheduledExecutioner implements ExecutionerInterface
      */
     private function organizeByEvent(ArrayCollection $logs)
     {
-        $organized = [];
+        $jumpTo = [];
+        $other  = [];
+
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
-            $event = $log->getEvent();
+            $event     = $log->getEvent();
+            $eventType = $event->getType();
 
-            if (!isset($organized[$event->getId()])) {
-                $organized[$event->getId()] = new ArrayCollection();
+            if ('campaign.jump_to_event' === $eventType) {
+                if (!isset($jumpTo[$event->getId()])) {
+                    $jumpTo[$event->getId()] = new ArrayCollection();
+                }
+
+                $jumpTo[$event->getId()]->set($log->getId(), $log);
+            } else {
+                if (!isset($other[$event->getId()])) {
+                    $other[$event->getId()] = new ArrayCollection();
+                }
+
+                $other[$event->getId()]->set($log->getId(), $log);
             }
-
-            $organized[$event->getId()]->set($log->getId(), $log);
         }
 
-        return $organized;
+        return array_merge($other, $jumpTo);
     }
 }
