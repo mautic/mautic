@@ -156,19 +156,15 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
 
     public function testEventsAreExecutedInQuietMode()
     {
-        $event  = new Event();
-        $event2 = new Event();
-        $event->setEventType(Event::TYPE_ACTION);
+        $this->repository->expects($this->once())
+            ->method('getScheduledCounts')
+            ->willReturn([1 => 2, 2 => 2]);
 
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
 
-        $campaign->expects($this->once())
-            ->method('getScheduleEvents')
-            ->willReturn(new ArrayCollection([$event, $event2]));
-
+        $event = new Event();
         $event->setCampaign($campaign);
-        $event2->setCampaign($campaign);
 
         $log1 = new LeadEventLog();
         $log1->setEvent($event);
@@ -177,6 +173,9 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $log2 = new LeadEventLog();
         $log2->setEvent($event);
         $log2->setCampaign($campaign);
+
+        $event2 = new Event();
+        $event2->setCampaign($campaign);
 
         $log3 = new LeadEventLog();
         $log3->setEvent($event2);
