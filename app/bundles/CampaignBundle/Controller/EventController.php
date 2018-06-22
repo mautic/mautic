@@ -230,7 +230,7 @@ class EventController extends CommonFormController
         if ($method === 'POST') {
             $event = array_merge($event, [
                 'anchor'          => $this->request->request->get('campaignevent[anchor]', '', true),
-                'anchorEventtype' => $this->request->request->get('campaignevent[anchorEventType]', '', true),
+                'anchorEventType' => $this->request->request->get('campaignevent[anchorEventType]', '', true),
             ]);
         } else {
             if (!isset($event['anchor'])) {
