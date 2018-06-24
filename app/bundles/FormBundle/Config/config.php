@@ -406,6 +406,7 @@ return [
                 'class'     => TokenHelper::class,
                 'arguments' => [
                     'mautic.form.model.form',
+                    'mautic.security',
                 ],
             ],
         ],
