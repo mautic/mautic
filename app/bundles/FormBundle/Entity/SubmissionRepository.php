@@ -11,6 +11,7 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
