@@ -126,6 +126,9 @@ class LeadExport extends AbstractPipedrive
         $accessor = PropertyAccess::createPropertyAccessor();
 
         foreach ($leadFields as $externalField => $internalField) {
+            if (in_array($externalField, self::NO_ALLOWED_FIELDS_TO_EXPORT)) {
+                continue;
+            }
             $mappedData[$externalField] = $accessor->getValue($lead, $internalField);
         }
 
