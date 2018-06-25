@@ -553,7 +553,7 @@ class LeadEventLogRepository extends CommonRepository
         $sql    = <<<SQL
 REPLACE INTO {$prefix}campaign_lead_event_failed_log( `log_id`, `date_added`, `reason`)
 SELECT id, :dateAdded as date_added, :message as reason from {$prefix}campaign_lead_event_log
-WHERE lead_id = :contactId AND campaign_id = :campaignId AND rotation = :rotation
+WHERE is_scheduled = 1, lead_id = :contactId AND campaign_id = :campaignId AND rotation = :rotation
 SQL;
 
         $connection = $this->getEntityManager()->getConnection();
@@ -571,6 +571,7 @@ SQL;
             ->set('is_scheduled', 0)
             ->where(
                 $qb->expr()->andX(
+                    $qb->expr()->eq('is_scheduled', 1),
                     $qb->expr()->eq('lead_id', ':contactId'),
                     $qb->expr()->eq('campaign_id', ':campaignId'),
                     $qb->expr()->eq('rotation', ':rotation')
