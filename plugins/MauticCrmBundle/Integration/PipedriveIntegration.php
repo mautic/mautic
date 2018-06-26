@@ -95,7 +95,9 @@ class PipedriveIntegration extends CrmAbstractIntegration
 
     public function getApiUrl()
     {
-        return $this->getKeys()['url'];
+        if (isset($this->getKeys()['url'])) {
+            return $this->getKeys()['url'];
+        }
     }
 
     /**
