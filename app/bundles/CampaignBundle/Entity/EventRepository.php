@@ -248,6 +248,23 @@ class EventRepository extends LegacyEventRepository
     }
 
     /**
+     * remove  parent_id in preparation for soft-deleting events from a campaign.
+     *
+     * @param $events
+     */
+    public function removeParentFromSoftDeletedEvent($events)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('parent_id', ':null')
+            ->setParameter('null', null)
+            ->where(
+                $qb->expr()->in('id', $events)
+            )
+            ->execute();
+    }
+
+    /**
      * @return string
      */
     public function getTableAlias()

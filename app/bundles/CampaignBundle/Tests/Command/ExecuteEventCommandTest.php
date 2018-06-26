@@ -32,7 +32,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 
-        // There should still be trhee events scheduled
+        // There should still be three events scheduled
         $byEvent = $this->getCampaignEventLogs([2]);
         $this->assertCount(3, $byEvent[2]);
 
@@ -44,7 +44,6 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         // Pop off the last so we can test that only the two given are executed
         $lastId = array_pop($logIds);
-
         // Wait 20 seconds to go past scheduled time
         sleep(20);
 
@@ -68,5 +67,26 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
                 $this->fail('Event is still scheduled for lead ID '.$log['lead_id']);
             }
         }
+    }
+
+    public function testSoftDelete()
+    {
+        $campaignModel = $this->container->get('mautic.campaign.model.campaign');
+        $eventModel    = $this->container->get('mautic.campaign.model.event');
+
+        //getEvent Count for Campaign 2
+        $campaign = $campaignModel->getEntity(2);
+
+        $eventList = $campaign->getPublishedEvents();
+        $this->assertEquals(2, count($eventList->getValues()));
+
+        $eventModel->deleteEvents([], [17]);
+        $eventList = $campaign->getPublishedEvents();
+        $this->assertEquals(1, count($eventList->getValues()));
+
+        $this->runCommand('mautic:campaigns:trigger', ['-i' => 2, '--contact-ids' => '1,2,3,4']);
+        $byEvent = $this->getCampaignEventLogs([16, 17], 2);
+        $this->assertCount(4, $byEvent[16]);
+        $this->assertCount(0, $byEvent[17]);
     }
 }

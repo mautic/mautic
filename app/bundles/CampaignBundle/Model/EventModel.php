@@ -107,6 +107,7 @@ class EventModel extends LegacyEventModel
         if (count($deletedEvents)) {
             // wipe out any references to these events to prevent restraint violations
             $this->getRepository()->nullEventRelationships($deletedKeys);
+            $this->getRepository()->removeParentFromSoftDeletedEvent($deletedKeys);
 
             // delete the events
             //  $this->deleteEntities($deletedEvents);
