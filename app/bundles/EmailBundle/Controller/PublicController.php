@@ -230,9 +230,9 @@ class PublicController extends CommonFormController
                                 'custom_tag'          => '<a name="end-'.$formView->vars['id'].'"></a>',
                                 'showContactFrequency'=> false !== strpos($html, 'data-slot="channelfrequency"') ||
                                     false !== strpos($html, BuilderSubscriber::channelfrequency),
-                                'showContactSegments'         => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
-                                'showContactCategories'       => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
-                                'showContactPreferredChannels'=> false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
+                                'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
+                                'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
+                                'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
                             ]
                         );
                         // Replace tokens in preference center page
