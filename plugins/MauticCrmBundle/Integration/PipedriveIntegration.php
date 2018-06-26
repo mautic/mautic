@@ -2,8 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PipedriveIntegration extends CrmAbstractIntegration
@@ -88,8 +86,10 @@ class PipedriveIntegration extends CrmAbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'url'   => 'mautic.pipedrive.api_url',
-            'token' => 'mautic.pipedrive.token',
+            'url'      => 'mautic.pipedrive.api_url',
+            'token'    => 'mautic.pipedrive.token',
+            'user'     => 'mautic.pipedrive.webhook_user',
+            'password' => 'mautic.pipedrive.webhook_password',
         ];
     }
 
@@ -213,30 +213,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'keys') {
-            $builder->add(
-                'user',
-                TextType::class,
-                [
-                    'label'    => 'mautic.pipedrive.webhook_user',
-                    'attr'     => [
-                        'class' => 'form-control',
-                    ],
-                    'required' => false,
-                ]
-            );
-            $builder->add(
-                'password',
-                PasswordType::class,
-                [
-                    'label'    => 'mautic.pipedrive.webhook_password',
-                    'attr'     => [
-                        'class' => 'form-control',
-                    ],
-                    'required' => false,
-                ]
-            );
-        } elseif ($formArea == 'features') {
+        if ($formArea == 'features') {
             $builder->add(
                 'objects',
                 'choice',
