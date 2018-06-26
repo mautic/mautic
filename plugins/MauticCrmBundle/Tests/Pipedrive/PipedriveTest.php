@@ -81,8 +81,10 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         if ($addCredential) {
             [
             $apiKeys = array_merge($apiKeys, [
-                'user'     => self::WEBHOOK_USER,
-                'password' => self::WEBHOOK_PASSWORD,
+                'url'       => '',
+                'token'     => '',
+                'user'      => self::WEBHOOK_USER,
+                'password'  => self::WEBHOOK_PASSWORD,
             ]),
         ];
         }
