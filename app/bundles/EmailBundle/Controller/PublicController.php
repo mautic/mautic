@@ -222,18 +222,19 @@ class PublicController extends CommonFormController
                                         false !== strpos($html, BuilderSubscriber::saveprefsRegex);
                     $frequencyPresent = false !== strpos($html, 'data-slot="channelfrequency"') ||
                                         false !== strpos($html, BuilderSubscriber::channelfrequency);
-                    $tokensPresent = $savePrefsPresent && $frequencyPresent;
+                    $tokensPresent = $savePrefsPresent || $frequencyPresent;
                     if ($tokensPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
                         $params = array_merge(
                             $viewParameters,
                             [
-                                'form'                         => $formView,
-                                'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
-                                'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
-                                'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
-                                'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
+                                'form'                          => $formView,
+                                'custom_tag'                    => '<a name="end-'.$formView->vars['id'].'"></a>',
+                                'showContactFrequency'          => $frequencyPresent,
+                                'showContactSegments'           => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
+                                'showContactCategories'         => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
+                                'showContactPreferredChannels'  => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
                             ]
                         );
                         // Replace tokens in preference center page
