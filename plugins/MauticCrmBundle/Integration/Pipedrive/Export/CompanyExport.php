@@ -108,6 +108,11 @@ class CompanyExport extends AbstractPipedrive
     private function getMappedCompanyData(Company $company)
     {
         $mappedData    = [];
+
+        if (empty($this->getIntegration()->getIntegrationSettings()->getFeatureSettings()['companyFields'])) {
+            return [];
+        }
+
         $companyFields = $this->getIntegration()->getIntegrationSettings()->getFeatureSettings()['companyFields'];
 
         $accessor = PropertyAccess::createPropertyAccessor();
