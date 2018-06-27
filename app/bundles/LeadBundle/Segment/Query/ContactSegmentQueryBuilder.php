@@ -73,7 +73,7 @@ class ContactSegmentQueryBuilder
          *
          * the bigger count($plan), the higher complexity of query
          */
-        $plan = $this->getResolutionPlan($segmentId);
+        $this->getResolutionPlan($segmentId);
 
         /** @var ContactSegmentFilter $filter */
         foreach ($segmentFilters as $filter) {
@@ -89,32 +89,6 @@ class ContactSegmentQueryBuilder
         $queryBuilder->applyStackLogic();
 
         return $queryBuilder;
-    }
-
-    /**
-     * Get the list of segment's related segments.
-     *
-     * @param $id array
-     *
-     * @return array
-     */
-    private function getContactSegmentRelations(array $id)
-    {
-        $referencedContactSegments = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->findBy(
-            ['id' => $id]
-        );
-
-        $relations = [];
-        foreach ($referencedContactSegments as $segment) {
-            $filters = $segment->getFilters();
-            foreach ($filters as $filter) {
-                if ($filter['field'] == 'leadlist') {
-                    $relations[] = $filter['filter'];
-                }
-            }
-        }
-
-        return $relations;
     }
 
     /**
@@ -285,26 +259,9 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param ContactSegmentFilter $filter
-     * @param                      $backReference
-     *
-     * @throws SegmentQueryException
-     */
-    private function checkForCircularDependencies(ContactSegmentFilter $filter, $backReference)
-    {
-        if ($filter->isContactSegmentReference()) {
-            $segmentIdArray = is_array($filter->getParameterValue()) ? $filter->getParameterValue() : [$filter->getParameterValue()];
-
-            if (!is_null($backReference) || in_array($backReference, $this->getContactSegmentRelations($segmentIdArray))) {
-                throw new SegmentQueryException('Circular reference detected.');
-            }
-        }
-    }
-
-    /**
      * Returns array with plan for processing.
      *
-     * @param       $segmentId
+     * @param int   $segmentId
      * @param array $seen
      * @param array $resolved
      *
@@ -336,18 +293,24 @@ class ContactSegmentQueryBuilder
         return $resolved;
     }
 
-    private function getSegmentEdges($segment)
+	/**
+	 * @param int $segmentId
+	 *
+	 * @return array
+	 */
+    private function getSegmentEdges($segmentId)
     {
-        if (!$segment instanceof LeadList) {
-            $segment = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->find($segment);
-        }
+		$segmentEdges   = [];
+
+		$segment = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->find($segmentId);
+		if (!$segment) {
+			return $segmentEdges;
+		}
 
         $segmentFilters = $segment->getFilters();
-        $segmentEdges   = [];
 
         foreach ($segmentFilters as $segmentFilter) {
-            /** @var ContactSegmentFilter $segmentFilter */
-            if (isset($segmentFilter['field']) && $segmentFilter['field'] == 'leadlist') {
+            if (isset($segmentFilter['field']) && 'leadlist' === $segmentFilter['field']) {
                 $filterEdges  = $segmentFilter['filter'];
                 $segmentEdges = array_merge($segmentEdges, $filterEdges);
             }
