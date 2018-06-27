@@ -1466,7 +1466,8 @@ class MailHelper
     }
 
     /**
-     * Set variables from params, for example POST request.
+     * Set variables from params, for example POST request
+     * toEmail, toName, fromEmail, fromName, replyToEmail, replyToName, subject, content.
      *
      * @param array $params
      */
