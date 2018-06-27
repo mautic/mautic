@@ -131,7 +131,7 @@ class EventRepository extends LegacyEventRepository
             $q->andWhere(
                 $q->expr()->eq('e.eventType', ':eventType')
             )
-                ->setParameter('eventType', $eventType);
+              ->setParameter('eventType', $eventType);
         }
 
         return $q->getQuery()->getArrayResult();
