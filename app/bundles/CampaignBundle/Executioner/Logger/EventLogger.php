@@ -248,10 +248,24 @@ class EventLogger
      *
      * @return ArrayCollection
      */
-    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry = false)
+    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry = false)
+    {
+        $this->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
+
+        return $this->generateLogsFromContacts($event, $config, $contacts, $isInactiveEntry);
+    }
+
+    /**
+     * @param Event                 $event
+     * @param AbstractEventAccessor $config
+     * @param ArrayCollection       $contacts
+     * @param bool                  $isInactiveEntry
+     *
+     * @return ArrayCollection
+     */
+    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry)
     {
         $isDecision = Event::TYPE_DECISION === $event->getEventType();
-        $this->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
@@ -275,7 +289,7 @@ class EventLogger
 
     /**
      * @param array $contactIds
-     * @param       $campaignId
+     * @param int   $campaignId
      */
     public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
     {
