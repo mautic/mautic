@@ -1,5 +1,5 @@
 {
-  "name": "mautic/integrations-bundle",
+  "name": "mautic/mautic-integrations-bundle",
   "description": "This plugin enables VTiger CRM integration",
   "type": "mautic-plugin",
   "version": "1.0-dev",
