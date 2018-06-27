@@ -37,6 +37,11 @@ $view['slots']->set(
                     $permissions['lead:lists:viewother'],
                     $list->getCreatedBy()
                 ),
+                'clone' => $view['security']->hasEntityAccess(
+                    $permissions['lead:leads:editown'],
+                    $permissions['lead:lists:viewother'],
+                    $list->getCreatedBy()
+                ),
             ],
             'routeBase' => 'segment',
         ]
@@ -120,6 +125,9 @@ $view['slots']->set(
                     </div>
                 </div>
             </div>
+
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <!-- search bar-->
             <form method="post" action="<?php echo $view['router']->path('mautic_segment_contacts', ['objectId' => $list->getId()]); ?>" class="panel" id="segment-contact-filters">

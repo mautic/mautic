@@ -62,6 +62,10 @@ $attr = $form->vars['attr'];
 
 $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
 
+if (!isset($previewUrl)) {
+    $previewUrl = '';
+}
+
 ?>
 
 <?php echo $view['form']->start($form, ['attr' => $attr]); ?>
@@ -106,32 +110,23 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                         <div class="row">
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['fromName']); ?>
-                            </div>
-                            <div class="col-md-6">
                                 <?php echo $view['form']->row($form['fromAddress']); ?>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
                                 <?php echo $view['form']->row($form['replyToAddress']); ?>
-                            </div>
-
-                            <div class="col-md-6">
                                 <?php echo $view['form']->row($form['bccAddress']); ?>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="pull-left">
+                                <div>
+                                    <div class="pull-left">
                                     <?php echo $view['form']->label($form['assetAttachments']); ?>
+                                    </div>
+                                    <div class="text-right pr-10">
+                                        <span class="label label-info" id="attachment-size"><?php echo $attachmentSize; ?></span>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <?php echo $view['form']->widget($form['assetAttachments']); ?>
                                 </div>
-                                <div class="text-right pr-10">
-                                    <span class="label label-info" id="attachment-size"><?php echo $attachmentSize; ?></span>
-                                </div>
-                                <div class="clearfix"></div>
-                                <?php echo $view['form']->widget($form['assetAttachments']); ?>
+
+                            </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['headers']); ?>
                             </div>
                         </div>
 
@@ -276,7 +271,9 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
     'slots'         => $slots,
     'sections'      => $sections,
     'objectId'      => $email->getSessionId(),
-]); ?>
+    'previewUrl'    => $previewUrl,
+]);
+?>
 
 <?php
 $type = $email->getEmailType();

@@ -87,7 +87,7 @@ MauticJS.serialize = function(obj) {
 };
 
 MauticJS.documentReady = function(f) {
-    /in/.test(document.readyState) ? setTimeout('MauticJS.documentReady(' + f + ')', 9) : f();
+    /in/.test(document.readyState) ? setTimeout(function(){MauticJS.documentReady(f)}, 9) : f();
 };
 
 MauticJS.iterateCollection = function(collection) {
@@ -247,8 +247,7 @@ MauticJS.mtcSet = false;
 MauticJS.appendTrackedContact = function(data) {
     if (window.localStorage) {
         if (mtcId  = localStorage.getItem('mtc_id')) {
-            data['mtc_id']  = mtcId;
-            data['mtc_sid'] = localStorage.getItem('mtc_sid');
+            data['mautic_device_id'] = localStorage.getItem('mautic_device_id');
         }              
     }
     
@@ -270,6 +269,7 @@ MauticJS.setTrackedContact = function(response) {
     if (response.id) {
         MauticJS.setCookie('mtc_id', response.id);
         MauticJS.setCookie('mtc_sid', response.sid);
+        MauticJS.setCookie('mautic_device_id', response.device_id);
         MauticJS.mtcSet = true;
             
         // Set the id in local storage in case cookies are only allowed for sites visited and Mautic is on a different domain
@@ -277,6 +277,7 @@ MauticJS.setTrackedContact = function(response) {
         try {
             localStorage.setItem('mtc_id', response.id);
             localStorage.setItem('mtc_sid', response.sid);
+            localStorage.setItem('mautic_device_id', response.device_id);
         } catch (e) {
             console.warn('Browser does not allow storing in local storage');
         }
@@ -310,8 +311,8 @@ document.addEventListener('mauticPageEventDelivered', function(e) {
     
     if (!MauticJS.firstDeliveryMade) {
         MauticJS.firstDeliveryMade = true;
-        for (var i in MauticJS.postEventDeliveryQueue) {
-            if (typeof MauticJS.postEventDeliveryQueue[i] == 'function') {
+        for (var i = 0; i < MauticJS.postEventDeliveryQueue.length; i++) {
+            if (typeof MauticJS.postEventDeliveryQueue[i] === 'function') {
                 MauticJS.postEventDeliveryQueue[i](detail);
             }
             delete MauticJS.postEventDeliveryQueue[i];
@@ -329,7 +330,7 @@ MauticJS.pixelLoaded = function(f) {
 */
 MauticJS.checkForTrackingPixel = function() {
     if (!/in/.test(document.readyState)) {
-        setTimeout('MauticJS.checkForTrackingPixel()', 9)
+        setTimeout(function(){MauticJS.checkForTrackingPixel()}, 9)
     } else {
         // Only fetch once a tracking pixel has been loaded
         var maxChecks  = 3000; // Keep it from indefinitely checking in case the pixel was never embedded

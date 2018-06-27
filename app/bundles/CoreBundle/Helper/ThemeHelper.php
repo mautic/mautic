@@ -137,7 +137,7 @@ class ThemeHelper
      */
     private function getDirectoryName($newName)
     {
-        return InputHelper::filename($newName, true);
+        return InputHelper::filename($newName);
     }
 
     /**

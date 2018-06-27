@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 /**
  * Class LeadEventLog.
  */
-class LeadEventLog
+class LeadEventLog implements ChannelInterface
 {
     /**
      * @var
@@ -298,7 +298,7 @@ class LeadEventLog
      *
      * @return $this
      */
-    public function setEvent($event)
+    public function setEvent(Event $event)
     {
         $this->event = $event;
 
@@ -365,7 +365,7 @@ class LeadEventLog
     }
 
     /**
-     * @return mixed
+     * @return Campaign
      */
     public function getCampaign()
     {
@@ -430,6 +430,19 @@ class LeadEventLog
     public function getMetadata()
     {
         return $this->metadata;
+    }
+
+    /**
+     * @param $metadata
+     */
+    public function appendToMetadata($metadata)
+    {
+        if (!is_array($metadata)) {
+            // Assumed output for timeline BC for <2.14
+            $metadata = ['timeline' => $metadata];
+        }
+
+        $this->metadata = array_merge($this->metadata, $metadata);
     }
 
     /**

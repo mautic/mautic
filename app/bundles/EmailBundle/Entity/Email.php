@@ -185,6 +185,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $sessionId;
 
+    /**
+     * @var array
+     */
+    private $headers = [];
+
     public function __clone()
     {
         $this->id               = null;
@@ -341,6 +346,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
             ->fetchExtraLazy()
             ->build();
+
+        $builder->addField('headers', 'json_array');
     }
 
     /**
@@ -485,6 +492,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'unsubscribeForm',
                     'dynamicContent',
                     'lists',
+                    'headers',
                 ]
             )
             ->build();
@@ -1094,6 +1102,26 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getAssetAttachments()
     {
         return $this->assetAttachments;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * @param array $headers
+     *
+     * @return Email
+     */
+    public function setHeaders($headers)
+    {
+        $this->headers = $headers;
+
+        return $this;
     }
 
     /**

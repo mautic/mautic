@@ -330,7 +330,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getTextHeaders()
     {
-        return ($this->helper !== null) ? $this->helper->getCustomHeaders() : $this->headers;
+        return ($this->helper !== null) ? $this->helper->getCustomHeaders() : $this->textHeaders;
     }
 
     /**

@@ -193,6 +193,14 @@ if (!$isEmbedded) {
                                     <td><?php echo $bccAddress; ?></td>
                                 </tr>
                             <?php endif; ?>
+                            <?php if ($headers = $email->getHeaders()): ?>
+                                <tr>
+                                    <td width="20%">
+                                        <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.custom_headers'); ?></span>
+                                    </td>
+                                    <td><?php echo $view['formatter']->simpleArrayToHtml($headers); ?></td>
+                                </tr>
+                            <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -225,6 +233,8 @@ if (!$isEmbedded) {
                     'dateRangeForm' => $dateRangeForm,
                 ]
             ); ?>
+
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
