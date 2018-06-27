@@ -48,7 +48,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->client->request($method, '/plugin/pipedrive/webhook', [], [], $headers, $json);
     }
 
-    protected function installPipedriveIntegration($published = false, array $settings = [], array $apiKeys = ['url'=>'', 'token'=>''], array $features = ['push_lead'], $addCredential = true)
+    protected function installPipedriveIntegration($published = false, array $settings = [], array $apiKeys = ['url' => '', 'token' => ''], array $features = ['push_lead'], $addCredential = true)
     {
         $plugin = new Plugin();
         $plugin->setName('CRM');
