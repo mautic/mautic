@@ -91,7 +91,6 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
                 $this->membershipManager->addContacts(
                     $contacts,
                     $campaign,
-                    true,
                     true
                 );
             }

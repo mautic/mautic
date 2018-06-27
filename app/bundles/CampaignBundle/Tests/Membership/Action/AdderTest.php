@@ -43,6 +43,8 @@ class AdderTest extends \PHPUnit_Framework_TestCase
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
             ->willReturn(1);
+        $campaign->method('allowRestart')
+            ->willReturn(true);
 
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')
@@ -68,8 +70,11 @@ class AdderTest extends \PHPUnit_Framework_TestCase
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(true);
         $campaignMember->setRotation(1);
+        $campaign = new Campaign();
+        $campaign->setAllowRestart(true);
+        $campaignMember->setCampaign($campaign);
 
-        $this->getAdder()->updateExistingMembership($campaignMember, true, true);
+        $this->getAdder()->updateExistingMembership($campaignMember, true);
 
         $this->assertEquals(true, $campaignMember->wasManuallyAdded());
         $this->assertEquals(2, $campaignMember->getRotation());
@@ -82,8 +87,11 @@ class AdderTest extends \PHPUnit_Framework_TestCase
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(true);
         $campaignMember->setRotation(1);
+        $campaign = new Campaign();
+        $campaign->setAllowRestart(false);
+        $campaignMember->setCampaign($campaign);
 
-        $this->getAdder()->updateExistingMembership($campaignMember, false, true);
+        $this->getAdder()->updateExistingMembership($campaignMember, false);
     }
 
     public function testContactAlreadyInCampaignExceptionIsThrownWhenAllowRestartIsFalse()
@@ -92,8 +100,11 @@ class AdderTest extends \PHPUnit_Framework_TestCase
 
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(false);
+        $campaign = new Campaign();
+        $campaign->setAllowRestart(false);
+        $campaignMember->setCampaign($campaign);
 
-        $this->getAdder()->updateExistingMembership($campaignMember, false, false);
+        $this->getAdder()->updateExistingMembership($campaignMember, false);
     }
 
     /**

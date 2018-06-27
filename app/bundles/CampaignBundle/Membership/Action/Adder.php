@@ -15,7 +15,6 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
-use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyInCampaignException;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -48,25 +47,33 @@ class Adder
     /**
      * @param Lead     $contact
      * @param Campaign $campaign
-     * @param bool     $isManualAction
+     * @param          $isManualAction
      *
      * @return CampaignMember
+     *
+     * @throws ContactCannotBeAddedToCampaignException
      */
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction)
     {
+        // BC support for prior to 2.14.
+        // If the contact was in the campaign to start with then removed, their logs remained but the original membership was removed
+        // Start the new rotation at 2
+        $rotation = 1;
+        if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
+            if (!$campaign->allowRestart()) {
+                // This contact has already been in the campaign at some point
+                throw new ContactCannotBeAddedToCampaignException();
+            }
+
+            $rotation = 2;
+        }
+
         $campaignMember = new CampaignMember();
         $campaignMember->setLead($contact);
         $campaignMember->setCampaign($campaign);
         $campaignMember->setManuallyAdded($isManualAction);
         $campaignMember->setDateAdded(new \DateTime());
-
-        // BC support for prior to 2.14.
-        // If the contact was in the campaign to start with then removed, their logs remained but the original membership was removed
-        // Start the new rotation at 2
-        if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
-            $campaignMember->setRotation(2);
-        }
-
+        $campaignMember->setRotation($rotation);
         $this->saveCampaignMember($campaignMember);
 
         return $campaignMember;
@@ -75,35 +82,25 @@ class Adder
     /**
      * @param CampaignMember $campaignMember
      * @param bool           $isManualAction
-     * @param bool           $allowRestart
      *
-     * @throws ContactAlreadyInCampaignException
      * @throws ContactCannotBeAddedToCampaignException
      */
-    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction, $allowRestart)
+    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction)
     {
-        $wasRemoved = $campaignMember->wasManuallyRemoved();
-        if (!$wasRemoved && !$allowRestart) {
-            // Contact is already in this campaign
+        if (!$campaignMember->getCampaign()->allowRestart()) {
+            // A contact cannot restart this campaign
 
-            if ($campaignMember->wasManuallyAdded() !== $isManualAction) {
-                // Update if this was now manually added or added by a segment
-                $campaignMember->setManuallyAdded($isManualAction);
-
-                $this->saveCampaignMember($campaignMember);
-            }
-
-            throw new ContactAlreadyInCampaignException();
+            throw new ContactCannotBeAddedToCampaignException();
         }
 
-        if ($wasRemoved && !$isManualAction && null === $campaignMember->getDateLastExited()) {
+        if ($campaignMember->wasManuallyRemoved() && !$isManualAction && null === $campaignMember->getDateLastExited()) {
             // Prevent contacts from being added back if they were manually removed but automatically added back
+
             throw new ContactCannotBeAddedToCampaignException();
         }
 
         // Contact exited but has been added back to the campaign
         $campaignMember->setManuallyRemoved(false);
-        $campaignMember->setManuallyAdded($isManualAction);
         $campaignMember->setDateLastExited(null);
         $campaignMember->startNewRotation();
 

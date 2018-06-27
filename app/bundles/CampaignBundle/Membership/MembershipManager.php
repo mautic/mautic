@@ -17,7 +17,6 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\Action\Remover;
-use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyInCampaignException;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaignException;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
@@ -86,9 +85,8 @@ class MembershipManager
      * @param Lead     $contact
      * @param Campaign $campaign
      * @param bool     $isManualAction
-     * @param bool     $allowRestart
      */
-    public function addContact(Lead $contact, Campaign $campaign, $isManualAction = true, $allowRestart = false)
+    public function addContact(Lead $contact, Campaign $campaign, $isManualAction = true)
     {
         // Validate that contact is not already in the Campaign
         /** @var CampaignMember $campaignMember */
@@ -101,28 +99,34 @@ class MembershipManager
 
         if ($campaignMember) {
             try {
-                $this->adder->updateExistingMembership($campaignMember, $isManualAction, $allowRestart);
+                $this->adder->updateExistingMembership($campaignMember, $isManualAction);
                 $this->logger->debug(
                     "CAMPAIGN: Membership for contact ID {$contact->getId()} in campaign ID {$campaign->getId()} was updated to be included."
                 );
 
                 // Notify listeners
                 $this->eventDispatcher->dispatchMembershipChange($campaignMember->getLead(), $campaignMember->getCampaign(), Adder::NAME);
-            } catch (ContactAlreadyInCampaignException $exception) {
-                // Do nothing
-                $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} is already in campaign ID {$campaign->getId()}.");
             } catch (ContactCannotBeAddedToCampaignException $exception) {
                 // Do nothing
                 $this->logger->debug(
-                    "CAMPAIGN: Contact ID {$contact->getId()} could not be added campaign ID {$campaign->getId()} because they were manually removed."
+                    "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
                 );
             }
 
             return;
         }
 
-        // Contact is not already in the campaign so create a new entry
-        $this->adder->createNewMembership($contact, $campaign, $isManualAction);
+        try {
+            // Contact is not already in the campaign so create a new entry
+            $this->adder->createNewMembership($contact, $campaign, $isManualAction);
+        } catch (ContactCannotBeAddedToCampaignException $exception) {
+            // Do nothing
+            $this->logger->debug(
+                "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
+            );
+
+            return;
+        }
 
         $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was added to campaign ID {$campaign->getId()} as a new member.");
 
@@ -134,9 +138,8 @@ class MembershipManager
      * @param ArrayCollection $contacts
      * @param Campaign        $campaign
      * @param bool            $isManualAction
-     * @param bool            $allowRestart
      */
-    public function addContacts(ArrayCollection $contacts, Campaign $campaign, $isManualAction = true, $allowRestart = false)
+    public function addContacts(ArrayCollection $contacts, Campaign $campaign, $isManualAction = true)
     {
         // Get a list of existing campaign members
         $campaignMembers = $this->leadRepository->getCampaignMembers($contacts->getKeys(), $campaign);
@@ -147,27 +150,32 @@ class MembershipManager
 
             if (isset($campaignMembers[$contact->getId()])) {
                 try {
-                    $this->adder->updateExistingMembership($campaignMembers[$contact->getId()], $isManualAction, $allowRestart);
+                    $this->adder->updateExistingMembership($campaignMembers[$contact->getId()], $isManualAction);
                     $this->logger->debug(
                         "CAMPAIGN: Membership for contact ID {$contact->getId()} in campaign ID {$campaign->getId()} was updated to be included."
                     );
-                } catch (ContactAlreadyInCampaignException $exception) {
-                    $contacts->remove($contact->getId());
-
-                    $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} is already in campaign ID {$campaign->getId()}.");
                 } catch (ContactCannotBeAddedToCampaignException $exception) {
                     $contacts->remove($contact->getId());
 
                     $this->logger->debug(
-                        "CAMPAIGN: Contact ID {$contact->getId()} could not be added campaign ID {$campaign->getId()} because they were manually removed."
+                        "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
                     );
                 }
 
                 continue;
             }
 
-            // Existing membership does not exist so create a new one
-            $this->adder->createNewMembership($contact, $campaign, $isManualAction);
+            try {
+                // Existing membership does not exist so create a new one
+                $this->adder->createNewMembership($contact, $campaign, $isManualAction);
+            } catch (ContactCannotBeAddedToCampaignException $exception) {
+                $this->logger->debug(
+                    "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
+                );
+
+                $contacts->remove($contact->getId());
+                continue;
+            }
 
             $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was added to campaign ID {$campaign->getId()} as a new member.");
         }

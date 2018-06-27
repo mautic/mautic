@@ -139,7 +139,7 @@ class MembershipManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->adder->expects($this->once())
             ->method('updateExistingMembership')
-            ->with($campaignMember, true, false);
+            ->with($campaignMember, true);
 
         $this->adder->expects($this->once())
             ->method('createNewMembership')

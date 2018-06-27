@@ -84,6 +84,11 @@ class Campaign extends FormEntity
     private $canvasSettings = [];
 
     /**
+     * @var bool
+     */
+    private $allowRestart = false;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -153,6 +158,8 @@ class Campaign extends FormEntity
             ->columnName('canvas_settings')
             ->nullable()
             ->build();
+
+        $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
     }
 
     /**
@@ -592,6 +599,34 @@ class Campaign extends FormEntity
     public function setCanvasSettings(array $canvasSettings)
     {
         $this->canvasSettings = $canvasSettings;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowRestart()
+    {
+        return $this->allowRestart;
+    }
+
+    /**
+     * @return bool
+     */
+    public function allowRestart()
+    {
+        return $this->getAllowRestart();
+    }
+
+    /**
+     * @param bool $allowRestart
+     *
+     * @return Campaign
+     */
+    public function setAllowRestart($allowRestart)
+    {
+        $this->allowRestart = $allowRestart;
+
+        return $this;
     }
 
     /**
