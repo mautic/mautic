@@ -56,6 +56,9 @@ class LeadExport extends AbstractPipedrive
 
         try {
             $createdLeadData   = $this->getIntegration()->getApiHelper()->createLead($mappedData, $lead);
+            if (empty($createdLeadData['id'])) {
+                return false;
+            }
             $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $createdLeadData['id'], $leadId);
 
             $this->em->persist($integrationEntity);
