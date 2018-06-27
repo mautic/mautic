@@ -27,5 +27,6 @@
     "mautic/composer-plugin": "^1.0",
     "mautic/mautic": "^2.14",
     "php": "^7.1 || ^7.2"
-  }
+  },
+  "minimum-stability": "dev"
 }
