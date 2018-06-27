@@ -19,7 +19,7 @@ interface BasicInterface {
     public function getPriority(): int;
 
     /**
-     * @return boold
+     * @return bool
      */
     public function isCoreIntegration(): bool;
 }

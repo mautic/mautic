@@ -2,14 +2,19 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle;
 
+use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use MauticPlugin\MauticIntegrationsBundle\DependencyInjection\Compiler\AuthenticationIntegrationPass;
 use MauticPlugin\MauticIntegrationsBundle\DependencyInjection\Compiler\BasicIntegrationPass;
 use MauticPlugin\MauticIntegrationsBundle\DependencyInjection\Compiler\DispatcherIntegrationPass;
 use MauticPlugin\MauticIntegrationsBundle\DependencyInjection\Compiler\EncryptionIntegrationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class MauticIntegrationsBundle extends Bundle
+/**
+ * Class MauticIntegrationsBundle
+ *
+ * @package MauticPlugin\MauticIntegrationsBundle
+ */
+class MauticIntegrationsBundle extends PluginBundleBase
 {
     public function build(ContainerBuilder $container)
     {

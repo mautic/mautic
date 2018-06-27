@@ -1,8 +1,8 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic Inc.
  *
  * @link        http://mautic.org
  *
@@ -13,16 +13,16 @@ namespace MauticPlugin\MauticIntegrationsBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\BCIntegrationFormsHelperTrait;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\BCIntegrationHelperTrait;
 use MauticPlugin\MauticIntegrationsBundle\Integration\Interfaces\BasicInterface;
-use MauticPlugin\MauticIntegrationsBundle\Integration\Interfaces\boold;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class AbstractIntegration.
  */
-abstract class BasicIntegration implements BasicInterface
+abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInterface
 {
     use BCIntegrationHelperTrait;
     use BCIntegrationFormsHelperTrait;
