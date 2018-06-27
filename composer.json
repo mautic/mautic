@@ -1,0 +1,31 @@
+{
+  "name": "mautic/integrations-bundle",
+  "description": "This plugin enables VTiger CRM integration",
+  "type": "mautic-plugin",
+  "version": "1.0-dev",
+  "keywords": ["mautic","plugin","integration"],
+  "authors": [
+    {
+      "name": "Jan Kozak",
+      "email": "galvani78@gmail.com",
+      "homepage": "https://github.com/galvani",
+      "role": "Engineer"
+    },
+    {
+      "name": "Don Gilbert",
+      "email": "don.gilbert@mautic.com",
+      "homepage": "https://github.com/dongilbert",
+      "role": "Engineer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "MauticPlugin\\MauticIntegrationsBundle\\": "./"
+    }
+  },
+  "require": {
+    "mautic/composer-plugin": "^1.0",
+    "mautic/mautic": "^2.14",
+    "php": "^7.1 || ^7.2"
+  }
+}
