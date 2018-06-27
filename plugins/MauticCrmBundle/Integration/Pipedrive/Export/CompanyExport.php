@@ -42,6 +42,9 @@ class CompanyExport extends AbstractPipedrive
 
         try {
             $createdData       = $this->getIntegration()->getApiHelper()->createCompany($mappedData);
+            if (empty($createdData['id'])) {
+                return false;
+            }
             $integrationEntity = $this->createIntegrationCompanyEntity(new \DateTime(), $createdData['id'], $companyId);
 
             $this->em->persist($integrationEntity);
