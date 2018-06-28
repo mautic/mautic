@@ -28,6 +28,11 @@ class LeadExport extends AbstractPipedrive
         $this->companyExport = $companyExport;
     }
 
+    /**
+     * @param Lead $lead
+     *
+     * @return bool
+     */
     public function create(Lead $lead)
     {
         // stop for anynomouse
@@ -72,6 +77,11 @@ class LeadExport extends AbstractPipedrive
         return false;
     }
 
+    /**
+     * @param Lead $lead
+     *
+     * @return bool
+     */
     public function update(Lead $lead)
     {
         $leadId            = $lead->getId();
@@ -99,6 +109,11 @@ class LeadExport extends AbstractPipedrive
         return false;
     }
 
+    /**
+     * @param Lead $lead
+     *
+     * @return bool
+     */
     public function delete(Lead $lead)
     {
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $lead->getId()]);
@@ -121,6 +136,11 @@ class LeadExport extends AbstractPipedrive
         return false;
     }
 
+    /**
+     * @param Lead $lead
+     *
+     * @return mixed
+     */
     private function getMappedLeadData(Lead $lead)
     {
         $mappedData = [];

@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PipedriveIntegration extends CrmAbstractIntegration
@@ -250,8 +251,15 @@ class PipedriveIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param array|\Mautic\LeadBundle\Entity\Lead $lead
+     * @param array                                $config
+     *
+     * @return mixed
+     */
     public function pushLead($lead, $config = [])
     {
+        /** @var LeadExport $leadExport */
         $leadExport = $this->factory->get('mautic_integration.pipedrive.export.lead');
         $leadExport->setIntegration($this);
 
@@ -284,6 +292,9 @@ class PipedriveIntegration extends CrmAbstractIntegration
         return parent::getFormNotes($section);
     }
 
+    /**
+     * @return bool
+     */
     public function isCompanySupportEnabled()
     {
         $supportedFeatures = $this->getIntegrationSettings()->getFeatureSettings();

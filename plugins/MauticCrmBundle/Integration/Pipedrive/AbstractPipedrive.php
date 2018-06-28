@@ -24,11 +24,17 @@ abstract class AbstractPipedrive
      */
     protected $em;
 
+    /**
+     * @param PipedriveIntegration $integration
+     */
     public function setIntegration(PipedriveIntegration $integration)
     {
         $this->integration = $integration;
     }
 
+    /**
+     * @return PipedriveIntegration
+     */
     public function getIntegration()
     {
         return $this->integration;
@@ -85,16 +91,39 @@ abstract class AbstractPipedrive
         return $data;
     }
 
+    /**
+     * @param $date
+     * @param $integrationEntityId
+     * @param $internalEntityId
+     *
+     * @return IntegrationEntity
+     */
     public function createIntegrationLeadEntity($date, $integrationEntityId, $internalEntityId)
     {
         return $this->createIntegrationEntity($date, $integrationEntityId, $internalEntityId, self::PERSON_ENTITY_TYPE, self::LEAD_ENTITY_TYPE);
     }
 
+    /**
+     * @param $date
+     * @param $integrationEntityId
+     * @param $internalEntityId
+     *
+     * @return IntegrationEntity
+     */
     public function createIntegrationCompanyEntity($date, $integrationEntityId, $internalEntityId)
     {
         return $this->createIntegrationEntity($date, $integrationEntityId, $internalEntityId, self::ORGANIZATION_ENTITY_TYPE, self::COMPANY_ENTITY_TYPE);
     }
 
+    /**
+     * @param $date
+     * @param $integrationEntityId
+     * @param $internalEntityId
+     * @param $integrationEntityName
+     * @param $internalEntityName
+     *
+     * @return IntegrationEntity
+     */
     private function createIntegrationEntity($date, $integrationEntityId, $internalEntityId, $integrationEntityName, $internalEntityName)
     {
         $integrationEntity = new IntegrationEntity();
@@ -109,6 +138,11 @@ abstract class AbstractPipedrive
         return $integrationEntity;
     }
 
+    /**
+     * @param array $criteria
+     *
+     * @return IntegrationEntity|null|object
+     */
     protected function getLeadIntegrationEntity(array $criteria = [])
     {
         $criteria['integrationEntity'] = self::PERSON_ENTITY_TYPE;
@@ -117,6 +151,11 @@ abstract class AbstractPipedrive
         return $this->getIntegrationEntity($criteria);
     }
 
+    /**
+     * @param array $criteria
+     *
+     * @return IntegrationEntity|null|object
+     */
     protected function getCompanyIntegrationEntity(array $criteria = [])
     {
         $criteria['integrationEntity'] = self::ORGANIZATION_ENTITY_TYPE;
@@ -125,6 +164,11 @@ abstract class AbstractPipedrive
         return $this->getIntegrationEntity($criteria);
     }
 
+    /**
+     * @param array $criteria
+     *
+     * @return IntegrationEntity|null|object
+     */
     private function getIntegrationEntity(array $criteria = [])
     {
         $criteria['integration'] = $this->getIntegration()->getName();
