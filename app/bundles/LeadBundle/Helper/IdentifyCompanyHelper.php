@@ -131,16 +131,20 @@ class IdentifyCompanyHelper
     {
         if (!strstr($email, '@')) { //not a valid email adress
             return false;
-        } else {
-            list($user, $domain) = explode('@', $email);
-            $arr                 = dns_get_record($domain, DNS_MX);
-
-            if ($arr && $arr[0]['host'] === $domain) {
-                return $domain;
-            } else {
-                return false;
-            }
         }
+
+        list($user, $domain) = explode('@', $email);
+        $arr                 = dns_get_record($domain, DNS_MX);
+
+        if (empty($arr)) {
+            return false;
+        }
+
+        if ($arr[0]['host'] === $domain) {
+            return $domain;
+        }
+
+        return false;
     }
 
     /**
