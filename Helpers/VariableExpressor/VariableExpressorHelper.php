@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Services;
+namespace MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\VariableEncodeDAO;
 

@@ -1,11 +1,12 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Services;
+namespace MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor;
+
 use MauticPlugin\MauticIntegrationsBundle\DAO\VariableEncodeDAO;
 
 /**
  * Interface VariableExpressorHelperInterface
- * @package MauticPlugin\MauticIntegrationsBundle\Services
+ * @package MauticPlugin\MauticIntegrationsBundle\Helpers
  */
 interface VariableExpressorHelperInterface
 {
