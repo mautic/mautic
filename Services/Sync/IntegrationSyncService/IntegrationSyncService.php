@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncSer
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncProcess\IntegrationSyncProcessFactoryInterface;
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeServiceInterface;
+use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncJudgeService\SyncJudgeServiceInterface;
 
 /**
@@ -25,20 +25,20 @@ final class IntegrationSyncService implements IntegrationSyncServiceInterface
     private $integrationEntityRepository;
 
     /**
-     * @var SyncDataExchangeServiceInterface
+     * @var SyncDataExchangeInterface
      */
     private $internalSyncDataExchange;
 
     /**
      * IntegrationSyncService constructor.
      * @param IntegrationEntityRepository $integrationEntityRepository
-     * @param SyncDataExchangeServiceInterface $internalSyncDataExchange
+     * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param IntegrationSyncProcessFactoryInterface $integrationSyncProcessFactory
      * @param SyncJudgeServiceInterface $syncJudgeService
      */
     public function __construct(
         IntegrationEntityRepository $integrationEntityRepository,
-        SyncDataExchangeServiceInterface $internalSyncDataExchange,
+        SyncDataExchangeInterface $internalSyncDataExchange,
         IntegrationSyncProcessFactoryInterface $integrationSyncProcessFactory,
         SyncJudgeServiceInterface $syncJudgeService
     )
@@ -50,18 +50,18 @@ final class IntegrationSyncService implements IntegrationSyncServiceInterface
     }
 
     /**
-     * @param SyncDataExchangeServiceInterface $integrationSyncDataExchange
+     * @param SyncDataExchangeInterface $syncDataExchangeService
      * @param int $fromTimestamp
      */
-    public function processIntegrationSync(SyncDataExchangeServiceInterface $integrationSyncDataExchange, $fromTimestamp)
+    public function processIntegrationSync(SyncDataExchangeInterface $syncDataExchangeService, $fromTimestamp)
     {
-        $integrationMappingManual = $this->integrationEntityRepository->getIntegrationMappingManual($integrationSyncDataExchange->getIntegration());
+        $integrationMappingManual = $this->integrationEntityRepository->getIntegrationMappingManual($syncDataExchangeService->getIntegration());
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
             $fromTimestamp,
             $this->syncJudgeService,
             $integrationMappingManual,
             $this->internalSyncDataExchange,
-            $integrationSyncDataExchange
+            $syncDataExchangeService
         );
         $integrationSyncProcess->execute();
     }

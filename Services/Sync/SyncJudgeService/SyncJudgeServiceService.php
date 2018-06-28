@@ -19,16 +19,26 @@ use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\InformationChangeRequestDAO;
 final class SyncJudgeServiceService implements SyncJudgeServiceInterface
 {
     /**
-     * @param string                        $mode
-     * @param InformationChangeRequestDAO   $changeRequest1
-     * @param InformationChangeRequestDAO   $changeRequest2
+     * @param string                             $mode
+     * @param InformationChangeRequestDAO|null   $changeRequest1
+     * @param InformationChangeRequestDAO|null   $changeRequest2
      *
      * @return mixed
      *
      * @throws \LogicException if conflict was not resolved
      */
-    public function adjudicate($mode = self::PRESUMPTION_OF_INNOCENCE_MODE, InformationChangeRequestDAO $changeRequest1, InformationChangeRequestDAO $changeRequest2)
+    public function adjudicate(
+        $mode = self::PRESUMPTION_OF_INNOCENCE_MODE,
+        InformationChangeRequestDAO $changeRequest1 = null,
+        InformationChangeRequestDAO $changeRequest2 = null
+    )
     {
+        if($changeRequest1 !== null && $changeRequest2 === null) {
+            return $changeRequest1->getNewValue();
+        }
+        elseif ($changeRequest1 === null && $changeRequest2 !== null) {
+            return $changeRequest2->getNewValue();
+        }
         if ($changeRequest1->getNewValue() === $changeRequest2->getNewValue()) {
             return $changeRequest1->getNewValue();
         }

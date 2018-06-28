@@ -3,7 +3,7 @@
 namespace MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncProcess;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\IntegrationMappingManualDAO;
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeServiceInterface;
+use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncJudgeService\SyncJudgeServiceInterface;
 
 /**
@@ -15,8 +15,8 @@ interface IntegrationSyncProcessFactoryInterface
      * @param $fromTimestamp
      * @param SyncJudgeServiceInterface $syncJudgeService
      * @param IntegrationMappingManualDAO $integrationMappingManual
-     * @param SyncDataExchangeServiceInterface $internalSyncDataExchange
-     * @param SyncDataExchangeServiceInterface $integrationSyncDataExchange
+     * @param SyncDataExchangeInterface $internalSyncDataExchange
+     * @param SyncDataExchangeInterface $integrationSyncDataExchange
      *
      * @return IntegrationSyncProcess
      */
@@ -24,7 +24,7 @@ interface IntegrationSyncProcessFactoryInterface
         $fromTimestamp,
         SyncJudgeServiceInterface $syncJudgeService,
         IntegrationMappingManualDAO $integrationMappingManual,
-        SyncDataExchangeServiceInterface $internalSyncDataExchange,
-        SyncDataExchangeServiceInterface $integrationSyncDataExchange
+        SyncDataExchangeInterface $internalSyncDataExchange,
+        SyncDataExchangeInterface $integrationSyncDataExchange
     );
 }

@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncService;
 
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeServiceInterface;
+use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeInterface;
 
 /**
  * Interface IntegrationSyncServiceInterface
@@ -11,8 +11,8 @@ use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\
 interface IntegrationSyncServiceInterface
 {
     /**
-     * @param SyncDataExchangeServiceInterface $syncDataExchangeService
+     * @param SyncDataExchangeInterface $syncDataExchangeService
      * @param int $fromTimestamp
      */
-    public function processIntegrationSync(SyncDataExchangeServiceInterface $syncDataExchangeService, $fromTimestamp);
+    public function processIntegrationSync(SyncDataExchangeInterface $syncDataExchangeService, $fromTimestamp);
 }

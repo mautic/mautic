@@ -29,17 +29,17 @@ class ObjectChangeDAO
     private $fieldsChanges = [];
 
     /**
-     * @var int
+     * @var int|null
      */
-    private $changeTimestamp;
+    private $changeTimestamp = null;
 
     /**
      * ObjectChangeDAO constructor.
      * @param int       $id
      * @param string    $entity
-     * @param int       $changeTimestamp
+     * @param int|null  $changeTimestamp
      */
-    public function __construct($id, $entity, $changeTimestamp)
+    public function __construct($id, $entity, $changeTimestamp = null)
     {
         $this->id = $id;
         $this->entity = $entity;
