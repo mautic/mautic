@@ -228,7 +228,8 @@ class MembershipManager
     /**
      * @param ArrayCollection $contacts
      * @param Campaign        $campaign
-     * @param bool            $isExit
+     * @param bool            $isExit   If true, the contact can be added by a segment/source. If false, the contact can only be added back
+     *                                  by a manual process.
      */
     public function removeContacts(ArrayCollection $contacts, Campaign $campaign, $isExit = false)
     {

@@ -223,7 +223,7 @@ class MembershipBuilder
             $contactsProcessed += $contactCollection->count();
 
             // Add the contacts to this segment
-            $this->manager->removeContacts($contactCollection, $this->campaign, false);
+            $this->manager->removeContacts($contactCollection, $this->campaign, true);
 
             // Clear Lead entities from RAM
             $this->leadRepository->clear();
