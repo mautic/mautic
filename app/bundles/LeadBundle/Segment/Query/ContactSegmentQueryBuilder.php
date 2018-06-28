@@ -180,9 +180,14 @@ class ContactSegmentQueryBuilder
     public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
     {
         $tableAlias = $this->generateRandomParameterName();
-        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias,
-            'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId));
-        $queryBuilder->addJoinCondition($tableAlias,
+        $queryBuilder->leftJoin(
+            'l',
+            MAUTIC_TABLE_PREFIX.'lead_lists_leads',
+            $tableAlias,
+            'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId)
+        );
+        $queryBuilder->addJoinCondition(
+            $tableAlias,
             $queryBuilder->expr()->andX(
                 $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1)
             )
@@ -203,8 +208,12 @@ class ContactSegmentQueryBuilder
     public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
     {
         $tableAlias = $this->generateRandomParameterName();
-        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias,
-            'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId));
+        $queryBuilder->leftJoin(
+            'l',
+            MAUTIC_TABLE_PREFIX.'lead_lists_leads',
+            $tableAlias,
+            'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId)
+        );
         $queryBuilder->addJoinCondition($tableAlias, $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 1));
         $queryBuilder->andWhere($queryBuilder->expr()->isNull($tableAlias.'.lead_id'));
 
@@ -293,20 +302,20 @@ class ContactSegmentQueryBuilder
         return $resolved;
     }
 
-	/**
-	 * @param int $segmentId
-	 *
-	 * @return array
-	 */
+    /**
+     * @param int $segmentId
+     *
+     * @return array
+     */
     private function getSegmentEdges($segmentId)
     {
-		$segment = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->find($segmentId);
-		if (null === $segment) {
-			return [];
-		}
+        $segment = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->find($segmentId);
+        if (null === $segment) {
+            return [];
+        }
 
         $segmentFilters = $segment->getFilters();
-		$segmentEdges   = [];
+        $segmentEdges   = [];
 
         foreach ($segmentFilters as $segmentFilter) {
             if (isset($segmentFilter['field']) && 'leadlist' === $segmentFilter['field']) {
