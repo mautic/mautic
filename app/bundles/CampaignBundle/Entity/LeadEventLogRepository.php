@@ -409,7 +409,8 @@ class LeadEventLogRepository extends CommonRepository
                     $q->expr()->eq('IDENTITY(o.event)', ':eventId'),
                     $q->expr()->eq('o.isScheduled', ':true'),
                     $q->expr()->lte('o.triggerDate', ':now'),
-                    $q->expr()->eq('c.isPublished', 1)
+                    $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->eq('e.isPublished', 1)
                 )
             )
             ->setParameter('eventId', (int) $eventId)

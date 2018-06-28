@@ -23,6 +23,7 @@
 /app/config/local*.php
 /app/config/config_local.php
 /app/config/paths_local.php
+/app/config/parameters_local.php
 
 /app/logs/*
 !/app/logs/.gitkeep
