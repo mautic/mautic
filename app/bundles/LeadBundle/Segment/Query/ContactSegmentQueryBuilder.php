@@ -300,14 +300,13 @@ class ContactSegmentQueryBuilder
 	 */
     private function getSegmentEdges($segmentId)
     {
-		$segmentEdges   = [];
-
 		$segment = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->find($segmentId);
-		if (!$segment) {
-			return $segmentEdges;
+		if (null === $segment) {
+			return [];
 		}
 
         $segmentFilters = $segment->getFilters();
+		$segmentEdges   = [];
 
         foreach ($segmentFilters as $segmentFilter) {
             if (isset($segmentFilter['field']) && 'leadlist' === $segmentFilter['field']) {
