@@ -237,16 +237,17 @@ class EventExecutioner
     }
 
     /**
-     * @param ArrayCollection $children
+     * @param ArrayCollection $events
      * @param ArrayCollection $contacts
      * @param Counter|null    $childrenCounter
+     * @param bool            $isInactive
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null)
+    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false)
     {
         if (!$contacts->count()) {
             return;
@@ -260,7 +261,7 @@ class EventExecutioner
             return $event->getType() !== 'campaign.jump_to_event';
         });
 
-        $this->performEventLoop($otherEvents, $contacts, $childrenCounter);
+        $this->performEventLoop($otherEvents, $contacts, $childrenCounter, $isInactive);
 
         if ($jumpEvents->count()) {
             // Increment the campaign rotation for the given contacts and current campaign
@@ -269,21 +270,22 @@ class EventExecutioner
                 $jumpEvents->first()->getCampaign()->getId()
             );
 
-            $this->performEventLoop($jumpEvents, $contacts, $childrenCounter);
+            $this->performEventLoop($jumpEvents, $contacts, $childrenCounter, $isInactive);
         }
     }
 
     /**
-     * @param ArrayCollection $children
+     * @param ArrayCollection $events
      * @param ArrayCollection $contacts
      * @param Counter|null    $childrenCounter
+     * @param bool            $isInactive
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function performEventLoop(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null)
+    private function performEventLoop(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false)
     {
         foreach ($events as $event) {
             // Ignore decisions
@@ -299,16 +301,17 @@ class EventExecutioner
                 ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
             );
 
-            if ($this->scheduler->shouldSchedule($executionDate, $this->executionDate)) {
+            // Check if we need to schedule this if it is not an inactivity check
+            if (!$isInactive && $this->scheduler->shouldSchedule($executionDate, $this->executionDate)) {
                 if ($childrenCounter) {
                     $childrenCounter->advanceTotalScheduled($contacts->count());
                 }
 
-                $this->scheduler->schedule($event, $executionDate, $contacts);
+                $this->scheduler->schedule($event, $executionDate, $contacts, $isInactive);
                 continue;
             }
 
-            $this->executeForContacts($event, $contacts, $childrenCounter);
+            $this->executeForContacts($event, $contacts, $childrenCounter, $isInactive);
         }
     }
 
