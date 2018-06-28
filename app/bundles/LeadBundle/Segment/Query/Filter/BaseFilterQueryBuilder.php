@@ -46,7 +46,6 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
-        //var_dump($filter);
         $filterOperator = $filter->getOperator();
         $filterGlue     = $filter->getGlue();
 
@@ -65,8 +64,6 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         }
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
-
-        var_dump($filterOperator);
 
         switch ($filterOperator) {
             case 'empty':
