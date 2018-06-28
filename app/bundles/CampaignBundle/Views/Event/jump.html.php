@@ -18,8 +18,8 @@ if (empty($route)) {
 <?php endif; ?>
     <div class="campaign-event-content">
         <div><span class="campaign-event-name ellipsis"><?php if ('dev' === MAUTIC_ENV):?><small><?php echo $event['id']; ?></small> <?php endif; ?><?php echo $event['name']; ?></span></div>
-        <a class="btn btn-primary btn-xs highlight-jump-target" href="javascript:void(0)" onClick="Mautic.highlightJumpTarget(event, this)" data-jump-target="<?php echo $event['properties']['jumpToEvent']; ?>">
-            <i class="fa fa-refresh btn-nospin" style="margin-top:3px;"></i>
+        <a class="btn btn-primary btn-nospin btn-xs highlight-jump-target" href="javascript:void(0)" onClick="Mautic.highlightJumpTarget(event, this)" data-jump-target="<?php echo $event['properties']['jumpToEvent']; ?>">
+            <i class="fa fa-refresh" style="margin-top:4px;"></i>
         </a>
     </div>
 <?php if (empty($update)): ?>
