@@ -140,7 +140,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addGroupBy('l.id');
             }
 
-            $queryBuilder->$filterGlueFunc($expression);
+            $queryBuilder->addLogic($expression, $filter->getGlue());
         }
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
