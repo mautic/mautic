@@ -517,10 +517,12 @@ class LeadRepository extends CommonRepository
             ->set('cl.rotation', 'cl.rotation + 1')
             ->where(
                 $q->expr()->andX(
-                    $q->expr()->in('cl.lead_id', $q->createNamedParameter(implode(',', $contactIds))),
-                    $q->expr()->eq('cl.campaign_id', $q->createNamedParameter($campaignId))
+                    $q->expr()->in('cl.lead_id', ':contactIds'),
+                    $q->expr()->eq('cl.campaign_id', ':campaignId')
                 )
             )
+            ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY)
+            ->setParameter('campaignId', (int) $campaignId)
             ->execute();
     }
 
