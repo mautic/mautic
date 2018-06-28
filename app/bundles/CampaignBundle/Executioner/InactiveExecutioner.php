@@ -284,10 +284,11 @@ class InactiveExecutioner implements ExecutionerInterface
                     );
 
                     if ($contacts->count()) {
-                        // Execute or schedule the events attached to the inactive side of the decision
-                        $this->executeLogsForInactiveEvents($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
                         // Record decision for these contacts
                         $this->executioner->recordLogsAsExecutedForEvent($decisionEvent, $contacts, true);
+
+                        // Execute or schedule the events attached to the inactive side of the decision
+                        $this->executeLogsForInactiveEvents($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
                     }
 
                     // Clear contacts from memory
