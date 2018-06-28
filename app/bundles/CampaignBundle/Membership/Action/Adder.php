@@ -93,10 +93,16 @@ class Adder
             throw new ContactCannotBeAddedToCampaignException();
         }
 
-        if ($campaignMember->wasManuallyRemoved() && !$isManualAction && null === $campaignMember->getDateLastExited()) {
+        $wasRemoved = $campaignMember->wasManuallyRemoved();
+        if ($wasRemoved && !$isManualAction && null === $campaignMember->getDateLastExited()) {
             // Prevent contacts from being added back if they were manually removed but automatically added back
 
             throw new ContactCannotBeAddedToCampaignException();
+        }
+
+        if ($wasRemoved && $isManualAction) {
+            // If they were manually removed and manually added back, mark it as so
+            $campaignMember->setManuallyAdded($isManualAction);
         }
 
         // Contact exited but has been added back to the campaign

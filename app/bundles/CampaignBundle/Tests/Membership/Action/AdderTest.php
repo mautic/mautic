@@ -16,7 +16,6 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Action\Adder;
-use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyInCampaignException;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -80,6 +79,22 @@ class AdderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $campaignMember->getRotation());
     }
 
+    public function testFilterRemovedAddedBackWhenManualActionAddsTheMember()
+    {
+        $campaignMember = new CampaignMember();
+        $campaignMember->setManuallyRemoved(true);
+        $campaignMember->setRotation(1);
+        $campaignMember->setDateLastExited(new \DateTime());
+        $campaign = new Campaign();
+        $campaign->setAllowRestart(true);
+        $campaignMember->setCampaign($campaign);
+
+        $this->getAdder()->updateExistingMembership($campaignMember, false);
+
+        $this->assertEquals(false, $campaignMember->wasManuallyAdded());
+        $this->assertEquals(2, $campaignMember->getRotation());
+    }
+
     public function testManuallyRemovedIsNotAddedBackWhenFilterActionAddsTheMember()
     {
         $this->expectException(ContactCannotBeAddedToCampaignException::class);
@@ -87,19 +102,6 @@ class AdderTest extends \PHPUnit_Framework_TestCase
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(true);
         $campaignMember->setRotation(1);
-        $campaign = new Campaign();
-        $campaign->setAllowRestart(false);
-        $campaignMember->setCampaign($campaign);
-
-        $this->getAdder()->updateExistingMembership($campaignMember, false);
-    }
-
-    public function testContactAlreadyInCampaignExceptionIsThrownWhenAllowRestartIsFalse()
-    {
-        $this->expectException(ContactAlreadyInCampaignException::class);
-
-        $campaignMember = new CampaignMember();
-        $campaignMember->setManuallyRemoved(false);
         $campaign = new Campaign();
         $campaign->setAllowRestart(false);
         $campaignMember->setCampaign($campaign);
