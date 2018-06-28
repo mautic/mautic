@@ -16,6 +16,8 @@ class PipedriveApi extends CrmApi
      */
     private $transport;
 
+    private $apiFields = [];
+
     /**
      * PipedriveApi constructor.
      *
@@ -180,6 +182,10 @@ class PipedriveApi extends CrmApi
      */
     public function getFields($object = null)
     {
+        if (!empty($this->apiFields[$object])) {
+            return $this->apiFields[$object];
+        }
+
         $params = [
             'query' => $this->getAuthQuery(),
         ];
@@ -187,6 +193,8 @@ class PipedriveApi extends CrmApi
         $url = sprintf('%s/%sFields', $this->integration->getApiUrl(), $object);
 
         $response = $this->transport->get($url, $params);
+
+        $this->apiFields[$object] = $response;
 
         return $this->getResponseData($response);
     }

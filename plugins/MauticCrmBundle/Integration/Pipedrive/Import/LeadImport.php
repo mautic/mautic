@@ -51,8 +51,7 @@ class LeadImport extends AbstractImport
         if ($integrationEntity) {
             throw new \Exception('Lead already have integration', Response::HTTP_CONFLICT);
         }
-
-        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::PERSON_ENTITY_TYPE));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
         if (!$lead =  $this->leadModel->checkForDuplicateContact($dataToUpdate)) {
@@ -107,7 +106,7 @@ class LeadImport extends AbstractImport
         // prevent listeners from exporting
         $lead->setEventData('pipedrive.webhook', 1);
 
-        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::PERSON_ENTITY_TYPE));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
         $lastSyncDate      = $integrationEntity->getLastSyncDate();

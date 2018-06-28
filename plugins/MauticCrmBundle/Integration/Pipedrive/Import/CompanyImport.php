@@ -53,7 +53,7 @@ class CompanyImport extends AbstractImport
         // prevent listeners from exporting
         $company->setEventData('pipedrive.webhook', 1);
 
-        $data       = $this->convertPipedriveData($data);
+        $data       = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(SELF::ORGANIZATION_ENTITY_TYPE));
         $mappedData = $this->getMappedCompanyData($data);
 
         // find company exists
@@ -108,7 +108,7 @@ class CompanyImport extends AbstractImport
         // prevent listeners from exporting
         $company->setEventData('pipedrive.webhook', 1);
 
-        $data    = $this->convertPipedriveData($data);
+        $data    = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(SELF::ORGANIZATION_ENTITY_TYPE));
         if ($data['owner_id']) {
             $this->addOwnerToCompany($data['owner_id'], $company);
         }
