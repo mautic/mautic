@@ -125,6 +125,22 @@ class IntegrationMappingManualDAO
     }
 
     /**
+     * @param string $entity
+     * @return string[]
+     */
+    public function getInternalFieldsList($entity)
+    {
+        if(!array_key_exists($entity, $this->internalFieldMapping)) {
+            throw new \InvalidArgumentException('Entity "' . $entity . '" wasn\'t found in mapping manual.');
+        }
+        $list = [];
+        foreach($this->internalFieldMapping[$entity] as $field => $fieldMappingIndex) {
+            $list[] = $field;
+        }
+        return $list;
+    }
+
+    /**
      * return string[]
      */
     public function getIntegrationEntities()

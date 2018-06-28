@@ -10,7 +10,7 @@ use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\IntegrationMappingManualItera
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\ObjectChangeDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\SyncOrderDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\SyncReportDAO;
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeServiceInterface;
+use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncJudgeService\SyncJudgeServiceInterface;
 use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncJudgeService\SyncJudgeServiceService;
 
@@ -32,7 +32,7 @@ class IntegrationSyncProcess
     private $integrationMappingManualIterator;
 
     /**
-     * @var SyncDataExchangeServiceInterface
+     * @var SyncDataExchangeInterface
      */
     private $internalSyncDataExchange;
 
@@ -47,7 +47,7 @@ class IntegrationSyncProcess
     private $internalSyncOrder;
 
     /**
-     * @var SyncDataExchangeServiceInterface
+     * @var SyncDataExchangeInterface
      */
     private $integrationSyncDataExchange;
 
@@ -66,15 +66,15 @@ class IntegrationSyncProcess
      * @param int    $fromTimestamp
      * @param SyncJudgeServiceInterface $syncJudgeService
      * @param IntegrationMappingManualDAO $integrationMappingManual
-     * @param SyncDataExchangeServiceInterface $internalSyncDataExchange
-     * @param SyncDataExchangeServiceInterface $integrationSyncDataExchange
+     * @param SyncDataExchangeInterface $internalSyncDataExchange
+     * @param SyncDataExchangeInterface $integrationSyncDataExchange
      */
     public function __construct(
         $fromTimestamp,
         SyncJudgeServiceInterface $syncJudgeService,
         IntegrationMappingManualDAO $integrationMappingManual,
-        SyncDataExchangeServiceInterface $internalSyncDataExchange,
-        SyncDataExchangeServiceInterface $integrationSyncDataExchange
+        SyncDataExchangeInterface $internalSyncDataExchange,
+        SyncDataExchangeInterface $integrationSyncDataExchange
     )
     {
         $this->syncJudgeService = $syncJudgeService;
@@ -156,7 +156,6 @@ class IntegrationSyncProcess
         );
         $judgeModes = [
             SyncJudgeServiceService::PRESUMPTION_OF_INNOCENCE_MODE,
-            SyncJudgeServiceService::HARD_EVIDENCE_MODE,
             SyncJudgeServiceService::BEST_EVIDENCE_MODE
         ];
         foreach($judgeModes as $judgeMode) {

@@ -29,13 +29,15 @@ class FieldChangeDAO
 
     /**
      * FieldChangeDAO constructor.
-     * @param string $field
-     * @param mixed  $value
+     * @param string    $field
+     * @param mixed     $value
+     * @param int|null  $certainChangeTimestamp
      */
-    public function __construct($field, $value)
+    public function __construct($field, $value, $certainChangeTimestamp)
     {
         $this->field = $field;
         $this->value = $value;
+        $this->certainChangeTimestamp = $certainChangeTimestamp;
     }
 
     /**
@@ -60,16 +62,6 @@ class FieldChangeDAO
     public function getCertainChangeTimestamp()
     {
         return $this->certainChangeTimestamp;
-    }
-
-    /**
-     * @param int|null $certainChangeTimestamp
-     * @return FieldChangeDAO
-     */
-    public function setCertainChangeTimestamp($certainChangeTimestamp)
-    {
-        $this->certainChangeTimestamp = $certainChangeTimestamp;
-        return $this;
     }
 
     /**

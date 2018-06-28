@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService;
+namespace MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\IntegrationMappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\SyncOrderDAO;
@@ -8,10 +8,10 @@ use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\SyncReportDAO;
 
 
 /**
- * Interface SyncDataExchangeServiceInterface
- * @package Mautic\PluginBundle\Model\Sync
+ * Interface SyncDataExchangeInterface
+ * @package MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService
  */
-interface SyncDataExchangeServiceInterface
+interface SyncDataExchangeInterface
 {
     /**
      * @return string

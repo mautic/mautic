@@ -8,12 +8,24 @@ namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
  */
 class IntegrationEntityMappingDAO
 {
+    /**
+     * @var string
+     */
     private $internalEntity;
 
+    /**
+     * @var int
+     */
     private $internalEntityId;
 
+    /**
+     * @var string
+     */
     private $integrationEntity;
 
+    /**
+     * @var int
+     */
     private $integrationEntityId;
 
     /**
