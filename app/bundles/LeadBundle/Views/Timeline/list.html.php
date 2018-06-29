@@ -67,7 +67,7 @@ $baseUrl = $view['router']->path(
             $counter += 1; // prevent 0
             $icon        = (isset($event['icon'])) ? $event['icon'] : 'fa-history';
             $eventLabel  = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
-            $isPublished = $this->container->get('mautic.campaign.model.event')->getEntity($event['extra']['log']['event_id'])->getIsPublished();
+            $isPublished = isset($event['extra']['log']['event_id']) ? $view->container->get('mautic.campaign.model.event')->getEntity($event['extra']['log']['event_id'])->getIsPublished() : 1;
             if (is_array($eventLabel)):
                 $linkType   = empty($eventLabel['isExternal']) ? 'data-toggle="ajax"' : 'target="_new"';
                 if (!$isPublished) {
