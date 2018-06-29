@@ -3,20 +3,24 @@
 namespace MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncService;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncProcess\IntegrationSyncProcessFactoryInterface;
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeInterface;
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncJudgeService\SyncJudgeServiceInterface;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudgeService\SyncJudgeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess\SyncProcessFactoryInterface;
 
 /**
- * Class IntegrationSyncService
- * @package Mautic\PluginBundle\Model\Sync
+ * Class SyncService
+ * @package MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncService
  */
-final class IntegrationSyncService implements IntegrationSyncServiceInterface
+final class SyncService implements SyncServiceInterface
 {
-    /** @var IntegrationSyncProcessFactoryInterface */
+    /**
+     * @var SyncProcessFactoryInterface
+     */
     private $integrationSyncProcessFactory;
 
-    /** @var SyncJudgeServiceInterface */
+    /**
+     * @var SyncJudgeInterface
+     */
     private $syncJudgeService;
 
     /**
@@ -30,17 +34,17 @@ final class IntegrationSyncService implements IntegrationSyncServiceInterface
     private $internalSyncDataExchange;
 
     /**
-     * IntegrationSyncService constructor.
+     * SyncService constructor.
      * @param IntegrationEntityRepository $integrationEntityRepository
      * @param SyncDataExchangeInterface $internalSyncDataExchange
-     * @param IntegrationSyncProcessFactoryInterface $integrationSyncProcessFactory
-     * @param SyncJudgeServiceInterface $syncJudgeService
+     * @param SyncProcessFactoryInterface $integrationSyncProcessFactory
+     * @param SyncJudgeInterface $syncJudgeService
      */
     public function __construct(
         IntegrationEntityRepository $integrationEntityRepository,
         SyncDataExchangeInterface $internalSyncDataExchange,
-        IntegrationSyncProcessFactoryInterface $integrationSyncProcessFactory,
-        SyncJudgeServiceInterface $syncJudgeService
+        SyncProcessFactoryInterface $integrationSyncProcessFactory,
+        SyncJudgeInterface $syncJudgeService
     )
     {
         $this->integrationEntityRepository = $integrationEntityRepository;

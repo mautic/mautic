@@ -2,7 +2,10 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
 
-
+/**
+ * Class InformationChangeRequestDAO
+ * @package MauticPlugin\MauticIntegrationsBundle\DAO\Sync
+ */
 class InformationChangeRequestDAO
 {
     /**
