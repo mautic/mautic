@@ -2,13 +2,13 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncService;
 
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
 
 /**
- * Interface IntegrationSyncServiceInterface
- * @package Mautic\PluginBundle\Model\Sync
+ * Interface SyncServiceInterface
+ * @package MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncService
  */
-interface IntegrationSyncServiceInterface
+interface SyncServiceInterface
 {
     /**
      * @param SyncDataExchangeInterface $syncDataExchangeService

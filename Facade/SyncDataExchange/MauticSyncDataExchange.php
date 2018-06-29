@@ -5,11 +5,12 @@ namespace MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\FieldChangeDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\IntegrationMappingManualDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\ObjectChangeDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\SyncOrderDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\SyncReportDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\FieldChangeDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ObjectChangeDAO AS ReportObjectChangeDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO AS OrderObjectChangeDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\VariableEncodeDAO;
 use MauticPlugin\MauticIntegrationsBundle\Services\VariableExpressorHelperInterface;
 
@@ -60,13 +61,13 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param IntegrationMappingManualDAO $integrationMapping
+     * @param MappingManualDAO $integrationMapping
      * @param int|null $fromTimestamp
-     * @return SyncReportDAO
+     * @return ReportDAO
      */
-    public function getSyncReport(IntegrationMappingManualDAO $integrationMapping, $fromTimestamp = null)
+    public function getSyncReport(MappingManualDAO $integrationMapping, $fromTimestamp = null)
     {
-        $syncReport = new SyncReportDAO('mautic');
+        $syncReport = new ReportDAO('mautic');
         $fieldsChanges = $this->repo->findAll();
         $objectChanges = [];
         foreach($fieldsChanges as $fieldChange) {
@@ -76,9 +77,9 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 $objectChanges[$object] = [];
             }
             if(!array_key_exists($objectId, $objectChanges[$object])) {
-                $objectChanges[$object][$objectId] = new ObjectChangeDAO($objectId, $object);
+                $objectChanges[$object][$objectId] = new ReportObjectChangeDAO($object, $objectId);
             }
-            /** @var ObjectChangeDAO $objectChangeDAO */
+            /** @var ReportObjectChangeDAO $objectChangeDAO */
             $objectChangeDAO = $objectChanges[$object][$objectId];
             $changeTimestamp = $fieldChange['modified_at'];
             $columnType = $fieldChange['column_type'];
@@ -95,38 +96,37 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param SyncOrderDAO $syncOrderDAO
+     * @param OrderDAO $syncOrderDAO
      */
-    public function executeSyncOrder(SyncOrderDAO $syncOrderDAO)
+    public function executeSyncOrder(OrderDAO $syncOrderDAO)
     {
         $objectChanges = $syncOrderDAO->getObjectsChanges();
         $chunkedObjectsChanges = [];
         $objectsIds = [];
         foreach($objectChanges as $objectChange) {
-            $entity = $objectChange->getEntity();
-            if(!array_key_exists($entity, $objectsIds)) {
-                $objectsIds[$entity] = [];
-                $chunkedObjectsChanges[$entity] = [];
+            $objectName = $objectChange->getObject();
+            if(!array_key_exists($objectName, $objectsIds)) {
+                $objectsIds[$objectName] = [];
+                $chunkedObjectsChanges[$objectName] = [];
             }
-            $objectsIds[$entity][] = $objectChange->getId();
-            $chunkedObjectsChanges[$entity][$objectChange->getId()] = $objectChange;
+            $objectsIds[$objectName][] = $objectChange->getObjectId();
+            $chunkedObjectsChanges[$objectName][$objectChange->getObjectId()] = $objectChange;
         }
-        foreach($objectsIds as $entity => $ids) {
-            switch($entity) {
+        foreach($objectsIds as $objectName => $ids) {
+            switch($objectName) {
                 case 'lead':
                     $leads = $this->leadRepository->findByIds($ids);
                     /** @var Lead $lead */
                     foreach($leads as $lead) {
-                        /** @var ObjectChangeDAO $objectChange */
-                        $objectChange = $chunkedObjectsChanges[$entity][$lead->getId()];
-                        $fieldsChanges = $objectChange->getFieldsChanges();
+                        /** @var OrderObjectChangeDAO $objectChange */
+                        $objectChange = $chunkedObjectsChanges[$objectName][$lead->getId()];
+                        $fieldsChanges = $objectChange->getFields();
                         foreach($fieldsChanges as $fieldsChange) {
-                            $lead->addUpdatedField($fieldsChange->getField(), $fieldsChange->getValue());
+                            $lead->addUpdatedField($fieldsChange->getName(), $fieldsChange->getValue());
                         }
                         $this->em->persist($lead);
                     }
             }
         }
-
     }
 }

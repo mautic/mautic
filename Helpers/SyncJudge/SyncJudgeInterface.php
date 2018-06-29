@@ -1,13 +1,14 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncJudgeService;
+namespace MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudgeService;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\InformationChangeRequestDAO;
 
 /**
- * Interface SyncJudgeServiceInterface.
+ * Interface SyncJudgeInterface
+ * @package MauticPlugin\MauticIntegrationsBundle\Services\SyncJudge
  */
-interface SyncJudgeServiceInterface
+interface SyncJudgeInterface
 {
     /**
      * Winner is selected only if provided vindications don't leave open possibilities of different result.

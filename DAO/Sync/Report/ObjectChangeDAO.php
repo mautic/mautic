@@ -1,25 +1,25 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
+namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report;
 
 /**
  * Class ObjectChangeDAO
- * @package Mautic\PluginBundle\Model\Sync\DAO
+ * @package MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report
  */
 class ObjectChangeDAO
 {
     /**
-     * @var int
-     */
-    private $id;
-
-    /**
      * @var string
      */
-    private $entity;
+    private $object;
 
     /**
-     * @var mixed[] name => value
+     * @var int
+     */
+    private $objectId;
+
+    /**
+     * @var FieldDAO[]
      */
     private $fields = [];
 
@@ -35,26 +35,24 @@ class ObjectChangeDAO
 
     /**
      * ObjectChangeDAO constructor.
-     * @param int       $id
-     * @param string    $entity
+     * @param string       $object
+     * @param int    $objectId
      * @param int|null  $changeTimestamp
      */
-    public function __construct($id, $entity, $changeTimestamp = null)
+    public function __construct($object, $objectId, $changeTimestamp = null)
     {
-        $this->id = $id;
-        $this->entity = $entity;
+        $this->object = $object;
+        $this->objectId = $objectId;
         $this->changeTimestamp = $changeTimestamp;
     }
 
     /**
-     * @param string    $name
-     * @param mixed     $value
-     *
-     * @return self
+     * @param FieldDAO $fieldDAO
+     * @return $this
      */
-    public function addField($name, $value)
+    public function addField(FieldDAO $fieldDAO)
     {
-        $this->fields[$name] = $value;
+        $this->fields[$fieldDAO->getName()] = $fieldDAO;
 
         return $this;
     }
@@ -74,23 +72,23 @@ class ObjectChangeDAO
     /**
      * @return int
      */
-    public function getId()
+    public function getObjectId()
     {
-        return $this->id;
+        return $this->objectId;
     }
 
     /**
      * @return string
      */
-    public function getEntity()
+    public function getObject()
     {
-        return $this->entity;
+        return $this->object;
     }
 
     /**
      * @param string $name
      *
-     * @return mixed
+     * @return FieldDAO
      */
     public function getField($name)
     {
@@ -101,7 +99,7 @@ class ObjectChangeDAO
     }
 
     /**
-     * @return mixed[string] name => value
+     * @return FieldDAO[]
      */
     public function getFields()
     {

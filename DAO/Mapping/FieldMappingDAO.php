@@ -1,12 +1,12 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
+namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
 
 /**
- * Class IntegrationFieldMappingDAO
- * @package Mautic\PluginBundle\Model\Sync\DAO
+ * Class FieldMappingDAO
+ * @package MauticPlugin\MauticIntegrationsBundle\DAO\Mapping
  */
-class IntegrationFieldMappingDAO
+class FieldMappingDAO
 {
     /**
      * @var string

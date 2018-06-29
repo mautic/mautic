@@ -1,25 +1,20 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
+namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
 
 /**
- * Class IntegrationMappingManualDAO
- * @package Mautic\PluginBundle\Model\Sync\DAO
+ * Class MappingManualDAO
+ * @package MauticPlugin\MauticIntegrationsBundle\DAO\Mapping
  */
-class IntegrationMappingManualDAO
+class MappingManualDAO
 {
     /**
-     * @var string
-     */
-    private $integration;
-
-    /**
-     * @var IntegrationEntityMappingDAO[]
+     * @var EntityMappingDAO[]
      */
     private $entityMappings = [];
 
     /**
-     * @var IntegrationFieldMappingDAO[]
+     * @var FieldMappingDAO[]
      */
     private $fieldMappings = [];
 
@@ -54,18 +49,9 @@ class IntegrationMappingManualDAO
     private $fieldMappingIndex = 0;
 
     /**
-     * IntegrationMappingManualDAO constructor.
-     * @param string $integration
+     * @param EntityMappingDAO $integrationEntityMapping
      */
-    public function __construct($integration)
-    {
-        $this->integration = $integration;
-    }
-
-    /**
-     * @param IntegrationEntityMappingDAO $integrationEntityMapping
-     */
-    public function addEntityMapping(IntegrationEntityMappingDAO $integrationEntityMapping)
+    public function addEntityMapping(EntityMappingDAO $integrationEntityMapping)
     {
         $this->entityMappings[$this->entityMappingIndex] = $integrationEntityMapping;
 
@@ -80,9 +66,9 @@ class IntegrationMappingManualDAO
     }
 
     /**
-     * @param IntegrationFieldMappingDAO $integrationFieldMapping
+     * @param FieldMappingDAO $integrationFieldMapping
      */
-    public function addFieldMapping(IntegrationFieldMappingDAO $integrationFieldMapping)
+    public function addFieldMapping(FieldMappingDAO $integrationFieldMapping)
     {
         $this->fieldMappings[$this->fieldMappingIndex] = $integrationFieldMapping;
 
@@ -172,7 +158,7 @@ class IntegrationMappingManualDAO
      * @param string $integrationEntity
      * @param int    $integrationEntityId
      *
-     * @return IntegrationEntityMappingDAO|null
+     * @return EntityMappingDAO|null
      */
     public function getInternalEntityMapping($integrationEntity, $integrationEntityId)
     {
@@ -187,7 +173,7 @@ class IntegrationMappingManualDAO
      * @param string $internalEntity
      * @param int    $internalEntityId
      *
-     * @return IntegrationEntityMappingDAO|null
+     * @return EntityMappingDAO|null
      */
     public function getIntegrationEntityMapping($internalEntity, $internalEntityId)
     {
@@ -202,7 +188,7 @@ class IntegrationMappingManualDAO
      * @param string $integrationEntity
      * @param string $integrationField
      *
-     * @return IntegrationFieldMappingDAO|null
+     * @return FieldMappingDAO|null
      */
     public function getInternalFieldMapping($integrationEntity, $integrationField)
     {
@@ -217,7 +203,7 @@ class IntegrationMappingManualDAO
      * @param string $internalEntity
      * @param string $internalField
      *
-     * @return IntegrationFieldMappingDAO|null
+     * @return FieldMappingDAO|null
      */
     public function getIntegrationFieldMapping($internalEntity, $internalField)
     {
@@ -264,7 +250,7 @@ class IntegrationMappingManualDAO
     }
 
     /**
-     * @return IntegrationEntityMappingDAO[]
+     * @return EntityMappingDAO[]
      */
     public function getEntityMappings()
     {
