@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\TypeNotFoundException;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Executioner\Event\ActionExecutioner;
 use Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
@@ -258,7 +259,7 @@ class EventExecutioner
 
         // Execute non jump-to events normally
         $otherEvents = $executeThese->filter(function (Event $event) {
-            return 'campaign.jump_to_event' !== $event->getType();
+            return CampaignActionJumpToEventSubscriber::EVENT_NAME !== $event->getType();
         });
         if ($otherEvents->count()) {
             foreach ($otherEvents as $event) {
@@ -268,7 +269,7 @@ class EventExecutioner
 
         // Create logs for the jump to events before the rotation is incremented
         $jumpEvents = $executeThese->filter(function (Event $event) {
-            return 'campaign.jump_to_event' === $event->getType();
+            return CampaignActionJumpToEventSubscriber::EVENT_NAME === $event->getType();
         });
         if ($jumpEvents->count()) {
             $jumpLogs = [];

@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
@@ -357,7 +358,7 @@ class ScheduledExecutioner implements ExecutionerInterface
             $event     = $log->getEvent();
             $eventType = $event->getType();
 
-            if ('campaign.jump_to_event' === $eventType) {
+            if (CampaignActionJumpToEventSubscriber::EVENT_NAME === $eventType) {
                 if (!isset($jumpTo[$event->getId()])) {
                     $jumpTo[$event->getId()] = new ArrayCollection();
                 }

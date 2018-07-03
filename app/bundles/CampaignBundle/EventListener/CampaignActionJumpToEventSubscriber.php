@@ -24,6 +24,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
+    const EVENT_NAME = 'campaign.jump_to_event';
+
     /**
      * @var EventRepository
      */
@@ -66,7 +68,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         // Add action to jump to another event in the campaign flow.
-        $event->addAction('campaign.jump_to_event', [
+        $event->addAction(self::EVENT_NAME, [
             'label'                  => 'mautic.campaign.event.jump_to_event',
             'description'            => 'mautic.campaign.event.jump_to_event_descr',
             'formType'               => CampaignEventJumpToEventType::class,
@@ -120,7 +122,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
         $toSave   = [];
 
         foreach ($events as $event) {
-            if ($event->getType() !== 'campaign.jump_to_event') {
+            if ($event->getType() !== self::EVENT_NAME) {
                 continue;
             }
 
@@ -130,7 +132,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
                 $event->setProperties(array_merge(
                     $event->getProperties(),
                     [
-                        'jumpToTarget' => $jumpTarget->getId(),
+                        'jumpToEvent' => $jumpTarget->getId(),
                     ]
                 ));
 
