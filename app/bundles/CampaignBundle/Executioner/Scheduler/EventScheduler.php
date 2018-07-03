@@ -100,7 +100,7 @@ class EventScheduler
      */
     public function scheduleForContact(Event $event, \DateTime $executionDate, Lead $contact)
     {
-        $contacts =  new ArrayCollection([$contact]);
+        $contacts = new ArrayCollection([$contact]);
 
         $this->schedule($event, $executionDate, $contacts);
     }
@@ -161,6 +161,24 @@ class EventScheduler
         $config = $this->collector->getEventConfig($event);
 
         $this->dispatchScheduledEvent($config, $log, true);
+    }
+
+    /**
+     * @param ArrayCollection|LeadEventLog[] $logs
+     * @param \DateTime                      $toBeExecutedOn
+     */
+    public function rescheduleLogs(ArrayCollection $logs, \DateTime $toBeExecutedOn)
+    {
+        foreach ($logs as $log) {
+            $log->setTriggerDate($toBeExecutedOn);
+        }
+
+        $this->eventLogger->persistCollection($logs);
+
+        $event  = $logs->first()->getEvent();
+        $config = $this->collector->getEventConfig($event);
+
+        $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
     }
 
     /**
@@ -272,13 +290,16 @@ class EventScheduler
             $eventExecutionDates[$child->getId()] = $this->getExecutionDateTime($child, $lastActiveDate);
         }
 
-        uasort($eventExecutionDates, function (\DateTime $a, \DateTime $b) {
-            if ($a === $b) {
-                return 0;
-            }
+        uasort(
+            $eventExecutionDates,
+            function (\DateTime $a, \DateTime $b) {
+                if ($a === $b) {
+                    return 0;
+                }
 
-            return $a < $b ? -1 : 1;
-        });
+                return $a < $b ? -1 : 1;
+            }
+        );
 
         return $eventExecutionDates;
     }

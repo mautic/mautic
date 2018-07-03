@@ -146,6 +146,10 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->executioner->expects($this->exactly(2))
             ->method('executeLogs');
 
+        $this->scheduler->expects($this->exactly(2))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
+
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
         $counter = $this->getExecutioner()->execute($campaign, $limiter);
@@ -165,17 +169,27 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $event->method('getCampaign')
             ->willReturn($campaign);
 
-        $log1 = new LeadEventLog();
-        $log1->setEvent($event);
-        $log1->setCampaign($campaign);
-        $log1->setDateTriggered(new \DateTime());
+        $log1 = $this->createMock(LeadEventLog::class);
+        $log1->method('getId')
+            ->willReturn(1);
+        $log1->method('getEvent')
+            ->willReturn($event);
+        $log1->method('getCampaign')
+            ->willReturn($campaign);
+        $log1->method('getDateTriggered')
+            ->willReturn(new \DateTime());
 
-        $log2 = new LeadEventLog();
-        $log2->setEvent($event);
-        $log2->setCampaign($campaign);
-        $log2->setDateTriggered(new \DateTime());
+        $log2 = $this->createMock(LeadEventLog::class);
+        $log2->method('getId')
+            ->willReturn(2);
+        $log2->method('getEvent')
+            ->willReturn($event);
+        $log2->method('getCampaign')
+            ->willReturn($campaign);
+        $log2->method('getDateTriggered')
+            ->willReturn(new \DateTime());
 
-        $logs = new ArrayCollection([$log1, $log2]);
+        $logs = new ArrayCollection([1 => $log1, 2 => $log2]);
 
         $this->repository->expects($this->once())
             ->method('getScheduledByIds')
@@ -189,7 +203,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->executioner->expects($this->exactly(1))
             ->method('executeLogs');
 
-        $this->contactFinder->expects($this->once())
+        $this->contactFinder->expects($this->exactly(1))
             ->method('hydrateContacts')
             ->with($logs);
 
