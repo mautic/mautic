@@ -329,9 +329,13 @@ class EventScheduler
      */
     public function shouldSchedule(\DateTime $executionDate, \DateTime $now)
     {
-        // Purposively ignore seconds to prevent rescheduling based on a variance of a few seconds
-        $executionDate = new \DateTime($executionDate->format('Y-m-d H:i'), $executionDate->getTimezone());
-        $now           = new \DateTime($now->format('Y-m-d H:i'), $now->getTimezone());
+        // Mainly for functional tests so we don't have to wait minutes but technically can be used in an environment as well if this behavior
+        // is desired by system admin
+        if (false === (bool) getenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS')) {
+            // Purposively ignore seconds to prevent rescheduling based on a variance of a few seconds
+            $executionDate = new \DateTime($executionDate->format('Y-m-d H:i'), $executionDate->getTimezone());
+            $now           = new \DateTime($now->format('Y-m-d H:i'), $now->getTimezone());
+        }
 
         return $executionDate > $now;
     }
