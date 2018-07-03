@@ -345,7 +345,6 @@ class ScheduledExecutioner implements ExecutionerInterface
             if ($this->scheduler->shouldSchedule($executionDate, $now)) {
                 // The schedule has changed for this event since first scheduled
                 $this->counter->advanceTotalScheduled();
-
                 if ($scheduleTogether) {
                     $toBeRescheduled->set($key, $log);
 
