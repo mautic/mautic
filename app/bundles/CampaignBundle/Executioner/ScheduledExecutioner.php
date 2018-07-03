@@ -212,7 +212,7 @@ class ScheduledExecutioner implements ExecutionerInterface
             $event = $organizedLogs->first()->getEvent();
 
             // Validate that the schedule is still appropriate
-            $this->validateSchedule($event, $organizedLogs, $now);
+            $this->validateSchedule($event, $organizedLogs, $now, true);
 
             try {
                 // Hydrate contacts with custom field data
@@ -323,28 +323,39 @@ class ScheduledExecutioner implements ExecutionerInterface
      * @param Event           $event
      * @param ArrayCollection $logs
      * @param \DateTime       $now
+     * @param bool            $scheduleTogether
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function validateSchedule(Event $event, ArrayCollection $logs, \DateTime $now)
+    private function validateSchedule(Event $event, ArrayCollection $logs, \DateTime $now, $scheduleTogether = false)
     {
-        $executionDate = $this->scheduler->getExecutionDateTime($event, $now);
-        $this->logger->debug(
-            'CAMPAIGN: Batch of scheduled logs'.
-            ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
-            ' compared to '.$now->format('Y-m-d H:i:s')
-        );
-
-        $toBeRescheduled = new ArrayCollection();
+        $toBeRescheduled     = new ArrayCollection();
+        $latestExecutionDate = $now;
 
         // Check if the event should be scheduled (let the schedulers do the debug logging)
         /** @var LeadEventLog $log */
         foreach ($logs as $key => $log) {
+            $executionDate = $this->scheduler->getExecutionDateTime($event, $now, $log->getDateTriggered());
+            $this->logger->debug(
+                'CAMPAIGN: Log ID #'.$log->getID().
+                ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
+                ' compared to '.$now->format('Y-m-d H:i:s')
+            );
+
             if ($this->scheduler->shouldSchedule($executionDate, $now)) {
                 // The schedule has changed for this event since first scheduled
                 $this->counter->advanceTotalScheduled();
 
-                $toBeRescheduled->set($key, $log);
+                if ($scheduleTogether) {
+                    $toBeRescheduled->set($key, $log);
+
+                    if ($executionDate > $latestExecutionDate) {
+                        $latestExecutionDate = $executionDate;
+                    }
+                } else {
+                    $this->scheduler->reschedule($log, $executionDate);
+                }
+
                 $logs->remove($key);
 
                 continue;
@@ -352,7 +363,7 @@ class ScheduledExecutioner implements ExecutionerInterface
         }
 
         if ($toBeRescheduled->count()) {
-            $this->scheduler->rescheduleLogs($toBeRescheduled, $executionDate);
+            $this->scheduler->rescheduleLogs($toBeRescheduled, $latestExecutionDate);
         }
     }
 
