@@ -42,9 +42,9 @@ class Version20180702145735 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql = <<<SQL
-INSERT INTO `{$this->prefix}lead_fields` (`is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `properties`) 
+INSERT INTO `{$this->prefix}lead_fields` (`is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `properties`, `object`) 
 VALUES 
-    (1,'Active', 'last_active', 'datetime', 'core', NULL , 0, 1, 1, 0, 1, 0, 0, 24, 'a:0:{}')
+    (1,'Date Last Active', 'last_active', 'datetime', 'core', NULL , 0, 1, 1, 0, 1, 0, 0, 24, 'a:0:{}', 'lead')
 SQL;
         $this->addSql($sql);
         $this->addSql("CREATE INDEX {$this->prefix}last_active_search ON {$this->prefix}leads (last_active)");
