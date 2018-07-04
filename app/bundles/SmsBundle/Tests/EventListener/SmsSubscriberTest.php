@@ -58,10 +58,6 @@ class SmsSubscriberTest extends WebTestCase
         );
         $subscriber->onTokenReplacement($tokenReplacementEvent);
         $this->assertNotSame($this->messsageText, $tokenReplacementEvent->getContent());
-
-        $mockSmsHelper->expects($this->any())
-            ->method('getDisableTrackableUrls')
-            ->willReturn(true);
     }
 
     public function testOnTokenReplacementWithDisableTrackableUrls()
