@@ -460,18 +460,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Check if the report has a specific column.
-     *
-     * @param string $column
-     *
-     * @return bool
-     */
-    private function hasCalculatedColumn($column)
-    {
-        return in_array($column, $this->getReport()->getAggregators(), true);
-    }
-
-    /**
      * @return string
      */
     public function createParameterName()
