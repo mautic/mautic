@@ -103,6 +103,9 @@ class AjaxController extends CommonAjaxController
                     'type'    => $field->getType(),
                     'options' => $options,
                 ];
+
+                // Be sure to not pollute the symbol table.
+                unset($optionList);
             }
         }
 
