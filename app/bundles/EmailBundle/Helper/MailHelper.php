@@ -440,6 +440,7 @@ class MailHelper
                 for ($sendAttempt = 0; $sendAttempt < 3 ; $sendAttempt++) {
                     try {
                         $this->mailer->send($this->message, $failures);
+                        break;
                     } catch(\Exception $e) {
                         if($sendAttempt >= 2) {
                             throw $e;
