@@ -254,25 +254,28 @@ class EventExecutioner
             return;
         }
 
-        // Schedule and return those that need to be executed
+        // Schedule then return those that need to be immediately executed
         $executeThese = $this->scheduleEvents($events, $contacts, $childrenCounter, $isInactive);
 
         // Execute non jump-to events normally
         $otherEvents = $executeThese->filter(function (Event $event) {
             return CampaignActionJumpToEventSubscriber::EVENT_NAME !== $event->getType();
         });
+
         if ($otherEvents->count()) {
             foreach ($otherEvents as $event) {
                 $this->executeForContacts($event, $contacts, $childrenCounter, $isInactive);
             }
         }
 
-        // Create logs for the jump to events before the rotation is incremented
+        // Now execute jump to events
         $jumpEvents = $executeThese->filter(function (Event $event) {
             return CampaignActionJumpToEventSubscriber::EVENT_NAME === $event->getType();
         });
         if ($jumpEvents->count()) {
             $jumpLogs = [];
+
+            // Create logs for the jump to events before the rotation is incremented
             foreach ($jumpEvents as $key => $event) {
                 $config         = $this->collector->getEventConfig($event);
                 $jumpLogs[$key] = $this->eventLogger->fetchRotationAndGenerateLogsFromContacts($event, $config, $contacts, $isInactive);
@@ -285,10 +288,34 @@ class EventExecutioner
                 $jumpEvents->first()->getCampaign()->getId()
             );
 
+            // Process the jump to events
             foreach ($jumpLogs as $key => $logs) {
                 $this->executeLogs($jumpEvents->get($key), $logs, $childrenCounter);
             }
         }
+    }
+
+    /**
+     * @param Event           $event
+     * @param ArrayCollection $contacts
+     * @param bool            $isInactiveEvent
+     */
+    public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, $isInactiveEvent = false)
+    {
+        $config = $this->collector->getEventConfig($event);
+        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
+
+        // Save updated log entries and clear from memory
+        $this->eventLogger->persistCollection($logs)
+            ->clearCollection($logs);
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getExecutionDate()
+    {
+        return $this->executionDate;
     }
 
     /**
@@ -334,29 +361,6 @@ class EventExecutioner
         }
 
         return $events;
-    }
-
-    /**
-     * @param Event           $event
-     * @param ArrayCollection $contacts
-     * @param bool            $isInactiveEvent
-     */
-    public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, $isInactiveEvent = false)
-    {
-        $config = $this->collector->getEventConfig($event);
-        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
-
-        // Save updated log entries and clear from memory
-        $this->eventLogger->persistCollection($logs)
-            ->clearCollection($logs);
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getExecutionDate()
-    {
-        return $this->executionDate;
     }
 
     /**

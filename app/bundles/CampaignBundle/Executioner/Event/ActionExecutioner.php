@@ -55,7 +55,6 @@ class ActionExecutioner implements EventInterface
      * @throws CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \ReflectionException
      */
     public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
     {
