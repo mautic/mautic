@@ -21,6 +21,7 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
@@ -37,15 +38,21 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
     private $eventExecutioner;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * CampaignActionJumpToEvent constructor.
      *
      * @param EventRepository  $eventRepository
      * @param EventExecutioner $eventExecutioner
      */
-    public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner)
+    public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner, TranslatorInterface $translator)
     {
         $this->eventRepository  = $eventRepository;
         $this->eventExecutioner = $eventExecutioner;
+        $this->translator       = $translator;
     }
 
     /**

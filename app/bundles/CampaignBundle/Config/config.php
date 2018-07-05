@@ -180,6 +180,7 @@ return [
                 'arguments' => [
                     'mautic.campaign.repository.event',
                     'mautic.campaign.event_executioner',
+                    'translator',
                 ],
             ],
         ],

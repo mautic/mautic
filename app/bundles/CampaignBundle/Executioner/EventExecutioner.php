@@ -83,6 +83,11 @@ class EventExecutioner
     private $executionDate;
 
     /**
+     * @var LeadRepository
+     */
+    private $leadRepository;
+
+    /**
      * EventExecutioner constructor.
      *
      * @param EventCollector       $eventCollector
