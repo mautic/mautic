@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CampaignBundle\Executioner\Scheduler;
+namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler;
 
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;

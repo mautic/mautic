@@ -339,7 +339,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $this->scheduler->expects($this->once())
             ->method('rescheduleLogs')
-            ->with($this->isInstanceOf(ArrayCollection::class, $threeMinuteDateTime));
+            ->with($this->isInstanceOf(ArrayCollection::class), $threeMinuteDateTime);
 
         $counter = $this->getExecutioner()->executeByIds([1, 2]);
 
