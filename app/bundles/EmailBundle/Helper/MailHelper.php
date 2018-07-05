@@ -437,7 +437,15 @@ class MailHelper
                     $this->transportStartTime = time();
                 }
 
-                $this->mailer->send($this->message, $failures);
+                for ($sendAttempt = 0; $sendAttempt < 3 ; $sendAttempt++) {
+                    try {
+                        $this->mailer->send($this->message, $failures);
+                    } catch(\Exception $e) {
+                        if($sendAttempt >= 2) {
+                            throw $e;
+                        }
+                    }
+                }
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
