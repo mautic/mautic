@@ -68,7 +68,7 @@ class ContactSegmentQueryBuilder
 
         $queryBuilder->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        /**
+        /*
          * Validate the plan, check for circular dependencies.
          *
          * the bigger count($plan), the higher complexity of query
