@@ -10,7 +10,7 @@ Please note the following assumptions about this plugin:
 
 ## Install integrations bundle
 
-1. Download https://github.com/mautic-inc/mautic-integrations/archive/master.zip
-2. Extract it and rename `mautic-integrations-master` to `MauticIntegrationsBundle`
+1. Download https://github.com/mautic-inc/plugin-mautic-integrations/archive/master.zip
+2. Extract it and rename `plugin-mautic-integrations-master` to `MauticIntegrationsBundle`
 3. Move `MauticIntegrationsBundle` into Mautic's `plugins` folder (fix ownership if using something other than the web user)
 4. Delete `app/cache/prod`
