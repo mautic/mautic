@@ -30,6 +30,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     protected $lockExpiration = false;
     protected $lockHandler;
     protected $lockFile;
+    private $bypassLocking;
 
     /* @var OutputInterface $output */
     protected $output;
@@ -41,6 +42,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     {
         $this
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.')
+            ->addOption('--bypass-locking', null, InputOption::VALUE_NONE, 'Bypass locking.')
             ->addOption(
                 '--timeout',
                 '-t',
@@ -67,12 +69,18 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     {
         $this->output         = $output;
         $this->lockExpiration = $input->getOption('timeout');
+        $this->bypassLocking  = $input->getOption('bypass-locking');
         $lockMode             = $input->getOption('lock_mode');
 
         if (!in_array($lockMode, ['pid', 'file_lock'])) {
             $output->writeln('<error>Unknown locking method specified.</error>');
 
             return false;
+        }
+
+        // If bypass locking, then don't bother locking
+        if ($this->bypassLocking) {
+            return true;
         }
 
         // Allow multiple runs of the same command if executing different IDs, etc
@@ -110,6 +118,10 @@ abstract class ModeratedCommand extends ContainerAwareCommand
      */
     protected function completeRun()
     {
+        if ($this->bypassLocking) {
+            return;
+        }
+
         if (self::MODE_LOCK == $this->moderationMode) {
             $this->lockHandler->release();
         }

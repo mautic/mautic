@@ -18,5 +18,6 @@ echo $view->render(
         'formName'      => (isset($formName)) ? $formName : '',
         'type'          => 'radio',
         'contactFields' => (isset($contactFields)) ? $contactFields : [],
+        'companyFields' => (isset($companyFields)) ? $companyFields : [],
     ]
 );

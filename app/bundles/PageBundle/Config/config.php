@@ -289,9 +289,10 @@ return [
                 ],
             ],
             'mautic.page.model.trackable' => [
-                'class'     => 'Mautic\PageBundle\Model\TrackableModel',
+                'class'     => \Mautic\PageBundle\Model\TrackableModel::class,
                 'arguments' => [
                     'mautic.page.model.redirect',
+                    'mautic.lead.repository.field',
                 ],
             ],
             'mautic.page.model.video' => [
@@ -299,6 +300,15 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.helper.ip_lookup',
+                ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.page.repository.redirect' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\PageBundle\Entity\Redirect::class,
                 ],
             ],
         ],

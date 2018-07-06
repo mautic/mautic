@@ -459,6 +459,15 @@ final class LeadEvents
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.lead.on_campaign_trigger_action';
 
     /**
+     * The mautic.lead.on_campaign_action_delete_contact event is dispatched when the campaign action to delete a contact is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_ACTION_DELETE_CONTACT = 'mautic.lead.on_campaign_action_delete_contact';
+
+    /**
      * The mautic.lead.on_campaign_trigger_condition event is fired when the campaign condition triggers.
      *
      * The event listener receives a
