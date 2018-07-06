@@ -42,6 +42,11 @@ class TokenSubscriber extends CommonSubscriber
      */
     public function decodeTokens(EmailSendEvent $event)
     {
+        if ($event->isDynamicContentParsing()) {
+            // prevent a loop
+            return;
+        }
+
         // Find and replace encoded tokens for trackable URL conversion
         $content = $event->getContent();
         $content = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $content, -1, $count);
@@ -57,11 +62,15 @@ class TokenSubscriber extends CommonSubscriber
             $lead       = $event->getLead();
             $tokens     = $event->getTokens();
             $tokenEvent = new TokenReplacementEvent(
-                null, $lead, [
+                null,
+                $lead,
+                [
                     'tokens'         => $tokens,
                     'lead'           => null,
                     'dynamicContent' => $dynamicContentAsArray,
-                ]
+                    'idHash'         => $event->getIdHash(),
+                ],
+                $email
             );
             $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
             $event->addTokens($tokenEvent->getTokens());
@@ -102,12 +111,14 @@ class TokenSubscriber extends CommonSubscriber
                 null,
                 [
                     'content' => $filterContent,
-                    'email'   => null,
-                    'idHash'  => null,
+                    'email'   => $event->getPassthrough(),
+                    'idHash'  => !empty($clickthrough['idHash']) ? $clickthrough['idHash'] : null,
                     'tokens'  => $tokens,
                     'lead'    => $lead,
-                ]
+                ],
+                true
             );
+
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $emailSendEvent);
             $untokenizedContent = $emailSendEvent->getContent(true);
 
