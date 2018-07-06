@@ -33,12 +33,12 @@ abstract class AbstractSmsApi
         $this->pageTrackableModel = $pageTrackableModel;
     }
 
-	/**
-	 * @param Lead   $lead
-	 * @param string $content
-	 *
-	 * @return mixed
-	 */
+    /**
+     * @param Lead   $lead
+     * @param string $content
+     *
+     * @return mixed
+     */
     abstract public function sendSms(Lead $lead, $content);
 
     /**

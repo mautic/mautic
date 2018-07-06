@@ -87,17 +87,17 @@ class TransportChain
         return $enabled[$this->primaryTransport];
     }
 
-	/**
-	 * @param Lead 	 $lead
-	 * @param string $content
-	 *
-	 * @return mixed
-	 *
-	 * @throws \Exception
-	 */
+    /**
+     * @param Lead   $lead
+     * @param string $content
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
     public function sendSms(Lead $lead, $content)
     {
-    	$number = $lead->getLeadPhoneNumber();
+        $number = $lead->getLeadPhoneNumber();
 
         $this->logger->addInfo('Sending an SMS message using '
                             .$this->transports[$this->primaryTransport]['integrationAlias'].' to '

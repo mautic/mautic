@@ -79,15 +79,15 @@ class TwilioApi extends AbstractSmsApi
         return $util->format($parsed, PhoneNumberFormat::E164);
     }
 
-	/**
-	 * @param Lead   $lead
-	 * @param string $content
-	 *
-	 * @return bool|string
-	 */
+    /**
+     * @param Lead   $lead
+     * @param string $content
+     *
+     * @return bool|string
+     */
     public function sendSms(Lead $lead, $content)
     {
-		$number = $lead->getLeadPhoneNumber();
+        $number = $lead->getLeadPhoneNumber();
 
         if ($number === null) {
             return false;
