@@ -401,17 +401,7 @@ class MailHelper
                 // Set metadata if applicable
                 if (method_exists($this->message, 'addMetadata')) {
                     foreach ($this->queuedRecipients as $email => $name) {
-                        $this->message->addMetadata(
-                            $email,
-                            [
-                                'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
-                                'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
-                                'hashId'      => $this->idHash,
-                                'hashIdState' => $this->idHashState,
-                                'source'      => $this->source,
-                                'tokens'      => $tokens,
-                            ]
-                        );
+                        $this->message->addMetadata($email, $this->buildMetadata($name, $tokens));
                     }
                 } elseif (!empty($tokens)) {
                     // Replace tokens
@@ -524,16 +514,7 @@ class MailHelper
                     ];
                 }
 
-                $this->metadata[$fromKey]['contacts'][$email] =
-                    [
-                        'name'        => $name,
-                        'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
-                        'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
-                        'hashId'      => $this->idHash,
-                        'hashIdState' => $this->idHashState,
-                        'source'      => $this->source,
-                        'tokens'      => $tokens,
-                    ];
+                $this->metadata[$fromKey]['contacts'][$email] = $this->buildMetadata($name, $tokens);
             }
 
             // Reset recipients
@@ -2129,6 +2110,27 @@ class MailHelper
                 }
             }
         }
+    }
+
+    /**
+     * @param       $name
+     * @param array $tokens
+     *
+     * @return array
+     */
+    private function buildMetadata($name, array $tokens)
+    {
+        return [
+            'name'        => $name,
+            'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
+            'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
+            'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
+            'hashId'      => $this->idHash,
+            'hashIdState' => $this->idHashState,
+            'source'      => $this->source,
+            'tokens'      => $tokens,
+            'utmTags'     => (!empty($this->email)) ? $this->email->getUtmTags() : [],
+        ];
     }
 
     /**

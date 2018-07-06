@@ -117,8 +117,10 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
             $content->setInlineCss($cssHeader);
         }
 
-        $returnPath   = $message->getReturnPath() ? $message->getReturnPath() : $messageFromEmail;
+        $returnPath = $message->getReturnPath() ? $message->getReturnPath() : $messageFromEmail;
+
         $transmission = new TransmissionDTO($content, $returnPath);
+        $transmission->setCampaignId($metadataProcessor->getCampaignId());
 
         $recipientsGrouped = [
             'to'  => (array) $message->getTo(),
