@@ -38,8 +38,12 @@ class ChannelExtractor
             return;
         }
 
+        if (!$event->getProperties()) {
+            return;
+        }
+
         $entity->setChannelId(
-            self::getChannelId($event->getProperties()['properties'], $channelIdField)
+            self::getChannelId($event->getProperties(), $channelIdField)
         );
     }
 
