@@ -271,7 +271,12 @@ class MailHelper
             $this->logError($e);
         }
 
-        $this->from       = $this->systemFrom       = (!empty($from)) ? $from : [$factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name')];
+        $systemFromEmail  = $factory->getParameter('mailer_from_email');
+        $systemFromName   = $this->cleanName(
+            $factory->getParameter('mailer_from_name')
+        );
+        $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
+
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
@@ -1210,6 +1215,8 @@ class MailHelper
      */
     public function setFrom($fromEmail, $fromName = null, $isGlobal = true)
     {
+        $fromName = $this->cleanName($fromName);
+
         if (null !== $isGlobal) {
             if ($isGlobal) {
                 if (is_array($fromEmail)) {
@@ -1226,7 +1233,6 @@ class MailHelper
         }
 
         try {
-            $fromName = $this->cleanName($fromName);
             $this->message->setFrom($fromEmail, $fromName);
         } catch (\Exception $e) {
             $this->logError($e, 'from');
@@ -2021,13 +2027,15 @@ class MailHelper
      */
     protected function cleanName($name)
     {
-        if (null !== $name) {
-            $name = trim($name);
+        if (null === $name) {
+            return $name;
+        }
 
-            // If empty, replace with null so that email clients do not show empty name because of To: '' <email@domain.com>
-            if (empty($name)) {
-                $name = null;
-            }
+        $name = trim(html_entity_decode($name, ENT_QUOTES));
+
+        // If empty, replace with null so that email clients do not show empty name because of To: '' <email@domain.com>
+        if (empty($name)) {
+            $name = null;
         }
 
         return $name;
@@ -2158,5 +2166,23 @@ class MailHelper
                 'Email address ['.$address.'] is invalid'
             );
         }
+    }
+
+    /**
+     * @param       $overrideFrom
+     * @param array $systemFrom
+     */
+    private function setDefaultFrom($overrideFrom, array $systemFrom)
+    {
+        if (is_array($overrideFrom)) {
+            $fromEmail         = key($overrideFrom);
+            $fromName          = $this->cleanName($overrideFrom[$fromEmail]);
+            $overrideFrom      = [$fromEmail => $fromName];
+        } elseif (!empty($overrideFrom)) {
+            $overrideFrom = [$overrideFrom => null];
+        }
+
+        $this->systemFrom = $overrideFrom ?: $systemFrom;
+        $this->from       = $this->systemFrom;
     }
 }
