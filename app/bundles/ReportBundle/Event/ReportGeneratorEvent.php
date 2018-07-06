@@ -386,15 +386,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function hasColumn($column)
     {
-        $reportColumns = $this->getReport()->getColumns();
-
-        if (is_array($this->getReport()->getAggregators())) {
-            $reportColumns = array_merge($reportColumns, array_column($this->getReport()->getAggregators(), 'column'));
-        }
-
         if (is_array($column)) {
             foreach ($column as $checkMe) {
-                if (in_array($checkMe, $reportColumns, true)) {
+                if (in_array($checkMe, $this->getReport()->getSelectAndAggregatorColumns(), true)) {
                     return true;
                 }
             }
@@ -402,7 +396,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
             return false;
         }
 
-        return in_array($column, $reportColumns, true);
+        return in_array($column, $this->getReport()->getSelectAndAggregatorColumns(), true);
     }
 
     /**
