@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
@@ -206,8 +207,14 @@ class ScheduledExecutioner implements ExecutionerInterface
         $scheduledLogCount = $totalLogsFound - $logs->count();
         $this->progressBar->advance($scheduledLogCount);
 
-        // Hydrate contacts with custom field data
-        $this->scheduledContactFinder->hydrateContacts($logs);
+        try {
+            // Hydrate contacts with custom field data
+            $this->scheduledContactFinder->hydrateContacts($logs);
+        } catch (NoContactsFoundException $e) {
+            $this->progressBar->clear();
+
+            return $this->counter;
+        }
 
         // Organize the logs by event ID
         $organized = $this->organizeByEvent($logs);
@@ -289,7 +296,11 @@ class ScheduledExecutioner implements ExecutionerInterface
     {
         $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         while ($logs->count()) {
-            $this->scheduledContactFinder->hydrateContacts($logs);
+            try {
+                $this->scheduledContactFinder->hydrateContacts($logs);
+            } catch (NoContactsFoundException $e) {
+                break;
+            }
 
             $event = $logs->first()->getEvent();
             $this->progressBar->advance($logs->count());
