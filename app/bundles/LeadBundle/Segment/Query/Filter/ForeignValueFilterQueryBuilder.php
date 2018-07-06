@@ -63,10 +63,15 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notIn':
-                $expression = $subQueryBuilder->expr()->$filterOperator(
+                // The use of NOT EXISTS here requires the use of IN instead of NOT IN to prevent a "double negative."
+                // We are not using EXISTS...NOT IN because it results in including everyone who has at least one entry that doesn't
+                // match the criteria. For example, with tags, if the contact has the tag in the filter but also another tag, they'll
+                // be included in the results which is not what we want.
+                $expression = $subQueryBuilder->expr()->in(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );
+
                 $subQueryBuilder->andWhere($expression);
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
