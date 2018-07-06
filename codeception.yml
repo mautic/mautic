@@ -7,6 +7,7 @@ paths:
     data: tests/_data
     support: tests/_support
     envs: tests/_envs
+    helpers: tests/_support
 actor_suffix: Tester
 coverage:
     enabled: true
@@ -18,3 +19,5 @@ coverage:
 extensions:
     enabled:
         - Codeception\Extension\RunFailed
+params:
+  - .env
