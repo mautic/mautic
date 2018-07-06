@@ -12,18 +12,42 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class TokenSubscriber.
  */
-class TokenSubscriber extends CommonSubscriber
+class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var PrimaryCompanyHelper
+     */
+    private $primaryCompanyHelper;
+
+    /**
+     * TokenSubscriber constructor.
+     *
+     * @param EventDispatcherInterface $dispatcher
+     * @param PrimaryCompanyHelper     $primaryCompanyHelper
+     */
+    public function __construct(EventDispatcherInterface $dispatcher, PrimaryCompanyHelper $primaryCompanyHelper)
+    {
+        $this->dispatcher           = $dispatcher;
+        $this->primaryCompanyHelper = $primaryCompanyHelper;
+    }
 
     /**
      * {@inheritdoc}
@@ -93,7 +117,9 @@ class TokenSubscriber extends CommonSubscriber
         $tokenData = $clickthrough['dynamicContent'];
 
         if ($lead instanceof Lead) {
-            $lead = $lead->getProfileFields();
+            $lead = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
+        } else {
+            $lead = $this->primaryCompanyHelper->mergePrimaryCompanyWithProfileFields($lead['id'], $lead);
         }
 
         foreach ($tokenData as $data) {

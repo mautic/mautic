@@ -754,6 +754,12 @@ return [
                     'mautic.lead.repository.lead',
                 ],
             ],
+            'mautic.lead.helper.primary_company' => [
+                'class'     => \Mautic\LeadBundle\Helper\PrimaryCompanyHelper::class,
+                'arguments' => [
+                    'mautic.lead.repository.company_lead',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [
@@ -761,6 +767,13 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\Company::class,
+                ],
+            ],
+            'mautic.lead.repository.company_lead' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\CompanyLead::class,
                 ],
             ],
             'mautic.lead.repository.dnc' => [
@@ -803,6 +816,13 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\MergeRecord::class,
+                ],
+            ],
+            'mautic.lead.repository.field' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\LeadField::class,
                 ],
             ],
         ],
