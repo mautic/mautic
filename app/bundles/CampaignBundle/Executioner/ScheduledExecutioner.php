@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -201,28 +202,28 @@ class ScheduledExecutioner implements ExecutionerInterface
         $this->progressBar = ProgressBarHelper::init($this->output, $totalLogsFound);
         $this->progressBar->start();
 
-        // Validate that the schedule is still appropriate
-        $now = new \DateTime();
-        $this->validateSchedule($logs, $now);
         $scheduledLogCount = $totalLogsFound - $logs->count();
         $this->progressBar->advance($scheduledLogCount);
 
-        try {
-            // Hydrate contacts with custom field data
-            $this->scheduledContactFinder->hydrateContacts($logs);
-        } catch (NoContactsFoundException $e) {
-            $this->progressBar->clear();
-
-            return $this->counter;
-        }
-
         // Organize the logs by event ID
         $organized = $this->organizeByEvent($logs);
+        $now       = new \DateTime();
         foreach ($organized as $organizedLogs) {
-            $this->progressBar->advance($organizedLogs->count());
-
             $event = $organizedLogs->first()->getEvent();
-            $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
+
+            // Validate that the schedule is still appropriate
+            $this->validateSchedule($event, $organizedLogs, $now, true);
+
+            try {
+                // Hydrate contacts with custom field data
+                $this->scheduledContactFinder->hydrateContacts($organizedLogs);
+
+                $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
+            } catch (NoContactsFoundException $e) {
+                // All of the events were rescheduled
+            }
+
+            $this->progressBar->advance($organizedLogs->count());
         }
 
         $this->progressBar->finish();
@@ -307,7 +308,7 @@ class ScheduledExecutioner implements ExecutionerInterface
             $this->counter->advanceEvaluated($logs->count());
 
             // Validate that the schedule is still appropriate
-            $this->validateSchedule($logs, $now);
+            $this->validateSchedule($event, $logs, $now);
 
             // Execute if there are any that did not get rescheduled
             $this->executioner->executeLogs($event, $logs, $this->counter);
@@ -319,37 +320,49 @@ class ScheduledExecutioner implements ExecutionerInterface
     }
 
     /**
+     * @param Event           $event
      * @param ArrayCollection $logs
      * @param \DateTime       $now
+     * @param bool            $scheduleTogether
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function validateSchedule(ArrayCollection $logs, \DateTime $now)
+    private function validateSchedule(Event $event, ArrayCollection $logs, \DateTime $now, $scheduleTogether = false)
     {
+        $toBeRescheduled     = new ArrayCollection();
+        $latestExecutionDate = $now;
+
         // Check if the event should be scheduled (let the schedulers do the debug logging)
         /** @var LeadEventLog $log */
         foreach ($logs as $key => $log) {
-            if ($createdDate = $log->getDateTriggered()) {
-                $event = $log->getEvent();
+            $executionDate = $this->scheduler->getExecutionDateTime($event, $now, $log->getDateTriggered());
+            $this->logger->debug(
+                'CAMPAIGN: Log ID #'.$log->getID().
+                ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
+                ' compared to '.$now->format('Y-m-d H:i:s')
+            );
 
-                // Date Triggered will be when the log entry was first created so use it to compare to ensure that the event's schedule
-                // hasn't been changed since this event was first scheduled
-                $executionDate = $this->scheduler->getExecutionDateTime($event, $now, $createdDate);
-                $this->logger->debug(
-                    'CAMPAIGN: Log ID# '.$log->getId().
-                    ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
-                    ' compared to '.$now->format('Y-m-d H:i:s')
-                );
+            if ($this->scheduler->shouldSchedule($executionDate, $now)) {
+                // The schedule has changed for this event since first scheduled
+                $this->counter->advanceTotalScheduled();
+                if ($scheduleTogether) {
+                    $toBeRescheduled->set($key, $log);
 
-                if ($this->scheduler->shouldSchedule($executionDate, $now)) {
-                    // The schedule has changed for this event since first scheduled
-                    $this->counter->advanceTotalScheduled();
+                    if ($executionDate > $latestExecutionDate) {
+                        $latestExecutionDate = $executionDate;
+                    }
+                } else {
                     $this->scheduler->reschedule($log, $executionDate);
-                    $logs->remove($key);
-
-                    continue;
                 }
+
+                $logs->remove($key);
+
+                continue;
             }
+        }
+
+        if ($toBeRescheduled->count()) {
+            $this->scheduler->rescheduleLogs($toBeRescheduled, $latestExecutionDate);
         }
     }
 
