@@ -1768,7 +1768,7 @@ class LeadModel extends FormModel
             $tags = explode(',', $tags);
         }
 
-        if (empty($tags)) {
+        if (empty($tags) && empty($removeTags)) {
             return false;
         }
 
