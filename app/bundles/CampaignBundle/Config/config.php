@@ -168,6 +168,13 @@ return [
                     'mautic.lead.model.company_report_data',
                 ],
             ],
+            'mautic.campaign.action.change_membership.subscriber' => [
+                'class'     => \Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.membership.manager',
+                    'mautic.campaign.model.campaign',
+                ],
+            ],
         ],
         'forms'        => [
             'mautic.campaign.type.form'                 => [
@@ -181,7 +188,10 @@ return [
             ],
             'mautic.campaign.type.campaignlist'         => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.campaign.model.campaign',
+                    'translator',
+                ],
                 'alias'     => 'campaign_list',
             ],
             'mautic.campaign.type.trigger.leadchange'   => [
@@ -209,14 +219,15 @@ return [
         ],
         'models'       => [
             'mautic.campaign.model.campaign'  => [
-                'class'     => 'Mautic\CampaignBundle\Model\CampaignModel',
+                'class'     => \Mautic\CampaignBundle\Model\CampaignModel::class,
                 'arguments' => [
-                    'mautic.helper.core_parameters',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.list',
                     'mautic.form.model.form',
                     'mautic.campaign.event_collector',
                     'mautic.campaign.helper.removed_contact_tracker',
+                    'mautic.campaign.membership.manager',
+                    'mautic.campaign.membership.builder',
                 ],
             ],
             'mautic.campaign.model.event'     => [
@@ -330,6 +341,7 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.tracker.contact',
                     'mautic.campaign.repository.lead_event_log',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
             'mautic.campaign.event_collector' => [
@@ -476,17 +488,60 @@ return [
                 ],
             ],
         ],
+        'membership' => [
+            'mautic.campaign.membership.adder' => [
+                'class'     => \Mautic\CampaignBundle\Membership\Action\Adder::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead',
+                    'mautic.campaign.repository.lead_event_log',
+                ],
+            ],
+            'mautic.campaign.membership.remover' => [
+                'class'     => \Mautic\CampaignBundle\Membership\Action\Remover::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead',
+                    'mautic.campaign.repository.lead_event_log',
+                    'translator',
+                    'mautic.helper.template.date',
+                ],
+            ],
+            'mautic.campaign.membership.event_dispatcher' => [
+                'class'     => \Mautic\CampaignBundle\Membership\EventDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.campaign.membership.manager' => [
+                'class'     => \Mautic\CampaignBundle\Membership\MembershipManager::class,
+                'arguments' => [
+                    'mautic.campaign.membership.adder',
+                    'mautic.campaign.membership.remover',
+                    'mautic.campaign.membership.event_dispatcher',
+                    'mautic.campaign.repository.lead',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.campaign.membership.builder' => [
+                'class'     => \Mautic\CampaignBundle\Membership\MembershipBuilder::class,
+                'arguments' => [
+                    'mautic.campaign.membership.manager',
+                    'mautic.campaign.repository.lead',
+                    'mautic.lead.repository.lead',
+                    'event_dispatcher',
+                    'translator',
+                ],
+            ],
+        ],
         'commands' => [
             'mautic.campaign.command.trigger' => [
                 'class'     => \Mautic\CampaignBundle\Command\TriggerCampaignCommand::class,
                 'arguments' => [
-                    'mautic.campaign.model.campaign',
+                    'mautic.campaign.repository.campaign',
                     'event_dispatcher',
                     'translator',
                     'mautic.campaign.executioner.kickoff',
                     'mautic.campaign.executioner.scheduled',
                     'mautic.campaign.executioner.inactive',
-                    'doctrine.orm.entity_manager',
                     'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
                 ],
@@ -506,6 +561,17 @@ return [
                 'arguments' => [
                     'mautic.campaign.executioner.inactive',
                     'translator',
+                    'mautic.helper.template.formatter',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.campaign.command.update' => [
+                'class'     => \Mautic\CampaignBundle\Command\UpdateLeadCampaignsCommand::class,
+                'arguments' => [
+                    'mautic.campaign.repository.campaign',
+                    'translator',
+                    'mautic.campaign.membership.builder',
+                    'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
                 ],
                 'tag' => 'console.command',
