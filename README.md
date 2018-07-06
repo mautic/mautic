@@ -1,24 +1,16 @@
 # Mautic Integrations
 
-> Integrations solutions structured to mirror current Integrations and created as transition to final product.
+Please note the following assumptions about this plugin:
+
+1. This is being written to replace the dependency on the Mautic/PluginBundle/Integration/AbstractIntegration class.
+2. It is not finished
+3. Once finished, it will be contributed to core as a core bundle which will require plugins to migrate namespaces.
+4. Mautic 2.14.0+ is required
+5. PHP 7.x is currently required
 
 ## Install integrations bundle
 
-> Currently there is no common way to install the bundle. As it is in early Alfa stage. This bundle is not intended
-for production use but solely for testing new plugins implemented using IntegrationsBundle class.
-
-**IntegrationsBundle** is yet another bundle in app/bundles directory.
-
-It is a core bundle.
-
-In order to checkout the branch you need to add a remote into your git configuration.
-
-```git remote add galvani git@github.com:galvani/mautic```
-
-and pull the branch
-
-```git pull origin integrations-v3 && git checkout integrations-v3```
-
-and clear the cache.
-
-_&copy; Jan Kozak, 2018_
+1. Download https://github.com/mautic-inc/mautic-integrations/archive/master.zip
+2. Extract it and rename `mautic-integrations-master` to `MauticIntegrationsBundle`
+3. Move `MauticIntegrationsBundle` into Mautic's `plugins` folder (fix ownership if using something other than the web user)
+4. Delete `app/cache/prod`
