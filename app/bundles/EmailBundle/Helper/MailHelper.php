@@ -442,6 +442,7 @@ class MailHelper
                         $this->mailer->send($this->message, $failures);
                         break;
                     } catch(\Exception $e) {
+                        sleep(10);
                         if($sendAttempt >= 2) {
                             throw $e;
                         }
