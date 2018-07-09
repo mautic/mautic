@@ -211,6 +211,10 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->executioner->expects($this->exactly(2))
             ->method('executeLogs');
 
+        $this->scheduler->expects($this->exactly(4))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
+
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
         $counter = $this->getExecutioner()->execute($campaign, $limiter);

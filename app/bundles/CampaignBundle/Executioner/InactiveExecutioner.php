@@ -221,25 +221,24 @@ class InactiveExecutioner implements ExecutionerInterface
         if (!$totalDecisions) {
             throw new NoEventsFoundException();
         }
-        if ($this->output instanceof NullOutput) {
-            return;
-        }
+        $totalContacts = 0;
+        if (!($this->output instanceof NullOutput)) {
+            $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
 
-        $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
+            $this->output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.decision_count_analyzed',
+                    [
+                        '%decisions%' => $totalDecisions,
+                        '%leads%'     => $totalContacts,
+                        '%batch%'     => $this->limiter->getBatchLimit(),
+                    ]
+                )
+            );
 
-        $this->output->writeln(
-            $this->translator->trans(
-                'mautic.campaign.trigger.decision_count_analyzed',
-                [
-                    '%decisions%' => $totalDecisions,
-                    '%leads%'     => $totalContacts,
-                    '%batch%'     => $this->limiter->getBatchLimit(),
-                ]
-            )
-        );
-
-        if (!$totalContacts) {
-            throw new NoContactsFoundException();
+            if (!$totalContacts) {
+                throw new NoContactsFoundException();
+            }
         }
 
         // Approximate total count because the query to fetch contacts will filter out those that have not arrived to this point in the campaign yet
@@ -274,9 +273,7 @@ class InactiveExecutioner implements ExecutionerInterface
                     // Get the max contact ID before any are removed
                     $batchMinContactId = max($contacts->getKeys()) + 1;
 
-                    if ($this->progressBar) {
-                        $this->progressBar->advance($contacts->count());
-                    }
+                    $this->progressBar->advance($contacts->count());
                     $this->counter->advanceEvaluated($contacts->count());
 
                     $inactiveEvents = $decisionEvent->getNegativeChildren();

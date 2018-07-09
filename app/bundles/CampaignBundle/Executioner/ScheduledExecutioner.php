@@ -199,23 +199,17 @@ class ScheduledExecutioner implements ExecutionerInterface
             return $this->counter;
         }
 
-        if (!($this->output instanceof NullOutput)) {
-            $this->progressBar = ProgressBarHelper::init($this->output, $totalLogsFound);
-            $this->progressBar->start();
-        }
+        $this->progressBar = ProgressBarHelper::init($this->output, $totalLogsFound);
+        $this->progressBar->start();
 
         $scheduledLogCount = $totalLogsFound - $logs->count();
-        if ($this->progressBar) {
-            $this->progressBar->advance($scheduledLogCount);
-        }
+        $this->progressBar->advance($scheduledLogCount);
 
         // Organize the logs by event ID
         $organized = $this->organizeByEvent($logs);
         $now       = new \DateTime();
         foreach ($organized as $organizedLogs) {
-            if ($this->progressBar) {
-                $this->progressBar->advance($organizedLogs->count());
-            }
+            $this->progressBar->advance($organizedLogs->count());
 
             $event = $organizedLogs->first()->getEvent();
 
@@ -234,9 +228,7 @@ class ScheduledExecutioner implements ExecutionerInterface
             $this->progressBar->advance($organizedLogs->count());
         }
 
-        if ($this->progressBar) {
-            $this->progressBar->finish();
-        }
+        $this->progressBar->finish();
 
         return $this->counter;
     }
@@ -252,14 +244,8 @@ class ScheduledExecutioner implements ExecutionerInterface
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
         $totalScheduledCount   = $scheduledEvents ? array_sum($scheduledEvents) : 0;
-        if (!$totalScheduledCount) {
-            throw new NoEventsFoundException();
-        }
         $this->scheduledEvents = array_keys($scheduledEvents);
         $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
-        if ($this->output instanceof NullOutput) {
-            return;
-        }
 
         $this->output->writeln(
             $this->translator->trans(
@@ -270,6 +256,10 @@ class ScheduledExecutioner implements ExecutionerInterface
                 ]
             )
         );
+
+        if (!$totalScheduledCount) {
+            throw new NoEventsFoundException();
+        }
 
         $this->progressBar = ProgressBarHelper::init($this->output, $totalScheduledCount);
         $this->progressBar->start();
@@ -316,9 +306,7 @@ class ScheduledExecutioner implements ExecutionerInterface
             }
 
             $event = $logs->first()->getEvent();
-            if ($this->progressBar) {
-                $this->progressBar->advance($logs->count());
-            }
+            $this->progressBar->advance($logs->count());
             $this->counter->advanceEvaluated($logs->count());
 
             // Validate that the schedule is still appropriate

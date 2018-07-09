@@ -165,25 +165,24 @@ class KickoffExecutioner implements ExecutionerInterface
             throw new NoEventsFoundException();
         }
         $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
-        if ($this->output instanceof NullOutput) {
-            return;
-        }
+        $totalKickoffEvents = 0;
+        if (!($this->output instanceof NullOutput)) {
+            $totalContacts      = $this->kickoffContactFinder->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
+            $totalKickoffEvents = $totalRootEvents * $totalContacts;
 
-        $totalContacts      = $this->kickoffContactFinder->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
-        $totalKickoffEvents = $totalRootEvents * $totalContacts;
+            $this->output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.event_count',
+                    [
+                        '%events%' => $totalKickoffEvents,
+                        '%batch%'  => $this->limiter->getBatchLimit(),
+                    ]
+                )
+            );
 
-        $this->output->writeln(
-            $this->translator->trans(
-                'mautic.campaign.trigger.event_count',
-                [
-                    '%events%' => $totalKickoffEvents,
-                    '%batch%'  => $this->limiter->getBatchLimit(),
-                ]
-            )
-        );
-
-        if (!$totalKickoffEvents) {
-            throw new NoEventsFoundException();
+            if (!$totalKickoffEvents) {
+                throw new NoEventsFoundException();
+            }
         }
 
         $this->progressBar = ProgressBarHelper::init($this->output, $totalKickoffEvents);
@@ -210,9 +209,7 @@ class KickoffExecutioner implements ExecutionerInterface
 
             /** @var Event $event */
             foreach ($this->rootEvents as $event) {
-                if ($this->progressBar) {
-                    $this->progressBar->advance($contacts->count());
-                }
+                $this->progressBar->advance($contacts->count());
                 $this->counter->advanceEvaluated($contacts->count());
 
                 // Check if the event should be scheduled (let the schedulers do the debug logging)
