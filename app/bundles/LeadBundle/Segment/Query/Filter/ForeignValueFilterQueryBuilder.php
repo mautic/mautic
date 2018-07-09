@@ -46,7 +46,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
         $subQueryBuilder
-            ->select('id')->from($filter->getTable(), $tableAlias)
+            ->select('NULL')->from($filter->getTable(), $tableAlias)
             ->andWhere($tableAlias.'.lead_id = l.id');
 
         if (!is_null($filter->getWhere())) {
