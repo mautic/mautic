@@ -11,15 +11,14 @@
 
 namespace Mautic\CampaignBundle\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Event\CampaignTriggerEvent;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
@@ -39,9 +38,9 @@ class TriggerCampaignCommand extends ModeratedCommand
     use WriteCountTrait;
 
     /**
-     * @var CampaignModel
+     * @var CampaignRepository
      */
-    private $campaignModel;
+    private $campaignRepository;
 
     /**
      * @var EventDispatcher
@@ -67,11 +66,6 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @var InactiveExecutioner
      */
     private $inactiveExecutioner;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
 
     /**
      * @var LoggerInterface
@@ -116,36 +110,33 @@ class TriggerCampaignCommand extends ModeratedCommand
     /**
      * TriggerCampaignCommand constructor.
      *
-     * @param CampaignModel            $campaignModel
+     * @param CampaignRepository       $campaignRepository
      * @param EventDispatcherInterface $dispatcher
      * @param TranslatorInterface      $translator
      * @param KickoffExecutioner       $kickoffExecutioner
      * @param ScheduledExecutioner     $scheduledExecutioner
      * @param InactiveExecutioner      $inactiveExecutioner
-     * @param EntityManagerInterface   $em
      * @param LoggerInterface          $logger
      * @param FormatterHelper          $formatterHelper
      */
     public function __construct(
-        CampaignModel $campaignModel,
+        CampaignRepository $campaignRepository,
         EventDispatcherInterface $dispatcher,
         TranslatorInterface $translator,
         KickoffExecutioner $kickoffExecutioner,
         ScheduledExecutioner $scheduledExecutioner,
         InactiveExecutioner $inactiveExecutioner,
-        EntityManagerInterface $em,
         LoggerInterface $logger,
         FormatterHelper $formatterHelper
     ) {
         parent::__construct();
 
-        $this->campaignModel        = $campaignModel;
+        $this->campaignRepository   = $campaignRepository;
         $this->dispatcher           = $dispatcher;
         $this->translator           = $translator;
         $this->kickoffExecutioner   = $kickoffExecutioner;
         $this->scheduledExecutioner = $scheduledExecutioner;
         $this->inactiveExecutioner  = $inactiveExecutioner;
-        $this->em                   = $em;
         $this->logger               = $logger;
         $this->formatterHelper      = $formatterHelper;
     }
@@ -282,7 +273,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         // Specific campaign;
         if ($id) {
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
-            if ($campaign = $this->campaignModel->getEntity($id)) {
+            if ($campaign = $this->campaignRepository->getEntity($id)) {
                 $this->triggerCampaign($campaign);
             } else {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
@@ -295,7 +286,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         // All published campaigns
         /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
-        $campaigns = $this->campaignModel->getEntities(['iterator_mode' => true]);
+        $campaigns = $this->campaignRepository->getEntities(['iterator_mode' => true]);
 
         while (($next = $campaigns->next()) !== false) {
             // Key is ID and not 0
@@ -370,11 +361,6 @@ class TriggerCampaignCommand extends ModeratedCommand
             if (!$this->scheduleOnly && !$this->kickoffOnly) {
                 $this->executeInactive();
             }
-
-            // Don't detach in tests since this command will be ran multiple times in the same process
-            if ('test' !== MAUTIC_ENV) {
-                $this->em->detach($campaign);
-            }
         } catch (\Exception $exception) {
             if ('prod' !== MAUTIC_ENV) {
                 // Throw the exception for dev/test mode
@@ -382,6 +368,11 @@ class TriggerCampaignCommand extends ModeratedCommand
             }
 
             $this->logger->error('CAMPAIGN: '.$exception->getMessage());
+        }
+
+        // Don't detach in tests since this command will be ran multiple times in the same process
+        if ('test' !== MAUTIC_ENV) {
+            $this->campaignRepository->detachEntity($campaign);
         }
     }
 

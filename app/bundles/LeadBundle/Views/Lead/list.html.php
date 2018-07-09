@@ -61,7 +61,7 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
         ],
         [
             'attr' => [
-                'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
+                'class'       => 'btn btn-default btn-sm btn-nospin',
                 'data-toggle' => 'ajaxmodal',
                 'data-target' => '#MauticSharedModal',
                 'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchDnc']),
