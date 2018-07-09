@@ -195,6 +195,7 @@ class Campaign extends FormEntity
             )
             ->addProperties(
                 [
+                    'allowRestart',
                     'publishUp',
                     'publishDown',
                     'events',
@@ -209,6 +210,7 @@ class Campaign extends FormEntity
                     'id',
                     'name',
                     'description',
+                    'allowRestart',
                     'events',
                     'publishUp',
                     'publishDown',
