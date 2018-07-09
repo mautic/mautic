@@ -75,17 +75,16 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $subscriber = new CampaignSubscriber($mockIpLookupHelper, $mockLeadModel, $mockLeadFieldModel, $mockListModel, $mockCompanyModel, $mockCampaignModel);
 
-        $leadMock = $this->createMock(Lead::class);
-        $mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
-            function () use ($leadMock) {
-                $leadMock->expects($this->once())->method('getPrimaryCompany')->willReturn($this->configTo);
-            }
-        );
-
         /** @var LeadModel $leadModel */
         $lead = new Lead();
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
+
+        $mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
+            function () use ($lead) {
+                $lead->setPrimaryCompany($this->configTo);
+            }
+        );
 
         $args = [
             'lead'  => $lead,
@@ -102,7 +101,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $subscriber->onCampaignTriggerActionUpdateCompany($event);
         $this->assertTrue($event->getResult());
 
-        $primaryCompany = $leadMock->getPrimaryCompany();
+        $primaryCompany = $lead->getPrimaryCompany();
 
         $this->assertSame($this->configTo['companyname'], $primaryCompany['companyname']);
     }
