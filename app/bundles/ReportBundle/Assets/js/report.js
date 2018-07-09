@@ -67,7 +67,9 @@ Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
     } else {
         mQuery('#scheduleDay label').show();
     }
-    Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    if($isScheduled.length) {
+        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    }
 };
 
 Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
