@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -26,54 +27,65 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /** @var array */
     private $configFrom = [
+        'id'                => 111,
         'companyname'       => 'Mautic',
         'companemail'       => 'mautic@mautic.com',
     ];
 
     private $configTo = [
+        'id'                => '112',
         'companyname'       => 'Mautic2',
         'companemail'       => 'mautic@mauticsecond.com',
     ];
 
     public function testOnCampaignTriggerActiononUpdateCompany()
     {
-        $mockIpLookupHelper = $this->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
+        $mockLeadModel      = $this->createMock(LeadModel::class);
+        $mockLeadFieldModel = $this->createMock(FieldModel::class);
+        $mockListModel      = $this->createMock(ListModel::class);
+        $mockCompanyModel   = $this->createMock(CompanyModel::class);
 
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $companyEntityFrom = $this->createMock(Company::class);
+        $companyEntityFrom->method('getId')
+            ->willReturn($this->configFrom['id']);
+        $companyEntityFrom->method('getName')
+            ->willReturn($this->configFrom['companyname']);
 
-        $mockLeadFieldModel = $this->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $companyEntityTo = $this->createMock(Company::class);
+        $companyEntityTo->method('getId')
+            ->willReturn($this->configTo['id']);
+        $companyEntityTo->method('getName')
+            ->willReturn($this->configTo['companyname']);
 
-        $mockListModel = $this->getMockBuilder(ListModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($companyEntityFrom);
 
-        $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockCompanyModel->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([$companyEntityTo]);
 
-        $mockCampaignModel = $this->getMockBuilder(CampaignModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockCompanyLeadRepo  = $this->createMock(CompanyLeadRepository::class);
+        $mockCompanyLeadRepo->expects($this->once())->method('getCompaniesByLeadId')->willReturn(null);
+
+        $mockCompanyModel->expects($this->once())
+            ->method('getCompanyLeadRepository')
+            ->willReturn($mockCompanyLeadRepo);
+
+        $mockCampaignModel = $this->createMock(CampaignModel::class);
 
         $subscriber = new CampaignSubscriber($mockIpLookupHelper, $mockLeadModel, $mockLeadFieldModel, $mockListModel, $mockCompanyModel, $mockCampaignModel);
 
+        $leadMock = $this->createMock(Lead::class);
+        $mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
+            function () use ($leadMock) {
+                $leadMock->expects($this->once())->method('getPrimaryCompany')->willReturn($this->configTo);
+            }
+        );
+
+        /** @var LeadModel $leadModel */
         $lead = new Lead();
-        $lead->setId(54);
-
-        $mockLeadModel->expects($this->once())->method('saveEntity')->with($lead);
-
-        $companyEntity = new Company();
-        $companyEntity->setName($this->configFrom['companyname']);
-        $companyEntity->setEmail($this->configFrom['companemail']);
-        $mockCompanyModel->expects($this->once())->method('saveEntity')->with($companyEntity);
-
-        $mockCompanyModel->expects($this->once())->method('addLeadToCompany')->with($companyEntity, $lead);
+        $lead->setId(99);
+        $lead->setPrimaryCompany($this->configFrom);
 
         $args = [
             'lead'  => $lead,
@@ -90,7 +102,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $subscriber->onCampaignTriggerActionUpdateCompany($event);
         $this->assertTrue($event->getResult());
 
-        $primaryCompany = $event->getLead()->getPrimaryCompany();
+        $primaryCompany = $leadMock->getPrimaryCompany();
 
         $this->assertSame($this->configTo['companyname'], $primaryCompany['companyname']);
     }
