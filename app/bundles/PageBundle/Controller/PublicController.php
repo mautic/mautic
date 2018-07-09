@@ -455,6 +455,8 @@ class PublicController extends CommonFormController
         $lead      = $leadModel->getContactFromRequest([$ct]);
         $leadArray = ($lead) ? $lead->getProfileFields() : [];
         $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
+        $url       = $this->replacePageTokenUrl($url);
+        $url       = $this->replaceAssetTokenUrl($url);
         $url       = UrlHelper::sanitizeAbsoluteUrl($url);
 
         if (false === filter_var($url, FILTER_VALIDATE_URL)) {
@@ -462,6 +464,48 @@ class PublicController extends CommonFormController
         }
 
         return $this->redirect($url);
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private function replaceAssetTokenUrl($url)
+    {
+        if ($this->urlIsToken($url)) {
+            $tokens = $this->get('mautic.asset.helper.token')->findAssetTokens($url);
+
+            return isset($tokens[$url]) ? $tokens[$url] : $url;
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private function replacePageTokenUrl($url)
+    {
+        if ($this->urlIsToken($url)) {
+            $tokens = $this->get('mautic.page.helper.token')->findPageTokens($url);
+
+            return isset($tokens[$url]) ? $tokens[$url] : $url;
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return bool
+     */
+    private function urlIsToken($url)
+    {
+        return substr($url, 0, 1) === '{';
     }
 
     /**
