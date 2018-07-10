@@ -725,8 +725,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $fieldsToUpdate = $mappedData[$object]['update'];
                         $fieldsToUpdate = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPersons[$object], $mappedData, $config);
                         $personFound    = true;
-                        if (!empty($fieldsToUpdate)) {
-                            foreach ($existingPersons[$object] as $person) {
+                        foreach ($existingPersons[$object] as $person) {
+                            if (!empty($fieldsToUpdate)) {
                                 if (isset($fieldsToUpdate['AccountId'])) {
                                     $accountId = $this->getCompanyName($fieldsToUpdate['AccountId'], 'Id', 'Name');
                                     if (!$accountId) {
@@ -744,9 +744,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     }
                                 }
 
-                                $personData                     = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $person['Id']);
-                                $people[$object][$person['Id']] = $person['Id'];
+                                $personData = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $person['Id']);
                             }
+
+                            $people[$object][$person['Id']] = $person['Id'];
                         }
                     }
 

@@ -174,6 +174,15 @@ class ContactMerger
         $newest = ($loserDate > $winnerDate) ? $loser : $winner;
         $oldest = ($newest->getId() === $winner->getId()) ? $loser : $winner;
 
+        // It may happen that the Lead entities doesn't have fields fill in. Fill them in if not.
+        if (!$newest->hasFields()) {
+            $newest->setFields($this->leadModel->getRepository()->getFieldValues($newest->getId()));
+        }
+
+        if (!$oldest->hasFields()) {
+            $oldest->setFields($this->leadModel->getRepository()->getFieldValues($oldest->getId()));
+        }
+
         $newestFields = $newest->getProfileFields();
         $oldestFields = $oldest->getProfileFields();
 
