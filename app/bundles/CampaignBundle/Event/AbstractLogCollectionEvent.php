@@ -89,6 +89,21 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
     }
 
     /**
+     * @return ArrayCollection
+     */
+    public function getContactsKeyedById()
+    {
+        $contacts = new ArrayCollection();
+
+        /** @var Lead $contact */
+        foreach ($this->contacts as $contact) {
+            $contacts->set($contact->getId(), $contact);
+        }
+
+        return $contacts;
+    }
+
+    /**
      * Get the IDs of all contacts affected by this event.
      *
      * @return array
