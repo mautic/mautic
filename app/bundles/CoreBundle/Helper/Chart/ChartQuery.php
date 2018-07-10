@@ -234,6 +234,8 @@ class ChartQuery extends AbstractChart
 
         if ($isEnumerable === true) {
             $count = 'COUNT('.$countColumn.') AS count';
+        } elseif ($isEnumerable == 'sum') {
+            $count = 'SUM('.$countColumn.') AS count';
         } else {
             $count = $countColumn.' AS count';
         }
@@ -260,6 +262,23 @@ class ChartQuery extends AbstractChart
     }
 
     /**
+     * Fetch data and sum it for a time related dataset.
+     *
+     * @param string $table     without prefix
+     * @param string $column    name. The column must be type of datetime
+     * @param array  $filters   will be added to where claues
+     * @param string $sumColumn name that will be summed
+     *
+     * @return array
+     */
+    public function fetchSumTimeData($table, $column, $filters = [], $sumColumn)
+    {
+        $query = $this->prepareTimeDataQuery($table, $column, $filters, $sumColumn, 'sum');
+
+        return $this->loadAndBuildTimeData($query);
+    }
+
+    /**
      * Loads data from prepared query and builds the chart data.
      *
      * @param QueryBuilder $query
@@ -269,6 +288,7 @@ class ChartQuery extends AbstractChart
     public function loadAndBuildTimeData($query)
     {
         $rawData = $query->execute()->fetchAll();
+        $at              =$query->getSQL();
 
         return $this->completeTimeData($rawData);
     }
