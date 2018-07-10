@@ -156,7 +156,7 @@ class EventExecutioner
         }
 
         $config = $this->collector->getEventConfig($event);
-        $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
+        $logs   = $this->eventLogger->fetchRotationAndGenerateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
 
         $this->executeLogs($event, $logs, $counter);
     }

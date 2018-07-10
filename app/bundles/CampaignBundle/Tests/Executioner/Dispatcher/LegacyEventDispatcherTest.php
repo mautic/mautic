@@ -271,7 +271,7 @@ class LegacyEventDispatcherTest extends \PHPUnit_Framework_TestCase
             ->with(CampaignEvents::ON_EVENT_FAILED, $this->isInstanceOf(FailedEvent::class));
 
         $this->scheduler->expects($this->once())
-            ->method('rescheduleFailure');
+            ->method('rescheduleFailures');
 
         $this->notificationHelper->expects($this->once())
             ->method('notifyOfFailure')
@@ -323,7 +323,7 @@ class LegacyEventDispatcherTest extends \PHPUnit_Framework_TestCase
             ->with(CampaignEvents::ON_EVENT_FAILED, $this->isInstanceOf(FailedEvent::class));
 
         $this->scheduler->expects($this->once())
-            ->method('rescheduleFailure');
+            ->method('rescheduleFailures');
 
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent);
     }
