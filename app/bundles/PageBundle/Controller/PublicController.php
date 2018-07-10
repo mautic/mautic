@@ -14,6 +14,7 @@ namespace Mautic\PageBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
@@ -452,16 +453,62 @@ class PublicController extends CommonFormController
         // Search replace lead fields in the URL
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
-        $lead      = $leadModel->getContactFromRequest([$ct]);
-        $leadArray = ($lead) ? $lead->getProfileFields() : [];
-        $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
-        $url       = UrlHelper::sanitizeAbsoluteUrl($url);
+        $lead      = $leadModel->getContactFromRequest(['ct' => $ct]);
+
+        /** @var PrimaryCompanyHelper $primaryCompanyHelper */
+        $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
+        $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+
+        $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+        $url = UrlHelper::sanitizeAbsoluteUrl($url);
 
         if (false === filter_var($url, FILTER_VALIDATE_URL)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
 
         return $this->redirect($url);
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private function replaceAssetTokenUrl($url)
+    {
+        if ($this->urlIsToken($url)) {
+            $tokens = $this->get('mautic.asset.helper.token')->findAssetTokens($url);
+
+            return isset($tokens[$url]) ? $tokens[$url] : $url;
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private function replacePageTokenUrl($url)
+    {
+        if ($this->urlIsToken($url)) {
+            $tokens = $this->get('mautic.page.helper.token')->findPageTokens($url);
+
+            return isset($tokens[$url]) ? $tokens[$url] : $url;
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return bool
+     */
+    private function urlIsToken($url)
+    {
+        return substr($url, 0, 1) === '{';
     }
 
     /**

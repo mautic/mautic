@@ -94,7 +94,7 @@ class DecisionDispatcherTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS, $this->isInstanceOf(DecisionResultsEvent::class));
 
-        $this->getEventDispatcher()->dispatchDecisionResultsEvent($config, new ArrayCollection(), new EvaluatedContacts());
+        $this->getEventDispatcher()->dispatchDecisionResultsEvent($config, new ArrayCollection([new LeadEventLog()]), new EvaluatedContacts());
     }
 
     /**

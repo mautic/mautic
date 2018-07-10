@@ -42,7 +42,7 @@ final class SparkpostFactory implements SparkpostFactoryInterface
             'host'     => '',
             'protocol' => 'https',
             'port'     => $port,
-            'key'      => $apiKey,
+            'key'      => ($apiKey) ?: 1234, // prevent Exception: You must provide an API key
         ];
 
         $hostInfo = parse_url($host);
