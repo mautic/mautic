@@ -25,7 +25,6 @@ trait WriteCountTrait
     private function writeCounts(OutputInterface $output, TranslatorInterface $translator, Counter $counter)
     {
         $output->writeln(
-            "\n".
             '<comment>'.$translator->transChoice(
                 'mautic.campaign.trigger.events_executed',
                 $counter->getTotalExecuted(),

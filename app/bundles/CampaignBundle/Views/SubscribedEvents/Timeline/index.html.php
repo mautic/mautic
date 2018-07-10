@@ -15,6 +15,8 @@ if (!empty($item['metadata']['errors'])) {
 } elseif (!empty($item['metadata']['failed'])) {
     $errors = (!empty($item['metadata']['reason'])) ? $item['metadata']['reason'] : 'mautic.campaign.event.failed.timeline';
     $errors = $view['translator']->trans($errors);
+} elseif (!empty($item['fail_reason'])) {
+    $errors = $item['fail_reason'];
 }
 
 $cancelled = (empty($item['isScheduled']) && empty($item['dateTriggered']));
@@ -24,6 +26,7 @@ if ($cancelled) {
     // Note is scheduled
     $item['isScheduled'] = true;
 }
+
 ?>
 <div class="mt-10">
 <?php if ($item['isScheduled']): ?>
