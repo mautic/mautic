@@ -97,8 +97,6 @@ class CompanyImport extends AbstractImport
         $integrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $data['id']]);
 
         if (!$integrationEntity) {
-            sleep(3);
-
             return $this->create($data);
         }
 
