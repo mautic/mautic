@@ -18,8 +18,8 @@ $img = $view['lead_avatar']->getAvatar($contact);
 ?>
 <div class="shuffle shuffle-item grid col-sm-6 col-lg-4 contact-cards">
     <div data-color="#<?php echo $color; ?>" class="panel<?php if (!empty($highlight)) {
-    echo ' highlight';
-} ?> card ovf-h" style="border-top: 3px solid #<?php echo $color; ?>;">
+        echo ' highlight';
+    } ?> card ovf-h" style="border-top: 3px solid #<?php echo $color; ?>;">
         <div class="box-layout">
             <div class="col-xs-4 va-m">
                 <div class="panel-body">
@@ -41,7 +41,7 @@ $img = $view['lead_avatar']->getAvatar($contact);
                         </a>
                     </h4>
                     <div class="text-muted mb-1 ellipsis">
-                        <i class="fa fa-fw fa-building mr-xs"></i><?php echo $fields['core']['company']['value']; ?>
+                        <i class="fa fa-fw fa-building mr-xs"></i><?php echo (!empty($fields['core']['company'])) ? $fields['core']['company']['value'] : ''; ?>
                     </div>
                     <div class="text-muted mb-1 ellipsis">
                         <i class="fa fa-fw fa-map-marker mr-xs"></i><?php
@@ -58,7 +58,7 @@ $img = $view['lead_avatar']->getAvatar($contact);
                         ?>
                     </div>
                     <div class="text-muted mb-1 ellipsis">
-                        <i class="fa fa-fw fa-globe mr-xs"></i><?php echo $fields['core']['country']['value']; ?>
+                        <i class="fa fa-fw fa-globe mr-xs"></i><?php echo (!empty($fields['core']['country'])) ? $fields['core']['country']['value'] : ''; ?>
                     </div>
                     <?php $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : ''; ?>
 
