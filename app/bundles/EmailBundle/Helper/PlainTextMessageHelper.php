@@ -12,9 +12,9 @@
 namespace Mautic\EmailBundle\Helper;
 
 /**
- * Class PlainTextMassageHelper.
+ * Class PlainTextMessageHelper.
  */
-class PlainTextMassageHelper
+class PlainTextMessageHelper
 {
     /**
      * Extract plain text from message.

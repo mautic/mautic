@@ -30,11 +30,28 @@ class ResponseItems implements \Iterator
     {
         $payload = $request->request->all();
         foreach ($payload as $item) {
-            if (empty($item['event']) || !CallbackEnum::shouldBeEventProcessed($item['event'])) {
+            $msys = $item['msys'];
+            if (isset($msys['message_event'])) {
+                $event = $msys['message_event'];
+            } elseif (isset($msys['unsubscribe_event'])) {
+                $event = $msys['unsubscribe_event'];
+            } else {
                 continue;
             }
+
+            if (isset($event['rcpt_type']) && 'to' !== $event['rcpt_type']) {
+                // Ignore cc/bcc
+
+                continue;
+            }
+
+            $bounceClass = isset($event['bounce_class']) ? (int) $event['bounce_class'] : null;
+            if (empty($event['type']) || !CallbackEnum::shouldBeEventProcessed($event['type'], $bounceClass)) {
+                continue;
+            }
+
             try {
-                $this->items[] = new ResponseItem($item);
+                $this->items[] = new ResponseItem($event);
             } catch (ResponseItemException $e) {
             }
         }
