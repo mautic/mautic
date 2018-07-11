@@ -361,6 +361,8 @@ class PublicController extends CommonFormController
 
     /**
      * @return Response
+     *
+     * @throws \Exception
      */
     public function trackingImageAction()
     {
@@ -373,6 +375,8 @@ class PublicController extends CommonFormController
 
     /**
      * @return JsonResponse
+     *
+     * @throws \Exception
      */
     public function trackingAction()
     {
@@ -416,13 +420,15 @@ class PublicController extends CommonFormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Exception
      */
     public function redirectAction($redirectId)
     {
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
+
+        $logger->debug('Redirect hit');
 
         /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
         $pageModel = $this->getModel('page');
@@ -465,6 +471,13 @@ class PublicController extends CommonFormController
         if (false === filter_var($url, FILTER_VALIDATE_URL)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
+
+        // Set the URL after tokens have been replaced so that page_hits has recorded the actual URL and not the token
+        $this->request->attributes->set('page_url', $url);
+
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+        $pageModel = $this->getModel('page');
+        $pageModel->hitPage($redirect, $this->request);
 
         return $this->redirect($url);
     }
