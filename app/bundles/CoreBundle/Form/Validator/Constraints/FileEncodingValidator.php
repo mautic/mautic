@@ -26,8 +26,10 @@ class FileEncodingValidator extends ConstraintValidator
      */
     public function validate($field, Constraint $constraint)
     {
-        if (!mb_check_encoding(file_get_contents($field->getPathname()), 'UTF-8')) {
-            $this->context->addViolation($constraint->encodingFormatMessage, ['%keyword%' => $field->getClientOriginalName()]);
+        if ($field->getPathname() != null) {
+            if (!mb_check_encoding(file_get_contents($field->getPathname()), 'UTF-8')) {
+                $this->context->addViolation($constraint->encodingFormatMessage, ['%keyword%' => $field->getClientOriginalName()]);
+            }
         }
     }
 }
