@@ -112,7 +112,7 @@ class RedirectRepository extends CommonRepository
         $segmentId = null
     ) {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->addSelect('pr.url')
+        $q->addSelect('ph.url')
             ->addSelect('pr.hits')
             ->addSelect('pr.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'pr')
@@ -126,7 +126,7 @@ class RedirectRepository extends CommonRepository
                 ->setParameter('userId', $createdByUserId);
         }
 
-        $q->andWhere('pr.date_added BETWEEN :dateFrom AND :dateTo')
+        $q->andWhere('ph.date_hit BETWEEN :dateFrom AND :dateTo')
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
 
