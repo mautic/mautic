@@ -180,7 +180,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * @param      $action
      * @param      $isPost
      * @param $objectId
-     * @param   $isClone
+     * @param $isClone
      */
     protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, $isClone = false)
     {
@@ -258,7 +258,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Clone an entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -402,7 +402,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     'edit'
                 )
             );
-        } elseif (!$this->checkActionPermission('edit', $entity)) {
+        } elseif ((!$isClone && !$this->checkActionPermission('edit', $entity)) || ($isClone && !$this->checkActionPermission('create'))) {
+            //deny access if the entity is not a clone and don't have permission to edit or is a clone and don't have permission to create
             return $this->accessDenied();
         } elseif (!$isClone && $model->isLocked($entity)) {
             //deny access if the entity is locked

@@ -191,4 +191,13 @@ final class CampaignEvents
      * @var string
      */
     const ON_EVENT_DECISION_TRIGGER = 'mautic.campaign_on_event_decision_trigger';
+
+    /**
+     * The mautic.lead.on_campaign_action_change_membership event is dispatched when the campaign action to change a contact's membership is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP = 'mautic.lead.on_campaign_action_change_membership';
 }

@@ -32,8 +32,9 @@ class CampaignEventAddRemoveLeadType extends AbstractType
             'attr'       => [
                 'class' => 'form-control',
             ],
-            'with_unpublished' => true,
             'required'         => false,
+            'include_this'     => $options['include_this'],
+            'this_translation' => 'mautic.campaign.form.thiscampaign_restart',
         ]);
 
         $builder->add('removeFrom', 'campaign_list', [
@@ -42,9 +43,8 @@ class CampaignEventAddRemoveLeadType extends AbstractType
             'attr'       => [
                 'class' => 'form-control',
             ],
-            'required'         => true,
-            'with_unpublished' => true,
-            'include_this'     => $options['include_this'],
+            'required'     => false,
+            'include_this' => $options['include_this'],
         ]);
     }
 

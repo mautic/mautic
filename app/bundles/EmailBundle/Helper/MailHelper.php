@@ -271,7 +271,12 @@ class MailHelper
             $this->logError($e);
         }
 
-        $this->from       = $this->systemFrom       = (!empty($from)) ? $from : [$factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name')];
+        $systemFromEmail  = $factory->getParameter('mailer_from_email');
+        $systemFromName   = $this->cleanName(
+            $factory->getParameter('mailer_from_name')
+        );
+        $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
+
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
@@ -401,17 +406,7 @@ class MailHelper
                 // Set metadata if applicable
                 if (method_exists($this->message, 'addMetadata')) {
                     foreach ($this->queuedRecipients as $email => $name) {
-                        $this->message->addMetadata(
-                            $email,
-                            [
-                                'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
-                                'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
-                                'hashId'      => $this->idHash,
-                                'hashIdState' => $this->idHashState,
-                                'source'      => $this->source,
-                                'tokens'      => $tokens,
-                            ]
-                        );
+                        $this->message->addMetadata($email, $this->buildMetadata($name, $tokens));
                     }
                 } elseif (!empty($tokens)) {
                     // Replace tokens
@@ -524,16 +519,7 @@ class MailHelper
                     ];
                 }
 
-                $this->metadata[$fromKey]['contacts'][$email] =
-                    [
-                        'name'        => $name,
-                        'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
-                        'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
-                        'hashId'      => $this->idHash,
-                        'hashIdState' => $this->idHashState,
-                        'source'      => $this->source,
-                        'tokens'      => $tokens,
-                    ];
+                $this->metadata[$fromKey]['contacts'][$email] = $this->buildMetadata($name, $tokens);
             }
 
             // Reset recipients
@@ -1229,6 +1215,8 @@ class MailHelper
      */
     public function setFrom($fromEmail, $fromName = null, $isGlobal = true)
     {
+        $fromName = $this->cleanName($fromName);
+
         if (null !== $isGlobal) {
             if ($isGlobal) {
                 if (is_array($fromEmail)) {
@@ -1245,7 +1233,6 @@ class MailHelper
         }
 
         try {
-            $fromName = $this->cleanName($fromName);
             $this->message->setFrom($fromEmail, $fromName);
         } catch (\Exception $e) {
             $this->logError($e, 'from');
@@ -2040,13 +2027,15 @@ class MailHelper
      */
     protected function cleanName($name)
     {
-        if (null !== $name) {
-            $name = trim($name);
+        if (null === $name) {
+            return $name;
+        }
 
-            // If empty, replace with null so that email clients do not show empty name because of To: '' <email@domain.com>
-            if (empty($name)) {
-                $name = null;
-            }
+        $name = trim(html_entity_decode($name, ENT_QUOTES));
+
+        // If empty, replace with null so that email clients do not show empty name because of To: '' <email@domain.com>
+        if (empty($name)) {
+            $name = null;
         }
 
         return $name;
@@ -2132,6 +2121,27 @@ class MailHelper
     }
 
     /**
+     * @param       $name
+     * @param array $tokens
+     *
+     * @return array
+     */
+    private function buildMetadata($name, array $tokens)
+    {
+        return [
+            'name'        => $name,
+            'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
+            'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
+            'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
+            'hashId'      => $this->idHash,
+            'hashIdState' => $this->idHashState,
+            'source'      => $this->source,
+            'tokens'      => $tokens,
+            'utmTags'     => (!empty($this->email)) ? $this->email->getUtmTags() : [],
+        ];
+    }
+
+    /**
      * Validates a given address to ensure RFC 2822, 3.6.2 specs.
      *
      * @deprecated 2.11.0 to be removed in 3.0; use Mautic\EmailBundle\Helper\EmailValidator
@@ -2156,5 +2166,23 @@ class MailHelper
                 'Email address ['.$address.'] is invalid'
             );
         }
+    }
+
+    /**
+     * @param       $overrideFrom
+     * @param array $systemFrom
+     */
+    private function setDefaultFrom($overrideFrom, array $systemFrom)
+    {
+        if (is_array($overrideFrom)) {
+            $fromEmail         = key($overrideFrom);
+            $fromName          = $this->cleanName($overrideFrom[$fromEmail]);
+            $overrideFrom      = [$fromEmail => $fromName];
+        } elseif (!empty($overrideFrom)) {
+            $overrideFrom = [$overrideFrom => null];
+        }
+
+        $this->systemFrom = $overrideFrom ?: $systemFrom;
+        $this->from       = $this->systemFrom;
     }
 }
