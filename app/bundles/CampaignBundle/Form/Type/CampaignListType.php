@@ -51,7 +51,7 @@ class CampaignListType extends AbstractType
         $resolver->setDefaults([
             'choices' => function (Options $options) use ($model, $msg) {
                 $choices = [];
-                $campaigns = $model->getRepository()->getPublishedCampaigns(null, null, true);
+                $campaigns = $model->getRepository()->getCampaignsForList(!($options['with_unpublished']));
                 foreach ($campaigns as $campaign) {
                     $choices[$campaign['id']] = $campaign['name'];
                 }
@@ -65,11 +65,12 @@ class CampaignListType extends AbstractType
 
                 return $choices;
             },
-            'empty_value'  => false,
-            'expanded'     => false,
-            'multiple'     => true,
-            'required'     => false,
-            'include_this' => false,
+            'empty_value'      => false,
+            'expanded'         => false,
+            'multiple'         => true,
+            'required'         => false,
+            'include_this'     => false,
+            'with_unpublished' => false,
         ]);
     }
 
