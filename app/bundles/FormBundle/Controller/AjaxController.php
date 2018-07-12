@@ -108,7 +108,6 @@ class AjaxController extends CommonAjaxController
                 unset($optionList);
             }
         }
-
         $dataArray['fields']  = $fields;
         $dataArray['success'] = 1;
 
