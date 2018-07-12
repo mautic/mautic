@@ -12,7 +12,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Component\Filesystem\Filesystem;
@@ -306,22 +306,11 @@ class ImportController extends FormController
                                         $linecount = $file->key();
 
                                         if (!empty($headers) && is_array($headers)) {
-                                            array_walk($headers, function (&$val) {
-                                                $val = trim($val);
-                                            });
+                                            $headers = CsvHelper::sanitizeHeaders($headers);
 
                                             $session->set('mautic.'.$object.'.import.headers', $headers);
-                                            sort($headers);
-
-                                            $importFields = [];
-
-                                            foreach ($headers as $header) {
-                                                $fieldName                = strtolower(InputHelper::alphanum($header, false, '_'));
-                                                $importFields[$fieldName] = $header;
-                                            }
-
                                             $session->set('mautic.'.$object.'.import.step', self::STEP_MATCH_FIELDS);
-                                            $session->set('mautic.'.$object.'.import.importfields', $importFields);
+                                            $session->set('mautic.'.$object.'.import.importfields', CsvHelper::convertHeadersIntoFields($headers));
                                             $session->set('mautic.'.$object.'.import.progress', [0, $linecount]);
                                             $session->set('mautic.'.$object.'.import.original.file', $fileData->getClientOriginalName());
 

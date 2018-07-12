@@ -34,7 +34,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 12;
+    const MINOR_VERSION = 13;
 
     /**
      * Patch version number.
@@ -89,7 +89,7 @@ class AppKernel extends Kernel
         if (defined('MAUTIC_INSTALLER')) {
             $uri = $request->getRequestUri();
             if (strpos($uri, 'installer') === false) {
-                $base = $request->getBaseUrl();
+                $base   = $request->getBaseUrl();
                 $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
                 if ((strpos(strtolower($_SERVER['SERVER_SOFTWARE']), 'apache') === false

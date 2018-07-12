@@ -613,8 +613,6 @@ class FormModel extends CommonFormModel
     public function deleteEntity($entity)
     {
         /* @var Form $entity */
-        parent::deleteEntity($entity);
-
         $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
@@ -623,6 +621,7 @@ class FormModel extends CommonFormModel
             $schemaHelper->deleteTable('form_results_'.$entity->deletedId.'_'.$entity->getAlias());
             $schemaHelper->executeChanges();
         }
+        parent::deleteEntity($entity);
     }
 
     /**

@@ -170,6 +170,11 @@ class CommonApiController extends FOSRestController implements MauticController
     protected $user;
 
     /**
+     * @var array
+     */
+    protected $entityRequestParameters = [];
+
+    /**
      * Delete a batch of entities.
      *
      * @return array|Response
@@ -372,7 +377,7 @@ class CommonApiController extends FOSRestController implements MauticController
         if ($this->security->checkPermissionExists($this->permissionBase.':viewother')
             && !$this->security->isGranted($this->permissionBase.':viewother')
         ) {
-            $this->listFilters = [
+            $this->listFilters[] = [
                 'column' => $tableAlias.'.createdBy',
                 'expr'   => 'eq',
                 'value'  => $this->user->getId(),
@@ -579,11 +584,25 @@ class CommonApiController extends FOSRestController implements MauticController
         $errors            = [];
         $statusCodes       = [];
         foreach ($parameters as $key => $params) {
-            $entity = $this->getNewEntity($params);
-            $this->processBatchForm($key, $entity, $params, 'POST', $errors, $entities);
+            // Can be new or an existing on based on params
+            $entity       = $this->getNewEntity($params);
+            $entityExists = false;
+            $method       = 'POST';
+            if ($entity->getId()) {
+                $entityExists = true;
+                $method       = 'PATCH';
+                if (!$this->checkEntityAccess($entity, 'edit')) {
+                    $this->setBatchError($key, 'mautic.core.error.accessdenied', Codes::HTTP_FORBIDDEN, $errors, $entities, $entity);
+                    $statusCodes[$key] = Codes::HTTP_FORBIDDEN;
+                    continue;
+                }
+            }
+            $this->processBatchForm($key, $entity, $params, $method, $errors, $entities);
 
             if (isset($errors[$key])) {
                 $statusCodes[$key] = $errors[$key]['code'];
+            } elseif ($entityExists) {
+                $statusCodes[$key] = Codes::HTTP_OK;
             } else {
                 $statusCodes[$key] = Codes::HTTP_CREATED;
             }
@@ -1058,7 +1077,7 @@ class CommonApiController extends FOSRestController implements MauticController
                     $entity
                 );
             }
-        } elseif ($formResponse === $entity) {
+        } elseif (get_class($formResponse) === get_class($entity)) {
             // Success
             $entities[$key] = $formResponse;
         } elseif (is_array($formResponse) && isset($formResponse['code'], $formResponse['message'])) {
@@ -1086,6 +1105,9 @@ class CommonApiController extends FOSRestController implements MauticController
             //get from request
             $parameters = $this->request->request->all();
         }
+
+        // Store the original parameters from the request so that callbacks can have access to them as needed
+        $this->entityRequestParameters = $parameters;
 
         //unset the ID in the parameters if set as this will cause the form to fail
         if (isset($parameters['id'])) {
