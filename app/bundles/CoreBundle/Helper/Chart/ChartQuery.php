@@ -288,8 +288,6 @@ class ChartQuery extends AbstractChart
     public function loadAndBuildTimeData($query)
     {
         $rawData = $query->execute()->fetchAll();
-        $at              =$query->getSQL();
-
         return $this->completeTimeData($rawData);
     }
 
