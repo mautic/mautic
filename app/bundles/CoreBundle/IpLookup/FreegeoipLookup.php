@@ -13,7 +13,6 @@ namespace Mautic\CoreBundle\IpLookup;
 
 class FreegeoipLookup extends AbstractRemoteDataLookup
 {
-
     /**
      * @return string
      */
