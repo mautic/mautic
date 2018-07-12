@@ -101,7 +101,7 @@ class StatRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
             ->addSelect('e.name AS email_name')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 's.email_id = ph.email_id AND s.lead_id = ph.lead_id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.source = "email" and ph.source_id = s.email_id and ph.lead_id = s.lead_id')
             ->addSelect('COUNT(ph.id) AS link_hits');
 
         if ($createdByUserId !== null) {
@@ -113,7 +113,17 @@ class StatRepository extends CommonRepository
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
 
-        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 's.lead_id = cl.lead_id')
+        $companyJoinOnExpr = $q->expr()->andX(
+            $q->expr()->eq('s.lead_id', 'cl.lead_id')
+        );
+        if (null === $companyId) {
+            // Must force a one to one relationship
+            $companyJoinOnExpr->add(
+                $q->expr()->eq('cl.is_primary', 1)
+            );
+        }
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', $companyJoinOnExpr)
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies', 'c', 'cl.company_id = c.id')
             ->addSelect('c.id AS company_id')
             ->addSelect('c.companyname AS company_name');
