@@ -208,7 +208,7 @@ class PipedriveApi extends CrmApi
     {
         $body = json_decode($response->getBody(), true);
 
-        return isset($body['data']) ? $body['data'] : [];
+        return isset($body['data']) && is_array($body['data']) ? $body['data'] : [];
     }
 
     /**
