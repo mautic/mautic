@@ -133,7 +133,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('companyId', $companyId);
         }
 
-        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source_id = ce.id AND s.source = "campaign.event"')
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source = "campaign.event" and s.source_id = ce.id')
             ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
             ->addSelect('campaign.id AS campaign_id')
             ->addSelect('campaign.name AS campaign_name');
