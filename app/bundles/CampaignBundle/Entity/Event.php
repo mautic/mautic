@@ -707,7 +707,7 @@ class Event implements ChannelInterface
     public function getChildrenByEventType($type)
     {
         $criteria = Criteria::create()->where(Criteria::expr()->andX(
-            Criteria::expr()->eq('type', $type),
+            Criteria::expr()->eq('eventType', $type),
             Criteria::expr()->eq('is_published', true)
             )
         );
