@@ -31,18 +31,24 @@ class ResponseItem
     private $dncReason;
 
     /**
+     * @var string
+     */
+    private $statHash;
+
+    /**
      * @param array $item
      *
      * @throws ResponseItemException
      */
     public function __construct(array $item)
     {
-        if (empty($item['email'])) {
+        if (empty($item['rcpt_to'])) {
             throw new ResponseItemException();
         }
-        $this->email     = $item['email'];
-        $this->reason    = !empty($item['reason']) ? $item['reason'] : null;
-        $this->dncReason = CallbackEnum::convertEventToDncReason($item['event']);
+        $this->email     = $item['rcpt_to'];
+        $this->dncReason = CallbackEnum::convertEventToDncReason($item['type']);
+        $this->reason    = CallbackEnum::getDncComments($item['type'], $item);
+        $this->statHash  = (!empty($item['rcpt_meta']['hashId'])) ? $item['rcpt_meta']['hashId'] : null;
     }
 
     /**
@@ -54,7 +60,7 @@ class ResponseItem
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getReason()
     {
@@ -67,5 +73,13 @@ class ResponseItem
     public function getDncReason()
     {
         return $this->dncReason;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getStatHash()
+    {
+        return $this->statHash;
     }
 }

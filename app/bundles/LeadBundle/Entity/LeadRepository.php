@@ -1082,6 +1082,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getContactCollection(array $ids)
     {
+        if (empty($ids)) {
+            return new ArrayCollection();
+        }
+
         $contacts = $this->getEntities(
             [
                 'filter'             => [

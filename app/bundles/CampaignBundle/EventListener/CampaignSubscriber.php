@@ -52,7 +52,6 @@ class CampaignSubscriber extends CommonSubscriber
         return [
             CampaignEvents::CAMPAIGN_POST_SAVE   => ['onCampaignPostSave', 0],
             CampaignEvents::CAMPAIGN_POST_DELETE => ['onCampaignDelete', 0],
-            CampaignEvents::CAMPAIGN_ON_BUILD    => ['onCampaignBuild', 0],
         ];
     }
 
@@ -99,25 +98,5 @@ class CampaignSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
-    }
-
-    /**
-     * Add event triggers and actions.
-     *
-     * @param Events\CampaignBuilderEvent $event
-     */
-    public function onCampaignBuild(Events\CampaignBuilderEvent $event)
-    {
-        //Add action to actually add/remove lead to a specific lists
-        $addRemoveLeadAction = [
-            'label'           => 'mautic.campaign.event.addremovelead',
-            'description'     => 'mautic.campaign.event.addremovelead_descr',
-            'formType'        => 'campaignevent_addremovelead',
-            'formTypeOptions' => [
-                'include_this' => true,
-            ],
-            'callback' => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::addRemoveLead',
-        ];
-        $event->addAction('campaign.addremovelead', $addRemoveLeadAction);
     }
 }
