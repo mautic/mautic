@@ -56,13 +56,12 @@ class StatRepository extends CommonRepository
     public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('ph.url')
+        $q->select('distinct ph.url')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->where('ph.email_id = :emailId')
             ->andWhere('ph.lead_id = :leadId')
             ->setParameter('leadId', $contactId)
-            ->setParameter('emailId', $emailId)
-            ->groupBy('ph.url');
+            ->setParameter('emailId', $emailId);
 
         $result = $q->execute()->fetchAll();
         $data   = [];
@@ -96,7 +95,7 @@ class StatRepository extends CommonRepository
         $campaignId = null,
         $segmentId = null
     ) {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
@@ -148,7 +147,27 @@ class StatRepository extends CommonRepository
             ->addSelect('ll.name AS segment_name');
 
         if ($segmentId !== null) {
-            $q->andWhere('s.list_id = :segmentId')
+            $sb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $sb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
+                ->where(
+                    $sb->expr()->andX(
+                        $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
+                        $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
+                        $sb->expr()->eq('lll.manually_removed', 0)
+                    )
+                );
+
+            // Filter for both broadcasts and campaign related segments
+            $q->andWhere(
+                $q->expr()->orX(
+                    $q->expr()->eq('s.list_id', ':segmentId'),
+                    $q->expr()->andX(
+                        $q->expr()->isNull('s.list_id'),
+                        sprintf('EXISTS (%s)', $sb->getSQL())
+                    )
+                )
+            )
                 ->setParameter('segmentId', $segmentId);
         }
 
