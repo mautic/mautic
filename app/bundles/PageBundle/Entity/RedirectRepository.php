@@ -113,8 +113,8 @@ class RedirectRepository extends CommonRepository
     ) {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->addSelect('ph.url')
-            ->addSelect('pr.hits')
-            ->addSelect('pr.unique_hits')
+            ->addSelect('count(ph.id) as hits')
+            ->addSelect('count(distinct ph.tracking_id) as unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'pr')
             ->leftJoin('pr', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'pr.redirect_id = ph.redirect_id')
             ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'emails', 'e', 'ph.email_id = e.id')
@@ -157,8 +157,10 @@ class RedirectRepository extends CommonRepository
         }
 
         $q->setMaxResults($limit);
-        $q->groupBy('pr.id');
-        $q->orderBy('pr.hits', 'DESC');
+
+        // Group by the page hit URL instead of redirect ID because the redirect could be a token
+        $q->groupBy('ph.url');
+        $q->orderBy('hits', 'DESC');
 
         return $q->execute()->fetchAll();
     }
