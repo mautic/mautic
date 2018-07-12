@@ -133,6 +133,16 @@ class RedirectRepository extends CommonRepository
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
 
+        $q->leftJoin('es', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'es.source = "campaign.event" and es.source_id = ce.id')
+            ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+            ->addSelect('campaign.id AS campaign_id')
+            ->addSelect('campaign.name AS campaign_name');
+
+        if ($campaignId !== null) {
+            $q->andWhere('ce.campaign_id = :campaignId')
+                ->setParameter('campaignId', $campaignId);
+        }
+
         if ($companyId !== null) {
             $sb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -151,34 +161,23 @@ class RedirectRepository extends CommonRepository
                 ->setParameter('companyId', $companyId);
         }
 
-        $q->leftJoin('es', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'es.source = "campaign.event" and es.source_id = ce.id')
-            ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
-            ->addSelect('campaign.id AS campaign_id')
-            ->addSelect('campaign.name AS campaign_name');
-
-        if ($campaignId !== null) {
-            $q->andWhere('ce.campaign_id = :campaignId')
-                ->setParameter('campaignId', $campaignId);
-        }
-
         if ($segmentId !== null) {
-            $q->leftJoin('ph', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'ph.lead_id = lll.lead_id')
-                ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'lll.leadlist_id = ll.id')
-                ->addSelect('ll.id AS segment_id')
-                ->addSelect('ll.name AS segment_name');
+            $sb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-            // Prevent strict errors in MySQL 5.7
-            $q->addGroupBy('ll.id, ll.name');
+            $sb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
+                ->where(
+                    $sb->expr()->andX(
+                        $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
+                        $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
+                        $sb->expr()->eq('lll.manually_removed', 0)
+                    )
+                );
 
-            $q->andWhere('lll.leadlist_id = :segmentId')
+            $q->andWhere(
+                sprintf('EXISTS (%s)', $sb->getSQL())
+            )
                 ->setParameter('segmentId', $segmentId);
-        } else {
-            // Due to many-to-many relationship between contact and segment, we cannot include segments unless filtering by segment or else
-            // each segment a contact is in will result in a click leading to confusing results. Imagine there is a click from a contact that is in
-            // one segment and a click from a contact that is in the same plus another. The results will show 1 click for the one segment and
-            // 2 clicks for the second. But there were only two clicks total and so there's no way to determine actual number of clicks.
-            // Since these results are not time aware (and thus not usable in a line graph), we should not include duplicate click counts.
-            $q->addSelect('null as segment_id, null as segment_name');
         }
 
         $q->setMaxResults($limit);
