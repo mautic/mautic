@@ -857,21 +857,6 @@ class FormModel extends CommonFormModel
                 'expr'        => 'notLike',
                 'negate_expr' => 'like',
             ],
-            'startsWith' => [
-                'label'       => 'mautic.core.operator.starts.with',
-                'expr'        => 'startsWith',
-                'negate_expr' => 'startsWith',
-            ],
-            'endsWith' => [
-                'label'       => 'mautic.core.operator.ends.with',
-                'expr'        => 'endsWith',
-                'negate_expr' => 'endsWith',
-            ],
-            'contains' => [
-                'label'       => 'mautic.core.operator.contains',
-                'expr'        => 'contains',
-                'negate_expr' => 'contains',
-            ],
             'date' => [
                 'label'       => 'mautic.lead.list.form.operator.date',
                 'expr'        => 'date', //special case
