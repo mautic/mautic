@@ -51,7 +51,7 @@ abstract class AbstractPipedrive
      *
      * @return array
      */
-    protected function convertPipedriveData(array $data = [], array $objectFields = [])
+    protected function convertPipedriveData(array $data = [], $objectFields = [])
     {
         // Convert multiselect data
         // Pipedrive webhook return IDs not labels, but  Mautic to Pipedrive sync labels
