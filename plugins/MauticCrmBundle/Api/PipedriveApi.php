@@ -196,7 +196,9 @@ class PipedriveApi extends CrmApi
 
         $this->apiFields[$object] = $response;
 
-        return $this->getResponseData($response);
+        $data = $this->getResponseData($response);
+
+        return !empty($data) ? $data : [];
     }
 
     /**
@@ -208,7 +210,7 @@ class PipedriveApi extends CrmApi
     {
         $body = json_decode($response->getBody(), true);
 
-        return isset($body['data']) && is_array($body['data']) ? $body['data'] : [];
+        return isset($body['data']) ? $body['data'] : [];
     }
 
     /**
