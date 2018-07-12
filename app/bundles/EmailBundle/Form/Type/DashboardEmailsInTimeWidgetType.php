@@ -65,6 +65,7 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
                 'label'       => 'mautic.email.campaignId.filter',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
+                'empty_data'  => '',
                 'empty_value' => '',
                 'required'    => false,
                 'multiple'    => false,
