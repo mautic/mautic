@@ -68,39 +68,25 @@ class TransportTypeTest extends \PHPUnit_Framework_TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.mandrill",
-                "mautic.transport.mailjet",
-                "mautic.transport.sendgrid",
-                "mautic.transport.elasticemail",
-                "mautic.transport.amazon",
-                "mautic.transport.postmark",
-                "gmail"';
+        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.postmark","gmail"';
 
-        $this->assertSame($expected, $transportType->getServiceRequiresLogin());
+        $this->assertSame($expected, $transportType->getServiceRequiresUser());
     }
 
     public function testDoNotNeedLogin()
     {
         $transportType = new TransportType();
 
-        $expected = '"mail",
-                "sendmail",
-                "mautic.transport.sparkpost",
-                "mautic.transport.sendgrid_api"';
+        $expected = '"mautic.transport.mandrill","mail","mautic.transport.sendgrid_api","sendmail","mautic.transport.sparkpost"';
 
-        $this->assertSame($expected, $transportType->getServiceDoNotNeedLogin());
+        $this->assertSame($expected, $transportType->getServiceDoNotNeedUser());
     }
 
     public function testRequiresPassword()
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.elasticemail",
-                "mautic.transport.sendgrid",
-                "mautic.transport.amazon",
-                "mautic.transport.postmark",
-                "mautic.transport.mailjet",
-                "gmail"';
+        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.postmark","gmail"';
 
         $this->assertSame($expected, $transportType->getServiceRequiresPassword());
     }
@@ -109,11 +95,7 @@ class TransportTypeTest extends \PHPUnit_Framework_TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mail",
-                "sendmail",
-                "mautic.transport.sparkpost",
-                "mautic.transport.mandrill",
-                "mautic.transport.sendgrid_api"';
+        $expected = '"mautic.transport.mandrill","mail","mautic.transport.sendgrid_api","sendmail","mautic.transport.sparkpost"';
 
         $this->assertSame($expected, $transportType->getServiceDoNotNeedPassword());
     }
@@ -122,9 +104,7 @@ class TransportTypeTest extends \PHPUnit_Framework_TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.sparkpost",
-                "mautic.transport.mandrill",
-                "mautic.transport.sendgrid_api"';
+        $expected = '"mautic.transport.sparkpost","mautic.transport.mandrill","mautic.transport.sendgrid_api"';
 
         $this->assertSame($expected, $transportType->getServiceRequiresApiKey());
     }

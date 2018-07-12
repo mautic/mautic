@@ -88,7 +88,7 @@ $container->loadFromExtension('monolog', [
             'formatter' => 'mautic.monolog.fulltrace.formatter',
             'type'      => 'rotating_file',
             'path'      => '%kernel.logs_dir%/%kernel.environment%.php',
-            'level'     => 'error',
+            'level'     => getenv('MAUTIC_DEBUG_LEVEL') ?: 'error',
             'channels'  => [
                 '!mautic',
             ],
@@ -102,7 +102,7 @@ $container->loadFromExtension('monolog', [
             'formatter' => 'mautic.monolog.fulltrace.formatter',
             'type'      => 'rotating_file',
             'path'      => '%kernel.logs_dir%/mautic_%kernel.environment%.php',
-            'level'     => 'error',
+            'level'     => getenv('MAUTIC_DEBUG_LEVEL') ?: 'error',
             'channels'  => [
                 'mautic',
             ],
