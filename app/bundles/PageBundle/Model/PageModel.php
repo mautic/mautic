@@ -1192,7 +1192,7 @@ class PageModel extends FormModel
         }
         $pageURL .= '://';
 
-        if ($request->server->get('SERVER_PORT') != '80') {
+        if (!in_array((int) $request->server->get('SERVER_PORT', 80), [80, 8080, 443])) {
             return $pageURL.$request->server->get('SERVER_NAME').':'.$request->server->get('SERVER_PORT').
                 $request->server->get('REQUEST_URI');
         }
