@@ -11,7 +11,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class FreegeoipLookup extends AbstractRemoteDataLookup
+class IpstackLookup extends AbstractRemoteDataLookup
 {
     /**
      * @return string

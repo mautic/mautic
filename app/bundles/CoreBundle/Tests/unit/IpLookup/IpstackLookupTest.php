@@ -11,12 +11,12 @@
 
 namespace Mautic\CoreBundle\Tests\IpLookup;
 
-use Mautic\CoreBundle\IpLookup\FreegeoipLookup;
+use Mautic\CoreBundle\IpLookup\IpstackLookup;
 
 /**
  * Class FreegeoipLookupTest.
  */
-class FreegeoipLookupTest extends \PHPUnit_Framework_TestCase
+class IpstackLookupTest extends \PHPUnit_Framework_TestCase
 {
     public function testIpLookupSuccessful()
     {
@@ -35,7 +35,7 @@ class FreegeoipLookupTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($mockResponse);
 
-        $ipService = new FreegeoipLookup(null, null, __DIR__.'/../../../../cache/test', null, $mockHttp);
+        $ipService = new IpstackLookup(null, null, __DIR__.'/../../../../cache/test', null, $mockHttp);
 
         $details = $ipService->setIpAddress('192.30.252.131')->getDetails();
 
