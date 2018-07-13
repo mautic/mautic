@@ -21,6 +21,7 @@ use Mautic\CampaignBundle\Executioner\Exception\CampaignNotExecutableException;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -271,6 +272,18 @@ class RealTimeExecutioner
             throw new CampaignNotExecutableException('Contact does not have any applicable '.$type.' associations.');
         }
 
-        $this->logger->debug('CAMPAIGN: Found '.count($this->events).' events to analyize for contact ID '.$this->contact->getId());
+        // 2.14 BC break workaround - pre 2.14 had a bug that recorded channelId for decisions as 1 regardless of actually ID
+        // if channelIdField was an array and only one item was selected. That caused the channel ID check in evaluateDecisionForContact
+        // to fail resulting in the decision never being evaluated. Therefore we are going to self heal these decisions.
+        /** @var Event $event */
+        foreach ($this->events as $event) {
+            if (1 === $event->getChannelId()) {
+                ChannelExtractor::setChannel($event, $event, $this->collector->getEventConfig($event));
+
+                $this->eventRepository->saveEntity($event);
+            }
+        }
+
+        $this->logger->debug('CAMPAIGN: Found '.count($this->events).' events to analyze for contact ID '.$this->contact->getId());
     }
 }
