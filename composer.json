@@ -2,7 +2,7 @@
   "name": "mautic/mautic-integrations-bundle",
   "description": "This plugin enables VTiger CRM integration",
   "type": "mautic-plugin",
-  "version": "1.0-dev",
+  "version": "1.0.1",
   "keywords": ["mautic","plugin","integration"],
   "authors": [
     {
