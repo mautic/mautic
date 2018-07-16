@@ -151,6 +151,10 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setFailed('mautic.notification.campaign.failed.missing_entity');
         }
 
+        if (!$notification->getIsPublished()) {
+            return $event->setFailed('mautic.notification.campaign.failed.unpublished');
+        }
+
         // If lead has subscribed on multiple devices, get all of them.
         /** @var \Mautic\NotificationBundle\Entity\PushID[] $pushIDs */
         $pushIDs = $lead->getPushIDs();
