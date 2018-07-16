@@ -1,93 +1,93 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncProcess;
+namespace MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess;
 
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\FieldChangeDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\IntegrationEntityMappingDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\IntegrationFieldMappingDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\IntegrationMappingManualDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\IntegrationMappingManualIteratorDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\ObjectChangeDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\SyncOrderDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\SyncReportDAO;
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncDataExchangeService\SyncDataExchangeServiceInterface;
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncJudgeService\SyncJudgeServiceInterface;
-use MauticPlugin\MauticIntegrationsBundle\Services\Sync\SyncJudgeService\SyncJudgeServiceService;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\FieldDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\EntityMappingDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\FieldMappingDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualIteratorDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudgeService\SyncJudgeInterface;
 
-class IntegrationSyncProcess
+/**
+ * Class IntegrationSyncProcess
+ * @package MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess
+ */
+class SyncProcess
 {
     /**
-     * @var SyncJudgeServiceInterface
+     * @var SyncJudgeInterface
      */
     private $syncJudgeService;
 
     /**
-     * @var IntegrationMappingManualDAO
+     * @var MappingManualDAO
      */
     private $integrationMappingManual;
 
     /**
-     * @var IntegrationMappingManualIteratorDAO
+     * @var MappingManualIteratorDAO
      */
     private $integrationMappingManualIterator;
 
     /**
-     * @var SyncDataExchangeServiceInterface
+     * @var SyncDataExchangeInterface
      */
     private $internalSyncDataExchange;
 
     /**
-     * @var SyncReportDAO
+     * @var ReportDAO
      */
     private $internalSyncReport;
 
     /**
-     * @var SyncOrderDAO
+     * @var OrderDAO
      */
     private $internalSyncOrder;
 
     /**
-     * @var SyncDataExchangeServiceInterface
+     * @var SyncDataExchangeInterface
      */
     private $integrationSyncDataExchange;
 
     /**
-     * @var SyncReportDAO
+     * @var ReportDAO
      */
     private $integrationSyncReport;
 
     /**
-     * @var SyncOrderDAO
+     * @var OrderDAO
      */
     private $integrationSyncOrder;
 
     /**
-     * IntegrationSyncProcess constructor.
+     * SyncProcess constructor.
      * @param int    $fromTimestamp
-     * @param SyncJudgeServiceInterface $syncJudgeService
-     * @param IntegrationMappingManualDAO $integrationMappingManual
-     * @param SyncDataExchangeServiceInterface $internalSyncDataExchange
-     * @param SyncDataExchangeServiceInterface $integrationSyncDataExchange
+     * @param SyncJudgeInterface $syncJudgeService
+     * @param MappingManualDAO $integrationMappingManual
+     * @param SyncDataExchangeInterface $internalSyncDataExchange
+     * @param SyncDataExchangeInterface $integrationSyncDataExchange
      */
     public function __construct(
         $fromTimestamp,
-        SyncJudgeServiceInterface $syncJudgeService,
-        IntegrationMappingManualDAO $integrationMappingManual,
-        SyncDataExchangeServiceInterface $internalSyncDataExchange,
-        SyncDataExchangeServiceInterface $integrationSyncDataExchange
+        SyncJudgeInterface $syncJudgeService,
+        MappingManualDAO $integrationMappingManual,
+        SyncDataExchangeInterface $internalSyncDataExchange,
+        SyncDataExchangeInterface $integrationSyncDataExchange
     )
     {
         $this->syncJudgeService = $syncJudgeService;
         $this->integrationMappingManual = $integrationMappingManual;
-        $this->integrationMappingManualIterator = new IntegrationMappingManualIteratorDAO($this->integrationMappingManual);
+        $this->integrationMappingManualIterator = new MappingManualIteratorDAO($this->integrationMappingManual);
         $this->internalSyncDataExchange = $internalSyncDataExchange;
         $this->integrationSyncDataExchange = $integrationSyncDataExchange;
 
         $this->internalSyncReport = $this->internalSyncDataExchange->getSyncReport($this->integrationMappingManual, $fromTimestamp);
         $this->integrationSyncReport = $this->integrationSyncDataExchange->getSyncReport($this->integrationMappingManual, $fromTimestamp);
-
-        $this->internalSyncOrder = new SyncOrderDAO();
-        $this->integrationSyncOrder = new SyncOrderDAO();
     }
 
     /**
@@ -96,28 +96,28 @@ class IntegrationSyncProcess
     public function execute()
     {
         $syncTimestamp = 0;
+        $this->internalSyncOrder = new OrderDAO($syncTimestamp);
+        $this->integrationSyncOrder = new OrderDAO($syncTimestamp);
         while (null !== ($currentEntityMapping = $this->integrationMappingManualIterator->getCurrentEntityMapping())) {
-            $this->processIntegrationEntitySync($currentEntityMapping, $syncTimestamp);
+            $this->processIntegrationEntitySync($currentEntityMapping);
         }
         $this->internalSyncDataExchange->executeSyncOrder($this->internalSyncOrder);
         $this->integrationSyncDataExchange->executeSyncOrder($this->integrationSyncOrder);
     }
 
     /**
-     * @param IntegrationEntityMappingDAO $currentEntityMapping
-     * @param $syncTimestamp
+     * @param EntityMappingDAO  $currentEntityMapping
      */
     private function processIntegrationEntitySync(
-        IntegrationEntityMappingDAO $currentEntityMapping,
-        $syncTimestamp
+        EntityMappingDAO $currentEntityMapping
     )
     {
         $internalEntity = $currentEntityMapping->getInternalEntity();
         $internalEntityId = $currentEntityMapping->getInternalEntityId();
         $integrationEntity = $currentEntityMapping->getIntegrationEntity();
         $integrationEntityId = $currentEntityMapping->getIntegrationEntityId();
-        $internalObjectChange = new ObjectChangeDAO($internalEntityId, $internalEntity, $syncTimestamp);
-        $integrationObjectChange = new ObjectChangeDAO($integrationEntityId, $integrationEntity, $syncTimestamp);
+        $internalObjectChange = new ObjectChangeDAO($internalEntityId, $internalEntity);
+        $integrationObjectChange = new ObjectChangeDAO($integrationEntityId, $integrationEntity);
         $this->integrationMappingManualIterator->resetFieldMapping($currentEntityMapping->getInternalEntity(), true);
         while(null !== ($currentFieldMapping = $this->integrationMappingManualIterator->getCurrentFieldMapping())) {
             $this->processIntegrationFieldSync(
@@ -132,14 +132,14 @@ class IntegrationSyncProcess
     }
 
     /**
-     * @param IntegrationEntityMappingDAO $currentEntityMapping
-     * @param IntegrationFieldMappingDAO $currentFieldMapping
-     * @param ObjectChangeDAO $internalObjectChange
-     * @param ObjectChangeDAO $integrationObjectChange
+     * @param EntityMappingDAO  $currentEntityMapping
+     * @param FieldMappingDAO   $currentFieldMapping
+     * @param ObjectChangeDAO   $internalObjectChange
+     * @param ObjectChangeDAO   $integrationObjectChange
      */
     private function processIntegrationFieldSync(
-        IntegrationEntityMappingDAO $currentEntityMapping,
-        IntegrationFieldMappingDAO $currentFieldMapping,
+        EntityMappingDAO $currentEntityMapping,
+        FieldMappingDAO $currentFieldMapping,
         ObjectChangeDAO $internalObjectChange,
         ObjectChangeDAO $integrationObjectChange
     )
@@ -155,9 +155,8 @@ class IntegrationSyncProcess
             $currentFieldMapping->getIntegrationField()
         );
         $judgeModes = [
-            SyncJudgeServiceService::PRESUMPTION_OF_INNOCENCE_MODE,
-            SyncJudgeServiceService::HARD_EVIDENCE_MODE,
-            SyncJudgeServiceService::BEST_EVIDENCE_MODE
+            SyncJudgeInterface::PRESUMPTION_OF_INNOCENCE_MODE,
+            SyncJudgeInterface::BEST_EVIDENCE_MODE
         ];
         foreach($judgeModes as $judgeMode) {
             try {
@@ -166,10 +165,10 @@ class IntegrationSyncProcess
                     $internalInformationChangeRequest,
                     $integrationInformationChangeRequest
                 );
-                $internalFieldChange = new FieldChangeDAO($currentFieldMapping->getInternalField(), $result);
-                $internalObjectChange->addFieldChange($internalFieldChange);
-                $integrationFieldChange = new FieldChangeDAO($currentFieldMapping->getIntegrationField(), $result);
-                $integrationObjectChange->addFieldChange($integrationFieldChange);
+                $internalFieldChange = new FieldDAO($currentFieldMapping->getInternalField(), $result);
+                $internalObjectChange->addField($internalFieldChange);
+                $integrationFieldChange = new FieldDAO($currentFieldMapping->getIntegrationField(), $result);
+                $integrationObjectChange->addField($integrationFieldChange);
                 break;
             } catch (\LogicException $ex) {
                 continue;

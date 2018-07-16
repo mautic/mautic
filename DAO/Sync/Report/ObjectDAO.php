@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
+namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report;
 
 /**
  * Class ObjectDAO
@@ -8,42 +8,39 @@ namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
  */
 class ObjectDAO
 {
-    const CONTACT_ENTITY = 'contact';
-
     /**
      * @var int
      */
-    private $id;
+    private $object;
 
     /**
      * @var string
      */
-    private $entity;
+    private $objectId;
 
     /**
-     * @var mixed[] name => value
+     * @var FieldDAO[]
      */
     private $fields = [];
 
     /**
      * ObjectDAO constructor.
-     * @param int       $id
-     * @param string    $entity
+     * @param string       $object
+     * @param int    $objectId
      */
-    public function __construct($id, $entity)
+    public function __construct($object, $objectId)
     {
-        $this->id = $id;
-        $this->entity = $entity;
+        $this->object = $object;
+        $this->objectId = $objectId;
     }
 
     /**
-     * @param string    $name
-     * @param mixed     $value
+     * @param FieldDAO $fieldDAO
      * @return $this
      */
-    public function addField($name, $value)
+    public function addField(FieldDAO $fieldDAO)
     {
-        $this->fields[$name] = $value;
+        $this->fields[$fieldDAO->getName()] = $fieldDAO;
 
         return $this;
     }
@@ -51,17 +48,17 @@ class ObjectDAO
     /**
      * @return int
      */
-    public function getId()
+    public function getObjectId()
     {
-        return $this->id;
+        return $this->objectId;
     }
 
     /**
      * @return string
      */
-    public function getEntity()
+    public function getObject()
     {
-        return $this->entity;
+        return $this->object;
     }
 
     /**
@@ -78,7 +75,7 @@ class ObjectDAO
     }
 
     /**
-     * @return mixed[] name => value
+     * @return FieldDAO[]
      */
     public function getFields()
     {

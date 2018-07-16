@@ -1,40 +1,40 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
+namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
 
 /**
- * Class IntegrationMappingManualIteratorDAO
- * @package Mautic\PluginBundle\Model\Sync\DAO
+ * Class MappingManualIteratorDAO
+ * @package MauticPlugin\MauticIntegrationsBundle\DAO\Mapping
  */
-class IntegrationMappingManualIteratorDAO
+class MappingManualIteratorDAO
 {
     /**
-     * @var IntegrationMappingManualDAO
+     * @var MappingManualDAO
      */
     private $integrationMappingManual;
 
     /**
-     * @var IntegrationEntityMappingDAO[]
+     * @var EntityMappingDAO[]
      */
     private $entityMappings;
 
     /**
-     * @var IntegrationFieldMappingDAO[]
+     * @var FieldMappingDAO[]
      */
     private $fieldMappings = [];
 
     /**
-     * IntegrationMappingManualIteratorDAO constructor.
-     * @param IntegrationMappingManualDAO $integrationMappingManual
+     * MappingManualIteratorDAO constructor.
+     * @param MappingManualDAO $integrationMappingManual
      */
-    public function __construct(IntegrationMappingManualDAO $integrationMappingManual)
+    public function __construct(MappingManualDAO $integrationMappingManual)
     {
         $this->integrationMappingManual = clone $integrationMappingManual;
         $this->entityMappings = reset($integrationMappingManual->getEntityMappings());
     }
 
     /**
-     * @return IntegrationEntityMappingDAO|false
+     * @return EntityMappingDAO|false
      */
     public function getCurrentEntityMapping()
     {
@@ -42,7 +42,7 @@ class IntegrationMappingManualIteratorDAO
     }
 
     /**
-     * @return IntegrationEntityMappingDAO|false
+     * @return EntityMappingDAO|false
      */
     public function getNextEntityMapping()
     {
@@ -63,7 +63,7 @@ class IntegrationMappingManualIteratorDAO
     }
 
     /**
-     * @return IntegrationFieldMappingDAO|false
+     * @return FieldMappingDAO|false
      */
     public function getCurrentFieldMapping()
     {
@@ -71,7 +71,7 @@ class IntegrationMappingManualIteratorDAO
     }
 
     /**
-     * @return IntegrationFieldMappingDAO|false
+     * @return FieldMappingDAO|false
      */
     public function getNextFieldMapping()
     {

@@ -30,6 +30,10 @@ return [
     ],
     'services' => [
         'events' => [
+            'mautic.integrations.lead.subscriber' => [
+                'class'     => \MauticPlugin\MauticIntegrationsBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [],
+            ],
         ],
         'forms' => [
         ],

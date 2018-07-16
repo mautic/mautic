@@ -1,19 +1,31 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
+namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
 
 /**
- * Class IntegrationEntityMappingDAO
- * @package Mautic\PluginBundle\Model\Sync\DAO
+ * Class EntityMappingDAO
+ * @package MauticPlugin\MauticIntegrationsBundle\DAO\Mapping
  */
-class IntegrationEntityMappingDAO
+class EntityMappingDAO
 {
+    /**
+     * @var string
+     */
     private $internalEntity;
 
+    /**
+     * @var int
+     */
     private $internalEntityId;
 
+    /**
+     * @var string
+     */
     private $integrationEntity;
 
+    /**
+     * @var int
+     */
     private $integrationEntityId;
 
     /**

@@ -1,12 +1,14 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
+namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report;
+
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\InformationChangeRequestDAO;
 
 /**
  * Class SyncReportDAO
  * @package Mautic\PluginBundle\Model\Sync\DAO
  */
-class SyncReportDAO
+class ReportDAO
 {
     /**
      * @var string
@@ -46,7 +48,7 @@ class SyncReportDAO
      */
     public function addObject(ObjectDAO $objectDAO)
     {
-        $this->objects[$objectDAO->getEntity()][$objectDAO->getId()] = $objectDAO;
+        $this->objects[$objectDAO->getObject()][$objectDAO->getObjectId()] = $objectDAO;
 
         return $this;
     }
@@ -57,48 +59,49 @@ class SyncReportDAO
      */
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO)
     {
-        $this->objectsChanges[$objectChangeDAO->getEntity()][$objectChangeDAO->getId()] = $objectChangeDAO;
+        $this->objectsChanges[$objectChangeDAO->getObject()][$objectChangeDAO->getObjectId()] = $objectChangeDAO;
 
         return $this;
     }
 
     /**
-     * @param string $entity
-     * @param int    $entityId
-     * @param string $field
+     * @param string $objectName
+     * @param int    $objectId
+     * @param string $fieldName
      *
      * @return InformationChangeRequestDAO
      */
-    public function getInformationChangeRequest($entity, $entityId, $field)
+    public function getInformationChangeRequest($objectName, $objectId, $fieldName)
     {
-        if (isset($this->objects[$entity][$entityId])) {
-            /** @var ObjectDAO $object */
-            $object = $this->objects[$entity][$entityId];
-            $fieldValue = $object->getField($field);
-            if ($field !== null) {
-                return new InformationChangeRequestDAO($this->integration, $entity, $entityId, $field, $fieldValue);
-            }
-        }
-        if (isset($this->objectsChanges[$entity][$entityId])) {
+        if (isset($this->objectsChanges[$objectName][$objectId])) {
             /** @var ObjectChangeDAO $objectChange */
-            $objectChange = $this->objectsChanges[$entity][$entityId];
-            $fieldValue = $objectChange->getField($field);
+            $objectChange = $this->objectsChanges[$objectName][$objectId];
+            $fieldValue = $objectChange->getField($fieldName);
             if ($fieldValue === null) {
-                $fieldChange = $objectChange->getFieldChange($field);
+                $fieldChange = $objectChange->getFieldChange($fieldName);
                 if($fieldChange !== null) {
                     $informationChangeRequest = new InformationChangeRequestDAO(
                         $this->integration,
-                        $entity, $entityId,
-                        $field,
+                        $objectName,
+                        $objectId,
+                        $fieldName,
                         $fieldChange->getValue()
                     );
-                    return $informationChangeRequest->setPossibleChangeTimestamp($fieldChange->getPossibleChangeTimestamp())
-                        ->setCertainChangeTimestamp($fieldChange->getCertainChangeTimestamp());
+                    return $informationChangeRequest->setPossibleChangeTimestamp($objectChange->getChangeTimestamp())
+                        ->setCertainChangeTimestamp($fieldChange->getChangeTimestamp());
                 }
             }
             else {
-                $informationChangeRequest = new InformationChangeRequestDAO($this->integration, $entity, $entityId, $field, $fieldValue);
+                $informationChangeRequest = new InformationChangeRequestDAO($this->integration, $objectName, $objectId, $fieldName, $fieldValue);
                 return $informationChangeRequest->setPossibleChangeTimestamp($objectChange->getChangeTimestamp());
+            }
+        }
+        if (isset($this->objects[$objectName][$objectId])) {
+            /** @var ObjectDAO $object */
+            $object = $this->objects[$objectName][$objectId];
+            $fieldValue = $object->getField($fieldName);
+            if ($fieldName !== null) {
+                return new InformationChangeRequestDAO($this->integration, $objectName, $objectId, $fieldName, $fieldValue);
             }
         }
         return null;
