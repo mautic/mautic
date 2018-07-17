@@ -24,7 +24,10 @@ class ChannelExtractor
      */
     public static function setChannel(ChannelInterface $entity, Event $event, AbstractEventAccessor $eventConfig)
     {
-        if ($entity->getChannel()) {
+        // Allow event to update itself
+        $isSelf = $entity === $event;
+
+        if (!$isSelf && $entity->getChannel()) {
             return;
         }
 
