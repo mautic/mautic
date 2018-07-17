@@ -224,7 +224,7 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setResult(false);
         }
 
-        $this->notificationModel->createStatEntry($notification, $lead);
+        $this->notificationModel->createStatEntry($notification, $lead, 'campaign.event', $event->getEvent()['id']);
         $this->notificationModel->getRepository()->upCount($notificationId);
 
         $result = [
