@@ -30,7 +30,7 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                 => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
+            NotificationEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerHasActiveCondition', 0],
         ];
     }
 
@@ -52,8 +52,12 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
     /**
      * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
+    public function onCampaignTriggerHasActiveCondition(CampaignExecutionEvent $event)
     {
+        if (!$event->checkContext('notification.has.active')) {
+            return;
+        }
+
         $pushIds = $event->getLead()->getPushIDs();
         /** @var PushID $pushID */
         foreach ($pushIds as $pushID) {
