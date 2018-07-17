@@ -12,17 +12,15 @@ if (empty($route)) {
     $route = 'mautic_campaignevent_action';
 }
 
-$eventType  = $event['eventType'];
-$eventLogic = '';
-// Show ID in dev mode to help with debugging
-$eventName = ('dev' === MAUTIC_ENV) ? "{$event['name']} <small>{$event['id']}</small>" : $event['name'];
 ?>
 <?php if (empty($update)): ?>
 <div id="CampaignEvent_<?php echo $event['id'] ?>" data-type="<?php echo $event['eventType']; ?>" class="draggable list-campaign-event list-campaign-<?php echo $event['eventType']; ?>" data-event="<?php echo $event['type']; ?>" data-event-id="<?php echo $event['id']; ?>">
 <?php endif; ?>
     <div class="campaign-event-content">
-        <div><span class="campaign-event-name ellipsis"><?php echo $eventName ?></span></div>
-        <span class="campaign-event-logic"><?php echo $view['translator']->trans('mautic.campaign.'.$event['type']); ?></span>
+        <div><span class="campaign-event-name ellipsis"><?php if ('dev' === MAUTIC_ENV):?><small><?php echo $event['id']; ?></small> <?php endif; ?><?php echo $event['name']; ?></span></div>
+        <a class="btn btn-primary btn-nospin btn-xs highlight-jump-target" href="javascript:void(0)" onClick="Mautic.highlightJumpTarget(event, this)" data-jump-target="<?php echo $event['properties']['jumpToEvent']; ?>">
+            <i class="fa fa-refresh" style="margin-top:4px;"></i>
+        </a>
     </div>
 <?php if (empty($update)): ?>
     <div class="campaign-event-buttons hide">

@@ -304,7 +304,7 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
 
         $this->executioner->expects($this->once())
-            ->method('executeForContact');
+            ->method('executeEventsForContact');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
 
