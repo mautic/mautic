@@ -118,7 +118,7 @@ final class MomentumFacade implements MomentumFacadeInterface
                     'message' => $exception->getMessage(),
                 ]);
 
-            throw new MomentumSendException();
+            throw new MomentumSendException($exception->getMessage());
         }
     }
 
