@@ -61,11 +61,13 @@ return [
     'services' => [
         'events' => [
             'mautic.channel.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\ChannelBundle\EventListener\CampaignSubscriber',
+                'class'     => Mautic\ChannelBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.channel.model.message',
-                    'mautic.campaign.model.campaign',
-                    'mautic.campaign.model.event',
+                    'mautic.campaign.dispatcher.action',
+                    'mautic.campaign.event_collector',
+                    'monolog.logger.mautic',
+                    'translator',
                 ],
             ],
             'mautic.channel.channelbundle.subscriber' => [

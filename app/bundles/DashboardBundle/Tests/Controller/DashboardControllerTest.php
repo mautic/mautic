@@ -35,6 +35,7 @@ class DashboardControllerTest extends \PHPUnit_Framework_TestCase
     private $sessionMock;
     private $flashBagMock;
     private $containerMock;
+    private $controller;
 
     protected function setUp()
     {
@@ -136,7 +137,7 @@ class DashboardControllerTest extends \PHPUnit_Framework_TestCase
             ->with('session')
             ->willReturn($this->sessionMock);
 
-        $this->routerMock->expects($this->any(0))
+        $this->routerMock->expects($this->any())
             ->method('generate')
             ->willReturn('https://some.url');
 

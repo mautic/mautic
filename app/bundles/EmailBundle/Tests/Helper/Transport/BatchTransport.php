@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\AbstractTokenArrayTransport;
 class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Transport
 {
     private $fromAddresses = [];
+    private $fromNames     = [];
     private $metadatas     = [];
     private $validate      = false;
     private $maxRecipients;
@@ -40,7 +41,10 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
         $this->message         = $message;
-        $this->fromAddresses[] = key($message->getFrom());
+        $from                  = $message->getFrom();
+        $fromEmail             = key($from);
+        $this->fromAddresses[] = $fromEmail;
+        $this->fromNames[]     = $from[$fromEmail];
         $this->metadatas[]     = $this->getMetadata();
 
         $messageArray = $this->messageToArray();
@@ -88,6 +92,14 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     public function getFromAddresses()
     {
         return $this->fromAddresses;
+    }
+
+    /**
+     * return array.
+     */
+    public function getFromNames()
+    {
+        return $this->fromNames;
     }
 
     /**

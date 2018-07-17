@@ -388,7 +388,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         if (is_array($column)) {
             foreach ($column as $checkMe) {
-                if (in_array($checkMe, $this->getReport()->getColumns(), true)) {
+                if (in_array($checkMe, $this->getReport()->getSelectAndAggregatorColumns(), true)) {
                     return true;
                 }
             }
@@ -396,7 +396,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
             return false;
         }
 
-        return in_array($column, $this->getReport()->getColumns(), true);
+        return in_array($column, $this->getReport()->getSelectAndAggregatorColumns(), true);
     }
 
     /**
