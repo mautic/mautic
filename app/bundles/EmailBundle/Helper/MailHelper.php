@@ -1221,6 +1221,8 @@ class MailHelper
      */
     public function setFrom($fromEmail, $fromName = null)
     {
+        $fromName = $this->cleanName($fromName);
+
         if (is_array($fromEmail)) {
             $this->from = $fromEmail;
         } else {
@@ -1228,7 +1230,6 @@ class MailHelper
         }
 
         try {
-            $fromName = $this->cleanName($fromName);
             $this->message->setFrom($fromEmail, $fromName);
         } catch (\Exception $e) {
             $this->logError($e, 'from');
