@@ -1221,22 +1221,14 @@ class MailHelper
      */
     public function setFrom($fromEmail, $fromName = null)
     {
-        if (null !== $isGlobal) {
-            if ($isGlobal) {
-                if (is_array($fromEmail)) {
-                    $this->from = $fromEmail;
-                } else {
-                    $this->from = [$fromEmail => $fromName];
-                }
-            } else {
-                // Reset the default to the system from
-                $this->from = $this->systemFrom;
-            }
-
-            $this->useGlobalFrom = $isGlobal;
+        if (is_array($fromEmail)) {
+            $this->from = $fromEmail;
+        } else {
+            $this->from = [$fromEmail => $fromName];
         }
 
         try {
+            $fromName = $this->cleanName($fromName);
             $this->message->setFrom($fromEmail, $fromName);
         } catch (\Exception $e) {
             $this->logError($e, 'from');
