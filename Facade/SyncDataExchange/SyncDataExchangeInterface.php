@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\RequestDAO;
 
 
 /**
@@ -19,12 +20,11 @@ interface SyncDataExchangeInterface
     public function getIntegration();
 
     /**
-     * @param MappingManualDAO $integrationMapping
-     * @param int|null $fromTimestamp
+     * @param RequestDAO $requestDAO
      *
      * @return ReportDAO
      */
-    public function getSyncReport(MappingManualDAO $integrationMapping, $fromTimestamp = null);
+    public function getSyncReport(RequestDAO $requestDAO);
 
     /**
      * @param OrderDAO $syncOrderDAO

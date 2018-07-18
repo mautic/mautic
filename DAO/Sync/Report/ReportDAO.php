@@ -21,11 +21,6 @@ class ReportDAO
     private $objects = [];
 
     /**
-     * @var ObjectChangeDAO[]
-     */
-    private $objectsChanges = [];
-
-    /**
      * SyncReportDAO constructor.
      * @param $integration
      */
@@ -54,17 +49,6 @@ class ReportDAO
     }
 
     /**
-     * @param ObjectChangeDAO $objectChangeDAO
-     * @return $this
-     */
-    public function addObjectChange(ObjectChangeDAO $objectChangeDAO)
-    {
-        $this->objectsChanges[$objectChangeDAO->getObject()][$objectChangeDAO->getObjectId()] = $objectChangeDAO;
-
-        return $this;
-    }
-
-    /**
      * @param string $objectName
      * @param int    $objectId
      * @param string $fieldName
@@ -73,38 +57,22 @@ class ReportDAO
      */
     public function getInformationChangeRequest($objectName, $objectId, $fieldName)
     {
-        if (isset($this->objectsChanges[$objectName][$objectId])) {
-            /** @var ObjectChangeDAO $objectChange */
-            $objectChange = $this->objectsChanges[$objectName][$objectId];
-            $fieldValue = $objectChange->getField($fieldName);
-            if ($fieldValue === null) {
-                $fieldChange = $objectChange->getFieldChange($fieldName);
-                if($fieldChange !== null) {
-                    $informationChangeRequest = new InformationChangeRequestDAO(
-                        $this->integration,
-                        $objectName,
-                        $objectId,
-                        $fieldName,
-                        $fieldChange->getValue()
-                    );
-                    return $informationChangeRequest->setPossibleChangeTimestamp($objectChange->getChangeTimestamp())
-                        ->setCertainChangeTimestamp($fieldChange->getChangeTimestamp());
-                }
-            }
-            else {
-                $informationChangeRequest = new InformationChangeRequestDAO($this->integration, $objectName, $objectId, $fieldName, $fieldValue);
-                return $informationChangeRequest->setPossibleChangeTimestamp($objectChange->getChangeTimestamp());
-            }
+        if (!isset($this->objects[$objectName][$objectId])) {
+            return null;
         }
-        if (isset($this->objects[$objectName][$objectId])) {
-            /** @var ObjectDAO $object */
-            $object = $this->objects[$objectName][$objectId];
-            $fieldValue = $object->getField($fieldName);
-            if ($fieldName !== null) {
-                return new InformationChangeRequestDAO($this->integration, $objectName, $objectId, $fieldName, $fieldValue);
-            }
-        }
-        return null;
+        /** @var ObjectDAO $reportObject */
+        $reportObject = $this->objects[$objectName][$objectId];
+        $reportField = $reportObject->getField($fieldName);
+        $informationChangeRequest = new InformationChangeRequestDAO(
+            $this->integration,
+            $objectName,
+            $objectId,
+            $fieldName,
+            $reportField->getValue()
+        );
+        $informationChangeRequest->setPossibleChangeTimestamp($reportObject->getChangeTimestamp())
+            ->setCertainChangeTimestamp($reportField->getChangeTimestamp());
+        return $informationChangeRequest;
     }
 
     /**
@@ -113,13 +81,5 @@ class ReportDAO
     public function getObjects()
     {
         return $this->objects;
-    }
-
-    /**
-     * @return array
-     */
-    public function getObjectsChanges()
-    {
-        return $this->objectsChanges;
     }
 }

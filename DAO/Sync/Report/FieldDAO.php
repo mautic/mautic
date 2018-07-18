@@ -19,6 +19,11 @@ class FieldDAO
     private $value;
 
     /**
+     * @var int|null
+     */
+    private $changeTimestamp = null;
+
+    /**
      * FieldDAO constructor.
      * @param string    $name
      * @param mixed     $value
@@ -43,5 +48,25 @@ class FieldDAO
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getChangeTimestamp(): ?int
+    {
+        return $this->changeTimestamp;
+    }
+
+    /**
+     * @param int|null $changeTimestamp
+     *
+     * @return FieldDAO
+     */
+    public function setChangeTimestamp(?int $changeTimestamp): FieldDAO
+    {
+        $this->changeTimestamp = $changeTimestamp;
+
+        return $this;
     }
 }
