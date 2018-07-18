@@ -228,13 +228,15 @@ abstract class AbstractChart
         if ($dayDiff <= 1) {
             $unit = 'H';
 
+            $sameDay    = $dateTo->format('d') == $dateFrom->format('d') ? 1 : 0;
+            $hourDiff   = $dateTo->diff($dateFrom)->format('%h');
             $minuteDiff = $dateTo->diff($dateFrom)->format('%i');
-            if ($minuteDiff <= 60) {
+            if ($sameDay && !intval($hourDiff) && intval($minuteDiff)) {
                 $unit = 'i';
             }
             $secondDiff = $dateTo->diff($dateFrom)->format('%s');
-            if ($minuteDiff < 1 && $secondDiff <= 60) {
-                $unit = 's';
+            if (!intval($minuteDiff) && intval($secondDiff)) {
+                $unit = 'i';
             }
         }
         if ($dayDiff > 31) {

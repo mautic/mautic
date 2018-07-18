@@ -20,6 +20,7 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Membership\MembershipManager;
@@ -370,9 +371,9 @@ class CampaignModel extends CommonFormModel
                 // Remove decision so that it doesn't affect execution
                 $events[$id]->setDecisionPath(null);
             }
-
-            $entity->addEvent($id, $events[$id]);
         }
+
+        $entity->addEvents($events);
 
         //set event order used when querying the events
         $this->buildOrder($hierarchy, $events, $entity);
@@ -849,26 +850,9 @@ class CampaignModel extends CommonFormModel
     {
         @trigger_error('Deprecated 2.14 to be removed in 3.0; use \Mautic\CampaignBundle\Helper\ChannelExtractor instead', E_USER_DEPRECATED);
 
-        $channelSet = false;
-        if (!$entity->getChannel() && !empty($eventSettings[$properties['type']]['channel'])) {
-            $entity->setChannel($eventSettings[$properties['type']]['channel']);
-            if (isset($eventSettings[$properties['type']]['channelIdField'])) {
-                $channelIdField = $eventSettings[$properties['type']]['channelIdField'];
-                if (!empty($properties['properties'][$channelIdField])) {
-                    if (is_array($properties['properties'][$channelIdField])) {
-                        if (count($properties['properties'][$channelIdField]) === 1) {
-                            // Only store channel ID if a single item was selected
-                            $entity->setChannelId($properties['properties'][$channelIdField]);
-                        }
-                    } else {
-                        $entity->setChannelId($properties['properties'][$channelIdField]);
-                    }
-                }
-            }
-            $channelSet = true;
-        }
+        ChannelExtractor::setChannel($entity, $entity, $this->eventCollector->getEventConfig($entity));
 
-        return $channelSet;
+        return true;
     }
 
     /**

@@ -201,9 +201,10 @@ class KickoffExecutioner implements ExecutionerInterface
         $contacts = $this->kickoffContactFinder->getContacts($this->campaign->getId(), $this->limiter);
         while ($contacts->count()) {
             $batchMinContactId = max($contacts->getKeys()) + 1;
+            $rootEvents        = clone $this->rootEvents;
 
             /** @var Event $event */
-            foreach ($this->rootEvents as $event) {
+            foreach ($rootEvents as $key => $event) {
                 $this->progressBar->advance($contacts->count());
                 $this->counter->advanceEvaluated($contacts->count());
 
@@ -218,11 +219,16 @@ class KickoffExecutioner implements ExecutionerInterface
                 if ($this->scheduler->shouldSchedule($executionDate, $now)) {
                     $this->counter->advanceTotalScheduled($contacts->count());
                     $this->scheduler->schedule($event, $executionDate, $contacts);
+
+                    $rootEvents->remove($key);
+
                     continue;
                 }
+            }
 
-                // Execute the event for the batch of contacts
-                $this->executioner->executeForContacts($event, $contacts, $this->counter);
+            if ($rootEvents->count()) {
+                // Execute the events for the batch of contacts
+                $this->executioner->executeEventsForContacts($rootEvents, $contacts, $this->counter);
             }
 
             $this->kickoffContactFinder->clear();
