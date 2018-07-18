@@ -27,7 +27,7 @@ class IpstackLookup extends AbstractRemoteDataLookup
     protected function getUrl()
     {
         if (empty($this->auth)) {
-            $this->logger->notice('FreeGeoIP has become IPStack and now requires an API key.');
+            $this->logger->warning('FreeGeoIP has become IPStack and now requires an API key.');
         }
 
         return 'http://api.ipstack.com/'.$this->ip.'?access_key='.$this->auth.'&output=json&legacy=1';

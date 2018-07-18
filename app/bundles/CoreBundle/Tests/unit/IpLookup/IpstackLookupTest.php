@@ -35,7 +35,7 @@ class IpstackLookupTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($mockResponse);
 
-        $ipService = new IpstackLookup(null, null, __DIR__.'/../../../../cache/test', null, $mockHttp);
+        $ipService = new IpstackLookup('mockApiToken', null, __DIR__.'/../../../../cache/test', null, $mockHttp);
 
         $details = $ipService->setIpAddress('192.30.252.131')->getDetails();
 
