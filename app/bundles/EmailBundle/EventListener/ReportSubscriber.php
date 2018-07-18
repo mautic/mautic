@@ -615,7 +615,7 @@ class ReportSubscriber extends CommonSubscriber
         $table     = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
         $alias     = 'dnc';
 
-        if (!self::isJoined($qb, $table, $fromAlias, $alias)) {
+        if (!$this->isJoined($qb, $table, $fromAlias, $alias)) {
             $qb->leftJoin(
                 $fromAlias,
                 $table,
@@ -625,7 +625,7 @@ class ReportSubscriber extends CommonSubscriber
         }
     }
 
-    private static function isJoined($query, $table, $fromAlias, $alias)
+    private function isJoined($query, $table, $fromAlias, $alias)
     {
         $joins = $query->getQueryParts()['join'];
         if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) {
