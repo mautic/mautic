@@ -218,6 +218,15 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
             ->with('Momentum send: 500', [
                 'response' => $responseBody,
             ]);
+        $exceptionMessage = 'Example exception message';
+        $this->loggerMock->expects($this->at(1))
+            ->method('addError')
+            ->with('Momentum send exception', [
+                'message' => $exceptionMessage,
+            ]);
+        $facade = $this->getMomentumFacade();
+        $this->expectException(SwiftMessageValidationException::class);
+        $facade->send($swiftMessageMock);
     }
 
     /**
