@@ -115,6 +115,112 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test for correct handle of first 500 error followed by 200
+     */
+    public function testSend500FirstAttempt()
+    {
+        $swiftMessageMock = $this->createMock(\Swift_Mime_Message::class);
+        $transmissionDTOMock = $this->createMock(TransmissionDTO::class);
+        $this->swiftMessageServiceMock->expects($this->at(0))
+            ->method('transformToTransmission')
+            ->with($swiftMessageMock)
+            ->willReturn($transmissionDTOMock);
+        $sparkPostPromiseMock = $this->createMock(SparkPostPromise::class);
+        $this->adapterMock->expects($this->at(0))
+            ->method('createTransmission')
+            ->with($transmissionDTOMock)
+            ->willReturn($sparkPostPromiseMock);
+        $sparkPostResponseMock = $this->createMock(SparkPostResponse::class);
+        $sparkPostPromiseMock->expects($this->at(0))
+            ->method('wait')
+            ->willReturn($sparkPostResponseMock);
+        $sparkPostResponseMock->expects($this->at(0))
+            ->method('getStatusCode')
+            ->willReturn('500');
+        $this->adapterMock->expects($this->at(1))
+            ->method('createTransmission')
+            ->with($transmissionDTOMock)
+            ->willReturn($sparkPostPromiseMock);
+        $sparkPostResponseMock = $this->createMock(SparkPostResponse::class);
+        $sparkPostPromiseMock->expects($this->at(1))
+            ->method('wait')
+            ->willReturn($sparkPostResponseMock);
+        $sparkPostResponseMock->expects($this->at(1))
+            ->method('getStatusCode')
+            ->willReturn('200');
+        $totalRecipients = 0;
+        $bodyResults     = [
+            'results' => [
+                'total_accepted_recipients' => $totalRecipients,
+            ],
+        ];
+        $sparkPostResponseMock->expects($this->at(1))
+            ->method('getBody')
+            ->willReturn($bodyResults);
+        $this->momentumCallbackMock->expects($this->at(0))
+            ->method('processImmediateFeedback')
+            ->with($swiftMessageMock, $bodyResults);
+        $facade = $this->getMomentumFacade();
+        $this->assertSame($totalRecipients, $facade->send($swiftMessageMock));
+    }
+
+    /**
+     * Test for correct handle of repeated 500s
+     */
+    public function testSend500Repeated()
+    {
+        $swiftMessageMock = $this->createMock(\Swift_Mime_Message::class);
+        $transmissionDTOMock = $this->createMock(TransmissionDTO::class);
+        $this->swiftMessageServiceMock->expects($this->at(0))
+            ->method('transformToTransmission')
+            ->with($swiftMessageMock)
+            ->willReturn($transmissionDTOMock);
+        $sparkPostPromiseMock = $this->createMock(SparkPostPromise::class);
+        $this->adapterMock->expects($this->at(0))
+            ->method('createTransmission')
+            ->with($transmissionDTOMock)
+            ->willReturn($sparkPostPromiseMock);
+        $sparkPostResponseMock = $this->createMock(SparkPostResponse::class);
+        $sparkPostPromiseMock->expects($this->at(0))
+            ->method('wait')
+            ->willReturn($sparkPostResponseMock);
+        $sparkPostResponseMock->expects($this->at(0))
+            ->method('getStatusCode')
+            ->willReturn('500');
+        $this->adapterMock->expects($this->at(1))
+            ->method('createTransmission')
+            ->with($transmissionDTOMock)
+            ->willReturn($sparkPostPromiseMock);
+        $sparkPostResponseMock = $this->createMock(SparkPostResponse::class);
+        $sparkPostPromiseMock->expects($this->at(1))
+            ->method('wait')
+            ->willReturn($sparkPostResponseMock);
+        $sparkPostResponseMock->expects($this->at(1))
+            ->method('getStatusCode')
+            ->willReturn('500');
+        $this->adapterMock->expects($this->at(2))
+            ->method('createTransmission')
+            ->with($transmissionDTOMock)
+            ->willReturn($sparkPostPromiseMock);
+        $sparkPostResponseMock = $this->createMock(SparkPostResponse::class);
+        $sparkPostPromiseMock->expects($this->at(2))
+            ->method('wait')
+            ->willReturn($sparkPostResponseMock);
+        $sparkPostResponseMock->expects($this->at(2))
+            ->method('getStatusCode')
+            ->willReturn('500');
+        $responseBody = 'Empty';
+        $sparkPostResponseMock->expects($this->at(3))
+            ->method('getBody')
+            ->willReturn($responseBody);
+        $this->loggerMock->expects($this->at(0))
+            ->method('addError')
+            ->with('Momentum send: 500', [
+                'response' => $responseBody,
+            ]);
+    }
+
+    /**
      * @return MomentumFacade
      */
     private function getMomentumFacade()
