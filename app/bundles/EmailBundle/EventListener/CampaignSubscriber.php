@@ -310,6 +310,12 @@ class CampaignSubscriber implements EventSubscriberInterface
          */
         foreach ($contacts as $logId => $contact) {
             $leadCredentials = $contact->getProfileFields();
+
+            // Set owner_id to support the "Owner is mailer" feature
+            if ($contact->getOwner()) {
+                $leadCredentials['owner_id'] = $contact->getOwner()->getId();
+            }
+
             if (empty($leadCredentials['email'])) {
                 // Pass with a note to the UI because no use retrying
                 $event->passWithError(
