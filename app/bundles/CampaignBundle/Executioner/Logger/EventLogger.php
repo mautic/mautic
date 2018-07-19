@@ -157,14 +157,11 @@ class EventLogger
         }
 
         $this->persistQueue->clear();
-    }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getLogs()
-    {
-        return $this->logs;
+        $logs = clone $this->logs;
+        $this->logs->clear();
+
+        return $logs;
     }
 
     /**
@@ -191,33 +188,6 @@ class EventLogger
     public function clearCollection(ArrayCollection $collection)
     {
         $this->leadEventLogRepository->detachEntities($collection->getValues());
-
-        return $this;
-    }
-
-    /**
-     * Persist logs entities after they've been updated.
-     *
-     * @return $this
-     */
-    public function persist()
-    {
-        if (!$this->logs->count()) {
-            return $this;
-        }
-
-        $this->leadEventLogRepository->saveEntities($this->logs->getValues());
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function clear()
-    {
-        $this->logs->clear();
-        $this->leadEventLogRepository->clear();
 
         return $this;
     }
@@ -282,9 +252,7 @@ class EventLogger
             }
         }
 
-        $this->persistQueuedLogs();
-
-        return $this->logs;
+        return $this->persistQueuedLogs();
     }
 
     /**

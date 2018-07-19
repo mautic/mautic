@@ -284,10 +284,11 @@ class InactiveExecutioner implements ExecutionerInterface
                     );
 
                     if ($contacts->count()) {
-                        // Execute or schedule the events attached to the inactive side of the decision
-                        $this->executeLogsForInactiveEvents($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
                         // Record decision for these contacts
                         $this->executioner->recordLogsAsExecutedForEvent($decisionEvent, $contacts, true);
+
+                        // Execute or schedule the events attached to the inactive side of the decision
+                        $this->executeLogsForInactiveEvents($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
                     }
 
                     // Clear contacts from memory
@@ -327,6 +328,7 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private function executeLogsForInactiveEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter, \DateTime $earliestLastActiveDateTime)
     {
+        $events              = clone $events;
         $eventExecutionDates = $this->scheduler->getSortedExecutionDates($events, $earliestLastActiveDateTime);
 
         /** @var \DateTime $earliestExecutionDate */
@@ -334,10 +336,12 @@ class InactiveExecutioner implements ExecutionerInterface
 
         $executionDate = $this->executioner->getExecutionDate();
 
-        foreach ($events as $event) {
+        foreach ($events as $key => $event) {
             // Ignore decisions
             if (Event::TYPE_DECISION == $event->getEventType()) {
                 $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$event->getId().' as a decision');
+
+                $events->remove($key);
                 continue;
             }
 
@@ -355,10 +359,14 @@ class InactiveExecutioner implements ExecutionerInterface
             if ($this->scheduler->shouldSchedule($eventExecutionDate, $executionDate)) {
                 $childrenCounter->advanceTotalScheduled($contacts->count());
                 $this->scheduler->schedule($event, $eventExecutionDate, $contacts, true);
+
+                $events->remove($key);
                 continue;
             }
+        }
 
-            $this->executioner->executeForContacts($event, $contacts, $childrenCounter, true);
+        if ($events->count()) {
+            $this->executioner->executeEventsForContacts($events, $contacts, $childrenCounter, true);
         }
     }
 }

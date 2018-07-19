@@ -501,6 +501,32 @@ class LeadRepository extends CommonRepository
     }
 
     /**
+     * Takes an array of contact ID's and increments
+     * their current rotation in a campaign by 1.
+     *
+     * @param array $contactIds
+     * @param int   $campaignId
+     *
+     * @return bool
+     */
+    public function incrementCampaignRotationForContacts(array $contactIds, $campaignId)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->set('cl.rotation', 'cl.rotation + 1')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('cl.lead_id', ':contactIds'),
+                    $q->expr()->eq('cl.campaign_id', ':campaignId')
+                )
+            )
+            ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY)
+            ->setParameter('campaignId', (int) $campaignId)
+            ->execute();
+    }
+
+    /**
      * @param $campaignId
      *
      * @return array

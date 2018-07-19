@@ -63,7 +63,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return ArrayCollection
+     * @return LeadEventLog[]|ArrayCollection
      */
     public function getPending()
     {
@@ -125,8 +125,8 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @param ArrayCollection $logs
-     * @param string          $reason
+     * @param LeadEventLog[]|ArrayCollection $logs
+     * @param string                         $reason
      */
     public function failLogs(ArrayCollection $logs, $reason)
     {
@@ -178,7 +178,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @param ArrayCollection $logs
+     * @param LeadEventLog[]|ArrayCollection $logs
      */
     public function passLogs(ArrayCollection $logs)
     {
@@ -200,7 +200,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return ArrayCollection
+     * @return LeadEventLog[]|ArrayCollection
      */
     public function getFailures()
     {
@@ -208,7 +208,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return ArrayCollection
+     * @return LeadEventLog[]|ArrayCollection
      */
     public function getSuccessful()
     {
