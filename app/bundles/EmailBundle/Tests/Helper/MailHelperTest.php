@@ -267,7 +267,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body&#39;s Business']);
-        $email = new Email();
+        $email  = new Email();
         $email->setUseOwnerAsMailer(true);
 
         $mailer->setEmail($email);
