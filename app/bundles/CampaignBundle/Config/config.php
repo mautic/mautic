@@ -121,7 +121,7 @@ return [
     'services'   => [
         'events'       => [
             'mautic.campaign.subscriber'                => [
-                'class'     => 'Mautic\CampaignBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
@@ -175,6 +175,14 @@ return [
                     'mautic.campaign.model.campaign',
                 ],
             ],
+            'mautic.campaign.action.jump_to_event.subscriber' => [
+                'class'     => \Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.repository.event',
+                    'mautic.campaign.event_executioner',
+                    'translator',
+                ],
+            ],
         ],
         'forms'        => [
             'mautic.campaign.type.form'                 => [
@@ -201,6 +209,10 @@ return [
             'mautic.campaign.type.action.addremovelead' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType',
                 'alias' => 'campaignevent_addremovelead',
+            ],
+            'mautic.campaign.type.action.jump_to_event' => [
+                'class' => \Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType::class,
+                'alias' => 'campaignevent_jump_to_event',
             ],
             'mautic.campaign.type.canvassettings'       => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
@@ -408,6 +420,7 @@ return [
                     'monolog.logger.mautic',
                     'mautic.campaign.scheduler',
                     'mautic.campaign.helper.removed_contact_tracker',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
             'mautic.campaign.executioner.kickoff'     => [

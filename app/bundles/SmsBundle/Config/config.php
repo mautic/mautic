@@ -26,6 +26,7 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
+                    'mautic.helper.sms',
                 ],
             ],
             'mautic.sms.channel.subscriber' => [
