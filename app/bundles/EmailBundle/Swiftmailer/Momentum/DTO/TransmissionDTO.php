@@ -77,6 +77,14 @@ class TransmissionDTO implements \JsonSerializable
     }
 
     /**
+     * @param $campaignId
+     */
+    public function setCampaignId($campaignId)
+    {
+        $this->campaignId = $campaignId;
+    }
+
+    /**
      * @return mixed
      */
     public function jsonSerialize()
@@ -89,10 +97,10 @@ class TransmissionDTO implements \JsonSerializable
         if ($this->options !== null) {
             $json['options'] = $this->options;
         }
-        if ($this->campaignId !== null) {
+        if (!empty($this->campaignId)) {
             $json['campaign_id'] = $this->campaignId;
         }
-        if ($this->description !== null) {
+        if (!empty($this->description)) {
             $json['description'] = $this->description;
         }
 

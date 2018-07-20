@@ -131,6 +131,10 @@ class ActionDispatcher
      */
     private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
+        if (!$logs->count()) {
+            return;
+        }
+
         foreach ($logs as $log) {
             $this->dispatcher->dispatch(
                 CampaignEvents::ON_EVENT_EXECUTED,
@@ -150,13 +154,15 @@ class ActionDispatcher
      */
     private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
     {
+        if (!$logs->count()) {
+            return;
+        }
+
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
             $this->logger->debug(
                 'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
             );
-
-            $this->scheduler->rescheduleFailure($log);
 
             $this->dispatcher->dispatch(
                 CampaignEvents::ON_EVENT_FAILED,
@@ -165,6 +171,8 @@ class ActionDispatcher
 
             $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());
         }
+
+        $this->scheduler->rescheduleFailures($logs);
     }
 
     /**

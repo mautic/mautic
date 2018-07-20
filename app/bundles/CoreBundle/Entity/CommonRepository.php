@@ -214,6 +214,14 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * @param mixed $entity
+     */
+    public function detachEntity($entity)
+    {
+        $this->getEntityManager()->detach($entity);
+    }
+
+    /**
      * @param      $alias
      * @param null $catAlias
      * @param null $lang

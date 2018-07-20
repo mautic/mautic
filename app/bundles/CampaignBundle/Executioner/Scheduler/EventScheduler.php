@@ -100,7 +100,7 @@ class EventScheduler
      */
     public function scheduleForContact(Event $event, \DateTime $executionDate, Lead $contact)
     {
-        $contacts =  new ArrayCollection([$contact]);
+        $contacts = new ArrayCollection([$contact]);
 
         $this->schedule($event, $executionDate, $contacts);
     }
@@ -114,6 +114,9 @@ class EventScheduler
     public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
     {
         $config = $this->collector->getEventConfig($event);
+
+        // Load the rotations for creating new log entries
+        $this->eventLogger->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
         foreach ($contacts as $contact) {
             // Create the entry
@@ -135,18 +138,19 @@ class EventScheduler
         }
 
         // Persist any pending in the queue
-        $this->eventLogger->persistQueuedLogs();
+        $logs = $this->eventLogger->persistQueuedLogs();
 
         // Send out a batch event
-        $this->dispatchBatchScheduledEvent($config, $event, $this->eventLogger->getLogs());
+        $this->dispatchBatchScheduledEvent($config, $event, $logs);
 
         // Update log entries and clear from memory
-        $this->eventLogger->persist()
-            ->clear();
+        $this->eventLogger->persistCollection($logs)
+            ->clearCollection($logs);
     }
 
     /**
      * @param LeadEventLog $log
+     * @param \DateTime    $toBeExecutedOn
      */
     public function reschedule(LeadEventLog $log, \DateTime $toBeExecutedOn)
     {
@@ -160,21 +164,73 @@ class EventScheduler
     }
 
     /**
+     * @param ArrayCollection|LeadEventLog[] $logs
+     * @param \DateTime                      $toBeExecutedOn
+     */
+    public function rescheduleLogs(ArrayCollection $logs, \DateTime $toBeExecutedOn)
+    {
+        foreach ($logs as $log) {
+            $log->setTriggerDate($toBeExecutedOn);
+        }
+
+        $this->eventLogger->persistCollection($logs);
+
+        $event  = $logs->first()->getEvent();
+        $config = $this->collector->getEventConfig($event);
+
+        $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
+    }
+
+    /**
      * @param LeadEventLog $log
      */
     public function rescheduleFailure(LeadEventLog $log)
     {
-        if ($interval = $this->coreParametersHelper->getParameter('campaign_time_wait_on_event_false')) {
-            try {
-                $date = new \DateTime();
-                $date->add(new \DateInterval($interval));
-            } catch (\Exception $exception) {
-                // Bad interval
-                return;
-            }
+        if (!$interval = $this->coreParametersHelper->getParameter('campaign_time_wait_on_event_false')) {
+            return;
+        }
 
+        try {
+            $date = new \DateTime();
+            $date->add(new \DateInterval($interval));
+        } catch (\Exception $exception) {
+            // Bad interval
+            return;
+        }
+
+        $this->reschedule($log, $date);
+    }
+
+    /**
+     * @param ArrayCollection $logs
+     */
+    public function rescheduleFailures(ArrayCollection $logs)
+    {
+        if (!$interval = $this->coreParametersHelper->getParameter('campaign_time_wait_on_event_false')) {
+            return;
+        }
+
+        if (!$logs->count()) {
+            return;
+        }
+
+        try {
+            $date = new \DateTime();
+            $date->add(new \DateInterval($interval));
+        } catch (\Exception $exception) {
+            // Bad interval
+            return;
+        }
+
+        foreach ($logs as $log) {
             $this->reschedule($log, $date);
         }
+
+        // Send out a batch event
+        $event  = $logs->first()->getEvent();
+        $config = $this->collector->getEventConfig($event);
+
+        $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
     }
 
     /**
@@ -234,13 +290,16 @@ class EventScheduler
             $eventExecutionDates[$child->getId()] = $this->getExecutionDateTime($child, $lastActiveDate);
         }
 
-        uasort($eventExecutionDates, function (\DateTime $a, \DateTime $b) {
-            if ($a === $b) {
-                return 0;
-            }
+        uasort(
+            $eventExecutionDates,
+            function (\DateTime $a, \DateTime $b) {
+                if ($a === $b) {
+                    return 0;
+                }
 
-            return $a < $b ? -1 : 1;
-        });
+                return $a < $b ? -1 : 1;
+            }
+        );
 
         return $eventExecutionDates;
     }
@@ -270,6 +329,14 @@ class EventScheduler
      */
     public function shouldSchedule(\DateTime $executionDate, \DateTime $now)
     {
+        // Mainly for functional tests so we don't have to wait minutes but technically can be used in an environment as well if this behavior
+        // is desired by system admin
+        if (false === (bool) getenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS')) {
+            // Purposively ignore seconds to prevent rescheduling based on a variance of a few seconds
+            $executionDate = new \DateTime($executionDate->format('Y-m-d H:i'), $executionDate->getTimezone());
+            $now           = new \DateTime($now->format('Y-m-d H:i'), $now->getTimezone());
+        }
+
         return $executionDate > $now;
     }
 
@@ -290,12 +357,17 @@ class EventScheduler
      * @param AbstractEventAccessor $config
      * @param Event                 $event
      * @param ArrayCollection       $logs
+     * @param bool                  $isReschedule
      */
-    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $isReschedule = false)
     {
+        if (!$logs->count()) {
+            return;
+        }
+
         $this->dispatcher->dispatch(
             CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
-            new ScheduledBatchEvent($config, $event, $logs)
+            new ScheduledBatchEvent($config, $event, $logs, $isReschedule)
         );
     }
 }
