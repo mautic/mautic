@@ -20,50 +20,49 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 
 class EmailRepositoryTest extends \PHPUnit_Framework_TestCase
 {
+    private $mockConnection;
+    private $em;
+    private $cm;
+
+    /**
+     * @var EmailRepository
+     */
+    private $repo;
+
     protected function setUp()
     {
         parent::setUp();
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
-        $mockConnection = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockConnection = $this->createMock(Connection::class);
+        $this->em             = $this->createMock(EntityManager::class);
+        $this->cm             = $this->createMock(ClassMetadata::class);
+        $this->repo           = new EmailRepository($this->em, $this->cm);
 
-        $mockConnection->method('createQueryBuilder')
+        $this->mockConnection->method('createQueryBuilder')
             ->willReturnCallback(
-                function () use ($mockConnection) {
-                    return new QueryBuilder($mockConnection);
+                function () {
+                    return new QueryBuilder($this->mockConnection);
                 }
             );
 
-        $mockConnection->method('getExpressionBuilder')
+        $this->mockConnection->method('getExpressionBuilder')
             ->willReturnCallback(
-                function () use ($mockConnection) {
-                    return new ExpressionBuilder($mockConnection);
+                function () {
+                    return new ExpressionBuilder($this->mockConnection);
                 }
             );
 
-        $mockConnection->method('quote')
+        $this->mockConnection->method('quote')
             ->willReturnCallback(
                 function ($value) {
                     return "'$value'";
                 }
             );
 
-        $this->em = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->cm = $this->getMockBuilder(ClassMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->em->method('getConnection')
-            ->willReturn($mockConnection);
-
-        $this->repo = new EmailRepository($this->em, $this->cm);
+            ->willReturn($this->mockConnection);
     }
 
     public function testGetEmailPendingQueryForSimpleCount()
