@@ -934,6 +934,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.email_read',
             'mautic.lead.lead.searchcommand.email_queued',
             'mautic.lead.lead.searchcommand.email_pending',
+            'mautic.lead.lead.searchcommand.page_source',
+            'mautic.lead.lead.searchcommand.page_source_id',
+            'mautic.lead.lead.searchcommand.page_id',
             'mautic.lead.lead.searchcommand.sms_sent',
             'mautic.lead.lead.searchcommand.web_sent',
             'mautic.lead.lead.searchcommand.mobile_sent',
@@ -1175,26 +1178,26 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $this->useDistinctCount = true;
         $joins                  = $q->getQueryPart('join');
-        if (!array_key_exists($primaryTable['alias'], $joins)) {
+        if (!preg_match('/"'.preg_quote($primaryTable['alias'], '/').'"/i', json_encode($joins))) {
             $q->$joinType(
                 $primaryTable['from_alias'],
                 MAUTIC_TABLE_PREFIX.$primaryTable['table'],
                 $primaryTable['alias'],
                 $primaryTable['condition']
             );
-            foreach ($tables as $table) {
-                $q->$joinType($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
-            }
-
-            if ($whereExpression) {
-                $q->andWhere($whereExpression);
-            }
-
-            if ($having) {
-                $q->andHaving($having);
-            }
-            $q->groupBy('l.id');
         }
+        foreach ($tables as $table) {
+            $q->$joinType($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
+        }
+
+        if ($whereExpression) {
+            $q->andWhere($whereExpression);
+        }
+
+        if ($having) {
+            $q->andHaving($having);
+        }
+        $q->groupBy('l.id');
     }
 
     /**

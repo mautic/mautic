@@ -138,14 +138,14 @@ class EventScheduler
         }
 
         // Persist any pending in the queue
-        $this->eventLogger->persistQueuedLogs();
+        $logs = $this->eventLogger->persistQueuedLogs();
 
         // Send out a batch event
-        $this->dispatchBatchScheduledEvent($config, $event, $this->eventLogger->getLogs());
+        $this->dispatchBatchScheduledEvent($config, $event, $logs);
 
         // Update log entries and clear from memory
-        $this->eventLogger->persist()
-            ->clear();
+        $this->eventLogger->persistCollection($logs)
+            ->clearCollection($logs);
     }
 
     /**
