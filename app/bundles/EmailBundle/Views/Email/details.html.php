@@ -221,7 +221,15 @@ if (!$isEmbedded) {
             </div>
             <!--/ email detail collapseable toggler -->
 
-            <?php echo $view->render(
+            <div id="emailGraphStats"></div>
+
+            <script>
+                mQuery( "#emailGraphStats" ).load( "<?php echo $view['router']->path('mautic_email_graph_stats', ['objectId' => $email->getId(), 'isVariant' => $showTranslations || $showVariants ?: 0]); ?>", function() {
+                    alert('Load done');
+                });
+            </script>
+
+            <?php /* echo $view->render(
                 'MauticEmailBundle:Email:graph.html.php',
                 [
                     'stats'         => $stats,
@@ -234,7 +242,7 @@ if (!$isEmbedded) {
                 ]
             ); ?>
 
-            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); */ ?>
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">

@@ -372,6 +372,7 @@ class EmailController extends FormController
         //get related translations
         list($translationParent, $translationChildren) = $email->getTranslations();
 
+        /*
         // Prepare stats for bargraph
         if ($chartStatsSource = $this->request->query->get('stats', false)) {
             $includeVariants = ('all' == $chartStatsSource);
@@ -402,6 +403,7 @@ class EmailController extends FormController
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData())
         );
+        */
 
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
@@ -420,9 +422,9 @@ class EmailController extends FormController
                 ),
                 'viewParameters' => [
                     'email'        => $email,
-                    'stats'        => $stats,
-                    'statsDevices' => $statsDevices,
-                    'showAllStats' => $includeVariants,
+                    //'stats'        => $stats,
+                    //'statsDevices' => $statsDevices,
+                    //'showAllStats' => $includeVariants,
                     'trackables'   => $trackableLinks,
                     'pending'      => $model->getPendingLeads($email, null, true),
                     'logs'         => $logs,
