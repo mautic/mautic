@@ -212,7 +212,6 @@ class DynamicContentType extends AbstractType
                 'required' => false,
             ]
         );
-
         $builder->add(
             'utmTags',
             'utm_tags',
