@@ -171,6 +171,14 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                 <?php echo $view['form']->row($form['publishDown']); ?>
                 <?php echo $view['form']->rest($form); ?>
             </div>
+            <hr/>
+            <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+            <br/>
+            <?php
+            foreach ($form['utmTags'] as $i => $utmTag):
+                echo $view['form']->row($utmTag);
+            endforeach;
+            ?>
         </div>
     </div>
 </div>
