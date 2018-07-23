@@ -9,251 +9,141 @@ namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
 class MappingManualDAO
 {
     /**
-     * @var EntityMappingDAO[]
+     * @var array
      */
-    private $entityMappings = [];
-
-    /**
-     * @var FieldMappingDAO[]
-     */
-    private $fieldMappings = [];
+    private $objectsMapping = [];
 
     /**
      * @var array
      */
-    private $internalEntityMapping = [];
+    private $internalObjectsMapping = [];
 
     /**
      * @var array
      */
-    private $integrationEntityMapping = [];
+    private $integrationObjectsMapping = [];
 
     /**
-     * @var array
+     * @param ObjectMappingDAO $objectMappingDAO
      */
-    private $internalFieldMapping = [];
-
-    /**
-     * @var array
-     */
-    private $integrationFieldMapping = [];
-
-    /**
-     * @var int
-     */
-    private $entityMappingIndex = 0;
-
-    /**
-     * @var int
-     */
-    private $fieldMappingIndex = 0;
-
-    /**
-     * @param EntityMappingDAO $integrationEntityMapping
-     */
-    public function addEntityMapping(EntityMappingDAO $integrationEntityMapping)
+    public function addObjectMapping(ObjectMappingDAO $objectMappingDAO)
     {
-        $this->entityMappings[$this->entityMappingIndex] = $integrationEntityMapping;
-
-        $internalEntity = $integrationEntityMapping->getInternalEntity();
-        $internalEntityId = $integrationEntityMapping->getInternalEntityId();
-        $integrationEntity = $integrationEntityMapping->getIntegrationEntity();
-        $integrationEntityId = $integrationEntityMapping->getIntegrationEntityId();
-        $this->internalEntityMapping[$internalEntity][$internalEntityId] = $this->entityMappingIndex;
-        $this->integrationEntityMapping[$integrationEntity][$integrationEntityId] = $this->entityMappingIndex;
-
-        $this->entityMappingIndex += 1;
-    }
-
-    /**
-     * @param FieldMappingDAO $integrationFieldMapping
-     */
-    public function addFieldMapping(FieldMappingDAO $integrationFieldMapping)
-    {
-        $this->fieldMappings[$this->fieldMappingIndex] = $integrationFieldMapping;
-
-        $internalEntity = $integrationFieldMapping->getInternalEntity();
-        $internalField = $integrationFieldMapping->getInternalField();
-        $integrationEntity = $integrationFieldMapping->getIntegrationEntity();
-        $integrationField = $integrationFieldMapping->getIntegrationField();
-        $this->internalFieldMapping[$internalEntity][$internalField] = $this->fieldMappingIndex;
-        $this->integrationFieldMapping[$integrationEntity][$integrationField] = $this->fieldMappingIndex;
-
-        $this->fieldMappingIndex += 1;
-    }
-
-    /**
-     * return string[]
-     */
-    public function getInternalEntities()
-    {
-        $entities = [];
-        foreach($this->internalEntityMapping as $entity => $ids) {
-            $entities[] = $entity;
+        $internalObjectName = $objectMappingDAO->getInternalObjectName();
+        $integrationObjectName = $objectMappingDAO->getInternalObjectName();
+        if(!array_key_exists($internalObjectName, $this->objectsMapping)) {
+            $this->objectsMapping[$internalObjectName] = [];
         }
-        return $entities;
+        if(!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
+            $this->internalObjectsMapping[$internalObjectName] = [];
+        }
+        if(!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
+            $this->integrationObjectsMapping[$integrationObjectName] = [];
+        }
+        $this->objectsMapping[$internalObjectName][$integrationObjectName] = $objectMappingDAO;
     }
 
     /**
-     * @param string $entity
+     * @param string $internalObjectName
+     * @param string $integrationObjectName
      *
-     * @return int[]
+     * @return ObjectMappingDAO|null
      */
-    public function getInternalEntityIds($entity)
+    public function getObjectMapping(string $internalObjectName, string $integrationObjectName): ?ObjectMappingDAO
     {
-        $ids = [];
-        /** @var array $internalEntity */
-        $internalEntity = $this->internalEntityMapping[$entity];
-        foreach($internalEntity as $id => $mapping) {
-           $ids[] = $id;
-        }
-        return $ids;
-    }
-
-    /**
-     * @param string $entity
-     * @return string[]
-     */
-    public function getInternalFieldsList($entity)
-    {
-        if(!array_key_exists($entity, $this->internalFieldMapping)) {
-            throw new \InvalidArgumentException('Entity "' . $entity . '" wasn\'t found in mapping manual.');
-        }
-        $list = [];
-        foreach($this->internalFieldMapping[$entity] as $field => $fieldMappingIndex) {
-            $list[] = $field;
-        }
-        return $list;
-    }
-
-    /**
-     * return string[]
-     */
-    public function getIntegrationEntities()
-    {
-        $entities = [];
-        foreach($this->integrationEntityMapping as $entity => $ids) {
-            $entities[] = $entity;
-        }
-        return $entities;
-    }
-
-    /**
-     * @param string $entity
-     *
-     * @return int[]
-     */
-    public function getIntegrationEntityIds($entity)
-    {
-        $ids = [];
-        /** @var array $integrationEntity */
-        $integrationEntity = $this->integrationEntityMapping[$entity];
-        foreach($integrationEntity as $id => $mapping) {
-            $ids[] = $id;
-        }
-        return $ids;
-    }
-
-    /**
-     * @param string $integrationEntity
-     * @param int    $integrationEntityId
-     *
-     * @return EntityMappingDAO|null
-     */
-    public function getInternalEntityMapping($integrationEntity, $integrationEntityId)
-    {
-        if(!isset($this->integrationEntityMapping[$integrationEntity][$integrationEntityId])) {
+        if(!array_key_exists($internalObjectName, $this->objectsMapping)) {
             return null;
         }
-        $entityMappingIndex = $this->integrationEntityMapping[$integrationEntity][$integrationEntityId];
-        return $this->entityMappings[$entityMappingIndex];
-    }
-
-    /**
-     * @param string $internalEntity
-     * @param int    $internalEntityId
-     *
-     * @return EntityMappingDAO|null
-     */
-    public function getIntegrationEntityMapping($internalEntity, $internalEntityId)
-    {
-        if(!isset($this->internalEntityMapping[$internalEntity][$internalEntityId])) {
+        if(!array_key_exists($integrationObjectName, $this->objectsMapping[$internalObjectName])) {
             return null;
         }
-        $entityMappingIndex = $this->internalEntityMapping[$internalEntity][$internalEntityId];
-        return $this->entityMappings[$entityMappingIndex];
+        return $this->objectsMapping[$internalObjectName][$integrationObjectName];
     }
 
     /**
-     * @param string $integrationEntity
-     * @param string $integrationField
-     *
-     * @return FieldMappingDAO|null
-     */
-    public function getInternalFieldMapping($integrationEntity, $integrationField)
-    {
-        if(!isset($this->integrationFieldMapping[$integrationEntity][$integrationField])) {
-            return null;
-        }
-        $fieldMappingIndex = $this->integrationFieldMapping[$integrationEntity][$integrationField];
-        return $this->fieldMappings[$fieldMappingIndex];
-    }
-
-    /**
-     * @param string $internalEntity
-     * @param string $internalField
-     *
-     * @return FieldMappingDAO|null
-     */
-    public function getIntegrationFieldMapping($internalEntity, $internalField)
-    {
-
-        if(!isset($this->internalFieldMapping[$internalEntity][$internalField])) {
-            return null;
-        }
-        $fieldMappingIndex = $this->internalEntityMapping[$internalEntity][$internalField];
-        return $this->fieldMappings[$fieldMappingIndex];
-    }
-
-    /**
-     * @param string $internalEntity
+     * @param string $internalObjectName
      *
      * @return string[]
      */
-    public function getFieldMappingsByInternalEntity($internalEntity)
+    public function getMappedIntegrationObjectsNames(string $internalObjectName): array
     {
-        $fieldMappings = [];
-        foreach($this->fieldMappings as $fieldMapping) {
-            if($fieldMapping->getInternalEntity() !== $internalEntity) {
-                continue;
+        if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
+            throw new \LogicException(); // TODO
+        }
+        return $this->internalObjectsMapping[$internalObjectName];
+    }
+
+    /**
+     * @param string $integrationObjectName
+     *
+     * @return string[]
+     */
+    public function getMappedInternalObjectsNames(string $integrationObjectName): array
+    {
+        if (!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
+            throw new \LogicException(); // TODO
+        }
+        return $this->integrationObjectsMapping[$integrationObjectName];
+    }
+
+    /**
+     * @return array
+     */
+    public function getInternalObjectsNames(): array
+    {
+        return array_keys($this->internalObjectsMapping);
+    }
+
+    /**
+     * @param string $internalObjectName
+     *
+     * @return array
+     */
+    public function getInternalObjectFieldNames(string $internalObjectName): array
+    {
+        if(!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
+            throw new \LogicException(); // TODO
+        }
+        $fields = [];
+        $integrationObjectsNames = $this->internalObjectsMapping[$internalObjectName];
+        foreach($integrationObjectsNames as $integrationObjectName) {
+            /** @var ObjectMappingDAO $objectMappingDAO */
+            $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
+            $fieldMappings = $objectMappingDAO->getFieldMappings();
+            foreach($fieldMappings as $fieldMapping) {
+                $fields[$fieldMapping->getInternalField()] = true;
             }
-            $fieldMappings[] = $fieldMapping;
         }
-        return $fieldMappings;
+        return array_keys($fields);
     }
 
     /**
-     * @param string $integrationEntity
+     * @return array
+     */
+    public function getIntegrationObjectsNames(): array
+    {
+        return array_keys($this->integrationObjectsMapping);
+    }
+
+    /**
+     * @param string $integrationObjectName
      *
-     * @return string[]
+     * @return array
      */
-    public function getFieldMappingsByIntegrationEntity($integrationEntity)
+    public function getIntegrationObjectFieldNames(string $integrationObjectName): array
     {
-        $fieldMappings = [];
-        foreach($this->fieldMappings as $fieldMapping) {
-            if($fieldMapping->getIntegrationEntity() !== $integrationEntity) {
-                continue;
-            }
-            $fieldMappings[] = $fieldMapping;
+        if(!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
+            throw new \LogicException(); // TODO
         }
-        return $fieldMappings;
-    }
-
-    /**
-     * @return EntityMappingDAO[]
-     */
-    public function getEntityMappings()
-    {
-        return $this->entityMappings;
+        $fields = [];
+        $internalObjectsNames = $this->integrationObjectsMapping[$integrationObjectName];
+        foreach($internalObjectsNames as $internalObjectName) {
+            /** @var ObjectMappingDAO $objectMappingDAO */
+            $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
+            $fieldMappings = $objectMappingDAO->getFieldMappings();
+            foreach($fieldMappings as $fieldMapping) {
+                $fields[$fieldMapping->getIntegrationField()] = true;
+            }
+        }
+        return array_keys($fields);
     }
 }

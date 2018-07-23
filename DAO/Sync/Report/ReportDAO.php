@@ -76,10 +76,36 @@ class ReportDAO
     }
 
     /**
+     * @param string|null $objectName
+     *
      * @return ObjectDAO[]
      */
-    public function getObjects()
+    public function getObjects(?string $objectName)
     {
-        return $this->objects;
+        $returnedObjects = [];
+        if($objectName === null) {
+            foreach($this->objects as $objectName => $objects) {
+                foreach($objects as $objectId => $object) {
+                    $returnedObjects[] = $object;
+                }
+            }
+        }
+        else {
+            foreach($this->objects[$objectName] as $objectId => $object) {
+                $returnedObjects[] = $object;
+            }
+        }
+        return $returnedObjects;
+    }
+
+    /**
+     * @param string $objectName
+     * @param int    $objectId
+     *
+     * @return ObjectDAO|null
+     */
+    public function getObject(string $objectName, int $objectId): ?ObjectDAO
+    {
+
     }
 }
