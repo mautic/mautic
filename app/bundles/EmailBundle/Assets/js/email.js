@@ -57,6 +57,15 @@ Mautic.emailOnLoad = function (container, response) {
 
         });
     }
+
+    if (mQuery('#emailGraphStats').length) {
+        // Email detail graph - loaded via AJAX not to block loading a whole page
+        var graphUrl = mQuery('#emailGraphStats').attr('data-graph-url');
+        mQuery("#emailGraphStats").load(graphUrl, function () {
+            Mautic.renderCharts();
+            Mautic.initDateRangePicker('#emailGraphStats #daterange_date_from', '#emailGraphStats #daterange_date_to');
+        });
+    }
 };
 
 Mautic.emailOnUnload = function(id) {

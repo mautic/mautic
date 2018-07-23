@@ -17,7 +17,7 @@ return [
                 'controller' => 'MauticEmailBundle:Email:index',
             ],
             'mautic_email_graph_stats' => [
-                'path'       => '/emails-graph-stats/{objectId}/{isVariant}',
+                'path'       => '/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
                 'controller' => 'MauticEmailBundle:EmailGraphStats:view',
             ],
             'mautic_email_action' => [

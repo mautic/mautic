@@ -221,13 +221,12 @@ if (!$isEmbedded) {
             </div>
             <!--/ email detail collapseable toggler -->
 
-            <div id="emailGraphStats"></div>
-
-            <script>
-                mQuery( "#emailGraphStats" ).load( "<?php echo $view['router']->path('mautic_email_graph_stats', ['objectId' => $email->getId(), 'isVariant' => $showTranslations || $showVariants ?: 0]); ?>", function() {
-                    alert('Load done');
-                });
-            </script>
+            <?php
+            $isVariant = $showTranslations || $showVariants ?: 0;
+            $dateFrom = new \DateTime($dateRangeForm->children['date_from']->vars['data']);
+            $dateTo   = new \DateTime($dateRangeForm->children['date_to']->vars['data']);
+            ?>
+            <div id="emailGraphStats" data-graph-url="<?php echo $view['router']->path('mautic_email_graph_stats', ['objectId' => $email->getId(), 'isVariant' => $isVariant, 'dateFrom' => $dateFrom->format('Y-m-d'), 'dateTo' => $dateTo->format('Y-m-d')]); ?>"></div>
 
             <?php /* echo $view->render(
                 'MauticEmailBundle:Email:graph.html.php',
