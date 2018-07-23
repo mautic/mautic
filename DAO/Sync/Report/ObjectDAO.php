@@ -24,6 +24,11 @@ class ObjectDAO
     private $fields = [];
 
     /**
+     * @var int|null
+     */
+    private $changeTimestamp = null;
+
+    /**
      * ObjectDAO constructor.
      * @param string       $object
      * @param int    $objectId
@@ -32,6 +37,26 @@ class ObjectDAO
     {
         $this->object = $object;
         $this->objectId = $objectId;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getChangeTimestamp(): ?int
+    {
+        return $this->changeTimestamp;
+    }
+
+    /**
+     * @param int|null $changeTimestamp
+     *
+     * @return ObjectDAO
+     */
+    public function setChangeTimestamp(?int $changeTimestamp): ObjectDAO
+    {
+        $this->changeTimestamp = $changeTimestamp;
+
+        return $this;
     }
 
     /**
@@ -64,7 +89,7 @@ class ObjectDAO
     /**
      * @param string $name
      *
-     * @return mixed
+     * @return FieldDAO|null
      */
     public function getField($name)
     {
