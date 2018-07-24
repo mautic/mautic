@@ -742,7 +742,11 @@ class CampaignController extends AbstractStandardFormController
         //load existing events into session
         $campaignEvents = [];
 
-        $existingEvents = $entity->getPublishedEvents()->toArray();
+        if ($isClone) {
+            $existingEvents = $entity->getEvents()->toArray();
+        } else {
+            $existingEvents = $entity->getPublishedEvents()->toArray();
+        }
         $translator     = $this->get('translator');
         $dateHelper     = $this->get('mautic.helper.template.date');
         foreach ($existingEvents as $e) {
