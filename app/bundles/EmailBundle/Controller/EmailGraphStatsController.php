@@ -32,7 +32,7 @@ class EmailGraphStatsController extends Controller
     public function viewAction(Request $request, $objectId, $isVariant, $dateFrom = null, $dateTo = null)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model    = $this->get('mautic.email.model.email');
+        $model = $this->get('mautic.email.model.email');
 
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
@@ -42,14 +42,11 @@ class EmailGraphStatsController extends Controller
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
 
-        if ($email === null) {
-            throw new AccessDeniedHttpException();
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
-            'email:emails:viewown',
-            'email:emails:viewother',
-            $email->getCreatedBy()
-        )
-        ) {
+        if (null === $email || !$this->get('mautic.security')->hasEntityAccess(
+                'email:emails:viewown',
+                'email:emails:viewother',
+                $email->getCreatedBy()
+        )) {
             throw new AccessDeniedHttpException();
         }
 
