@@ -106,7 +106,10 @@ $view['slots']->set(
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0" id="clicks-container">
-                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', ['trackables' => $trackables]); ?>
+                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', [
+                    'trackables'  => $trackables,
+                    'entity'      => $notification,
+                    'channel'     => 'notification', ]); ?>
             </div>
 
             <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">

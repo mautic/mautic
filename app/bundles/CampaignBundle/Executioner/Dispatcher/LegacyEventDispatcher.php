@@ -119,6 +119,8 @@ class LegacyEventDispatcher
             return;
         }
 
+        $rescheduleFailures = new ArrayCollection();
+
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
             $this->leadModel->setSystemCurrentLead($log->getLead());
@@ -146,7 +148,7 @@ class LegacyEventDispatcher
                 if ($this->isFailed($result)) {
                     $this->processFailedLog($result, $log, $pendingEvent);
 
-                    $this->scheduler->rescheduleFailure($log);
+                    $rescheduleFailures->set($log->getId(), $log);
 
                     $this->dispatchFailedEvent($config, $log);
 
@@ -161,6 +163,10 @@ class LegacyEventDispatcher
 
                 $this->dispatchExecutedEvent($config, $log);
             }
+        }
+
+        if ($rescheduleFailures->count()) {
+            $this->scheduler->rescheduleFailures($rescheduleFailures);
         }
 
         $this->leadModel->setSystemCurrentLead(null);

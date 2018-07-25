@@ -289,9 +289,10 @@ return [
                 ],
             ],
             'mautic.page.model.trackable' => [
-                'class'     => 'Mautic\PageBundle\Model\TrackableModel',
+                'class'     => \Mautic\PageBundle\Model\TrackableModel::class,
                 'arguments' => [
                     'mautic.page.model.redirect',
+                    'mautic.lead.repository.field',
                 ],
             ],
             'mautic.page.model.video' => [
