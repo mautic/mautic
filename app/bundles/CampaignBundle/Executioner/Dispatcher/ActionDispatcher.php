@@ -88,7 +88,6 @@ class ActionDispatcher
      *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
-     * @throws \ReflectionException
      */
     public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null)
     {

@@ -142,7 +142,6 @@ class KickoffExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 
