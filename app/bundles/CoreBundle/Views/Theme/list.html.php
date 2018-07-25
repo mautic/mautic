@@ -125,7 +125,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                     <td>
                         <div>
                             <?php if (isset($item['config']['authorUrl'])) : ?>
-                                <a href="<?php echo $item['config']['authorUrl']; ?>" target="_blank">
+                                <a href="<?php echo \Mautic\CoreBundle\Helper\InputHelper::url($item['config']['authorUrl']); ?>" target="_blank">
                                     <?php echo $view->escape($item['config']['author']); ?>
                                 </a>
                             <?php elseif (isset($item['config']['author'])) : ?>
