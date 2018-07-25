@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -573,7 +574,7 @@ class EmailRepository extends CommonRepository
     /**
      * Up the read/sent counts.
      *
-     * @param            $id
+     * @param int        $id
      * @param string     $type
      * @param int        $increaseBy
      * @param bool|false $variant
@@ -586,15 +587,29 @@ class EmailRepository extends CommonRepository
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->update(MAUTIC_TABLE_PREFIX.'emails')
-            ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
-            ->where('id = '.(int) $id);
+        $q->update(MAUTIC_TABLE_PREFIX.'emails');
+        $q->set($type.'_count', $type.'_count + '.(int) $increaseBy);
+        $q->where('id = '.(int) $id);
 
         if ($variant) {
             $q->set('variant_'.$type.'_count', 'variant_'.$type.'_count + '.(int) $increaseBy);
         }
 
-        $q->execute();
+        // Try to execute 3 times before throwing the exception
+        // to increase the chance the update will do its stuff.
+        $retrialLimit = 3;
+        while ($retrialLimit >= 0) {
+            try {
+                $q->execute();
+
+                return;
+            } catch (DBALException $e) {
+                --$retrialLimit;
+                if (0 === $retrialLimit) {
+                    throw $e;
+                }
+            }
+        }
     }
 
     /**

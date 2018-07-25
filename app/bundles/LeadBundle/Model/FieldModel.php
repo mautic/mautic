@@ -86,6 +86,7 @@ class FieldModel extends FormModel
             'fixed'    => true,
             'listable' => true,
             'object'   => 'lead',
+            'default'  => 0,
         ],
         'fax' => [
             'type'     => 'tel',

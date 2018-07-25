@@ -15,6 +15,7 @@ use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Monolog\Logger;
@@ -79,13 +80,15 @@ class TwilioApi extends AbstractSmsApi
     }
 
     /**
-     * @param string $number
+     * @param Lead   $lead
      * @param string $content
      *
      * @return bool|string
      */
-    public function sendSms($number, $content)
+    public function sendSms(Lead $lead, $content)
     {
+        $number = $lead->getLeadPhoneNumber();
+
         if ($number === null) {
             return false;
         }
