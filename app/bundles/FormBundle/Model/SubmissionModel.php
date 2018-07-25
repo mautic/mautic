@@ -367,11 +367,10 @@ class SubmissionModel extends CommonFormModel
             $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
         }
 
-        // Get updated lead if applicable with tracking ID
-        /** @var Lead $lead */
         $lead          = $this->leadModel->getCurrentLead();
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
         $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
             ->setLead($lead);

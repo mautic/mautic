@@ -84,6 +84,10 @@ class DecisionDispatcher
      */
     public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
     {
+        if (!$logs->count()) {
+            return;
+        }
+
         $this->dispatcher->dispatch(
             CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS,
             new DecisionResultsEvent($config, $logs, $evaluatedContacts)

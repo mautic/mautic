@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
-use Mautic\EmailBundle\Helper\PlainTextMassageHelper;
+use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 
 /**
  * Class MessageHelperTest.
@@ -23,6 +23,6 @@ class PlainTextMessageHelperTest extends \PHPUnit_Framework_TestCase
         $message = new \Swift_Message('Subject', 'My Content', 'text/html');
         $message->addPart('plain text', 'text/plain');
 
-        $this->assertSame('plain text', PlainTextMassageHelper::getPlainTextFromMessage($message));
+        $this->assertSame('plain text', PlainTextMessageHelper::getPlainTextFromMessage($message));
     }
 }

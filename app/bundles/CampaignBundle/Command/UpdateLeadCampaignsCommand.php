@@ -11,13 +11,85 @@
 
 namespace Mautic\CampaignBundle\Command;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
+    /**
+     * @var CampaignRepository
+     */
+    private $campaignRepository;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var MembershipBuilder
+     */
+    private $membershipBuilder;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var FormatterHelper
+     */
+    private $formatterHelper;
+
+    /**
+     * @var int
+     */
+    private $runLimit;
+
+    /**
+     * @var ContactLimiter
+     */
+    private $contactLimiter;
+
+    /**
+     * @var bool
+     */
+    private $quiet;
+
+    /**
+     * UpdateLeadCampaignsCommand constructor.
+     *
+     * @param CampaignRepository  $campaignRepository
+     * @param TranslatorInterface $translator
+     * @param MembershipBuilder   $membershipBuilder
+     * @param LoggerInterface     $logger
+     */
+    public function __construct(
+        CampaignRepository $campaignRepository,
+        TranslatorInterface $translator,
+        MembershipBuilder $membershipBuilder,
+        LoggerInterface $logger,
+        FormatterHelper $formatterHelper
+    ) {
+        $this->campaignRepository = $campaignRepository;
+        $this->translator         = $translator;
+        $this->membershipBuilder  = $membershipBuilder;
+        $this->logger             = $logger;
+        $this->formatterHelper    = $formatterHelper;
+
+        parent::__construct();
+    }
+
     protected function configure()
     {
         $this
@@ -30,70 +102,149 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 '-m',
                 InputOption::VALUE_OPTIONAL,
                 'Set max number of contacts to process per campaign for this script execution. Defaults to all.',
-                false
+                0
             )
-            ->addOption('--campaign-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
+            ->addOption(
+                '--campaign-id',
+                '-i',
+                InputOption::VALUE_OPTIONAL,
+                'Build membership for a specific campaign.  Otherwise, all campaigns will be rebuilt.',
+                null
+            )
+            ->addOption(
+                '--contact-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Build membership for a specific contact.',
+                null
+            )
+            ->addOption(
+                '--contact-ids',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'CSV of contact IDs to evaluate.'
+            )
+            ->addOption(
+                '--min-contact-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Build membership starting at a specific contact ID.',
+                null
+            )
+            ->addOption(
+                '--max-contact-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Build membership up to a specific contact ID.',
+                null
+            )
+            ->addOption(
+                '--thread-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The number of this current process if running multiple in parallel.'
+            )
+            ->addOption(
+                '--max-threads',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The maximum number of processes you intend to run in parallel.'
+            );
 
         parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container  = $this->getContainer();
-        $translator = $container->get('translator');
-        $em         = $container->get('doctrine')->getManager();
+        $id             = $input->getOption('campaign-id');
+        $batchLimit     = $input->getOption('batch-limit');
+        $contactMinId   = $input->getOption('min-contact-id');
+        $contactMaxId   = $input->getOption('max-contact-id');
+        $contactId      = $input->getOption('contact-id');
+        $contactIds     = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
+        $threadId       = $input->getOption('thread-id');
+        $maxThreads     = $input->getOption('max-threads');
+        $this->runLimit = $input->getOption('max-contacts');
+        $this->quiet    = $input->getOption('quiet');
+        $this->output   = ($this->quiet) ? new NullOutput() : $output;
 
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel = $container->get('mautic.campaign.model.campaign');
+        if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
+            $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
-        $id    = $input->getOption('campaign-id');
-        $batch = $input->getOption('batch-limit');
-        $max   = $input->getOption('max-contacts');
+            return 1;
+        }
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
         }
 
+        $this->contactLimiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads);
+
         if ($id) {
-            $campaign = $campaignModel->getEntity($id);
-            if ($campaign !== null) {
-                $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', ['%id%' => $id]).'</info>');
-                $processed = $campaignModel->rebuildCampaignLeads($campaign, $batch, $max, $output);
-                $output->writeln(
-                    '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
-                );
-            } else {
-                $output->writeln('<error>'.$translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
+            $campaign = $this->campaignRepository->getEntity($id);
+            if ($campaign === null) {
+                $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
+
+                return 0;
             }
+
+            $this->updateCampaign($campaign);
         } else {
-            $campaigns = $campaignModel->getEntities(
+            $campaigns = $this->campaignRepository->getEntities(
                 [
                     'iterator_mode' => true,
                 ]
             );
 
-            while (($c = $campaigns->next()) !== false) {
+            while (($results = $campaigns->next()) !== false) {
                 // Get first item; using reset as the key will be the ID and not 0
-                $c = reset($c);
+                $campaign = reset($results);
 
-                if ($c->isPublished()) {
-                    $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', ['%id%' => $c->getId()]).'</info>');
+                $this->updateCampaign($campaign);
 
-                    $processed = $campaignModel->rebuildCampaignLeads($c, $batch, $max, $output);
-                    $output->writeln(
-                        '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
-                    );
-                }
-
-                $em->detach($c);
-                unset($c);
+                unset($results, $campaign);
             }
-
-            unset($campaigns);
         }
 
         $this->completeRun();
 
         return 0;
+    }
+
+    /**
+     * @param Campaign $campaign
+     *
+     * @throws \Exception
+     */
+    private function updateCampaign(Campaign $campaign)
+    {
+        if (!$campaign->isPublished()) {
+            return;
+        }
+
+        try {
+            $this->output->writeln(
+                '<info>'.$this->translator->trans('mautic.campaign.rebuild.rebuilding', ['%id%' => $campaign->getId()]).'</info>'
+            );
+
+            // Reset batch limiter
+            $this->contactLimiter->resetBatchMinContactId();
+
+            $this->membershipBuilder->build($campaign, $this->contactLimiter, $this->runLimit, ($this->quiet) ? null : $this->output);
+        } catch (\Exception $exception) {
+            if ('prod' !== MAUTIC_ENV) {
+                // Throw the exception for dev/test mode
+                throw $exception;
+            }
+
+            $this->logger->error('CAMPAIGN: '.$exception->getMessage());
+        }
+
+        // Don't detach in tests since this command will be ran multiple times in the same process
+        if ('test' !== MAUTIC_ENV) {
+            $this->campaignRepository->detachEntity($campaign);
+        }
+
+        $this->output->writeln('');
     }
 }

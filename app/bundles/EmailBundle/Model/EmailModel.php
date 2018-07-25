@@ -502,15 +502,21 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->em->persist($email);
         }
 
-        $emailOpenStat = new StatDevice();
-        $emailOpenStat->setIpAddress($ipAddress);
-        $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
-        $emailOpenStat->setDevice($trackedDevice);
-        $emailOpenStat->setDateOpened($readDateTime->toUtcString());
-        $emailOpenStat->setStat($stat);
+        if ($lead) {
+            $emailOpenStat = new StatDevice();
+            $emailOpenStat->setIpAddress($ipAddress);
+            $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
+            $emailOpenStat->setDevice($trackedDevice);
+            $emailOpenStat->setDateOpened($readDateTime->toUtcString());
+            $emailOpenStat->setStat($stat);
+        }
 
         $this->em->persist($stat);
-        $this->em->persist($emailOpenStat);
+
+        if ($lead) {
+            $this->em->persist($emailOpenStat);
+        }
+
         try {
             $this->em->flush();
         } catch (\Exception $ex) {
