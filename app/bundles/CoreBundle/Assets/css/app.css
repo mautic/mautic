@@ -406,17 +406,17 @@ body > #app-wrapper {
   border-bottom: 1px solid #202830;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:hover,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:focus {
   background-color: #1d232b;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.95);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > a,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > a {
   background-color: #1d232b;
-  color: rgba(255, 255, 255, 0.75);
+  color: #ffffff;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > .nav-submenu,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > .nav-submenu {
@@ -433,15 +433,15 @@ body > #app-wrapper {
   box-shadow: 0 0 0 2px #1a2026;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a:hover,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a:focus {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li.active > a,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li.open > a {
-  color: rgba(255, 255, 255, 0.8);
+  color: #ffffff;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav .nav-heading {
   color: rgba(255, 255, 255, 0.25);
@@ -483,17 +483,17 @@ body > #app-wrapper {
   border-bottom: 1px solid #202830;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a:hover,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a:focus {
   background-color: #1d232b;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.95);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.active > a,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.open > a {
   background-color: #1d232b;
-  color: rgba(255, 255, 255, 0.75);
+  color: #ffffff;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.active > .nav-submenu,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.open > .nav-submenu {
@@ -510,15 +510,15 @@ body > #app-wrapper {
   box-shadow: 0 0 0 2px #1a2026;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li > a {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li > a:hover,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li > a:focus {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li.active > a,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li.open > a {
-  color: rgba(255, 255, 255, 0.8);
+  color: #ffffff;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav .nav-heading {
   color: rgba(255, 255, 255, 0.25);
@@ -4313,9 +4313,6 @@ lesshat-selector { -lh-property: 0 ;
   top: 0;
   width: 70%;
   height: 100%;
-}
-.builder-panel #preview .panel-body {
-  padding: 7px 0;
 }
 .code-mode .builder-panel {
   width: 50%;

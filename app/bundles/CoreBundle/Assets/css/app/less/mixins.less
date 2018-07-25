@@ -180,11 +180,11 @@
     }
 
     > a {
-      color: fade(contrast(@bgcolor), 50%);
+      color: fade(contrast(@bgcolor), 85%);
       &:hover,
       &:focus {
         background-color: @bgcolor;
-        color: fade(contrast(@bgcolor), 75%);
+        color: fade(contrast(@bgcolor), 95%);
       }
     }
 
@@ -193,7 +193,7 @@
     &.open {
       > a {
         background-color: @bgcolor;
-        color: fade(contrast(@bgcolor), 75%);
+        color: fade(contrast(@bgcolor), 100%);
       }
 
       // `nav-submenu`
@@ -215,10 +215,10 @@
           box-shadow: 0 0 0 2px darken(@bgcolor, 1.5%);
         }
         > a {
-          color: fade(contrast(@bgcolor), 50%);
+          color: fade(contrast(@bgcolor), 85%);
           &:hover,
           &:focus {
-            color: fade(contrast(@bgcolor), 80%);
+            color: fade(contrast(@bgcolor), 90%);
           }
         }
 
@@ -226,7 +226,7 @@
         &.active,
         &.open {
           > a {
-            color: fade(contrast(@bgcolor), 80%);
+            color: fade(contrast(@bgcolor), 100%);
           }
         }
       }
