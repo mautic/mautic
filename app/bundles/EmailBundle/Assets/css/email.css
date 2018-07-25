@@ -31,9 +31,9 @@
 
 #emailGraphStats {
     height: 437px;
-    text-align: center;
 }
 
 #emailGraphStats .spinner {
     padding-top: 50px;
+    text-align: center;
 }
