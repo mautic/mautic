@@ -28,3 +28,12 @@
 
 .clickable-stat a { color: #fff; }
 .clickable-stat a:hover { color: #fff; }
+
+#emailGraphStats {
+    height: 437px;
+    text-align: center;
+}
+
+#emailGraphStats .spinner {
+    padding-top: 50px;
+}
