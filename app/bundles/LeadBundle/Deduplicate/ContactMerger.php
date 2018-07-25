@@ -130,8 +130,10 @@ class ContactMerger
         /*
          * The winner should keep the oldest date identified timestamp
          * as long as the loser's date identified is not null.
+         * Alternatively, if the winner's date identified is null,
+         * use the loser's date identified (doesn't matter if it is null).
          */
-        if ($loser->getDateIdentified() !== null && $loser->getDateIdentified() < $winner->getDateIdentified()) {
+        if (($loser->getDateIdentified() !== null && $loser->getDateIdentified() < $winner->getDateIdentified()) || $winner->getDateIdentified() === null) {
             $winner->setDateIdentified($loser->getDateIdentified());
         }
 

@@ -101,6 +101,14 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $this->getMerger()->mergeTimestamps($winner, $loser);
 
         $this->assertEquals($latestDateTime, $winner->getDateIdentified());
+
+        // Test with null date identified winner
+        $winner->setDateIdentified(null);
+        $loser->setDateIdentified($latestDateTime);
+
+        $this->getMerger()->mergeTimestamps($winner, $loser);
+
+        $this->assertEquals($latestDateTime, $winner->getDateIdentified());
     }
 
     public function testMergeIpAddresses()
