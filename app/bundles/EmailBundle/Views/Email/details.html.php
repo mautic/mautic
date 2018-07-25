@@ -228,20 +228,7 @@ if (!$isEmbedded) {
             ?>
             <div id="emailGraphStats" data-graph-url="<?php echo $view['router']->path('mautic_email_graph_stats', ['objectId' => $email->getId(), 'isVariant' => $isVariant, 'dateFrom' => $dateFrom->format('Y-m-d'), 'dateTo' => $dateTo->format('Y-m-d')]); ?>"></div>
 
-            <?php /* echo $view->render(
-                'MauticEmailBundle:Email:graph.html.php',
-                [
-                    'stats'         => $stats,
-                    'statsDevices'  => $statsDevices,
-                    'emailType'     => $emailType,
-                    'email'         => $email,
-                    'isVariant'     => ($showTranslations || $showVariants),
-                    'showAllStats'  => $showAllStats,
-                    'dateRangeForm' => $dateRangeForm,
-                ]
-            ); ?>
-
-            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); */ ?>
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
