@@ -153,7 +153,6 @@ class ScheduledExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 
@@ -210,20 +209,27 @@ class ScheduledExecutioner implements ExecutionerInterface
         $organized = $this->organizeByEvent($logs);
         $now       = new \DateTime();
         foreach ($organized as $organizedLogs) {
-            $this->progressBar->advance($organizedLogs->count());
-
+            /** @var Event $event */
             $event = $organizedLogs->first()->getEvent();
 
             // Validate that the schedule is still appropriate
             $this->validateSchedule($event, $organizedLogs, $now, true);
 
-            try {
-                // Hydrate contacts with custom field data
-                $this->scheduledContactFinder->hydrateContacts($organizedLogs);
+            // Check that the campaign is published with up/down dates
+            if ($event->getCampaign()->isPublished()) {
+                try {
+                    // Hydrate contacts with custom field data
+                    $this->scheduledContactFinder->hydrateContacts($organizedLogs);
 
-                $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
-            } catch (NoContactsFoundException $e) {
-                // All of the events were rescheduled
+                    $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
+                } catch (NoContactsFoundException $e) {
+                    // All of the events were rescheduled
+                }
+            } else {
+                $this->executioner->recordLogsWithError(
+                    $organizedLogs,
+                    $this->translator->trans('mautic.campaign.event.campaign_unpublished')
+                );
             }
 
             $this->progressBar->advance($organizedLogs->count());

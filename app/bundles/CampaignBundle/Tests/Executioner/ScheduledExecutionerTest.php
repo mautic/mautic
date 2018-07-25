@@ -412,6 +412,64 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $counter->getTotalScheduled());
     }
 
+    public function testSpecificEventsWithUnpublishedCamapign()
+    {
+        $campaign = $this->getMockBuilder(Campaign::class)
+            ->getMock();
+        $campaign->expects($this->once())
+            ->method('isPublished')
+            ->willReturn(false);
+
+        $event = $this->getMockBuilder(Event::class)
+            ->getMock();
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getCampaign')
+            ->willReturn($campaign);
+
+        $log1 = $this->createMock(LeadEventLog::class);
+        $log1->method('getId')
+            ->willReturn(1);
+        $log1->method('getEvent')
+            ->willReturn($event);
+        $log1->method('getCampaign')
+            ->willReturn($campaign);
+        $log1->method('getDateTriggered')
+            ->willReturn(new \DateTime());
+
+        $log2 = $this->createMock(LeadEventLog::class);
+        $log2->method('getId')
+            ->willReturn(2);
+        $log2->method('getEvent')
+            ->willReturn($event);
+        $log2->method('getCampaign')
+            ->willReturn($campaign);
+        $log2->method('getDateTriggered')
+            ->willReturn(new \DateTime());
+
+        $logs = new ArrayCollection([1 => $log1, 2 => $log2]);
+
+        $this->repository->expects($this->once())
+            ->method('getScheduledByIds')
+            ->with([1, 2])
+            ->willReturn($logs);
+
+        $this->executioner->expects($this->never())
+            ->method('executeLogs');
+
+        $this->executioner->expects($this->once())
+            ->method('recordLogsWithError');
+
+        $this->contactFinder->expects($this->never())
+            ->method('hydrateContacts');
+
+        $counter = $this->getExecutioner()->executeByIds([1, 2]);
+
+        // Two events were evaluated
+        $this->assertEquals(2, $counter->getTotalEvaluated());
+        $this->assertEquals(0, $counter->getTotalExecuted());
+    }
+
     /**
      * @return ScheduledExecutioner
      */
