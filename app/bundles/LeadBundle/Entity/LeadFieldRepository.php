@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * LeadFieldRepository.
@@ -132,21 +133,24 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * Return column alias and join tables.
+     * Return property by field alias and join tables.
      *
      * @param string                                                       $field
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
-    public function getColumnAliasByField($field, $q)
+    public function getPropertyByField($field, $q)
     {
         $columnAlias = 'l.';
         // Join company tables If we're trying search by company fields
         if (strpos($field, 'company.') !== false) {
             $this->addCompanyLeftJoin($q);
             $columnAlias = '';
+        } elseif (in_array($field, ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term'])) {
+            $q->join('l', MAUTIC_TABLE_PREFIX.'lead_utmtags', 'u', 'l.id = u.lead_id');
+            $columnAlias = 'u.';
         }
 
-        return $columnAlias;
+        return $columnAlias.$field;
     }
 
     /**
@@ -188,30 +192,29 @@ class LeadFieldRepository extends CommonRepository
                 return false;
             }
         } else {
-            $columnAlias = $this->getColumnAliasByField($field, $q);
-            // Standard field
+            $property = $this->getPropertyByField($field, $q);
             if ($operatorExpr === 'empty' || $operatorExpr === 'notEmpty') {
                 $q->where(
                     $q->expr()->andX(
                         $q->expr()->eq('l.id', ':lead'),
                         ($operatorExpr === 'empty') ?
                             $q->expr()->orX(
-                                $q->expr()->isNull($columnAlias.$field),
-                                $q->expr()->eq($columnAlias.$field, $q->expr()->literal(''))
+                                $q->expr()->isNull($property),
+                                $q->expr()->eq($property, $q->expr()->literal(''))
                             )
                         :
                         $q->expr()->andX(
-                            $q->expr()->isNotNull($columnAlias.$field),
-                            $q->expr()->neq($columnAlias.$field, $q->expr()->literal(''))
+                            $q->expr()->isNotNull($property),
+                            $q->expr()->neq($property, $q->expr()->literal(''))
                         )
                     )
                 )
                   ->setParameter('lead', (int) $lead);
             } elseif ($operatorExpr === 'regexp' || $operatorExpr === 'notRegexp') {
                 if ($operatorExpr === 'regexp') {
-                    $where = $columnAlias.$field.' REGEXP  :value';
+                    $where = $property.' REGEXP  :value';
                 } else {
-                    $where = $columnAlias.$field.' NOT REGEXP  :value';
+                    $where = $property.' NOT REGEXP  :value';
                 }
 
                 $q->where(
@@ -222,6 +225,28 @@ class LeadFieldRepository extends CommonRepository
                 )
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
+            } elseif ($operatorExpr === 'in' || $operatorExpr === 'notIn') {
+                $value = $q->expr()->literal(
+                    InputHelper::clean($value)
+                );
+
+                $value = trim($value, "'");
+                if (substr($operatorExpr, 0, 3) === 'not') {
+                    $operator = 'NOT REGEXP';
+                } else {
+                    $operator = 'REGEXP';
+                }
+
+                $expr = $q->expr()->andX(
+                    $q->expr()->eq('l.id', ':lead')
+                );
+
+                $expr->add(
+                    'l.'.$field." $operator '\\\\|?$value\\\\|?'"
+                );
+
+                $q->where($expr)
+                    ->setParameter('lead', (int) $lead);
             } else {
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead')
@@ -231,8 +256,8 @@ class LeadFieldRepository extends CommonRepository
                     // include null
                     $expr->add(
                         $q->expr()->orX(
-                            $q->expr()->$operatorExpr($columnAlias.$field, ':value'),
-                            $q->expr()->isNull($columnAlias.$field)
+                            $q->expr()->$operatorExpr($property, ':value'),
+                            $q->expr()->isNull($property)
                         )
                     );
                 } else {
@@ -252,13 +277,18 @@ class LeadFieldRepository extends CommonRepository
                     }
 
                     $expr->add(
-                        $q->expr()->$operatorExpr($columnAlias.$field, ':value')
+                        $q->expr()->$operatorExpr($property, ':value')
                     );
                 }
 
                 $q->where($expr)
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
+            }
+            if ($utmField) {
+                // Match only against the latest UTM properties.
+                $q->orderBy('u.date_added', 'DESC');
+                $q->setMaxResults(1);
             }
             $result = $q->execute()->fetch();
 
@@ -278,15 +308,12 @@ class LeadFieldRepository extends CommonRepository
     public function compareDateValue($lead, $field, $value)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-
-        $columnAlias = $this->getColumnAliasByField($field, $q);
-
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->eq($columnAlias.$field, ':value')
+                    $q->expr()->eq('l.'.$field, ':value')
                 )
             )
             ->setParameter('lead', (int) $lead)
@@ -326,5 +353,15 @@ class LeadFieldRepository extends CommonRepository
         $result = $q->execute()->fetch();
 
         return !empty($result['id']);
+    }
+
+    /**
+     * @param $type
+     *
+     * @return LeadField[]
+     */
+    public function getFieldsByType($type)
+    {
+        return $this->findBy(['type' => $type]);
     }
 }

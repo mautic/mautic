@@ -459,6 +459,15 @@ final class LeadEvents
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.lead.on_campaign_trigger_action';
 
     /**
+     * The mautic.lead.on_campaign_action_delete_contact event is dispatched when the campaign action to delete a contact is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_ACTION_DELETE_CONTACT = 'mautic.lead.on_campaign_action_delete_contact';
+
+    /**
      * The mautic.lead.on_campaign_trigger_condition event is fired when the campaign condition triggers.
      *
      * The event listener receives a
@@ -533,6 +542,16 @@ final class LeadEvents
      * @var string
      */
     const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
+
+    /**
+     * The mautic.list_filters_querybuilder_generated event is dispatched when the queryBuilder for segment was generated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent instance.
+     *
+     * @var string
+     */
+    const LIST_FILTERS_QUERYBUILDER_GENERATED = 'mautic.list_filters_querybuilder_generated';
 
     /**
      * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.

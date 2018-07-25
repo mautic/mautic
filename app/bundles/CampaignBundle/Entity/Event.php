@@ -21,11 +21,18 @@ use Mautic\LeadBundle\Entity\Lead as Contact;
 /**
  * Class Event.
  */
-class Event
+class Event implements ChannelInterface
 {
     const TYPE_DECISION  = 'decision';
     const TYPE_ACTION    = 'action';
     const TYPE_CONDITION = 'condition';
+
+    const PATH_INACTION = 'no';
+    const PATH_ACTION   = 'yes';
+
+    const TRIGGER_MODE_DATE      = 'date';
+    const TRIGGER_MODE_INTERVAL  = 'interval';
+    const TRIGGER_MODE_IMMEDIATE = 'immediate';
 
     /**
      * @var int
@@ -145,7 +152,6 @@ class Event
      */
     public function __clone()
     {
-        $this->id        = null;
         $this->tempId    = null;
         $this->campaign  = null;
         $this->channel   = null;
@@ -379,6 +385,11 @@ class Event
         return $this->id;
     }
 
+    public function nullId()
+    {
+        $this->id = null;
+    }
+
     /**
      * Set order.
      *
@@ -597,13 +608,55 @@ class Event
     }
 
     /**
-     * Get children.
-     *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection|Event[]
      */
     public function getChildren()
     {
         return $this->children;
+    }
+
+    /**
+     * @return ArrayCollection|Event[]
+     */
+    public function getPositiveChildren()
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_ACTION));
+
+        return $this->getChildren()->matching($criteria);
+    }
+
+    /**
+     * @return ArrayCollection|Event[]
+     */
+    public function getNegativeChildren()
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_INACTION));
+
+        return $this->getChildren()->matching($criteria);
+    }
+
+    /**
+     * @param $type
+     *
+     * @return ArrayCollection
+     */
+    public function getChildrenByType($type)
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('type', $type));
+
+        return $this->getChildren()->matching($criteria);
+    }
+
+    /**
+     * @param $type
+     *
+     * @return ArrayCollection
+     */
+    public function getChildrenByEventType($type)
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
+
+        return $this->getChildren()->matching($criteria);
     }
 
     /**

@@ -76,7 +76,7 @@ class SortableListType extends AbstractType
                     'error_bubbling' => false,
                 ]
             )
-        )->addModelTransformer(new SortableListTransformer($options['option_notblank'], $options['with_labels']));
+        )->addModelTransformer(new SortableListTransformer($options['option_notblank'], $options['with_labels'], $options['key_value_pairs']));
     }
 
     /**
@@ -104,6 +104,8 @@ class SortableListType extends AbstractType
                 'with_labels'         => false,
                 'entry_type'          => 'text',
                 'add_value_button'    => 'mautic.core.form.list.additem',
+                // Stores as [label => value] array instead of [list => [[label => the label, value => the value], ...]]
+                'key_value_pairs'    => false,
             ]
         );
 

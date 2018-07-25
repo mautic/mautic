@@ -430,12 +430,10 @@ return [
                 'alias'     => 'gravatar',
             ],
             'mautic.helper.template.analytics' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\AnalyticsHelper',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\AnalyticsHelper::class,
                 'alias'     => 'analytics',
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.helper.cookie',
-                    'mautic.lead.model.lead',
                 ],
             ],
             'mautic.helper.template.mautibot' => [
@@ -613,7 +611,8 @@ return [
                 'class' => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher::class,
             ],
             'mautic.cipher.openssl' => [
-                'class' => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
+                'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
+                'arguments' => ['%kernel.environment%'],
             ],
             'mautic.factory' => [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
@@ -761,6 +760,12 @@ return [
                     '%mautic.parameters%',
                     'mautic.helper.integration',
                 ],
+            ],
+            'mautic.helper.hash' => [
+                'class' => \Mautic\CoreBundle\Helper\HashHelper\HashHelper::class,
+            ],
+            'mautic.helper.random' => [
+                'class' => \Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
             ],
             'mautic.menu_renderer' => [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
