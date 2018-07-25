@@ -5,7 +5,7 @@
 .php_cs.cache
 /.env
 /composer.phar
-
+/package-lock.json
 /app/bootstrap*
 /app/tests.bootstrap*
 /app/phpunit.xml
