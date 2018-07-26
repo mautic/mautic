@@ -187,4 +187,14 @@ class TokenHelperTest extends \PHPUnit_Framework_TestCase
         $tokenList = TokenHelper::findLeadTokens($token, $this->lead);
         $this->assertNotSame($this->lead['date'], $tokenList[$token]);
     }
+
+    public function testDateFormatForEmptyValue()
+    {
+        $lead         = $this->lead;
+        $lead['date'] = '';
+
+        $token     = '{contactfield=date|time}';
+        $tokenList = TokenHelper::findLeadTokens($token, $lead);
+        $this->assertEmpty($tokenList[$token]);
+    }
 }

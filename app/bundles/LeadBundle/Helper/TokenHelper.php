@@ -98,31 +98,40 @@ class TokenHelper
             $value = $lead['companies'][0][$alias];
         }
 
-        switch ($defaultValue) {
-            case 'true':
-                $value = urlencode($value);
-                break;
-            case 'datetime':
-            case 'date':
-            case 'time':
-            $dt   = new DateTimeHelper($value);
-            $date = $dt->getDateTime()->format((new ParamsLoaderHelper())->getParameters()['date_format_dateonly']);
-            $time = $dt->getDateTime()->format((new ParamsLoaderHelper())->getParameters()['date_format_timeonly']);
+        if ($value) {
             switch ($defaultValue) {
+                case 'true':
+                    $value = urlencode($value);
+                    break;
                 case 'datetime':
-                    $value = $date.' '.$time;
-                    break;
                 case 'date':
-                    $value =  $date;
-                    break;
                 case 'time':
-                    $value = $time;
+                    $dt   = new DateTimeHelper($value);
+                    $date = $dt->getDateTime()->format(
+                        (new ParamsLoaderHelper())->getParameters()['date_format_dateonly']
+                    );
+                    $time = $dt->getDateTime()->format(
+                        (new ParamsLoaderHelper())->getParameters()['date_format_timeonly']
+                    );
+                    switch ($defaultValue) {
+                        case 'datetime':
+                            $value = $date.' '.$time;
+                            break;
+                        case 'date':
+                            $value = $date;
+                            break;
+                        case 'time':
+                            $value = $time;
+                            break;
+                    }
                     break;
             }
-                break;
         }
-
-        return $value ?: $defaultValue;
+        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime'])) {
+            return $value;
+        } else {
+            return $value ?: $defaultValue;
+        }
     }
 
     /**
