@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Helper\TrackingHelper;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\Routing\RouterInterface;
@@ -52,8 +53,12 @@ class CampaignSubscriber extends CommonSubscriber
      * @param TrackingHelper  $trackingHelper
      * @param RouterInterface $router
      */
-    public function __construct(EventModel $eventModel, FocusModel $focusModel, TrackingHelper $trackingHelper, RouterInterface $router)
-    {
+    public function __construct(
+        EventModel $eventModel,
+        FocusModel $focusModel,
+        TrackingHelper $trackingHelper,
+        RouterInterface $router
+    ) {
         $this->campaignEventModel = $eventModel;
         $this->focusModel         = $focusModel;
         $this->trackingHelper     = $trackingHelper;
@@ -66,8 +71,9 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
-            FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
+            FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION   => ['onCampaignTriggerAction', 0],
+            FocusEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
         ];
     }
 
@@ -95,6 +101,21 @@ class CampaignSubscriber extends CommonSubscriber
             ],
         ];
         $event->addAction('focus.show', $action);
+
+        $event->addDecision(
+            'focus.open',
+            [
+                'label'                  => 'mautic.focus.campaign.event.focus.on.open',
+                'description'            => 'mautic.focus.campaign.event.focus.on.open_descr',
+                'eventName'              => FocusEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'formType'               => 'focusshow_list',
+                'formTheme'              => 'MauticFocusBundle:FormTheme\FocusShowList',
+                'formTypeOptions'        => [
+                    'update_select' => 'campaignevent_properties_focus',
+                    'urls'          => true,
+                ],
+            ]
+        );
     }
 
     /**
@@ -107,9 +128,59 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setResult(false);
         }
         $values                 = [];
-        $values['focus_item'][] = ['id' => $focusId, 'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], true)];
+        $values['focus_item'][] = [
+            'id' => $focusId,
+            'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], true),
+        ];
         $this->trackingHelper->updateSession($values);
 
         return $event->setResult(true);
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    {
+        $focusId      = (int) $event->getConfig()['focus'];
+        $eventDetails = $event->getEventDetails();
+        $eventConfig  = $event->getConfig();
+
+        if (!$focusId) {
+            return $event->setResult(false);
+        }
+        // STOP sent campaignEventModel just if Focus Item is opened
+        if (empty($eventDetails['stop']) && !empty($eventDetails['hit'])) {
+            $hit = $eventDetails['hit'];
+            // Limit to URLS
+            if (!empty($eventConfig['urls']['list'])) {
+                $limitToUrl = $eventConfig['urls']['list'];
+                $isUrl      = false;
+                foreach ($limitToUrl as $url) {
+                    if (preg_match('/'.preg_quote($url, '/').'/i', $hit->getUrl())) {
+                        $isUrl = true;
+                    }
+                }
+                // page hit url doesn't match
+                if (!$isUrl) {
+                    return $event->setResult(false);
+                }
+            }
+
+            // Set Focus Item JS url to session
+            $values                 = [];
+            $values['focus_item'][] = [
+                'id' => $focusId,
+                'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], true),
+            ];
+            $this->trackingHelper->updateSession($values);
+
+            return $event->setResult(false);
+        } elseif (!empty($eventDetails['stop']) && !empty($eventDetails['focus']) && $eventDetails['focus']->getId() == $focusId) {
+            // Decision return true If we trigger it on open event
+            return $event->setResult(true);
+        } else {
+            return $event->setResult(false);
+        }
     }
 }

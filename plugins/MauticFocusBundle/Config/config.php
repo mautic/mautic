@@ -64,12 +64,14 @@ return [
                 'arguments' => [
                     'mautic.focus.model.focus',
                     'router',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.focus.subscriber.stat' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\StatSubscriber',
                 'arguments' => [
                     'mautic.focus.model.focus',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.focus.subscriber.focus' => [
