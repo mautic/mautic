@@ -205,6 +205,8 @@ class ReportSubscriber extends CommonSubscriber
             $event->addCompanyLeftJoin($qb);
         }
 
+        $event->applyDateFilters($qb, 'date_triggered', 'log');
+
         $event->setQueryBuilder($qb);
     }
 
