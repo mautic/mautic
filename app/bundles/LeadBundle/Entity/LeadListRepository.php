@@ -1222,26 +1222,55 @@ class LeadListRepository extends CommonRepository
                         ->select($select)
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
-                    if ($details['filter'] == 1) {
-                        $subqb->where(
-                            $q->expr()
-                                ->andX(
-                                    $q->expr()
-                                        ->isNotNull($alias.'.'.$column),
-                                    $q->expr()
-                                        ->eq($alias.'.lead_id', 'l.id')
-                                )
-                        );
-                    } else {
-                        $subqb->where(
-                            $q->expr()
-                                ->andX(
-                                    $q->expr()
-                                        ->isNull($alias.'.'.$column),
-                                    $q->expr()
-                                        ->eq($alias.'.lead_id', 'l.id')
-                                )
-                        );
+                    switch ($details['filter']) {
+                        case 0:
+                            $subqb->where(
+                                $q->expr()
+                                    ->andX(
+                                        $q->expr()
+                                            ->isNull($alias.'.'.$column),
+                                        $q->expr()
+                                            ->eq($alias.'.lead_id', 'l.id')
+                                    )
+                            );
+                            break;
+                        case 1:
+                            $subqb->where(
+                                $q->expr()
+                                    ->andX(
+                                        $q->expr()
+                                            ->isNotNull($alias.'.'.$column),
+                                        $q->expr()
+                                            ->eq($alias.'.lead_id', 'l.id')
+                                    )
+                            );
+                            break;
+                        case 2:
+                            $subqb->where(
+                                $q->expr()
+                                    ->andX(
+                                        $q->expr()
+                                            ->isNotNull($alias.'.'.$column),
+                                        $q->expr()
+                                            ->eq($alias.'.lead_id', 'l.id'),
+                                        $q->expr()
+                                            ->eq($alias.'.enabled', 1)
+                                    )
+                            );
+                            break;
+                        case 3:
+                            $subqb->where(
+                                $q->expr()
+                                    ->andX(
+                                        $q->expr()
+                                            ->isNotNull($alias.'.'.$column),
+                                        $q->expr()
+                                            ->eq($alias.'.lead_id', 'l.id'),
+                                        $q->expr()
+                                            ->eq($alias.'.enabled', 0)
+                                    )
+                            );
+                            break;
                     }
                     // Specific lead
                     if (!empty($leadId)) {
