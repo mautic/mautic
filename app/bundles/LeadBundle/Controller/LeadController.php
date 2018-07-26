@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -873,7 +875,12 @@ class LeadController extends FormController
                     }
 
                     //Both leads are good so now we merge them
-                    $mainLead = $model->mergeLeads($mainLead, $secLead, false);
+                    /** @var ContactMerger $contactMerger */
+                    $contactMerger = $this->container->get('mautic.lead.merger');
+                    try {
+                        $mainLead = $contactMerger->merge($mainLead, $secLead);
+                    } catch (SameContactException $exception) {
+                    }
                 }
             }
 
