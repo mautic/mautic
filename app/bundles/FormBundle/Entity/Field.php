@@ -842,7 +842,6 @@ class Field
         }
 
         if ($this->showWhenValueExists === false) {
-
             // Hide the field if there is the value condition and if we already know the value for this field
             if ($submissions) {
                 foreach ($submissions as $submission) {
@@ -859,5 +858,21 @@ class Field
         }
 
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCaptchaType()
+    {
+        return $this->type === 'captcha';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFileType()
+    {
+        return $this->type === 'file';
     }
 }

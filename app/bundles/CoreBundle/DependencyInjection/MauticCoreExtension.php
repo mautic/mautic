@@ -63,6 +63,9 @@ class MauticCoreExtension extends Extension
                         case 'integrations':
                             $defaultTag = 'mautic.integration';
                             break;
+                        case 'command':
+                            $defaultTag = 'console.command';
+                            break;
                         default:
                             $defaultTag = false;
                             break;
@@ -144,6 +147,10 @@ class MauticCoreExtension extends Extension
                                 }
 
                                 $definition->addTag($tag, $tagArguments[$k]);
+
+                                if ('mautic.email_transport' === $tag) {
+                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $name);
+                                }
                             }
                         } else {
                             $tag          = (!empty($details['tag'])) ? $details['tag'] : $defaultTag;
@@ -155,6 +162,10 @@ class MauticCoreExtension extends Extension
                                 }
 
                                 $definition->addTag($tag, $tagArguments);
+
+                                if ('mautic.email_transport' === $tag) {
+                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $name);
+                                }
                             }
 
                             if ($type == 'events') {

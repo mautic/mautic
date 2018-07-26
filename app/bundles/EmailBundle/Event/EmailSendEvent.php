@@ -27,6 +27,11 @@ class EmailSendEvent extends CommonEvent
     private $helper;
 
     /**
+     * @var Mail
+     */
+    private $email;
+
+    /**
      * @var string
      */
     private $content = '';
@@ -72,10 +77,18 @@ class EmailSendEvent extends CommonEvent
     private $textHeaders = [];
 
     /**
-     * @param MailHelper $helper
-     * @param array      $args
+     * @var bool
      */
-    public function __construct(MailHelper $helper = null, $args = [])
+    private $isDynamicContentParsing;
+
+    /**
+     * EmailSendEvent constructor.
+     *
+     * @param MailHelper|null $helper
+     * @param array           $args
+     * @param bool            $isDynamicContentParsing
+     */
+    public function __construct(MailHelper $helper = null, $args = [], $isDynamicContentParsing = false)
     {
         $this->helper = $helper;
 
@@ -89,6 +102,10 @@ class EmailSendEvent extends CommonEvent
 
         if (isset($args['subject'])) {
             $this->subject = $args['subject'];
+        }
+
+        if (isset($args['email'])) {
+            $this->email = $args['email'];
         }
 
         if (!$this->subject && isset($args['email']) && $args['email'] instanceof Email) {
@@ -120,6 +137,8 @@ class EmailSendEvent extends CommonEvent
         if (isset($args['textHeaders'])) {
             $this->textHeaders = $args['textHeaders'];
         }
+
+        $this->isDynamicContentParsing = $isDynamicContentParsing;
     }
 
     /**
@@ -149,7 +168,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getEmail()
     {
-        return ($this->helper !== null) ? $this->helper->getEmail() : null;
+        return ($this->helper !== null) ? $this->helper->getEmail() : $this->email;
     }
 
     /**
@@ -321,7 +340,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getTextHeaders()
     {
-        return ($this->helper !== null) ? $this->helper->getCustomHeaders() : $this->headers;
+        return ($this->helper !== null) ? $this->helper->getCustomHeaders() : $this->textHeaders;
     }
 
     /**
@@ -370,5 +389,13 @@ class EmailSendEvent extends CommonEvent
         } else {
             return md5($this->getContent().$this->getPlainText());
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDynamicContentParsing()
+    {
+        return $this->isDynamicContentParsing;
     }
 }

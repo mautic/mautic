@@ -34,7 +34,6 @@ return [
             ],
         ],
         'public' => [
-
         ],
     ],
 
@@ -48,13 +47,10 @@ return [
             ],
         ],
         'admin' => [
-
         ],
         'profile' => [
-
         ],
         'extra' => [
-
         ],
     ],
 
@@ -65,11 +61,13 @@ return [
     'services' => [
         'events' => [
             'mautic.channel.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\ChannelBundle\EventListener\CampaignSubscriber',
+                'class'     => Mautic\ChannelBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.channel.model.message',
-                    'mautic.campaign.model.campaign',
-                    'mautic.campaign.model.event',
+                    'mautic.campaign.dispatcher.action',
+                    'mautic.campaign.event_collector',
+                    'monolog.logger.mautic',
+                    'translator',
                 ],
             ],
             'mautic.channel.channelbundle.subscriber' => [
@@ -78,7 +76,15 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
-
+            'mautic.channel.channelbundle.lead.subscriber' => [
+                'class' => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
+            ],
+            'mautic.channel.reportbundle.subscriber' => [
+                'class'     => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
+            ],
         ],
         'forms' => [
             \Mautic\ChannelBundle\Form\Type\MessageType::class => [
@@ -130,6 +136,5 @@ return [
     ],
 
     'parameters' => [
-
     ],
 ];

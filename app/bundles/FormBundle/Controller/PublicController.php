@@ -329,6 +329,7 @@ class PublicController extends CommonFormController
      */
     public function previewAction($id = 0)
     {
+        /** @var FormModel $model */
         $objectId          = (empty($id)) ? InputHelper::int($this->request->get('id')) : $id;
         $css               = InputHelper::string($this->request->get('css'));
         $model             = $this->getModel('form.form');
@@ -395,6 +396,9 @@ class PublicController extends CommonFormController
      */
     public function generateAction()
     {
+        // Don't store a visitor with this request
+        defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
+
         $formId = InputHelper::int($this->request->get('id'));
 
         $model = $this->getModel('form.form');

@@ -120,7 +120,7 @@ class AjaxController extends CommonAjaxController
                             'id'    => $r['id'],
                         ];
                     }
-                } elseif (in_array($leadField, ['hit_url', 'referer', 'url_title', 'source'])) {
+                } elseif (in_array($leadField, ['hit_url', 'referer', 'url_title', 'source', 'source_id'])) {
                     $dataArray[] = [
                         'value' => '',
                     ];
@@ -646,17 +646,14 @@ class AjaxController extends CommonAjaxController
         $tags = json_decode($tags, true);
 
         if (is_array($tags)) {
-            $newTags = [];
+            $leadModel = $this->getModel('lead');
+            $newTags   = [];
+
             foreach ($tags as $tag) {
                 if (!is_numeric($tag)) {
-                    // New tag
-                    $tagEntity = new Tag();
-                    $tagEntity->setTag(InputHelper::clean($tag));
-                    $newTags[] = $tagEntity;
+                    $newTags[] = $leadModel->getTagRepository()->getTagByNameOrCreateNewOne($tag);
                 }
             }
-
-            $leadModel = $this->getModel('lead');
 
             if (!empty($newTags)) {
                 $leadModel->getTagRepository()->saveEntities($newTags);

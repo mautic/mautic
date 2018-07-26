@@ -36,7 +36,7 @@ class Version20160808000000 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}integration_entity (
+CREATE TABLE IF NOT EXISTS {$this->prefix}integration_entity (
 	id INT AUTO_INCREMENT NOT NULL,
 	integration VARCHAR(255) DEFAULT NULL,
 	integration_entity VARCHAR(255) DEFAULT NULL,

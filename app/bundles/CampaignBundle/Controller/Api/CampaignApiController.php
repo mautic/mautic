@@ -243,6 +243,8 @@ class CampaignApiController extends CommonApiController
 
         $where = InputHelper::clean($this->request->query->get('where', []));
         $order = InputHelper::clean($this->request->query->get('order', []));
+        $start = (int) $this->request->query->get('start', 0);
+        $limit = (int) $this->request->query->get('limit', 100);
 
         $where[] = [
             'col'  => 'campaign_id',
@@ -263,6 +265,8 @@ class CampaignApiController extends CommonApiController
                 'itemsName' => 'contacts',
                 'order'     => $order,
                 'where'     => $where,
+                'start'     => $start,
+                'limit'     => $limit,
             ]
         );
     }

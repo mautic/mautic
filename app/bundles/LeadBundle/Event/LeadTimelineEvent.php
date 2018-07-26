@@ -115,6 +115,11 @@ class LeadTimelineEvent extends Event
     protected $siteDomain;
 
     /**
+     * @var bool
+     */
+    protected $fetchTypesOnly = false;
+
+    /**
      * @var array
      */
     protected $serializerGroups = [
@@ -157,11 +162,11 @@ class LeadTimelineEvent extends Event
         $this->siteDomain  = $siteDomain;
 
         if (!empty($filters['dateFrom'])) {
-            $this->dateFrom = new \DateTime($filters['dateFrom']);
+            $this->dateFrom = ($filters['dateFrom'] instanceof \DateTime) ? $filters['dateFrom'] : new \DateTime($filters['dateFrom']);
         }
 
         if (!empty($filters['dateTo'])) {
-            $this->dateTo = new \DateTime($filters['dateTo']);
+            $this->dateTo = ($filters['dateTo'] instanceof \DateTime) ? $filters['dateTo'] : new \DateTime($filters['dateTo']);
         }
     }
 
@@ -217,19 +222,22 @@ class LeadTimelineEvent extends Event
                 // Rename extra to details
                 if (isset($data['extra'])) {
                     $data['details'] = $data['extra'];
-                    $this->prepareDetailsForAPI($data['details']);
+                    $data['details'] = $this->prepareDetailsForAPI($data['details']);
                     unset($data['extra']);
                 }
 
                 // Ensure a full URL
                 if ($this->siteDomain && isset($data['eventLabel']) && is_array($data['eventLabel']) && isset($data['eventLabel']['href'])) {
-                    if (!empty($data['eventLabel']['isExternal'])) {
-                        // If this does not have a http, then assume a Mautic URL
-                        if (strpos($data['eventLabel']['href'], '://') === false) {
-                            $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
-                        }
+                    // If this does not have a http, then assume a Mautic URL
+                    if (strpos($data['eventLabel']['href'], '://') === false) {
+                        $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
                     }
                 }
+            }
+
+            if (empty($data['eventId'])) {
+                // Every entry should have an eventId so generate one if the listener itself didn't handle this
+                $data['eventId'] = $this->generateEventId($data);
             }
 
             $this->events[$data['event']][] = $data;
@@ -421,6 +429,10 @@ class LeadTimelineEvent extends Event
      */
     public function isApplicable($eventType, $inclusive = false)
     {
+        if ($this->fetchTypesOnly) {
+            return false;
+        }
+
         if (in_array($eventType, $this->filters['excludeEvents'])) {
             return false;
         }
@@ -594,11 +606,21 @@ class LeadTimelineEvent extends Event
     }
 
     /**
+     * Will cause isApplicable to return false for all in order to just compile a list of event types.
+     */
+    public function fetchTypesOnly()
+    {
+        $this->fetchTypesOnly = true;
+    }
+
+    /**
      * Convert all snake case keys o camel case for API congruency.
      *
      * @param array $details
+     *
+     * @return array
      */
-    protected function prepareDetailsForAPI(array &$details)
+    private function prepareDetailsForAPI(array $details)
     {
         foreach ($details as $key => &$detailValues) {
             if (is_array($detailValues)) {
@@ -617,5 +639,17 @@ class LeadTimelineEvent extends Event
                 unset($details[$key]);
             }
         }
+
+        return $details;
+    }
+
+    /**
+     * Generate something consistent for this event to identify this log entry.
+     *
+     * @param array $data
+     */
+    private function generateEventId(array $data)
+    {
+        return $data['eventType'].hash('crc32', json_encode($data), false);
     }
 }

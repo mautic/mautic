@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
 $view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_LIST_ACTIONS, ButtonHelper::TYPE_DROPDOWN, $item);
 include 'action_button_helper.php';
@@ -24,7 +24,7 @@ if (is_array($item)) {
 ?>
 <div class="input-group input-group-sm">
     <span class="input-group-addon">
-        <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb<?php echo $id; ?>" value="<?php echo $id; ?>"/>
+        <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb<?php echo $id; ?>" value="<?php echo $view->escape($id); ?>"/>
     </span>
 
     <div class="input-group-btn">

@@ -234,16 +234,25 @@ class InputHelper
 
     /**
      * Returns a satnitized string which can be used in a file system.
+     * Attaches the file extension if provided.
      *
-     * @param  $value
+     * @param string $value
+     * @param string $extension
      *
      * @return string
      */
-    public static function filename($value)
+    public static function filename($value, $extension = null)
     {
         $value = str_replace(' ', '_', $value);
 
-        return preg_replace("/[^a-z0-9\.\_]/", '', strtolower($value));
+        $sanitized = preg_replace("/[^a-z0-9\.\_-]/", '', strtolower($value));
+        $sanitized = preg_replace("/^\.\./", '', strtolower($sanitized));
+
+        if (null === $extension) {
+            return $sanitized;
+        }
+
+        return sprintf('%s.%s', $sanitized, $extension);
     }
 
     /**
@@ -345,8 +354,10 @@ class InputHelper
         }
 
         $value = substr($value, 0, 254);
+        $value = filter_var($value, FILTER_SANITIZE_EMAIL);
+        $value = str_replace('..', '.', $value);
 
-        return filter_var($value, FILTER_SANITIZE_EMAIL);
+        return trim($value);
     }
 
     /**
@@ -361,6 +372,12 @@ class InputHelper
     {
         $value = self::clean($value, $urldecode);
 
+        // Return empty array for empty values
+        if (empty($value)) {
+            return [];
+        }
+
+        // Put a value into array if not an array
         if (!is_array($value)) {
             $value = [$value];
         }

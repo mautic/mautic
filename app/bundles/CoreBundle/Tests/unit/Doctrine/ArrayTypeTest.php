@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 class ExampleClassWithPrivateProperty
 {
     /** @noinspection PhpUnusedPrivateFieldInspection */
-        private $test = 'value';
+    private $test = 'value';
 }
 
 class ExampleClassWithProtectedProperty

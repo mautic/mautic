@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\DynamicContentTrait;
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -72,7 +73,7 @@ class EmailType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'headers' => 'clean']));
         $builder->addEventSubscriber(new FormExitSubscriber('email.email', $options));
 
         $builder->add(
@@ -94,7 +95,6 @@ class EmailType extends AbstractType
                     'label'      => 'mautic.email.subject',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => ['class' => 'form-control'],
-                    'required'   => false,
                 ]
             )->addModelTransformer($emojiTransformer)
         );
@@ -170,6 +170,21 @@ class EmailType extends AbstractType
                     'tooltip' => 'mautic.email.utm_tags.tooltip',
                 ],
                 'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'headers',
+            SortableListType::class,
+            [
+                'required'        => false,
+                'label'           => 'mautic.email.custom_headers',
+                'attr'            => [
+                    'tooltip' => 'mautic.email.custom_headers.tooltip',
+                ],
+                'option_required' => false,
+                'with_labels'     => true,
+                'key_value_pairs' => true, // do not store under a `list` key and use label as the key
             ]
         );
 
@@ -266,7 +281,28 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'            => 'form-control',
-                        'tootlip'          => 'mautic.email.form.unsubscribeform.tooltip',
+                        'tooltip'          => 'mautic.email.form.unsubscribeform.tooltip',
+                        'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
+                    ],
+                    'required'    => false,
+                    'multiple'    => false,
+                    'empty_value' => '',
+                ]
+            )
+                ->addModelTransformer($transformer)
+        );
+
+        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
+        $builder->add(
+            $builder->create(
+                'preferenceCenter',
+                'preference_center_list',
+                [
+                    'label'      => 'mautic.email.form.preference_center',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'            => 'form-control',
+                        'tooltip'          => 'mautic.email.form.preference_center.tooltip',
                         'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
                     ],
                     'required'    => false,

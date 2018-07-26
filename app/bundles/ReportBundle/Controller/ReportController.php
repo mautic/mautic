@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ExportResponse;
 use Symfony\Component\HttpFoundation;
 
 /**
@@ -388,7 +389,6 @@ class ReportController extends FormController
                     //reset old columns
                     $entity->setColumns($oldColumns);
                     $entity->setGraphs($oldGraphs);
-                    $this->addFlash('mautic.core.error.not.valid', [], 'error');
                 }
             } else {
                 //unlock the entity
@@ -414,7 +414,7 @@ class ReportController extends FormController
                         ]
                     )
                 );
-            } else {
+            } elseif ($valid) {
                 // Rebuild the form for updated columns
                 $form = $model->createForm($entity, $this->get('form.factory'), $action);
             }
@@ -801,9 +801,12 @@ class ReportController extends FormController
         $name    = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($entity->getName(), false, '-');
         $options = ['dateFrom' => new \DateTime($fromDate), 'dateTo' => new \DateTime($toDate)];
 
+        $dynamicFilters            = $session->get('mautic.report.'.$objectId.'.filters', []);
+        $options['dynamicFilters'] = $dynamicFilters;
+
         if ($format === 'csv') {
             $response = new HttpFoundation\StreamedResponse(
-                function () use ($model, $fromDate, $toDate, $entity, $format, $name, $options) {
+                function () use ($model, $entity, $format, $options) {
                     $options['paginate'] = true;
                     $options['ignoreGraphData'] = true;
                     $options['limit'] =
@@ -819,12 +822,8 @@ class ReportController extends FormController
                 }
             );
 
-            $response->headers->set('Content-Type', 'application/force-download');
-            $response->headers->set('Content-Type', 'application/octet-stream');
-            $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.'.$format.'"');
-            $response->headers->set('Expires', 0);
-            $response->headers->set('Cache-Control', 'must-revalidate');
-            $response->headers->set('Pragma', 'public');
+            $fileName = $name.'.'.$format;
+            ExportResponse::setResponseHeaders($response, $fileName);
         } else {
             if ($format === 'xlsx') {
                 $options['ignoreGraphData'] = true;

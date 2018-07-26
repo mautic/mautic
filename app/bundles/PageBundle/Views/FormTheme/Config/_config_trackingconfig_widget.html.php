@@ -34,7 +34,6 @@
                             <?php echo $view['form']->row($f); ?>
                         </div>
                     <?php
-
 }
             endforeach; ?>
         </div>
@@ -53,7 +52,6 @@
                         <?php echo $view['form']->row($f); ?>
                     </div>
                     <?php
-
             }
             endforeach; ?>
         </div>
@@ -73,7 +71,6 @@
                         <?php echo $view['form']->row($f); ?>
                     </div>
                     <?php
-
             }
             endforeach; ?>
         </div>

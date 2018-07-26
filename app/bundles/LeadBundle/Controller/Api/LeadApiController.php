@@ -35,74 +35,38 @@ class LeadApiController extends CommonApiController
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
 
+    const MODEL_ID = 'lead.lead';
+
     /**
      * @param FilterControllerEvent $event
      */
     public function initialize(FilterControllerEvent $event)
     {
-        $this->model            = $this->getModel('lead.lead');
-        $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
+        $this->model            = $this->getModel(self::MODEL_ID);
+        $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
-        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
+        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'stageList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
 
         parent::initialize($event);
     }
 
     /**
-     * Creates a new lead or edits if one is found with same email.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
-     */
-    public function newEntityAction()
-    {
-        $existingLeads = $this->getExistingLeads();
-        if (!empty($existingLeads)) {
-            return parent::editEntityAction($existingLeads[0]->getId());
-        }
-
-        return parent::newEntityAction();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function editEntityAction($id)
-    {
-        $existingLeads = $this->getExistingLeads();
-        if (isset($existingLeads[0]) && $existingLeads[0] instanceof Lead) {
-            $entity = $this->model->getEntity($id);
-            if ($entity instanceof Lead && $existingLeads[0]->getId() != $entity->getId()) {
-                $this->model->mergeLeads($existingLeads[0], $entity, false);
-            }
-        }
-
-        return parent::editEntityAction($id);
-    }
-
-    /**
-     * Get existing duplicated contacts based on unique fields and the request data.
+     * Get existing duplicated contact based on unique fields and the request data.
      *
-     * @return array
+     * @param array $parameters
+     * @param null  $id
+     *
+     * @return null|Lead
+     *
+     * @deprecated since 2.12.2, to be removed in 3.0.0. Use $model->checkForDuplicateContact directly instead
      */
-    protected function getExistingLeads()
+    protected function getExistingLead(array $parameters, $id = null)
     {
-        // Check for an email to see if the lead already exists
-        $parameters          = $this->request->request->all();
-        $uniqueLeadFields    = $this->getModel('lead.field')->getUniqueIdentiferFields();
-        $uniqueLeadFieldData = [];
+        $model   = $this->getModel(self::MODEL_ID);
+        $contact = $id ? $model->getEntity($id) : null;
 
-        foreach ($parameters as $k => $v) {
-            if (array_key_exists($k, $uniqueLeadFields) && !empty($v)) {
-                $uniqueLeadFieldData[$k] = $v;
-            }
-        }
-
-        if (count($uniqueLeadFieldData)) {
-            return $this->get('doctrine.orm.entity_manager')->getRepository(
-                'MauticLeadBundle:Lead'
-            )->getLeadsByUniqueFields($uniqueLeadFieldData, null, 1);
-        }
-
-        return [];
+        return $model->checkForDuplicateContact($parameters, $contact);
     }
 
     /**
@@ -602,54 +566,89 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Creates new entity from provided params.
+     *
+     * @param array $params
+     *
+     * @return object
+     */
+    public function getNewEntity(array $params)
+    {
+        return $this->model->checkForDuplicateContact($params);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function prepareParametersForBinding($parameters, $entity, $action)
+    {
+        // Unset the tags from params to avoid a validation error
+        if (isset($parameters['tags'])) {
+            unset($parameters['tags']);
+        }
+
+        if (count($entity->getTags()) > 0) {
+            foreach ($entity->getTags() as $tag) {
+                $parameters['tags'][] = $tag->getId();
+            }
+        }
+
+        return $parameters;
+    }
+
+    /**
      * {@inheritdoc}
      *
-     * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param                                $parameters
-     * @param                                $form
-     * @param string                         $action
+     * @param Lead   $entity
+     * @param array  $parameters
+     * @param        $form
+     * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        $originalParams = $this->request->request->all();
+        if ('edit' === $action) {
+            // Merge existing duplicate contact based on unique fields if exist
+            // new endpoints will leverage getNewEntity in order to return the correct status codes
+            $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
+        }
 
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
             unset($parameters['companies']);
         }
 
+        if (isset($parameters['owner'])) {
+            $owner = $this->getModel('user.user')->getEntity((int) $parameters['owner']);
+            $entity->setOwner($owner);
+            unset($parameters['owner']);
+        }
+
+        if (isset($parameters['stage'])) {
+            $stage = $this->getModel('stage.stage')->getEntity((int) $parameters['stage']);
+            $entity->setStage($stage);
+            unset($parameters['stage']);
+        }
+
+        if (isset($this->entityRequestParameters['tags'])) {
+            $this->model->modifyTags($entity, $this->entityRequestParameters['tags'], null, false);
+        }
+
         //Since the request can be from 3rd party, check for an IP address if included
-        if (isset($originalParams['ipAddress'])) {
-            $ipAddress = $this->factory->getIpAddress($originalParams['ipAddress']);
+        if (isset($this->entityRequestParameters['ipAddress'])) {
+            $ipAddress = $this->get('mautic.helper.ip_lookup')->getIpAddress($this->entityRequestParameters['ipAddress']);
 
             if (!$entity->getIpAddresses()->contains($ipAddress)) {
                 $entity->addIpAddress($ipAddress);
             }
 
-            unset($originalParams['ipAddress']);
-        }
-
-        // Check for tags
-        if (isset($originalParams['tags'])) {
-            $this->model->modifyTags($entity, $originalParams['tags']);
-            unset($originalParams['tags']);
-        }
-
-        // Contact parameters which can be updated apart form contact fields
-        $contactParams = ['points', 'color', 'owner'];
-
-        foreach ($contactParams as $contactParam) {
-            if (isset($parameters[$contactParam])) {
-                $entity->setPoints($parameters[$contactParam]);
-                unset($parameters[$contactParam]);
-            }
+            unset($this->entityRequestParameters['ipAddress']);
         }
 
         // Check for lastActive date
-        if (isset($originalParams['lastActive'])) {
-            $lastActive = new DateTimeHelper($originalParams['lastActive']);
+        if (isset($this->entityRequestParameters['lastActive'])) {
+            $lastActive = new DateTimeHelper($this->entityRequestParameters['lastActive']);
             $entity->setLastActive($lastActive->getDateTime());
-            unset($originalParams['lastActive']);
+            unset($this->entityRequestParameters['lastActive']);
         }
 
         if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {
@@ -680,7 +679,7 @@ class LeadApiController extends CommonApiController
             unset($parameters['frequencyRules']);
         }
 
-        $this->setCustomFieldValues($entity, $form, $parameters);
+        $this->setCustomFieldValues($entity, $form, $parameters, 'POST' === $this->request->getMethod());
     }
 
     /**

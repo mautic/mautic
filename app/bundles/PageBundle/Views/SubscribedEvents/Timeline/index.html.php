@@ -89,6 +89,56 @@ $query = $event['extra']['hit']['query'];
         <?php endif; ?>
 
     <?php endif; ?>
+
+    <?php
+    if (!empty($query)) {
+        $counter = 0;
+        foreach ($query as $k => $v) {
+            if (in_array($v, ['', null, []])) {
+                continue;
+            }
+            if (in_array($k, ['ct', 'page_title', 'page_referrer', 'page_url'])) {
+                continue;
+            }
+            if (is_array($v)) {
+                foreach ($v as $k2 => $v2) {
+                    ++$counter;
+                    $k2 = ucwords(str_replace('_', ' ', $k));
+
+                    echo '<dt>'.$k2.':</dt>';
+                    echo '<dd class="ellipsis">'.$v2.'</dd>';
+
+                    if (empty($showMore) && $counter > 5) {
+                        $showMore = true;
+
+                        echo '<div style="display:none">';
+                    }
+                }
+
+                continue;
+            }
+
+            ++$counter;
+            $k = ucwords(str_replace('_', ' ', $k));
+
+            echo '<dt>'.$k.':</dt>';
+            echo '<dd class="ellipsis">'.$v.'</dd>';
+
+            if (empty($showMore) && $counter > 5) {
+                $showMore = true;
+
+                echo '<div style="display:none">';
+            }
+        }
+
+        if (!empty($showMore)) {
+            echo '</div>';
+            echo '<a href="javascript:void(0);" class="text-center small center-block mt-xs" onclick="Mautic.toggleTimelineMoreVisiblity(mQuery(this).prev());">';
+            echo $view['translator']->trans('mautic.core.more.show');
+            echo '</a>';
+        }
+    }
+    ?>
 </dl>
 <div class="small">
     <?php echo InputHelper::clean($event['extra']['hit']['userAgent']); ?>

@@ -38,7 +38,7 @@ class Version20170515222314 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}imports (
+CREATE TABLE IF NOT EXISTS {$this->prefix}imports (
     id INT AUTO_INCREMENT NOT NULL,
     is_published TINYINT(1) NOT NULL,
     date_added DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',

@@ -152,13 +152,34 @@ return [
                     'mautic.plugin.model.plugin',
                 ],
             ],
+            'mautic.plugin.helper.reload' => [
+                'class'     => \Mautic\PluginBundle\Helper\ReloadHelper::class,
+                'arguments' => [
+                    'mautic.factory',
+                ],
+            ],
+        ],
+        'facades' => [
+            'mautic.plugin.facade.reload' => [
+                'class'     => \Mautic\PluginBundle\Facade\ReloadFacade::class,
+                'arguments' => [
+                    'mautic.plugin.model.plugin',
+                    'mautic.plugin.helper.reload',
+                    'translator',
+                ],
+            ],
         ],
         'models' => [
             'mautic.plugin.model.plugin' => [
                 'class'     => 'Mautic\PluginBundle\Model\PluginModel',
                 'arguments' => [
                     'mautic.lead.model.field',
+                    'mautic.helper.core_parameters',
                 ],
+            ],
+
+            'mautic.plugin.model.integration_entity' => [
+                'class' => Mautic\PluginBundle\Model\IntegrationEntityModel::class,
             ],
         ],
     ],

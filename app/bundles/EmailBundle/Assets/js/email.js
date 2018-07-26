@@ -484,7 +484,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             parentElement.remove();
             tabLink.remove();
             // if tabContainer is for variants, show the first one, if it is the DEC vertical list, show the second one
-            if (tabContainer.hasClass('tabs-left')) {
+            if (tabContainer.hasClass('tabs-left') || $this.hasClass('remove-filter')) {
                 tabContainer.find('li').first().next().find('a').tab('show');
             } else {
                 tabContainer.find('li').first().find('a').tab('show');
@@ -639,7 +639,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
         var fieldCallback = selectedOption.data("field-callback");
         if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
             fieldOptions = selectedOption.data("field-list");
-            Mautic[fieldCallback](filterIdBase + '_display', selectedFilter, fieldOptions);
+            Mautic[fieldCallback](filterIdBase + '_display', selectedFilter, fieldOptions, mQuery);
         }
     } else {
         mQuery(filter).attr('type', fieldType);

@@ -11,9 +11,10 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Templating\Helper\Helper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class FormatHelper.
@@ -21,29 +22,45 @@ use Symfony\Component\Templating\Helper\Helper;
 class FormatterHelper extends Helper
 {
     /**
+     * @var AppVersion
+     */
+    private $appVersion;
+
+    /**
      * @var DateHelper
      */
     private $dateHelper;
-    private $version;
 
     /**
-     * @param MauticFactory $factory
+     * @var TranslatorInterface
      */
-    public function __construct(MauticFactory $factory)
+    private $translator;
+
+    /**
+     * @param AppVersion          $appVersion
+     * @param DateHelper          $dateHelper
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(AppVersion $appVersion, DateHelper $dateHelper, TranslatorInterface $translator)
     {
-        $this->dateHelper = $factory->getHelper('template.date');
-        $this->version    = $factory->getVersion();
+        $this->appVersion = $appVersion;
+        $this->dateHelper = $dateHelper;
+        $this->translator = $translator;
     }
 
     /**
      * Format a string.
      *
      * @param $val
-     * @param $type
+     * @param string $type
+     * @param bool   $textOnly
+     * @param int    $round
+     *
+     * @return string
      */
     public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
-        if (empty($val)) {
+        if (empty($val) && $type !== 'bool') {
             return $val;
         }
 
@@ -92,6 +109,10 @@ class FormatterHelper extends Helper
             case 'html':
                 $string = InputHelper::strict_html($val);
                 break;
+            case 'bool':
+                $translate = $val ? 'mautic.core.yes' : 'mautic.core.no';
+                $string    = $this->translator->trans($translate);
+                break;
             default:
                 $string = InputHelper::clean($val);
                 break;
@@ -131,6 +152,45 @@ class FormatterHelper extends Helper
     }
 
     /**
+     * @param array  $array
+     * @param string $delimeter
+     *
+     * @return string
+     */
+    public function simpleArrayToHtml(array $array, $delimeter = '<br />')
+    {
+        $pairs = [];
+        foreach ($array as $key => $value) {
+            $pairs[] = "$key: $value";
+        }
+
+        return implode($delimeter, $pairs);
+    }
+
+    /**
+     * Takes a simple csv list like 1,2,3,4 and returns as an array.
+     *
+     * @param $csv
+     *
+     * @return array
+     */
+    public function simpleCsvToArray($csv, $type = null)
+    {
+        if (!$csv) {
+            return [];
+        }
+
+        return array_map(
+            function ($value) use ($type) {
+                $value = trim($value);
+
+                return $this->_($value, $type);
+            },
+            explode(',', $csv)
+        );
+    }
+
+    /**
      * @return string
      */
     public function getName()
@@ -140,9 +200,13 @@ class FormatterHelper extends Helper
 
     /**
      * @return string
+     *
+     * @deprecated - Use VersionHelper or AppVersion class
+     *
+     * @todo Remove this method and $this->appVersion in Mautic 3.0
      */
     public function getVersion()
     {
-        return $this->version;
+        return $this->appVersion->getVersion();
     }
 }

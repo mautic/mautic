@@ -124,13 +124,7 @@ class WebhookModel extends FormModel
         Serializer $serializer,
         NotificationModel $notificationModel
     ) {
-        $this->webhookStart      = (int) $coreParametersHelper->getParameter('webhook_start', 0);
-        $this->webhookLimit      = (int) $coreParametersHelper->getParameter('webhook_limit', 10);
-        $this->disableLimit      = (int) $coreParametersHelper->getParameter('webhook_disable_limit', 100);
-        $this->webhookTimeout    = (int) $coreParametersHelper->getParameter('webhook_timeout', 15);
-        $this->logMax            = (int) $coreParametersHelper->getParameter('webhook_log_max', 1000);
-        $this->queueMode         = $coreParametersHelper->getParameter('queue_mode');
-        $this->eventsOrderByDir  = $coreParametersHelper->getParameter('events_orderby_dir', Criteria::ASC);
+        $this->setConfigProps($coreParametersHelper);
         $this->serializer        = $serializer;
         $this->notificationModel = $notificationModel;
     }
@@ -344,7 +338,6 @@ class WebhookModel extends FormModel
 
             // throw an error exception if we don't get a 200 back
             if ($response->code >= 300 && $response->code < 200) {
-
                 // The reciever of the webhook is telling us to stop bothering him with our requests by code 410
                 if ($response->code == 410) {
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
@@ -372,7 +365,6 @@ class WebhookModel extends FormModel
         // Run this on command as well as immediate send because if switched from queue to immediate
         // it can have some rows in the queue which will be send in every webhook forever
         if (!empty($this->webhookQueueIdList)) {
-
             /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
             $webhookQueueRepo = $this->getQueueRepository();
 
@@ -527,7 +519,6 @@ class WebhookModel extends FormModel
         /* @var WebhookQueue $queue */
         foreach ($queuesArray as $queues) {
             foreach ($queues as $queue) {
-
                 /** @var \Mautic\WebhookBundle\Entity\Event $event */
                 $event = $queue->getEvent();
                 $type  = $event->getEventType();
@@ -543,11 +534,13 @@ class WebhookModel extends FormModel
                 // its important to decode the payload form the DB as we re-encode it with the
                 $payload[$type][] = $queuePayload;
 
-                // Add to the webhookQueueIdList only if ID exists. That means if it was stored to DB.
-                // That means if not sent via immediate send.
+                // Add to the webhookQueueIdList only if ID exists.
+                // That means if it was stored to DB and not sent via immediate send.
                 if ($queue->getId()) {
                     $this->webhookQueueIdList[$queue->getId()] = $queue;
-                    $this->em->clear(WebhookQueue::class);
+
+                    // Clear the WebhookQueue entity from memory
+                    $this->em->detach($queue);
                 } else {
                     // remove the queue from the webhook right away so it won't get persisted to DB
                     // This happens on immediate send only
@@ -571,7 +564,7 @@ class WebhookModel extends FormModel
         /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $queueRepo */
         $queueRepo = $this->getQueueRepository();
 
-        $queues = $queueRepo->getEntities(
+        return $queueRepo->getEntities(
             [
                 'iterator_mode' => true,
                 'start'         => $this->webhookStart,
@@ -589,8 +582,6 @@ class WebhookModel extends FormModel
                 ],
             ]
         );
-
-        return $queues;
     }
 
     /**
@@ -693,5 +684,21 @@ class WebhookModel extends FormModel
     public function getPermissionBase()
     {
         return 'webhook:webhooks';
+    }
+
+    /**
+     * Sets all class properties from CoreParametersHelper.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    private function setConfigProps(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->webhookStart     = (int) $coreParametersHelper->getParameter('webhook_start', 0);
+        $this->webhookLimit     = (int) $coreParametersHelper->getParameter('webhook_limit', 10);
+        $this->disableLimit     = (int) $coreParametersHelper->getParameter('webhook_disable_limit', 100);
+        $this->webhookTimeout   = (int) $coreParametersHelper->getParameter('webhook_timeout', 15);
+        $this->logMax           = (int) $coreParametersHelper->getParameter('webhook_log_max', 1000);
+        $this->queueMode        = $coreParametersHelper->getParameter('queue_mode');
+        $this->eventsOrderByDir = $coreParametersHelper->getParameter('events_orderby_dir', Criteria::ASC);
     }
 }

@@ -20,14 +20,17 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportEvent;
+use Mautic\LeadBundle\Exception\ImportDelayedException;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -187,26 +190,51 @@ class ImportModel extends FormModel
      * Start import. This is meant for the CLI command since it will import
      * the whole file at once.
      *
+     * @deprecated in 2.13.0. To be removed in 3.0.0. Use beginImport instead
+     *
      * @param Import   $import
      * @param Progress $progress
+     * @param int      $limit    Number of records to import before delaying the import. 0 will import all
      *
      * @return bool
      */
-    public function startImport(Import $import, Progress $progress)
+    public function startImport(Import $import, Progress $progress, $limit = 0)
+    {
+        try {
+            return $this->beginImport($import, $progress, $limit);
+        } catch (\Exception $e) {
+            $this->logDebug($e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * Start import. This is meant for the CLI command since it will import
+     * the whole file at once.
+     *
+     * @param Import   $import
+     * @param Progress $progress
+     * @param int      $limit    Number of records to import before delaying the import. 0 will import all
+     *
+     * @throws ImportFailedException
+     * @throws ImportDelayedException
+     */
+    public function beginImport(Import $import, Progress $progress, $limit = 0)
     {
         $this->setGhostImportsAsFailed();
 
         if (!$import) {
-            $this->logDebug('import is empty, closing the import process');
-
-            return false;
+            $msg = 'import is empty, closing the import process';
+            $this->logDebug($msg, $import);
+            throw new ImportFailedException($msg);
         }
 
         if (!$import->canProceed()) {
             $this->saveEntity($import);
-            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
-
-            return false;
+            $msg = 'import cannot be processed because '.$import->getStatusInfo();
+            $this->logDebug($msg, $import);
+            throw new ImportFailedException($msg);
         }
 
         if (!$this->checkParallelImportLimit()) {
@@ -216,13 +244,22 @@ class ImportModel extends FormModel
             );
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
             $this->saveEntity($import);
-            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
-
-            return false;
+            $msg = 'import is delayed because parrallel limit was hit. '.$import->getStatusInfo();
+            $this->logDebug($msg, $import);
+            throw new ImportDelayedException($msg);
         }
 
-        $progress->setTotal($import->getLineCount());
-        $progress->setDone($import->getProcessedRows());
+        $processed = $import->getProcessedRows();
+        $total     = $import->getLineCount();
+        $pending   = $total - $processed;
+
+        if ($limit && $limit < $pending) {
+            $processed = 0;
+            $total     = $limit;
+        }
+
+        $progress->setTotal($total);
+        $progress->setDone($processed);
 
         $import->start();
 
@@ -231,8 +268,8 @@ class ImportModel extends FormModel
         $this->logDebug('The background import is about to start', $import);
 
         try {
-            if (!$this->process($import, $progress)) {
-                return false;
+            if (!$this->process($import, $progress, $limit)) {
+                throw new ImportFailedException($import->getStatusInfo());
             }
         } catch (ORMException $e) {
             // The EntityManager is probably closed. The entity cannot be saved.
@@ -243,9 +280,7 @@ class ImportModel extends FormModel
 
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
 
-            $this->logDebug('Database had been overloaded', $import);
-
-            return false;
+            throw new ImportFailedException('Database had been overloaded');
         }
 
         $import->end();
@@ -268,8 +303,6 @@ class ImportModel extends FormModel
                 $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
             );
         }
-
-        return true;
     }
 
     /**
@@ -277,31 +310,38 @@ class ImportModel extends FormModel
      *
      * @param Import   $import
      * @param Progress $progress
+     * @param int      $limit    Number of records to import before delaying the import
      *
      * @return bool
      */
-    public function process(Import $import, Progress $progress)
+    public function process(Import $import, Progress $progress, $limit = 0)
     {
+        //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
+        ini_set('auto_detect_line_endings', true);
+
         try {
             $file = new \SplFileObject($import->getFilePath());
         } catch (\Exception $e) {
-            $import->setStatusInfo('SplFileObject cannot read the file');
+            $import->setStatusInfo('SplFileObject cannot read the file. '.$e->getMessage());
             $import->setStatus(Import::FAILED);
             $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
         }
 
-        $lineNumber  = $progress->getDone();
-        $headers     = $import->getHeaders();
-        $headerCount = count($headers);
-        $config      = $import->getParserConfig();
+        $lastImportedLine = $import->getLastLineImported();
+        $headers          = $import->getHeaders();
+        $headerCount      = count($headers);
+        $config           = $import->getParserConfig();
+        $counter          = 0;
 
-        $this->logDebug('The import is starting on line '.$lineNumber, $import);
-
-        if ($lineNumber > 0) {
-            $file->seek($lineNumber);
+        if ($lastImportedLine > 0) {
+            // Seek is zero-based line numbering and
+            $file->seek($lastImportedLine - 1);
         }
+
+        $lineNumber = $lastImportedLine + 1;
+        $this->logDebug('The import is starting on line '.$lineNumber, $import);
 
         $batchSize = $config['batchlimit'];
 
@@ -312,9 +352,10 @@ class ImportModel extends FormModel
 
         while ($batchSize && !$file->eof()) {
             $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+            $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
-            if ($lineNumber === 0) {
+            if ($lineNumber === 1) {
                 ++$lineNumber;
                 continue;
             }
@@ -337,6 +378,10 @@ class ImportModel extends FormModel
 
             if (!$errorMessage) {
                 $data = $this->trimArrayValues($data);
+                if (!array_filter($data)) {
+                    continue;
+                }
+
                 $data = array_combine($headers, $data);
 
                 try {
@@ -349,7 +394,8 @@ class ImportModel extends FormModel
                         $import->getDefault('list'),
                         $import->getDefault('tags'),
                         true,
-                        $eventLog
+                        $eventLog,
+                        $import->getId()
                     );
 
                     if ($merged) {
@@ -369,7 +415,16 @@ class ImportModel extends FormModel
                 $import->increaseIgnoredCount();
                 $this->logImportRowError($eventLog, $errorMessage);
                 $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
+            } else {
+                $this->leadEventLogRepo->saveEntity($eventLog);
             }
+
+            // Release entities in Doctrine's memory to prevent memory leak
+            $this->em->detach($eventLog);
+            $eventLog = null;
+            $data     = null;
+            $this->em->clear(Lead::class);
+            $this->em->clear(Company::class);
 
             // Save Import entity once per batch so the user could see the progress
             if ($batchSize === 0 && $import->isBackgroundProcess()) {
@@ -380,11 +435,6 @@ class ImportModel extends FormModel
                 }
 
                 $this->saveEntity($import);
-
-                // clear unit of work of already imported data to save memory
-                $this->em->clear('Mautic\LeadBundle\Entity\Lead');
-                $this->em->clear('Mautic\LeadBundle\Entity\Company');
-
                 $this->dispatchEvent('batch_processed', $import);
 
                 // Stop the import loop if the import got unpublished
@@ -394,6 +444,13 @@ class ImportModel extends FormModel
                 }
 
                 $batchSize = $config['batchlimit'];
+            }
+
+            ++$counter;
+            if ($limit && $counter >= $limit) {
+                $import->setStatus($import::DELAYED);
+                $this->saveEntity($import);
+                break;
             }
         }
 

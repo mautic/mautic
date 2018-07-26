@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Command;
 
+use Mautic\LeadBundle\Exception\ImportDelayedException;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,6 +32,7 @@ class ImportCommand extends ContainerAwareCommand
         $this->setName('mautic:import')
             ->setDescription('Imports data to Mautic')
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to import. Defaults to next in the queue.', false)
+            ->addOption('--limit', '-l', InputOption::VALUE_OPTIONAL, 'Maximum number of records to import for this script execution.', 0)
             ->setHelp(
                 <<<'EOT'
 The <info>%command.name%</info> command starts to import CSV files when some are created.
@@ -54,6 +57,7 @@ EOT
 
         $progress = new Progress($output);
         $id       = (int) $input->getOption('id');
+        $limit    = (int) $input->getOption('limit');
 
         if ($id) {
             $import = $model->getEntity($id);
@@ -81,20 +85,9 @@ EOT
             ]
         ).'</info>');
 
-        $success = $model->startImport($import, $progress);
-
-        // Import was delayed
-        if ($import->getStatus() === $import::DELAYED) {
-            $output->writeln('<info>'.$translator->trans(
-                'mautic.lead.import.delayed',
-                [
-                    '%reason%' => $import->getStatusInfo(),
-                ]
-            ).'</info>');
-        }
-
-        // Import failed
-        if (!$success) {
+        try {
+            $model->beginImport($import, $progress, $limit);
+        } catch (ImportFailedException $e) {
             $output->writeln('<error>'.$translator->trans(
                 'mautic.lead.import.failed',
                 [
@@ -103,6 +96,15 @@ EOT
             ).'</error>');
 
             return 1;
+        } catch (ImportDelayedException $e) {
+            $output->writeln('<info>'.$translator->trans(
+                'mautic.lead.import.delayed',
+                [
+                    '%reason%' => $import->getStatusInfo(),
+                ]
+            ).'</info>');
+
+            return 0;
         }
 
         // Success

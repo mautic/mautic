@@ -13,10 +13,15 @@ $view['slots']->set('mauticContent', 'page');
 $isExisting = $activePage->getId();
 
 $variantParent = $activePage->getVariantParent();
-$subheader     = ($variantParent) ? '<div><span class="small">'.$view['translator']->trans('mautic.core.variant_of', [
-    '%name%'   => $activePage->getTitle(),
-    '%parent%' => $variantParent->getTitle(),
-]).'</span></div>' : '';
+$subheader     = '';
+if ($variantParent) {
+    $subheader = '<div><span class="small">'.$view['translator']->trans('mautic.core.variant_of', [
+                    '%name%'   => $activePage->getTitle(),
+                    '%parent%' => $variantParent->getTitle(),
+                ]).'</span></div>';
+} elseif ($activePage->isVariant(false)) {
+    $subheader = '<div><span class="small">'.$view['translator']->trans('mautic.page.form.has_variants').'</span></div>';
+}
 
 $header = $isExisting ?
     $view['translator']->trans('mautic.page.header.edit',
@@ -31,6 +36,10 @@ $attr                               = $form->vars['attr'];
 $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
 
 $isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
+
+if (!isset($previewUrl)) {
+    $previewUrl = '';
+}
 
 ?>
 
@@ -88,6 +97,11 @@ $isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
             endif;
 
             echo $view['form']->row($form['isPublished']);
+            if (($permissions['page:preference_center:editown'] ||
+                    $permissions['page:preference_center:editother']) &&
+                        !$activePage->isVariant()) {
+                echo $view['form']->row($form['isPreferenceCenter']);
+            }
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
 
@@ -95,8 +109,8 @@ $isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
             echo $view['form']->row($form['redirectType']);
             echo $view['form']->row($form['redirectUrl']);
             endif;
+            echo $view['form']->row($form['noIndex']);
             ?>
-
             <div class="template-fields<?php echo (!$template) ? ' hide"' : ''; ?>">
                 <?php echo $view['form']->row($form['metaDescription']); ?>
             </div>
@@ -118,4 +132,5 @@ $isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
     'slots'         => $slots,
     'sections'      => $sections,
     'objectId'      => $activePage->getSessionId(),
+    'previewUrl'    => $previewUrl,
 ]); ?>
