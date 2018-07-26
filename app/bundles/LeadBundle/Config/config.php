@@ -497,6 +497,7 @@ return [
                     'mautic.lead.repository.lead_event_log',
                     'mautic.helper.user',
                     'translator',
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.lead.subscriber.segment' => [

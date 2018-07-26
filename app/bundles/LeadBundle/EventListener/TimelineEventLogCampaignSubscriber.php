@@ -100,6 +100,9 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @param LeadTimelineEvent $event
+     */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         $this->addEvents(

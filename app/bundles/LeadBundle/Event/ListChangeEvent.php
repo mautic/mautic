@@ -56,7 +56,7 @@ class ListChangeEvent extends Event
     /**
      * Returns batch array of leads.
      *
-     * @return array|Lead[]
+     * @return array
      */
     public function getLeads()
     {
