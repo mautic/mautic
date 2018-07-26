@@ -26,8 +26,9 @@ use Mautic\ReportBundle\ReportEvents;
  */
 class ReportSubscriber extends CommonSubscriber
 {
-    const CONTEXT_PAGES     = 'pages';
-    const CONTEXT_PAGE_HITS = 'page.hits';
+    const CONTEXT_PAGES      = 'pages';
+    const CONTEXT_PAGE_HITS  = 'page.hits';
+    const CONTEXT_VIDEO_HITS = 'video.hits';
 
     /**
      * @var CompanyReportData
@@ -58,7 +59,7 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if (!$event->checkContext([self::CONTEXT_PAGES, self::CONTEXT_PAGE_HITS])) {
+        if (!$event->checkContext([self::CONTEXT_PAGES, self::CONTEXT_PAGE_HITS, self::CONTEXT_VIDEO_HITS])) {
             return;
         }
 
@@ -269,7 +270,7 @@ class ReportSubscriber extends CommonSubscriber
             $event->addGraph($context, 'table', 'mautic.page.table.most.visited');
             $event->addGraph($context, 'table', 'mautic.page.table.most.visited.unique');
         }
-        if ($event->checkContext(['video.hits'])) {
+        if ($event->checkContext(self::CONTEXT_VIDEO_HITS)) {
             $hitPrefix  = 'vh.';
             $hitColumns = [
                 $hitPrefix.'id' => [
@@ -313,10 +314,6 @@ class ReportSubscriber extends CommonSubscriber
                     'label' => 'mautic.page.report.hits.url',
                     'type'  => 'url',
                 ],
-                $hitPrefix.'url_title' => [
-                    'label' => 'mautic.page.report.hits.url_title',
-                    'type'  => 'string',
-                ],
                 $hitPrefix.'user_agent' => [
                     'label' => 'mautic.page.report.hits.user_agent',
                     'type'  => 'string',
@@ -350,10 +347,10 @@ class ReportSubscriber extends CommonSubscriber
             ];
 
             $data = [
-                'display_name' => 'mautic.video.hits',
+                'display_name' => 'mautic.'.self::CONTEXT_VIDEO_HITS,
                 'columns'      => array_merge($hitColumns, $event->getLeadColumns(), $event->getIpColumn()),
             ];
-            $event->addTable('video.hits', $data, 'videos');
+            $event->addTable(self::CONTEXT_VIDEO_HITS, $data, 'videos');
         }
     }
 
