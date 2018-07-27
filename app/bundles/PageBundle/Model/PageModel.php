@@ -1171,25 +1171,23 @@ class PageModel extends FormModel
     private function setLeadManipulator($page, Hit $hit, Lead $lead)
     {
         // Only save the lead and dispatch events if needed
-        if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
-            $source   = 'hit';
-            $sourceId = $hit->getId();
-            if ($page) {
-                $source   = $page instanceof Page ? 'page' : 'redirect';
-                $sourceId = $page->getId();
-            }
-
-            $lead->setManipulator(
-                new LeadManipulator(
-                    'page',
-                    $source,
-                    $sourceId,
-                    $hit->getUrl()
-                )
-            );
-
-            $this->leadModel->saveEntity($lead);
+        $source   = 'hit';
+        $sourceId = $hit->getId();
+        if ($page) {
+            $source   = $page instanceof Page ? 'page' : 'redirect';
+            $sourceId = $page->getId();
         }
+
+        $lead->setManipulator(
+            new LeadManipulator(
+                'page',
+                $source,
+                $sourceId,
+                $hit->getUrl()
+            )
+        );
+
+        $this->leadModel->saveEntity($lead);
     }
 
     /**
