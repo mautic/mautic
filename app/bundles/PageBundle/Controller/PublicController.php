@@ -428,11 +428,7 @@ class PublicController extends CommonFormController
         $redirectModel = $this->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
-        $logger->debug('Redirect hit');
-
-        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-        $pageModel = $this->getModel('page');
-        $pageModel->hitPage($redirect, $this->request);
+        $logger->debug('Executing Redirect: '.(string) $redirect);
 
         $url = $redirect->getUrl();
 
@@ -461,6 +457,10 @@ class PublicController extends CommonFormController
         $leadModel = $this->getModel('lead');
         $lead      = $leadModel->getContactFromRequest(['ct' => $ct]);
 
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+        $pageModel = $this->getModel('page');
+        $pageModel->hitPage($redirect, $this->request, 200, $lead);
+
         /** @var PrimaryCompanyHelper $primaryCompanyHelper */
         $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
         $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
@@ -471,13 +471,6 @@ class PublicController extends CommonFormController
         if (false === filter_var($url, FILTER_VALIDATE_URL)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
-
-        // Set the URL after tokens have been replaced so that page_hits has recorded the actual URL and not the token
-        $this->request->attributes->set('page_url', $url);
-
-        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-        $pageModel = $this->getModel('page');
-        $pageModel->hitPage($redirect, $this->request);
 
         return $this->redirect($url);
     }
