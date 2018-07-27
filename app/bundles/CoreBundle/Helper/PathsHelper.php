@@ -71,8 +71,8 @@ class PathsHelper
     /**
      * PathsHelper constructor.
      *
-     * @param CoreParametersHelper
-     * @param UserHelper $userHelper
+     * @param UserHelper           $userHelper
+     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper)
     {
@@ -82,7 +82,7 @@ class PathsHelper
         $this->imagePath              = $this->removeTrailingSlash($coreParametersHelper->getParameter('image_path'));
         $this->dashboardImportDir     = $this->removeTrailingSlash($coreParametersHelper->getParameter('dashboard_import_dir'));
         $this->temporaryDir           = $this->removeTrailingSlash($coreParametersHelper->getParameter('tmp_path'));
-        $this->dashboardImportUserDir = $this->removeTrailingSlash($coreParametersHelper->getParameter('dashboard_import_user_dir'));
+        $this->dashboardUserImportDir = $this->removeTrailingSlash($coreParametersHelper->getParameter('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($coreParametersHelper->getParameter('kernel.cache_dir'));
         $this->kernelLogsDir          = $this->removeTrailingSlash($coreParametersHelper->getParameter('kernel.logs_dir'));
     }
