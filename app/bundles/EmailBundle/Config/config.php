@@ -111,6 +111,20 @@ return [
                     'mautic.helper.message',
                 ],
             ],
+            'mautic.email.queue.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\QueueSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
+            ],
+            'mautic.email.momentum.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\MomentumSubscriber::class,
+                'arguments' => [
+                    'mautic.transport.momentum.callback',
+                    'mautic.queue.service',
+                    'mautic.email.helper.request.storage',
+                ],
+            ],
             'mautic.email.monitored.bounce.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\ProcessBounceSubscriber::class,
                 'arguments' => [
@@ -654,6 +668,12 @@ return [
                 'class'     => \Mautic\EmailBundle\Stat\StatHelper::class,
                 'arguments' => [
                     'mautic.email.repository.stat',
+                ],
+            ],
+            'mautic.email.helper.request.storage' => [
+                'class'     => \Mautic\EmailBundle\Helper\RequestStorageHelper::class,
+                'arguments' => [
+                    'mautic.helper.cache_storage',
                 ],
             ],
         ],
