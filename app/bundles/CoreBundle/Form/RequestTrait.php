@@ -53,7 +53,11 @@ trait RequestTrait
                         if ($child->getConfig()->getOption('multiple')) {
                             // Ensure the value is an array
                             if (!is_array($params[$name])) {
-                                $params[$name] = [$params[$name]];
+                                if (strpos($params[$name], '|') !== false) {
+                                    $params[$name] = explode('|', $params[$name]);
+                                } else {
+                                    $params[$name] = [$params[$name]];
+                                }
                             }
                         }
                         break;
