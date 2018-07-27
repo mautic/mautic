@@ -112,17 +112,15 @@ class RedirectRepository extends CommonRepository
         $segmentId = null
     ) {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->addSelect('ph.url')
+        $q->addSelect('pr.url')
             ->addSelect('count(ph.id) as hits')
             ->addSelect('count(distinct ph.tracking_id) as unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+            ->join('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'pr', 'pr.id = ph.redirect_id')
             ->join('ph', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 'ph.source = "email" and ph.source_id = es.email_id and ph.lead_id = es.lead_id')
             ->join('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'es.email_id = e.id')
             ->addSelect('e.id AS email_id')
             ->addSelect('e.name AS email_name');
-
-        // Group by the page hit URL instead of redirect ID because the redirect could be a token
-        $q->groupBy('ph.url, e.id, e.name, campaign.id, campaign.name');
 
         if ($createdByUserId !== null) {
             $q->andWhere('e.created_by = :userId')
@@ -179,6 +177,8 @@ class RedirectRepository extends CommonRepository
             )
                 ->setParameter('segmentId', $segmentId);
         }
+
+        $q->groupBy('pr.id, pr.url, e.id, e.name, campaign.id, campaign.name');
 
         $q->setMaxResults($limit);
 
