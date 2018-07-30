@@ -28,7 +28,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -935,8 +934,6 @@ class LeadModel extends FormModel
     public function getContactFromRequest($queryFields = [])
     {
         // @todo Instantiate here until we can remove circular dependency on LeadModel in order to make it a service
-        /** @var StatRepository $emailStatRepository */
-        $emailStatRepository = $this->em->getRepository('MauticEmailBundle:Stat');
         $requestStack        = new RequestStack();
         $requestStack->push($this->request);
         $contactRequestHelper = new ContactRequestHelper(
@@ -944,10 +941,10 @@ class LeadModel extends FormModel
             $this->contactTracker,
             $this->coreParametersHelper,
             $this->ipLookupHelper,
-            $emailStatRepository,
             $this->getDeviceRepository(),
             $requestStack,
-            $this->logger
+            $this->logger,
+            $this->dispatcher
         );
 
         return $contactRequestHelper->getContactFromQuery($queryFields);
