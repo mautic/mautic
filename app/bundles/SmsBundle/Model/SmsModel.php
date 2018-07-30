@@ -269,8 +269,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             if (count($contacts)) {
                 /** @var Lead $lead */
                 foreach ($contacts as $lead) {
-                    $leadId = $lead->getId();
-
+                    $leadId          = $lead->getId();
+                    $stat            = $this->createStatEntry($sms, $lead, $channel, false);
                     $leadPhoneNumber = $lead->getLeadPhoneNumber();
 
                     if (empty($leadPhoneNumber)) {
@@ -291,7 +291,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         new TokenReplacementEvent(
                             $smsEvent->getContent(),
                             $lead,
-                            ['channel' => ['sms', $sms->getId()]]
+                            [
+                                'channel' => ['sms' => $sms->getId()],
+                                'stat'    => $stat->getTrackingHash(),
+                            ]
                         )
                     );
 
@@ -308,9 +311,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
+                        unset($stat);
                     } else {
                         $sendResult['sent'] = true;
-                        $stats[]            = $this->createStatEntry($sms, $lead, $channel, false);
+                        $stats[]            = $stat;
                         ++$sentCount;
                     }
 
@@ -354,6 +358,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $source = $source[0];
         }
         $stat->setSource($source);
+        $stat->setTrackingHash(str_replace('.', '', uniqid('', true)));
 
         if ($persist) {
             $this->getStatRepository()->saveEntity($stat);
