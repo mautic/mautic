@@ -424,7 +424,7 @@ class Point extends FormEntity
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getRepeatable()
     {
