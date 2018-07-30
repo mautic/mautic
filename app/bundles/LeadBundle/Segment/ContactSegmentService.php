@@ -74,6 +74,7 @@ class ContactSegmentService
         $qb = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
 
         $this->addMinMaxLimiters($qb, $batchLimiters);
+        $this->addLeadLimiter($qb, $batchLimiters);
 
         if (!empty($batchLimiters['excludeVisitors'])) {
             $this->excludeVisitors($qb);
@@ -148,6 +149,7 @@ class ContactSegmentService
         $queryBuilder->setMaxResults($limit);
 
         $this->addMinMaxLimiters($queryBuilder, $batchLimiters);
+        $this->addLeadLimiter($queryBuilder, $batchLimiters);
 
         if (!empty($batchLimiters['dateTime'])) {
             // Only leads in the list at the time of count
@@ -303,6 +305,20 @@ class ContactSegmentService
     private function excludeVisitors(QueryBuilder $queryBuilder)
     {
         $queryBuilder->andWhere($queryBuilder->expr()->isNotNull('l.date_identified'));
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param array        $batchLimiters
+     */
+    private function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters)
+    {
+        if (empty($batchLimiters['lead_id'])) {
+            return;
+        }
+
+        $queryBuilder->andWhere('l.id = :leadId')
+            ->setParameter('leadId', $batchLimiters['lead_id']);
     }
 
     /***** DEBUG *****/
