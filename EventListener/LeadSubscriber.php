@@ -7,10 +7,31 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChange;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpressorHelper;
+use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpressorHelperInterface;
 
 class LeadSubscriber extends CommonSubscriber
 {
+    /**
+     * @var FieldChangeRepository
+     */
+    private $repo;
+
+    /**
+     * @var VariableExpressorHelperInterface
+     */
+    private $variableExpressor;
+
+    /**
+     * @param FieldChangeRepository            $repo
+     * @param VariableExpressorHelperInterface $variableExpressor
+     */
+    public function __construct(FieldChangeRepository $repo, VariableExpressorHelperInterface $variableExpressor)
+    {
+        $this->repo              = $repo;
+        $this->variableExpressor = $variableExpressor;
+    }
+
     /**
      * @return array
      */
@@ -29,30 +50,29 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
-        $repo          = $this->em->getRepository(FieldChange::class);
         $lead          = $event->getLead();
+        $changes       = $lead->getChanges(true);
         $toPersist     = [];
         $changedFields = [];
-        $expressor     = new VariableExpressorHelper;
-        $changes       = $lead->getChanges(true);
 
         if (!isset($changes['fields'])) {
             return;
         }
 
         foreach ($changes['fields'] as $key => list($oldValue, $newValue)) {
+            $valueDAO        = $this->variableExpressor->encodeVariable($newValue);
             $changedFields[] = $key;
             $toPersist[]     = (new FieldChange)
                 ->setObjectType(Lead::class)
                 ->setObjectId($lead->getId())
                 ->setModifiedAt(new \DateTime)
                 ->setColumnName($key)
-                ->setColumnType('?')
-                ->setColumnValue($newValue);
+                ->setColumnType($valueDAO->getType())
+                ->setColumnValue($valueDAO->getValue());
         }
         
-        $repo->deleteEntitiesForObjectByColumnName($lead->getId(), Lead::class, $changedFields);
-        $repo->saveEntities($toPersist);
+        $this->repo->deleteEntitiesForObjectByColumnName($lead->getId(), Lead::class, $changedFields);
+        $this->repo->saveEntities($toPersist);
     }
 
     /**
@@ -62,9 +82,6 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadPostDelete(Events\LeadEvent $event)
     {
-        $repo = $this->em->getRepository(FieldChange::class);
-        $lead = $event->getLead();
-
-        $repo->deleteEntitiesForObject($lead->getId(), Lead::class);
+        $this->repo->deleteEntitiesForObject($event->getLead()->getId(), Lead::class);
     }
 }

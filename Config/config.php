@@ -22,7 +22,7 @@ return [
         'api' => [
             'mautic_integration_api_plugin_list' => [
                 'path' => '/integration/plugin/list',
-                'controller' => 'MauticIntegrationBundle:Api\Plugin:list',
+                'controller' => 'MauticIntegrationsBundle:Api\Plugin:list',
             ],
         ],
     ],
@@ -32,12 +32,18 @@ return [
         'events' => [
             'mautic.integrations.lead.subscriber' => [
                 'class'     => \MauticPlugin\MauticIntegrationsBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [],
+                'arguments' => [
+                    'mautic.integrations.repository.field_change',
+                    'mautic.integrations.helper.variable_expressor'
+                ],
             ],
         ],
         'forms' => [
         ],
         'helpers' => [
+            'mautic.integrations.helper.variable_expressor' => [
+                'class' => \MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpressorHelper::class
+            ]
         ],
         'menus' => [
         ],
@@ -48,10 +54,25 @@ return [
                     'mautic.helper.encryption',
                 ],
             ],
+            'mautic.integrations.service.sync' => [
+                'class' => \MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncService::class,
+                'arguments' => [
+                    'mautic.plugin.repository.integration_entity',
+                ]
+            ]
         ],
         'models' => [
         ],
         'validator' => [
+        ],
+        'repositories' => [
+            'mautic.integrations.repository.field_change' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \MauticPlugin\MauticIntegrationsBundle\Entity\FieldChangeRepository::class,
+                ],
+            ],
         ],
     ],
 
