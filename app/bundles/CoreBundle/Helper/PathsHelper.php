@@ -116,8 +116,8 @@ class PathsHelper
                 } elseif ('logs' === $name) {
                     return $this->kernelLogsDir;
                 } else {
-                    if (!is_dir($this->temporaryDir) && !file_exists($this->temporaryDir)) {
-                        mkdir($this->temporaryDir, 0755);
+                    if (!is_dir($this->temporaryDir) && !file_exists($this->temporaryDir) && is_writable($this->temporaryDir)) {
+                        mkdir($this->temporaryDir, 0755, true);
                     }
 
                     return $this->temporaryDir;
@@ -142,8 +142,7 @@ class PathsHelper
 
                 $userPath .= '/'.$this->user->getId();
 
-                // @todo check is_writable
-                if (!is_dir($userPath) && !file_exists($userPath)) {
+                if (!is_dir($userPath) && !file_exists($userPath) && is_writable($userPath)) {
                     mkdir($userPath, 0755);
                 }
 
