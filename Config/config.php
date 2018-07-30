@@ -58,8 +58,21 @@ return [
                 'class' => \MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncService::class,
                 'arguments' => [
                     'mautic.plugin.repository.integration_entity',
-                ]
-            ]
+                ],
+            ],
+            'mautic.http.client' => [
+                'class' => GuzzleHttp\Client::class
+            ],
+            'mautic.integrations.auth.factory' => [
+                'class' => MauticPlugin\MauticIntegrationsBundle\Auth\Factory::class,
+            ],
+            'mautic.integrations.auth.provider.oauth1a' => [
+                'class' => MauticPlugin\MauticIntegrationsBundle\Auth\Provider\OAuth1aProvider::class,
+                'arguments' => [
+                    'mautic.http.client',
+                ],
+                'tag' => 'mautic.integrations.auth.provider'
+            ],
         ],
         'models' => [
         ],
