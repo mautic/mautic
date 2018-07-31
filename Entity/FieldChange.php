@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Entity;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -23,7 +24,7 @@ class FieldChange
     private $objectType;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      */
     private $modifiedAt;
 
@@ -59,32 +60,32 @@ class FieldChange
         $builder->addId();
         
         $builder
-            ->createField('objectId', 'int')
+            ->createField('objectId', Type::INTEGER)
             ->columnName('object_id')
             ->build();
         
         $builder
-            ->createField('objectType', 'string')
+            ->createField('objectType', Type::STRING)
             ->columnName('object_type')
             ->build();
         
         $builder
-            ->createField('modifiedAt', 'datetime')
+            ->createField('modifiedAt', Type::DATETIME)
             ->columnName('modified_at')
             ->build();
 
         $builder
-            ->createField('columnName', 'string')
+            ->createField('columnName', Type::STRING)
             ->columnName('column_name')
             ->build();
 
         $builder
-            ->createField('columnType', 'string')
+            ->createField('columnType', Type::STRING)
             ->columnName('column_type')
             ->build();
 
         $builder
-            ->createField('columnValue', 'string')
+            ->createField('columnValue', Type::STRING)
             ->columnName('column_value')
             ->build();
     }
