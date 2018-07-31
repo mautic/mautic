@@ -356,6 +356,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::segmentListRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -363,6 +364,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::categoryListRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -370,6 +372,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::preferredchannel;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -377,6 +380,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::channelfrequency;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -384,6 +388,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::saveprefsRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -418,15 +423,20 @@ class BuilderSubscriber extends CommonSubscriber
             $dom = new DOMDocument('1.0', 'utf-8');
             $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
             $xpath      = new DOMXPath($dom);
-            $divContent = $xpath->query('//*[@data-prefs-center-first="1"]');
+            // If use slots
+            $divContent = $xpath->query('//*[@data-prefs-center="1"]');
+            if (!$divContent->length) {
+                // If use tokens
+                $divContent = $xpath->query('//*[@data-prefs-center="1"]');
+            }
             for ($i = 0; $i < $divContent->length; ++$i) {
-                $slot         = $divContent->item($i);
-                $newnode      = $dom->createElement('startform');
-                $firstSibling = $slot->parentNode->firstChild;
-                $slot->parentNode->firstChild->parentNode->insertBefore($newnode, $slot->parentNode->firstChild);
+                $slot    = $divContent->item($i);
+                $newnode = $dom->createElement('startform');
+                $slot->parentNode->insertBefore($newnode, $slot);
+                break;
             }
             $content         = $dom->saveHTML();
-            //$content = str_replace('<startform></startform>', $params['action'], $content);
+            $content         = str_replace('<startform></startform>', $params['startform'], $content);
         }
         $clickThrough = ['source' => ['page', $page->getId()]];
         $tokens       = $this->tokenHelper->findPageTokens($content, $clickThrough);
@@ -478,12 +488,7 @@ class BuilderSubscriber extends CommonSubscriber
      */
     private function setAttributeForFirtSlot()
     {
-        static $exist = false;
-        if (!$exist) {
-            $exist = true;
-
-            return 'data-prefs-center-first="1"';
-        }
+        return 'data-prefs-center-first="1"';
     }
 
     /**
