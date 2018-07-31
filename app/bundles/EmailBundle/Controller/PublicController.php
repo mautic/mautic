@@ -144,7 +144,6 @@ class PublicController extends CommonFormController
         $lead               = null;
         $template           = null;
         $session            = $this->get('session');
-        $successSessionName = 'mautic.email.prefscenter.success';
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
@@ -190,6 +189,8 @@ class PublicController extends CommonFormController
             if ($lead->getPreferredLocale()) {
                 $translator->setLocale($lead->getPreferredLocale());
             }
+
+            $successSessionName = 'mautic.email.prefscenter.success.'.$lead->getId();
 
             if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {
                 $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $translator);
