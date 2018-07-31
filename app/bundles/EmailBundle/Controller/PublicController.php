@@ -223,13 +223,16 @@ class PublicController extends CommonFormController
                     $frequencyPresent = false !== strpos($html, 'data-slot="channelfrequency"') ||
                                         false !== strpos($html, BuilderSubscriber::channelfrequency);
                     $tokensPresent = $savePrefsPresent && $frequencyPresent;
-                    if ($tokensPresent) {
+                    if ($savePrefsPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
-                        $params = array_merge(
+                        /** @var \Mautic\CoreBundle\Templating\Helper\FormHelper $formHelper */
+                        $formHelper =$this->get('templating.helper.form');
+                        $params     = array_merge(
                             $viewParameters,
                             [
                                 'form'                         => $formView,
+                                'action'                       => $formHelper->start($formView),
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
                                 'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
                                 'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),

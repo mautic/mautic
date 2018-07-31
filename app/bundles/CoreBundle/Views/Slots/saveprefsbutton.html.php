@@ -11,7 +11,6 @@
 if (isset($form)) {
     // add form tag
     echo '<script src="'.$view['assets']->getUrl('app/bundles/PageBundle/Assets/js/prefcenter.js').'"></script>';
-    $view['assets']->addCustomDeclaration($view['form']->start($form), 'bodyOpen');
 }
 ?>
     <a href="javascript:void(null)"

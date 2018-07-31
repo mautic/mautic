@@ -45,6 +45,7 @@ class BuilderSubscriber extends CommonSubscriber
      * @var PageModel
      */
     protected $pageModel;
+
     protected $pageTokenRegex      = '{pagelink=(.*?)}';
     protected $dwcTokenRegex       = '{dwc=(.*?)}';
     protected $langBarRegex        = '{langbar}';
@@ -119,8 +120,12 @@ class BuilderSubscriber extends CommonSubscriber
             $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
 
             // add only filter based dwc tokens
-            $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent', 'dynamiccontent:dynamiccontents');
-            $expr           = $this->factory->getDatabase()->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
+            $dwcTokenHelper = new BuilderTokenHelper(
+                $this->factory, 'dynamicContent', 'dynamiccontent:dynamiccontents'
+            );
+            $expr           = $this->factory->getDatabase()->getExpressionBuilder()->andX(
+                'e.is_campaign_based <> 1 and e.slot_name is not null'
+            );
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,
                 '',
@@ -205,7 +210,11 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot_socialfollow',
                 600
             );
-            if ($this->security->isGranted(['page:preference_center:editown', 'page:preference_center:editother'], 'MATCH_ONE')) {
+            if ($this->security->isGranted(
+                ['page:preference_center:editown', 'page:preference_center:editother'],
+                'MATCH_ONE'
+            )
+            ) {
                 $event->addSlotType(
                     'segmentlist',
                     $this->translator->trans('mautic.core.slot.label.segmentlist'),
@@ -405,8 +414,20 @@ class BuilderSubscriber extends CommonSubscriber
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
-        }
 
+            $dom = new DOMDocument('1.0', 'utf-8');
+            $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+            $xpath      = new DOMXPath($dom);
+            $divContent = $xpath->query('//*[@data-prefs-center-first="1"]');
+            for ($i = 0; $i < $divContent->length; ++$i) {
+                $slot         = $divContent->item($i);
+                $newnode      = $dom->createElement('startform');
+                $firstSibling = $slot->parentNode->firstChild;
+                $slot->parentNode->firstChild->parentNode->insertBefore($newnode, $slot->parentNode->firstChild);
+            }
+            $content         = $dom->saveHTML();
+            //$content = str_replace('<startform></startform>', $params['action'], $content);
+        }
         $clickThrough = ['source' => ['page', $page->getId()]];
         $tokens       = $this->tokenHelper->findPageTokens($content, $clickThrough);
 
@@ -415,6 +436,16 @@ class BuilderSubscriber extends CommonSubscriber
         }
 
         $event->setContent($content);
+    }
+
+    public function appendHTML(DOMNode $parent, $source)
+    {
+        $tmpDoc = new DOMDocument();
+        $tmpDoc->loadHTML($source);
+        foreach ($tmpDoc->getElementsByTagName('body')->item(0)->childNodes as $node) {
+            $node = $parent->ownerDocument->importNode($node, true);
+            $parent->appendChild($node);
+        }
     }
 
     /**
@@ -443,6 +474,19 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
+     * @return string
+     */
+    private function setAttributeForFirtSlot()
+    {
+        static $exist = false;
+        if (!$exist) {
+            $exist = true;
+
+            return 'data-prefs-center-first="1"';
+        }
+    }
+
+    /**
      * Renders the HTML for the segment list.
      *
      * @param array $params
@@ -454,7 +498,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-segmentlist'>\n";
+            $content = "<div class='pref-segmentlist' ".$this->setAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
             $content .= "</div>\n";
         }
@@ -472,7 +516,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-categorylist'>\n";
+            $content = "<div class='pref-categorylist ' ".$this->setAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
             $content .= "</div>\n";
         }
@@ -526,7 +570,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-saveprefs'>\n";
+            $content = "<div class='pref-saveprefs ' ".$this->setAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
             $content .= "</div>\n";
         }
@@ -572,7 +616,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $related[$parent->getId()] = [
                     'lang' => $trans,
                     // Add ntrd to not auto redirect to another language
-                    'url' => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
+                    'url'  => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
                 ];
                 foreach ($children as $c) {
                     $lang  = $c->getLanguage();
@@ -583,7 +627,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $related[$c->getId()] = [
                         'lang' => $trans,
                         // Add ntrd to not auto redirect to another language
-                        'url' => $this->pageModel->generateUrl($c, false).'?ntrd=1',
+                        'url'  => $this->pageModel->generateUrl($c, false).'?ntrd=1',
                     ];
                 }
             }
@@ -600,7 +644,10 @@ class BuilderSubscriber extends CommonSubscriber
                 return;
             }
 
-            $langbar = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
+            $langbar = $this->templating->render(
+                'MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php',
+                ['pages' => $related]
+            );
         }
 
         return $langbar;
