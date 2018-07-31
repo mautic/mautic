@@ -17,8 +17,6 @@ return [
                 'controller' => 'MauticIntegrationBundle:Default:index',
             ],
         ],
-        'public' => [
-        ],
         'api' => [
             'mautic_integration_api_plugin_list' => [
                 'path' => '/integration/plugin/list',

@@ -4,50 +4,82 @@ namespace MauticPlugin\MauticIntegrations\AuthProvider;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
-use Mautic\AuthenticationBundle\Integration\NeedsAuthorizationInterface;
+use Mautic\PluginBundle\Helper\oAuthHelper;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-class OAuth1aProvider implements AuthProviderInterface
+class OAuth1aProvider
 {
-    use AuthProviderTrait;
+    protected $consumerKey;
+    protected $consumerSecret;
+    protected $token;
+    protected $tokenSecret;
 
     /**
-     * @var Client
+     * @TODO 
      */
-    protected $http;
-
-    protected $accessToken;
-
-    /**
-     * @param Client $http
-     */
-    public function __construct(Client $http)
+    public function getAuthHeaders($uri, $params, $method)
     {
-        $this->http = $http;
+        $integration = new class(
+            $this->consumerKey,
+            $this->consumerSecret,
+            $this->token
+        ) implements UnifiedIntegrationInterface {
+            protected $consumerKey;
+            protected $consumerSecret;
+            protected $token;
 
-        $this->setAuthKeys([
-            'consumer_id',
-            'consumer_secret',
+            public function __construct($consumerKey, $consumerSecret, $token)
+            {
+                $this->consumerKey = $consumerKey;
+                $this->consumerSecret = $consumerSecret;
+                $this->token = $token;
+            }
+
+            public function getAuthCallbackUrl()
+            {
+                return null;
+            }
+
+            public function getAuthTokenKey()
+            {
+                return 'access_token';
+            }
+
+            public function getClientIdKey()
+            {
+                return 'consumer_id';
+            }
+
+            public function getClientSecretKey()
+            {
+                return 'consumer_secret';
+            }
+            
+            public function getDecryptedApiKeys()
+            {
+                return [
+                    'access_token' => $this->token,
+                    'consumer_id' => $this->consumerKey,
+                    'consumer_secret' => $this->consumerSecret
+                ];
+            }
+        };
+
+        $oauthHelper = new oAuthHelper($integration, null, [
+            'token_secret' => $this->tokenSecret,
+            'double_encode_basestring_parameters' => false,
         ]);
-    }
 
-    protected function getAuthHeaders()
-    {
-        return [
-            'Authorization' => 'OAuth '.$this->accessToken,
-        ];
-    }
+        $headers     = [];
+        $authHeaders = $oauthHelper->getAuthorizationHeader($uri, $params, $method);
 
-    protected function getAuthQueryParameters()
-    {
-        return [
-            'oauth_callback' => '',
-            'oauth_consumer_key' => '',
-            'oauth_nonce' => $this->generateNonce(),
-            'oauth_signature_method' => 'HMAC-SHA1',
-            'oauth_signature' => '',
-            'oauth_timestamp' => time(),
-            'oauth_version' => '1.0'
-        ];
+        foreach ($authHeaders as $header) {
+            list ($key, $value) = explode(':', $header, 2);
+
+            $headers[$key] = $value;
+        }
+
+        return $headers;
     }
 
     /**
@@ -56,5 +88,53 @@ class OAuth1aProvider implements AuthProviderInterface
     public function getAuthType()
     {
         return 'oauth1a';
+    }
+    
+    /**
+     * @param string $consumerKey
+     * 
+     * @return $this
+     */
+    public function setConsumerKey(string $consumerKey): self
+    {
+        $this->consumerKey = $consumerKey;
+
+        return $this;
+    }
+
+    /**
+     * @param string $consumerSecret
+     * 
+     * @return $this
+     */
+    public function setConsumerSecret(string $consumerSecret): self
+    {
+        $this->consumerSecret = $consumerSecret;
+
+        return $this;
+    }
+
+    /**
+     * @param string $token
+     * 
+     * @return $this
+     */
+    public function setToken(string $token): self
+    {
+        $this->token = $token;
+
+        return $this;
+    }
+
+    /**
+     * @param string $tokenSecret
+     * 
+     * @return $this
+     */
+    public function setTokenSecret(string $tokenSecret): self
+    {
+        $this->tokenSecret = $tokenSecret;
+
+        return $this;
     }
 }
