@@ -65,7 +65,7 @@ trait BCIntegrationFormsHelperTrait
      *
      * @return array
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         if (isset($settings['feature_settings']['objects']['company'])) {
             unset($settings['feature_settings']['objects']['company']);
