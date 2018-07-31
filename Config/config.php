@@ -57,7 +57,7 @@ return [
             'mautic.integrations.service.sync' => [
                 'class' => \MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncService::class,
                 'arguments' => [
-                    'mautic.plugin.repository.integration_entity',
+                    //'mautic.plugin.repository.integration_entity',
                 ],
             ],
             'mautic.http.client' => [
@@ -83,7 +83,7 @@ return [
                 'class'     => \Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
-                    \MauticPlugin\MauticIntegrationsBundle\Entity\FieldChangeRepository::class,
+                    \MauticPlugin\MauticIntegrationsBundle\Entity\FieldChange::class,
                 ],
             ],
         ],
