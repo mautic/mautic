@@ -252,6 +252,12 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.email.subscriber.contact_tracker' => [
+                'class'     => \Mautic\EmailBundle\EventListener\TrackingSubscriber::class,
+                'arguments' => [
+                    'mautic.email.repository.stat',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.email' => [
@@ -555,20 +561,6 @@ return [
                     'mautic.helper.paths',
                 ],
             ],
-            'mautic.email.repository.emailReply' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\EmailReply::class,
-                ],
-            ],
-            'mautic.email.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\Stat::class,
-                ],
-            ],
             'mautic.message.search.contact' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class,
                 'arguments' => [
@@ -721,6 +713,22 @@ return [
                     'mautic.validator.email',
                 ],
                 'tag' => 'validator.constraint_validator',
+            ],
+        ],
+        'repositories' => [
+            'mautic.email.repository.emailReply' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\EmailReply::class,
+                ],
+            ],
+            'mautic.email.repository.stat' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\Stat::class,
+                ],
             ],
         ],
     ],
