@@ -223,7 +223,7 @@ class PublicController extends CommonFormController
                     $frequencyPresent = false !== strpos($html, 'data-slot="channelfrequency"') ||
                                         false !== strpos($html, BuilderSubscriber::channelfrequency);
                     $tokensPresent = $savePrefsPresent && $frequencyPresent;
-                    if ($savePrefsPresent) {
+                    if ($tokensPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
                         /** @var \Mautic\CoreBundle\Templating\Helper\FormHelper $formHelper */
