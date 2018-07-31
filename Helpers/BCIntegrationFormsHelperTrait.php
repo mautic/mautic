@@ -152,7 +152,7 @@ trait BCIntegrationFormsHelperTrait
      *
      * @return string
      */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         switch ($this->getAuthenticationType()) {
             case 'oauth1a':
