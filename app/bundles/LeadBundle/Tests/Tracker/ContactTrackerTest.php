@@ -19,7 +19,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\DefaultValueTrait;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -31,7 +30,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactTrackerTest extends \PHPUnit_Framework_TestCase
 {
-    use DefaultValueTrait;
     /**
      * @var LeadRepository
      */
