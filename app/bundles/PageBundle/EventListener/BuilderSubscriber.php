@@ -427,7 +427,7 @@ class BuilderSubscriber extends CommonSubscriber
             $divContent = $xpath->query('//*[@data-prefs-center="1"]');
             if (!$divContent->length) {
                 // If use tokens
-                $divContent = $xpath->query('//*[@data-prefs-center="1"]');
+                $divContent = $xpath->query('//*[@data-prefs-center-first="1"]');
             }
             for ($i = 0; $i < $divContent->length; ++$i) {
                 $slot    = $divContent->item($i);
