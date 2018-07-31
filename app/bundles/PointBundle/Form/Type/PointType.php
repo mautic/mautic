@@ -122,6 +122,7 @@ class PointType extends AbstractType
             'yesno_button_group',
             [
                 'label' => 'mautic.point.form.repeat',
+                'data'  => $options['data']->getRepeatable() ?: false,
             ]
         );
 
