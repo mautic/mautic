@@ -292,7 +292,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                             $smsEvent->getContent(),
                             $lead,
                             [
-                                'channel' => ['sms' => $sms->getId()],
+                                'channel' => [
+                                    'sms',          // Keep BC pre 2.14.1
+                                    $sms->getId(),  // Keep BC pre 2.14.1
+                                    'sms' => $sms->getId(),
+                                ],
                                 'stat'    => $stat->getTrackingHash(),
                             ]
                         )
