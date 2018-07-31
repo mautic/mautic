@@ -65,7 +65,7 @@ trait BCIntegrationFormsHelperTrait
      *
      * @return array
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         if (isset($settings['feature_settings']['objects']['company'])) {
             unset($settings['feature_settings']['objects']['company']);
@@ -187,7 +187,7 @@ trait BCIntegrationFormsHelperTrait
      *                                   integration is called when adding an integration to events like point triggers,
      *                                   campaigns actions, forms actions, etc
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(FormBuilder $builder, array $data, string $formArea)
     {
     }
 
