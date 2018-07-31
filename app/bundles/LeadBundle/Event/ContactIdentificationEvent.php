@@ -27,6 +27,11 @@ class ContactIdentificationEvent extends Event
     private $identifiedContact;
 
     /**
+     * @var string
+     */
+    private $identifiedByChannel;
+
+    /**
      * ContactIdentificationEvent constructor.
      *
      * @param array $clickthrough
@@ -45,13 +50,23 @@ class ContactIdentificationEvent extends Event
     }
 
     /**
-     * @param Lead $contact
+     * @param Lead   $contact
+     * @param string $channel
      */
-    public function setIdentifiedContact(Lead $contact)
+    public function setIdentifiedContact(Lead $contact, $channel)
     {
-        $this->identifiedContact = $contact;
+        $this->identifiedContact   = $contact;
+        $this->identifiedByChannel = $channel;
 
         $this->stopPropagation();
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier()
+    {
+        return $this->identifiedByChannel;
     }
 
     /**
