@@ -226,6 +226,8 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
+        $campaign->method('isPublished')
+            ->willReturn(true);
 
         $event = $this->getMockBuilder(Event::class)
             ->getMock();
@@ -346,6 +348,8 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
+        $campaign->method('isPublished')
+            ->willReturn(true);
 
         $event = $this->getMockBuilder(Event::class)
             ->getMock();
@@ -464,6 +468,9 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('hydrateContacts');
 
         $this->scheduler->method('validateExecutionDateTime')
+            ->willReturn(new \DateTime());
+
+        $this->scheduler->method('getExecutionDateTime')
             ->willReturn(new \DateTime());
 
         $counter = $this->getExecutioner()->executeByIds([1, 2]);
