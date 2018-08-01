@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncService;
+namespace MauticPlugin\MauticIntegrationsBundle\Services\SyncService;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
