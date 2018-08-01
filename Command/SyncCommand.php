@@ -29,9 +29,8 @@ class SyncCommand extends ContainerAwareCommand
     {
         $this->setName('mautic:integration:sync')
             ->setDescription('Fetch objects from integration.')
-            ->addOption(
-                '--integration',
-                '-i',
+            ->addArgument(
+                'integration',
                 InputOption::VALUE_REQUIRED,
                 'Fetch objects from integration.',
                 null
@@ -51,7 +50,7 @@ class SyncCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io          = new SymfonyStyle($input, $output);
-        $integration = $input->getOption('integration');
+        $integration = $input->getArgument('integration');
         $startDateS  = $input->getOption('start-date');
 
         try {
@@ -63,6 +62,9 @@ class SyncCommand extends ContainerAwareCommand
         }
         
         try {
+            // $customers line below is temporary. For testing OAuth signature
+            $customers = $this->getContainer()->get('magento.repository.customers')->getCustomersSince(new \DateTimeImmutable);
+
             $event = new SyncEvent($integration, $startDate);
             $this->getContainer()->get('event_dispatcher')->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
