@@ -192,6 +192,20 @@ trait BCIntegrationFormsHelperTrait
     }
 
     /**
+     * Function used to format unformated fields coming from FieldsTypeTrait
+     * (usually used in campaign actions).
+     * Called after mapping form is submitted from FieldsTypeTrait
+     *
+     * @param array $fields
+     *
+     * @return array
+     */
+    public function formatMatchedFields(array $fields): array
+    {
+        return $fields;
+    }
+
+    /**
      * Checks if an integration is authorized and/or authorizes the request.
      *
      * @return bool
