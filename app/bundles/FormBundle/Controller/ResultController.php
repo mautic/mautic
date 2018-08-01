@@ -17,7 +17,6 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -125,6 +124,7 @@ class ResultController extends CommonFormController
                 'form'           => $form,
                 'withTotalCount' => true,
                 'viewOnlyFields' => $viewOnlyFields,
+                'simpleResults'  => true,
             ]
         );
 
@@ -320,8 +320,8 @@ class ResultController extends CommonFormController
         if ($this->request->getMethod() == 'POST') {
             $model = $this->getModel('form.submission');
 
-                // Find the result
-                $entity = $model->getEntity($objectId);
+            // Find the result
+            $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
                 $flashes[] = [

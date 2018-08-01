@@ -218,7 +218,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
             return [
                 'template'   => 'MauticCrmBundle:Integration:dynamics.html.php',
                 'parameters' => [
-
                 ],
             ];
         }
@@ -831,6 +830,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         // Fetch them separately so we can determine which oneas are already there
         $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, $totalToUpdate, $params['start'], $params['end'],  'contacts', [])['contacts'];
+
 
         if (is_array($toUpdate)) {
             foreach ($toUpdate as $lead) {

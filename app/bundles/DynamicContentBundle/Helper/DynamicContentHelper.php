@@ -63,24 +63,26 @@ class DynamicContentHelper
      */
     public function getDynamicContentForLead($slot, $lead)
     {
-        $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dwc.decision.'.$slot);
-        $content  = '';
-
+        // Attempt campaign slots first
+        $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dynamicContent');
         if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
-            $content = array_shift($response['action']['dwc.push_content']);
-        } else {
-            $data = $this->dynamicContentModel->getSlotContentForLead($slot, $lead);
-
-            if (!empty($data)) {
-                $content = $data['content'];
-                $dwc     = $this->dynamicContentModel->getEntity($data['id']);
-                if ($dwc instanceof DynamicContent) {
-                    $content = $this->getRealDynamicContent($slot, $lead, $dwc);
-                }
-            }
+            return array_shift($response['action']['dwc.push_content']);
         }
 
-        return $content;
+        // Attempt stored content second
+        $data = $this->dynamicContentModel->getSlotContentForLead($slot, $lead);
+        if (!empty($data)) {
+            $content = $data['content'];
+            $dwc     = $this->dynamicContentModel->getEntity($data['id']);
+            if ($dwc instanceof DynamicContent) {
+                $content = $this->getRealDynamicContent($slot, $lead, $dwc);
+            }
+
+            return $content;
+        }
+
+        // Finally attempt standalone DWC
+        return $this->getDynamicContentSlotForLead($slot, $lead);
     }
 
     /**
@@ -95,7 +97,8 @@ class DynamicContentHelper
         if ($lead instanceof Lead) {
             $leadArray = $this->convertLeadToArray($lead);
         }
-        $dwcs = $this->getDwcsBySlotName($slotName);
+
+        $dwcs = $this->getDwcsBySlotName($slotName, true);
         /** @var DynamicContent $dwc */
         foreach ($dwcs as $dwc) {
             if ($dwc->getIsCampaignBased()) {
@@ -203,22 +206,33 @@ class DynamicContentHelper
 
     /**
      * @param string $slotName
+     * @param bool   $publishedOnly
      *
      * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getDwcsBySlotName($slotName)
+    public function getDwcsBySlotName($slotName, $publishedOnly = false)
     {
+        $filter = [
+            'where' => [
+                [
+                    'col'  => 'e.slotName',
+                    'expr' => 'eq',
+                    'val'  => $slotName,
+                ],
+            ],
+        ];
+
+        if ($publishedOnly) {
+            $filter['where'][] = [
+                'col'  => 'e.isPublished',
+                'expr' => 'eq',
+                'val'  => 1,
+            ];
+        }
+
         return $this->dynamicContentModel->getEntities(
             [
-                'filter' => [
-                    'where' => [
-                        [
-                            'col'  => 'e.slotName',
-                            'expr' => 'eq',
-                            'val'  => $slotName,
-                        ],
-                    ],
-                ],
+                'filter'           => $filter,
                 'ignore_paginator' => true,
             ]
         );

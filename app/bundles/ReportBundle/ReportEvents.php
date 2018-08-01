@@ -74,6 +74,15 @@ final class ReportEvents
     const REPORT_ON_GENERATE = 'mautic.report_on_generate';
 
     /**
+     * The mautic.report_query_pre_execute event is dispatched to allow a plugin to alter the query before execution.
+     *
+     * The event listener receives a Mautic\ReportBundle\Event\ReportQueryEvent instance.
+     *
+     * @var string
+     */
+    const REPORT_QUERY_PRE_EXECUTE = 'mautic.report_query_pre_execute';
+
+    /**
      * The mautic.report_on_display event is dispatched when displaying a report.
      *
      * The event listener receives a Mautic\ReportBundle\Event\ReportDataEvent instance.
@@ -90,4 +99,13 @@ final class ReportEvents
      * @var string
      */
     const REPORT_ON_GRAPH_GENERATE = 'mautic.report_on_graph_generate';
+
+    /**
+     * The mautic.report_schedule_send event is dispatched to send an exported report to a user.
+     *
+     * The event listener receives a Mautic\ReportBundle\Event\ReportScheduleSendEvent instance.
+     *
+     * @var string
+     */
+    const REPORT_SCHEDULE_SEND = 'mautic.report_schedule_send';
 }

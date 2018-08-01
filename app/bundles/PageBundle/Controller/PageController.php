@@ -11,7 +11,6 @@
 
 namespace Mautic\PageBundle\Controller;
 
-use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
@@ -622,6 +621,7 @@ class PageController extends FormController
                 'sections'      => $this->buildSlotForms($sections),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                 'sectionForm'   => $sectionForm->createView(),
+                'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], true),
                 'permissions'   => $security->isGranted(
                     [
                         'page:preference_center:editown',
@@ -629,7 +629,7 @@ class PageController extends FormController
                     ],
                     'RETURN_ARRAY'
                 ),
-                'security' => $security,
+                'security'      => $security,
             ],
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => [
@@ -1000,7 +1000,6 @@ class PageController extends FormController
         $content = $entity->getContent();
 
         foreach ($slots as $slot => $slotConfig) {
-
             // backward compatibility - if slotConfig array does not exist
             if (is_numeric($slot)) {
                 $slot       = $slotConfig;
@@ -1093,7 +1092,6 @@ class PageController extends FormController
             }
         }
 
-        //add builder toolbar
         $slotsHelper->start('builder'); ?>
         <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
         <?php

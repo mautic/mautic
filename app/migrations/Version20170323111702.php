@@ -63,9 +63,9 @@ class Version20170323111702 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("CREATE TABLE {$this->tableName} (id INT AUTO_INCREMENT NOT NULL, category_id INT DEFAULT NULL, page_id INT DEFAULT NULL, asset_id INT DEFAULT NULL, is_published TINYINT(1) NOT NULL, date_added DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', created_by INT DEFAULT NULL, created_by_user VARCHAR(255) DEFAULT NULL, date_modified DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', modified_by INT DEFAULT NULL, modified_by_user VARCHAR(255) DEFAULT NULL, checked_out DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', checked_out_by INT DEFAULT NULL, checked_out_by_user VARCHAR(255) DEFAULT NULL, name VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, media_id VARCHAR(255) DEFAULT NULL, media_path VARCHAR(255) DEFAULT NULL, text VARCHAR(255) NOT NULL, sent_count INT DEFAULT NULL, favorite_count INT DEFAULT NULL, retweet_count INT DEFAULT NULL, lang VARCHAR(255) DEFAULT NULL, INDEX tweet_text_index (text), INDEX favorite_count_index (favorite_count), INDEX sent_count_index (sent_count), INDEX retweet_count_index (retweet_count), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB");
+        $this->addSql("CREATE TABLE IF NOT EXISTS {$this->tableName} (id INT AUTO_INCREMENT NOT NULL, category_id INT DEFAULT NULL, page_id INT DEFAULT NULL, asset_id INT DEFAULT NULL, is_published TINYINT(1) NOT NULL, date_added DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', created_by INT DEFAULT NULL, created_by_user VARCHAR(255) DEFAULT NULL, date_modified DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', modified_by INT DEFAULT NULL, modified_by_user VARCHAR(255) DEFAULT NULL, checked_out DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', checked_out_by INT DEFAULT NULL, checked_out_by_user VARCHAR(255) DEFAULT NULL, name VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, media_id VARCHAR(255) DEFAULT NULL, media_path VARCHAR(255) DEFAULT NULL, text VARCHAR(255) NOT NULL, sent_count INT DEFAULT NULL, favorite_count INT DEFAULT NULL, retweet_count INT DEFAULT NULL, lang VARCHAR(255) DEFAULT NULL, INDEX tweet_text_index (text), INDEX favorite_count_index (favorite_count), INDEX sent_count_index (sent_count), INDEX retweet_count_index (retweet_count), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB");
 
-        $this->addSql("CREATE TABLE {$this->prefix}tweet_stats (id INT AUTO_INCREMENT NOT NULL, tweet_id INT DEFAULT NULL, lead_id INT DEFAULT NULL, twitter_tweet_id VARCHAR(255) DEFAULT NULL, handle VARCHAR(255) NOT NULL, date_sent DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', is_failed TINYINT(1) DEFAULT NULL, retry_count INT DEFAULT NULL, source VARCHAR(255) DEFAULT NULL, source_id INT DEFAULT NULL, favorite_count INT DEFAULT NULL, retweet_count INT DEFAULT NULL, response_details LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)', INDEX stat_tweet_search (tweet_id, lead_id), INDEX stat_tweet_search2 (lead_id, tweet_id), INDEX stat_tweet_failed_search (is_failed), INDEX stat_tweet_source_search (source, source_id), INDEX favorite_count_index (favorite_count), INDEX retweet_count_index (retweet_count), INDEX tweet_date_sent (date_sent), INDEX twitter_tweet_id_index (twitter_tweet_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB");
+        $this->addSql("CREATE TABLE IF NOT EXISTS {$this->prefix}tweet_stats (id INT AUTO_INCREMENT NOT NULL, tweet_id INT DEFAULT NULL, lead_id INT DEFAULT NULL, twitter_tweet_id VARCHAR(255) DEFAULT NULL, handle VARCHAR(255) NOT NULL, date_sent DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', is_failed TINYINT(1) DEFAULT NULL, retry_count INT DEFAULT NULL, source VARCHAR(255) DEFAULT NULL, source_id INT DEFAULT NULL, favorite_count INT DEFAULT NULL, retweet_count INT DEFAULT NULL, response_details LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)', INDEX stat_tweet_search (tweet_id, lead_id), INDEX stat_tweet_search2 (lead_id, tweet_id), INDEX stat_tweet_failed_search (is_failed), INDEX stat_tweet_source_search (source, source_id), INDEX favorite_count_index (favorite_count), INDEX retweet_count_index (retweet_count), INDEX tweet_date_sent (date_sent), INDEX twitter_tweet_id_index (twitter_tweet_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB");
 
         $this->addSql("ALTER TABLE {$this->tableName} ADD CONSTRAINT ".$this->generatePropertyName('tweets', 'fk', ['category_id'])." FOREIGN KEY (category_id) REFERENCES {$this->prefix}categories (id) ON DELETE SET NULL");
         $this->addSql("ALTER TABLE {$this->tableName} ADD CONSTRAINT ".$this->generatePropertyName('tweets', 'fk', ['page_id'])." FOREIGN KEY (page_id) REFERENCES {$this->prefix}pages (id) ON DELETE SET NULL");
@@ -104,7 +104,6 @@ class Version20170323111702 extends AbstractMauticMigration
             ->setMaxResults($batch);
 
         while ($results = $qb->execute()->fetchAll()) {
-
             // Start a transaction
             $this->connection->beginTransaction();
 
@@ -155,7 +154,6 @@ class Version20170323111702 extends AbstractMauticMigration
             ->setMaxResults($batch);
 
         while ($results = $qb->execute()->fetchAll()) {
-
             // Start a transaction
             $this->connection->beginTransaction();
 

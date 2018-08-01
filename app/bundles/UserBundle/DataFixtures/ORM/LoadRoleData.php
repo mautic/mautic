@@ -41,14 +41,16 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
-        $role = new Role();
-        $role->setName('Administrators');
-        $role->setDescription('Has access to everything.');
-        $role->setIsAdmin(1);
-        $manager->persist($role);
-        $manager->flush();
+        if (!$this->hasReference('admin-role')) {
+            $role = new Role();
+            $role->setName('Administrators');
+            $role->setDescription('Has access to everything.');
+            $role->setIsAdmin(1);
+            $manager->persist($role);
+            $manager->flush();
 
-        $this->addReference('admin-role', $role);
+            $this->addReference('admin-role', $role);
+        }
 
         $role = new Role();
         $role->setName('Sales Team');

@@ -171,6 +171,8 @@ $view['slots']->set(
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <?php if ($showVariants): ?>
@@ -236,7 +238,7 @@ $view['slots']->set(
                 <div class="input-group">
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly
-                           value="<?php echo $pageUrl; ?>"/>
+                           value="<?php echo $view->escape($pageUrl); ?>"/>
                     <span class="input-group-btn">
                         <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $pageUrl; ?>', '_blank');">
                             <i class="fa fa-external-link"></i>
@@ -254,7 +256,7 @@ $view['slots']->set(
                 <div class="input-group">
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly
-                           value="<?php echo $previewUrl; ?>"/>
+                           value="<?php echo $view->escape($previewUrl); ?>"/>
                     <span class="input-group-btn">
                     <button class="btn btn-default btn-nospin"
                             onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">

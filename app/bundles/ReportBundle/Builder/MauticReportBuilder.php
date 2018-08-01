@@ -164,7 +164,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    protected function configureBuilder(array $options)
+    private function configureBuilder(array $options)
     {
         // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
         /** @var ReportGeneratorEvent $event */
@@ -460,6 +460,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                             case 'string':
                             case 'email':
+                            case 'url':
                                 switch ($exprFunction) {
                                     case 'startsWith':
                                         $exprFunction    = 'like';

@@ -133,6 +133,15 @@ class PageType extends AbstractType
         );
 
         $builder->add(
+            'noIndex',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.page.config.no_index',
+                'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
+            ]
+        );
+
+        $builder->add(
             'publishUp',
             'datetime',
             [

@@ -148,6 +148,26 @@ final class LeadEvents
     const LEAD_IDENTIFIED = 'mautic.lead_identified';
 
     /**
+     * The mautic.lead_channel_subscription_changed event is dispatched when a lead's DNC status changes.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ChannelSubscriptionChange instance.
+     *
+     * @var string
+     */
+    const CHANNEL_SUBSCRIPTION_CHANGED = 'mautic.lead_channel_subscription_changed';
+
+    /**
+     * The mautic.lead_build_search_commands event is dispatched when the search commands are built.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadBuildSearchEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_BUILD_SEARCH_COMMANDS = 'mautic.lead_build_search_commands';
+
+    /**
      * The mautic.current_lead_changed event is dispatched when the current lead is changed to another such as when
      * a new lead is created from a form submit.  This gives opportunity to update session data if applicable.
      *
@@ -379,6 +399,46 @@ final class LeadEvents
     const DEVICE_POST_DELETE = 'mautic.lead_device_post_delete';
 
     /**
+     * The mautic.lead_tag_pre_save event is dispatched right before a lead tag is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagEvent instance.
+     *
+     * @var string
+     */
+    const TAG_PRE_SAVE = 'mautic.lead_tag_pre_save';
+
+    /**
+     * The mautic.lead_tag_post_save event is dispatched right after a lead tag is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagEvent instance.
+     *
+     * @var string
+     */
+    const TAG_POST_SAVE = 'mautic.lead_tag_post_save';
+
+    /**
+     * The mautic.lead_tag_pre_delete event is dispatched before a lead tag is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagEvent instance.
+     *
+     * @var string
+     */
+    const TAG_PRE_DELETE = 'mautic.lead_tag_pre_delete';
+
+    /**
+     * The mautic.lead_tag_post_delete event is dispatched after a lead tag is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagEvent instance.
+     *
+     * @var string
+     */
+    const TAG_POST_DELETE = 'mautic.lead_tag_post_delete';
+
+    /**
      * The mautic.filter_choice_fields event is dispatched when the list filter dropdown is populated.
      *
      * The event listener receives a
@@ -397,6 +457,15 @@ final class LeadEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.lead.on_campaign_trigger_action';
+
+    /**
+     * The mautic.lead.on_campaign_action_delete_contact event is dispatched when the campaign action to delete a contact is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_ACTION_DELETE_CONTACT = 'mautic.lead.on_campaign_action_delete_contact';
 
     /**
      * The mautic.lead.on_campaign_trigger_condition event is fired when the campaign condition triggers.
@@ -473,6 +542,16 @@ final class LeadEvents
      * @var string
      */
     const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
+
+    /**
+     * The mautic.list_filters_querybuilder_generated event is dispatched when the queryBuilder for segment was generated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent instance.
+     *
+     * @var string
+     */
+    const LIST_FILTERS_QUERYBUILDER_GENERATED = 'mautic.list_filters_querybuilder_generated';
 
     /**
      * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.

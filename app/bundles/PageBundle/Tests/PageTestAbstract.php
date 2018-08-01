@@ -17,14 +17,15 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\QueueBundle\Queue\QueueService;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -70,6 +71,11 @@ class PageTestAbstract extends WebTestCase
             ->getMock();
 
         $redirectModel = $this->getRedirectModel();
+
+        $companyModel = $this
+            ->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $trackableModel = $this
             ->getMockBuilder(TrackableModel::class)
@@ -125,6 +131,8 @@ class PageTestAbstract extends WebTestCase
                 )
             );
 
+        $deviceTrackerMock = $this->createMock(DeviceTracker::class);
+
         $pageModel = new PageModel(
             $cookieHelper,
             $ipLookupHelper,
@@ -132,7 +140,9 @@ class PageTestAbstract extends WebTestCase
             $leadFieldModel,
             $redirectModel,
             $trackableModel,
-            $queueService
+            $queueService,
+            $companyModel,
+            $deviceTrackerMock
         );
 
         $pageModel->setDispatcher($dispatcher);

@@ -204,6 +204,24 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * @param array $entities
+     */
+    public function detachEntities(array $entities)
+    {
+        foreach ($entities as $entity) {
+            $this->getEntityManager()->detach($entity);
+        }
+    }
+
+    /**
+     * @param mixed $entity
+     */
+    public function detachEntity($entity)
+    {
+        $this->getEntityManager()->detach($entity);
+    }
+
+    /**
      * @param      $alias
      * @param null $catAlias
      * @param null $lang
@@ -308,7 +326,7 @@ class CommonRepository extends EntityRepository
      *
      * @param array $args
      *
-     * @return Paginator
+     * @return array|\Doctrine\ORM\Internal\Hydration\IterableResult|Paginator
      */
     public function getEntities(array $args = [])
     {
@@ -866,7 +884,7 @@ class CommonRepository extends EntityRepository
         }
 
         $clause['dir'] = $this->sanitize(strtoupper($clause['dir']));
-        $clause['col'] = $this->sanitize($clause['col'], ['_']);
+        $clause['col'] = $this->sanitize($clause['col'], ['_.']);
 
         return $clause;
     }
@@ -1112,8 +1130,8 @@ class CommonRepository extends EntityRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
             case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
-                $expr            = $q->expr()->eq("IDENTITY($prefix.createdBy)", $this->currentUser->getId());
-                $returnParameter = false;
+                $expr            = $q->expr()->eq("$prefix.createdBy", ":$unique");
+                $forceParameters = [$unique => $this->currentUser->getId()];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
             case $this->translator->trans('mautic.core.searchcommand.category', [], null, 'en_US'):
@@ -1188,7 +1206,7 @@ class CommonRepository extends EntityRepository
      *
      * @return bool
      */
-    protected function buildClauses(&$q, array $args)
+    protected function buildClauses($q, array $args)
     {
         $this->buildSelectClause($q, $args);
         $this->buildIndexByClause($q, $args);
@@ -1311,20 +1329,22 @@ class CommonRepository extends EntityRepository
      * @param \Doctrine\ORM\QueryBuilder $q
      * @param array                      $args
      */
-    protected function buildOrderByClause(&$q, array $args)
+    protected function buildOrderByClause($q, array $args)
     {
-        $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
-        $orderByDir = $this->sanitize(
-            array_key_exists('orderByDir', $args) ? $args['orderByDir'] : ''
-        );
+        $orderBy = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
 
-        if (empty($orderBy)) {
+        if (!empty($args['filter']['order'])) {
+            $this->buildOrderByClauseFromArray($q, $args['filter']['order']);
+        } elseif (empty($orderBy)) {
             $defaultOrder = $this->getDefaultOrder();
 
             foreach ($defaultOrder as $order) {
                 $q->addOrderBy($order[0], $order[1]);
             }
         } else {
+            $orderByDir = $this->sanitize(
+                array_key_exists('orderByDir', $args) ? $args['orderByDir'] : ''
+            );
             //add direction after each column
             $parts = explode(',', $orderBy);
             foreach ($parts as $order) {
@@ -1363,7 +1383,6 @@ class CommonRepository extends EntityRepository
     {
         $isOrm = $q instanceof QueryBuilder;
         if (isset($args['select'])) {
-
             // Build a custom select
             if (is_string($args['select'])) {
                 $args['select'] = explode(',', $args['select']);
@@ -1434,7 +1453,7 @@ class CommonRepository extends EntityRepository
      * @param \Doctrine\ORM\QueryBuilder $q
      * @param array                      $args
      */
-    protected function buildWhereClause(&$q, array $args)
+    protected function buildWhereClause($q, array $args)
     {
         $filter                    = array_key_exists('filter', $args) ? $args['filter'] : '';
         $filterHelper              = new SearchStringHelper();

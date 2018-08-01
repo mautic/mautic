@@ -351,6 +351,20 @@ Mautic.leadlistOnLoad = function(container) {
         });
 
     }
+
+    // segment contact filters
+    var segmentContactForm = mQuery('#segment-contact-filters');
+
+    if (segmentContactForm.length) {
+        segmentContactForm.on('change', function() {
+            segmentContactForm.submit();
+        }).on('keyup', function() {
+            segmentContactForm.delay(200).submit();
+        }).on('submit', function(e) {
+            e.preventDefault();
+            Mautic.refreshSegmentContacts(segmentContactForm);
+        });
+    }
 };
 
 Mautic.reorderSegmentFilters = function() {
@@ -472,7 +486,12 @@ Mautic.updateLookupListFilter = function(field, datum) {
     }
 };
 
-Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptions) {
+Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptions, mQueryObject) {
+
+    if(typeof mQueryObject == 'function'){
+        mQuery = mQueryObject;
+    }
+
     mQuery('#' + displayId).attr('data-lookup-callback', 'updateLookupListFilter');
 
     Mautic.activateFieldTypeahead(displayId, filterId, [], 'lead:fieldList')
@@ -891,6 +910,13 @@ Mautic.refreshLeadNotes = function(form) {
     Mautic.postForm(mQuery(form), function (response) {
         response.target = '#NoteList';
         mQuery('#NoteCount').html(response.noteCount);
+        Mautic.processPageContent(response);
+    });
+};
+
+Mautic.refreshSegmentContacts = function(form) {
+    Mautic.postForm(mQuery(form), function (response) {
+        response.target = '#contacts-container';
         Mautic.processPageContent(response);
     });
 };

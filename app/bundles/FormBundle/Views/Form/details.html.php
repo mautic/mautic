@@ -152,6 +152,8 @@ $showActions = count($activeFormActions);
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <?php if ($showActions): ?>
@@ -374,4 +376,4 @@ $showActions = count($activeFormActions);
 </div>
 <!--/ end: box layout -->
 
-<input type="hidden" name="entityId" id="entityId" value="<?php echo $activeForm->getId(); ?>"/>
+<input type="hidden" name="entityId" id="entityId" value="<?php echo $view->escape($activeForm->getId()); ?>"/>

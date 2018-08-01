@@ -148,9 +148,9 @@ class ImportTest extends StandardImportTestHelper
 
         $this->assertNull($import->getRunTime());
 
-        $this->fakeImportStartDate($import, (10 * 60));
-
         $import->end(false);
+
+        $this->fakeImportStartDate($import, (10 * 60));
 
         $this->assertTrue($import->getRunTime() instanceof \DateInterval);
         $this->assertSame(10, $import->getRunTime()->i);
@@ -162,9 +162,9 @@ class ImportTest extends StandardImportTestHelper
 
         $this->assertSame(0, $import->getRunTimeSeconds());
 
-        $this->fakeImportStartDate($import, 600);
-
         $import->end(false);
+
+        $this->fakeImportStartDate($import, 600);
 
         $this->assertSame(600, $import->getRunTimeSeconds());
     }
@@ -175,10 +175,10 @@ class ImportTest extends StandardImportTestHelper
 
         $this->assertSame(0, $import->getSpeed());
 
-        $this->fakeImportStartDate($import, 600);
-
         $import->setInsertedCount(900);
         $import->end(false);
+
+        $this->fakeImportStartDate($import, 600);
 
         $this->assertSame(1.5, $import->getSpeed());
     }
@@ -203,7 +203,8 @@ class ImportTest extends StandardImportTestHelper
      */
     protected function fakeImportStartDate(Import $import, $runtime = 600)
     {
-        $dateStarted = new \DateTime();
+        $dateEnded   = $import->getDateEnded();
+        $dateStarted = new \DateTime($dateEnded->format('Y-m-d H:i:s.u'), $dateEnded->getTimezone());
         $dateStarted->modify('-'.$runtime.' seconds');
         $import->setDateStarted($dateStarted);
     }

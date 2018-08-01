@@ -4,11 +4,14 @@ namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Monolog\Logger;
 
 class ListModelFunctionalTest extends MauticWebTestCase
 {
     public function testSegmentCountIsCorrect()
     {
+        /** @var LeadListRepository $repo */
         $repo                                               = $this->em->getRepository(LeadList::class);
         $segmentTest1Ref                                    = $this->fixtures->getReference('segment-test-1');
         $segmentTest2Ref                                    = $this->fixtures->getReference('segment-test-2');
@@ -28,8 +31,16 @@ class ListModelFunctionalTest extends MauticWebTestCase
         $segmentTestIncludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-include-segment-manual-members');
         $segmentTestExcludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-exclude-segment-manual-members');
         $segmentTestExcludeMembershipWithoutOtherFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-without-other-filters');
-        $segmentTestIncludeWithUnrelatedManualRemovalRef    = $this->fixtures->getReference('segment-test-include-segment-with-unrelated-segment-manual-removal');
+        $segmentTestIncludeWithUnrelatedManualRemovalRef    = $this->fixtures->getReference(
+            'segment-test-include-segment-with-unrelated-segment-manual-removal'
+        );
         $segmentMembershipRegex                             = $this->fixtures->getReference('segment-membership-regexp');
+        $segmentCompanyFields                               = $this->fixtures->getReference('segment-company-only-fields');
+        $segmentMembershipCompanyOnlyFields                 = $this->fixtures->getReference('segment-including-segment-with-company-only-fields');
+
+        $logger = $this->getMockBuilder(Logger::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         // These expect filters to be part of the $lists passed to getLeadsByList so pass the entity
         $segmentContacts = $repo->getLeadsByList(
@@ -54,8 +65,11 @@ class ListModelFunctionalTest extends MauticWebTestCase
                 $segmentTestExcludeMembershipWithoutOtherFiltersRef,
                 $segmentTestIncludeWithUnrelatedManualRemovalRef,
                 $segmentMembershipRegex,
+                $segmentCompanyFields,
+                $segmentMembershipCompanyOnlyFields,
             ],
-            ['countOnly' => true]
+            ['countOnly' => true],
+            $logger
         );
 
         $this->assertEquals(
@@ -177,10 +191,23 @@ class ListModelFunctionalTest extends MauticWebTestCase
             $segmentContacts[$segmentMembershipRegex->getId()]['count'],
             'There should be 11 contacts that match the regex with dayrep.com in it'
         );
+
+        $this->assertEquals(
+            6,
+            $segmentContacts[$segmentCompanyFields->getId()]['count'],
+            'There should only be 6 in this segment (6 contacts belong to HostGator based in Houston)'
+        );
+
+        $this->assertEquals(
+            14,
+            $segmentContacts[$segmentMembershipCompanyOnlyFields->getId()]['count'],
+            'There should be 14 in this segment.'
+        );
     }
 
     public function testPublicSegmentsInContactPreferences()
     {
+        /** @var LeadListRepository $repo */
         $repo = $this->em->getRepository(LeadList::class);
 
         $lists = $repo->getGlobalLists();
@@ -196,6 +223,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
 
     public function testSegmentRebuildCommand()
     {
+        /** @var LeadListRepository $repo */
         $repo            = $this->em->getRepository(LeadList::class);
         $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
 
@@ -204,9 +232,13 @@ class ListModelFunctionalTest extends MauticWebTestCase
             '--env' => 'test',
         ]);
 
+        $logger = $this->getMockBuilder(Logger::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $segmentContacts = $repo->getLeadsByList([
             $segmentTest3Ref,
-        ], ['countOnly' => true]);
+        ], ['countOnly' => true], $logger);
 
         $this->assertEquals(
             24,
@@ -222,9 +254,13 @@ class ListModelFunctionalTest extends MauticWebTestCase
             '--env' => 'test',
         ]);
 
+        $logger = $this->getMockBuilder(Logger::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $segmentContacts = $repo->getLeadsByList([
             $segmentTest3Ref,
-        ], ['countOnly' => true]);
+        ], ['countOnly' => true], $logger);
 
         $this->assertEquals(
             0,

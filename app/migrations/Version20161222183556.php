@@ -3,7 +3,7 @@
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @see         http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -38,10 +38,10 @@ class Version20161222183556 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}saml_id_entry (
-  id VARCHAR(255) NOT NULL, 
-  entity_id VARCHAR(255) NOT NULL, 
-  expiryTimestamp INT NOT NULL, 
+CREATE TABLE IF NOT EXISTS {$this->prefix}saml_id_entry (
+  id VARCHAR(255) NOT NULL,
+  entity_id VARCHAR(255) NOT NULL,
+  expiryTimestamp INT NOT NULL,
   PRIMARY KEY(id, entity_id)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
 SQL;

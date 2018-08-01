@@ -85,6 +85,7 @@ class OneSignalIntegration extends AbstractIntegration
             'requires_authorization' => false,
         ];
     }
+
     /**
      * {@inheritdoc}
      *

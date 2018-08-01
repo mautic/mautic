@@ -13,7 +13,7 @@ if (!$isEmbedded) {
 
     $view['slots']->set('mauticContent', 'monitoring');
     $view['slots']->set('headerTitle', $activeMonitoring->getTitle());
-// @todo finish ACL here
+    // @todo finish ACL here
     $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
         'item'            => $activeMonitoring,
         'templateButtons' => [
@@ -85,6 +85,8 @@ echo $view['assets']->includeScript('plugins/MauticSocialBundle/Assets/js/social
                 </div>
             </div>
             <!--/ stats -->
+
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">

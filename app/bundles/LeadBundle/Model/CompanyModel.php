@@ -58,6 +58,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     protected $emailValidator;
 
     /**
+     * @var array
+     */
+    private $fields = [];
+
+    /**
      * CompanyModel constructor.
      *
      * @param FieldModel     $leadFieldModel
@@ -77,9 +82,29 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function saveEntity($entity, $unlock = true)
     {
+        // Update leads primary company name
         $this->setEntityDefaultValues($entity, 'company');
+        $this->getCompanyLeadRepository()->updateLeadsPrimaryCompanyName($entity);
 
         parent::saveEntity($entity, $unlock);
+    }
+
+    /**
+     * Save an array of entities.
+     *
+     * @param array $entities
+     * @param bool  $unlock
+     *
+     * @return array
+     */
+    public function saveEntities($entities, $unlock = true)
+    {
+        // Update leads primary company name
+        foreach ($entities as $k => $entity) {
+            $this->setEntityDefaultValues($entity, 'company');
+            $this->getCompanyLeadRepository()->updateLeadsPrimaryCompanyName($entity);
+        }
+        parent::saveEntities($entities, $unlock);
     }
 
     /**
@@ -224,18 +249,18 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         if (empty($fieldValues)) {
             // Lead is new or they haven't been populated so let's build the fields now
-            static $fields;
-            if (empty($fields)) {
-                $fields = $this->leadFieldModel->getEntities(
+            if (empty($this->fields)) {
+                $this->fields = $this->leadFieldModel->getEntities(
                     [
                         'filter'         => ['object' => 'company'],
                         'hydration_mode' => 'HYDRATE_ARRAY',
                     ]
                 );
-                $fields = $this->organizeFieldsByGroup($fields);
+                $this->fields = $this->organizeFieldsByGroup($this->fields);
             }
-            $fieldValues = $fields;
+            $fieldValues = $this->fields;
         }
+
         //update existing values
         foreach ($fieldValues as $group => &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
@@ -366,9 +391,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->getCompanyLeadRepository()->saveEntities($persistCompany);
         }
 
-        // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear(CompanyLead::class);
-
         if (!empty($companyName)) {
             $currentCompanyName = $lead->getCompany();
             if ($currentCompanyName !== $companyName) {
@@ -387,7 +409,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        //unset($lead, $persistCompany, $companies);
+        // Clear CompanyLead entities from Doctrine memory
+        $this->em->clear(CompanyLead::class);
 
         return $contactAdded;
     }
@@ -464,7 +487,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             );
 
             if ($companyLead == null) {
-
                 // Lead is not part of this list
                 continue;
             }
@@ -799,7 +821,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         foreach ($this->fetchCompanyFields() as $entityField) {
             if (isset($fieldData[$entityField['alias']])) {
-                $fieldData[$entityField['alias']] = InputHelper::clean($fieldData[$entityField['alias']]);
+                $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
 
                 if ('NULL' === $fieldData[$entityField['alias']]) {
                     $fieldData[$entityField['alias']] = null;
@@ -816,7 +838,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 // Skip if the value is in the CSV row
                 continue;
             } elseif ($entityField['defaultValue']) {
-
                 // Fill in the default value if any
                 $fieldData[$entityField['alias']] = ('multiselect' === $entityField['type']) ? [$entityField['defaultValue']] : $entityField['defaultValue'];
             }

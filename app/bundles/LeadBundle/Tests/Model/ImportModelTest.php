@@ -15,6 +15,8 @@ use Doctrine\ORM\ORMException;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Exception\ImportDelayedException;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
@@ -160,7 +162,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->method('getParallelImportLimit')
             ->will($this->returnValue(1));
 
-        $model->expects($this->once())
+        $model->expects($this->exactly(2))
             ->method('logDebug');
 
         $model->setTranslator($this->getTranslatorMock());
@@ -177,6 +179,42 @@ class ImportModelTest extends StandardImportTestHelper
         $this->assertSame(0, $entity->getInsertedCount());
         $this->assertSame(0, $entity->getIgnoredCount());
         $this->assertSame(Import::DELAYED, $entity->getStatus());
+    }
+
+    public function testBeginImportWhenParallelLimitHit()
+    {
+        $model = $this->getMockBuilder(ImportModel::class)
+            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $model->method('checkParallelImportLimit')
+            ->will($this->returnValue(false));
+
+        $model->expects($this->once())
+            ->method('getParallelImportLimit')
+            ->will($this->returnValue(1));
+
+        $model->setTranslator($this->getTranslatorMock());
+
+        $entity = $this->initImportEntity(['canProceed']);
+
+        $entity->method('canProceed')
+            ->will($this->returnValue(true));
+
+        try {
+            $model->beginImport($entity, new Progress());
+            $this->fail();
+        } catch (ImportDelayedException $e) {
+            // This is expected
+        }
+
+        $this->assertEquals(0, $entity->getProgressPercentage());
+        $this->assertSame(0, $entity->getInsertedCount());
+        $this->assertSame(0, $entity->getIgnoredCount());
+        $this->assertSame(Import::DELAYED, $entity->getStatus());
+
+        $model->expects($this->never())->method('saveEntity');
     }
 
     public function testStartImportWhenDatabaseException()
@@ -211,6 +249,43 @@ class ImportModelTest extends StandardImportTestHelper
         $this->assertSame(0, $entity->getInsertedCount());
         $this->assertSame(0, $entity->getIgnoredCount());
         $this->assertSame(Import::DELAYED, $entity->getStatus());
+    }
+
+    public function testBeginImportWhenDatabaseException()
+    {
+        $model = $this->getMockBuilder(ImportModel::class)
+            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $model->expects($this->once())
+            ->method('checkParallelImportLimit')
+            ->will($this->returnValue(true));
+
+        $model->expects($this->once())
+            ->method('process')
+            ->will($this->throwException(new ORMException()));
+
+        $model->setTranslator($this->getTranslatorMock());
+
+        $entity = $this->initImportEntity(['canProceed']);
+
+        $entity->method('canProceed')
+            ->will($this->returnValue(true));
+
+        try {
+            $model->beginImport($entity, new Progress());
+            $this->fail();
+        } catch (ImportFailedException $e) {
+            // This is expected
+        }
+
+        $this->assertEquals(0, $entity->getProgressPercentage());
+        $this->assertSame(0, $entity->getInsertedCount());
+        $this->assertSame(0, $entity->getIgnoredCount());
+        $this->assertSame(Import::DELAYED, $entity->getStatus());
+
+        $model->expects($this->never())->method('saveEntity');
     }
 
     public function testIsEmptyCsvRow()
@@ -315,5 +390,64 @@ class ImportModelTest extends StandardImportTestHelper
             );
             $this->assertSame($test['mod'], $test['row']);
         }
+    }
+
+    public function testLimit()
+    {
+        $model = $this->initImportModel();
+
+        $import = new Import();
+        $import->setFilePath(self::$largeCsvPath)
+            ->setLineCount(511)
+            ->setHeaders(self::$initialList[0])
+            ->setParserConfig(
+                [
+                    'batchlimit' => 10,
+                    'delimiter'  => ',',
+                    'enclosure'  => '"',
+                    'escape'     => '/',
+                ]
+            );
+
+        $import->start();
+        $progress = new Progress();
+        // Each batch should have the last line imported recorded as limit + 1
+        $model->process($import, $progress, 100);
+        $this->assertEquals(101, $import->getLastLineImported());
+        $model->process($import, $progress, 100);
+        $this->assertEquals(201, $import->getLastLineImported());
+        $model->process($import, $progress, 100);
+        $this->assertEquals(301, $import->getLastLineImported());
+        $model->process($import, $progress, 100);
+        $this->assertEquals(401, $import->getLastLineImported());
+        $model->process($import, $progress, 100);
+        $this->assertEquals(501, $import->getLastLineImported());
+        $model->process($import, $progress, 100);
+
+        // 512 is an empty line in the CSV
+        $this->assertEquals(512, $import->getLastLineImported());
+
+        // Excluding the header but including the empty row in 512, there are 511 rows
+        $this->assertEquals(511, $import->getProcessedRows());
+
+        $import->end();
+    }
+
+    public function testMacLineEndings()
+    {
+        $oldCsv = self::$csvPath;
+
+        // Generate a new CSV
+        self::generateSmallCSV();
+
+        $csv = file_get_contents(self::$csvPath);
+        $csv = str_replace("\n", "\r", $csv);
+        file_put_contents(self::$csvPath, $csv);
+
+        $this->testProcess();
+
+        @unlink(self::$csvPath);
+
+        self::$csvPath = $oldCsv;
     }
 }

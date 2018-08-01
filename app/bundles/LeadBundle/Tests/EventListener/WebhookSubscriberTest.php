@@ -12,7 +12,9 @@
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\LeadEvents;
@@ -116,5 +118,52 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
         $lead  = new Lead();
         $event = new LeadEvent($lead, false);
         $dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
+    }
+
+    /**
+     * @testdox Test that webhook is queued for channel subscription changes
+     */
+    public function testChannelChangeIsPickedUpByWebhook()
+    {
+        $dispatcher = new EventDispatcher();
+
+        $mockFactory = $this->getMockBuilder(MauticFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockModel = $this->getMockBuilder(WebhookModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $lead    = new Lead();
+        $channel = 'email';
+
+        $mockModel->expects($this->exactly(1))
+            ->method('queueWebhooksByType')
+            ->with(
+                LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED,
+                [
+                    'contact'    => $lead,
+                    'channel'    => $channel,
+                    'old_status' => 'contactable',
+                    'new_status' => 'unsubscribed',
+                ],
+
+                [
+                    'leadDetails',
+                    'userList',
+                    'publishDetails',
+                    'ipAddress',
+                ]
+            );
+
+        $webhookSubscriber = new WebhookSubscriber();
+        $webhookSubscriber->setFactory($mockFactory);
+        $webhookSubscriber->setWebhookModel($mockModel);
+
+        $dispatcher->addSubscriber($webhookSubscriber);
+
+        $event = new ChannelSubscriptionChange($lead, $channel, DoNotContact::IS_CONTACTABLE, DoNotContact::UNSUBSCRIBED);
+        $dispatcher->dispatch(LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED, $event);
     }
 }

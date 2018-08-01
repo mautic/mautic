@@ -2,17 +2,11 @@
     width: 75px;
 }
 
-.btn-close-campaign-builder {
+
+.campaign-builder .btns-builder {
     position: fixed;
     top: 15px;
     right: 30px;
-    z-index: 1040;
-}
-
-.campaign-builder .btn-apply-builder {
-    position: fixed;
-    top: 15px;
-    right: 142px;
     z-index: 1040;
 }
 
@@ -138,6 +132,22 @@
     padding: 0;
 }
 
+.campaign-event-content {
+    cursor: pointer;
+    position: relative;
+}
+
+.campaign-event-content .highlight-jump-target {
+    position: absolute;
+    bottom: -26px;
+    left: 50%;
+    border-radius: 10px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin-left: -10px;
+}
+
 .list-campaign-event .campaign-event-name {
     overflow: hidden;
     white-space: nowrap;
@@ -218,6 +228,9 @@
 
 .preview .builder-content {
     position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
 }
 
 .preview .builder-active {
@@ -279,4 +292,15 @@
 
 .list-campaign-action .campaign-event-logic {
     color: #9babeb;
+}
+
+#EventJumpOverlay {
+  display: none;
+  background: rgba(0, 0, 0, 0.5);
+  width: 10000px;
+  height: 10000px;
+  z-index: 2000;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
