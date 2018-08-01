@@ -113,7 +113,13 @@ class CompanyExport extends AbstractPipedrive
         $accessor = PropertyAccess::createPropertyAccessor();
 
         foreach ($companyFields as $externalField => $internalField) {
-            $fieldName                  = substr($internalField, strlen($company::FIELD_ALIAS));
+            if (strpos($internalField, $company::FIELD_ALIAS, 0) !== false && method_exists('get'.ucfirst(substr($internalField, strlen($company::FIELD_ALIAS))))) {
+                //for core company field
+                $fieldName = substr($internalField, strlen($company::FIELD_ALIAS));
+            } else {
+                //for custom company field
+                $fieldName = $internalField;
+            }
             $mappedData[$externalField] = $accessor->getValue($company, $fieldName);
         }
 
