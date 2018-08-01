@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrations\AuthProvider;
+namespace MauticPlugin\MauticIntegrationsBundle\Auth\Provider;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
