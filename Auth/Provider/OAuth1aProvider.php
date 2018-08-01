@@ -15,9 +15,13 @@ class OAuth1aProvider
     protected $tokenSecret;
 
     /**
-     * @TODO 
+     * Append auth headers to the request
+     * 
+     * @param Request $request
+     * 
+     * @return Request
      */
-    public function getAuthHeaders($uri, $params, $method)
+    public function appendAuthHeaders(Request $request): Request
     {
         $integration = new class(
             $this->consumerKey,
@@ -70,16 +74,20 @@ class OAuth1aProvider
             'double_encode_basestring_parameters' => false,
         ]);
 
-        $headers     = [];
-        $authHeaders = $oauthHelper->getAuthorizationHeader($uri, $params, $method);
+        $uri = $request->getUri();
+        $url = sprintf('%s://%s/%s', $uri->getScheme(), $uri->getHost(), ltrim($uri->getPath(), '/'));
+        
+        parse_str($uri->getQuery(), $query);
+
+        $authHeaders = $oauthHelper->getAuthorizationHeader($url, $query, $request->getMethod());
 
         foreach ($authHeaders as $header) {
-            list ($key, $value) = explode(':', $header, 2);
+            [$key, $value] = explode(':', $header, 2);
 
-            $headers[$key] = $value;
+            $request = $request->withHeader($key, $value);
         }
 
-        return $headers;
+        return $request;
     }
 
     /**
