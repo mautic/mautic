@@ -172,15 +172,16 @@ class ContactSegmentService
 
     /**
      * @param LeadList $segment
+     * @param array    $batchLimiters
      *
      * @return array
      *
      * @throws Exception\SegmentQueryException
-     * @throws \Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
-    public function getOrphanedLeadListLeadsCount(LeadList $segment)
+    public function getOrphanedLeadListLeadsCount(LeadList $segment, array $batchLimiters = [])
     {
-        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment);
+        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters);
         $queryBuilder = $this->contactSegmentQueryBuilder->wrapInCount($queryBuilder);
 
         $this->logger->debug('Segment QB: Orphan Leads Count SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
@@ -192,15 +193,16 @@ class ContactSegmentService
 
     /**
      * @param LeadList $segment
+     * @param array    $batchLimiters
      *
      * @return array
      *
      * @throws Exception\SegmentQueryException
-     * @throws \Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
-    public function getOrphanedLeadListLeads(LeadList $segment)
+    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [])
     {
-        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment);
+        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters);
 
         $this->logger->debug('Segment QB: Orphan Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
@@ -251,17 +253,19 @@ class ContactSegmentService
 
     /**
      * @param LeadList $segment
+     * @param array    $batchLimiters
      *
      * @return QueryBuilder
      *
      * @throws Exception\SegmentQueryException
-     * @throws \Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
-    private function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment)
+    private function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [])
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(), $segmentFilters);
+        $this->addLeadLimiter($queryBuilder, $batchLimiters);
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
@@ -274,6 +278,7 @@ class ContactSegmentService
         $qbO->andWhere($qbO->expr()->isNull('members.id'));
         $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));
         $qbO->setParameter(':orpsegid', $segment->getId());
+        $this->addLeadLimiter($qbO, $batchLimiters, 'orp.lead_id');
 
         return $qbO;
     }
@@ -310,14 +315,15 @@ class ContactSegmentService
     /**
      * @param QueryBuilder $queryBuilder
      * @param array        $batchLimiters
+     * @param string       $leadIdColumn
      */
-    private function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters)
+    private function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters, $leadIdColumn = 'l.id')
     {
         if (empty($batchLimiters['lead_id'])) {
             return;
         }
 
-        $queryBuilder->andWhere('l.id = :leadId')
+        $queryBuilder->andWhere($leadIdColumn.' = :leadId')
             ->setParameter('leadId', $batchLimiters['lead_id']);
     }
 
