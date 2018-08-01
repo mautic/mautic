@@ -812,6 +812,18 @@ class ListModel extends FormModel
     }
 
     /**
+     * Get a list of preference center lead lists.
+     *
+     * @return mixed
+     */
+    public function getPreferenceCenterLists()
+    {
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getPreferenceCenterList();
+
+        return $lists;
+    }
+
+    /**
      * @param LeadList $entity
      *
      * @return array

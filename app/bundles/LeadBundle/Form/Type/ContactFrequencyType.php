@@ -192,12 +192,12 @@ class ContactFrequencyType extends AbstractType
                 'lead_lists',
                 'leadlist_choices',
                 [
-                    'global_only' => true,
-                    'label'       => 'mautic.lead.form.list',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'multiple'    => true,
-                    'expanded'    => $options['public_view'],
-                    'required'    => false,
+                    'preference_center_only' => $options['preference_center_only'],
+                    'label'                  => 'mautic.lead.form.list',
+                    'label_attr'             => ['class' => 'control-label'],
+                    'multiple'               => true,
+                    'expanded'               => true,
+                    'required'               => false,
                 ]
             );
         }
@@ -242,7 +242,8 @@ class ContactFrequencyType extends AbstractType
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(
             [
-                'public_view' => false,
+                'public_view'            => false,
+                'preference_center_only' => false,
             ]
         );
     }

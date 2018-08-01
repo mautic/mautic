@@ -167,6 +167,14 @@ class ListType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'isPreferenceCenter',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.lead.list.form.isPreferenceCenter',
+            ]
+        );
+
         $builder->add('isPublished', 'yesno_button_group');
 
         $filterModalTransformer = new FieldFilterTransformer($this->translator);

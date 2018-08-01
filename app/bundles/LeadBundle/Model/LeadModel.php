@@ -995,11 +995,11 @@ class LeadModel extends FormModel
      *
      * @return mixed
      */
-    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false)
+    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
 
-        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic);
+        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
 
     /**

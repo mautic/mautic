@@ -34,15 +34,16 @@ trait FrequencyRuleTrait
     protected $isPublicView = false;
 
     /**
-     * @param      $lead
-     * @param      $viewParameters
-     * @param null $data
-     * @param bool $isPublic
-     * @param null $action
+     * @param       $lead
+     * @param array $viewParameters
+     * @param null  $data
+     * @param bool  $isPublic
+     * @param null  $action
+     * @param bool  $isPreferenceCenter
      *
      * @return bool|Form
      */
-    protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null)
+    protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
@@ -80,10 +81,11 @@ trait FrequencyRuleTrait
             'lead_contact_frequency_rules',
             $data,
             [
-                'action'             => $action,
-                'channels'           => $allChannels,
-                'public_view'        => $isPublic,
-                'allow_extra_fields' => true,
+                'action'                 => $action,
+                'channels'               => $allChannels,
+                'public_view'            => $isPublic,
+                'preference_center_only' => $isPreferenceCenter,
+                'allow_extra_fields'     => true,
             ]
         );
 
