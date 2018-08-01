@@ -723,6 +723,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'mautic.helper.field.alias',
+                    '@doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.lead.constraint.alias' => [
