@@ -20,7 +20,7 @@ $datePrototype = (isset($list->vars['prototype'])) ?
            class="btn btn-warning btn-xs btn-add-item" href="#" id="<?php echo $form->vars['id']; ?>_additem">
             <?php echo $view['translator']->trans($addValueButton); ?>
         </a>
-        <?php echo $view['form']->errors($list); ?>
+        <?php echo $view['form']->block($list, 'sortablelist_errors'); ?>
         <?php if ($isSortable): ?>
         <div id="sortable-<?php echo $form->vars['id']; ?>" class="list-sortable" <?php foreach ($attr as $k => $v) {
     printf('%s="%s" ', $view->escape($k), $view->escape($v));
