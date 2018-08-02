@@ -27,7 +27,7 @@ class SyncCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:integration:sync')
+        $this->setName('mautic:integrations:sync')
             ->setDescription('Fetch objects from integration.')
             ->addArgument(
                 'integration',
@@ -62,9 +62,6 @@ class SyncCommand extends ContainerAwareCommand
         }
         
         try {
-            // $customers line below is temporary. For testing OAuth signature
-            $customers = $this->getContainer()->get('magento.repository.customers')->getCustomersSince(new \DateTimeImmutable);
-
             $event = new SyncEvent($integration, $startDate);
             $this->getContainer()->get('event_dispatcher')->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
