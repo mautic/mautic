@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudgeService;
+namespace MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\InformationChangeRequestDAO;
 

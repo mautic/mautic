@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudgeService\SyncJudgeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 
 /**
  * Interface SyncProcessFactoryInterface

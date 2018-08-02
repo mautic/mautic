@@ -13,7 +13,7 @@ use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudgeService\SyncJudgeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 
 /**
  * Class IntegrationSyncProcess
@@ -76,30 +76,29 @@ class SyncProcess
         MappingManualDAO $mappingManualDAO,
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange
-    )
-    {
-        $this->syncJudgeService                 = $syncJudgeService;
-        $this->mappingManualDAO                 = $mappingManualDAO;
-        $this->internalSyncDataExchange         = $internalSyncDataExchange;
-        $this->integrationSyncDataExchange      = $integrationSyncDataExchange;
+    ) {
+        $this->syncJudgeService            = $syncJudgeService;
+        $this->mappingManualDAO            = $mappingManualDAO;
+        $this->internalSyncDataExchange    = $internalSyncDataExchange;
+        $this->integrationSyncDataExchange = $integrationSyncDataExchange;
 
         $internalRequestDAO   = new RequestDAO($fromTimestamp);
         $internalObjectsNames = $mappingManualDAO->getInternalObjectsNames();
-        foreach($internalObjectsNames as $internalObjectName) {
+        foreach ($internalObjectsNames as $internalObjectName) {
             $internalRequestObject = new RequestObjectDAO($internalObjectName);
-            $internalObjectFields = $mappingManualDAO->getInternalObjectFieldNames($internalObjectName);
-            foreach($internalObjectFields as $internalObjectField) {
+            $internalObjectFields  = $mappingManualDAO->getInternalObjectFieldNames($internalObjectName);
+            foreach ($internalObjectFields as $internalObjectField) {
                 $internalRequestObject->addField($internalObjectField);
             }
             $internalRequestDAO->addObject($internalRequestObject);
         }
         $this->internalSyncReport = $this->internalSyncDataExchange->getSyncReport($internalRequestDAO);
-        $integrationRequestDAO = new RequestDAO($fromTimestamp);
-        $integrationObjectsNames = $mappingManualDAO->getIntegrationObjectsNames();
-        foreach($integrationObjectsNames as $integrationObjectName) {
+        $integrationRequestDAO    = new RequestDAO($fromTimestamp);
+        $integrationObjectsNames  = $mappingManualDAO->getIntegrationObjectsNames();
+        foreach ($integrationObjectsNames as $integrationObjectName) {
             $integrationRequestObject = new RequestObjectDAO($integrationObjectName);
-            $integrationObjectFields = $mappingManualDAO->getIntegrationObjectFieldNames($integrationObjectName);
-            foreach($integrationObjectFields as $integrationObjectField) {
+            $integrationObjectFields  = $mappingManualDAO->getIntegrationObjectFieldNames($integrationObjectName);
+            foreach ($integrationObjectFields as $integrationObjectField) {
                 $integrationRequestObject->addField($integrationObjectField);
             }
             $integrationRequestDAO->addObject($integrationRequestObject);
@@ -112,17 +111,17 @@ class SyncProcess
      */
     public function execute()
     {
-        $syncTimestamp = 0;
-        $this->internalSyncOrder = new OrderDAO($syncTimestamp);
+        $syncTimestamp              = 0;
+        $this->internalSyncOrder    = new OrderDAO($syncTimestamp);
         $this->integrationSyncOrder = new OrderDAO($syncTimestamp);
-        $internalObjectsNames = $this->mappingManualDAO->getInternalObjectsNames();
-        $duplicityDetectors = [
+        $internalObjectsNames       = $this->mappingManualDAO->getInternalObjectsNames();
+        $duplicityDetectors         = [
 
         ];
-        foreach($internalObjectsNames as $internalObjectName) {
-            $internalObjects = $this->internalSyncReport->getObjects($internalObjectName);
+        foreach ($internalObjectsNames as $internalObjectName) {
+            $internalObjects               = $this->internalSyncReport->getObjects($internalObjectName);
             $mappedIntegrationObjectsNames = $this->mappingManualDAO->getMappedIntegrationObjectsNames($internalObjectName);
-            foreach($mappedIntegrationObjectsNames as $mappedIntegrationObjectName) {
+            foreach ($mappedIntegrationObjectsNames as $mappedIntegrationObjectName) {
                 $objectMappingDAO   = $this->mappingManualDAO->getObjectMapping($internalObjectName, $mappedIntegrationObjectName);
                 $integrationObjects = $this->integrationSyncReport->getObjects($mappedIntegrationObjectName);
                 do {
@@ -167,14 +166,14 @@ class SyncProcess
             }
         }
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectsNames();
-        foreach($integrationObjectsNames as $integrationObjectName) {
-            $integrationObjects = $this->integrationSyncReport->getObjects($integrationObjectName);
+        foreach ($integrationObjectsNames as $integrationObjectName) {
+            $integrationObjects         = $this->integrationSyncReport->getObjects($integrationObjectName);
             $mappedInternalObjectsNames = $this->mappingManualDAO->getMappedInternalObjectsNames($integrationObjectName);
-            foreach($mappedInternalObjectsNames as $mappedInternalObjectName) {
+            foreach ($mappedInternalObjectsNames as $mappedInternalObjectName) {
                 $objectMappingDAO = $this->mappingManualDAO->getObjectMapping($mappedInternalObjectName, $integrationObjectName);
-                foreach($integrationObjects as $integrationObject) {
+                foreach ($integrationObjects as $integrationObject) {
                     $mappedInternalObjectId = $objectMappingDAO->getMappedInternalObjectId($integrationObject->getObjectId());
-                    if($mappedInternalObjectId !== null) {
+                    if ($mappedInternalObjectId !== null) {
                         continue;
                     }
                     // Object is new in integration and not duplicate
@@ -183,7 +182,7 @@ class SyncProcess
             }
         }
 
-        $internalOrderResult = $this->internalSyncDataExchange->executeSyncOrder($this->internalSyncOrder);
+        $internalOrderResult    = $this->internalSyncDataExchange->executeSyncOrder($this->internalSyncOrder);
         $integrationOrderResult = $this->integrationSyncDataExchange->executeSyncOrder($this->integrationSyncOrder);
         // TODO both parties should provide newly created objects to finish pairing (add temporary ids and pair using them?)
 
@@ -194,18 +193,18 @@ class SyncProcess
 
     /**
      * @param ObjectMappingDAO $objectMappingDAO
-     * @param ReportObjectDAO        $internalObjectDAO
-     * @param ReportObjectDAO        $integrationObjectDAO
+     * @param ReportObjectDAO  $internalObjectDAO
+     * @param ReportObjectDAO  $integrationObjectDAO
      */
     private function orderObjectsSync(ObjectMappingDAO $objectMappingDAO, ReportObjectDAO $internalObjectDAO, ReportObjectDAO $integrationObjectDAO)
     {
-        $internalObjectChange = new ObjectChangeDAO($objectMappingDAO->getInternalObjectName(), $internalObjectDAO->getObjectId());
+        $internalObjectChange    = new ObjectChangeDAO($objectMappingDAO->getInternalObjectName(), $internalObjectDAO->getObjectId());
         $integrationObjectChange = new ObjectChangeDAO($objectMappingDAO->getIntegrationObjectName(), $integrationObjectDAO->getObjectId());
 
         /** @var FieldMappingDAO[] $fieldMappings */
         $fieldMappings = $objectMappingDAO->getFieldMappings();
-        foreach($fieldMappings as $fieldMappingDAO) {
-            $internalInformationChangeRequest = $this->internalSyncReport->getInformationChangeRequest(
+        foreach ($fieldMappings as $fieldMappingDAO) {
+            $internalInformationChangeRequest    = $this->internalSyncReport->getInformationChangeRequest(
                 $objectMappingDAO->getInternalObjectName(),
                 $internalObjectDAO->getObjectId(),
                 $fieldMappingDAO->getInternalField()
@@ -220,9 +219,9 @@ class SyncProcess
                 SyncJudgeInterface::PRESUMPTION_OF_INNOCENCE_MODE,
                 SyncJudgeInterface::BEST_EVIDENCE_MODE
             ];
-            foreach($judgeModes as $judgeMode) {
+            foreach ($judgeModes as $judgeMode) {
                 try {
-                    $result = $this->syncJudgeService->adjudicate(
+                    $result              = $this->syncJudgeService->adjudicate(
                         $judgeMode,
                         $internalInformationChangeRequest,
                         $integrationInformationChangeRequest
