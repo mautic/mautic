@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Facade;
 
-use Mautic\EmailBundle\Swiftmailer\Exception\SendFailedException;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\AdapterInterface;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallbackInterface;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Facade\MomentumSendException;
@@ -84,15 +83,15 @@ final class MomentumFacade implements MomentumFacadeInterface
         try {
             $this->swiftMessageValidator->validate($message);
             $transmission = $this->swiftMessageService->transformToTransmission($message);
-            $attempt = 0;
+            $attempt      = 0;
             do {
-                if(0 !== $attempt) {
-                    sleep(10);
+                if (0 !== $attempt) {
+                    sleep(5);
                 }
                 $attempt += 1;
                 $response = $this->adapter->createTransmission($transmission);
                 $response = $response->wait();
-            } while(500 === (int) $response->getStatusCode() && 3 >= $attempt);
+            } while (500 === (int) $response->getStatusCode() && 3 > $attempt);
 
             if (200 === (int) $response->getStatusCode()) {
                 $results = $response->getBody();
