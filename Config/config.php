@@ -52,12 +52,6 @@ return [
                     'mautic.helper.encryption',
                 ],
             ],
-            'mautic.integrations.service.sync' => [
-                'class' => \MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncService::class,
-                'arguments' => [
-                    //'mautic.plugin.repository.integration_entity',
-                ],
-            ],
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class
             ],
@@ -82,6 +76,21 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\MauticIntegrationsBundle\Entity\FieldChange::class,
+                ],
+            ],
+        ],
+        'sync' => [
+            'mautic.integrations.helper.sync_judge' => [
+                'class' => \MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudge::class,
+            ],
+            'mautic.integrations.helper.sync_process_factory' => [
+                'class' => \MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess\SyncProcessFactory::class,
+            ],
+            'mautic.integrations.service.sync' => [
+                'class' => \MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncService::class,
+                'arguments' => [
+                    'mautic.integrations.helper.sync_process_factory',
+                    'mautic.integrations.helper.sync_judge',
                 ],
             ],
         ],

@@ -2,9 +2,9 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Services\SyncService;
 
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudgeService\SyncJudgeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess\SyncProcessFactoryInterface;
 
 /**
@@ -24,43 +24,34 @@ final class SyncService implements SyncServiceInterface
     private $syncJudgeService;
 
     /**
-     * @var IntegrationEntityRepository
-     */
-    private $integrationEntityRepository;
-
-    /**
      * @var SyncDataExchangeInterface
      */
     private $internalSyncDataExchange;
 
     /**
      * SyncService constructor.
-     * @param IntegrationEntityRepository $integrationEntityRepository
-     * @param SyncDataExchangeInterface $internalSyncDataExchange
+     *
      * @param SyncProcessFactoryInterface $integrationSyncProcessFactory
-     * @param SyncJudgeInterface $syncJudgeService
+     * @param SyncJudgeInterface          $syncJudgeService
      */
     public function __construct(
-        IntegrationEntityRepository $integrationEntityRepository,
-        SyncDataExchangeInterface $internalSyncDataExchange,
         SyncProcessFactoryInterface $integrationSyncProcessFactory,
         SyncJudgeInterface $syncJudgeService
-    )
-    {
-        $this->integrationEntityRepository = $integrationEntityRepository;
-        $this->internalSyncDataExchange = $internalSyncDataExchange;
+    ) {
         $this->integrationSyncProcessFactory = $integrationSyncProcessFactory;
-        $this->syncJudgeService = $syncJudgeService;
+        $this->syncJudgeService              = $syncJudgeService;
     }
 
     /**
      * @param SyncDataExchangeInterface $syncDataExchangeService
-     * @param int $fromTimestamp
+     * @param MappingManualDAO          $integrationMappingManual
+     * @param                           $fromTimestamp
+     *
+     * @return mixed|void
      */
-    public function processIntegrationSync(SyncDataExchangeInterface $syncDataExchangeService, $fromTimestamp)
+    public function processIntegrationSync(SyncDataExchangeInterface $syncDataExchangeService, MappingManualDAO $integrationMappingManual, $fromTimestamp)
     {
-        $integrationMappingManual = $this->integrationEntityRepository->getIntegrationMappingManual($syncDataExchangeService->getIntegration());
-        $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
+        $integrationSyncProcess   = $this->integrationSyncProcessFactory->create(
             $fromTimestamp,
             $this->syncJudgeService,
             $integrationMappingManual,

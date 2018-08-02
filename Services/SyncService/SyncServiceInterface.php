@@ -2,17 +2,24 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Services\SyncService;
 
+use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
 
 /**
  * Interface SyncServiceInterface
- * @package MauticPlugin\MauticIntegrationsBundle\Services\Sync\IntegrationSyncService
  */
 interface SyncServiceInterface
 {
     /**
      * @param SyncDataExchangeInterface $syncDataExchangeService
-     * @param int $fromTimestamp
+     * @param MappingManualDAO          $integrationMappingManual
+     * @param                           $fromTimestamp
+     *
+     * @return mixed
      */
-    public function processIntegrationSync(SyncDataExchangeInterface $syncDataExchangeService, $fromTimestamp);
+    public function processIntegrationSync(
+        SyncDataExchangeInterface $syncDataExchangeService,
+        MappingManualDAO $integrationMappingManual,
+        $fromTimestamp
+    );
 }
