@@ -1046,6 +1046,7 @@ return [
             'facebookexternalhit',
         ],
         'do_not_track_internal_ips' => [],
+        'track_private_ip_ranges'   => false,
         'link_shortener_url'        => null,
         'cached_data_timeout'       => 10,
         'batch_sleep_time'          => 1,

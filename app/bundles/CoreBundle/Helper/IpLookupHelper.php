@@ -72,6 +72,7 @@ class IpLookupHelper
         $this->doNotTrackIps         = $coreParametersHelper->getParameter('mautic.do_not_track_ips');
         $this->doNotTrackBots        = $coreParametersHelper->getParameter('mautic.do_not_track_bots');
         $this->doNotTrackInternalIps = $coreParametersHelper->getParameter('mautic.do_not_track_internal_ips');
+        $this->trackPrivateIPRanges  = $coreParametersHelper->getParameter('mautic.track_private_ip_ranges');
     }
 
     /**
@@ -209,10 +210,12 @@ class IpLookupHelper
      */
     public function ipIsValid($ip)
     {
+        $filterFlagNoPrivRange = $this->trackPrivateIPRanges ? 0 : FILTER_FLAG_NO_PRIV_RANGE;
+
         return filter_var(
             $ip,
             FILTER_VALIDATE_IP,
-            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | $filterFlagNoPrivRange | FILTER_FLAG_NO_RES_RANGE
         );
     }
 
