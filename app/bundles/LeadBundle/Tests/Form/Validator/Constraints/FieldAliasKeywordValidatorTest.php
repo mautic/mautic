@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Form\Validator\Constraints;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator;
@@ -23,6 +24,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit_Framework_TestCase
     private $listModelMock;
     private $fieldAliasHelperlMock;
     private $executionContextMock;
+    private $entityManagerMock;
     private $validator;
 
     protected function setUp()
@@ -32,6 +34,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit_Framework_TestCase
         $this->fieldAliasHelperlMock = $this->createMock(FieldAliasHelper::class);
         $this->listModelMock         = $this->createMock(ListModel::class);
         $this->executionContextMock  = $this->createMock(ExecutionContextInterface::class);
+        $this->entityManagerMock     = $this->createMock(EntityManager::class);
 
         $this->listModelMock->method('getChoiceFields')
             ->willReturn(
@@ -53,7 +56,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->validator = new FieldAliasKeywordValidator($this->listModelMock, $this->fieldAliasHelperlMock);
+        $this->validator = new FieldAliasKeywordValidator($this->listModelMock, $this->fieldAliasHelperlMock, $this->entityManagerMock);
         $this->validator->initialize($this->executionContextMock);
     }
 
