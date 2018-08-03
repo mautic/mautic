@@ -1976,9 +1976,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't')
     {
         if ($companyId !== null) {
-            $q->innerJoin($fromAlias, MAUTIC_TABLE_PREFIX.'companies_leads', 'company_lead', $fromAlias.'.lead_id = company_lead.lead_id')
-                ->andWhere('company_lead.company_id = :companyId')
-                ->setParameter('companyId', $companyId);
+            $sb = $this->em->getConnection()->createQueryBuilder();
+
+            $sb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+                ->where(
+                    $sb->expr()->andX(
+                        $sb->expr()->eq('cl.company_id', ':companyId'),
+                        $sb->expr()->eq('cl.lead_id', $fromAlias.'.lead_id')
+                    )
+                );
+
+            $q->andWhere(
+                sprintf('EXISTS (%s)', $sb->getSql())
+            )->setParameter('companyId', $companyId);
         }
     }
 
@@ -2005,9 +2016,21 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't')
     {
         if ($segmentId !== null) {
-            $q->innerJoin($fromAlias, MAUTIC_TABLE_PREFIX.'lead_lists', 'll', $fromAlias.'.list_id = ll.id')
-                ->andWhere($fromAlias.'.list_id = :segmentId')
-                ->setParameter('segmentId', $segmentId);
+            $sb = $this->em->getConnection()->createQueryBuilder();
+
+            $sb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
+                ->where(
+                    $sb->expr()->andX(
+                        $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
+                        $sb->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
+                        $sb->expr()->eq('lll.manually_removed', 0)
+                    )
+                );
+
+            $q->andWhere(
+                sprintf('EXISTS (%s)', $sb->getSql())
+            )->setParameter('segmentId', $segmentId);
         }
     }
 
