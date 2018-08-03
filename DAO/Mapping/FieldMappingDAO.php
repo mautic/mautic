@@ -37,19 +37,26 @@ class FieldMappingDAO
     private $integrationField;
 
     /**
-     * IntegrationFieldMappingDAO constructor.
-     *
-     * @param string $internalEntity
-     * @param string $internalField
-     * @param string $integrationEntity
-     * @param string $integrationField
+     * @var string
      */
-    public function __construct($internalEntity, $internalField, $integrationEntity, $integrationField)
+    private $syncDirection;
+
+    /**
+     * FieldMappingDAO constructor.
+     *
+     * @param $internalEntity
+     * @param $internalField
+     * @param $integrationEntity
+     * @param $integrationField
+     * @param $syncDirection
+     */
+    public function __construct($internalEntity, $internalField, $integrationEntity, $integrationField, $syncDirection)
     {
         $this->internalEntity    = $internalEntity;
         $this->internalField     = $internalField;
         $this->integrationEntity = $integrationEntity;
         $this->integrationField  = $integrationField;
+        $this->syncDirection     = $syncDirection;
     }
 
     /**
@@ -82,5 +89,13 @@ class FieldMappingDAO
     public function getIntegrationField()
     {
         return $this->integrationField;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSyncDirection()
+    {
+        return $this->syncDirection;
     }
 }
