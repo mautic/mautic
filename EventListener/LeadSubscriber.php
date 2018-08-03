@@ -45,7 +45,7 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * @TODO Use VariableExpressorHelper to modify values
-     * 
+     *
      * @param Events\LeadEvent $event
      */
     public function onLeadPostSave(Events\LeadEvent $event)
@@ -70,14 +70,16 @@ class LeadSubscriber extends CommonSubscriber
                 ->setColumnType($valueDAO->getType())
                 ->setColumnValue($valueDAO->getValue());
         }
-        
+
         $this->repo->deleteEntitiesForObjectByColumnName($lead->getId(), Lead::class, $changedFields);
         $this->repo->saveEntities($toPersist);
+
+        $this->repo->clear();
     }
 
     /**
      * @TODO Remove matching entries from FieldChangeRepository
-     * 
+     *
      * @param Events\LeadEvent $event
      */
     public function onLeadPostDelete(Events\LeadEvent $event)
