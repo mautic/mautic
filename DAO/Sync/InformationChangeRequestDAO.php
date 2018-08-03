@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync;
 
 /**
  * Class InformationChangeRequestDAO
- * @package MauticPlugin\MauticIntegrationsBundle\DAO\Sync
  */
 class InformationChangeRequestDAO
 {
@@ -45,6 +53,7 @@ class InformationChangeRequestDAO
 
     /**
      * InformationChangeRequestDAO constructor.
+     *
      * @param string $integration
      * @param string $entity
      * @param int    $entityId
@@ -54,10 +63,10 @@ class InformationChangeRequestDAO
     public function __construct($integration, $entity, $entityId, $field, $newValue)
     {
         $this->integration = $integration;
-        $this->entity = $entity;
-        $this->entityId = $entityId;
-        $this->field = $field;
-        $this->newValue = $newValue;
+        $this->entity      = $entity;
+        $this->entityId    = $entityId;
+        $this->field       = $field;
+        $this->newValue    = $newValue;
     }
 
     /**
@@ -110,11 +119,13 @@ class InformationChangeRequestDAO
 
     /**
      * @param int|null $possibleChangeTimestamp
+     *
      * @return InformationChangeRequestDAO
      */
     public function setPossibleChangeTimestamp($possibleChangeTimestamp)
     {
         $this->possibleChangeTimestamp = $possibleChangeTimestamp;
+
         return $this;
     }
 
@@ -128,11 +139,13 @@ class InformationChangeRequestDAO
 
     /**
      * @param int|null $certainChangeTimestamp
+     *
      * @return InformationChangeRequestDAO
      */
     public function setCertainChangeTimestamp($certainChangeTimestamp)
     {
         $this->certainChangeTimestamp = $certainChangeTimestamp;
+
         return $this;
     }
 }

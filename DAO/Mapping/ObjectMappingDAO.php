@@ -1,11 +1,18 @@
 <?php
-declare(strict_types=1);
+
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
 
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
 
 /**
  * Class ObjectMappingDAO
- * @package MauticPlugin\MauticIntegrationsBundle\DAO\Mapping
  */
 class ObjectMappingDAO
 {
@@ -42,7 +49,7 @@ class ObjectMappingDAO
      */
     public function __construct(string $internalObjectName, string $integrationObjectName)
     {
-        $this->internalObjectName = $internalObjectName;
+        $this->internalObjectName    = $internalObjectName;
         $this->integrationObjectName = $integrationObjectName;
     }
 
@@ -76,6 +83,7 @@ class ObjectMappingDAO
         if (array_key_exists($internalObjectId, $this->internalIdMapping)) {
             return $this->internalIdMapping[$internalObjectId];
         }
+
         return null;
     }
 
@@ -89,6 +97,7 @@ class ObjectMappingDAO
         if (array_key_exists($integrationObjectId, $this->integrationIdMapping)) {
             return $this->integrationIdMapping[$integrationObjectId];
         }
+
         return null;
     }
 
@@ -100,10 +109,10 @@ class ObjectMappingDAO
      */
     public function mapIds(int $internalObjectId, int $integrationObjectId)
     {
-        if(array_key_exists($internalObjectId, $this->internalIdMapping)) {
+        if (array_key_exists($internalObjectId, $this->internalIdMapping)) {
             throw new \LogicException(); // TODO better exception
         }
-        $this->internalIdMapping[$internalObjectId] = $integrationObjectId;
+        $this->internalIdMapping[$internalObjectId]       = $integrationObjectId;
         $this->integrationIdMapping[$integrationObjectId] = $internalObjectId;
     }
 

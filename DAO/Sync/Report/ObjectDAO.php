@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report;
 
 /**
  * Class ObjectDAO
- * @package Mautic\PluginBundle\Model\Sync\DAO
  */
 class ObjectDAO
 {
@@ -30,12 +38,13 @@ class ObjectDAO
 
     /**
      * ObjectDAO constructor.
-     * @param string       $object
+     *
+     * @param string $object
      * @param int    $objectId
      */
     public function __construct($object, $objectId)
     {
-        $this->object = $object;
+        $this->object   = $object;
         $this->objectId = $objectId;
     }
 
@@ -61,6 +70,7 @@ class ObjectDAO
 
     /**
      * @param FieldDAO $fieldDAO
+     *
      * @return $this
      */
     public function addField(FieldDAO $fieldDAO)
@@ -96,6 +106,7 @@ class ObjectDAO
         if (!isset($this->fields[$name])) {
             return null;
         }
+
         return $this->fields[$name];
     }
 

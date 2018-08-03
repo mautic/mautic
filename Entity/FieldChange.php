@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\MauticIntegrationsBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
@@ -8,11 +17,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class FieldChange
 {
-    /**
-     * @var int
-     */
-    private $id;
-
     /**
      * @var int
      */
@@ -45,30 +49,30 @@ class FieldChange
 
     /**
      * @param ORM\ClassMetadata $metadata
-     * 
+     *
      * @return void
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-        
+
         $builder
             ->setTable('object_field_change_report')
             ->setCustomRepositoryClass(FieldChangeRepository::class)
             ->addIndex(['object_id', 'object_type'], 'object_composite_key');
 
         $builder->addId();
-        
+
         $builder
             ->createField('objectId', Type::INTEGER)
             ->columnName('object_id')
             ->build();
-        
+
         $builder
             ->createField('objectType', Type::STRING)
             ->columnName('object_type')
             ->build();
-        
+
         $builder
             ->createField('modifiedAt', Type::DATETIME)
             ->columnName('modified_at')
@@ -92,7 +96,7 @@ class FieldChange
 
     /**
      * @param int $id
-     * 
+     *
      * @return FieldChange
      */
     public function setObjectId(int $id): FieldChange
@@ -112,7 +116,7 @@ class FieldChange
 
     /**
      * @param string $type
-     * 
+     *
      * @return FieldChange
      */
     public function setObjectType(string $type): FieldChange
@@ -132,7 +136,7 @@ class FieldChange
 
     /**
      * @param \DateTime $value
-     * 
+     *
      * @return FieldChange
      */
     public function setModifiedAt(\DateTime $time): FieldChange
@@ -152,7 +156,7 @@ class FieldChange
 
     /**
      * @param string $name
-     * 
+     *
      * @return FieldChange
      */
     public function setColumnName(string $name): FieldChange
@@ -172,7 +176,7 @@ class FieldChange
 
     /**
      * @param string $type
-     * 
+     *
      * @return FieldChange
      */
     public function setColumnType(string $type): FieldChange
@@ -192,7 +196,7 @@ class FieldChange
 
     /**
      * @param string $value
-     * 
+     *
      * @return FieldChange
      */
     public function setColumnValue(string $value): FieldChange

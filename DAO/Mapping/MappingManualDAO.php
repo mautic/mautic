@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
 
 /**
  * Class MappingManualDAO
- * @package MauticPlugin\MauticIntegrationsBundle\DAO\Mapping
  */
 class MappingManualDAO
 {
@@ -28,15 +36,15 @@ class MappingManualDAO
      */
     public function addObjectMapping(ObjectMappingDAO $objectMappingDAO)
     {
-        $internalObjectName = $objectMappingDAO->getInternalObjectName();
+        $internalObjectName    = $objectMappingDAO->getInternalObjectName();
         $integrationObjectName = $objectMappingDAO->getInternalObjectName();
-        if(!array_key_exists($internalObjectName, $this->objectsMapping)) {
+        if (!array_key_exists($internalObjectName, $this->objectsMapping)) {
             $this->objectsMapping[$internalObjectName] = [];
         }
-        if(!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
+        if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
             $this->internalObjectsMapping[$internalObjectName] = [];
         }
-        if(!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
+        if (!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
             $this->integrationObjectsMapping[$integrationObjectName] = [];
         }
         $this->objectsMapping[$internalObjectName][$integrationObjectName] = $objectMappingDAO;
@@ -50,12 +58,13 @@ class MappingManualDAO
      */
     public function getObjectMapping(string $internalObjectName, string $integrationObjectName): ?ObjectMappingDAO
     {
-        if(!array_key_exists($internalObjectName, $this->objectsMapping)) {
+        if (!array_key_exists($internalObjectName, $this->objectsMapping)) {
             return null;
         }
-        if(!array_key_exists($integrationObjectName, $this->objectsMapping[$internalObjectName])) {
+        if (!array_key_exists($integrationObjectName, $this->objectsMapping[$internalObjectName])) {
             return null;
         }
+
         return $this->objectsMapping[$internalObjectName][$integrationObjectName];
     }
 
@@ -69,6 +78,7 @@ class MappingManualDAO
         if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
             throw new \LogicException(); // TODO
         }
+
         return $this->internalObjectsMapping[$internalObjectName];
     }
 
@@ -82,6 +92,7 @@ class MappingManualDAO
         if (!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
             throw new \LogicException(); // TODO
         }
+
         return $this->integrationObjectsMapping[$integrationObjectName];
     }
 
@@ -100,19 +111,20 @@ class MappingManualDAO
      */
     public function getInternalObjectFieldNames(string $internalObjectName): array
     {
-        if(!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
+        if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
             throw new \LogicException(); // TODO
         }
-        $fields = [];
+        $fields                  = [];
         $integrationObjectsNames = $this->internalObjectsMapping[$internalObjectName];
-        foreach($integrationObjectsNames as $integrationObjectName) {
+        foreach ($integrationObjectsNames as $integrationObjectName) {
             /** @var ObjectMappingDAO $objectMappingDAO */
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
-            $fieldMappings = $objectMappingDAO->getFieldMappings();
-            foreach($fieldMappings as $fieldMapping) {
+            $fieldMappings    = $objectMappingDAO->getFieldMappings();
+            foreach ($fieldMappings as $fieldMapping) {
                 $fields[$fieldMapping->getInternalField()] = true;
             }
         }
+
         return array_keys($fields);
     }
 
@@ -131,19 +143,20 @@ class MappingManualDAO
      */
     public function getIntegrationObjectFieldNames(string $integrationObjectName): array
     {
-        if(!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
+        if (!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
             throw new \LogicException(); // TODO
         }
-        $fields = [];
+        $fields               = [];
         $internalObjectsNames = $this->integrationObjectsMapping[$integrationObjectName];
-        foreach($internalObjectsNames as $internalObjectName) {
+        foreach ($internalObjectsNames as $internalObjectName) {
             /** @var ObjectMappingDAO $objectMappingDAO */
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
-            $fieldMappings = $objectMappingDAO->getFieldMappings();
-            foreach($fieldMappings as $fieldMapping) {
+            $fieldMappings    = $objectMappingDAO->getFieldMappings();
+            foreach ($fieldMappings as $fieldMapping) {
                 $fields[$fieldMapping->getIntegrationField()] = true;
             }
         }
+
         return array_keys($fields);
     }
 }

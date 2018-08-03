@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\ObjectMappingDAO;
@@ -16,8 +25,7 @@ use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDat
 use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 
 /**
- * Class IntegrationSyncProcess
- * @package MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess
+ * Class SyncProcess
  */
 class SyncProcess
 {
@@ -93,6 +101,7 @@ class SyncProcess
             $internalRequestDAO->addObject($internalRequestObject);
         }
         $this->internalSyncReport = $this->internalSyncDataExchange->getSyncReport($internalRequestDAO);
+
         $integrationRequestDAO    = new RequestDAO($fromTimestamp);
         $integrationObjectsNames  = $mappingManualDAO->getIntegrationObjectsNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {
@@ -118,6 +127,7 @@ class SyncProcess
         $duplicityDetectors         = [
 
         ];
+
         foreach ($internalObjectsNames as $internalObjectName) {
             $internalObjects               = $this->internalSyncReport->getObjects($internalObjectName);
             $mappedIntegrationObjectsNames = $this->mappingManualDAO->getMappedIntegrationObjectsNames($internalObjectName);
@@ -165,6 +175,7 @@ class SyncProcess
                 } while (next($internalObjects) !== false);
             }
         }
+
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {
             $integrationObjects         = $this->integrationSyncReport->getObjects($integrationObjectName);

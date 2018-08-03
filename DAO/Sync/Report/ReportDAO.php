@@ -1,12 +1,20 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\InformationChangeRequestDAO;
 
 /**
- * Class SyncReportDAO
- * @package Mautic\PluginBundle\Model\Sync\DAO
+ * Class ReportDAO
  */
 class ReportDAO
 {
@@ -22,6 +30,7 @@ class ReportDAO
 
     /**
      * SyncReportDAO constructor.
+     *
      * @param $integration
      */
     public function __construct($integration)
@@ -39,10 +48,15 @@ class ReportDAO
 
     /**
      * @param ObjectDAO $objectDAO
+     *
      * @return $this
      */
     public function addObject(ObjectDAO $objectDAO)
     {
+        if (!isset($this->objects[$objectDAO->getObject()])) {
+            $this->objects[$objectDAO->getObject()] = [];
+        }
+
         $this->objects[$objectDAO->getObject()][$objectDAO->getObjectId()] = $objectDAO;
 
         return $this;
@@ -60,9 +74,10 @@ class ReportDAO
         if (!isset($this->objects[$objectName][$objectId])) {
             return null;
         }
+
         /** @var ObjectDAO $reportObject */
-        $reportObject = $this->objects[$objectName][$objectId];
-        $reportField = $reportObject->getField($fieldName);
+        $reportObject             = $this->objects[$objectName][$objectId];
+        $reportField              = $reportObject->getField($fieldName);
         $informationChangeRequest = new InformationChangeRequestDAO(
             $this->integration,
             $objectName,
@@ -70,8 +85,10 @@ class ReportDAO
             $fieldName,
             $reportField->getValue()
         );
+
         $informationChangeRequest->setPossibleChangeTimestamp($reportObject->getChangeTimestamp())
             ->setCertainChangeTimestamp($reportField->getChangeTimestamp());
+
         return $informationChangeRequest;
     }
 
@@ -83,18 +100,20 @@ class ReportDAO
     public function getObjects(?string $objectName)
     {
         $returnedObjects = [];
-        if($objectName === null) {
-            foreach($this->objects as $objectName => $objects) {
-                foreach($objects as $objectId => $object) {
+        if ($objectName === null) {
+            foreach ($this->objects as $objectName => $objects) {
+                foreach ($objects as $objectId => $object) {
                     $returnedObjects[] = $object;
                 }
             }
+
+            return $returnedObjects;
         }
-        else {
-            foreach($this->objects[$objectName] as $objectId => $object) {
-                $returnedObjects[] = $object;
-            }
+
+        foreach ($this->objects[$objectName] as $objectId => $object) {
+            $returnedObjects[] = $object;
         }
+
         return $returnedObjects;
     }
 

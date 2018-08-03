@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order;
 
 /**
  * Class ObjectChangeDAO
- * @package MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order
  */
 class ObjectChangeDAO
 {
@@ -14,9 +22,14 @@ class ObjectChangeDAO
     private $object;
 
     /**
-     * @var int
+     * @var mixed
      */
     private $objectId;
+
+    /**
+     * @var mixed
+     */
+    private $mappedId;
 
     /**
      * @var FieldDAO[]
@@ -25,13 +38,16 @@ class ObjectChangeDAO
 
     /**
      * ObjectChangeDAO constructor.
-     * @param string    $object
-     * @param int       $objectId
+     *
+     * @param string $object
+     * @param mixed  $objectId
+     * @param mixed  $mappedId ID of the opposite object this object is mapped to (Mautic -> Integration or Integration -> Mautic)
      */
-    public function __construct($object, $objectId)
+    public function __construct($object, $objectId, $mappedId = null)
     {
-        $this->object = $object;
+        $this->object   = $object;
         $this->objectId = $objectId;
+        $this->mappedId = $mappedId;
     }
 
     /**
@@ -39,7 +55,7 @@ class ObjectChangeDAO
      *
      * @return $this
      */
-    public function addField(FieldDAO $fieldDAO)
+    public function addField(FieldDAO $fieldDAO): ObjectChangeDAO
     {
         $this->fields[$fieldDAO->getName()] = $fieldDAO;
 
@@ -63,6 +79,14 @@ class ObjectChangeDAO
     }
 
     /**
+     * @return mixed|null
+     */
+    public function getMappedId()
+    {
+        return $this->mappedId;
+    }
+
+    /**
      * @param string $name
      *
      * @return FieldDAO
@@ -72,13 +96,14 @@ class ObjectChangeDAO
         if (!isset($this->fields[$name])) {
             return null;
         }
+
         return $this->fields[$name];
     }
 
     /**
      * @return FieldDAO[]
      */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }

@@ -1,10 +1,20 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order;
+
+use MauticPlugin\MauticIntegrationsBundle\DAO\Value\NormalizedValueDAO;
 
 /**
  * Class FieldDAO
- * @package MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order
  */
 class FieldDAO
 {
@@ -14,18 +24,19 @@ class FieldDAO
     private $name;
 
     /**
-     * @var mixed
+     * @var NormalizedValueDAO
      */
     private $value;
 
     /**
      * FieldDAO constructor.
-     * @param string    $name
-     * @param mixed     $value
+     *
+     * @param string             $name
+     * @param NormalizedValueDAO $value
      */
-    public function __construct($name, $value)
+    public function __construct($name, NormalizedValueDAO $value)
     {
-        $this->name = $name;
+        $this->name  = $name;
         $this->value = $value;
     }
 
@@ -38,9 +49,9 @@ class FieldDAO
     }
 
     /**
-     * @return mixed
+     * @return NormalizedValueDAO
      */
-    public function getValue()
+    public function getValue(): NormalizedValueDAO
     {
         return $this->value;
     }

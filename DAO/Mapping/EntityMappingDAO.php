@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
 
 /**
  * Class EntityMappingDAO
- * @package MauticPlugin\MauticIntegrationsBundle\DAO\Mapping
  */
 class EntityMappingDAO
 {
@@ -30,16 +38,17 @@ class EntityMappingDAO
 
     /**
      * IntegrationEntityMappingDAO constructor.
+     *
      * @param string $internalEntity
-     * @param int $internalEntityId
+     * @param int    $internalEntityId
      * @param string $integrationEntity
-     * @param int $integrationEntityId
+     * @param int    $integrationEntityId
      */
     public function __construct($internalEntity, $internalEntityId, $integrationEntity, $integrationEntityId)
     {
-        $this->internalEntity = $internalEntity;
-        $this->internalEntityId = $internalEntityId;
-        $this->integrationEntity = $integrationEntity;
+        $this->internalEntity      = $internalEntity;
+        $this->internalEntityId    = $internalEntityId;
+        $this->integrationEntity   = $integrationEntity;
         $this->integrationEntityId = $integrationEntityId;
     }
 

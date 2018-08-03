@@ -1,10 +1,10 @@
 <?php
 
 /*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
  *
- * @link        http://mautic.org
+ * @link        https://www.mautic.com
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -15,7 +15,6 @@ use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\InformationChangeRequestDAO;
 
 /**
  * Class SyncJudge
- * @package MauticPlugin\MauticIntegrationsBundle\Services\SyncJudge
  */
 final class SyncJudge implements SyncJudgeInterface
 {

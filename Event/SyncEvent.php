@@ -18,6 +18,16 @@ use Symfony\Component\EventDispatcher\Event;
 class SyncEvent extends Event
 {
     /**
+     * @var string
+     */
+    private $integration;
+
+    /**
+     * @var DateTimeImmutable
+     */
+    private $startDate;
+
+    /**
      * @param string            $integration
      * @param DateTimeImmutable $startDate
      */
