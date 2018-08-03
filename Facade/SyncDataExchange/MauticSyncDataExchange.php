@@ -29,6 +29,8 @@ use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpr
  */
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
+    const CONTACT_OBJECT = 'lead'; // kept as lead for BC
+
     /**
      * @var EntityManager
      */

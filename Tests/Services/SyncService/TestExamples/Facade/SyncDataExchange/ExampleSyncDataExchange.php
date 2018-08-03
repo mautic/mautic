@@ -25,31 +25,39 @@ use MauticPlugin\MauticIntegrationsBundle\Helpers\ValueNormalizer\ValueNormalize
 
 class ExampleSyncDataExchange implements SyncDataExchangeInterface
 {
-    /**
-     * @var ValueNormalizer
-     */
-    private $valueNormalizer;
+    const LEAD_OBJECT = 'lead';
+    const CONTACT_OBJECT = 'contact';
 
     /**
      * @var array
      */
-    private $fields = [
+    const FIELDS = [
         'id'            => [
-            'type' => NormalizedValueDAO::INT_TYPE,
+            'label' => 'ID',
+            'type'  => NormalizedValueDAO::INT_TYPE,
         ],
         'first_name'    => [
-            'type' => NormalizedValueDAO::STRING_TYPE,
+            'label' => 'First Name',
+            'type'  => NormalizedValueDAO::STRING_TYPE,
         ],
         'last_name'     => [
-            'type' => NormalizedValueDAO::STRING_TYPE,
+            'label' => 'Last Name',
+            'type'  => NormalizedValueDAO::STRING_TYPE,
         ],
         'email'         => [
-            'type' => NormalizedValueDAO::STRING_TYPE,
+            'label' => 'Email',
+            'type'  => NormalizedValueDAO::STRING_TYPE,
         ],
         'last_modified' => [
-            'type' => NormalizedValueDAO::DATETIME_TYPE,
+            'label' => 'Last Modified',
+            'type'  => NormalizedValueDAO::DATETIME_TYPE,
         ],
     ];
+
+    /**
+     * @var ValueNormalizer
+     */
+    private $valueNormalizer;
 
     /**
      * ExampleSyncDataExchange constructor.
@@ -183,7 +191,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
 
                 foreach ($person as $field => $value) {
                     // Normalize the value from the API to what Mautic needs
-                    $normalizedValue = $this->valueNormalizer->normalizeForMautic($this->fields[$field]['type'], $value);
+                    $normalizedValue = $this->valueNormalizer->normalizeForMautic(self::FIELDS[$field]['type'], $value);
                     $reportFieldDAO  = new FieldDAO($field, $normalizedValue);
 
                     // If we know for certain that this specific field was modified at a specific date/time, set the change timestamp
@@ -213,7 +221,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         // applicable to the integration. I.e. Salesforce supports querying for specific fields in it's SOQL
 
         $payload = [
-            'Contact' => [
+            self::CONTACT_OBJECT => [
                 [
                     'id'            => 1,
                     'first_name'    => 'John',
@@ -229,7 +237,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                     'last_modified' => '2018-08-02T10:07:00+05:00',
                 ],
             ],
-            'Lead'    => [
+            self::LEAD_OBJECT    => [
                 [
                     'id'            => 3,
                     'first_name'    => 'John',

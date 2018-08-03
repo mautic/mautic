@@ -54,13 +54,14 @@ class ObjectMappingDAO
     }
 
     /**
-     * @param FieldMappingDAO $fieldMappingDAO
+     * @param $internalField
+     * @param $integrationField
      *
-     * @return self
+     * @return ObjectMappingDAO
      */
-    public function addFieldMapping(FieldMappingDAO $fieldMappingDAO): self
+    public function addFieldMapping($internalField, $integrationField, $direction = ): ObjectMappingDAO
     {
-        $this->fieldMappings[] = $fieldMappingDAO;
+        $this->fieldMappings[] = new FieldMappingDAO($this->internalObjectName, $internalField, $this->integrationObjectName, $integrationField);
 
         return $this;
     }

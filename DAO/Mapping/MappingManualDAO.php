@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
 
 /**
@@ -37,7 +39,7 @@ class MappingManualDAO
     public function addObjectMapping(ObjectMappingDAO $objectMappingDAO)
     {
         $internalObjectName    = $objectMappingDAO->getInternalObjectName();
-        $integrationObjectName = $objectMappingDAO->getInternalObjectName();
+        $integrationObjectName = $objectMappingDAO->getIntegrationObjectName();
         if (!array_key_exists($internalObjectName, $this->objectsMapping)) {
             $this->objectsMapping[$internalObjectName] = [];
         }
