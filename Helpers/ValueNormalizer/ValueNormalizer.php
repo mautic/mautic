@@ -45,13 +45,12 @@ final class ValueNormalizer implements ValueNormalizerInterface
     }
 
     /**
-     * @param $value
-     * @param $type
+     * @param NormalizedValueDAO $value
      *
-     * @return NormalizedValueDAO
+     * @return mixed
      */
     public function normalizeForIntegration(NormalizedValueDAO $value)
     {
-        return $this->normalizeForMautic($value->getType(), $value->getNormalizedValue());
+        return $value->getNormalizedValue();
     }
 }
