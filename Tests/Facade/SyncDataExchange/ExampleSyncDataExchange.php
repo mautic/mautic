@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Tests\Facade\SyncDataExchangeService;
 
+use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\EntityMappingDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\OrderDAO;
@@ -67,8 +68,8 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      */
     public function executeSyncOrder(OrderDAO $syncOrderDAO)
     {
-        $payload        = ['create' => [], 'update' => []];
-        $emails         = [];
+        $payload = ['create' => [], 'update' => []];
+        $byEmail = [];
 
         $orderedObjects = $syncOrderDAO->getUnidentifiedObjects();
         foreach ($orderedObjects as $objectName => $unidentifiedObjects) {
@@ -76,12 +77,14 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
              * @var mixed           $key
              * @var ObjectChangeDAO $unidentifiedObject
              */
-            foreach ($unidentifiedObjects as $key => $unidentifiedObject) {
+            foreach ($unidentifiedObjects as $unidentifiedObject) {
                 $fields = $unidentifiedObject->getFields();
 
                 // Extract identifier fields for this integration to check if they exist before creating
                 // Some integrations offer a upsert feature which may make this not necessary.
-                $emails[] = $unidentifiedObject->getField('email');
+                $emailAddress = $unidentifiedObject->getField('email')->getValue()->getNormalizedValue();
+                // Store by email address so they can be found again when we update the OrderDAO about mapping
+                $byEmail[$emailAddress] = $unidentifiedObject;
 
                 // Build the person's profile
                 $person = ['object' => $objectName];
@@ -90,10 +93,11 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 }
 
                 // Create by default because it is unknown if they exist upstream or not
-                $payload['create'][$key] = $person;
+                $payload['create'][$emailAddress] = $person;
             }
 
             // If applicable, do something to verify if email addresses exist and if so, update objects instead
+            // $api->searchByEmail(array_keys($byEmail));
         }
 
         $orderedObjects = $syncOrderDAO->getIdentifiedObjects();
@@ -118,7 +122,34 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
             }
         }
 
-        // Deliver payload
+        // Deliver payload and get response
+        $response = [
+            'results' => [
+                [
+                    'result'     => 'created',
+                    'id'         => 'lead_1',
+                    'first_name' => 'John',
+                    'last_name'  => 'Smith',
+                    'email'      => 'john.smith@lead.com',
+                    'object'     => 'Lead',
+                ], // etc
+            ]
+        ];
+
+        // Notify the order regarding IDs of created objects
+        foreach ($response['results'] as $result) {
+            /** @var ObjectChangeDAO $object */
+            $object = $byEmail[$result['email']];
+
+            $syncOrderDAO->addEntityMapping(
+                new EntityMappingDAO(
+                    $object->getMappedObject(),
+                    $object->getMappedId(),
+                    $result['object'],
+                    $result['id']
+                )
+            );
+        }
     }
 
     /**

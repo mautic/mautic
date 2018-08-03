@@ -29,6 +29,11 @@ class ObjectChangeDAO
     /**
      * @var mixed
      */
+    private $mappedObject;
+
+    /**
+     * @var mixed
+     */
     private $mappedId;
 
     /**
@@ -41,13 +46,15 @@ class ObjectChangeDAO
      *
      * @param string $object
      * @param mixed  $objectId
-     * @param mixed  $mappedId ID of the opposite object this object is mapped to (Mautic -> Integration or Integration -> Mautic)
+     * @param mixed  $mappedId     ID of the source object
+     * @param mixed  $mappedObject Name of the source object type
      */
-    public function __construct($object, $objectId, $mappedId = null)
+    public function __construct($object, $objectId, $mappedObject, $mappedId)
     {
-        $this->object   = $object;
-        $this->objectId = $objectId;
-        $this->mappedId = $mappedId;
+        $this->object       = $object;
+        $this->objectId     = $objectId;
+        $this->mappedId     = $mappedId;
+        $this->mappedObject = $mappedObject;
     }
 
     /**
@@ -79,6 +86,18 @@ class ObjectChangeDAO
     }
 
     /**
+     * Returns the name/type for the object in this system that is being synced to the other
+     *
+     * @return string
+     */
+    public function getMappedObject()
+    {
+        return $this->mappedObject;
+    }
+
+    /**
+     * Returns the ID for the object in this system that is being synced to the other
+     *
      * @return mixed|null
      */
     public function getMappedId()

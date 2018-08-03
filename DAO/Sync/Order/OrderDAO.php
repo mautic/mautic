@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order;
 
+use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\EntityMappingDAO;
+
 /**
  * Class OrderDAO
  */
@@ -30,6 +32,11 @@ class OrderDAO
      * @var array
      */
     private $unidentifiedObjects = [];
+
+    /**
+     * @var array
+     */
+    private $entityMappings = [];
 
     /**
      * OrderDAO constructor.
@@ -79,6 +86,14 @@ class OrderDAO
     public function getUnidentifiedObjects(): array
     {
         return $this->unidentifiedObjects;
+    }
+
+    /**
+     * @param EntityMappingDAO $entityMappingDAO
+     */
+    public function addEntityMapping(EntityMappingDAO $entityMappingDAO)
+    {
+        $this->entityMappings[] = $entityMappingDAO;
     }
 
     /**
