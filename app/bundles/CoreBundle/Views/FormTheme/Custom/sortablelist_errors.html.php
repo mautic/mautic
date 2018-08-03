@@ -1,4 +1,4 @@
-<?php $errorsMessages = array(); ?>
+<?php $errorsMessages = []; ?>
 <?php foreach ($errors as $error): ?>
     <?php if (!in_array($error->getMessage(), $errorsMessages)): ?>
         <?php $errorsMessages[] = $error->getMessage(); ?>
@@ -10,11 +10,11 @@
         <?php if (count($errorsMessages) > 1): ?>
             <ul>
                 <?php foreach ($errorsMessages as $errorMessage): ?>
-                    <li><?php echo $errorMessage ?></li>
+                    <li><?php echo $errorMessage; ?></li>
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <?php echo $errorsMessages[0] ?>
+            <?php echo $errorsMessages[0]; ?>
         <?php endif; ?>
     </div>
-<?php endif ?>
+<?php endif; ?>
