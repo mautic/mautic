@@ -9,8 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Tests\Facade\SyncDataExchangeService;
+namespace MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange;
 
+use MauticPlugin\MagentoBundle\Integration\ExampleIntegration;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\EntityMappingDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Value\NormalizedValueDAO;
@@ -163,7 +164,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     public function getSyncReport(RequestDAO $requestDAO)
     {
         // Build a report of objects that have been modified
-        $syncReport = new ReportDAO(self::class);
+        $syncReport = new ReportDAO(ExampleIntegration::NAME);
 
         $requestedObjects = $requestDAO->getObjects();
         foreach ($requestedObjects as $requestedObject) {
