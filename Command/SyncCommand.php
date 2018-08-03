@@ -52,6 +52,7 @@ class SyncCommand extends ContainerAwareCommand
         $io          = new SymfonyStyle($input, $output);
         $integration = $input->getArgument('integration');
         $startDateS  = $input->getOption('start-date');
+        $env         = $input->getOption('env', 'production');
 
         try {
             $startDate = new DateTimeImmutable($startDateS);
@@ -67,6 +68,10 @@ class SyncCommand extends ContainerAwareCommand
 
             // @todo do the syncing here
         } catch (\Exception $e) {
+            if ($env === 'dev') {
+                throw $e;
+            }
+            
             $io->error($e->getMessage());
 
             return 1;
