@@ -60,7 +60,8 @@ class FieldAliasKeywordValidator extends ConstraintValidator
         $oldValue = $this->em->getUnitOfWork()->getOriginalEntityData($field);
         $this->aliasHelper->makeAliasUnique($field);
 
-        if (is_array($oldValue) && !empty($oldValue) && $oldValue['alias'] != $field->getAlias()) {
+        //If empty it's a new object else it's an edit
+        if (empty($oldValue) || (!empty($oldValue) && is_array($oldValue) && $oldValue['alias'] != $field->getAlias())) {
             $segmentChoices = $this->listModel->getChoiceFields();
             if (isset($segmentChoices[$field->getObject()][$field->getAlias()])) {
                 $this->context->addViolation($constraint->message, ['%keyword%' => $field->getAlias()]);
