@@ -27,6 +27,16 @@ return [
     'menu' => [
     ],
     'services' => [
+        'commands' => [
+            'mautic.integrations.command.sync' => [
+                'class'     => \MauticPlugin\MauticIntegrationsBundle\Command\SyncCommand::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.integrations.service.sync',
+                ],
+                'tag' => 'console.command',
+            ],
+        ],
         'events' => [
             'mautic.integrations.lead.subscriber' => [
                 'class'     => \MauticPlugin\MauticIntegrationsBundle\EventListener\LeadSubscriber::class,

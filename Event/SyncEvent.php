@@ -12,7 +12,8 @@
 namespace MauticPlugin\MauticIntegrationsBundle\Event;
 
 use DateTimeImmutable;
-use Mautic\PluginBundle\Entity\Integration;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 class SyncEvent extends Event
@@ -28,6 +29,16 @@ class SyncEvent extends Event
     private $startDate;
 
     /**
+     * @var SyncDataExchangeInterface
+     */
+    private $dataExchange;
+
+    /**
+     * @var MappingManualDAO
+     */
+    private $mappingManual;
+
+    /**
      * @param string            $integration
      * @param DateTimeImmutable $startDate
      */
@@ -38,6 +49,8 @@ class SyncEvent extends Event
     }
 
     /**
+     * @param $integration
+     *
      * @return bool
      */
     public function shouldIntegrationSync($integration): bool
@@ -51,5 +64,41 @@ class SyncEvent extends Event
     public function getStartDate()
     {
         return $this->startDate;
+    }
+
+    /**
+     * @param SyncDataExchangeInterface $dataExchange
+     * @param MappingManualDAO          $mappingManualDAO
+     */
+    public function setSyncServices(SyncDataExchangeInterface $dataExchange, MappingManualDAO $mappingManualDAO)
+    {
+        $this->dataExchange  = $dataExchange;
+        $this->mappingManual = $mappingManualDAO;
+
+        $this->stopPropagation();
+    }
+
+    /**
+     * @return SyncDataExchangeInterface
+     */
+    public function getDataExchange(): SyncDataExchangeInterface
+    {
+        return $this->dataExchange;
+    }
+
+    /**
+     * @return MappingManualDAO
+     */
+    public function getMappingManual(): MappingManualDAO
+    {
+        return $this->mappingManual;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIntegration(): string
+    {
+        return $this->integration;
     }
 }

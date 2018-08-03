@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticIntegrationsBundle\Command;
 
 use DateTimeImmutable;
+use MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncServiceInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,9 +20,34 @@ use Symfony\Component\Console\Output\OutputInterface;
 use MauticPlugin\MauticIntegrationsBundle\Event\SyncEvent;
 use MauticPlugin\MauticIntegrationsBundle\IntegrationEvents;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SyncCommand extends ContainerAwareCommand
 {
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * @var SyncServiceInterface
+     */
+    private $syncService;
+
+    /**
+     * SyncCommand constructor.
+     *
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param SyncServiceInterface     $syncService
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher, SyncServiceInterface $syncService)
+    {
+        parent::__construct();
+
+        $this->eventDispatcher = $eventDispatcher;
+        $this->syncService = $syncService;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -61,17 +87,17 @@ class SyncCommand extends ContainerAwareCommand
 
             return 1;
         }
-        
+
         try {
             $event = new SyncEvent($integration, $startDate);
-            $this->getContainer()->get('event_dispatcher')->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
+            $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
-            // @todo do the syncing here
+            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $startDate->getTimestamp());
         } catch (\Exception $e) {
-            if ($env === 'dev') {
+            if ($env === 'dev' || MAUTIC_ENV === 'dev') {
                 throw $e;
             }
-            
+
             $io->error($e->getMessage());
 
             return 1;
