@@ -211,7 +211,7 @@ if ($tmpl == 'index') {
                                 ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_read').':'.$item->getId()]
                             ); ?>" data-toggle="tooltip"
                                title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
-                                <?php echo $view['translator']->trans('mautic.email.stat.readpercent', ['%count%' => $item->getReadCount(true)]); ?>
+                                <?php echo $view['translator']->trans('mautic.email.stat.readpercent', ['%count%' => $item->getReadPercentage(true)]); ?>
                             </a>
                         </span>
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
