@@ -32,7 +32,7 @@ return [
                 'class'     => \MauticPlugin\MauticIntegrationsBundle\Command\SyncCommand::class,
                 'arguments' => [
                     'event_dispatcher',
-                    'mautic.integrations.service.sync',
+                    'mautic.integrations.sync.service',
                 ],
                 'tag' => 'console.command',
             ],
@@ -93,14 +93,20 @@ return [
             'mautic.integrations.helper.sync_judge' => [
                 'class' => \MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudge::class,
             ],
+            'mautic.integrations.sync.data_exchange.mautic' => [
+                'class' => \MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange::class,
+                'arguments' => [
+                ],
+            ],
             'mautic.integrations.helper.sync_process_factory' => [
                 'class' => \MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess\SyncProcessFactory::class,
             ],
-            'mautic.integrations.service.sync' => [
+            'mautic.integrations.sync.service' => [
                 'class' => \MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncService::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_process_factory',
                     'mautic.integrations.helper.sync_judge',
+                    'mautic.integrations.sync.data_exchange.mautic',
                 ],
             ],
         ],

@@ -31,16 +31,6 @@ class ObjectMappingDAO
     private $integrationObjectName;
 
     /**
-     * @var array
-     */
-    private $internalIdMapping = [];
-
-    /**
-     * @var array
-     */
-    private $integrationIdMapping = [];
-
-    /**
      * @var FieldMappingDAO[]
      */
     private $fieldMappings = [];
@@ -83,49 +73,6 @@ class ObjectMappingDAO
     public function getFieldMappings(): array
     {
         return $this->fieldMappings;
-    }
-
-    /**
-     * @param int $internalObjectId
-     *
-     * @return int|null
-     */
-    public function getMappedIntegrationObjectId(int $internalObjectId): ?int
-    {
-        if (array_key_exists($internalObjectId, $this->internalIdMapping)) {
-            return $this->internalIdMapping[$internalObjectId];
-        }
-
-        return null;
-    }
-
-    /**
-     * @param int $integrationObjectId
-     *
-     * @return int|null
-     */
-    public function getMappedInternalObjectId(int $integrationObjectId): ?int
-    {
-        if (array_key_exists($integrationObjectId, $this->integrationIdMapping)) {
-            return $this->integrationIdMapping[$integrationObjectId];
-        }
-
-        return null;
-    }
-
-    /**
-     * @param int $internalObjectId
-     * @param int $integrationObjectId
-     *
-     * @throws \LogicException
-     */
-    public function mapIds(int $internalObjectId, int $integrationObjectId)
-    {
-        if (array_key_exists($internalObjectId, $this->internalIdMapping)) {
-            throw new \LogicException(); // TODO better exception
-        }
-        $this->internalIdMapping[$internalObjectId]       = $integrationObjectId;
-        $this->integrationIdMapping[$integrationObjectId] = $internalObjectId;
     }
 
     /**

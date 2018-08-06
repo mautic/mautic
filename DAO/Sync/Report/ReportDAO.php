@@ -86,6 +86,7 @@ class ReportDAO
             $reportField->getValue()
         );
 
+
         $informationChangeRequest->setPossibleChangeTimestamp($reportObject->getChangeTimestamp())
             ->setCertainChangeTimestamp($reportField->getChangeTimestamp());
 
@@ -115,16 +116,5 @@ class ReportDAO
         }
 
         return $returnedObjects;
-    }
-
-    /**
-     * @param string $objectName
-     * @param int    $objectId
-     *
-     * @return ObjectDAO|null
-     */
-    public function getObject(string $objectName, int $objectId): ?ObjectDAO
-    {
-
     }
 }
