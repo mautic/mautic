@@ -853,6 +853,28 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Get direction field alias to Zoho.
+     *
+     * @param string $object
+     *
+     * @return array
+     */
+    private function getFieldsMatchToUpdateInZoho($object)
+    {
+        $config                    = $this->mergeConfigToFeatureSettings();
+        $fieldsToUpdateInZoho      = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
+        $availableFields           = $this->getAvailableLeadFields(['feature_settings' => ['objects' => [$object]]]);
+        $fieldsMatchToUpdateInZoho = [];
+        foreach ($availableFields[$object] as $key => $field) {
+            if (in_array($key, $fieldsToUpdateInZoho) && !empty($field['dv'])) {
+                $fieldsMatchToUpdateInZoho[] = $field['dv'];
+            }
+        }
+
+        return $fieldsMatchToUpdateInZoho;
+    }
+
+    /**
      * @param Lead  $lead
      * @param array $config
      *
@@ -862,6 +884,24 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $config['object'] = 'Leads';
         $mappedData       = parent::populateLeadData($lead, $config);
+
+        /** @var IntegrationEntityRepository $integrationEntityRepo */
+        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationId         = $integrationEntityRepo->getIntegrationsEntityId(
+            'Zoho',
+            'Leads',
+            'lead',
+            $lead->getId()
+        );
+        // If integration exist, then just update fields with direction to Zoho
+        if (count($integrationId)) { // contact exists, then update
+            foreach ($mappedData as $key=>$data) {
+                if ($key != 'Email' && !in_array($key, $this->getFieldsMatchToUpdateInZoho($config['object']))) {
+                    unset($mappedData[$key]);
+                }
+            }
+        }
+
         $writer           = new Writer($config['object']);
         if ($lead instanceof Lead) {
             $row = $writer->row($lead->getId());
