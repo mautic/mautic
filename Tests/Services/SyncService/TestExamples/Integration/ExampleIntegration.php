@@ -26,7 +26,7 @@ final class ExampleIntegration extends BasicIntegration implements BasicInterfac
      */
     public function getName(): string
     {
-        return MagentoIntegration::NAME;
+        return self::NAME;
     }
 
     /**
