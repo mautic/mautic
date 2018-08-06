@@ -12,8 +12,8 @@
 namespace MauticPlugin\MauticIntegrationsBundle\Services\SyncService;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\MauticSyncDataExchange;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess\SyncProcessFactoryInterface;
 
@@ -57,14 +57,17 @@ final class SyncService implements SyncServiceInterface
     /**
      * @param SyncDataExchangeInterface $syncDataExchangeService
      * @param MappingManualDAO          $integrationMappingManual
-     * @param                           $fromTimestamp
+     * @param \DateTimeImmutable        $fromDateTime
      *
      * @return mixed|void
      */
-    public function processIntegrationSync(SyncDataExchangeInterface $syncDataExchangeService, MappingManualDAO $integrationMappingManual, $fromTimestamp)
-    {
+    public function processIntegrationSync(
+        SyncDataExchangeInterface $syncDataExchangeService,
+        MappingManualDAO $integrationMappingManual,
+        \DateTimeImmutable $fromDateTime
+    ) {
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
-            $fromTimestamp,
+            $fromDateTime->getTimestamp(),
             $this->syncJudgeService,
             $integrationMappingManual,
             $this->internalSyncDataExchange,

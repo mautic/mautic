@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MagentoBundle\Integration;
+namespace MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration;
 
 use MauticPlugin\MauticIntegrationsBundle\Integration\BasicIntegration;
 use MauticPlugin\MauticIntegrationsBundle\Integration\Interfaces\BasicInterface;

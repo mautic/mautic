@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange;
 
-use MauticPlugin\MagentoBundle\Integration\ExampleIntegration;
+use MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\EntityMappingDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Value\NormalizedValueDAO;
@@ -20,7 +20,7 @@ use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\RequestDAO;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\ValueNormalizer\ValueNormalizer;
 
 class ExampleSyncDataExchange implements SyncDataExchangeInterface

@@ -11,14 +11,13 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\EventListener;
 
-use MauticPlugin\MagentoBundle\Integration\ExampleIntegration;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\FieldMappingDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\MauticIntegrationsBundle\Event\SyncEvent;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\MauticSyncDataExchange;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\MauticIntegrationsBundle\IntegrationEvents;
 use MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange\ExampleSyncDataExchange;
+use MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class IntegrationSubscriber implements EventSubscriberInterface
@@ -89,6 +88,9 @@ class IntegrationSubscriber implements EventSubscriberInterface
             // The contact object will sync by default, bidirectionally
             $contactObjectMapping->addFieldMapping($mauticField, $integrationField);
         }
+
+        // Set the SyncDataExchangeInterface and MappingManualDAO for the sync service to execute
+        $event->setSyncServices($this->dataExchange, $mappingManual);
     }
 
     /**

@@ -13,7 +13,7 @@ namespace MauticPlugin\MauticIntegrationsBundle\Event;
 
 use DateTimeImmutable;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService\SyncDataExchangeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 class SyncEvent extends Event

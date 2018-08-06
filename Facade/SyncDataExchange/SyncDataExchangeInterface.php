@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService;
+namespace MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\OrderDAO;

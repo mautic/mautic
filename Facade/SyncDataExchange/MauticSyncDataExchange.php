@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService;
+namespace MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,7 +20,8 @@ use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO AS Orde
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\RequestDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\VariableEncodeDAO;
+use MauticPlugin\MauticIntegrationsBundle\DAO\Value\EncodedValueDAO;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpressorHelperInterface;
 
 /**
@@ -40,20 +41,20 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @var LeadRepository
      */
     private $leadRepository;
-
-    /**
-     * MauticSyncDataExchangeService constructor.
-     *
-     * @param EntityManager  $entityManager
-     * @param LeadRepository $leadRepository
-     */
-    public function __construct(
-        EntityManager $entityManager,
-        LeadRepository $leadRepository
-    ) {
-        $this->em             = $entityManager;
-        $this->leadRepository = $leadRepository;
-    }
+//
+//    /**
+//     * MauticSyncDataExchangeService constructor.
+//     *
+//     * @param EntityManager  $entityManager
+//     * @param LeadRepository $leadRepository
+//     */
+//    public function __construct(
+//        EntityManager $entityManager,
+//        LeadRepository $leadRepository
+//    ) {
+//        $this->em             = $entityManager;
+//        $this->leadRepository = $leadRepository;
+//    }
 
     /**
      * @param RequestDAO $requestDAO
