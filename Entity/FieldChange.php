@@ -20,6 +20,11 @@ class FieldChange
     /**
      * @var int
      */
+    private $id;
+
+    /**
+     * @var int
+     */
     private $objectId;
 
     /**
@@ -92,6 +97,14 @@ class FieldChange
             ->createField('columnValue', Type::STRING)
             ->columnName('column_value')
             ->build();
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**
