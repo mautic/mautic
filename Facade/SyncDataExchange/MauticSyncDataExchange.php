@@ -30,6 +30,7 @@ use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpr
  */
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
+    const NAME = 'mautic';
     const CONTACT_OBJECT = 'lead'; // kept as lead for BC
 
     /**
@@ -64,7 +65,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     public function getSyncReport(RequestDAO $requestDAO)
     {
 
-        $syncReport = new ReportDAO(self::class);
+        $syncReport = new ReportDAO(self::NAME);
 //        $fieldsChanges = $this->repo->findAll();
 //        $reportObjects = [];
 //        foreach ($fieldsChanges as $fieldChange) {

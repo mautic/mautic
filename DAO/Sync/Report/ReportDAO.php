@@ -24,7 +24,7 @@ class ReportDAO
     private $integration;
 
     /**
-     * @var ObjectDAO[]
+     * @var array
      */
     private $objects = [];
 
@@ -71,8 +71,8 @@ class ReportDAO
      */
     public function getInformationChangeRequest($objectName, $objectId, $fieldName)
     {
-        if (!isset($this->objects[$objectName][$objectId])) {
-            return null;
+        if (empty($this->objects[$objectName][$objectId])) {
+            throw new \LogicException(); //@todo better exception
         }
 
         /** @var ObjectDAO $reportObject */
@@ -101,9 +101,9 @@ class ReportDAO
     public function getObjects(?string $objectName)
     {
         $returnedObjects = [];
-        if ($objectName === null) {
+        if (null === $objectName) {
             foreach ($this->objects as $objectName => $objects) {
-                foreach ($objects as $objectId => $object) {
+                foreach ($objects as $object) {
                     $returnedObjects[] = $object;
                 }
             }
@@ -111,10 +111,26 @@ class ReportDAO
             return $returnedObjects;
         }
 
-        foreach ($this->objects[$objectName] as $objectId => $object) {
-            $returnedObjects[] = $object;
+        return isset($this->objects[$objectName]) ? $this->objects[$objectName] : [];
+    }
+
+
+    /**
+     * @param string $objectName
+     * @param int    $objectId
+     *
+     * @return ObjectDAO|null
+     */
+    public function getObject(string $objectName, $objectId): ?ObjectDAO
+    {
+        if (!isset($this->objects[$objectName])) {
+            return null;
         }
 
-        return $returnedObjects;
+        if (!isset($this->objects[$objectName][$objectId])) {
+            return null;
+        }
+
+        return $this->objects[$objectName][$objectId];
     }
 }

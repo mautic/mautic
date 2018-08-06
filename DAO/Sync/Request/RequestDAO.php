@@ -64,4 +64,14 @@ class RequestDAO
     {
         return $this->objects;
     }
+
+    /**
+     * Returns true if there are objects to sync
+     *
+     * @return bool
+     */
+    public function shouldSync()
+    {
+        return !empty($this->objects);
+    }
 }

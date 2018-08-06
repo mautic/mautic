@@ -96,6 +96,7 @@ return [
             'mautic.integrations.sync.data_exchange.mautic' => [
                 'class' => \MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange::class,
                 'arguments' => [
+                    // @todo add mautic sync arguments
                 ],
             ],
             'mautic.integrations.helper.sync_process_factory' => [

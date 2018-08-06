@@ -58,7 +58,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
         }
 
         // Generate mapping manual that will be passed to the sync service. This instructs the sync service how to map Mautic fields to integration fields
-        $mappingManual = new MappingManualDAO();
+        $mappingManual = new MappingManualDAO(ExampleIntegration::NAME);
 
         // Each object like lead, contact, user, company, account, etc, will need it's own ObjectMappingDAO
         // In this example, Mautic's Contact object is mapped to the Example's Lead object

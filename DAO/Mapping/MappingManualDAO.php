@@ -18,6 +18,8 @@ namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
  */
 class MappingManualDAO
 {
+    private $integration;
+
     /**
      * @var array
      */
@@ -32,6 +34,24 @@ class MappingManualDAO
      * @var array
      */
     private $integrationObjectsMapping = [];
+
+    /**
+     * MappingManualDAO constructor.
+     *
+     * @param string $integration
+     */
+    public function __construct(string $integration)
+    {
+        $this->integration = $integration;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIntegration(): string
+    {
+        return $this->integration;
+    }
 
     /**
      * @param ObjectMappingDAO $objectMappingDAO
@@ -123,6 +143,11 @@ class MappingManualDAO
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
             $fieldMappings    = $objectMappingDAO->getFieldMappings();
             foreach ($fieldMappings as $fieldMapping) {
+                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_INTEGRATION) {
+                    // Ignore because this field is a one way sync
+                    continue;
+                }
+
                 $fields[$fieldMapping->getInternalField()] = true;
             }
         }
@@ -155,10 +180,44 @@ class MappingManualDAO
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
             $fieldMappings    = $objectMappingDAO->getFieldMappings();
             foreach ($fieldMappings as $fieldMapping) {
+                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_MAUTIC) {
+                    // Ignore because this field is a one way sync
+                    continue;
+                }
+
                 $fields[$fieldMapping->getIntegrationField()] = true;
             }
         }
 
         return array_keys($fields);
+    }
+
+    /**
+     * @param string $internalObjectName
+     * @param string $integrationObjectName
+     * @param string $internalFieldName
+     *
+     * @return string
+     */
+    public function getIntegrationMappedField(string $internalObjectName, string $integrationObjectName, string $internalFieldName): string
+    {
+        if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
+            throw new \LogicException(); // TODO
+        }
+
+        if (!array_key_exists($integrationObjectName, $this->objectsMapping[$internalObjectName])) {
+            throw new \LogicException(); // TODO
+        }
+
+        /** @var ObjectMappingDAO $objectMappingDAO */
+        $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
+        $fieldMappings    = $objectMappingDAO->getFieldMappings();
+        foreach ($fieldMappings as $fieldMapping) {
+            if ($fieldMapping->getInternalField() === $internalFieldName) {
+                return $fieldMapping->getIntegrationField();
+            }
+        }
+
+        throw new \LogicException(); // TODO
     }
 }

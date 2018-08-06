@@ -131,6 +131,9 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
             }
         }
 
+        return;
+
+        //@todo
         // Deliver payload and get response
         $response = [
             'results' => [
