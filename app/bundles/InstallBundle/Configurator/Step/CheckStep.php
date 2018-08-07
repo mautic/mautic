@@ -362,6 +362,8 @@ class CheckStep implements StepInterface
         }
 
         $last = strtolower($val[strlen($val) - 1]);
+        $val  = (int) $val;
+
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
