@@ -24,7 +24,7 @@ final class ValueNormalizer implements ValueNormalizerInterface
      *
      * @return NormalizedValueDAO
      */
-    public function normalizeForMautic($type, $value)
+    public function normalizeForMautic(string $type, $value)
     {
         switch ($type) {
             case NormalizedValueDAO::STRING_TYPE:

@@ -23,7 +23,7 @@ interface ValueNormalizerInterface
      *
      * @return NormalizedValueDAO
      */
-    public function normalizeForMautic($value, $type);
+    public function normalizeForMautic(string $value, $type);
 
     /**
      * @param NormalizedValueDAO $value
