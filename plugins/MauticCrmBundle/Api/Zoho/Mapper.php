@@ -101,7 +101,6 @@ class Mapper
         if ($zohoId) {
             $row->add('Id', $zohoId);
         }
-
         foreach ($this->mappedFields as $zohoField => $mauticField) {
             $field = $this->getField($zohoField);
             if ($field && isset($this->contact[$mauticField]) && $this->contact[$mauticField]) {

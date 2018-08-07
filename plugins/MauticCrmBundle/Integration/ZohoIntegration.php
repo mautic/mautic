@@ -853,28 +853,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Get direction field alias to Zoho.
-     *
-     * @param string $object
-     *
-     * @return array
-     */
-    private function getFieldsMatchToUpdateInZoho($object)
-    {
-        $config                    = $this->mergeConfigToFeatureSettings();
-        $fieldsToUpdateInZoho      = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
-        $availableFields           = $this->getAvailableLeadFields(['feature_settings' => ['objects' => [$object]]]);
-        $fieldsMatchToUpdateInZoho = [];
-        foreach ($availableFields[$object] as $key => $field) {
-            if (in_array($key, $fieldsToUpdateInZoho) && !empty($field['dv'])) {
-                $fieldsMatchToUpdateInZoho[] = $field['dv'];
-            }
-        }
-
-        return $fieldsMatchToUpdateInZoho;
-    }
-
-    /**
      * @param Lead  $lead
      * @param array $config
      *
@@ -884,24 +862,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $config['object'] = 'Leads';
         $mappedData       = parent::populateLeadData($lead, $config);
-
-        /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        $integrationId         = $integrationEntityRepo->getIntegrationsEntityId(
-            'Zoho',
-            'Leads',
-            'lead',
-            $lead->getId()
-        );
-        // If integration exist, then just update fields with direction to Zoho
-        if (count($integrationId)) { // contact exists, then update
-            foreach ($mappedData as $key=>$data) {
-                if ($key != 'Email' && !in_array($key, $this->getFieldsMatchToUpdateInZoho($config['object']))) {
-                    unset($mappedData[$key]);
-                }
-            }
-        }
-
         $writer           = new Writer($config['object']);
         if ($lead instanceof Lead) {
             $row = $writer->row($lead->getId());
@@ -1148,6 +1108,73 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
 
         return [$totalUpdated, $totalCreated, $totalErrors, $totalCount - ($totalCreated + $totalUpdated + $totalErrors)];
+    }
+
+    /**
+     * @param Lead|array $lead
+     * @param array      $config
+     *
+     * @return array|bool
+     */
+    public function pushLead($lead, $config = [])
+    {
+        $config  = $this->mergeConfigToFeatureSettings($config);
+        $zObject = 'Leads';
+
+        $fieldsToUpdateInZoho       = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
+        $availableFields            = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
+        $fieldsToUpdate['Leads']    = array_values(array_intersect(array_keys($availableFields['Leads']), $fieldsToUpdateInZoho));
+        $fieldsToUpdate['Contacts'] = array_values(array_intersect(array_keys($availableFields['Contacts']), $fieldsToUpdateInZoho));
+        $fieldsToUpdate['Leads']    = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Leads']));
+        $fieldsToUpdate['Contacts'] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Contacts']));
+        $objectFields               = $this->prepareFieldsForPush($availableFields[$zObject]);
+        $existingPerson             = $this->getExistingRecord('email', $lead->getEmail(), $zObject);
+        $fieldsToUpdate[$zObject]   = $this->getBlankFieldsToUpdate($fieldsToUpdate[$zObject], $existingPerson, $objectFields, $config);
+
+        if (empty($config['leadFields'])) {
+            return [];
+        }
+
+        $mappedData = $this->populateLeadData($lead, $config);
+
+        $this->amendLeadDataBeforePush($mappedData);
+
+        if (empty($mappedData)) {
+            return false;
+        }
+        $leadArray = $lead->getFields(true);
+        $mapper    = new Mapper($availableFields);
+        $mapper->setObject($zObject);
+
+        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Zoho', $zObject, 'lead', $lead->getId());
+
+        $counter      = 0;
+        $errorCounter = 0;
+
+        try {
+            if ($this->isAuthorized()) {
+                if (!empty($existingPerson) && !empty($integrationId)) { // contact exists, then update
+                    $mapper
+                        ->setMappedFields($fieldsToUpdate[$zObject])
+                        ->setContact($lead->getProfileFields())
+                        ->map($lead->getId(), $integrationId[0]['integration_entity_id']);
+                    $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
+                } else {
+                    $mapper
+                        ->setMappedFields($config['leadFields'])
+                        ->setContact($lead->getProfileFields())
+                        ->map($lead->getId());
+                    $this->createContactInZoho($mapper, $zObject, $counter, $errorCounter);
+                }
+
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return false;
     }
 
     /**
