@@ -1,13 +1,12 @@
 <?php
 $list            = $form->children['list'];
 $parentHasErrors = $view['form']->containsErrors($form->parent);
-$hasErrors       = count($list->vars['errors']);
 
-if ($parentHasErrors && $hasErrors && empty($list->vars['value']) && isset($form->parent->children['properties']['list'])) {
-    // Work around for Symfony bug not repopulating values
+if ($parentHasErrors && empty($list->vars['value']) && isset($form->parent->children['properties']['list']) && $form->parent->vars['data']->getId() === null) {
+    // Work around for Symfony bug not repopulating values only for add action
     $list = $form->parent->children['properties']['list'];
 }
-
+$hasErrors     = $view['form']->containsErrors($list);
 $feedbackClass = (!empty($hasErrors)) ? ' has-error' : '';
 $datePrototype = (isset($list->vars['prototype'])) ?
     $view->escape('<div class="sortable">'.$view['form']->widget($list->vars['prototype']).'</div>') : '';
@@ -15,7 +14,7 @@ $datePrototype = (isset($list->vars['prototype'])) ?
 ?>
 <div class="row">
     <div data-toggle="sortablelist" data-prefix="<?php echo $form->vars['id']; ?>" class="form-group col-xs-12 <?php echo $feedbackClass; ?>" id="<?php echo $form->vars['id']; ?>_list" style="overflow:auto">
-        <?php echo $view['form']->label($form, $label) ?>
+        <?php echo $view['form']->label($form, $label); ?>
         <a  data-prototype="<?php echo $datePrototype; ?>"
            class="btn btn-warning btn-xs btn-add-item" href="#" id="<?php echo $form->vars['id']; ?>_additem">
             <?php echo $view['translator']->trans($addValueButton); ?>
