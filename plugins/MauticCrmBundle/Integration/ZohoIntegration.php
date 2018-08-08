@@ -1142,7 +1142,6 @@ class ZohoIntegration extends CrmAbstractIntegration
         if (empty($mappedData)) {
             return false;
         }
-        $leadArray = $lead->getFields(true);
         $mapper    = new Mapper($availableFields);
         $mapper->setObject($zObject);
 
@@ -1151,10 +1150,17 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         $counter      = 0;
         $errorCounter = 0;
-
         try {
             if ($this->isAuthorized()) {
-                if (!empty($existingPerson) && !empty($integrationId)) { // contact exists, then update
+                if (!empty($existingPerson) && empty($integrationId)) {
+                    /** @var IntegrationEntity $integrationEntity */
+                    $integrationEntity = $this->createIntegrationEntity($zObject, $existingPerson['LEADID'], 'lead', $lead->getId());
+                    $mapper
+                        ->setMappedFields($fieldsToUpdate[$zObject])
+                        ->setContact($lead->getProfileFields())
+                        ->map($lead->getId(), $integrationEntity->getIntegrationEntityId());
+                    $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
+                } elseif (!empty($existingPerson) && !empty($integrationId)) { // contact exists, then update
                     $mapper
                         ->setMappedFields($fieldsToUpdate[$zObject])
                         ->setContact($lead->getProfileFields())
@@ -1279,7 +1285,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
         $selectColumns   = implode(',', array_keys($availableFields[$object]));
         $records         = $this->getApiHelper()->getSearchRecords($selectColumns, $seachColumn, $searchValue, $object);
-        $parsedRecords   = $this->parseZohoRecord($records, $availableFields[$object]);
+        $parsedRecords   = $this->parseZohoRecord($records, array_merge($availableFields[$object], ['LEADID' => ['dv'=>'LEADID']]));
 
         return $parsedRecords;
     }
