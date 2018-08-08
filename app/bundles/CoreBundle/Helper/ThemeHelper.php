@@ -83,17 +83,24 @@ class ThemeHelper
     ];
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * ThemeHelper constructor.
      *
-     * @param PathsHelper         $pathsHelper
-     * @param TemplatingHelper    $templatingHelper
-     * @param TranslatorInterface $translator
+     * @param PathsHelper          $pathsHelper
+     * @param TemplatingHelper     $templatingHelper
+     * @param TranslatorInterface  $translator
+     * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper, TranslatorInterface $translator)
+    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
-        $this->pathsHelper      = $pathsHelper;
-        $this->templatingHelper = $templatingHelper;
-        $this->translator       = $translator;
+        $this->pathsHelper          = $pathsHelper;
+        $this->templatingHelper     = $templatingHelper;
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -430,7 +437,7 @@ class ThemeHelper
             throw new \Exception($this->getExtractError($archive));
         } else {
             $containsConfig    = false;
-            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'tiff', 'ico', 'icns', 'eot', 'woff', 'svg'];
+            $allowedExtensions = $this->coreParametersHelper->getParameter('theme_import_allowed_extensions');
             $allowedFiles      = [];
             for ($i = 0; $i < $zipper->numFiles; ++$i) {
                 $entry     = $zipper->getNameIndex($i);
@@ -442,7 +449,7 @@ class ThemeHelper
                 }
 
                 // Filter out dangerous files like .php
-                if (in_array(strtolower($extension), $allowedExtensions)) {
+                if (empty($extension) || in_array(strtolower($extension), $allowedExtensions)) {
                     $allowedFiles[] = $entry;
                 }
             }
