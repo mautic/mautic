@@ -163,7 +163,10 @@ class ListType extends AbstractType
             'isGlobal',
             'yesno_button_group',
             [
-                'label' => 'mautic.lead.list.form.isglobal',
+                'label'      => 'mautic.lead.list.form.isglobal',
+                'attr'       => [
+                    'tooltip' => 'mautic.lead.list.form.isglobal.tooltip',
+                ],
             ]
         );
 
@@ -171,7 +174,10 @@ class ListType extends AbstractType
             'isPreferenceCenter',
             'yesno_button_group',
             [
-                'label' => 'mautic.lead.list.form.isPreferenceCenter',
+                'label'      => 'mautic.lead.list.form.isPreferenceCenter',
+                'attr'       => [
+                    'tooltip' => 'mautic.lead.list.form.isPreferenceCenter.tooltip',
+                ],
             ]
         );
 
