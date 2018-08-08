@@ -790,7 +790,7 @@ class FormModel extends CommonFormModel
         $formName = $form->generateFormName();
         $fields   = $form->getFields();
         /** @var \Mautic\FormBundle\Entity\Field $field */
-        foreach ($fields as $key=> $field) {
+        foreach ($fields as $key => $field) {
             $leadField  = $field->getLeadField();
             $isAutoFill = $field->getIsAutoFill();
 
@@ -804,13 +804,13 @@ class FormModel extends CommonFormModel
             return;
         }
 
-        $lead     = $this->leadModel->getCurrentLead();
+        $lead = $this->leadModel->getCurrentLead();
         if (!$lead instanceof Lead) {
             return;
         }
 
         foreach ($fields as $field) {
-            $value      = $lead->getFieldValue($field->getLeadField());
+            $value = $lead->getFieldValue($field->getLeadField());
 
             if (!empty($value)) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
