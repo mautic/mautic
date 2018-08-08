@@ -35,7 +35,7 @@ class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
 
         $details = $ipService->setIpAddress('192.30.252.131')->getDetails();
 
-        $this->assertEquals('San Francisco', $details['city']);
+        
         $this->assertEquals('California', $details['region']);
         $this->assertEquals('United States', $details['country']);
         $this->assertEquals('', $details['zipcode']);
