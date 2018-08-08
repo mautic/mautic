@@ -2757,7 +2757,7 @@ abstract class AbstractIntegration
     public function getCompoundMauticFields($lead)
     {
         if ($lead['internal_entity_id']) {
-            $lead['mauticContactId']                   = $lead['id'];
+            $lead['mauticContactId']                   = $lead['internal_entity_id'];
             $lead['mauticContactTimelineLink']         = $this->getContactTimelineLink($lead['internal_entity_id']);
             $lead['mauticContactIsContactableByEmail'] = $this->getLeadDoNotContact($lead['internal_entity_id']);
         }
