@@ -123,7 +123,7 @@ class SyncProcess
     }
 
     /**
-     * @param                  $fromTimestamp
+     * @param $fromTimestamp
      */
     private function generateInternalSyncReport($fromTimestamp)
     {
@@ -151,7 +151,7 @@ class SyncProcess
     }
 
     /**
-     * @param                  $fromTimestamp
+     * @param $fromTimestamp
      */
     private function generateIntegrationSyncReport($fromTimestamp)
     {

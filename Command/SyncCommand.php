@@ -92,7 +92,7 @@ class SyncCommand extends ContainerAwareCommand
             $event = new SyncEvent($integration, $startDate);
             $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
-            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $startDate->getTimestamp());
+            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $startDate);
         } catch (\Exception $e) {
             if ($env === 'dev' || MAUTIC_ENV === 'dev') {
                 throw $e;
