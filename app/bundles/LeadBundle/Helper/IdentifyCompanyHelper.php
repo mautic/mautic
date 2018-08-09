@@ -126,13 +126,19 @@ class IdentifyCompanyHelper
      */
     protected static function domainExists($email)
     {
-        list($user, $domain) = explode('@', $email);
-        if (!empty($domain)) {
-            $arr = dns_get_record($domain, DNS_MX);
+        if (!strstr($email, '@')) { //not a valid email adress
+            return false;
+        }
 
-            if ($arr && $arr[0]['host'] === $domain) {
-                return $domain;
-            }
+        list($user, $domain) = explode('@', $email);
+        $arr                 = dns_get_record($domain, DNS_MX);
+
+        if (empty($arr)) {
+            return false;
+        }
+
+        if ($arr[0]['host'] === $domain) {
+            return $domain;
         }
 
         return false;
