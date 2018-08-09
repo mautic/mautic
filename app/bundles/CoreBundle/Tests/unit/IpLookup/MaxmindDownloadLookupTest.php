@@ -33,14 +33,14 @@ class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
         // Keep the file contained to cache/test
         $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../../cache/test');
 
-        $details = $ipService->setIpAddress('192.30.150.130')->getDetails();
+        $details = $ipService->setIpAddress('52.52.118.192')->getDetails();
 
-        $this->assertEquals('Norwalk', $details['city']);
-        $this->assertEquals('Connecticut', $details['region']);
+        $this->assertEquals('San Jose', $details['city']);
+        $this->assertEquals('California', $details['region']);
         $this->assertEquals('United States', $details['country']);
         $this->assertEquals('', $details['zipcode']);
-        $this->assertEquals('41.1003', $details['latitude']);
-        $this->assertEquals('-73.3983', $details['longitude']);
-        $this->assertEquals('America/New_York', $details['timezone']);
+        $this->assertEquals('37.3388', $details['latitude']);
+        $this->assertEquals('-121.8914', $details['longitude']);
+        $this->assertEquals('America/Los_Angeles', $details['timezone']);
     }
 }
