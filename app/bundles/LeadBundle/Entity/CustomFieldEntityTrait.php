@@ -121,9 +121,20 @@ trait CustomFieldEntityTrait
      */
     public function addUpdatedField($alias, $value, $oldValue = null)
     {
+        // Don't allow overriding ID
+        if ('id' === $alias) {
+            return $this;
+        }
+
         $property = (defined('self::FIELD_ALIAS')) ? str_replace(self::FIELD_ALIAS, '', $alias) : $alias;
         $field    = $this->getField($alias);
         $setter   = 'set'.ucfirst($property);
+
+        if (null == $oldValue) {
+            $oldValue = $this->getFieldValue($alias);
+        } elseif ($field) {
+            $oldValue = CustomFieldHelper::fixValueType($field['type'], $oldValue);
+        }
 
         if (property_exists($this, $property) && method_exists($this, $setter)) {
             // Fixed custom field so use the setter but don't get caught in a loop such as a custom field called "notes"
@@ -132,12 +143,6 @@ trait CustomFieldEntityTrait
                 $value = null;
             }
             $this->$setter($value);
-        }
-
-        if (null == $oldValue) {
-            $oldValue = $this->getFieldValue($alias);
-        } elseif ($field) {
-            $oldValue = CustomFieldHelper::fixValueType($field['type'], $oldValue);
         }
 
         if (is_string($value)) {
@@ -187,6 +192,14 @@ trait CustomFieldEntityTrait
      */
     public function getFieldValue($field, $group = null)
     {
+        if (property_exists($this, $field)) {
+            $value = $this->{'get'.ucfirst($field)}();
+
+            if (null !== $value) {
+                return $value;
+            }
+        }
+
         if (array_key_exists($field, $this->updatedFields)) {
             return $this->updatedFields[$field];
         }
@@ -248,6 +261,14 @@ trait CustomFieldEntityTrait
 
             return $this->fields;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasFields()
+    {
+        return !empty($this->fields);
     }
 
     /**

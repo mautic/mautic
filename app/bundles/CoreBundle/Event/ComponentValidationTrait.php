@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\CoreBundle\Exception\BadConfigurationException;
+
 /**
  * Class ComponentValidationTrait.
  */
@@ -27,17 +29,17 @@ trait ComponentValidationTrait
             if (is_array($k)) {
                 // Check that at least one option exists
                 if (empty(array_intersect($k, array_keys($component)))) {
-                    throw new InvalidArgumentException("At least one of the following keys are required: '".implode(', ', $k));
+                    throw new BadConfigurationException("At least one of the following keys are required: '".implode(', ', $k));
                 }
             } elseif (!array_key_exists($k, $component)) {
-                throw new InvalidArgumentException("The key, '$k' is missing.");
+                throw new BadConfigurationException("The key, '$k' is missing.");
             }
         }
 
         if ($callbacks) {
             foreach ($callbacks as $m) {
                 if (isset($component[$m]) && !is_callable($component[$m])) {
-                    throw new InvalidArgumentException($component[$m].' is not callable.');
+                    throw new BadConfigurationException($component[$m].' is not callable.');
                 }
             }
         }

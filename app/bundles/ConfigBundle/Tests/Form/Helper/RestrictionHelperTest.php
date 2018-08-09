@@ -270,6 +270,8 @@ class RestrictionHelperTest extends TypeTestCase
         $transportType = $this->getMockBuilder(TransportType::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $transportType->method('getTransportTypes')
+            ->willReturn([]);
 
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
