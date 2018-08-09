@@ -759,9 +759,9 @@ class AjaxController extends CommonAjaxController
     {
         $alias     = InputHelper::clean($request->request->get('alias'));
         // If fields alias has prefix
-        list($alias, $alias2) = explode('.', $alias);
-        if (isset($alias2)) {
-            $alias = $alias2;
+        $aliases = explode('.', $alias);
+        if (count($aliases) == 2) {
+            $alias = $aliases[0];
         }
         $operator  = InputHelper::clean($request->request->get('operator'));
         $changed   = InputHelper::clean($request->request->get('changed'));
