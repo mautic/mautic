@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order;
 
+use UnexpectedValueException;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\EntityMappingDAO;
 
 /**
@@ -32,6 +33,13 @@ class OrderDAO
      * @var array
      */
     private $unidentifiedObjects = [];
+
+    /**
+     * Array of all changed objects.
+     * 
+     * @var ObjectChangeDAO[]
+     */
+    private $changedObjects = [];
 
     /**
      * @var array
@@ -56,9 +64,12 @@ class OrderDAO
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): OrderDAO
     {
         if (!isset($this->identifiedObjects[$objectChangeDAO->getObject()])) {
-            $this->identifiedObjects[$objectChangeDAO->getObject()]      = [];
+            $this->identifiedObjects[$objectChangeDAO->getObject()]   = [];
             $this->unidentifiedObjects[$objectChangeDAO->getObject()] = [];
+            $this->changedObjects[$objectChangeDAO->getObject()]      = [];
         }
+
+        $this->changedObjects[$objectChangeDAO->getObject()][] = $objectChangeDAO;
 
         if ($knownId = $objectChangeDAO->getObjectId()) {
             $this->identifiedObjects[$objectChangeDAO->getObject()][$objectChangeDAO->getObjectId()] = $objectChangeDAO;
@@ -70,6 +81,22 @@ class OrderDAO
         $this->unidentifiedObjects[$objectChangeDAO->getObject()][$objectChangeDAO->getMappedId()] = $objectChangeDAO;
 
         return $this;
+    }
+
+    /**
+     * @param string $objectType
+     * 
+     * @return array
+     * 
+     * @throws UnexpectedValueException
+     */
+    public function getChangedObjectsByObjectType(string $objectType): array
+    {
+        if (isset($this->changedObjects[$objectType])) {
+            return $this->changedObjects[$objectType];
+        }
+
+        throw UnexpectedValueException("There are no change objects for object type '$objectType'");
     }
 
     /**
@@ -94,6 +121,14 @@ class OrderDAO
     public function addEntityMapping(EntityMappingDAO $entityMappingDAO)
     {
         $this->entityMappings[] = $entityMappingDAO;
+    }
+
+    /**
+     * @return EntityMappingDAO[]
+     */
+    public function getEntityMappings(): array
+    {
+        return $this->entityMappings;
     }
 
     /**
