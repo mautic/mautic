@@ -261,3 +261,18 @@ div[data-slot].ui-sortable-helper {
         font: normal normal normal 14px/1 FontAwesome;
     }
 }
+.codemodeHtmlContainer {
+    background:#eee;
+    padding:1em 0 0 0;
+    display:block;
+    position:relative;
+    margin-bottom:2px;
+}
+.codemodeHtmlContainer:before {
+    position:absolute;
+    left:0;
+    top:0;
+    color:gray;
+    font-size:small;
+    content:attr(data-placeholder);
+}
