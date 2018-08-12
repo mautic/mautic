@@ -406,7 +406,11 @@ class ReportSubscriber extends CommonSubscriber
     {
         $graphs = $event->getRequestedGraphs();
 
-        if (!$event->checkContext(self::CONTEXT_EMAIL_STATS) || ($event->checkContext(self::CONTEXT_EMAILS) && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs))) {
+        if (!$event->checkContext([self::CONTEXT_EMAIL_STATS, self::CONTEXT_EMAILS])) {
+            return;
+        }
+
+        if ($event->checkContext(self::CONTEXT_EMAILS) && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)) {
             return;
         }
 

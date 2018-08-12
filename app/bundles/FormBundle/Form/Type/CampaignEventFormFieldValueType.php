@@ -123,11 +123,17 @@ class CampaignEventFormFieldValueType extends AbstractType
                         'onchange'           => 'Mautic.updateFormFieldValues(this)',
                         'data-field-options' => json_encode($options),
                     ],
+                    'required'    => true,
+                    'constraints' => [
+                        new NotBlank(
+                            ['message' => 'mautic.core.value.required']
+                        ),
+                    ],
                 ]
             );
 
             // Display selectbox for a field with choices, textbox for others
-            if (empty($options[$data['field']])) {
+            if (empty($data['field']) || empty($options[$data['field']])) {
                 $form->add(
                     'value',
                     'text',
