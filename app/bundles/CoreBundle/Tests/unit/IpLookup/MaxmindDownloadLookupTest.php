@@ -25,7 +25,9 @@ class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
     {
         // Keep the file contained to cache/test
         $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../../cache/test');
+
         $details = $ipService->setIpAddress('52.52.118.192')->getDetails();
+
         $this->assertEquals('San Jose', $details['city']);
         $this->assertEquals('California', $details['region']);
         $this->assertEquals('United States', $details['country']);
