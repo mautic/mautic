@@ -37,6 +37,12 @@ return [
                 'controller' => 'MauticPluginBundle:Plugin:reload',
             ],
         ],
+        'api' => [
+            'mautic_api_plugin_view_settings' => [
+                'path'       => '/plugins/settings/{name}',
+                'controller' => 'MauticPluginBundle:Plugin:viewSettings',
+            ],
+        ],
         'public' => [
             'mautic_integration_auth_user' => [
                 'path'       => '/plugins/integrations/authuser/{integration}',
