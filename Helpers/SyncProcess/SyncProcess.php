@@ -110,6 +110,7 @@ class SyncProcess
     {
         $this->syncTimestamp = (new \DateTime())->getTimestamp();
 
+        // @todo batching!!!!!
         // 2. prepare internal sync order based on mapped objects
         // 3. add unmatched integration objects to internal sync order
         // 4. prepare integration sync order based on mapped objects
