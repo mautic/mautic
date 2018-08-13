@@ -61,10 +61,15 @@ class SyncCommand extends ContainerAwareCommand
                 'Fetch objects from integration.',
                 null
             )
-            ->addOption('--start-date',
-                '-d',
+            ->addOption('--start-datetime',
+                '-s',
                 InputOption::VALUE_REQUIRED,
-                'Set start date for updated values.'
+                'Set start date/time for updated values.'
+            )
+            ->addOption('--end-datetime',
+                '-e',
+                InputOption::VALUE_REQUIRED,
+                'Set end date/time for updated values.'
             );
 
         parent::configure();
@@ -77,22 +82,34 @@ class SyncCommand extends ContainerAwareCommand
     {
         $io          = new SymfonyStyle($input, $output);
         $integration = $input->getArgument('integration');
-        $startDateS  = $input->getOption('start-date');
-        $env         = $input->getOption('env', 'production');
+        $startDateTimeString  = $input->getOption('start-datetime');
+        $endDateTimeString  = $input->getOption('end-datetime');
+        $env         = $input->getOption('env');
 
         try {
-            $startDate = new DateTimeImmutable($startDateS);
+            $startDateTime = new DateTimeImmutable($startDateTimeString);
         } catch (\Exception $e) {
-            $io->error("'$startDateS' is not a valid date. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00'");
+            $io->error("'$startDateTimeString' is not a valid date. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00'");
 
             return 1;
         }
 
         try {
-            $event = new SyncEvent($integration, $startDate);
+            $endDateTimeString = $endDateTimeString ?: 'now';
+            $endDateTime = new DateTimeImmutable($endDateTimeString);
+        } catch (\Exception $e) {
+            $io->error("'$endDateTimeString' is not a valid date. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00'");
+
+            return 1;
+        }
+
+        try {
+            $event = new SyncEvent($integration, $startDateTime, $endDateTime);
             $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
-            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $startDate);
+            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $startDateTime, $endDateTime);
+
+            $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_COMPLETE, $event);
         } catch (\Exception $e) {
             if ($env === 'dev' || MAUTIC_ENV === 'dev') {
                 throw $e;

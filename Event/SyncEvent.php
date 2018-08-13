@@ -29,6 +29,11 @@ class SyncEvent extends Event
     private $startDate;
 
     /**
+     * @var DateTimeImmutable
+     */
+    private $endDate;
+
+    /**
      * @var SyncDataExchangeInterface
      */
     private $dataExchange;
@@ -39,13 +44,17 @@ class SyncEvent extends Event
     private $mappingManual;
 
     /**
-     * @param string            $integration
+     * SyncEvent constructor.
+     *
+     * @param                   $integration
      * @param DateTimeImmutable $startDate
+     * @param DateTimeImmutable $endDate
      */
-    public function __construct($integration, DateTimeImmutable $startDate)
+    public function __construct($integration, DateTimeImmutable $startDate, DateTimeImmutable $endDate)
     {
         $this->integration = $integration;
         $this->startDate   = $startDate;
+        $this->endDate     = $endDate;
     }
 
     /**
@@ -64,6 +73,14 @@ class SyncEvent extends Event
     public function getStartDate()
     {
         return $this->startDate;
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getEndDate()
+    {
+        return $this->endDate;
     }
 
     /**

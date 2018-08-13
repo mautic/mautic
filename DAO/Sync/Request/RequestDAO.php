@@ -23,6 +23,11 @@ class RequestDAO
     private $fromTimestamp = null;
 
     /**
+     * @var int|null
+     */
+    private $toTimestamp = null;
+
+    /**
      * @var ObjectDAO[]
      */
     private $objects = [];
@@ -31,10 +36,12 @@ class RequestDAO
      * RequestDAO constructor.
      *
      * @param int|null $fromTimestamp
+     * @param int|null $toTimestamp
      */
-    public function __construct(int $fromTimestamp = null)
+    public function __construct(int $fromTimestamp = null, int $toTimestamp = null)
     {
         $this->fromTimestamp = $fromTimestamp;
+        $this->toTimestamp   = $toTimestamp;
     }
 
     /**
@@ -43,6 +50,14 @@ class RequestDAO
     public function getFromTimestamp(): ?int
     {
         return $this->fromTimestamp;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getToTimestamp(): ?int
+    {
+        return $this->toTimestamp;
     }
 
     /**

@@ -23,12 +23,12 @@ interface SyncServiceInterface
      * @param SyncDataExchangeInterface $syncDataExchangeService
      * @param MappingManualDAO          $integrationMappingManual
      * @param \DateTimeImmutable        $fromDateTime
-     *
-     * @return mixed
+     * @param \DateTimeImmutable        $toDateTime
      */
     public function processIntegrationSync(
         SyncDataExchangeInterface $syncDataExchangeService,
         MappingManualDAO $integrationMappingManual,
-        \DateTimeImmutable $fromDateTime
+        \DateTimeImmutable $fromDateTime,
+        \DateTimeImmutable $toDateTime
     );
 }
