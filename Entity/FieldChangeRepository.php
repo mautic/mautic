@@ -17,21 +17,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class FieldChangeRepository extends CommonRepository
 {
     /**
-     * Will return array of data based on passed mapping parameters.
-     * Does _not_ return array of FieldChange entities.
-     *
-     * @TODO
-     *
-     * @param $mapping
-     *
-     * @return array
-     */
-    public function basedOnMapping($mapping)
-    {
-
-    }
-
-    /**
      * Takes an object id & type and deletes all entities
      * that match the given column names.
      *
@@ -80,6 +65,56 @@ class FieldChangeRepository extends CommonRepository
             )
             ->setParameter('objectId', $objectId)
             ->setParameter('objectType', $objectType)
+            ->execute();
+    }
+
+    /**
+     * @param $objectType
+     * @param $fromTimestamp
+     * @param $toTimestamp
+     *
+     * @return array
+     */
+    public function findChangesBetween($objectType, $fromTimestamp, $toTimestamp)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb
+            ->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'object_field_change_report', 'f')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('f.object_type', ':objectType'),
+                    sprintf('f.modified_at BETWEEN :startDateTime and :endDateTime')
+                )
+            )
+            ->setParameter('objectType', $objectType)
+            ->setParameter('startDateTime', (new \DateTime($fromTimestamp, new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'))
+            ->setParameter('endDateTime', (new \DateTime($toTimestamp, new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'));
+
+        return $qb->execute()->fetchAll();
+    }
+
+    /**
+     * @param $objectType
+     * @param $fromTimestamp
+     * @param $toTimestamp
+     */
+    public function deleteChangesBetween($objectType, $fromTimestamp, $toTimestamp)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb
+            ->delete(MAUTIC_TABLE_PREFIX.'object_field_change_report')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('object_type', ':objectType'),
+                    sprintf('modified_at BETWEEN :startDateTime and :endDateTime')
+                )
+            )
+            ->setParameter('objectType', $objectType)
+            ->setParameter('startDateTime', (new \DateTime($fromTimestamp, new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'))
+            ->setParameter('endDateTime', (new \DateTime($toTimestamp, new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'))
             ->execute();
     }
 }

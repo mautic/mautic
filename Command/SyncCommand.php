@@ -45,7 +45,7 @@ class SyncCommand extends ContainerAwareCommand
         parent::__construct();
 
         $this->eventDispatcher = $eventDispatcher;
-        $this->syncService = $syncService;
+        $this->syncService     = $syncService;
     }
 
     /**
@@ -61,12 +61,14 @@ class SyncCommand extends ContainerAwareCommand
                 'Fetch objects from integration.',
                 null
             )
-            ->addOption('--start-datetime',
+            ->addOption(
+                '--start-datetime',
                 '-s',
                 InputOption::VALUE_REQUIRED,
                 'Set start date/time for updated values.'
             )
-            ->addOption('--end-datetime',
+            ->addOption(
+                '--end-datetime',
                 '-e',
                 InputOption::VALUE_REQUIRED,
                 'Set end date/time for updated values.'
@@ -80,11 +82,11 @@ class SyncCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io          = new SymfonyStyle($input, $output);
-        $integration = $input->getArgument('integration');
-        $startDateTimeString  = $input->getOption('start-datetime');
-        $endDateTimeString  = $input->getOption('end-datetime');
-        $env         = $input->getOption('env');
+        $io                  = new SymfonyStyle($input, $output);
+        $integration         = $input->getArgument('integration');
+        $startDateTimeString = $input->getOption('start-datetime');
+        $endDateTimeString   = $input->getOption('end-datetime');
+        $env                 = $input->getOption('env');
 
         try {
             $startDateTime = new DateTimeImmutable($startDateTimeString);
@@ -96,7 +98,7 @@ class SyncCommand extends ContainerAwareCommand
 
         try {
             $endDateTimeString = $endDateTimeString ?: 'now';
-            $endDateTime = new DateTimeImmutable($endDateTimeString);
+            $endDateTime       = new DateTimeImmutable($endDateTimeString);
         } catch (\Exception $e) {
             $io->error("'$endDateTimeString' is not a valid date. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00'");
 

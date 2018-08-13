@@ -8,7 +8,10 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChange;
 use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\MauticIntegrationsBundle\Event\SyncEvent;
+use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpressorHelperInterface;
+use MauticPlugin\MauticIntegrationsBundle\IntegrationEvents;
 
 class LeadSubscriber extends CommonSubscriber
 {
@@ -40,12 +43,11 @@ class LeadSubscriber extends CommonSubscriber
         return [
             LeadEvents::LEAD_POST_SAVE   => ['onLeadPostSave', 0],
             LeadEvents::LEAD_POST_DELETE => ['onLeadPostDelete', 255],
+            IntegrationEvents::ON_SYNC_COMPLETE => ['onSyncComplete', 0],
         ];
     }
 
     /**
-     * @TODO Use VariableExpressorHelper to modify values
-     *
      * @param Events\LeadEvent $event
      */
     public function onLeadPostSave(Events\LeadEvent $event)
@@ -78,12 +80,18 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @TODO Remove matching entries from FieldChangeRepository
-     *
      * @param Events\LeadEvent $event
      */
     public function onLeadPostDelete(Events\LeadEvent $event)
     {
-        $this->repo->deleteEntitiesForObject($event->getLead()->getId(), Lead::class);
+        $this->repo->deleteEntitiesForObject($event->getLead()->deletedId, Lead::class);
+    }
+
+    /**
+     * @param SyncEvent $event
+     */
+    public function onSyncComplete(SyncEvent $event)
+    {
+        $this->repo->deleteChangesBetween(MauticSyncDataExchange::CONTACT_OBJECT, $event->getStartDate(), $event->getEndDate());
     }
 }
