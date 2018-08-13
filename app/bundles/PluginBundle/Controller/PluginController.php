@@ -64,7 +64,7 @@ class PluginController extends FormController
         $session->set('mautic.integrations.filter', $pluginFilter);
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper  = $this->factory->getHelper('integration');
+        $integrationHelper  = $this->get('mautic.helper.integration');
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
         $integrations       = $foundPlugins       = [];
 
@@ -155,7 +155,7 @@ class PluginController extends FormController
         $authorize = $this->request->request->get('integration_details[in_auth]', false, true);
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationHelper = $this->get('mautic.helper.integration');
         /** @var AbstractIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject($name);
 
@@ -386,9 +386,12 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationHelper = $this->get('mautic.helper.integration');
+<<<<<<< HEAD
 
         $bundle->splitDescriptions();
+=======
+>>>>>>> ca6d56e7b3cc3a6eca2963bf61109595915d4d52
 
         return $this->delegateView(
             [
@@ -437,5 +440,21 @@ class PluginController extends FormController
                 ],
             ]
         );
+    }
+
+     /**
+     * @param $name
+     *
+     * @return JsonResponse|Response
+     */
+    public function viewSettingsAction($name)
+    {
+        $integrationHelper = $this->get('mautic.helper.integration');
+        $integrationObject = $integrationHelper->getIntegrationObject($name);
+        if ($integrationObject && $integrationObject->getIntegrationSettings()->getIsPublished()) {
+            return new JsonResponse($integrationObject->getIntegrationSettings()->getFeatureSettings());
+        }
+
+        return $this->notFound();
     }
 }
