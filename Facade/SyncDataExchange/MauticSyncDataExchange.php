@@ -11,8 +11,6 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\FieldDAO AS ReportFieldDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
@@ -21,12 +19,13 @@ use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Value\EncodedValueDAO;
+use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChange;
+use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpressorHelperInterface;
 
 /**
  * Class MauticSyncDataExchange
- * @package MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchangeService
  */
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
@@ -34,28 +33,36 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     const CONTACT_OBJECT = 'lead'; // kept as lead for BC
 
     /**
-     * @var EntityManager
+     * @var FieldChangeRepository
      */
-    private $em;
+    private $fieldChangeRepository;
 
     /**
      * @var LeadRepository
      */
     private $leadRepository;
-//
-//    /**
-//     * MauticSyncDataExchangeService constructor.
-//     *
-//     * @param EntityManager  $entityManager
-//     * @param LeadRepository $leadRepository
-//     */
-//    public function __construct(
-//        EntityManager $entityManager,
-//        LeadRepository $leadRepository
-//    ) {
-//        $this->em             = $entityManager;
-//        $this->leadRepository = $leadRepository;
-//    }
+
+    /**
+     * @var VariableExpressorHelperInterface
+     */
+    private $variableExpressorHelper;
+
+    /**
+     * MauticSyncDataExchange constructor.
+     *
+     * @param FieldChangeRepository            $fieldChangeRepository
+     * @param LeadRepository                   $leadRepository
+     * @param VariableExpressorHelperInterface $variableExpressorHelper
+     */
+    public function __construct(
+        FieldChangeRepository $fieldChangeRepository,
+        LeadRepository $leadRepository,
+        VariableExpressorHelperInterface $variableExpressorHelper
+    ) {
+        $this->fieldChangeRepository   = $fieldChangeRepository;
+        $this->leadRepository          = $leadRepository;
+        $this->variableExpressorHelper = $variableExpressorHelper;
+    }
 
     /**
      * @param RequestDAO $requestDAO
@@ -64,34 +71,49 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      */
     public function getSyncReport(RequestDAO $requestDAO)
     {
+        $requestedObjects = $requestDAO->getObjects();
+        $syncReport       = new ReportDAO(self::NAME);
 
-        $syncReport = new ReportDAO(self::NAME);
-//        $fieldsChanges = $this->repo->findAll();
-//        $reportObjects = [];
-//        foreach ($fieldsChanges as $fieldChange) {
-//            $object   = $fieldChange['object'];
-//            $objectId = $fieldChange['object_id'];
-//            if (!array_key_exists($object, $reportObjects)) {
-//                $reportObjects[$object] = [];
-//            }
-//            if (!array_key_exists($objectId, $reportObjects[$object])) {
-//                $reportObjects[$object][$objectId] = new ReportObjectDAO($object, $objectId);
-//            }
-//            /** @var ReportObjectDAO $reportObjectDAO */
-//            $reportObjectDAO = $reportObjects[$object][$objectId];
-//            $changeTimestamp = $fieldChange['modified_at'];
-//            $columnType      = $fieldChange['column_type'];
-//            $columnValue     = $fieldChange['column_value'];
-//            $newValue        = $this->variableExpressorHelper->decodeVariable(new VariableEncodeDAO($columnType, $columnValue));
-//            $reportFieldDAO  = new ReportFieldDAO($fieldChange['column_name'], $newValue);
-//            $reportFieldDAO->setChangeTimestamp($changeTimestamp);
-//            $reportObjectDAO->addField($reportFieldDAO);
-//        }
-//        foreach ($reportObjects as $objectsDAO) {
-//            foreach ($objectsDAO as $reportObjectDAO) {
-//                $syncReport->addObject($reportObjectDAO);
-//            }
-//        }
+        foreach ($requestedObjects as $objectDAO) {
+            $fieldsChanges = $this->fieldChangeRepository->findChangesBetween(
+                $objectDAO->getObject(),
+                $requestDAO->getFromTimestamp(),
+                $requestDAO->getToTimestamp()
+            );
+
+            $reportObjects = [];
+            foreach ($fieldsChanges as $fieldChange) {
+                $object = $fieldChange['object'];
+                $objectId = $fieldChange['object_id'];
+
+                if (!array_key_exists($object, $reportObjects)) {
+                    $reportObjects[$object] = [];
+                }
+
+                if (!array_key_exists($objectId, $reportObjects[$object])) {
+                    $reportObjects[$object][$objectId] = new ReportObjectDAO($object, $objectId);
+                }
+
+                /** @var ReportObjectDAO $reportObjectDAO */
+                $reportObjectDAO = $reportObjects[$object][$objectId];
+
+                $changeTimestamp = $fieldChange['modified_at'];
+                $columnType      = $fieldChange['column_type'];
+                $columnValue     = $fieldChange['column_value'];
+                $newValue        = $this->variableExpressorHelper->decodeVariable(new EncodedValueDAO($columnType, $columnValue));
+
+                $reportFieldDAO = new ReportFieldDAO($fieldChange['column_name'], $newValue);
+                $reportFieldDAO->setChangeTimestamp($changeTimestamp);
+
+                $reportObjectDAO->addField($reportFieldDAO);
+            }
+
+            foreach ($reportObjects as $objectsDAO) {
+                foreach ($objectsDAO as $reportObjectDAO) {
+                    $syncReport->addObject($reportObjectDAO);
+                }
+            }
+        }
 
         return $syncReport;
     }
@@ -103,7 +125,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      */
     public function executeSyncOrder(OrderDAO $syncOrderDAO)
     {
-//        $objectChanges         = $syncOrderDAO->getObjectsChanges();
+//        $objectChanges         = $syncOrderDAO->getIdentifiedObjects();
 //        $chunkedObjectsChanges = [];
 //        $objectsIds            = [];
 //        foreach ($objectChanges as $objectChange) {

@@ -11,8 +11,8 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order;
 
-use UnexpectedValueException;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\EntityMappingDAO;
+use MauticPlugin\MauticIntegrationsBundle\Exception\UnexpectedValueException;
 
 /**
  * Class OrderDAO
@@ -36,8 +36,8 @@ class OrderDAO
 
     /**
      * Array of all changed objects.
-     * 
-     * @var ObjectChangeDAO[]
+     *
+     * @var array|ObjectChangeDAO[]
      */
     private $changedObjects = [];
 
@@ -85,9 +85,9 @@ class OrderDAO
 
     /**
      * @param string $objectType
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws UnexpectedValueException
      */
     public function getChangedObjectsByObjectType(string $objectType): array
@@ -96,7 +96,7 @@ class OrderDAO
             return $this->changedObjects[$objectType];
         }
 
-        throw UnexpectedValueException("There are no change objects for object type '$objectType'");
+        throw new UnexpectedValueException("There are no change objects for object type '$objectType'");
     }
 
     /**
