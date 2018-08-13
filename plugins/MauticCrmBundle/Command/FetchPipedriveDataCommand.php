@@ -6,6 +6,7 @@ use MauticPlugin\MauticCrmBundle\Api\PipedriveApi;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -21,7 +22,15 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:integration:pipedrive:fetch');
+        $this->setName('mautic:integration:pipedrive:fetch')
+            ->setDescription('Pulls the data from Pipedrive and sends it to Mautic')
+            ->addOption(
+                '--restart',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                $this->getContainer()->get('templating.helper.translator')->trans('mautic.plugin.config.integration.restart'),
+                null
+            );
 
         parent::configure();
     }
@@ -53,15 +62,27 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
         }
 
         foreach ($types as $type => $endPoint) {
-            $this->getData($type, $endPoint, $integrationObject);
+            $this->getData($type, $endPoint, $integrationObject, $input->getOption('restart'));
         }
 
         $this->io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
     }
 
-    private function getData($type, $endPoint, $integrationObject)
+    /**
+     * @param                      $type
+     * @param                      $endPoint
+     * @param PipedriveIntegration $integrationObject
+     * @param bool                 $restart
+     */
+    private function getData($type, $endPoint, $integrationObject, $restart = false)
     {
-        $container = $this->getContainer();
+        $container  = $this->getContainer();
+        $translator = $container->get('templating.helper.translator');
+        if ($restart) {
+            $this->io->title($translator->trans('mautic.plugin.config.integration.restarted', ['%integration%'=>$this->getName()]));
+            $integrationObject->removeIntegrationEntities();
+        }
+
         $this->io->title('Pulling '.$type);
         $start = 0;
         $limit = 500;

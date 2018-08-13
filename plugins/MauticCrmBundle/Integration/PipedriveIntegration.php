@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Doctrine\ORM\EntityManager;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -312,5 +313,24 @@ class PipedriveIntegration extends CrmAbstractIntegration
         }
 
         return true;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Driver\Statement|int
+     */
+    public function removeIntegrationEntities()
+    {
+        /** @var EntityManager $em */
+        $em = $this->get('doctrine.orm.entity_manager');
+        $qb = $em->getConnection()->createQueryBuilder();
+
+        return $qb->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->where(
+                $qb->expr()->eq(
+                    'integration',
+                    $this->getName()
+                )
+            )
+            ->execute();
     }
 }
