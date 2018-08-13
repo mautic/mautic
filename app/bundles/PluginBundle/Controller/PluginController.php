@@ -387,8 +387,11 @@ class PluginController extends FormController
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->get('mautic.helper.integration');
+<<<<<<< HEAD
 
         $bundle->splitDescriptions();
+=======
+>>>>>>> ca6d56e7b3cc3a6eca2963bf61109595915d4d52
 
         return $this->delegateView(
             [
