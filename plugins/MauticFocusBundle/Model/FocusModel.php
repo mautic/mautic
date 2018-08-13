@@ -319,6 +319,8 @@ class FocusModel extends FormModel
     }
 
     /**
+     * Add a stat entry.
+     *
      * @param Focus $focus
      * @param       $type
      * @param null  $data
