@@ -319,12 +319,12 @@ class FocusModel extends FormModel
     }
 
     /**
-     * Add a stat entry.
-     *
      * @param Focus $focus
      * @param       $type
      * @param null  $data
      * @param null  $lead
+     *
+     * @return Stat
      */
     public function addStat(Focus $focus, $type, $data = null, $lead = null)
     {
@@ -351,6 +351,8 @@ class FocusModel extends FormModel
             ->setLead($lead);
 
         $this->getStatRepository()->saveEntity($stat);
+
+        return $stat;
     }
 
     /**
