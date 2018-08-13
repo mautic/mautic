@@ -33,7 +33,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\CompanyLead;
-use Mautic\LeadBundle\Entity\DoNotContact as DNC;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
@@ -930,8 +930,8 @@ class LeadModel extends FormModel
     public function checkForDuplicateContact(array $queryFields, Lead $lead = null, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
     {
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
-        if (null == $this->availableLeadFields) {
-            $filter = ['isPublished' => true];
+        if (empty($this->availableLeadFields)) {
+            $filter = ['isPublished' => true, 'object' => 'lead'];
 
             if ($onlyPubliclyUpdateable) {
                 $filter['isPubliclyUpdatable'] = true;
@@ -948,13 +948,14 @@ class LeadModel extends FormModel
             $lead = new Lead();
         }
 
-        // Run values through setFieldValues to clean them first
-        $this->setFieldValues($lead, $queryFields, false, false);
-        $cleanFields = $lead->getFields();
-
         $uniqueFields    = $this->leadFieldModel->getUniqueIdentifierFields();
         $uniqueFieldData = [];
         $inQuery         = array_intersect_key($queryFields, $this->availableLeadFields);
+        $values          = $onlyPubliclyUpdateable ? $inQuery : $queryFields;
+
+        // Run values through setFieldValues to clean them first
+        $this->setFieldValues($lead, $values, false, false);
+        $cleanFields = $lead->getFields();
 
         foreach ($inQuery as $k => $v) {
             if (empty($queryFields[$k])) {
@@ -1466,7 +1467,7 @@ class LeadModel extends FormModel
 
                 // The email must be set for successful unsubscribtion
                 $lead->addUpdatedField('email', $data[$fields['email']]);
-                $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
+                $this->addDncForLead($lead, 'email', $reason, DoNotContact::MANUAL);
             }
         }
         unset($fieldData['doNotEmail']);
@@ -1661,8 +1662,8 @@ class LeadModel extends FormModel
     public function addUTMTags(Lead $lead, $params)
     {
         // known "synonym" fields expected
-        $synonyms = ['useragent' => 'user_agent',
-                    'remotehost' => 'remote_host', ];
+        $synonyms = ['useragent'  => 'user_agent',
+                     'remotehost' => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
@@ -2244,7 +2245,7 @@ class LeadModel extends FormModel
 
         $channels = [];
         foreach ($allChannels as $channel) {
-            if ($this->isContactable($lead, $channel) === DNC::IS_CONTACTABLE) {
+            if ($this->isContactable($lead, $channel) === DoNotContact::IS_CONTACTABLE) {
                 $channels[$channel] = $channel;
             }
         }
@@ -2259,13 +2260,13 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function getDNCChannels(Lead $lead)
+    public function getDoNotContactChannels(Lead $lead)
     {
         $allChannels = $this->getPreferenceChannels();
 
         $channels = [];
         foreach ($allChannels as $channel) {
-            if ($this->isContactable($lead, $channel) !== DNC::IS_CONTACTABLE) {
+            if ($this->isContactable($lead, $channel) !== DoNotContact::IS_CONTACTABLE) {
                 $channels[$channel] = $channel;
             }
         }
@@ -2464,16 +2465,16 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DNC instead
+     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
      * @param Lead   $lead
      * @param string $channel
      *
      * @return int
      *
-     * @see \Mautic\LeadBundle\Entity\DNC This method can return boolean false, so be
+     * @see \Mautic\LeadBundle\Entity\DoNotContact This method can return boolean false, so be
      *                                             sure to always compare the return value against
-     *                                             the class constants of DNC
+     *                                             the class constants of DoNotContact
      */
     public function isContactable(Lead $lead, $channel)
     {
@@ -2481,30 +2482,30 @@ class LeadModel extends FormModel
             $channel = key($channel);
         }
 
-        /** @var \Mautic\LeadBundle\Entity\DNCRepository $dncRepo */
-        $dncRepo = $this->em->getRepository('MauticLeadBundle:DNC');
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
 
-        /** @var \Mautic\LeadBundle\Entity\DNC[] $entries */
+        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
 
         // If the lead has no entries in the DNC table, we're good to go
         if (empty($dncEntries)) {
-            return DNC::IS_CONTACTABLE;
+            return DoNotContact::IS_CONTACTABLE;
         }
 
         foreach ($dncEntries as $dnc) {
-            if ($dnc->getReason() !== DNC::IS_CONTACTABLE) {
+            if ($dnc->getReason() !== DoNotContact::IS_CONTACTABLE) {
                 return $dnc->getReason();
             }
         }
 
-        return DNC::IS_CONTACTABLE;
+        return DoNotContact::IS_CONTACTABLE;
     }
 
     /**
      * Remove a Lead's DNC entry based on channel.
      *
-     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DNC instead
+     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
      * @param Lead      $lead
      * @param string    $channel
@@ -2514,10 +2515,10 @@ class LeadModel extends FormModel
      */
     public function removeDncForLead(Lead $lead, $channel, $persist = true)
     {
-        /** @var DNC $dnc */
-        foreach ($lead->getDNC() as $dnc) {
+        /** @var DoNotContact $dnc */
+        foreach ($lead->getDoNotContact() as $dnc) {
             if ($dnc->getChannel() === $channel) {
-                $lead->removeDNCEntry($dnc);
+                $lead->removeDoNotContactEntry($dnc);
 
                 if ($persist) {
                     $this->saveEntity($lead);
@@ -2533,27 +2534,27 @@ class LeadModel extends FormModel
     /**
      * Create a DNC entry for a lead.
      *
-     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DNC instead
+     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
      * @param Lead         $lead
      * @param string|array $channel            If an array with an ID, use the structure ['email' => 123]
      * @param string       $comments
-     * @param int          $reason             Must be a class constant from the DNC class
+     * @param int          $reason             Must be a class constant from the DoNotContact class
      * @param bool         $persist
      * @param bool         $checkCurrentStatus
      * @param bool         $override
      *
-     * @return bool|DNC If a DNC entry is added or updated, returns the DNC object. If a DNC is already present
-     *                  and has the specified reason, nothing is done and this returns false
+     * @return bool|DoNotContact If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
+     *                           and has the specified reason, nothing is done and this returns false
      */
-    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DNC::BOUNCED, $persist = true, $checkCurrentStatus = true, $override = false)
+    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true, $checkCurrentStatus = true, $override = false)
     {
         // if !$checkCurrentStatus, assume is contactable due to already being valided
-        $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DNC::IS_CONTACTABLE;
+        $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DoNotContact::IS_CONTACTABLE;
 
         // If they don't have a DNC entry yet
-        if ($isContactable === DNC::IS_CONTACTABLE) {
-            $dnc = new DNC();
+        if ($isContactable === DoNotContact::IS_CONTACTABLE) {
+            $dnc = new DoNotContact();
 
             if (is_array($channel)) {
                 $channelId = reset($channel);
@@ -2568,7 +2569,7 @@ class LeadModel extends FormModel
             $dnc->setDateAdded(new \DateTime());
             $dnc->setComments($comments);
 
-            $lead->addDNCEntry($dnc);
+            $lead->addDoNotContactEntry($dnc);
 
             if ($persist) {
                 // Use model saveEntity to trigger events for DNC change
@@ -2579,15 +2580,15 @@ class LeadModel extends FormModel
         }
         // Or if the given reason is different than the stated reason
         elseif ($isContactable !== $reason) {
-            /** @var DNC $dnc */
-            foreach ($lead->getDNC() as $dnc) {
+            /** @var DoNotContact $dnc */
+            foreach ($lead->getDoNotContact() as $dnc) {
                 // Only update if the contact did not unsubscribe themselves
-                if (!$override && $dnc->getReason() !== DNC::UNSUBSCRIBED) {
+                if (!$override && $dnc->getReason() !== DoNotContact::UNSUBSCRIBED) {
                     $override = true;
                 }
                 if ($dnc->getChannel() === $channel && $override) {
                     // Remove the outdated entry
-                    $lead->removeDNCEntry($dnc);
+                    $lead->removeDoNotContactEntry($dnc);
 
                     // Update the DNC entry
                     $dnc->setChannel($channel);
@@ -2597,7 +2598,7 @@ class LeadModel extends FormModel
                     $dnc->setComments($comments);
 
                     // Re-add the entry to the lead
-                    $lead->addDNCEntry($dnc);
+                    $lead->addDoNotContactEntry($dnc);
 
                     if ($persist) {
                         // Use model saveEntity to trigger events for DNC change
