@@ -321,16 +321,16 @@ class PipedriveIntegration extends CrmAbstractIntegration
     public function removeIntegrationEntities()
     {
         /** @var EntityManager $em */
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->factory->get('doctrine.orm.entity_manager');
         $qb = $em->getConnection()->createQueryBuilder();
 
         return $qb->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
             ->where(
-                $qb->expr()->eq(
-                    'integration',
-                    $this->getName()
+                $qb->expr()->andX(
+                    $qb->expr()->eq('integration', ':integration')
                 )
             )
+            ->setParameter('integration', $this->getName())
             ->execute();
     }
 }

@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -22,7 +23,14 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:integration:pipedrive:push');
+        $this->setName('mautic:integration:pipedrive:push')
+            ->setDescription('Pushes the data from Mautic to Pipedrive')
+            ->addOption(
+                '--restart',
+                null,
+                InputOption::VALUE_NONE,
+                'Restart intgeration'
+            );
 
         parent::configure();
     }
@@ -43,6 +51,16 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
             $this->io->note('Pipedrive integration id disabled.');
 
             return;
+        }
+
+        if ($input->getOption('restart')) {
+            $this->io->note(
+                $this->getContainer()->get('templating.helper.translator')->trans(
+                    'mautic.plugin.config.integration.restarted',
+                    ['%integration%' => $integrationObject->getName()]
+                )
+            );
+            $integrationObject->removeIntegrationEntities();
         }
 
         if ($integrationObject->isCompanySupportEnabled()) {

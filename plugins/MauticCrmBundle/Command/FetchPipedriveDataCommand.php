@@ -27,9 +27,8 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
             ->addOption(
                 '--restart',
                 null,
-                InputOption::VALUE_OPTIONAL,
-                $this->getContainer()->get('templating.helper.translator')->trans('mautic.plugin.config.integration.restart'),
-                null
+                InputOption::VALUE_NONE,
+                'Restart intgeration'
             );
 
         parent::configure();
@@ -61,8 +60,18 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
             $types = ['company' => PipedriveApi::ORGANIZATIONS_API_ENDPOINT] + $types;
         }
 
+        if ($input->getOption('restart')) {
+            $this->io->note(
+                $container->get('templating.helper.translator')->trans(
+                    'mautic.plugin.config.integration.restarted',
+                    ['%integration%' => $integrationObject->getName()]
+                )
+            );
+            $integrationObject->removeIntegrationEntities();
+        }
+
         foreach ($types as $type => $endPoint) {
-            $this->getData($type, $endPoint, $integrationObject, $input->getOption('restart'));
+            $this->getData($type, $endPoint, $integrationObject);
         }
 
         $this->io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
@@ -72,16 +81,11 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
      * @param                      $type
      * @param                      $endPoint
      * @param PipedriveIntegration $integrationObject
-     * @param bool                 $restart
      */
-    private function getData($type, $endPoint, $integrationObject, $restart = false)
+    private function getData($type, $endPoint, $integrationObject)
     {
         $container  = $this->getContainer();
         $translator = $container->get('templating.helper.translator');
-        if ($restart) {
-            $this->io->title($translator->trans('mautic.plugin.config.integration.restarted', ['%integration%'=>$this->getName()]));
-            $integrationObject->removeIntegrationEntities();
-        }
 
         $this->io->title('Pulling '.$type);
         $start = 0;
