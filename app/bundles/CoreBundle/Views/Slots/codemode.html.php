@@ -9,5 +9,5 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="codemodeHtmlContainer" data-placeholder="<?php echo $view['translator']->trans('mautic.core.code.mode'); ?>"><p><?php echo $view['translator']->trans('mautic.core.code.mode.placeholder'); ?></p></div>
+<div class="codemodeHtmlContainer"><p><?php echo $view['translator']->trans('mautic.core.code.mode.placeholder'); ?></p></div>
 

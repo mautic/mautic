@@ -5496,10 +5496,12 @@ div[data-slot].ui-sortable-helper {
   margin-bottom:2px;
 }
 .codemodeHtmlContainer:before {
+  content: "\f121";
+  font: normal normal normal 14px/1 FontAwesome;
   position:absolute;
-  left:0;
-  top:0;
+  right: 2px;
+  top: 2px;
   color:gray;
   font-size:small;
-  content:attr(data-placeholder);
 }
+
