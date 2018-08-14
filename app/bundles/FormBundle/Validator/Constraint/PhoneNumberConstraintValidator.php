@@ -90,8 +90,6 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
 
             if (false === in_array($type, $validTypes)) {
                 $this->addViolation($value, $constraint);
-
-                return;
             }
         }
     }

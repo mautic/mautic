@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony2 PhoneNumberBundle.
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic
  *
- * (c) University of Cambridge
+ * @link        http://mautic.org
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\FormBundle\Validator\Constraint;
@@ -16,8 +16,6 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Phone number constraint.
- *
- * @Annotation
  */
 class PhoneNumberConstraint extends Constraint
 {

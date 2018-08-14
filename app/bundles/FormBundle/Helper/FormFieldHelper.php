@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -70,7 +70,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'select'    => [],
         'tel'       => [
             'constraints' => [
-                PhoneNumberConstraint::class=> ['message' => 'mautic.form.submission.phone.invalid'],
+                PhoneNumberConstraint::class => ['message' => 'mautic.form.submission.phone.invalid'],
             ],
         ],
         'text'      => [],
@@ -167,7 +167,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     continue;
                 }
 
-                if ($f != null && $f->getType() == 'tel' && $f->getProperties()['international'] && !empty($value)) {
+                if ($f !== null && $f->getType() === 'tel' && !empty($f->getProperties()['international']) && !empty($value)) {
                     continue;
                 }
                 if ($type == 'captcha') {
