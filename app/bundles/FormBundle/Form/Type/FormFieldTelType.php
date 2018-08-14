@@ -32,12 +32,4 @@ class FormFieldTelType extends AbstractType
             ]
         );
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'formfield_tel';
-    }
 }
