@@ -167,8 +167,7 @@ class PublicController extends CommonFormController
         $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
 
         if (!empty($stat)) {
-            $lead = $stat->getLead();
-            if ($lead) {
+            if ($lead = $stat->getLead()) {
                 // Set the lead as current lead
                 $leadModel->setCurrentLead($lead);
 
