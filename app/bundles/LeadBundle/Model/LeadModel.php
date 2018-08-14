@@ -971,7 +971,7 @@ class LeadModel extends FormModel
             $leadRepo = $this->getRepository();
             $leadRepo->setCurrentUser($this->userHelper->getUser());
 
-            $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData, ($lead) ? $lead->getId() : null,null, $this->security->isGranted('lead:leads:viewother'));
+            $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData, ($lead) ? $lead->getId() : null, null, $this->security->isGranted('lead:leads:viewother'));
 
             if (!empty($existingLeads)) {
                 $this->logger->addDebug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
