@@ -37,6 +37,6 @@ class Version20180722100755 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("ALTER TABLE {$this->prefix}dynamic_content ADD utm_tags LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)';");
+        $this->addSql("ALTER TABLE {$this->prefix}dynamic_content ADD utm_tags LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';");
     }
 }

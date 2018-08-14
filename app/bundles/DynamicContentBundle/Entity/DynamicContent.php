@@ -12,6 +12,7 @@
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -153,7 +154,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
             ->nullable()
             ->build();
 
-        $builder->createField('utmTags', 'array')
+        $builder->createField('utmTags', Type::JSON_ARRAY)
             ->columnName('utm_tags')
             ->nullable()
             ->build();
