@@ -13,8 +13,6 @@ namespace Mautic\FormBundle\Validator\Constraint;
 
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumber;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberType;
 use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -42,55 +40,19 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
 
         if (false === $value instanceof PhoneNumber) {
             $value = (string) $value;
-
             try {
-                $phoneNumber = $phoneUtil->parse($value, $constraint->defaultRegion);
+                $phoneNumber = $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
             } catch (NumberParseException $e) {
                 $this->addViolation($value, $constraint);
 
                 return;
             }
-        } else {
-            $phoneNumber = $value;
-            $value       = $phoneUtil->format($phoneNumber, PhoneNumberFormat::INTERNATIONAL);
         }
 
         if (false === $phoneUtil->isValidNumber($phoneNumber)) {
             $this->addViolation($value, $constraint);
 
             return;
-        }
-        $i = $constraint->getType();
-        if ($i === PhoneNumberType::FIXED_LINE) {
-            $validTypes = [PhoneNumberType::FIXED_LINE, PhoneNumberType::FIXED_LINE_OR_MOBILE];
-        } elseif ($i === PhoneNumberType::MOBILE) {
-            $validTypes = [PhoneNumberType::MOBILE, PhoneNumberType::FIXED_LINE_OR_MOBILE];
-        } elseif ($i === PhoneNumberType::PAGER) {
-            $validTypes = [PhoneNumberType::PAGER];
-        } elseif ($i === PhoneNumberType::PERSONAL_NUMBER) {
-            $validTypes = [PhoneNumberType::PERSONAL_NUMBER];
-        } elseif ($i === PhoneNumberType::PREMIUM_RATE) {
-            $validTypes = [PhoneNumberType::PREMIUM_RATE];
-        } elseif ($i === PhoneNumberType::SHARED_COST) {
-            $validTypes = [PhoneNumberType::SHARED_COST];
-        } elseif ($i === PhoneNumberType::TOLL_FREE) {
-            $validTypes = [PhoneNumberType::TOLL_FREE];
-        } elseif ($i === PhoneNumberType::UAN) {
-            $validTypes = [PhoneNumberType::UAN];
-        } elseif ($i == PhoneNumberType::VOIP) {
-            $validTypes = [PhoneNumberType::VOIP];
-        } elseif ($i === PhoneNumberType::VOICEMAIL) {
-            $validTypes = [PhoneNumberType::VOICEMAIL];
-        } else {
-            $validTypes = [];
-        }
-
-        if (count($validTypes)) {
-            $type = $phoneUtil->getNumberType($phoneNumber);
-
-            if (false === in_array($type, $validTypes)) {
-                $this->addViolation($value, $constraint);
-            }
         }
     }
 
@@ -104,7 +66,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
     {
         $this->context->addViolation(
             $constraint->getMessage(),
-            ['{{ type }}' => $constraint->getType(), '{{ value }}' => $value]
+            ['{{ value }}' => $value]
         );
     }
 }
