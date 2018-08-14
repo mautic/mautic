@@ -968,7 +968,7 @@ class LeadModel extends FormModel
         // Check for leads using unique identifier
         if (count($uniqueFieldData)) {
 
-            $leadRepo = $this->getRepository('MauticLeadBundle:Lead');
+            $leadRepo = $this->getRepository();
             $leadRepo->setCurrentUser($this->userHelper->getUser());
 
             $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData, ($lead) ? $lead->getId() : null,null, $this->security->isGranted('lead:leads:viewother'));
