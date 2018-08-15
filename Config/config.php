@@ -50,7 +50,7 @@ return [
         ],
         'helpers' => [
             'mautic.integrations.helper.variable_expressor' => [
-                'class' => \MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpressorHelper::class
+                'class' => \MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpresserHelper::class
             ]
         ],
         'menus' => [

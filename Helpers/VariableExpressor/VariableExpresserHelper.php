@@ -14,9 +14,9 @@ namespace MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Value\EncodedValueDAO;
 
 /**
- * Class VariableExpressorHelper
+ * Class VariableExpresserHelper
  */
-final class VariableExpressorHelper implements VariableExpressorHelperInterface
+final class VariableExpresserHelper implements VariableExpresserHelperInterface
 {
     const TRUE_BOOLEAN_VALUE = 'true';
     const FALSE_BOOLEAN_VALUE = 'false';

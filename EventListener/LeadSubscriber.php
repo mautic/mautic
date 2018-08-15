@@ -10,7 +10,7 @@ use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChange;
 use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\MauticIntegrationsBundle\Event\SyncEvent;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpressorHelperInterface;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpresserHelperInterface;
 use MauticPlugin\MauticIntegrationsBundle\IntegrationEvents;
 
 class LeadSubscriber extends CommonSubscriber
@@ -21,15 +21,15 @@ class LeadSubscriber extends CommonSubscriber
     private $repo;
 
     /**
-     * @var VariableExpressorHelperInterface
+     * @var VariableExpresserHelperInterface
      */
     private $variableExpressor;
 
     /**
      * @param FieldChangeRepository            $repo
-     * @param VariableExpressorHelperInterface $variableExpressor
+     * @param VariableExpresserHelperInterface $variableExpressor
      */
-    public function __construct(FieldChangeRepository $repo, VariableExpressorHelperInterface $variableExpressor)
+    public function __construct(FieldChangeRepository $repo, VariableExpresserHelperInterface $variableExpressor)
     {
         $this->repo              = $repo;
         $this->variableExpressor = $variableExpressor;

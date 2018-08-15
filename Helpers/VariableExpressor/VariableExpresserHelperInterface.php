@@ -14,9 +14,9 @@ namespace MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Value\EncodedValueDAO;
 
 /**
- * Interface VariableExpressorHelperInterface
+ * Interface VariableExpresserHelperInterface
  */
-interface VariableExpressorHelperInterface
+interface VariableExpresserHelperInterface
 {
     /**
      * @param EncodedValueDAO $EncodedValueDAO
