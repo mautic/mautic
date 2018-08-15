@@ -18,14 +18,9 @@ namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request;
 class RequestDAO
 {
     /**
-     * @var int|null
+     * @var \DateTimeInterface
      */
-    private $fromTimestamp = null;
-
-    /**
-     * @var int|null
-     */
-    private $toTimestamp = null;
+    private $fromDateTime;
 
     /**
      * @var ObjectDAO[]
@@ -35,29 +30,19 @@ class RequestDAO
     /**
      * RequestDAO constructor.
      *
-     * @param int|null $fromTimestamp
-     * @param int|null $toTimestamp
+     * @param \DateTimeInterface $fromDateTime
      */
-    public function __construct(int $fromTimestamp = null, int $toTimestamp = null)
+    public function __construct(\DateTimeInterface $fromDateTime)
     {
-        $this->fromTimestamp = $fromTimestamp;
-        $this->toTimestamp   = $toTimestamp;
+        $this->fromDateTime = $fromDateTime;
     }
 
     /**
-     * @return int|null
+     * @return \DateTimeInterface
      */
-    public function getFromTimestamp(): ?int
+    public function getFromDateTime(): \DateTimeInterface
     {
-        return $this->fromTimestamp;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getToTimestamp(): ?int
-    {
-        return $this->toTimestamp;
+        return $this->fromDateTime;
     }
 
     /**

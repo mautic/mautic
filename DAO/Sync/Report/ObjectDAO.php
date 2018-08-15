@@ -32,9 +32,9 @@ class ObjectDAO
     private $fields = [];
 
     /**
-     * @var int|null
+     * @var \DateTimeInterface|null
      */
-    private $changeTimestamp = null;
+    private $changeDateTime = null;
 
     /**
      * ObjectDAO constructor.
@@ -49,21 +49,21 @@ class ObjectDAO
     }
 
     /**
-     * @return int|null
+     * @return \DateTimeInterface|null
      */
-    public function getChangeTimestamp(): ?int
+    public function getChangeDateTime(): ?\DateTimeInterface
     {
-        return $this->changeTimestamp;
+        return $this->changeDateTime;
     }
 
     /**
-     * @param int|null $changeTimestamp
+     * @param \DateTimeInterface $changeDateTime
      *
      * @return ObjectDAO
      */
-    public function setChangeTimestamp(?int $changeTimestamp): ObjectDAO
+    public function setChangeDateTime(\DateTimeInterface $changeDateTime): ObjectDAO
     {
-        $this->changeTimestamp = $changeTimestamp;
+        $this->changeDateTime = $changeDateTime;
 
         return $this;
     }

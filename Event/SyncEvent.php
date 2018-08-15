@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Event;
 
-use DateTimeImmutable;
+use DateTimeInterface;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -24,14 +24,9 @@ class SyncEvent extends Event
     private $integration;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTimeInterface
      */
     private $startDate;
-
-    /**
-     * @var DateTimeImmutable
-     */
-    private $endDate;
 
     /**
      * @var SyncDataExchangeInterface
@@ -47,14 +42,12 @@ class SyncEvent extends Event
      * SyncEvent constructor.
      *
      * @param                   $integration
-     * @param DateTimeImmutable $startDate
-     * @param DateTimeImmutable $endDate
+     * @param DateTimeInterface $startDate
      */
-    public function __construct($integration, DateTimeImmutable $startDate, DateTimeImmutable $endDate)
+    public function __construct($integration, \DateTimeInterface $startDate)
     {
         $this->integration = $integration;
         $this->startDate   = $startDate;
-        $this->endDate     = $endDate;
     }
 
     /**
@@ -68,19 +61,11 @@ class SyncEvent extends Event
     }
 
     /**
-     * @return DateTimeImmutable
+     * @return DateTimeInterface
      */
     public function getStartDate()
     {
         return $this->startDate;
-    }
-
-    /**
-     * @return DateTimeImmutable
-     */
-    public function getEndDate()
-    {
-        return $this->endDate;
     }
 
     /**

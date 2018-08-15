@@ -29,9 +29,9 @@ class FieldDAO
     private $value;
 
     /**
-     * @var int|null
+     * @var null|\DateTimeInterface
      */
-    private $changeTimestamp = null;
+    private $changeDateTime = null;
 
     /**
      * FieldDAO constructor.
@@ -62,21 +62,21 @@ class FieldDAO
     }
 
     /**
-     * @return int|null
+     * @return \DateTimeInterface|null
      */
-    public function getChangeTimestamp(): ?int
+    public function getChangeDateTime(): ?\DateTimeInterface
     {
-        return $this->changeTimestamp;
+        return $this->changeDateTime;
     }
 
     /**
-     * @param int|null $changeTimestamp
+     * @param \DateTimeInterface $changeDateTime
      *
      * @return FieldDAO
      */
-    public function setChangeTimestamp(?int $changeTimestamp): FieldDAO
+    public function setChangeDateTime(\DateTimeInterface $changeDateTime): FieldDAO
     {
-        $this->changeTimestamp = $changeTimestamp;
+        $this->changeDateTime = $changeDateTime;
 
         return $this;
     }

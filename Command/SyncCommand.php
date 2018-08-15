@@ -66,12 +66,6 @@ class SyncCommand extends ContainerAwareCommand
                 '-s',
                 InputOption::VALUE_REQUIRED,
                 'Set start date/time for updated values.'
-            )
-            ->addOption(
-                '--end-datetime',
-                '-e',
-                InputOption::VALUE_REQUIRED,
-                'Set end date/time for updated values.'
             );
 
         parent::configure();
@@ -85,7 +79,6 @@ class SyncCommand extends ContainerAwareCommand
         $io                  = new SymfonyStyle($input, $output);
         $integration         = $input->getArgument('integration');
         $startDateTimeString = $input->getOption('start-datetime');
-        $endDateTimeString   = $input->getOption('end-datetime');
         $env                 = $input->getOption('env');
 
         try {
@@ -97,19 +90,10 @@ class SyncCommand extends ContainerAwareCommand
         }
 
         try {
-            $endDateTimeString = $endDateTimeString ?: 'now';
-            $endDateTime       = new DateTimeImmutable($endDateTimeString);
-        } catch (\Exception $e) {
-            $io->error("'$endDateTimeString' is not a valid date. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00'");
-
-            return 1;
-        }
-
-        try {
-            $event = new SyncEvent($integration, $startDateTime, $endDateTime);
+            $event = new SyncEvent($integration, $startDateTime);
             $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
-            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $startDateTime, $endDateTime);
+            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $startDateTime);
 
             $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_COMPLETE, $event);
         } catch (\Exception $e) {

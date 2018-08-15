@@ -78,16 +78,14 @@ class SyncProcess
     /**
      * SyncProcess constructor.
      *
-     * @param                           $fromTimestamp
-     * @param                           $toTimestamp
+     * @param \DateTimeInterface        $fromDateTime
      * @param SyncJudgeInterface        $syncJudgeService
      * @param MappingManualDAO          $mappingManualDAO
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
      */
     public function __construct(
-        $fromTimestamp,
-        $toTimestamp,
+        \DateTimeInterface $fromDateTime,
         SyncJudgeInterface $syncJudgeService,
         MappingManualDAO $mappingManualDAO,
         SyncDataExchangeInterface $internalSyncDataExchange,
@@ -99,8 +97,8 @@ class SyncProcess
         $this->integrationSyncDataExchange = $integrationSyncDataExchange;
         $this->mappingManualDAO            = $mappingManualDAO;
 
-        $this->generateInternalSyncReport($fromTimestamp, $toTimestamp);
-        $this->generateIntegrationSyncReport($fromTimestamp, $toTimestamp);
+        $this->generateInternalSyncReport($fromDateTime);
+        $this->generateIntegrationSyncReport($fromDateTime);
     }
 
     /**
@@ -126,12 +124,11 @@ class SyncProcess
     }
 
     /**
-     * @param $fromTimestamp
-     * @param $toTimestamp
+     * @param \DateTimeInterface $fromDateTime
      */
-    private function generateInternalSyncReport($fromTimestamp, $toTimestamp)
+    private function generateInternalSyncReport(\DateTimeInterface $fromDateTime)
     {
-        $internalRequestDAO = new RequestDAO($fromTimestamp, $toTimestamp);
+        $internalRequestDAO = new RequestDAO($fromDateTime);
 
         $internalObjectsNames = $this->mappingManualDAO->getInternalObjectsNames();
         foreach ($internalObjectsNames as $internalObjectName) {
@@ -155,12 +152,11 @@ class SyncProcess
     }
 
     /**
-     * @param $fromTimestamp
-     * @param $toTimestamp
+     * @param \DateTimeInterface $fromDateTime
      */
-    private function generateIntegrationSyncReport($fromTimestamp, $toTimestamp)
+    private function generateIntegrationSyncReport(\DateTimeInterface $fromDateTime)
     {
-        $integrationRequestDAO = new RequestDAO($fromTimestamp, $toTimestamp);
+        $integrationRequestDAO = new RequestDAO($fromDateTime);
 
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {

@@ -20,8 +20,7 @@ use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 final class SyncProcessFactory implements SyncProcessFactoryInterface
 {
     /**
-     * @param                           $fromTimestamp
-     * @param                           $toTimestamp
+     * @param \DateTimeInterface        $fromTimestamp
      * @param SyncJudgeInterface        $syncJudgeService
      * @param MappingManualDAO          $integrationMappingManual
      * @param SyncDataExchangeInterface $internalSyncDataExchange
@@ -30,8 +29,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
      * @return SyncProcess
      */
     public function create(
-        $fromTimestamp,
-        $toTimestamp,
+        \DateTimeInterface $fromTimestamp,
         SyncJudgeInterface $syncJudgeService,
         MappingManualDAO $integrationMappingManual,
         SyncDataExchangeInterface $internalSyncDataExchange,
@@ -39,7 +37,6 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
     ) {
         return new SyncProcess(
             $fromTimestamp,
-            $toTimestamp,
             $syncJudgeService,
             $integrationMappingManual,
             $internalSyncDataExchange,

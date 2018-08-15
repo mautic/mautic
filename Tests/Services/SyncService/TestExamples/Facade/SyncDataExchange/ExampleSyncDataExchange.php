@@ -180,18 +180,17 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         $requestedObjects = $requestDAO->getObjects();
         foreach ($requestedObjects as $requestedObject) {
             $objectName    = $requestedObject->getObject();
-            $fromTimestamp = $requestDAO->getFromTimestamp();
-            $toTimestamp   = $requestDAO->getToTimestamp();
+            $fromDateTime = $requestDAO->getFromDateTime();
             $mappedFields  = $requestedObject->getFields();
 
-            $updatedPeople = $this->getPayload($objectName, $fromTimestamp, $toTimestamp, $mappedFields);
+            $updatedPeople = $this->getPayload($objectName, $fromDateTime, $mappedFields);
             foreach ($updatedPeople as $person) {
                 // If the integration knows modified timestamps per field, use that. Otherwise, we're using the complete object's
                 // last modified timestamp.
-                $objectChangeTimestamp = strtotime($person['last_modified']);
+                $objectChangeTimestamp = new \DateTimeImmutable($person['last_modified']);
 
                 $objectDAO = new ObjectDAO($objectName, $person['id']);
-                $objectDAO->setChangeTimestamp($objectChangeTimestamp);
+                $objectDAO->setChangeDateTime($objectChangeTimestamp);
 
                 foreach ($person as $field => $value) {
                     // Normalize the value from the API to what Mautic needs
@@ -213,16 +212,15 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param       $object
-     * @param       $fromDateTime
-     * @param       $toTimestamp
-     * @param array $mappedFields
+     * @param                    $object
+     * @param \DateTimeImmutable $fromDateTime
+     * @param array              $mappedFields
      *
      * @return mixed
      */
-    private function getPayload($object, $fromDateTime, $toTimestamp, array $mappedFields)
+    private function getPayload($object, \DateTimeImmutable $fromDateTime, array $mappedFields)
     {
-        // Query integration's API for objects changed between $fromDateTime and $toTimestamp with the requested fields in $mappedFields if that's
+        // Query integration's API for objects changed since $fromDateTime with the requested fields in $mappedFields if that's
         // applicable to the integration. I.e. Salesforce supports querying for specific fields in it's SOQL
 
         $payload = [

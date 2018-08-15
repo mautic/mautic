@@ -57,19 +57,16 @@ final class SyncService implements SyncServiceInterface
     /**
      * @param SyncDataExchangeInterface $syncDataExchangeService
      * @param MappingManualDAO          $integrationMappingManual
-     * @param \DateTimeImmutable        $fromDateTime
-     * @param \DateTimeImmutable        $toDateTime
+     * @param \DateTimeInterface        $fromDateTime
      */
     public function processIntegrationSync(
         SyncDataExchangeInterface $syncDataExchangeService,
         MappingManualDAO $integrationMappingManual,
-        \DateTimeImmutable $fromDateTime,
-        \DateTimeImmutable $toDateTime
+        \DateTimeInterface $fromDateTime
 
     ) {
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
-            $fromDateTime->getTimestamp(),
-            $toDateTime->getTimestamp(),
+            $fromDateTime,
             $this->syncJudgeService,
             $integrationMappingManual,
             $this->internalSyncDataExchange,
