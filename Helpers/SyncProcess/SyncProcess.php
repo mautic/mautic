@@ -23,6 +23,7 @@ use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\ObjectDAO as RequestO
 use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncDateHelper;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 
 /**
@@ -46,6 +47,16 @@ class SyncProcess
     private $internalSyncDataExchange;
 
     /**
+     * @var SyncDataExchangeInterface
+     */
+    private $integrationSyncDataExchange;
+
+    /**
+     * @var SyncDateHelper
+     */
+    private $syncDateHelper;
+
+    /**
      * @var ReportDAO
      */
     private $internalSyncReport;
@@ -54,11 +65,6 @@ class SyncProcess
      * @var OrderDAO
      */
     private $internalSyncOrder;
-
-    /**
-     * @var SyncDataExchangeInterface
-     */
-    private $integrationSyncDataExchange;
 
     /**
      * @var ReportDAO
@@ -78,27 +84,30 @@ class SyncProcess
     /**
      * SyncProcess constructor.
      *
-     * @param \DateTimeInterface        $fromDateTime
      * @param SyncJudgeInterface        $syncJudgeService
      * @param MappingManualDAO          $mappingManualDAO
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
+     * @param SyncDateHelper            $syncDateHelper
+     * @param \DateTimeInterface|null   $syncFromDateTime
      */
     public function __construct(
         SyncJudgeInterface $syncJudgeService,
         MappingManualDAO $mappingManualDAO,
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
-        \DateTimeInterface $fromDateTime = null
+        SyncDateHelper $syncDateHelper,
+        \DateTimeInterface $syncFromDateTime = null
     ) {
         $this->syncJudgeService            = $syncJudgeService;
         $this->mappingManualDAO            = $mappingManualDAO;
         $this->internalSyncDataExchange    = $internalSyncDataExchange;
         $this->integrationSyncDataExchange = $integrationSyncDataExchange;
         $this->mappingManualDAO            = $mappingManualDAO;
+        $this->syncDateHelper = $syncDateHelper;
 
-        $this->generateInternalSyncReport($fromDateTime);
-        $this->generateIntegrationSyncReport($fromDateTime);
+        $this->generateInternalSyncReport($syncFromDateTime);
+        $this->generateIntegrationSyncReport($syncFromDateTime);
     }
 
     /**
@@ -124,9 +133,9 @@ class SyncProcess
     }
 
     /**
-     * @param \DateTimeInterface $fromDateTime
+     * @param \DateTimeInterface $syncFromDateTime
      */
-    private function generateInternalSyncReport(\DateTimeInterface $fromDateTime)
+    private function generateInternalSyncReport(\DateTimeInterface $syncFromDateTime = null)
     {
         $internalRequestDAO = new RequestDAO();
 
@@ -138,7 +147,7 @@ class SyncProcess
                 continue;
             }
 
-            $internalRequestObject = new RequestObjectDAO($internalObjectName);
+            $internalRequestObject = new RequestObjectDAO($internalObjectName, $syncFromDateTime);
             foreach ($internalObjectFields as $internalObjectField) {
                 $internalRequestObject->addField($internalObjectField);
             }
@@ -152,9 +161,9 @@ class SyncProcess
     }
 
     /**
-     * @param \DateTimeInterface $fromDateTime
+     * @param \DateTimeInterface $syncFromDateTime
      */
-    private function generateIntegrationSyncReport(\DateTimeInterface $fromDateTime)
+    private function generateIntegrationSyncReport(\DateTimeInterface $syncFromDateTime = null)
     {
         $integrationRequestDAO = new RequestDAO();
 
@@ -166,7 +175,8 @@ class SyncProcess
                 continue;
             }
 
-            $integrationRequestObject = new RequestObjectDAO($integrationObjectName);
+            $objectSyncFromDateTime = $this->getSyncFromDateTime($this->mappingManualDAO->getIntegration(), $integrationObjectName, $syncFromDateTime);
+            $integrationRequestObject = new RequestObjectDAO($integrationObjectName, $objectSyncFromDateTime);
             foreach ($integrationObjectFields as $integrationObjectField) {
                 $integrationRequestObject->addField($integrationObjectField);
             }
@@ -436,5 +446,28 @@ class SyncProcess
         }
 
         $this->internalSyncOrder->addObjectChange($internalObjectChange);
+    }
+
+    /**
+     * @param string                  $integration
+     * @param string                  $object
+     * @param \DateTimeInterface|null $syncFromDateTime
+     *
+     * @return \DateTimeInterface
+     */
+    private function getSyncFromDateTime(string $integration, string $object, \DateTimeInterface $syncFromDateTime = null): \DateTimeInterface
+    {
+        if ($syncFromDateTime) {
+            // The command requested a specific start date so use it
+
+            return $syncFromDateTime;
+        }
+
+        if ($lastSync = $this->syncDateHelper->getLastSyncDateForObject($integration, $object)) {
+            return new \DateTimeImmutable($lastSync, new \DateTimeZone('UTC'));
+        }
+
+        // Default to 24 hours ago
+        return new \DateTimeImmutable('-24 hours', new \DateTimeZone('UTC'));
     }
 }

@@ -107,7 +107,14 @@ return [
                 'arguments' => [
                     'mautic.integrations.helper.sync_process_factory',
                     'mautic.integrations.helper.sync_judge',
+                    'mautic.integrations.helper.sync_date',
                     'mautic.integrations.sync.data_exchange.mautic',
+                ],
+            ],
+            'mautic.integrations.helper.sync_date' => [
+                'class'     => \MauticPlugin\MauticIntegrationsBundle\Helpers\SyncDateHelper::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
                 ],
             ],
         ],

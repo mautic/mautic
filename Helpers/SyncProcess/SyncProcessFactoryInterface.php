@@ -12,6 +12,7 @@ namespace MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess;
 
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncDateHelper;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 
 /**
@@ -24,7 +25,8 @@ interface SyncProcessFactoryInterface
      * @param MappingManualDAO          $integrationMappingManual
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
-     * @param \DateTimeInterface|null   $fromDateTime
+     * @param SyncDateHelper            $syncDateHelper
+     * @param \DateTimeInterface|null   $syncFromDateTime
      *
      * @return SyncProcess
      */
@@ -33,6 +35,7 @@ interface SyncProcessFactoryInterface
         MappingManualDAO $integrationMappingManual,
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
-        \DateTimeInterface $fromDateTime = null
+        SyncDateHelper $syncDateHelper,
+        \DateTimeInterface $syncFromDateTime = null
     );
 }

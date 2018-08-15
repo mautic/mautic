@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticIntegrationsBundle\Services\SyncService;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
+use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncDateHelper;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess\SyncProcessFactoryInterface;
 
@@ -33,6 +34,11 @@ final class SyncService implements SyncServiceInterface
     private $syncJudgeService;
 
     /**
+     * @var SyncDateHelper
+     */
+    private $syncDateHelper;
+
+    /**
      * @var SyncDataExchangeInterface
      */
     private $internalSyncDataExchange;
@@ -42,34 +48,38 @@ final class SyncService implements SyncServiceInterface
      *
      * @param SyncProcessFactoryInterface $integrationSyncProcessFactory
      * @param SyncJudgeInterface          $syncJudgeService
+     * @param SyncDateHelper              $syncDateHelper
      * @param MauticSyncDataExchange      $internalSyncDataExchange
      */
     public function __construct(
         SyncProcessFactoryInterface $integrationSyncProcessFactory,
         SyncJudgeInterface $syncJudgeService,
+        SyncDateHelper $syncDateHelper,
         MauticSyncDataExchange $internalSyncDataExchange
     ) {
         $this->integrationSyncProcessFactory = $integrationSyncProcessFactory;
         $this->syncJudgeService              = $syncJudgeService;
+        $this->syncDateHelper                = $syncDateHelper;
         $this->internalSyncDataExchange      = $internalSyncDataExchange;
     }
 
     /**
      * @param SyncDataExchangeInterface $syncDataExchangeService
      * @param MappingManualDAO          $integrationMappingManual
-     * @param \DateTimeInterface|null   $fromDateTime
+     * @param \DateTimeInterface|null   $syncFromDateTime
      */
     public function processIntegrationSync(
         SyncDataExchangeInterface $syncDataExchangeService,
         MappingManualDAO $integrationMappingManual,
-        \DateTimeInterface $fromDateTime = null
+        \DateTimeInterface $syncFromDateTime = null
     ) {
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
-            $fromDateTime,
             $this->syncJudgeService,
             $integrationMappingManual,
             $this->internalSyncDataExchange,
-            $syncDataExchangeService
+            $syncDataExchangeService,
+            $this->syncDateHelper,
+            $syncFromDateTime
         );
         $integrationSyncProcess->execute();
     }
