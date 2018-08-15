@@ -27,7 +27,7 @@ class ObjectChangeDAO
     private $objectId;
 
     /**
-     * @var mixed
+     * @var string
      */
     private $mappedObject;
 
@@ -47,7 +47,7 @@ class ObjectChangeDAO
      * @param string $object
      * @param mixed  $objectId
      * @param mixed  $mappedId     ID of the source object
-     * @param mixed  $mappedObject Name of the source object type
+     * @param string $mappedObject Name of the source object type
      */
     public function __construct($object, $objectId, $mappedObject, $mappedId)
     {
@@ -75,6 +75,14 @@ class ObjectChangeDAO
     public function getObject()
     {
         return $this->object;
+    }
+
+    /**
+     * @param mixed $objectId
+     */
+    public function setObjectId($objectId)
+    {
+        $this->objectId = $objectId;
     }
 
     /**
