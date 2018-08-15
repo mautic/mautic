@@ -18,9 +18,24 @@ namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request;
 class RequestDAO
 {
     /**
+     * @var int
+     */
+    private $syncIteration;
+
+    /**
      * @var ObjectDAO[]
      */
     private $objects = [];
+
+    /**
+     * RequestDAO constructor.
+     *
+     * @param int $syncIteration
+     */
+    public function __construct($syncIteration)
+    {
+        $this->syncIteration = (int) $syncIteration;
+    }
 
     /**
      * @param ObjectDAO $objectDAO
@@ -40,6 +55,14 @@ class RequestDAO
     public function getObjects(): array
     {
         return $this->objects;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSyncIteration(): int
+    {
+        return $this->syncIteration;
     }
 
     /**

@@ -23,9 +23,14 @@ class ObjectDAO
     private $object;
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|null
      */
     private $fromDateTime;
+
+    /**
+     * @var \DateTimeInterface|null
+     */
+    private $toDateTime;
 
     /**
      * @var string[]
@@ -35,13 +40,15 @@ class ObjectDAO
     /**
      * ObjectDAO constructor.
      *
-     * @param                    $object
+     * @param string             $object
      * @param \DateTimeInterface $fromDateTime
+     * @param \DateTimeInterface $toDateTime
      */
-    public function __construct($object, \DateTimeInterface $fromDateTime)
+    public function __construct(string $object, \DateTimeInterface $fromDateTime = null, \DateTimeInterface $toDateTime = null)
     {
         $this->object       = $object;
         $this->fromDateTime = $fromDateTime;
+        $this->toDateTime   = $toDateTime;
     }
 
     /**
@@ -73,10 +80,18 @@ class ObjectDAO
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
-    public function getFromDateTime(): \DateTimeInterface
+    public function getFromDateTime(): ?\DateTimeInterface
     {
         return $this->fromDateTime;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getToDateTime(): ?\DateTimeInterface
+    {
+        return $this->toDateTime;
     }
 }

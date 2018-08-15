@@ -133,4 +133,12 @@ class ReportDAO
 
         return $this->objects[$objectName][$objectId];
     }
+
+    /**
+     * @return bool
+     */
+    public function shouldSync()
+    {
+        return !empty($this->objects);
+    }
 }

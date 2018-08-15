@@ -84,7 +84,7 @@ class SyncCommand extends ContainerAwareCommand
         try {
             $startDateTime = ($startDateTimeString) ? new DateTimeImmutable($startDateTimeString) : null;
         } catch (\Exception $e) {
-            $io->error("'$startDateTimeString' is not a valid date. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00'");
+            $io->error("'$startDateTimeString' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
 
             return 1;
         }
