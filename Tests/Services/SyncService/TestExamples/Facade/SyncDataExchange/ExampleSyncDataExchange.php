@@ -179,9 +179,9 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
 
         $requestedObjects = $requestDAO->getObjects();
         foreach ($requestedObjects as $requestedObject) {
-            $objectName    = $requestedObject->getObject();
-            $fromDateTime = $requestDAO->getFromDateTime();
-            $mappedFields  = $requestedObject->getFields();
+            $objectName   = $requestedObject->getObject();
+            $fromDateTime = $requestedObject->getFromDateTime();
+            $mappedFields = $requestedObject->getFields();
 
             $updatedPeople = $this->getPayload($objectName, $fromDateTime, $mappedFields);
             foreach ($updatedPeople as $person) {
@@ -213,12 +213,12 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
 
     /**
      * @param                    $object
-     * @param \DateTimeImmutable $fromDateTime
+     * @param \DateTimeInterface $fromDateTime
      * @param array              $mappedFields
      *
      * @return mixed
      */
-    private function getPayload($object, \DateTimeImmutable $fromDateTime, array $mappedFields)
+    private function getPayload($object, \DateTimeInterface $fromDateTime, array $mappedFields)
     {
         // Query integration's API for objects changed since $fromDateTime with the requested fields in $mappedFields if that's
         // applicable to the integration. I.e. Salesforce supports querying for specific fields in it's SOQL

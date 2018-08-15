@@ -85,11 +85,11 @@ class SyncProcess
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
      */
     public function __construct(
-        \DateTimeInterface $fromDateTime,
         SyncJudgeInterface $syncJudgeService,
         MappingManualDAO $mappingManualDAO,
         SyncDataExchangeInterface $internalSyncDataExchange,
-        SyncDataExchangeInterface $integrationSyncDataExchange
+        SyncDataExchangeInterface $integrationSyncDataExchange,
+        \DateTimeInterface $fromDateTime = null
     ) {
         $this->syncJudgeService            = $syncJudgeService;
         $this->mappingManualDAO            = $mappingManualDAO;
@@ -128,7 +128,7 @@ class SyncProcess
      */
     private function generateInternalSyncReport(\DateTimeInterface $fromDateTime)
     {
-        $internalRequestDAO = new RequestDAO($fromDateTime);
+        $internalRequestDAO = new RequestDAO();
 
         $internalObjectsNames = $this->mappingManualDAO->getInternalObjectsNames();
         foreach ($internalObjectsNames as $internalObjectName) {
@@ -156,7 +156,7 @@ class SyncProcess
      */
     private function generateIntegrationSyncReport(\DateTimeInterface $fromDateTime)
     {
-        $integrationRequestDAO = new RequestDAO($fromDateTime);
+        $integrationRequestDAO = new RequestDAO();
 
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {

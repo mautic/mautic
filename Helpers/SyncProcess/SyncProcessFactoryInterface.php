@@ -20,19 +20,19 @@ use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 interface SyncProcessFactoryInterface
 {
     /**
-     * @param \DateTimeInterface        $fromDateTime
      * @param SyncJudgeInterface        $syncJudgeService
      * @param MappingManualDAO          $integrationMappingManual
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
+     * @param \DateTimeInterface|null   $fromDateTime
      *
      * @return SyncProcess
      */
     public function create(
-        \DateTimeInterface $fromDateTime,
         SyncJudgeInterface $syncJudgeService,
         MappingManualDAO $integrationMappingManual,
         SyncDataExchangeInterface $internalSyncDataExchange,
-        SyncDataExchangeInterface $integrationSyncDataExchange
+        SyncDataExchangeInterface $integrationSyncDataExchange,
+        \DateTimeInterface $fromDateTime = null
     );
 }

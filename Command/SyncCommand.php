@@ -82,7 +82,7 @@ class SyncCommand extends ContainerAwareCommand
         $env                 = $input->getOption('env');
 
         try {
-            $startDateTime = new DateTimeImmutable($startDateTimeString);
+            $startDateTime = ($startDateTimeString) ? new DateTimeImmutable($startDateTimeString) : null;
         } catch (\Exception $e) {
             $io->error("'$startDateTimeString' is not a valid date. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00'");
 
@@ -90,7 +90,7 @@ class SyncCommand extends ContainerAwareCommand
         }
 
         try {
-            $event = new SyncEvent($integration, $startDateTime);
+            $event = new SyncEvent($integration);
             $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
             $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $startDateTime);

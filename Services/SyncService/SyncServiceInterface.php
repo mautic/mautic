@@ -22,11 +22,11 @@ interface SyncServiceInterface
     /**
      * @param SyncDataExchangeInterface $syncDataExchangeService
      * @param MappingManualDAO          $integrationMappingManual
-     * @param \DateTimeInterface        $fromDateTime
+     * @param \DateTimeInterface|null   $fromDateTime
      */
     public function processIntegrationSync(
         SyncDataExchangeInterface $syncDataExchangeService,
         MappingManualDAO $integrationMappingManual,
-        \DateTimeInterface $fromDateTime
+        \DateTimeInterface $fromDateTime = null
     );
 }

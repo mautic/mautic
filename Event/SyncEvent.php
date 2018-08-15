@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticIntegrationsBundle\Event;
 
-use DateTimeInterface;
 use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -22,11 +21,6 @@ class SyncEvent extends Event
      * @var string
      */
     private $integration;
-
-    /**
-     * @var DateTimeInterface
-     */
-    private $startDate;
 
     /**
      * @var SyncDataExchangeInterface
@@ -42,12 +36,10 @@ class SyncEvent extends Event
      * SyncEvent constructor.
      *
      * @param                   $integration
-     * @param DateTimeInterface $startDate
      */
-    public function __construct($integration, \DateTimeInterface $startDate)
+    public function __construct($integration)
     {
         $this->integration = $integration;
-        $this->startDate   = $startDate;
     }
 
     /**
@@ -58,14 +50,6 @@ class SyncEvent extends Event
     public function shouldIntegrationSync($integration): bool
     {
         return strtolower($this->integration) === strtolower($integration);
-    }
-
-    /**
-     * @return DateTimeInterface
-     */
-    public function getStartDate()
-    {
-        return $this->startDate;
     }
 
     /**
