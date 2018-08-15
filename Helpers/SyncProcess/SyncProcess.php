@@ -71,9 +71,9 @@ class SyncProcess
     private $integrationSyncOrder;
 
     /**
-     * @var int
+     * @var \DateTimeInterface
      */
-    private $syncTimestamp;
+    private $syncDateTime;
 
     /**
      * SyncProcess constructor.
@@ -106,7 +106,7 @@ class SyncProcess
      */
     public function execute()
     {
-        $this->syncTimestamp = (new \DateTime())->getTimestamp();
+        $this->syncDateTime = new \DateTimeImmutable();
 
         // @todo batching!!!!!
         // 2. prepare internal sync order based on mapped objects
@@ -181,8 +181,8 @@ class SyncProcess
 
     private function generateSyncOrders()
     {
-        $this->internalSyncOrder    = new OrderDAO($this->syncTimestamp);
-        $this->integrationSyncOrder = new OrderDAO($this->syncTimestamp);
+        $this->internalSyncOrder    = new OrderDAO($this->syncDateTime);
+        $this->integrationSyncOrder = new OrderDAO($this->syncDateTime);
 
         $internalObjectsNames = $this->mappingManualDAO->getInternalObjectsNames();
 

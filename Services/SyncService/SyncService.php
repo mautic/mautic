@@ -63,7 +63,6 @@ final class SyncService implements SyncServiceInterface
         SyncDataExchangeInterface $syncDataExchangeService,
         MappingManualDAO $integrationMappingManual,
         \DateTimeInterface $fromDateTime
-
     ) {
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
             $fromDateTime,

@@ -22,7 +22,7 @@ class OrderDAO
     /**
      * @var int
      */
-    private $syncTimestamp;
+    private $syncDateTime;
 
     /**
      * @var array|ObjectChangeDAO[]
@@ -49,11 +49,11 @@ class OrderDAO
     /**
      * OrderDAO constructor.
      *
-     * @param int $syncTimestamp
+     * @param \DateTimeInterface $syncDateTime
      */
-    public function __construct($syncTimestamp)
+    public function __construct(\DateTimeInterface $syncDateTime)
     {
-        $this->syncTimestamp = (int) $syncTimestamp;
+        $this->syncDateTime = $syncDateTime;
     }
 
     /**
@@ -146,10 +146,10 @@ class OrderDAO
     }
 
     /**
-     * @return int
+     * @return \DateTimeInterface
      */
-    public function getSyncTimestamp(): int
+    public function getSyncDateTime(): \DateTimeInterface
     {
-        return $this->syncTimestamp;
+        return $this->syncDateTime;
     }
 }
