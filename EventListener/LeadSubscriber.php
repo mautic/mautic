@@ -48,6 +48,8 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
+     * @todo only do this if a sync is enabled otherwise this will fill up fast
+     *
      * @param Events\LeadEvent $event
      */
     public function onLeadPostSave(Events\LeadEvent $event)

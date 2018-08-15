@@ -15,7 +15,6 @@ use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncDateHelper;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess\SyncProcessFactoryInterface;
 
 /**
@@ -27,11 +26,6 @@ final class SyncService implements SyncServiceInterface
      * @var SyncProcessFactoryInterface
      */
     private $integrationSyncProcessFactory;
-
-    /**
-     * @var SyncJudgeInterface
-     */
-    private $syncJudgeService;
 
     /**
      * @var SyncDateHelper
@@ -47,18 +41,15 @@ final class SyncService implements SyncServiceInterface
      * SyncService constructor.
      *
      * @param SyncProcessFactoryInterface $integrationSyncProcessFactory
-     * @param SyncJudgeInterface          $syncJudgeService
      * @param SyncDateHelper              $syncDateHelper
      * @param MauticSyncDataExchange      $internalSyncDataExchange
      */
     public function __construct(
         SyncProcessFactoryInterface $integrationSyncProcessFactory,
-        SyncJudgeInterface $syncJudgeService,
         SyncDateHelper $syncDateHelper,
         MauticSyncDataExchange $internalSyncDataExchange
     ) {
         $this->integrationSyncProcessFactory = $integrationSyncProcessFactory;
-        $this->syncJudgeService              = $syncJudgeService;
         $this->syncDateHelper                = $syncDateHelper;
         $this->internalSyncDataExchange      = $internalSyncDataExchange;
     }
@@ -74,7 +65,6 @@ final class SyncService implements SyncServiceInterface
         \DateTimeInterface $syncFromDateTime = null
     ) {
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
-            $this->syncJudgeService,
             $integrationMappingManual,
             $this->internalSyncDataExchange,
             $syncDataExchangeService,

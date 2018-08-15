@@ -42,14 +42,14 @@ return [
                 'class'     => \MauticPlugin\MauticIntegrationsBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
-                    'mautic.integrations.helper.variable_expressor'
+                    'mautic.integrations.helper.variable_expresser'
                 ],
             ],
         ],
         'forms' => [
         ],
         'helpers' => [
-            'mautic.integrations.helper.variable_expressor' => [
+            'mautic.integrations.helper.variable_expresser' => [
                 'class' => \MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpresserHelper::class
             ]
         ],
@@ -96,7 +96,11 @@ return [
             'mautic.integrations.sync.data_exchange.mautic' => [
                 'class' => \MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange::class,
                 'arguments' => [
-                    // @todo add mautic sync arguments
+                    'mautic.integrations.helper.sync_judge',
+                    'mautic.integrations.repository.field_change',
+                    'mautic.lead.repository.lead',
+                    'mautic.lead.model.lead',
+                    'mautic.integrations.helper.variable_expresser',
                 ],
             ],
             'mautic.integrations.helper.sync_process_factory' => [
@@ -106,7 +110,6 @@ return [
                 'class' => \MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncService::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_process_factory',
-                    'mautic.integrations.helper.sync_judge',
                     'mautic.integrations.helper.sync_date',
                     'mautic.integrations.sync.data_exchange.mautic',
                 ],
