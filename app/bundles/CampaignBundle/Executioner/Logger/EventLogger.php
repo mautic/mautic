@@ -88,7 +88,6 @@ class EventLogger
     public function queueToPersist(LeadEventLog $log)
     {
         $this->persistQueue->add($log);
-        $this->logs->set($log->getId(), $log);
 
         if ($this->persistQueue->count() >= 20) {
             $this->persistPendingAndInsertIntoLogStack();
