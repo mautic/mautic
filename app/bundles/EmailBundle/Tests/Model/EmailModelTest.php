@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Tests;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -231,6 +232,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
 
         $deviceTrackerMock      = $this->createMock(DeviceTracker::class);
         $redirectRepositoryMock = $this->createMock(RedirectRepository::class);
+        $cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -244,7 +246,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $messageModel,
             $sendToContactModel,
             $deviceTrackerMock,
-            $redirectRepositoryMock
+            $redirectRepositoryMock,
+            $cacheStorageHelperMock,
         );
 
         $emailModel->setTranslator($translator);
