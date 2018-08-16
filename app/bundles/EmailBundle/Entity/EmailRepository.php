@@ -306,8 +306,6 @@ class EmailRepository extends CommonRepository
             $q->setFirstResult(0)
                 ->setMaxResults($limit);
         }
-        var_dump($q->getParameters());
-        die(var_export($q->getSQL(), true));
 
         return $q;
     }
