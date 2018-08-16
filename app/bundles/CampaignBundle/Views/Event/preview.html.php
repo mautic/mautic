@@ -14,13 +14,14 @@ if (empty($route)) {
 
 $eventType  = $event['eventType'];
 $eventLogic = '';
-
+// Show ID in dev mode to help with debugging
+$eventName = ('dev' === MAUTIC_ENV) ? "{$event['name']} <small>{$event['id']}</small>" : $event['name'];
 ?>
 <?php if (empty($update)): ?>
-<div id="CampaignEvent_<?php echo $event['id'] ?>" data-type="<?php echo $event['eventType']; ?>" class="draggable list-campaign-event list-campaign-<?php echo $event['eventType']; ?>" data-event="<?php echo $event['type']; ?>">
+<div id="CampaignEvent_<?php echo $event['id'] ?>" data-type="<?php echo $event['eventType']; ?>" class="draggable list-campaign-event list-campaign-<?php echo $event['eventType']; ?>" data-event="<?php echo $event['type']; ?>" data-event-id="<?php echo $event['id']; ?>">
 <?php endif; ?>
     <div class="campaign-event-content">
-        <div><span class="campaign-event-name ellipsis"><?php echo $event['name']; ?></span></div>
+        <div><span class="campaign-event-name ellipsis"><?php echo $eventName ?></span></div>
         <span class="campaign-event-logic"><?php echo $view['translator']->trans('mautic.campaign.'.$event['type']); ?></span>
     </div>
 <?php if (empty($update)): ?>

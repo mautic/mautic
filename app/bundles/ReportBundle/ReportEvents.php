@@ -74,6 +74,15 @@ final class ReportEvents
     const REPORT_ON_GENERATE = 'mautic.report_on_generate';
 
     /**
+     * The mautic.report_query_pre_execute event is dispatched to allow a plugin to alter the query before execution.
+     *
+     * The event listener receives a Mautic\ReportBundle\Event\ReportQueryEvent instance.
+     *
+     * @var string
+     */
+    const REPORT_QUERY_PRE_EXECUTE = 'mautic.report_query_pre_execute';
+
+    /**
      * The mautic.report_on_display event is dispatched when displaying a report.
      *
      * The event listener receives a Mautic\ReportBundle\Event\ReportDataEvent instance.

@@ -329,4 +329,14 @@ class LeadFieldRepository extends CommonRepository
 
         return !empty($result['id']);
     }
+
+    /**
+     * @param $type
+     *
+     * @return LeadField[]
+     */
+    public function getFieldsByType($type)
+    {
+        return $this->findBy(['type' => $type]);
+    }
 }

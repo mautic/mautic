@@ -156,14 +156,13 @@ final class EmailEvents
     const EMAIL_RESEND = 'mautic.on_email_resend';
 
     /**
-     * The mautic.email.on_campaign_trigger_action event is fired when the campaign action triggers.
+     * The mautic.email.on_campaign_batch_action event is dispatched when the campaign action triggers.
      *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
+    const ON_CAMPAIGN_BATCH_ACTION = 'mautic.email.on_campaign_batch_action';
 
     /**
      * The mautic.email.on_campaign_trigger_decision event is fired when the campaign action triggers.
@@ -213,4 +212,16 @@ final class EmailEvents
      * @var string
      */
     const ON_SENT_EMAIL_TO_USER = 'mautic.email.on_sent_email_to_user';
+
+    /**
+     * @deprecated 2.13.0; to be removed in 3.0. Listen to ON_CAMPAIGN_BATCH_ACTION instead.
+     *
+     * The mautic.email.on_campaign_trigger_action event is fired when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
 }
