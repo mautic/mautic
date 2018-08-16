@@ -438,4 +438,12 @@ class PluginController extends FormController
             ]
         );
     }
+
+    public function viewSettingsAction($name)
+    {
+        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationObject = $integrationHelper->getIntegrationObject($name);
+        $featureSettings = $integrationObject->getIntegrationSettings()->getFeatureSettings();
+        return new JsonResponse($featureSettings);
+    }
 }
