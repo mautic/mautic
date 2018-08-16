@@ -439,7 +439,7 @@ class PluginController extends FormController
         );
     }
 
-     /**
+    /**
      * @param $name
      *
      * @return JsonResponse|Response
