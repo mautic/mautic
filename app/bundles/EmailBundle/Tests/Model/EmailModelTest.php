@@ -247,7 +247,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $sendToContactModel,
             $deviceTrackerMock,
             $redirectRepositoryMock,
-            $cacheStorageHelperMock,
+            $cacheStorageHelperMock
         );
 
         $emailModel->setTranslator($translator);
