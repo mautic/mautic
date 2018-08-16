@@ -476,6 +476,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
 
         $deviceTrackerMock      = $this->createMock(DeviceTracker::class);
         $redirectRepositoryMock = $this->createMock(RedirectRepository::class);
+        $cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -489,7 +490,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $messageModel,
             $sendToContactModel,
             $deviceTrackerMock,
-            $redirectRepositoryMock
+            $redirectRepositoryMock,
+            $cacheStorageHelperMock
         );
 
         $emailModel->setTranslator($translator);
@@ -641,6 +643,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
 
         $deviceTrackerMock      = $this->createMock(DeviceTracker::class);
         $redirectRepositoryMock = $this->createMock(RedirectRepository::class);
+        $cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -654,7 +657,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $messageModel,
             $sendToContactModel,
             $deviceTrackerMock,
-            $redirectRepositoryMock
+            $redirectRepositoryMock,
+            $cacheStorageHelperMock
         );
 
         $emailModel->setTranslator($translator);
@@ -786,6 +790,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
 
         $deviceTrackerMock      = $this->createMock(DeviceTracker::class);
         $redirectRepositoryMock = $this->createMock(RedirectRepository::class);
+        $cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -799,7 +804,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $messageModel,
             $sendToContactModel,
             $deviceTrackerMock,
-            $redirectRepositoryMock
+            $redirectRepositoryMock,
+            $cacheStorageHelperMock
         );
 
         $emailModel->setTranslator($translator);
@@ -910,6 +916,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $deviceTrackerMock  = $this->createMock(DeviceTracker::class);
 
         $redirectRepositoryMock = $this->createMock(RedirectRepository::class);
+        $cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -923,7 +930,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $messageModel,
             $sendToContactModel,
             $deviceTrackerMock,
-            $redirectRepositoryMock
+            $redirectRepositoryMock,
+            $cacheStorageHelperMock
         );
 
         $emailModel->setTranslator($translator);
@@ -1051,6 +1059,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
 
         $deviceTrackerMock      = $this->createMock(DeviceTracker::class);
         $redirectRepositoryMock = $this->createMock(RedirectRepository::class);
+        $cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
 
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
@@ -1064,7 +1073,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $messageModel,
             $sendToContactModel,
             $deviceTrackerMock,
-            $redirectRepositoryMock
+            $redirectRepositoryMock,
+            $cacheStorageHelperMock
         );
 
         $emailModel->setTranslator($translator);
