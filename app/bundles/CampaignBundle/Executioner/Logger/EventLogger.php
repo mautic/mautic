@@ -144,6 +144,8 @@ class EventLogger
 
     /**
      * Persist the queue, clear the entities from memory, and reset the queue.
+     *
+     * @return ArrayCollection
      */
     public function persistQueuedLogs()
     {
@@ -202,10 +204,10 @@ class EventLogger
     }
 
     /**
-     * @param Event                  $event
-     * @param AbstractEventAccessor  $config
-     * @param ArrayCollection|Lead[] $contacts
-     * @param bool                   $isInactiveEvent
+     * @param Event                 $event
+     * @param AbstractEventAccessor $config
+     * @param ArrayCollection       $contacts
+     * @param bool                  $isInactiveEntry
      *
      * @return ArrayCollection
      */
