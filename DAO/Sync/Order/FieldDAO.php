@@ -9,9 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order;
+namespace MauticPlugin\IntegrationsBundle\DAO\Sync\Order;
 
-use MauticPlugin\MauticIntegrationsBundle\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Value\NormalizedValueDAO;
 
 /**
  * Class FieldDAO

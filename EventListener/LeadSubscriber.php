@@ -1,17 +1,17 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\EventListener;
+namespace MauticPlugin\IntegrationsBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChange;
-use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChangeRepository;
-use MauticPlugin\MauticIntegrationsBundle\Event\SyncEvent;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpresserHelperInterface;
-use MauticPlugin\MauticIntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
+use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
+use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Helpers\VariableExpressor\VariableExpresserHelperInterface;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 
 class LeadSubscriber extends CommonSubscriber
 {

@@ -8,11 +8,11 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-namespace MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess;
+namespace MauticPlugin\IntegrationsBundle\Helpers\SyncProcess;
 
-use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncDateHelper;
+use MauticPlugin\IntegrationsBundle\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
+use MauticPlugin\IntegrationsBundle\Helpers\SyncDateHelper;
 
 /**
  * Class SyncProcessFactory

@@ -9,7 +9,7 @@
  * @author      Jan Kozak <galvani78@gmail.com>
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Configuration;
+namespace MauticPlugin\IntegrationsBundle\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

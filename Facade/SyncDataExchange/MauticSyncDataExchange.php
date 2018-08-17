@@ -9,22 +9,22 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange;
+namespace MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange;
 
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\FieldDAO AS ReportFieldDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO AS OrderObjectChangeDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\OrderDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\RequestDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Value\EncodedValueDAO;
-use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChange;
-use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChangeRepository;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpresserHelperInterface;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\FieldDAO AS ReportFieldDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO AS OrderObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Request\RequestDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Value\EncodedValueDAO;
+use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
+use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
+use MauticPlugin\IntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
+use MauticPlugin\IntegrationsBundle\Helpers\VariableExpressor\VariableExpresserHelperInterface;
 
 /**
  * Class MauticSyncDataExchange

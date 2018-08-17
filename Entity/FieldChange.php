@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Entity;
+namespace MauticPlugin\IntegrationsBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;

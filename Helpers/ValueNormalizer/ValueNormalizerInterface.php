@@ -8,9 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-namespace MauticPlugin\MauticIntegrationsBundle\Helpers\ValueNormalizer;
+namespace MauticPlugin\IntegrationsBundle\Helpers\ValueNormalizer;
 
-use MauticPlugin\MauticIntegrationsBundle\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Value\NormalizedValueDAO;
 
 /**
  * Interface ValueNormalizerInterface

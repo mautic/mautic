@@ -1,21 +1,21 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle;
+namespace MauticPlugin\IntegrationsBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
-use MauticPlugin\MauticIntegrationsBundle\DependencyInjection\Compiler\AuthPass;
-use MauticPlugin\MauticIntegrationsBundle\DependencyInjection\Compiler\AuthenticationIntegrationPass;
-use MauticPlugin\MauticIntegrationsBundle\DependencyInjection\Compiler\BasicIntegrationPass;
-use MauticPlugin\MauticIntegrationsBundle\DependencyInjection\Compiler\DispatcherIntegrationPass;
-use MauticPlugin\MauticIntegrationsBundle\DependencyInjection\Compiler\EncryptionIntegrationPass;
+use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\AuthPass;
+use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\AuthenticationIntegrationPass;
+use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\BasicIntegrationPass;
+use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\DispatcherIntegrationPass;
+use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\EncryptionIntegrationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Class MauticIntegrationsBundle
+ * Class IntegrationsBundle
  *
- * @package MauticPlugin\MauticIntegrationsBundle
+ * @package MauticPlugin\IntegrationsBundle
  */
-class MauticIntegrationsBundle extends PluginBundleBase
+class IntegrationsBundle extends PluginBundleBase
 {
     public function build(ContainerBuilder $container)
     {

@@ -10,7 +10,7 @@
  */
 
 
-namespace MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request;
+namespace MauticPlugin\IntegrationsBundle\DAO\Sync\Request;
 
 /**
  * Class RequestDAO

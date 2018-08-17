@@ -9,16 +9,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService;
+namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService;
 
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use MauticPlugin\MauticIntegrationsBundle\Event\SyncEvent;
-use MauticPlugin\MauticIntegrationsBundle\IntegrationEvents;
-use MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncService;
-use MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\EventListener\IntegrationSubscriber;
-use MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange\ExampleSyncDataExchange;
-use MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
+use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Services\SyncService\SyncService;
+use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\EventListener\IntegrationSubscriber;
+use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange\ExampleSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SyncServiceTest extends MauticMysqlTestCase

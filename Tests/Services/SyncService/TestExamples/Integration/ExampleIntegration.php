@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration;
+namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration;
 
-use MauticPlugin\MauticIntegrationsBundle\Integration\BasicIntegration;
-use MauticPlugin\MauticIntegrationsBundle\Integration\Interfaces\BasicInterface;
+use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 
 final class ExampleIntegration extends BasicIntegration implements BasicInterface
 {

@@ -9,16 +9,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Command;
+namespace MauticPlugin\IntegrationsBundle\Command;
 
 use DateTimeImmutable;
-use MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncServiceInterface;
+use MauticPlugin\IntegrationsBundle\Services\SyncService\SyncServiceInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use MauticPlugin\MauticIntegrationsBundle\Event\SyncEvent;
-use MauticPlugin\MauticIntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

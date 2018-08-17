@@ -9,9 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor;
+namespace MauticPlugin\IntegrationsBundle\Helpers\VariableExpressor;
 
-use MauticPlugin\MauticIntegrationsBundle\DAO\Value\EncodedValueDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Value\EncodedValueDAO;
 
 /**
  * Class VariableExpresserHelper

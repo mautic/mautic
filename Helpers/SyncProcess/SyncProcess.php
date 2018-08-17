@@ -9,21 +9,21 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Helpers\SyncProcess;
+namespace MauticPlugin\IntegrationsBundle\Helpers\SyncProcess;
 
-use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\ObjectMappingDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\FieldDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\FieldMappingDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\OrderDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\RequestDAO;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\SyncDateHelper;
+use MauticPlugin\IntegrationsBundle\DAO\Mapping\ObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Order\FieldDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Mapping\FieldMappingDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Request\RequestDAO;
+use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
+use MauticPlugin\IntegrationsBundle\Helpers\SyncDateHelper;
 
 /**
  * Class SyncProcess

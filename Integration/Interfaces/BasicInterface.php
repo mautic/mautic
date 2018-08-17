@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Integration\Interfaces;
+namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
 interface BasicInterface {
     /**

@@ -9,19 +9,19 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange;
+namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange;
 
-use MauticPlugin\MauticIntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Mapping\EntityMappingDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Value\NormalizedValueDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Order\OrderDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\FieldDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ObjectDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\MauticIntegrationsBundle\DAO\Sync\Request\RequestDAO;
-use MauticPlugin\MauticIntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\ValueNormalizer\ValueNormalizer;
+use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
+use MauticPlugin\IntegrationsBundle\DAO\Mapping\EntityMappingDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\FieldDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\ObjectDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\Request\RequestDAO;
+use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
+use MauticPlugin\IntegrationsBundle\Helpers\ValueNormalizer\ValueNormalizer;
 
 class ExampleSyncDataExchange implements SyncDataExchangeInterface
 {

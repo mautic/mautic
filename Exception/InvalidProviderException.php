@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Exception;
+namespace MauticPlugin\IntegrationsBundle\Exception;
 
 class InvalidProviderException extends \Exception
 {

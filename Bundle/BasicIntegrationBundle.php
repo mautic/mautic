@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Bundle;
+namespace MauticPlugin\IntegrationsBundle\Bundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 

@@ -9,7 +9,7 @@
  * @author      Jan Kozak <galvani78@gmail.com>
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Facade;
+namespace MauticPlugin\IntegrationsBundle\Facade;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 

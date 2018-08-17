@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Helpers;
+namespace MauticPlugin\IntegrationsBundle\Helpers;
 
 
 use Doctrine\DBAL\Connection;

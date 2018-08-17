@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MauticIntegrationsBundle\DAO\Mapping;
+namespace MauticPlugin\IntegrationsBundle\DAO\Mapping;
 
 /**
  * Class MappingManualDAO
