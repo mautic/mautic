@@ -60,12 +60,11 @@ class ObjectChangeDAO
     /**
      * @param FieldDAO $fieldDAO
      *
-     * @return $this
+     * @return ObjectChangeDAO
      */
     public function addField(FieldDAO $fieldDAO): ObjectChangeDAO
     {
         $this->fields[$fieldDAO->getName()] = $fieldDAO;
-
         return $this;
     }
 

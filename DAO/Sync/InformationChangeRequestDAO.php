@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\IntegrationsBundle\DAO\Sync;
 
+use MauticPlugin\IntegrationsBundle\DAO\Value\NormalizedValueDAO;
+
 /**
  * Class InformationChangeRequestDAO
  */
@@ -24,12 +26,12 @@ class InformationChangeRequestDAO
     /**
      * @var string
      */
-    private $entity;
+    private $objectName;
 
     /**
-     * @var int
+     * @var mixed
      */
-    private $entityId;
+    private $objectId;
 
     /**
      * @var string
@@ -42,31 +44,31 @@ class InformationChangeRequestDAO
     private $newValue;
 
     /**
-     * @var int|null
+     * @var \DateTimeInterface|null
      */
-    private $possibleChangeTimestamp = null;
+    private $possibleChangeDateTime = null;
 
     /**
-     * @var int|null
+     * @var \DateTimeInterface|null
      */
-    private $certainChangeTimestamp = null;
+    private $certainChangeDateTime = null;
 
     /**
      * InformationChangeRequestDAO constructor.
      *
-     * @param string $integration
-     * @param string $entity
-     * @param int    $entityId
-     * @param string $field
-     * @param mixed  $newValue
+     * @param string             $integration
+     * @param string             $objectName
+     * @param mixed              $objectId
+     * @param string             $field
+     * @param NormalizedValueDAO $normalizedValueDAO
      */
-    public function __construct($integration, $entity, $entityId, $field, $newValue)
+    public function __construct($integration, $objectName, $objectId, $field, NormalizedValueDAO $normalizedValueDAO)
     {
         $this->integration = $integration;
-        $this->entity      = $entity;
-        $this->entityId    = $entityId;
+        $this->objectName  = $objectName;
+        $this->objectId    = $objectId;
         $this->field       = $field;
-        $this->newValue    = $newValue;
+        $this->newValue    = $normalizedValueDAO->getNormalizedValue();
     }
 
     /**
@@ -78,19 +80,19 @@ class InformationChangeRequestDAO
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getEntityId()
+    public function getObjectId()
     {
-        return $this->entityId;
+        return $this->objectId;
     }
 
     /**
      * @return string
      */
-    public function getEntity()
+    public function getObject()
     {
-        return $this->entity;
+        return $this->objectName;
     }
 
     /**
@@ -110,41 +112,41 @@ class InformationChangeRequestDAO
     }
 
     /**
-     * @return int|null
+     * @return \DateTimeInterface|null
      */
-    public function getPossibleChangeTimestamp()
+    public function getPossibleChangeDateTime()
     {
-        return $this->possibleChangeTimestamp;
+        return $this->possibleChangeDateTime;
     }
 
     /**
-     * @param int|null $possibleChangeTimestamp
+     * @param \DateTimeInterface $possibleChangeDateTime
      *
      * @return InformationChangeRequestDAO
      */
-    public function setPossibleChangeTimestamp($possibleChangeTimestamp)
+    public function setPossibleChangeDateTime(\DateTimeInterface $possibleChangeDateTime)
     {
-        $this->possibleChangeTimestamp = $possibleChangeTimestamp;
+        $this->possibleChangeDateTime = $possibleChangeDateTime;
 
         return $this;
     }
 
     /**
-     * @return int|null
+     * @return \DateTimeInterface|null
      */
-    public function getCertainChangeTimestamp()
+    public function getCertainChangeDateTime()
     {
-        return $this->certainChangeTimestamp;
+        return $this->certainChangeDateTime;
     }
 
     /**
-     * @param int|null $certainChangeTimestamp
+     * @param \DateTimeInterface $certainChangeDateTime
      *
      * @return InformationChangeRequestDAO
      */
-    public function setCertainChangeTimestamp($certainChangeTimestamp)
+    public function setCertainChangeDateTime(\DateTimeInterface $certainChangeDateTime)
     {
-        $this->certainChangeTimestamp = $certainChangeTimestamp;
+        $this->certainChangeDateTime = $certainChangeDateTime;
 
         return $this;
     }

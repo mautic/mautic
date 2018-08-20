@@ -87,8 +87,8 @@ class ReportDAO
         );
 
 
-        $informationChangeRequest->setPossibleChangeTimestamp($reportObject->getChangeTimestamp())
-            ->setCertainChangeTimestamp($reportField->getChangeTimestamp());
+        $informationChangeRequest->setPossibleChangeDateTime($reportObject->getChangeDateTime())
+            ->setCertainChangeDateTime($reportField->getChangeDateTime());
 
         return $informationChangeRequest;
     }

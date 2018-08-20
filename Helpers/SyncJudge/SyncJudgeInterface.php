@@ -37,7 +37,8 @@ interface SyncJudgeInterface
      * @param string $mode
      * @param InformationChangeRequestDAO|null $changeRequest1
      * @param InformationChangeRequestDAO|null $changeRequest2
-     * @return mixed New value
+     *
+     * @return InformationChangeRequestDAO
      */
     public function adjudicate(
         $mode = self::PRESUMPTION_OF_INNOCENCE_MODE,

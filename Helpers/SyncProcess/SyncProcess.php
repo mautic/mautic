@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Helpers\SyncProcess;
 
 use MauticPlugin\IntegrationsBundle\DAO\Mapping\ObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\DAO\Mapping\FieldMappingDAO;
 use MauticPlugin\IntegrationsBundle\DAO\Mapping\MappingManualDAO;
@@ -24,12 +25,15 @@ use MauticPlugin\IntegrationsBundle\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Helpers\SyncDateHelper;
+use MauticPlugin\IntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 
 /**
  * Class SyncProcess
  */
 class SyncProcess
 {
+    private $syncJudge;
+
     /**
      * @var MappingManualDAO
      */
@@ -61,18 +65,19 @@ class SyncProcess
     private $syncFromDateTime;
 
     /**
-     * @var int
-     */
-    private $syncIteration = 1;
-
-    /**
      * @var \DateTimeInterface[]
      */
     private $lastObjectSyncDates = [];
 
     /**
+     * @var int
+     */
+    private $syncIteration;
+
+    /**
      * SyncProcess constructor.
      *
+     * @param SyncJudgeInterface        $syncJudge
      * @param MappingManualDAO          $mappingManualDAO
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
@@ -80,13 +85,14 @@ class SyncProcess
      * @param \DateTimeInterface|null   $syncFromDateTime
      */
     public function __construct(
+        SyncJudgeInterface $syncJudge,
         MappingManualDAO $mappingManualDAO,
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
         SyncDateHelper $syncDateHelper,
         \DateTimeInterface $syncFromDateTime = null
-    )
-    {
+    ) {
+        $this->syncJudge                   = $syncJudge;
         $this->mappingManualDAO            = $mappingManualDAO;
         $this->internalSyncDataExchange    = $internalSyncDataExchange;
         $this->integrationSyncDataExchange = $integrationSyncDataExchange;
@@ -102,15 +108,17 @@ class SyncProcess
     {
         defined('MAUTIC_INTEGRATION_ACTIVE_SYNC') or define('MAUTIC_INTEGRATION_ACTIVE_SYNC', 1);
 
-        $this->syncDateTime  = new \DateTimeImmutable();
+        $this->syncDateTime = new \DateTimeImmutable();
 
         $this->syncIteration = 1;
         do {
             $syncReport = $this->generateIntegrationSyncReport();
 
             if ($syncReport->shouldSync()) {
-                $internalSyncOrder = $this->generateInternalSyncOrder($syncReport);
-                $this->internalSyncDataExchange->executeSyncOrder($internalSyncOrder);
+                // Convert the integrations' report into an "order" or instructions for Mautic
+                $syncOrder = $this->generateInternalSyncOrder($syncReport);
+                // Execute the sync instructions
+                $this->internalSyncDataExchange->executeSyncOrder($syncOrder);
             }
 
             $this->syncIteration++;
@@ -120,16 +128,17 @@ class SyncProcess
             $syncReport = $this->generateInternalSyncReport();
 
             if ($syncReport->shouldSync()) {
-                $integrationSyncOrder = $this->generateIntegrationSyncOrder($syncReport);
-                $this->integrationSyncDataExchange->executeSyncOrder($integrationSyncOrder);
+                $syncOrder = $this->generateIntegrationSyncOrder($syncReport);
+                $this->integrationSyncDataExchange->executeSyncOrder($syncOrder);
 
-                $this->internalSyncDataExchange->saveObjectRelationships($integrationSyncOrder->getEntityMappings());
+                $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getEntityMappings());
             }
         } while ($syncReport->shouldSync());
     }
 
     /**
      * @return ReportDAO
+     * @throws \Exception
      */
     private function generateIntegrationSyncReport()
     {
@@ -143,7 +152,7 @@ class SyncProcess
                 continue;
             }
 
-            $objectSyncFromDateTime = $this->getSyncFromDateTime($this->mappingManualDAO->getIntegration(), $integrationObjectName);
+            $objectSyncFromDateTime   = $this->getSyncFromDateTime($this->mappingManualDAO->getIntegration(), $integrationObjectName);
             $integrationRequestObject = new RequestObjectDAO($integrationObjectName, $objectSyncFromDateTime, $this->syncDateTime);
             foreach ($integrationObjectFields as $integrationObjectField) {
                 $integrationRequestObject->addField($integrationObjectField);
@@ -158,7 +167,6 @@ class SyncProcess
 
         return $integrationSyncReport;
     }
-
 
     /**
      * @return ReportDAO
@@ -192,6 +200,8 @@ class SyncProcess
     }
 
     /**
+     * Generates an "order" which translates the report from the integration into instructions for Mautic to sync
+     *
      * @param ReportDAO $syncReport
      *
      * @return OrderDAO
@@ -205,9 +215,10 @@ class SyncProcess
             $integrationObjects         = $syncReport->getObjects($integrationObjectName);
             $mappedInternalObjectsNames = $this->mappingManualDAO->getMappedInternalObjectsNames($integrationObjectName);
             foreach ($mappedInternalObjectsNames as $mappedInternalObjectName) {
-                $objectMappingDAO = $this->mappingManualDAO->getObjectMapping($mappedInternalObjectName, $integrationObjectName);
+                $objectMapping = $this->mappingManualDAO->getObjectMapping($mappedInternalObjectName, $integrationObjectName);
                 foreach ($integrationObjects as $integrationObject) {
-                    $objectChange = $this->getIntegrationSyncObjectChange($syncReport, $objectMappingDAO, $integrationObject);
+                    $internalObject = $this->internalSyncDataExchange->getConflictedInternalObject($this->mappingManualDAO, $mappedInternalObjectName, $integrationObject);
+                    $objectChange   = $this->getSyncObjectChangeIntegrationToMautic($syncReport, $objectMapping, $integrationObject, $internalObject);
 
                     $syncOrder->addObjectChange($objectChange);
                 }
@@ -218,6 +229,8 @@ class SyncProcess
     }
 
     /**
+     * Generates an "order" which translates the report from Mautic into instructions for the Integration to sync
+     *
      * @param ReportDAO $syncReport
      *
      * @return OrderDAO
@@ -228,12 +241,13 @@ class SyncProcess
 
         $internalObjectNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($internalObjectNames as $internalObjectName) {
-            $internalObjects         = $syncReport->getObjects($internalObjectName);
+            $internalObjects              = $syncReport->getObjects($internalObjectName);
             $mappedIntegrationObjectNames = $this->mappingManualDAO->getMappedIntegrationObjectsNames($internalObjectName);
             foreach ($mappedIntegrationObjectNames as $mappedIntegrationObjectName) {
-                $objectMappingDAO = $this->mappingManualDAO->getObjectMapping($mappedIntegrationObjectName, $internalObjectName);
+                $objectMapping = $this->mappingManualDAO->getObjectMapping($mappedIntegrationObjectName, $internalObjectName);
                 foreach ($internalObjects as $internalObject) {
-                    $objectChange = $this->getInternalSyncObjectChange($syncReport, $objectMappingDAO, $internalObject);
+                    $integrationObject = $this->internalSyncDataExchange->getMappedIntegrationObject($mappedIntegrationObjectName, $internalObject);
+                    $objectChange = $this->getSyncObjectChangeMauticToIntegration($syncReport, $objectMapping, $internalObject, $integrationObject);
 
                     $syncOrder->addObjectChange($objectChange);
                 }
@@ -248,6 +262,7 @@ class SyncProcess
      * @param string $object
      *
      * @return \DateTimeInterface
+     * @throws \Exception
      */
     private function getSyncFromDateTime(string $integration, string $object): \DateTimeInterface
     {
@@ -275,29 +290,127 @@ class SyncProcess
         return $this->lastObjectSyncDates[$key];
     }
 
-
     /**
+     * Generates a ObjectChangeDAO from Integration to Mautic
+     *
      * @param ReportDAO        $syncReport
-     * @param ObjectMappingDAO $objectMappingDAO
-     * @param ReportObjectDAO  $internalObjectDAO
+     * @param ObjectMappingDAO $objectMapping
+     * @param ReportObjectDAO  $integrationObject
+     * @param ReportObjectDAO  $internalObject
      *
      * @return ObjectChangeDAO
      */
-    private function getIntegrationSyncObjectChange(ReportDAO $syncReport, ObjectMappingDAO $objectMappingDAO, ReportObjectDAO $internalObjectDAO)
-    {
-        $integrationObjectChange = new ObjectChangeDAO(
-            $objectMappingDAO->getIntegrationObjectName(),
-            null,
-            $internalObjectDAO->getObject(),
-            $internalObjectDAO->getObjectId()
+    private function getSyncObjectChangeIntegrationToMautic(
+        ReportDAO $syncReport,
+        ObjectMappingDAO $objectMapping,
+        ReportObjectDAO $integrationObject,
+        ReportObjectDAO $internalObject
+    ) {
+        $objectChange = new ObjectChangeDAO(
+            $objectMapping->getInternalObjectName(),
+            $internalObject->getObject(),
+            $integrationObject->getObject(),
+            $integrationObject->getObjectId()
         );
 
         /** @var FieldMappingDAO[] $fieldMappings */
-        $fieldMappings = $objectMappingDAO->getFieldMappings();
+        $fieldMappings = $objectMapping->getFieldMappings();
+        foreach ($fieldMappings as $fieldMappingDAO) {
+            $integrationInformationChangeRequest = $syncReport->getInformationChangeRequest(
+                $integrationObject->getObject(),
+                $integrationObject->getObjectId(),
+                $fieldMappingDAO->getIntegrationField()
+            );
+
+            // Perform the sync in the direction instructed
+            switch ($fieldMappingDAO->getSyncDirection()) {
+                case ObjectMappingDAO::SYNC_TO_MAUTIC:
+                    $objectChange->addField(
+                        new FieldDAO($fieldMappingDAO->getInternalField(), $integrationInformationChangeRequest->getNewValue())
+                    );
+
+                    break;
+
+                case ObjectMappingDAO::SYNC_TO_INTEGRATION:
+                    // Ignore this field
+
+                    break;
+                case ObjectMappingDAO::SYNC_BIDIRECTIONALLY:
+                    if ($internalField = $internalObject->getField($fieldMappingDAO->getInternalField())) {
+                        $internalInformationChangeRequest = new InformationChangeRequestDAO(
+                            MauticSyncDataExchange::NAME,
+                            $internalObject->getObject(),
+                            $internalObject->getObjectId(),
+                            $internalField->getName(),
+                            $internalField->getValue()
+                        );
+
+                        // There is a conflict so let the judge determine which value comes out on top
+                        $judgeModes = [
+                            SyncJudgeInterface::PRESUMPTION_OF_INNOCENCE_MODE,
+                            SyncJudgeInterface::BEST_EVIDENCE_MODE
+                        ];
+
+                        foreach ($judgeModes as $judgeMode) {
+                            try {
+                                $winningChangeRequest = $this->syncJudge->adjudicate(
+                                    $judgeMode,
+                                    $internalInformationChangeRequest,
+                                    $integrationInformationChangeRequest
+                                );
+
+                                $objectChange->addField(
+                                    new FieldDAO($fieldMappingDAO->getInternalField(), $winningChangeRequest->getNewValue())
+                                );
+                                break;
+                            } catch (\LogicException $ex) {
+                                continue;
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    $objectChange->addField(
+                        new FieldDAO(
+                            $fieldMappingDAO->getInternalField(),
+                            $integrationInformationChangeRequest->getNewValue()
+                        )
+                    );
+                    break;
+            }
+        }
+
+        return $objectChange;
+    }
+
+    /**
+     * @param ReportDAO        $syncReport
+     * @param ObjectMappingDAO $objectMapping
+     * @param ReportObjectDAO  $internalObject
+     * @param ReportObjectDAO  $integrationObject
+     *
+     * @return ObjectChangeDAO
+     */
+    private function getSyncObjectChangeMauticToIntegration(
+        ReportDAO $syncReport,
+        ObjectMappingDAO $objectMapping,
+        ReportObjectDAO $internalObject,
+        ReportObjectDAO $integrationObject
+    ) {
+        $objectChange = new ObjectChangeDAO(
+            $objectMapping->getIntegrationObjectName(),
+            $integrationObject->getObjectId(),
+            $internalObject->getObject(),
+            $internalObject->getObjectId()
+        );
+
+        /** @var FieldMappingDAO[] $fieldMappings */
+        $fieldMappings = $objectMapping->getFieldMappings();
         foreach ($fieldMappings as $fieldMappingDAO) {
             $internalInformationChangeRequest = $syncReport->getInformationChangeRequest(
-                $objectMappingDAO->getInternalObjectName(),
-                $internalObjectDAO->getObjectId(),
+                $internalObject->getObject(),
+                $internalObject->getObjectId(),
                 $fieldMappingDAO->getInternalField()
             );
 
@@ -305,60 +418,19 @@ class SyncProcess
             switch ($fieldMappingDAO->getSyncDirection()) {
                 case ObjectMappingDAO::SYNC_TO_MAUTIC:
                     // Ignore this field
+
                     break;
-                case ObjectMappingDAO::SYNC_BIDIRECTIONALLY:
                 case ObjectMappingDAO::SYNC_TO_INTEGRATION:
-                    $integrationFieldChange = new FieldDAO($fieldMappingDAO->getIntegrationField(), $internalInformationChangeRequest->getNewValue());
-                    $integrationObjectChange->addField($integrationFieldChange);
+                case ObjectMappingDAO::SYNC_BIDIRECTIONALLY:
+                    // Bidirectional conflicts were handled by getSyncObjectChangeIntegrationToMautic
+                    $objectChange->addField(
+                        new FieldDAO($fieldMappingDAO->getInternalField(), $internalInformationChangeRequest->getNewValue())
+                    );
 
                     break;
             }
         }
 
-        return $integrationObjectChange;
-    }
-
-    /**
-     * @param ReportDAO        $syncReport
-     * @param ObjectMappingDAO $objectMappingDAO
-     * @param ReportObjectDAO  $integrationObjectDAO
-     *
-     * @return ObjectChangeDAO
-     */
-    private function getInternalSyncObjectChange(ReportDAO $syncReport, ObjectMappingDAO $objectMappingDAO, ReportObjectDAO $integrationObjectDAO)
-    {
-        $internalObjectChange = new ObjectChangeDAO(
-            $objectMappingDAO->getInternalObjectName(),
-            null,
-            $integrationObjectDAO->getObject(),
-            $integrationObjectDAO->getObjectId()
-        );
-
-        /** @var FieldMappingDAO[] $fieldMappings */
-        $fieldMappings = $objectMappingDAO->getFieldMappings();
-        foreach ($fieldMappings as $fieldMappingDAO) {
-            $integrationInformationChangeRequest = $syncReport->getInformationChangeRequest(
-                $objectMappingDAO->getIntegrationObjectName(),
-                $integrationObjectDAO->getObjectId(),
-                $fieldMappingDAO->getIntegrationField()
-            );
-
-            // Perform the sync in the direction instructed
-            switch ($fieldMappingDAO->getSyncDirection()) {
-                case ObjectMappingDAO::SYNC_TO_INTEGRATION:
-                    // Ignore this field
-
-                    break;
-                case ObjectMappingDAO::SYNC_TO_MAUTIC:
-                case ObjectMappingDAO::SYNC_BIDIRECTIONALLY:
-
-                    $internalFieldChange = new FieldDAO($fieldMappingDAO->getInternalField(), $integrationInformationChangeRequest->getNewValue());
-                    $internalObjectChange->addField($internalFieldChange);
-
-                    break;
-            }
-        }
-
-        return $internalObjectChange;
+        return $objectChange;
     }
 }

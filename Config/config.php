@@ -101,6 +101,7 @@ return [
                     'mautic.lead.repository.lead',
                     'mautic.lead.model.lead',
                     'mautic.integrations.helper.variable_expresser',
+                    'mautic.integrations.helper.sync_duplicity_finder',
                 ],
             ],
             'mautic.integrations.helper.sync_process_factory' => [
@@ -118,6 +119,12 @@ return [
                 'class'     => \MauticPlugin\IntegrationsBundle\Helpers\SyncDateHelper::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.integrations.helper.sync_duplicity_finder' => [
+                'class' => \MauticPlugin\IntegrationBundle\Helpers\Duplicity\DuplicityFinder::class,
+                'arguments' => [
+
                 ],
             ],
         ],

@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Command;
 
 use DateTimeImmutable;
+use MauticPlugin\IntegrationsBundle\Event\SyncCompletedEvent;
 use MauticPlugin\IntegrationsBundle\Services\SyncService\SyncServiceInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -94,8 +95,6 @@ class SyncCommand extends ContainerAwareCommand
             $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
             $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $startDateTime);
-
-            $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_COMPLETE, $event);
         } catch (\Exception $e) {
             if ($env === 'dev' || MAUTIC_ENV === 'dev') {
                 throw $e;

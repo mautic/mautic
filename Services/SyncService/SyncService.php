@@ -15,6 +15,7 @@ use MauticPlugin\IntegrationsBundle\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Helpers\SyncDateHelper;
+use MauticPlugin\IntegrationsBundle\Helpers\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\IntegrationsBundle\Helpers\SyncProcess\SyncProcessFactoryInterface;
 
 /**
@@ -22,6 +23,11 @@ use MauticPlugin\IntegrationsBundle\Helpers\SyncProcess\SyncProcessFactoryInterf
  */
 final class SyncService implements SyncServiceInterface
 {
+    /**
+     * @var SyncJudgeInterface
+     */
+    private $syncJudge;
+
     /**
      * @var SyncProcessFactoryInterface
      */
@@ -40,15 +46,18 @@ final class SyncService implements SyncServiceInterface
     /**
      * SyncService constructor.
      *
+     * @param SyncJudgeInterface          $syncJudge
      * @param SyncProcessFactoryInterface $integrationSyncProcessFactory
      * @param SyncDateHelper              $syncDateHelper
      * @param MauticSyncDataExchange      $internalSyncDataExchange
      */
     public function __construct(
+        SyncJudgeInterface $syncJudge,
         SyncProcessFactoryInterface $integrationSyncProcessFactory,
         SyncDateHelper $syncDateHelper,
         MauticSyncDataExchange $internalSyncDataExchange
     ) {
+        $this->syncJudge                     = $syncJudge;
         $this->integrationSyncProcessFactory = $integrationSyncProcessFactory;
         $this->syncDateHelper                = $syncDateHelper;
         $this->internalSyncDataExchange      = $internalSyncDataExchange;
@@ -65,6 +74,7 @@ final class SyncService implements SyncServiceInterface
         \DateTimeInterface $syncFromDateTime = null
     ) {
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
+            $this->syncJudge,
             $integrationMappingManual,
             $this->internalSyncDataExchange,
             $syncDataExchangeService,

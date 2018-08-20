@@ -64,7 +64,7 @@ class FieldChange
         $builder
             ->setTable('object_field_change_report')
             ->setCustomRepositoryClass(FieldChangeRepository::class)
-            ->addIndex(['object_id', 'object_type', 'column_name'], 'object_composite_key')
+            ->addIndex(['object_type', 'object_id', 'column_name'], 'object_composite_key')
             ->addIndex(['object_type', 'modified_at'], 'object_type_modification_composite_key');
 
         $builder->addId();

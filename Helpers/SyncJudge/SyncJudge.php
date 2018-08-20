@@ -23,11 +23,11 @@ final class SyncJudge implements SyncJudgeInterface
     const NO_WINNER = 'no';
 
     /**
-     * @param string                             $mode
-     * @param InformationChangeRequestDAO|null   $changeRequest1
-     * @param InformationChangeRequestDAO|null   $changeRequest2
+     * @param string $mode
+     * @param InformationChangeRequestDAO|null $changeRequest1
+     * @param InformationChangeRequestDAO|null $changeRequest2
      *
-     * @return mixed
+     * @return InformationChangeRequestDAO
      *
      * @throws \LogicException if conflict was not resolved
      */
@@ -35,17 +35,19 @@ final class SyncJudge implements SyncJudgeInterface
         $mode = self::PRESUMPTION_OF_INNOCENCE_MODE,
         InformationChangeRequestDAO $changeRequest1 = null,
         InformationChangeRequestDAO $changeRequest2 = null
-    )
-    {
-        if($changeRequest1 !== null && $changeRequest2 === null) {
-            return $changeRequest1->getNewValue();
+    ) {
+        if ($changeRequest1 !== null && $changeRequest2 === null) {
+            return $changeRequest1;
         }
-        elseif ($changeRequest1 === null && $changeRequest2 !== null) {
-            return $changeRequest2->getNewValue();
+
+        if ($changeRequest1 === null && $changeRequest2 !== null) {
+            return $changeRequest2;
         }
+
         if ($changeRequest1->getNewValue() === $changeRequest2->getNewValue()) {
-            return $changeRequest1->getNewValue();
+            return $changeRequest1;
         }
+
         switch ($mode) {
             case SyncJudgeInterface::PRESUMPTION_OF_INNOCENCE_MODE:
                 return $this->adjudicatePresumptionOfInnocence($changeRequest1, $changeRequest2);
@@ -62,76 +64,94 @@ final class SyncJudge implements SyncJudgeInterface
      * @param InformationChangeRequestDAO $changeRequest1
      * @param InformationChangeRequestDAO $changeRequest2
      *
-     * @return mixed
+     * @return InformationChangeRequestDAO
      */
     private function adjudicatePresumptionOfInnocence(InformationChangeRequestDAO $changeRequest1, InformationChangeRequestDAO $changeRequest2)
     {
-        $certainChangeCompare = $this->compareTimestamps($changeRequest1->getCertainChangeTimestamp(), $changeRequest2->getCertainChangeTimestamp());
+        $certainChangeCompare = $this->compareDateTimes($changeRequest1->getCertainChangeDateTime(), $changeRequest2->getCertainChangeDateTime());
         if ($certainChangeCompare === self::NO_WINNER) {
-            $possibleChangeCompare = $this->compareTimestamps($changeRequest1->getPossibleChangeTimestamp(), $changeRequest2->getPossibleChangeTimestamp());
+            $possibleChangeCompare = $this->compareDateTimes(
+                $changeRequest1->getPossibleChangeDateTime(),
+                $changeRequest2->getPossibleChangeDateTime()
+            );
+
             if ($possibleChangeCompare === self::NO_WINNER) {
                 throw new \LogicException('Not resolved conflict');
-            } elseif ($possibleChangeCompare === self::LEF_WINNER) {
-                return $changeRequest1->getNewValue();
-            } else {
-                return $changeRequest2->getNewValue();
             }
-        } elseif ($certainChangeCompare === self::LEF_WINNER) {
-            if ($changeRequest2->getPossibleChangeTimestamp() > $changeRequest1->getCertainChangeTimestamp()) {
-                throw new \LogicException('Not resolved conflict');
-            } else {
-                return $changeRequest1->getNewValue();
+
+            if ($possibleChangeCompare === self::LEF_WINNER) {
+                return $changeRequest1;
             }
-        } else {
-            if ($changeRequest1->getPossibleChangeTimestamp() > $changeRequest2->getCertainChangeTimestamp()) {
-                throw new \LogicException('Not resolved conflict');
-            } else {
-                return $changeRequest2->getNewValue();
-            }
+
+            return $changeRequest2;
         }
+
+        if ($certainChangeCompare === self::LEF_WINNER) {
+            if ($changeRequest2->getPossibleChangeDateTime() > $changeRequest1->getCertainChangeDateTime()) {
+                throw new \LogicException('Not resolved conflict');
+            }
+
+            return $changeRequest1;
+        }
+
+        if ($changeRequest1->getPossibleChangeDateTime() > $changeRequest2->getCertainChangeDateTime()) {
+            throw new \LogicException('Not resolved conflict');
+        }
+
+        return $changeRequest2;
     }
 
     /**
      * @param InformationChangeRequestDAO $changeRequest1
      * @param InformationChangeRequestDAO $changeRequest2
      *
-     * @return mixed
+     * @return InformationChangeRequestDAO
      */
     private function adjudicateHardEvidence(InformationChangeRequestDAO $changeRequest1, InformationChangeRequestDAO $changeRequest2)
     {
-        $certainChangeCompare = $this->compareTimestamps($changeRequest1->getCertainChangeTimestamp(), $changeRequest2->getCertainChangeTimestamp());
+        $certainChangeCompare = $this->compareDateTimes($changeRequest1->getCertainChangeDateTime(), $changeRequest2->getCertainChangeDateTime());
         if ($certainChangeCompare === self::NO_WINNER) {
             throw new \LogicException('Not resolved conflict');
-        } elseif ($certainChangeCompare === self::LEF_WINNER) {
-            return $changeRequest1->getNewValue();
-        } else {
-            return $changeRequest2->getNewValue();
         }
+
+        if ($certainChangeCompare === self::LEF_WINNER) {
+            return $changeRequest1;
+        }
+
+        return $changeRequest2;
     }
 
     /**
      * @param InformationChangeRequestDAO $changeRequest1
      * @param InformationChangeRequestDAO $changeRequest2
      *
-     * @return mixed
+     * @return InformationChangeRequestDAO
      */
     private function adjudicateBestEvidence(InformationChangeRequestDAO $changeRequest1, InformationChangeRequestDAO $changeRequest2)
     {
-        $certainChangeCompare = $this->compareTimestamps($changeRequest1->getCertainChangeTimestamp(), $changeRequest2->getCertainChangeTimestamp());
+        $certainChangeCompare = $this->compareDateTimes($changeRequest1->getCertainChangeDateTime(), $changeRequest2->getCertainChangeDateTime());
         if ($certainChangeCompare === self::NO_WINNER) {
-            $possibleChangeCompare = $this->compareTimestamps($changeRequest1->getPossibleChangeTimestamp(), $changeRequest2->getPossibleChangeTimestamp());
+            $possibleChangeCompare = $this->compareDateTimes(
+                $changeRequest1->getPossibleChangeDateTime(),
+                $changeRequest2->getPossibleChangeDateTime()
+            );
+
             if ($possibleChangeCompare === self::NO_WINNER) {
                 throw new \LogicException('Not resolved conflict');
-            } elseif ($possibleChangeCompare === self::LEF_WINNER) {
-                return $changeRequest1->getNewValue();
-            } else {
-                return $changeRequest2->getNewValue();
             }
-        } elseif ($certainChangeCompare === self::LEF_WINNER) {
-            return $changeRequest1->getNewValue();
-        } else {
-            return $changeRequest2->getNewValue();
+
+            if ($possibleChangeCompare === self::LEF_WINNER) {
+                return $changeRequest1;
+            }
+
+            return $changeRequest2;
         }
+
+        if ($certainChangeCompare === self::LEF_WINNER) {
+            return $changeRequest1;
+        }
+
+        return $changeRequest2;
     }
 
     /**
@@ -140,7 +160,7 @@ final class SyncJudge implements SyncJudgeInterface
      *
      * @return string self::LEFT_WINNER|self::RIGHT_WINNER|self::NO_WINNER
      */
-    private function compareTimestamps($timestamp1 = null, $timestamp2 = null)
+    private function compareDateTimes($timestamp1 = null, $timestamp2 = null)
     {
         if ($timestamp1 !== null && ($timestamp2 === null || $timestamp1 > $timestamp2)) {
             return self::LEF_WINNER;
@@ -148,6 +168,7 @@ final class SyncJudge implements SyncJudgeInterface
         if ($timestamp2 !== null && ($timestamp1 === null || $timestamp2 > $timestamp1)) {
             return self::RIGHT_WINNER;
         }
+
         return self::NO_WINNER;
     }
 }

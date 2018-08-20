@@ -22,7 +22,7 @@ class ObjectDAO
     private $object;
 
     /**
-     * @var string
+     * @var mixed
      */
     private $objectId;
 
@@ -39,13 +39,15 @@ class ObjectDAO
     /**
      * ObjectDAO constructor.
      *
-     * @param string $object
-     * @param int    $objectId
+     * @param string                  $object
+     * @param mixed                   $objectId
+     * @param \DateTimeInterface|null $changeDateTime
      */
-    public function __construct($object, $objectId)
+    public function __construct($object, $objectId, \DateTimeInterface $changeDateTime = null)
     {
-        $this->object   = $object;
-        $this->objectId = $objectId;
+        $this->object         = $object;
+        $this->objectId       = $objectId;
+        $this->changeDateTime = $changeDateTime;
     }
 
     /**
@@ -81,7 +83,7 @@ class ObjectDAO
     }
 
     /**
-     * @return int
+     * @return mixed
      */
     public function getObjectId()
     {
