@@ -11,8 +11,8 @@
 
 namespace MauticPlugin\IntegrationsBundle\Event;
 
-use MauticPlugin\IntegrationsBundle\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 class SyncEvent extends Event

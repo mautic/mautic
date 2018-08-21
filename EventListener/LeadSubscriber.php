@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
-use MauticPlugin\IntegrationsBundle\Helpers\VariableExpressor\VariableExpresserHelperInterface;
+use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 
 /**
  * Class LeadSubscriber

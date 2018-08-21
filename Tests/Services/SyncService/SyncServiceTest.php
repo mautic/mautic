@@ -15,7 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Services\SyncService\SyncService;
+use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\EventListener\IntegrationSubscriber;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange\ExampleSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;

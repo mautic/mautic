@@ -50,7 +50,7 @@ return [
         ],
         'helpers' => [
             'mautic.integrations.helper.variable_expresser' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Helpers\VariableExpressor\VariableExpresserHelper::class
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class
             ]
         ],
         'menus' => [
@@ -91,10 +91,10 @@ return [
         ],
         'sync' => [
             'mautic.integrations.helper.sync_judge' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Helpers\SyncJudge\SyncJudge::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudge::class,
             ],
             'mautic.integrations.sync.data_exchange.mautic' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_judge',
                     'mautic.integrations.repository.field_change',
@@ -105,10 +105,10 @@ return [
                 ],
             ],
             'mautic.integrations.helper.sync_process_factory' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Helpers\SyncProcess\SyncProcessFactory::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcessFactory::class,
             ],
             'mautic.integrations.sync.service' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Services\SyncService\SyncService::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_process_factory',
                     'mautic.integrations.helper.sync_date',
@@ -122,7 +122,7 @@ return [
                 ],
             ],
             'mautic.integrations.helper.sync_duplicity_finder' => [
-                'class' => \MauticPlugin\IntegrationBundle\Helpers\Duplicity\DuplicityFinder::class,
+                'class' => \MauticPlugin\IntegrationBundle\Sync\Duplicity\DuplicityFinder::class,
                 'arguments' => [
 
                 ],

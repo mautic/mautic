@@ -11,10 +11,10 @@
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\EventListener;
 
-use MauticPlugin\IntegrationsBundle\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\DAO\Mapping\ObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
-use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange\ExampleSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;

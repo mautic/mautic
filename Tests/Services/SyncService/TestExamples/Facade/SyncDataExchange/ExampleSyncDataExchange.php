@@ -12,16 +12,16 @@
 namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange;
 
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
-use MauticPlugin\IntegrationsBundle\DAO\Mapping\EntityMappingDAO;
-use MauticPlugin\IntegrationsBundle\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\DAO\Value\NormalizedValueDAO;
-use MauticPlugin\IntegrationsBundle\DAO\Sync\Order\OrderDAO;
-use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\FieldDAO;
-use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\ObjectDAO;
-use MauticPlugin\IntegrationsBundle\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\IntegrationsBundle\DAO\Sync\Request\RequestDAO;
-use MauticPlugin\IntegrationsBundle\Facade\SyncDataExchange\SyncDataExchangeInterface;
-use MauticPlugin\IntegrationsBundle\Helpers\ValueNormalizer\ValueNormalizer;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\EntityMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
+use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 
 class ExampleSyncDataExchange implements SyncDataExchangeInterface
 {

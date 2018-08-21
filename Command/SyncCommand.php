@@ -12,8 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Command;
 
 use DateTimeImmutable;
-use MauticPlugin\IntegrationsBundle\Event\SyncCompletedEvent;
-use MauticPlugin\IntegrationsBundle\Services\SyncService\SyncServiceInterface;
+use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
