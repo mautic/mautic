@@ -504,7 +504,10 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('points', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
+                    $queryBuilder2          = clone $queryBuilder;
+                    $queryBuilder2->resetQueryPart('join');
+                    $queryBuilder2->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
+                    $items                  = $pointLogRepo->getMostPoints($queryBuilder2, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
