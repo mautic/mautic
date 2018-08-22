@@ -969,7 +969,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $countWithMaxMin = false
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
-        $total      = (int) $this->getRepository()->getEmailPendingLeads(
+        $total      = $this->getRepository()->getEmailPendingLeads(
             $email->getId(),
             $variantIds,
             $listId,
@@ -980,8 +980,16 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $countWithMaxMin
         );
 
-        if ($total) {
-            $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'pending'), $total);
+        if (!empty($total)) {
+            if ($countOnly && $countWithMaxMin) {
+                $toStore = $total['count'];
+            } elseif ($countOnly) {
+                $toStore = $total;
+            } else {
+                $toStore = count($total);
+            }
+
+            $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'pending'), $toStore);
         }
 
         return $total;
