@@ -56,7 +56,7 @@ class StatRepository extends CommonRepository
     public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('ph.url')
+        $q->select('distinct ph.url, ph.date_hit')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->where('ph.email_id = :emailId')
             ->andWhere('ph.lead_id = :leadId')
@@ -65,11 +65,10 @@ class StatRepository extends CommonRepository
             ->groupBy('ph.url');
 
         $result = $q->execute()->fetchAll();
-        $data   = [];
 
         if ($result) {
             foreach ($result as $row) {
-                $data[] = $row['url'];
+                $data[$row['date_hit']] = $row['url'];
             }
         }
 
@@ -96,8 +95,8 @@ class StatRepository extends CommonRepository
         $campaignId = null,
         $segmentId = null
     ) {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id')
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
             ->addSelect('e.name AS email_name')

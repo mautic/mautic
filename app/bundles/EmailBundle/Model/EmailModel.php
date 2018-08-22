@@ -571,36 +571,41 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         foreach ($stats as $stat) {
             $statId = $stat['id'];
-            if (!array_key_exists($statId, $data)) {
-                $item = [
-                    'contact_id'    => $stat['lead_id'],
-                    'contact_email' => $stat['email_address'],
-                    'open'          => $stat['is_read'],
-                    'click'         => ($stat['link_hits'] !== null) ? $stat['link_hits'] : 0,
-                    'links_clicked' => [],
-                    'email_id'      => (string) $stat['email_id'],
-                    'email_name'    => (string) $stat['email_name'],
-                    'segment_id'    => (string) $stat['segment_id'],
-                    'segment_name'  => (string) $stat['segment_name'],
-                    'company_id'    => (string) $stat['company_id'],
-                    'company_name'  => (string) $stat['company_name'],
-                    'campaign_id'   => (string) $stat['campaign_id'],
-                    'campaign_name' => (string) $stat['campaign_name'],
-                ];
 
-                if ($item['click'] && $item['email_id'] && $item['contact_id']) {
-                    $item['links_clicked'] = $this->getStatRepository()->getUniqueClickedLinksPerContactAndEmail($item['contact_id'], $item['email_id']);
-                }
+            if (empty($stat['segment_id']) && !empty($stat['campaign_id'])) {
+                // Let's fetch the segment based on current campaign/segment membership
+                $segmentMembership = $this->em->getRepository('MauticCampaignBundle:Campaign')
+                    ->getContactSingleSegmentByCampaign($stat['lead_id'], $stat['campaign_id']);
 
-                $data[$statId] = $item;
-            } else {
-                if ($stat['link_hits'] !== null) {
-                    $data[$statId]['click'] += $stat['link_hits'];
-                }
-                if ($stat['link_url'] !== null && !in_array($stat['link_url'], $data[$statId]['links_clicked'])) {
-                    $data[$statId]['links_clicked'][] = $stat['link_url'];
+                if ($segmentMembership) {
+                    $stat['segment_id']   = $segmentMembership['id'];
+                    $stat['segment_name'] = $segmentMembership['name'];
                 }
             }
+
+            $item = [
+                'contact_id'    => $stat['lead_id'],
+                'contact_email' => $stat['email_address'],
+                'open'          => $stat['is_read'],
+                'click'         => ($stat['link_hits'] !== null) ? $stat['link_hits'] : 0,
+                'links_clicked' => [],
+                'email_id'      => (string) $stat['email_id'],
+                'email_name'    => (string) $stat['email_name'],
+                'segment_id'    => (string) $stat['segment_id'],
+                'segment_name'  => (string) $stat['segment_name'],
+                'company_id'    => (string) $stat['company_id'],
+                'company_name'  => (string) $stat['company_name'],
+                'campaign_id'   => (string) $stat['campaign_id'],
+                'campaign_name' => (string) $stat['campaign_name'],
+                'date_sent'     => $stat['date_sent'],
+                'date_read'     => $stat['date_read'],
+            ];
+
+            if ($item['click'] && $item['email_id'] && $item['contact_id']) {
+                $item['links_clicked'] = $this->getStatRepository()->getUniqueClickedLinksPerContactAndEmail($item['contact_id'], $item['email_id']);
+            }
+
+            $data[$statId] = $item;
         }
 
         return $data;
