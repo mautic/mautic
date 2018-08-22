@@ -653,6 +653,10 @@ class ReportSubscriber extends CommonSubscriber
     private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters)
     {
         $pointColumns = [
+            'lp.id' => [
+                'label' => 'mautic.lead.report.points.id',
+                'type'  => 'int',
+            ],
             'lp.type' => [
                 'label' => 'mautic.lead.report.points.type',
                 'type'  => 'string',
