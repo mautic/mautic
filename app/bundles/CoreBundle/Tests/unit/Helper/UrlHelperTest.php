@@ -131,7 +131,7 @@ class UrlHelperTest extends \PHPUnit_Framework_TestCase
                 https://example.org/with/colon: It is cool!
                 This website https://example.org/with/semi-colon; Very awesome!
                 A single example \'https://example.org/with/double-quotes\'
-                An double example "https://example.org/with/simple-quotes"
+                A double example "https://example.org/with/simple-quotes"
                 Thanks for this https://example.org/with/exclamation!
                 Someone said “https://example.org/with/quotation”')
         );
