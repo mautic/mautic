@@ -409,6 +409,9 @@ class ReportSubscriber extends CommonSubscriber
 
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
+            $queryBuilder->resetQueryPart('join');
+            $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
+
             switch ($g) {
                 case 'mautic.lead.graph.pie.attribution_stages':
                 case 'mautic.lead.graph.pie.attribution_campaigns':
@@ -504,9 +507,6 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('points', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $queryBuilder2          = clone $queryBuilder;
-                    $queryBuilder2->resetQueryPart('join');
-                    $queryBuilder2->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
                     $items                  = $pointLogRepo->getMostPoints($queryBuilder2, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
