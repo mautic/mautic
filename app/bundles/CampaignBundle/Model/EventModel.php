@@ -132,7 +132,7 @@ class EventModel extends LegacyEventModel
         $q     = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
 
         if (!$canViewOthers) {
-            $q->join('t', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = c.campaign_id')
+            $q->join('t', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = t.campaign_id')
                 ->andWhere('c.created_by = :userId')
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
