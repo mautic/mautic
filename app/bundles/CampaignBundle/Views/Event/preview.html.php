@@ -21,9 +21,9 @@ $eventLogic = '';
 <?php endif; ?>
     <div class="campaign-event-content">
         <div>
-            <span class="campaign-event-name ellipsis">
-                <i class="fa fa-info-circle" title="<?php echo $view['translator']->trans('mautic.campaign.'.$event['type']); ?>"></i>&emsp;<?php echo $event['name']; ?>
-            </span>
+                <span class="campaign-event-name ellipsis">
+                        <i class="fa fa-info-circle" title="<?php echo $view['translator']->trans('mautic.campaign.'.$event['type']); ?>"></i>&emsp;<?php echo $event['name']; ?>
+                </span>
         </div>
     </div>
 <?php if (empty($update)): ?>
