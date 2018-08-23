@@ -43,10 +43,10 @@ class SyncDateHelper
 
         return $qb
             ->select('max(e.last_sync_date)')
-            ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'e')
+            ->from(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'm')
             ->where(
-                $qb->expr()->eq('e.integration', ':integration'),
-                $qb->expr()->eq('e.integration_object', ':object')
+                $qb->expr()->eq('m.integration', ':integration'),
+                $qb->expr()->eq('m.integration_object_name', ':object')
             )
             ->setParameter('integration', $integration)
             ->setParameter('object', $object)
