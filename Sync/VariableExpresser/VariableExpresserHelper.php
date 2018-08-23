@@ -71,7 +71,7 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
         }
 
         if ($var instanceof \DateTime) {
-            return new EncodedValueDAO(EncodedValueDAO::DATETIME_TYPE, $var->getTimestamp());
+            return new EncodedValueDAO(EncodedValueDAO::DATETIME_TYPE, $var->format('c'));
         }
 
         if (is_bool($var)) {
