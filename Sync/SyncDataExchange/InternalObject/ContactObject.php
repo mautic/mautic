@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
 
 
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -32,15 +33,22 @@ class ContactObject implements ObjectInterface
     private $repository;
 
     /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
      * ContactObject constructor.
      *
      * @param LeadModel      $model
      * @param LeadRepository $repository
+     * @param Connection     $connection
      */
-    public function __construct(LeadModel $model, LeadRepository $repository)
+    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection)
     {
         $this->model      = $model;
         $this->repository = $repository;
+        $this->connection = $connection;
     }
 
     /**
@@ -97,5 +105,40 @@ class ContactObject implements ObjectInterface
             $this->model->saveEntity($contact);
             $this->repository->detachEntity($contact);
         }
+    }
+
+    /**
+     * Unfortunately the LeadRepository doesn't give us what we need so we have to write our own queries
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int       $start
+     * @param int       $limit
+     *
+     * @return array
+     */
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit)
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where(
+                $qb->expr()->orX(
+                    $qb->expr()->andX(
+                        $qb->expr()->isNotNull('l.date_modified'),
+                        $qb->expr()->comparison('l.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
+                    ),
+                    $qb->expr()->andX(
+                        $qb->expr()->isNull('l.date_modified'),
+                        $qb->expr()->comparison('l.date_added', 'BETWEEN', ':dateFrom and :dateTo')
+                    )
+                )
+            )
+            ->setParameter('dateFrom', $from->format('Y-m-d H:i:s'))
+            ->setParameter('dateTo', $to->format('Y-m-d H:i:s'))
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
+
+        return $qb->execute()->fetchAll();
     }
 }

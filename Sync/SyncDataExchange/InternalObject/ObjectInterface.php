@@ -29,4 +29,14 @@ interface ObjectInterface
      * @param ObjectChangeDAO[] $objects
      */
     public function update(array $ids, array $objects);
+
+    /**
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int                $start
+     * @param int                $limit
+     *
+     * @return mixed
+     */
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit);
 }

@@ -192,8 +192,8 @@ class SyncProcess
                 continue;
             }
 
-            // Sync date does not matter in this case because Mautic will simply process anything in the queue
-            $internalRequestObject = new RequestObjectDAO($internalObjectName);
+            $objectSyncFromDateTime = $this->getSyncFromDateTime(MauticSyncDataExchange::NAME, $internalObjectName);
+            $internalRequestObject  = new RequestObjectDAO($internalObjectName, $objectSyncFromDateTime, $this->syncDateTime);
             foreach ($internalObjectFields as $internalObjectField) {
                 $internalRequestObject->addField($internalObjectField);
             }
@@ -297,7 +297,7 @@ class SyncProcess
             return $this->lastObjectSyncDates[$key];
         }
 
-        if ($lastSync = $this->syncDateHelper->getLastSyncDateForObject($integration, $object)) {
+        if (MauticSyncDataExchange::NAME !== $integration && $lastSync = $this->syncDateHelper->getLastSyncDateForObject($integration, $object)) {
             // Use the latest sync date recorded
             $this->lastObjectSyncDates[$key] = new \DateTimeImmutable($lastSync, new \DateTimeZone('UTC'));
         } else {

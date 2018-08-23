@@ -134,5 +134,4 @@ class MappingHelper
         $this->objectMappingRepository->saveEntity($objectMapping);
         $this->objectMappingRepository->clear();
     }
-
 }

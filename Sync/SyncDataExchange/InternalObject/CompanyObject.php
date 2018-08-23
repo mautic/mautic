@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
 
 
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -30,6 +31,11 @@ class CompanyObject implements ObjectInterface
      * @var CompanyRepository
      */
     private $repository;
+
+    /**
+     * @var Connection
+     */
+    private $connection;
 
     /**
      * @param ObjectChangeDAO[] $objects
@@ -85,5 +91,40 @@ class CompanyObject implements ObjectInterface
             $this->model->saveEntity($company);
             $this->repository->detachEntity($company);
         }
+    }
+
+    /**
+     * Unfortunately the CompanyRepository doesn't give us what we need so we have to write our own queries
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int                $start
+     * @param int                $limit
+     *
+     * @return array
+     */
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit)
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
+            ->where(
+                $qb->expr()->orX(
+                    $qb->expr()->andX(
+                        $qb->expr()->isNotNull('c.date_modified'),
+                        $qb->expr()->comparison('c.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
+                    ),
+                    $qb->expr()->andX(
+                        $qb->expr()->isNull('c.date_modified'),
+                        $qb->expr()->comparison('c.date_added', 'BETWEEN', ':dateFrom and :dateTo')
+                    )
+                )
+            )
+            ->setParameter('dateFrom', $from->format('Y-m-d H:i:s'))
+            ->setParameter('dateTo', $to->format('Y-m-d H:i:s'))
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
+
+        return $qb->execute()->fetchAll();
     }
 }

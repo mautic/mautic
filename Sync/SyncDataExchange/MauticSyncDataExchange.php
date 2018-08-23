@@ -92,45 +92,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      */
     public function getSyncReport(RequestDAO $requestDAO)
     {
-        $requestedObjects = $requestDAO->getObjects();
-        $syncReport       = new ReportDAO(self::NAME);
-
-        foreach ($requestedObjects as $objectDAO) {
-            $fieldsChanges = $this->fieldChangeRepository->findChangesAfter(
-                $this->getFieldObjectName($objectDAO->getObject()),
-                $objectDAO->getFromDateTime()
-            );
-
-            $reportObjects = [];
-            foreach ($fieldsChanges as $fieldChange) {
-                $object   = $fieldChange['object'];
-                $objectId = $fieldChange['object_id'];
-
-                if (!array_key_exists($object, $reportObjects)) {
-                    $reportObjects[$object] = [];
-                }
-
-                if (!array_key_exists($objectId, $reportObjects[$object])) {
-                    $reportObjects[$object][$objectId] = new ReportObjectDAO($object, $objectId);
-                }
-
-                /** @var ReportObjectDAO $reportObjectDAO */
-                $reportObjectDAO = $reportObjects[$object][$objectId];
-
-                $reportObjectDAO->addField(
-                    $this->getFieldChangeObject($fieldChange)
-                );
-
-            }
-
-            foreach ($reportObjects as $objectsDAO) {
-                foreach ($objectsDAO as $reportObjectDAO) {
-                    $syncReport->addObject($reportObjectDAO);
-                }
-            }
+        if ($requestDAO->isFirstTimeSync()) {
+            return $this->buildReportFromFullObjects($requestDAO);
         }
 
-        return $syncReport;
+        return $this->buildReportFromTrackedChanges($requestDAO);
     }
 
     /**
@@ -217,6 +183,90 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         foreach ($mappings as $mapping) {
             $this->mappingHelper->saveObjectMapping($mapping);
         }
+    }
+
+    /**
+     * @param RequestDAO $requestDAO
+     *
+     * @return ReportDAO
+     * @throws ObjectNotSupportedException
+     */
+    private function buildReportFromFullObjects(RequestDAO $requestDAO)
+    {
+        $syncReport       = new ReportDAO(self::NAME);
+        $requestedObjects = $requestDAO->getObjects();
+
+        $limit = 200;
+        $start = $limit * ($requestDAO->getSyncIteration() - 1);
+
+        foreach ($requestedObjects as $objectDAO) {
+            switch ($objectDAO->getObject()) {
+                case self::OBJECT_CONTACT:
+                    $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates($objectDAO->getFromDateTime(), $objectDAO->getToDateTime(), $start, $limit);
+                    break;
+                case self::OBJECT_COMPANY:
+                    $foundObjects = $this->companyObjectHelper->findObjectsBetweenDates($objectDAO->getFromDateTime(), $objectDAO->getToDateTime(), $start, $limit);
+                    break;
+                default:
+                    throw new ObjectNotSupportedException(self::NAME, $objectDAO->getObject());
+            }
+
+            $reportObjects = [];
+            foreach ($foundObjects as $object) {
+//                $objectDAO = new ReportObjectDAO($objectDAO->getObject(), $object['id']);
+//                $syncReport->addObject($objectDAO);
+//
+//                $this->variableExpresserHelper->decodeVariable(new EncodedValueDAO($columnType, $columnValue));
+//
+//                $reportFieldDAO = new ReportFieldDAO($fieldChange['column_name'], $newValue);
+//                $objectDAO->addField(
+//
+//                );
+            }
+        }
+    }
+
+    /**
+     * @param RequestDAO $requestDAO
+     *
+     * @return ReportDAO
+     * @throws ObjectNotSupportedException
+     */
+    private function buildReportFromTrackedChanges(RequestDAO $requestDAO)
+    {
+        $syncReport       = new ReportDAO(self::NAME);
+        $requestedObjects = $requestDAO->getObjects();
+
+        foreach ($requestedObjects as $objectDAO) {
+            $fieldsChanges = $this->fieldChangeRepository->findChangesAfter(
+                $this->getFieldObjectName($objectDAO->getObject()),
+                $objectDAO->getFromDateTime()
+            );
+
+            $reportObjects = [];
+            foreach ($fieldsChanges as $fieldChange) {
+                $object   = $fieldChange['object'];
+                $objectId = $fieldChange['object_id'];
+
+                if (!array_key_exists($object, $reportObjects)) {
+                    $reportObjects[$object] = [];
+                }
+
+                if (!array_key_exists($objectId, $reportObjects[$object])) {
+                    $reportObjects[$object][$objectId] = new ReportObjectDAO($object, $objectId);
+                    $syncReport->addObject($reportObjects[$object][$objectId]);
+                }
+
+                /** @var ReportObjectDAO $reportObjectDAO */
+                $reportObjectDAO = $reportObjects[$object][$objectId];
+
+                $reportObjectDAO->addField(
+                    $this->getFieldChangeObject($fieldChange)
+                );
+            }
+        }
+
+        return $syncReport;
     }
 
     /**
