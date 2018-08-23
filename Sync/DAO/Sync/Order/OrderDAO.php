@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order;
 
+use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\EntityMappingDAO;
 use MauticPlugin\IntegrationsBundle\Exception\UnexpectedValueException;
 
@@ -42,9 +43,9 @@ class OrderDAO
     private $changedObjects = [];
 
     /**
-     * @var array
+     * @var array|ObjectMapping
      */
-    private $entityMappings = [];
+    private $objectMappings = [];
 
     /**
      * OrderDAO constructor.
@@ -116,19 +117,34 @@ class OrderDAO
     }
 
     /**
-     * @param EntityMappingDAO $entityMappingDAO
+     * @param ObjectChangeDAO $objectChange
+     * @param                 $integrationObjectName
+     * @param                 $integrationObjectId
+     * @param null            $objectModifiedDate
      */
-    public function addEntityMapping(EntityMappingDAO $entityMappingDAO)
+    public function addObjectMapping(ObjectChangeDAO $objectChange, $integrationObjectName, $integrationObjectId, $objectModifiedDate = null)
     {
-        $this->entityMappings[] = $entityMappingDAO;
+        if (null === $objectModifiedDate) {
+            $objectModifiedDate = new \DateTime();
+        }
+
+        $objectMapping = new ObjectMapping();
+        $objectMapping->setIntegration($objectChange->getIntegration())
+            ->setInternalObjectName($objectChange->getMappedObject())
+            ->setInternalObjectId($objectChange->getMappedId())
+            ->setIntegrationObjectName($integrationObjectName)
+            ->setIntegrationObjectId($integrationObjectId)
+            ->setLastSyncDate($objectModifiedDate);
+
+        $this->objectMappings[] = $objectMapping;
     }
 
     /**
-     * @return EntityMappingDAO[]
+     * @return ObjectMapping[]
      */
-    public function getEntityMappings(): array
+    public function getObjectMappings(): array
     {
-        return $this->entityMappings;
+        return $this->objectMappings;
     }
 
     /**

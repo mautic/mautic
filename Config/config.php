@@ -88,6 +88,13 @@ return [
                     \MauticPlugin\IntegrationsBundle\Entity\FieldChange::class,
                 ],
             ],
+            'mautic.integrations.repository.object_mapping' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \MauticPlugin\IntegrationsBundle\Entity\ObjectMapping::class
+                ],
+            ],
         ],
         'sync' => [
             'mautic.integrations.helper.sync_judge' => [
@@ -122,9 +129,10 @@ return [
                 ],
             ],
             'mautic.integrations.helper.sync_duplicity_finder' => [
-                'class' => \MauticPlugin\IntegrationBundle\Sync\Duplicity\DuplicityFinder::class,
+                'class' => \MauticPlugin\IntegrationBundle\Sync\Mapping\MappingHelper::class,
                 'arguments' => [
-
+                    'mautic.lead.model.field',
+                    ''
                 ],
             ],
         ],

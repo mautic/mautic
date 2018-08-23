@@ -32,7 +32,7 @@ class ObjectDAO
     private $fields = [];
 
     /**
-     * @var \DateTimeInterface|null
+     * @var \DateTimeInterface
      */
     private $changeDateTime = null;
 
@@ -51,9 +51,9 @@ class ObjectDAO
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return \DateTimeInterface
      */
-    public function getChangeDateTime(): ?\DateTimeInterface
+    public function getChangeDateTime(): \DateTimeInterface
     {
         return $this->changeDateTime;
     }

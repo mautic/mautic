@@ -241,13 +241,22 @@ class SyncProcess
 
         $internalObjectNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($internalObjectNames as $internalObjectName) {
-            $internalObjects              = $syncReport->getObjects($internalObjectName);
+            $internalObjects = $syncReport->getObjects($internalObjectName);
             $mappedIntegrationObjectNames = $this->mappingManualDAO->getMappedIntegrationObjectsNames($internalObjectName);
             foreach ($mappedIntegrationObjectNames as $mappedIntegrationObjectName) {
                 $objectMapping = $this->mappingManualDAO->getObjectMapping($mappedIntegrationObjectName, $internalObjectName);
                 foreach ($internalObjects as $internalObject) {
-                    $integrationObject = $this->internalSyncDataExchange->getMappedIntegrationObject($mappedIntegrationObjectName, $internalObject);
-                    $objectChange = $this->getSyncObjectChangeMauticToIntegration($syncReport, $objectMapping, $internalObject, $integrationObject);
+                    $integrationObject = $this->internalSyncDataExchange->getMappedIntegrationObject(
+                        $this->mappingManualDAO->getIntegration(),
+                        $mappedIntegrationObjectName,
+                        $internalObject
+                    );
+                    $objectChange      = $this->getSyncObjectChangeMauticToIntegration(
+                        $syncReport,
+                        $objectMapping,
+                        $internalObject,
+                        $integrationObject
+                    );
 
                     $syncOrder->addObjectChange($objectChange);
                 }
@@ -307,6 +316,7 @@ class SyncProcess
         ReportObjectDAO $internalObject
     ) {
         $objectChange = new ObjectChangeDAO(
+            $syncReport->getIntegration(),
             $objectMapping->getInternalObjectName(),
             $internalObject->getObject(),
             $integrationObject->getObject(),
@@ -399,6 +409,7 @@ class SyncProcess
         ReportObjectDAO $integrationObject
     ) {
         $objectChange = new ObjectChangeDAO(
+            $syncReport->getIntegration(),
             $objectMapping->getIntegrationObjectName(),
             $integrationObject->getObjectId(),
             $internalObject->getObject(),

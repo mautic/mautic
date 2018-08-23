@@ -19,6 +19,11 @@ class ObjectChangeDAO
     /**
      * @var string
      */
+    private $integration;
+
+    /**
+     * @var string
+     */
     private $object;
 
     /**
@@ -44,17 +49,27 @@ class ObjectChangeDAO
     /**
      * ObjectChangeDAO constructor.
      *
+     * @param string $integration
      * @param string $object
      * @param mixed  $objectId
      * @param mixed  $mappedId     ID of the source object
      * @param string $mappedObject Name of the source object type
      */
-    public function __construct($object, $objectId, $mappedObject, $mappedId)
+    public function __construct($integration, $object, $objectId, $mappedObject, $mappedId)
     {
+        $this->integration  = $integration;
         $this->object       = $object;
         $this->objectId     = $objectId;
         $this->mappedId     = $mappedId;
         $this->mappedObject = $mappedObject;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIntegration(): string
+    {
+        return $this->integration;
     }
 
     /**

@@ -13,7 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange;
 
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\IntegrationBundle\Sync\Duplicity\DuplicityFinder;
+use MauticPlugin\IntegrationBundle\Sync\Mapping\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO AS ReportFieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
@@ -63,9 +63,9 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     private $variableExpresserHelper;
 
     /**
-     * @var DuplicityFinder
+     * @var MappingHelper
      */
-    private $duplicityFinder;
+    private $mappingHelper;
 
     /**
      * MauticSyncDataExchange constructor.
@@ -75,7 +75,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @param LeadRepository                   $leadRepository
      * @param LeadModel                        $leadModel
      * @param VariableExpresserHelperInterface $variableExpresserHelper
-     * @param DuplicityFinder                  $duplicityFinder
+     * @param MappingHelper                  $mappingHelper
      */
     public function __construct(
         SyncJudgeInterface $syncJudge,
@@ -83,14 +83,14 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         LeadRepository $leadRepository,
         LeadModel $leadModel,
         VariableExpresserHelperInterface $variableExpresserHelper,
-        DuplicityFinder $duplicityFinder
+        MappingHelper $mappingHelper
     ) {
         $this->syncJudge               = $syncJudge;
         $this->fieldChangeRepository   = $fieldChangeRepository;
         $this->leadRepository          = $leadRepository;
         $this->leadModel               = $leadModel;
         $this->variableExpresserHelper = $variableExpresserHelper;
-        $this->duplicityFinder         = $duplicityFinder;
+        $this->mappingHelper         = $mappingHelper;
     }
 
     /**
@@ -184,12 +184,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @param ReportObjectDAO        $integrationObjectDAO
      *
      * @return ReportObjectDAO
-     * @throws \Doctrine\ORM\ORMException
      */
     public function getConflictedInternalObject(MappingManualDAO $mappingManualDAO, string $internalObjectName, ReportObjectDAO $integrationObjectDAO)
     {
         // Check to see if we have a match
-        $internalObjectDAO = $this->duplicityFinder->findMauticObject($mappingManualDAO, $internalObjectName, $integrationObjectDAO);
+        $internalObjectDAO = $this->mappingHelper->findMauticObject($mappingManualDAO, $internalObjectName, $integrationObjectDAO);
 
         if (!$internalObjectDAO) {
             return new ReportObjectDAO($internalObjectName, null);
@@ -206,14 +205,15 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
+     * @param string          $integration
      * @param string          $integrationObjectName
      * @param ReportObjectDAO $internalObjectDAO
      *
      * @return ReportObjectDAO
      */
-    public function getMappedIntegrationObject($integrationObjectName, ReportObjectDAO $internalObjectDAO)
+    public function getMappedIntegrationObject(string $integration, string $integrationObjectName, ReportObjectDAO $internalObjectDAO)
     {
-        $integrationObject = $this->duplicityFinder->findIntegrationObject($integrationObjectName, $internalObjectDAO);
+        $integrationObject = $this->mappingHelper->findIntegrationObject($integration, $integrationObjectName, $internalObjectDAO);
 
         if ($integrationObject) {
             return $integrationObject;
@@ -227,7 +227,9 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      */
     public function saveObjectMappings(array $mappings)
     {
-
+        foreach ($mappings as $mapping) {
+            $this->mappingHelper->saveObjectMapping($mapping);
+        }
     }
 
     /**

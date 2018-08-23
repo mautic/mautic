@@ -69,8 +69,9 @@ class FieldChangeRepository extends CommonRepository
     }
 
     /**
-     * @param $objectType
-     * @param $fromTimestamp
+     * @param     $objectType
+     * @param     $fromTimestamp
+     * @param int $objectCount
      *
      * @return array
      */
@@ -117,6 +118,32 @@ class FieldChangeRepository extends CommonRepository
 
         return $qb->execute()->fetchAll();
     }
+
+    /**
+     * @param $objectType
+     * @param $objectId
+     *
+     * @return array
+     */
+    public function findChangesForObject($objectType, $objectId)
+    {
+        // Get a list of object IDs so that we can get complete snapshots of the objects
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb
+            ->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'object_field_change_report', 'f')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('f.object_type', ':objectType'),
+                    $qb->expr()->gte('f.object_id', ':objectId')
+                )
+            )
+            ->setParameter('objectType', $objectType)
+            ->setParameter('objectId', $objectId);
+
+        return $qb->execute()->fetchAll();
+    }
+
 
 //    /**
 //     * @param $objectType

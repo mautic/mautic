@@ -131,37 +131,33 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
             }
         }
 
-        return;
-
-        //@todo
-        // Deliver payload and get response
-        $response = [
-            'results' => [
-                [
-                    'result'     => 'created',
-                    'id'         => 'lead_1',
-                    'first_name' => 'John',
-                    'last_name'  => 'Smith',
-                    'email'      => 'john.smith@lead.com',
-                    'object'     => 'Lead',
-                ], // etc
-            ]
-        ];
-
-        // Notify the order regarding IDs of created objects
-        foreach ($response['results'] as $result) {
-            /** @var ObjectChangeDAO $object */
-            $object = $byEmail[$result['email']];
-
-            $syncOrderDAO->addEntityMapping(
-                new EntityMappingDAO(
-                    $object->getMappedObject(),
-                    $object->getMappedId(),
-                    $result['object'],
-                    $result['id']
-                )
-            );
-        }
+//        //@todo
+//        // Deliver payload and get response
+//        $response = [
+//            'results' => [
+//                [
+//                    'result'     => 'created',
+//                    'id'         => 'lead_1',
+//                    'first_name' => 'John',
+//                    'last_name'  => 'Smith',
+//                    'email'      => 'john.smith@lead.com',
+//                    'object'     => 'Lead',
+//                ], // etc
+//            ]
+//        ];
+//
+//        // Notify the order regarding IDs of created objects
+//        foreach ($response['results'] as $result) {
+//            /** @var ObjectChangeDAO $object */
+//            $object = $byEmail[$result['email']];
+//
+//            $syncOrderDAO->addObjectMapping(
+//                    $object,
+//                    $result['object'],
+//                    $result['id'],
+//                    $result['last_modified']
+//            );
+//        }
     }
 
     /**
@@ -189,8 +185,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 // last modified timestamp.
                 $objectChangeTimestamp = new \DateTimeImmutable($person['last_modified']);
 
-                $objectDAO = new ObjectDAO($objectName, $person['id']);
-                $objectDAO->setChangeDateTime($objectChangeTimestamp);
+                $objectDAO = new ObjectDAO($objectName, $person['id'], $objectChangeTimestamp);
 
                 foreach ($person as $field => $value) {
                     // Normalize the value from the API to what Mautic needs
