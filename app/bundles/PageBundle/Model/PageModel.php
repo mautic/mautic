@@ -604,10 +604,12 @@ class PageModel extends FormModel
         }
 
         // Set info from request
-        $query = InputHelper::cleanArray($query);
+        $hitUrl = InputHelper::url((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
+        $query  = InputHelper::cleanArray($query);
 
         $hit->setQuery($query);
-        $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
+        $hit->setUrl($hitUrl);
+
         if (isset($query['page_referrer'])) {
             $hit->setReferer($query['page_referrer']);
         }
