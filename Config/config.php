@@ -120,6 +120,8 @@ return [
                     'mautic.integrations.repository.field_change',
                     'mautic.integrations.helper.variable_expresser',
                     'mautic.integrations.helper.sync_mapping_helper',
+                    'mautic.integrations.helper.company_object',
+                    'mautic.integrations.helper.contact_object',
                 ],
             ],
             'mautic.integrations.helper.sync_process_factory' => [
