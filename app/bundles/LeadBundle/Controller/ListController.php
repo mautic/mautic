@@ -531,9 +531,20 @@ class ListController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var ListModel $model */
-            $model     = $this->getModel('lead.list');
-            $ids       = json_decode($this->request->query->get('ids', '{}'));
-            $deleteIds = [];
+            $model           = $this->getModel('lead.list');
+            $ids             = json_decode($this->request->query->get('ids', '{}'));
+            $canNotBeDeleted = $model->canNotBeDeleted($ids);
+
+            if (!empty($canNotBeDeleted)) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
+                    'msgVars' => ['%segments%' => implode(', ', $canNotBeDeleted)],
+                ];
+            }
+
+            $toBeDeleted = array_diff($ids, array_keys($canNotBeDeleted));
+            $deleteIds   = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {

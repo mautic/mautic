@@ -1715,24 +1715,101 @@ class ListModel extends FormModel
     }
 
     /**
-     * Is custom field used in at least one defined segment?
+     * Get segments which are dependent on given segment.
      *
-     * @param LeadField $field
+     * @param int $segmentId
      *
-     * @return bool
+     * @return array
      */
-    public function isFieldUsed(LeadField $field)
+    public function getSegmentsWithDependenciesOnSegment($segmentId)
     {
-        $alias       = $field->getAlias();
-        $aliasLength = mb_strlen($alias);
-        $likeContent = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+        $page  = 1;
+        $limit = 1000;
+        $start = 0;
 
         $filter = [
             'force'  => [
-                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=> $likeContent],
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
+                ['column' => 'l.id', 'expr' => 'neq', 'value'=>$segmentId],
             ],
         ];
 
-        return $this->getEntities(['filter' => $filter])->count() !== 0;
+        $entities = $this->getEntities(
+            [
+                'start'      => $start,
+                'limit'      => $limit,
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['type'] === 'leadlist' && in_array($segmentId, $eachFilter['filter'])) {
+                    $dependents[] = $entity->getName();
+                }
+            }
+        }
+
+        return $dependents;
+    }
+
+    /**
+     * Get segments which are used as a dependent by other segments to prevent batch deletion of them.
+     *
+     * @param array $segmentIds
+     *
+     * @return array
+     */
+    public function canNotBeDeleted($segmentIds)
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
+            ],
+        ];
+
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+
+        $idsNotToBeDeleted   = [];
+        $namesNotToBeDeleted = [];
+        $dependency          = [];
+
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['type'] !== 'leadlist') {
+                    continue;
+                }
+
+                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $eachFilter['filter']));
+                foreach ($eachFilter['filter'] as $val) {
+                    if (!empty($dependency[$val])) {
+                        $dependency[$val] = array_merge($dependency[$val], [$entity->getId()]);
+                        $dependency[$val] = array_unique($dependency[$val]);
+                    } else {
+                        $dependency[$val] = [$entity->getId()];
+                    }
+                }
+            }
+        }
+        foreach ($dependency as $key => $value) {
+            if (array_intersect($value, $segmentIds) === $value) {
+                $idsNotToBeDeleted = array_unique(array_diff($idsNotToBeDeleted, [$key]));
+            }
+        }
+
+        $idsNotToBeDeleted = array_intersect($segmentIds, $idsNotToBeDeleted);
+
+        foreach ($idsNotToBeDeleted as $val) {
+            $namesNotToBeDeleted[$val] = $this->getEntity($val)->getName();
+        }
+
+        return $namesNotToBeDeleted;
     }
 }
