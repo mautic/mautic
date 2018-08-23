@@ -66,6 +66,12 @@ class SyncCommand extends ContainerAwareCommand
                 '-s',
                 InputOption::VALUE_REQUIRED,
                 'Set start date/time for updated values.'
+            )
+            ->addOption(
+                '--first-time-sync',
+                '-f',
+                InputOption::VALUE_NONE,
+                'Notate if this is a first time sync where Mautic will sync existing objects instead of just tracked changes'
             );
 
         parent::configure();
@@ -79,6 +85,7 @@ class SyncCommand extends ContainerAwareCommand
         $io                  = new SymfonyStyle($input, $output);
         $integration         = $input->getArgument('integration');
         $startDateTimeString = $input->getOption('start-datetime');
+        $firstTimeSync = $input->getOption('first-time-sync');
         $env                 = $input->getOption('env');
 
         try {
@@ -90,10 +97,10 @@ class SyncCommand extends ContainerAwareCommand
         }
 
         try {
-            $event = new SyncEvent($integration);
+            $event = new SyncEvent($integration, $firstTimeSync);
             $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
-            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $startDateTime);
+            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $firstTimeSync, $startDateTime);
         } catch (\Exception $e) {
             if ($env === 'dev' || MAUTIC_ENV === 'dev') {
                 throw $e;

@@ -23,6 +23,11 @@ class RequestDAO
     private $syncIteration;
 
     /**
+     * @var bool
+     */
+    private $isFirstTimeSync;
+
+    /**
      * @var ObjectDAO[]
      */
     private $objects = [];
@@ -30,11 +35,13 @@ class RequestDAO
     /**
      * RequestDAO constructor.
      *
-     * @param int $syncIteration
+     * @param $syncIteration
+     * @param $isFirstTimeSync
      */
-    public function __construct($syncIteration)
+    public function __construct($syncIteration, $isFirstTimeSync)
     {
         $this->syncIteration = (int) $syncIteration;
+        $this->isFirstTimeSync = $isFirstTimeSync;
     }
 
     /**
@@ -63,6 +70,14 @@ class RequestDAO
     public function getSyncIteration(): int
     {
         return $this->syncIteration;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFirstTimeSync(): bool
+    {
+        return $this->isFirstTimeSync;
     }
 
     /**

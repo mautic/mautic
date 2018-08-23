@@ -26,9 +26,10 @@ interface SyncProcessFactoryInterface
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
      * @param SyncDateHelper            $syncDateHelper
+     * @param bool                      $isFirstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
      *
-     * @return SyncProcess
+     * @return mixed
      */
     public function create(
         SyncJudgeInterface $syncJudge,
@@ -36,6 +37,7 @@ interface SyncProcessFactoryInterface
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
         SyncDateHelper $syncDateHelper,
+        $isFirstTimeSync,
         \DateTimeInterface $syncFromDateTime = null
     );
 }

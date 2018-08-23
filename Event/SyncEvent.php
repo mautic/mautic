@@ -33,13 +33,20 @@ class SyncEvent extends Event
     private $mappingManual;
 
     /**
+     * @var bool
+     */
+    private $firstTimeSync;
+
+    /**
      * SyncEvent constructor.
      *
-     * @param                   $integration
+     * @param string $integration
+     * @param bool   $firstTimeSync
      */
-    public function __construct($integration)
+    public function __construct($integration, $firstTimeSync)
     {
-        $this->integration = $integration;
+        $this->integration   = $integration;
+        $this->firstTimeSync = (bool) $firstTimeSync;
     }
 
     /**
@@ -86,5 +93,13 @@ class SyncEvent extends Event
     public function getIntegration(): string
     {
         return $this->integration;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFirstTimeSync(): bool
+    {
+        return $this->firstTimeSync;
     }
 }

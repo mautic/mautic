@@ -26,6 +26,11 @@ class OrderDAO
     private $syncDateTime;
 
     /**
+     * @var bool
+     */
+    private $isFirstTimeSync;
+
+    /**
      * @var array|ObjectChangeDAO[]
      */
     private $identifiedObjects = [];
@@ -51,10 +56,12 @@ class OrderDAO
      * OrderDAO constructor.
      *
      * @param \DateTimeInterface $syncDateTime
+     * @param bool               $isFirstTimeSync
      */
-    public function __construct(\DateTimeInterface $syncDateTime)
+    public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync)
     {
-        $this->syncDateTime = $syncDateTime;
+        $this->syncDateTime    = $syncDateTime;
+        $this->isFirstTimeSync = $isFirstTimeSync;
     }
 
     /**
@@ -167,5 +174,13 @@ class OrderDAO
     public function getSyncDateTime(): \DateTimeInterface
     {
         return $this->syncDateTime;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFirstTimeSync(): bool
+    {
+        return $this->isFirstTimeSync;
     }
 }

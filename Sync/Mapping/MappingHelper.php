@@ -36,6 +36,20 @@ class MappingHelper
     private $objectMappingRepository;
 
     /**
+     * MappingHelper constructor.
+     *
+     * @param FieldModel              $fieldModel
+     * @param LeadRepository          $leadRepository
+     * @param ObjectMappingRepository $objectMappingRepository
+     */
+    public function __construct(FieldModel $fieldModel, LeadRepository $leadRepository, ObjectMappingRepository $objectMappingRepository)
+    {
+        $this->fieldModel              = $fieldModel;
+        $this->leadRepository          = $leadRepository;
+        $this->objectMappingRepository = $objectMappingRepository;
+    }
+
+    /**
      * @param MappingManualDAO $mappingManualDAO
      * @param string           $internalObjectName
      * @param ObjectDAO        $integrationObjectDAO

@@ -60,6 +60,11 @@ class SyncProcess
     private $syncDateTime;
 
     /**
+     * @var bool
+     */
+    private $isFirstTimeSync = false;
+
+    /**
      * @var \DateTimeInterface|null
      */
     private $syncFromDateTime;
@@ -82,6 +87,7 @@ class SyncProcess
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
      * @param SyncDateHelper            $syncDateHelper
+     * @param bool                      $isFirstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
      */
     public function __construct(
@@ -90,6 +96,7 @@ class SyncProcess
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
         SyncDateHelper $syncDateHelper,
+        $isFirstTimeSync,
         \DateTimeInterface $syncFromDateTime = null
     ) {
         $this->syncJudge                   = $syncJudge;
@@ -98,6 +105,7 @@ class SyncProcess
         $this->integrationSyncDataExchange = $integrationSyncDataExchange;
         $this->mappingManualDAO            = $mappingManualDAO;
         $this->syncDateHelper              = $syncDateHelper;
+        $this->isFirstTimeSync             = $isFirstTimeSync;
         $this->syncFromDateTime            = $syncFromDateTime;
     }
 
@@ -138,11 +146,10 @@ class SyncProcess
 
     /**
      * @return ReportDAO
-     * @throws \Exception
      */
     private function generateIntegrationSyncReport()
     {
-        $integrationRequestDAO = new RequestDAO($this->syncIteration);
+        $integrationRequestDAO = new RequestDAO($this->syncIteration, $this->isFirstTimeSync);
 
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {
@@ -173,7 +180,7 @@ class SyncProcess
      */
     private function generateInternalSyncReport()
     {
-        $internalRequestDAO = new RequestDAO($this->syncIteration);
+        $internalRequestDAO = new RequestDAO($this->syncIteration, $this->isFirstTimeSync);
 
         $internalObjectsNames = $this->mappingManualDAO->getInternalObjectsNames();
         foreach ($internalObjectsNames as $internalObjectName) {
@@ -208,7 +215,7 @@ class SyncProcess
      */
     private function generateInternalSyncOrder(ReportDAO $syncReport)
     {
-        $syncOrder = new OrderDAO($this->syncDateTime);
+        $syncOrder = new OrderDAO($this->syncDateTime, $this->isFirstTimeSync);
 
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {
@@ -237,7 +244,7 @@ class SyncProcess
      */
     private function generateIntegrationSyncOrder(ReportDAO $syncReport)
     {
-        $syncOrder = new OrderDAO($this->syncDateTime);
+        $syncOrder = new OrderDAO($this->syncDateTime, $this->isFirstTimeSync);
 
         $internalObjectNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($internalObjectNames as $internalObjectName) {

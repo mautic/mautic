@@ -26,9 +26,10 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
      * @param SyncDateHelper            $syncDateHelper
+     * @param bool                      $isFirstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
      *
-     * @return SyncProcess
+     * @return SyncProcess|mixed
      */
     public function create(
         SyncJudgeInterface $syncJudge,
@@ -36,6 +37,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
         SyncDateHelper $syncDateHelper,
+        $isFirstTimeSync,
         \DateTimeInterface $syncFromDateTime = null
     ) {
         return new SyncProcess(
@@ -44,6 +46,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
             $internalSyncDataExchange,
             $integrationSyncDataExchange,
             $syncDateHelper,
+            $isFirstTimeSync,
             $syncFromDateTime = null
         );
     }

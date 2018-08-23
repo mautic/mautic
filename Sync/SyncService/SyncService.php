@@ -66,11 +66,13 @@ final class SyncService implements SyncServiceInterface
     /**
      * @param SyncDataExchangeInterface $syncDataExchangeService
      * @param MappingManualDAO          $integrationMappingManual
+     * @param bool                      $firstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
      */
     public function processIntegrationSync(
         SyncDataExchangeInterface $syncDataExchangeService,
         MappingManualDAO $integrationMappingManual,
+        $firstTimeSync,
         \DateTimeInterface $syncFromDateTime = null
     ) {
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
@@ -81,6 +83,7 @@ final class SyncService implements SyncServiceInterface
             $this->syncDateHelper,
             $syncFromDateTime
         );
+
         $integrationSyncProcess->execute();
     }
 }
