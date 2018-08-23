@@ -13,7 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange;
 
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\IntegrationBundle\Sync\Mapping\MappingHelper;
+use MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO AS ReportFieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
@@ -36,11 +36,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
     const NAME = 'mautic';
     const CONTACT_OBJECT = 'lead'; // kept as lead for BC
-
-    /**
-     * @var SyncJudgeInterface
-     */
-    private $syncJudge;
 
     /**
      * @var FieldChangeRepository
@@ -70,7 +65,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     /**
      * MauticSyncDataExchange constructor.
      *
-     * @param SyncJudgeInterface               $syncJudge
      * @param FieldChangeRepository            $fieldChangeRepository
      * @param LeadRepository                   $leadRepository
      * @param LeadModel                        $leadModel
@@ -78,14 +72,12 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @param MappingHelper                  $mappingHelper
      */
     public function __construct(
-        SyncJudgeInterface $syncJudge,
         FieldChangeRepository $fieldChangeRepository,
         LeadRepository $leadRepository,
         LeadModel $leadModel,
         VariableExpresserHelperInterface $variableExpresserHelper,
         MappingHelper $mappingHelper
     ) {
-        $this->syncJudge               = $syncJudge;
         $this->fieldChangeRepository   = $fieldChangeRepository;
         $this->leadRepository          = $leadRepository;
         $this->leadModel               = $leadModel;

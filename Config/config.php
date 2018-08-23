@@ -103,12 +103,11 @@ return [
             'mautic.integrations.sync.data_exchange.mautic' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange::class,
                 'arguments' => [
-                    'mautic.integrations.helper.sync_judge',
                     'mautic.integrations.repository.field_change',
                     'mautic.lead.repository.lead',
                     'mautic.lead.model.lead',
                     'mautic.integrations.helper.variable_expresser',
-                    'mautic.integrations.helper.sync_duplicity_finder',
+                    'mautic.integrations.helper.sync_mapping_helper',
                 ],
             ],
             'mautic.integrations.helper.sync_process_factory' => [
@@ -117,22 +116,24 @@ return [
             'mautic.integrations.sync.service' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService::class,
                 'arguments' => [
+                    'mautic.integrations.helper.sync_judge',
                     'mautic.integrations.helper.sync_process_factory',
                     'mautic.integrations.helper.sync_date',
                     'mautic.integrations.sync.data_exchange.mautic',
                 ],
             ],
             'mautic.integrations.helper.sync_date' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Helpers\SyncDateHelper::class,
+                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncDate\SyncDateHelper::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                 ],
             ],
-            'mautic.integrations.helper.sync_duplicity_finder' => [
-                'class' => \MauticPlugin\IntegrationBundle\Sync\Mapping\MappingHelper::class,
+            'mautic.integrations.helper.sync_mapping_helper' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper::class,
                 'arguments' => [
                     'mautic.lead.model.field',
-                    ''
+                    'mautic.lead.repository.lead',
+                    'mautic.integrations.repository.object_mapping',
                 ],
             ],
         ],

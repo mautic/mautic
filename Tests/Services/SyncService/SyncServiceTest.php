@@ -31,7 +31,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         $dataExchange = new ExampleSyncDataExchange();
         $dispatcher->addSubscriber(new IntegrationSubscriber($dataExchange));
 
-        $event = new SyncEvent(ExampleIntegration::NAME, new \DateTimeImmutable());
+        $event = new SyncEvent(ExampleIntegration::NAME, true);
         $dispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
         /** @var SyncService $syncService */
