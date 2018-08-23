@@ -74,9 +74,9 @@ class ObjectMapping
         $builder
             ->setTable('sync_object_mapping')
             ->setCustomRepositoryClass(ObjectMappingRepository::class)
-            ->addIndex(['integration', 'integration_object', 'integration_object_id'], 'integration_object')
-            ->addIndex(['integration', 'internal_object', 'internal_object_id'], 'internal_object')
-            ->addIndex(['integration', 'internal_object', 'integration_object'], 'object_match')
+            ->addIndex(['integration', 'integration_object_name', 'integration_object_id'], 'integration_object')
+            ->addIndex(['integration', 'internal_object_name', 'internal_object_id'], 'internal_object')
+            ->addIndex(['integration', 'internal_object_name', 'integration_object_name'], 'object_match')
             ->addIndex(['integration', 'last_sync_date'], 'integration_last_sync_date');
 
         $builder->addId();
