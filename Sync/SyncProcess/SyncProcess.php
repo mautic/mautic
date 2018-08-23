@@ -127,8 +127,6 @@ class SyncProcess
                 $syncOrder = $this->generateInternalSyncOrder($syncReport);
                 // Execute the sync instructions
                 $this->internalSyncDataExchange->executeSyncOrder($syncOrder);
-                // Save the mappings between Mautic objects and the integration's objects
-                $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getObjectMappings());
             }
 
             $this->syncIteration++;

@@ -34,7 +34,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
     const NAME = 'mautic';
     const OBJECT_CONTACT = 'lead'; // kept as lead for BC
-    const OBJECT_COMPANY = 'company'; // kept as lead for BC
+    const OBJECT_COMPANY = 'company';
 
     /**
      * @var FieldChangeRepository
@@ -79,9 +79,9 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     ) {
         $this->fieldChangeRepository   = $fieldChangeRepository;
         $this->variableExpresserHelper = $variableExpresserHelper;
-        $this->mappingHelper         = $mappingHelper;
-        $this->companyObjectHelper = $companyObjectHelper;
-        $this->contactObjectHelper = $contactObjectHelper;
+        $this->mappingHelper           = $mappingHelper;
+        $this->companyObjectHelper     = $companyObjectHelper;
+        $this->contactObjectHelper     = $contactObjectHelper;
     }
 
     /**
@@ -156,10 +156,10 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         foreach ($unidentifiedObjects as $objectName => $createObjects) {
             switch ($objectName) {
                 case self::OBJECT_CONTACT:
-                    $this->contactObjectHelper->create($createObjects, $syncOrderDAO);
+                    $this->contactObjectHelper->create($createObjects);
                     break;
                 case self::OBJECT_COMPANY:
-                    $this->companyObjectHelper->create($createObjects, $syncOrderDAO);
+                    $this->companyObjectHelper->create($createObjects);
                     break;
             }
         }
@@ -168,7 +168,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     /**
      * @param MappingManualDAO $mappingManualDAO
      * @param string           $internalObjectName
-     * @param ReportObjectDAO        $integrationObjectDAO
+     * @param ReportObjectDAO  $integrationObjectDAO
      *
      * @return ReportObjectDAO
      */

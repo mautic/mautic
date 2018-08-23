@@ -12,10 +12,12 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
 
 
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
+use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class CompanyObject implements ObjectInterface
 {
@@ -30,12 +32,34 @@ class CompanyObject implements ObjectInterface
     private $repository;
 
     /**
-     * @param OrderDAO          $syncOrder
      * @param ObjectChangeDAO[] $objects
+     *
+     * @return ObjectMapping[]
      */
-    public function create(array $objects, OrderDAO $syncOrder)
+    public function create(array $objects)
     {
-        // TODO: Implement create() method.
+        $objectMappings = [];
+        foreach ($objects as $object) {
+            $company = new Company();
+            $fields  = $object->getFields();
+            foreach ($fields as $field) {
+                $company->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
+            }
+
+            $this->model->saveEntity($company);
+            $this->repository->detachEntity($company);
+
+            $objectMapping = new ObjectMapping();
+            $objectMapping->setLastSyncDate($company->getDateAdded())
+                ->setIntegration($object->getIntegration())
+                ->setIntegrationObjectName($object->getMappedObject())
+                ->setIntegrationObjectId($object->getMappedObjectId())
+                ->setInternalObjectName(MauticSyncDataExchange::OBJECT_COMPANY)
+                ->setInternalObjectId($company->getId());
+            $objectMappings[] = $objectMapping;
+        }
+
+        return $objectMappings;
     }
 
     /**
@@ -44,6 +68,22 @@ class CompanyObject implements ObjectInterface
      */
     public function update(array $ids, array $objects)
     {
-        // TODO: Implement update() method.
+        /** @var Company[] $companies */
+        $companies = $this->model->getEntities(['ids' => $ids]);
+        foreach ($companies as $company) {
+            $changedObjects = $objects[$company->getId()];
+
+            /** @var ObjectChangeDAO $changedObject */
+            foreach ($changedObjects as $changedObject) {
+                $fields = $changedObject->getFields();
+
+                foreach ($fields as $field) {
+                    $company->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
+                }
+            }
+
+            $this->model->saveEntity($company);
+            $this->repository->detachEntity($company);
+        }
     }
 }

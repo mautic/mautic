@@ -15,8 +15,9 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class ContactObject implements ObjectInterface
 {
@@ -43,11 +44,13 @@ class ContactObject implements ObjectInterface
     }
 
     /**
-     * @param OrderDAO $syncOrder
      * @param ObjectChangeDAO[] $objects
+     *
+     * @return ObjectMapping[]
      */
-    public function create(array $objects, OrderDAO $syncOrder)
+    public function create(array $objects)
     {
+        $objectMappings = [];
         foreach ($objects as $object) {
             $contact = new Lead();
             $fields  = $object->getFields();
@@ -56,11 +59,19 @@ class ContactObject implements ObjectInterface
             }
 
             $this->model->saveEntity($contact);
-
-            // Todo save mapping
-
             $this->repository->detachEntity($contact);
+
+            $objectMapping = new ObjectMapping();
+            $objectMapping->setLastSyncDate($contact->getDateAdded())
+                ->setIntegration($object->getIntegration())
+                ->setIntegrationObjectName($object->getMappedObject())
+                ->setIntegrationObjectId($object->getMappedObjectId())
+                ->setInternalObjectName(MauticSyncDataExchange::OBJECT_CONTACT)
+                ->setInternalObjectId($contact->getId());
+            $objectMappings[] = $objectMapping;
         }
+
+        return $objectMappings;
     }
 
     /**
