@@ -122,7 +122,7 @@ class ObjectChangeDAO
      *
      * @return mixed|null
      */
-    public function getMappedId()
+    public function getMappedObjectId()
     {
         return $this->mappedId;
     }

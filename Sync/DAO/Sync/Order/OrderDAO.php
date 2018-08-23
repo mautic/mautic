@@ -86,7 +86,7 @@ class OrderDAO
         }
 
         // These objects are not already tracked and thus possibly need to be created
-        $this->unidentifiedObjects[$objectChangeDAO->getObject()][$objectChangeDAO->getMappedId()] = $objectChangeDAO;
+        $this->unidentifiedObjects[$objectChangeDAO->getObject()][$objectChangeDAO->getMappedObjectId()] = $objectChangeDAO;
 
         return $this;
     }
@@ -138,7 +138,7 @@ class OrderDAO
         $objectMapping = new ObjectMapping();
         $objectMapping->setIntegration($objectChange->getIntegration())
             ->setInternalObjectName($objectChange->getMappedObject())
-            ->setInternalObjectId($objectChange->getMappedId())
+            ->setInternalObjectId($objectChange->getMappedObjectId())
             ->setIntegrationObjectName($integrationObjectName)
             ->setIntegrationObjectId($integrationObjectId)
             ->setLastSyncDate($objectModifiedDate);
