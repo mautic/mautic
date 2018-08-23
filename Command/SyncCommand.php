@@ -97,6 +97,8 @@ class SyncCommand extends ContainerAwareCommand
         }
 
         try {
+            defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $integration);
+
             $event = new SyncEvent($integration, $firstTimeSync);
             $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
