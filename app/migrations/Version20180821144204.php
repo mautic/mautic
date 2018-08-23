@@ -24,7 +24,7 @@ class Version20180821144204 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->getTable("{$this->prefix}webhook_queue")->hasIndex("{$this->prefix}tmp_id_date")) {
+        if ($schema->getTable("{$this->prefix}webhook_queue")->hasIndex("{$this->prefix}webhook_id_date")) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -34,6 +34,6 @@ class Version20180821144204 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("CREATE INDEX {$this->prefix}tmp_id_date ON {$this->prefix}webhook_queue (webhook_id, date_added)");
+        $this->addSql("CREATE INDEX {$this->prefix}webhook_id_date ON {$this->prefix}webhook_queue (webhook_id, date_added)");
     }
 }
