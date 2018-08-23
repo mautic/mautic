@@ -507,7 +507,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('points', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $pointLogRepo->getMostPoints($queryBuilder2, $limit, $offset);
+                    $items                  = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
