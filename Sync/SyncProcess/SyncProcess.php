@@ -127,6 +127,8 @@ class SyncProcess
                 $syncOrder = $this->generateInternalSyncOrder($syncReport);
                 // Execute the sync instructions
                 $this->internalSyncDataExchange->executeSyncOrder($syncOrder);
+                // Save the mappings between Mautic objects and the integration's objects
+                $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getObjectMappings());
             }
 
             $this->syncIteration++;
@@ -136,10 +138,12 @@ class SyncProcess
             $syncReport = $this->generateInternalSyncReport();
 
             if ($syncReport->shouldSync()) {
+                // Convert the internal report into an "order" or instructions for the integration
                 $syncOrder = $this->generateIntegrationSyncOrder($syncReport);
+                // Execute the sync instructions
                 $this->integrationSyncDataExchange->executeSyncOrder($syncOrder);
-
-                $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getEntityMappings());
+                // Save the mappings between Mautic objects and the integration's objects
+                $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getObjectMappings());
             }
         } while ($syncReport->shouldSync());
     }

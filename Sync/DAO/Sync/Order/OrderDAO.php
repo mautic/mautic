@@ -159,7 +159,7 @@ class OrderDAO
      *
      * @return array
      */
-    public function getObjectKnownIds(string $object): array
+    public function getIdentifiedObjectIds(string $object): array
     {
         if (!array_key_exists($object, $this->identifiedObjects)) {
             return [];

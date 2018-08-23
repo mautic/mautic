@@ -100,12 +100,24 @@ return [
             'mautic.integrations.helper.sync_judge' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudge::class,
             ],
+            'mautic.integrations.helper.contact_object' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\ContactObject::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.repository.lead',
+                ],
+            ],
+            'mautic.integrations.helper.company_object' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\CompanyObject::class,
+                'arguments' => [
+                    'mautic.lead.model.company',
+                    'mautic.lead.repository.company',
+                ],
+            ],
             'mautic.integrations.sync.data_exchange.mautic' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
-                    'mautic.lead.repository.lead',
-                    'mautic.lead.model.lead',
                     'mautic.integrations.helper.variable_expresser',
                     'mautic.integrations.helper.sync_mapping_helper',
                 ],

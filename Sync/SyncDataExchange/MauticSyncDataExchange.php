@@ -11,23 +11,21 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange;
 
-use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO AS ReportFieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO AS OrderObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
-use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
-use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
-use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\CompanyObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\ContactObject;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use MauticPlugin\MagentoBundle\Exception\ObjectNotSupportedException;
 
 /**
  * Class MauticSyncDataExchange
@@ -35,22 +33,13 @@ use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelp
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
     const NAME = 'mautic';
-    const CONTACT_OBJECT = 'lead'; // kept as lead for BC
+    const OBJECT_CONTACT = 'lead'; // kept as lead for BC
+    const OBJECT_COMPANY = 'company'; // kept as lead for BC
 
     /**
      * @var FieldChangeRepository
      */
     private $fieldChangeRepository;
-
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
 
     /**
      * @var VariableExpresserHelperInterface
@@ -63,32 +52,43 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     private $mappingHelper;
 
     /**
+     * @var CompanyObject
+     */
+    private $companyObjectHelper;
+
+    /**
+     * @var ContactObject
+     */
+    private $contactObjectHelper;
+
+    /**
      * MauticSyncDataExchange constructor.
      *
      * @param FieldChangeRepository            $fieldChangeRepository
-     * @param LeadRepository                   $leadRepository
-     * @param LeadModel                        $leadModel
      * @param VariableExpresserHelperInterface $variableExpresserHelper
-     * @param MappingHelper                  $mappingHelper
+     * @param MappingHelper                    $mappingHelper
+     * @param CompanyObject                    $companyObjectHelper
+     * @param ContactObject                    $contactObjectHelper
      */
     public function __construct(
         FieldChangeRepository $fieldChangeRepository,
-        LeadRepository $leadRepository,
-        LeadModel $leadModel,
         VariableExpresserHelperInterface $variableExpresserHelper,
-        MappingHelper $mappingHelper
+        MappingHelper $mappingHelper,
+        CompanyObject $companyObjectHelper,
+        ContactObject $contactObjectHelper
     ) {
         $this->fieldChangeRepository   = $fieldChangeRepository;
-        $this->leadRepository          = $leadRepository;
-        $this->leadModel               = $leadModel;
         $this->variableExpresserHelper = $variableExpresserHelper;
         $this->mappingHelper         = $mappingHelper;
+        $this->companyObjectHelper = $companyObjectHelper;
+        $this->contactObjectHelper = $contactObjectHelper;
     }
 
     /**
      * @param RequestDAO $requestDAO
      *
      * @return ReportDAO
+     * @throws ObjectNotSupportedException
      */
     public function getSyncReport(RequestDAO $requestDAO)
     {
@@ -97,7 +97,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
         foreach ($requestedObjects as $objectDAO) {
             $fieldsChanges = $this->fieldChangeRepository->findChangesAfter(
-                $objectDAO->getObject(),
+                $this->getFieldObjectName($objectDAO->getObject()),
                 $objectDAO->getFromDateTime()
             );
 
@@ -135,39 +135,34 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
     /**
      * @param OrderDAO $syncOrderDAO
-     *
-     * @throws \Doctrine\ORM\ORMException
      */
     public function executeSyncOrder(OrderDAO $syncOrderDAO)
     {
-//        $objectChanges         = $syncOrderDAO->getIdentifiedObjects();
-//        $chunkedObjectsChanges = [];
-//        $objectsIds            = [];
-//        foreach ($objectChanges as $objectChange) {
-//            $objectName = $objectChange->getObject();
-//            if (!array_key_exists($objectName, $objectsIds)) {
-//                $objectsIds[$objectName]            = [];
-//                $chunkedObjectsChanges[$objectName] = [];
-//            }
-//            $objectsIds[$objectName][]                                        = $objectChange->getObjectId();
-//            $chunkedObjectsChanges[$objectName][$objectChange->getObjectId()] = $objectChange;
-//        }
-//        foreach ($objectsIds as $objectName => $ids) {
-//            switch ($objectName) {
-//                case 'lead':
-//                    $leads = $this->leadRepository->findByIds($ids);
-//                    /** @var Lead $lead */
-//                    foreach ($leads as $lead) {
-//                        /** @var OrderObjectChangeDAO $objectChange */
-//                        $objectChange  = $chunkedObjectsChanges[$objectName][$lead->getId()];
-//                        $fieldsChanges = $objectChange->getFields();
-//                        foreach ($fieldsChanges as $fieldsChange) {
-//                            $lead->addUpdatedField($fieldsChange->getName(), $fieldsChange->getValue());
-//                        }
-//                        $this->em->persist($lead);
-//                    }
-//            }
-//        }
+        $identifiedObjects = $syncOrderDAO->getIdentifiedObjects();
+        foreach ($identifiedObjects as $objectName => $updateObjects) {
+            $identifiedObjectIds = $syncOrderDAO->getIdentifiedObjectIds($objectName);
+
+            switch ($objectName) {
+                case self::OBJECT_CONTACT:
+                    $this->contactObjectHelper->update($identifiedObjectIds, $updateObjects);
+                    break;
+                case self::OBJECT_COMPANY:
+                    $this->companyObjectHelper->update($identifiedObjectIds, $updateObjects);
+                    break;
+            }
+        }
+
+        $unidentifiedObjects = $syncOrderDAO->getUnidentifiedObjects();
+        foreach ($unidentifiedObjects as $objectName => $createObjects) {
+            switch ($objectName) {
+                case self::OBJECT_CONTACT:
+                    $this->contactObjectHelper->create($createObjects, $syncOrderDAO);
+                    break;
+                case self::OBJECT_COMPANY:
+                    $this->companyObjectHelper->create($createObjects, $syncOrderDAO);
+                    break;
+            }
+        }
     }
 
     /**
@@ -240,5 +235,23 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         $reportFieldDAO->setChangeDateTime($changeTimestamp);
 
         return $reportFieldDAO;
+    }
+
+    /**
+     * @param string $objectName
+     *
+     * @return string
+     * @throws ObjectNotSupportedException
+     */
+    private function getFieldObjectName(string $objectName)
+    {
+        switch ($objectName) {
+            case self::OBJECT_CONTACT:
+                return Lead::class;
+            case self::OBJECT_COMPANY:
+                return Company::class;
+            default:
+                throw new ObjectNotSupportedException(self::NAME, $objectName);
+        }
     }
 }

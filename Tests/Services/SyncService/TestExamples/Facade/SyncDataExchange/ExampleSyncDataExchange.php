@@ -26,7 +26,7 @@ use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 class ExampleSyncDataExchange implements SyncDataExchangeInterface
 {
     const LEAD_OBJECT = 'lead';
-    const CONTACT_OBJECT = 'contact';
+    const OBJECT_CONTACT = 'contact';
 
     /**
      * @var array
@@ -219,7 +219,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         // applicable to the integration. I.e. Salesforce supports querying for specific fields in it's SOQL
 
         $payload = [
-            self::CONTACT_OBJECT => [
+            self::OBJECT_CONTACT => [
                 [
                     'id'            => 1,
                     'first_name'    => 'John',

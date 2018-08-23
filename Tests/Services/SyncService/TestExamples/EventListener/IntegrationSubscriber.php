@@ -63,15 +63,15 @@ class IntegrationSubscriber implements EventSubscriberInterface
         // Each object like lead, contact, user, company, account, etc, will need it's own ObjectMappingDAO
         // In this example, Mautic's Contact object is mapped to the Example's Lead object
         $leadObjectMapping = new ObjectMappingDAO(
-            MauticSyncDataExchange::CONTACT_OBJECT,
+            MauticSyncDataExchange::OBJECT_CONTACT,
             ExampleSyncDataExchange::LEAD_OBJECT
         );
         $mappingManual->addObjectMapping($leadObjectMapping);
 
         // Then it is also mapping Mautic's Contact object to the Example's Contact object
         $contactObjectMapping = new ObjectMappingDAO(
-            MauticSyncDataExchange::CONTACT_OBJECT,
-            ExampleSyncDataExchange::CONTACT_OBJECT
+            MauticSyncDataExchange::OBJECT_CONTACT,
+            ExampleSyncDataExchange::OBJECT_CONTACT
         );
         $mappingManual->addObjectMapping($contactObjectMapping);
 
