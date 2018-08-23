@@ -81,6 +81,7 @@ final class SyncService implements SyncServiceInterface
             $this->internalSyncDataExchange,
             $syncDataExchangeService,
             $this->syncDateHelper,
+            $firstTimeSync,
             $syncFromDateTime
         );
 
