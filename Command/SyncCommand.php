@@ -63,7 +63,7 @@ class SyncCommand extends ContainerAwareCommand
             )
             ->addOption(
                 '--start-datetime',
-                '-s',
+                '-t',
                 InputOption::VALUE_REQUIRED,
                 'Set start date/time for updated values.'
             )
