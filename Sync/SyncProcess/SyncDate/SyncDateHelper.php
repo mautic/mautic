@@ -42,7 +42,7 @@ class SyncDateHelper
         $qb = $this->connection->createQueryBuilder();
 
         return $qb
-            ->select('max(e.last_sync_date)')
+            ->select('max(m.last_sync_date)')
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'm')
             ->where(
                 $qb->expr()->eq('m.integration', ':integration'),
