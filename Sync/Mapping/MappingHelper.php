@@ -75,7 +75,7 @@ class MappingHelper
             $integrationField = $mappingManualDAO->getIntegrationMappedField($internalObjectName, $integrationObjectDAO->getObject(), $field);
 
             if ($integrationValue = $integrationObjectDAO->getField($integrationField)) {
-                $identifiers[$integrationField] = trim($integrationValue);
+                $identifiers[$integrationField] = $integrationValue->getValue()->getNormalizedValue();
             }
         }
 
