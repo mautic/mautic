@@ -318,8 +318,20 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $companyFieldTypes = $this->fieldModel->getFieldListWithProperties('company');
         foreach ($matchedFields as $companyField => $value) {
-            if (isset($companyFieldTypes[$companyField]['type']) && $companyFieldTypes[$companyField]['type'] == 'text') {
-                $matchedFields[$companyField] = substr($value, 0, 255);
+            if (isset($companyFieldTypes[$companyField]['type'])) {
+                switch ($companyFieldTypes[$companyField]['type']) {
+                    case 'text':
+                        $matchedFields[$companyField] = substr($value, 0, 255);
+                        break;
+                    case 'date':
+                        $date = new \DateTime($value);
+                        $matchedFields[$companyField] = $date->format("Y-m-d");
+                        break;
+                    case 'datetime':
+                        $date = new \DateTime($value);
+                        $matchedFields[$companyField] = $date->format("Y-m-d H:i:s");
+                        break;
+                }
             }
         }
 
