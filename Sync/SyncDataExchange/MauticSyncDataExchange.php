@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO AS ReportFieldDAO;
@@ -124,11 +125,28 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
     /**
      * @param OrderDAO $syncOrderDAO
+     *
+     * @throws ObjectNotSupportedException
      */
     public function executeSyncOrder(OrderDAO $syncOrderDAO)
     {
         $identifiedObjects = $syncOrderDAO->getIdentifiedObjects();
         foreach ($identifiedObjects as $objectName => $updateObjects) {
+            $updateCount = count($updateObjects);
+            DebugLogger::log(
+                self::NAME,
+                sprintf(
+                    "Updating %d %s object(s)",
+                    $updateCount,
+                    $objectName
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
+
+            if (0 === $updateCount) {
+                continue;
+            }
+
             $identifiedObjectIds = $syncOrderDAO->getIdentifiedObjectIds($objectName);
 
             switch ($objectName) {
@@ -138,11 +156,29 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 case self::OBJECT_COMPANY:
                     $this->companyObjectHelper->update($identifiedObjectIds, $updateObjects);
                     break;
+                default:
+                    throw new ObjectNotSupportedException(self::NAME, $objectName);
             }
         }
 
         $unidentifiedObjects = $syncOrderDAO->getUnidentifiedObjects();
         foreach ($unidentifiedObjects as $objectName => $createObjects) {
+            $createCount = count($createObjects);
+
+            DebugLogger::log(
+                self::NAME,
+                sprintf(
+                    "Creating %d %s object(s)",
+                    $createCount,
+                    $objectName
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
+
+            if (0 === $createCount) {
+                continue;
+            }
+
             switch ($objectName) {
                 case self::OBJECT_CONTACT:
                     $this->contactObjectHelper->create($createObjects);
@@ -150,6 +186,8 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 case self::OBJECT_COMPANY:
                     $this->companyObjectHelper->create($createObjects);
                     break;
+                default:
+                    throw new ObjectNotSupportedException(self::NAME, $objectName);
             }
         }
     }
@@ -227,10 +265,20 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
             switch ($objectDAO->getObject()) {
                 case self::OBJECT_CONTACT:
-                    $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates($objectDAO->getFromDateTime(), $objectDAO->getToDateTime(), $start, $limit);
+                    $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates(
+                        $objectDAO->getFromDateTime(),
+                        $objectDAO->getToDateTime(),
+                        $start,
+                        $limit
+                    );
                     break;
                 case self::OBJECT_COMPANY:
-                    $foundObjects = $this->companyObjectHelper->findObjectsBetweenDates($objectDAO->getFromDateTime(), $objectDAO->getToDateTime(), $start, $limit);
+                    $foundObjects = $this->companyObjectHelper->findObjectsBetweenDates(
+                        $objectDAO->getFromDateTime(),
+                        $objectDAO->getToDateTime(),
+                        $start,
+                        $limit
+                    );
                     break;
                 default:
                     throw new ObjectNotSupportedException(self::NAME, $objectDAO->getObject());
@@ -238,14 +286,18 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
             $fields = $objectDAO->getFields();
             foreach ($foundObjects as $object) {
-                $objectDAO = new ReportObjectDAO($objectDAO->getObject(), $object['id']);
+                $modifiedDateTime = new \DateTime(
+                    !empty($object['date_modified']) ? $object['date_modified'] : $object['date_added'],
+                    new \DateTimeZone('UTC')
+                );
+                $objectDAO        = new ReportObjectDAO($objectDAO->getObject(), $object['id'], $modifiedDateTime);
                 $syncReport->addObject($objectDAO);
 
                 foreach ($fields as $field) {
+                    $fieldType       = $this->getNormalizedFieldType($mauticFields[$field]['type']);
                     $normalizedValue = new NormalizedValueDAO(
-                        $mauticFields[$field]['type'],
-                        $object[$field],
-                        $this->valueNormalizer->normalizeForMautic($mauticFields[$field]['type'], $object[$field])
+                        $fieldType,
+                        $object[$field]
                     );
 
                     $objectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
@@ -277,14 +329,17 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
             foreach ($fieldsChanges as $fieldChange) {
                 $object   = $fieldChange['object'];
                 $objectId = $fieldChange['object_id'];
+                $modifiedDateTime = new \DateTime($fieldChange['modified_at'], new \DateTimeZone('UTC'));
 
                 if (!array_key_exists($object, $reportObjects)) {
                     $reportObjects[$object] = [];
                 }
 
                 if (!array_key_exists($objectId, $reportObjects[$object])) {
-                    $reportObjects[$object][$objectId] = new ReportObjectDAO($object, $objectId);
+                    /** @var ReportObjectDAO $reportObjectDAO */
+                    $reportObjects[$object][$objectId] = $reportObjectDAO = new ReportObjectDAO($object, $objectId);
                     $syncReport->addObject($reportObjects[$object][$objectId]);
+                    $reportObjectDAO->setChangeDateTime($modifiedDateTime);
                 }
 
                 /** @var ReportObjectDAO $reportObjectDAO */
@@ -293,6 +348,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 $reportObjectDAO->addField(
                     $this->getFieldChangeObject($fieldChange)
                 );
+
+                // Track the latest change as the object's change date/time
+                if ($reportObjectDAO->getChangeDateTime() > $modifiedDateTime) {
+                    $reportObjectDAO->setChangeDateTime($modifiedDateTime);
+                }
             }
         }
 
@@ -336,16 +396,37 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param $object
+     * @param string $object
      *
      * @return array
      */
-    private function getFieldList($object)
+    private function getFieldList(string $object)
     {
         if (!isset($this->fieldList[$object])) {
             $this->fieldList[$object] = $this->fieldModel->getFieldListWithProperties($object);
         }
 
         return $this->fieldList[$object];
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return string
+     */
+    private function getNormalizedFieldType(string $type)
+    {
+        switch ($type) {
+            case 'boolean':
+                return NormalizedValueDAO::BOOLEAN_TYPE;
+            case 'date':
+            case 'datetime':
+            case 'time':
+                return NormalizedValueDAO::DATETIME_TYPE;
+            case 'number':
+                return NormalizedValueDAO::FLOAT_TYPE;
+            default:
+                return NormalizedValueDAO::STRING_TYPE;
+        }
     }
 }
