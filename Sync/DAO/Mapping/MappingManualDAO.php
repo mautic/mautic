@@ -60,16 +60,21 @@ class MappingManualDAO
     {
         $internalObjectName    = $objectMappingDAO->getInternalObjectName();
         $integrationObjectName = $objectMappingDAO->getIntegrationObjectName();
+
         if (!array_key_exists($internalObjectName, $this->objectsMapping)) {
             $this->objectsMapping[$internalObjectName] = [];
         }
+        $this->objectsMapping[$internalObjectName][$integrationObjectName] = $objectMappingDAO;
+
         if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
             $this->internalObjectsMapping[$internalObjectName] = [];
         }
+        $this->internalObjectsMapping[$internalObjectName][] = $integrationObjectName;
+
         if (!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
             $this->integrationObjectsMapping[$integrationObjectName] = [];
         }
-        $this->objectsMapping[$internalObjectName][$integrationObjectName] = $objectMappingDAO;
+        $this->integrationObjectsMapping[$integrationObjectName][] = $internalObjectName;
     }
 
     /**
@@ -175,6 +180,7 @@ class MappingManualDAO
         }
         $fields               = [];
         $internalObjectsNames = $this->integrationObjectsMapping[$integrationObjectName];
+
         foreach ($internalObjectsNames as $internalObjectName) {
             /** @var ObjectMappingDAO $objectMappingDAO */
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
