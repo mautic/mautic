@@ -156,6 +156,7 @@ class SyncProcess
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {
             $integrationObjectFields = $this->mappingManualDAO->getIntegrationObjectFieldNames($integrationObjectName);
+
             if (count($integrationObjectFields) === 0) {
                 // No fields configured for a sync
                 continue;

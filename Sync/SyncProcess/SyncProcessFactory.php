@@ -29,7 +29,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
      * @param bool                      $isFirstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
      *
-     * @return SyncProcess|mixed
+     * @return SyncProcess
      */
     public function create(
         SyncJudgeInterface $syncJudge,
