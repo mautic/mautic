@@ -292,6 +292,11 @@ return [
                     'channel' => 'email',
                 ],
             ],
+            'bc_mautic_api_importcsv' => [
+                'path'       => '/contacts/importCsv',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:importCsv',
+                'method'     => 'POST',
+            ],
             'bc_mautic_api_dncremovecontact' => [
                 'path'       => '/contacts/{id}/dnc/remove/{channel}',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:removeDnc',
