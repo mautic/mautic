@@ -12,20 +12,31 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
 
 
+use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 
 interface ObjectInterface
 {
     /**
-     * @param OrderDAO          $syncOrder
      * @param ObjectChangeDAO[] $objects
+     *
+     * @return ObjectMapping[]
      */
-    public function create(array $objects, OrderDAO $syncOrder);
+    public function create(array $objects);
 
     /**
      * @param array             $ids
      * @param ObjectChangeDAO[] $objects
      */
     public function update(array $ids, array $objects);
+
+    /**
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int                $start
+     * @param int                $limit
+     *
+     * @return mixed
+     */
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit);
 }

@@ -37,6 +37,6 @@ class SyncServiceTest extends MauticMysqlTestCase
         /** @var SyncService $syncService */
         $syncService = $this->container->get('mautic.integrations.sync.service');
 
-        $syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $event->getStartDate());
+        $syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), true);
     }
 }

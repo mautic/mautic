@@ -105,6 +105,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.lead',
+                    'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.integrations.helper.company_object' => [
@@ -112,6 +113,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.company',
                     'mautic.lead.repository.company',
+                    'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic' => [
@@ -122,6 +124,7 @@ return [
                     'mautic.integrations.helper.sync_mapping_helper',
                     'mautic.integrations.helper.company_object',
                     'mautic.integrations.helper.contact_object',
+                    'mautic.lead.model.field',
                 ],
             ],
             'mautic.integrations.helper.sync_process_factory' => [

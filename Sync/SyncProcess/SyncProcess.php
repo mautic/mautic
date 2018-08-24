@@ -127,8 +127,6 @@ class SyncProcess
                 $syncOrder = $this->generateInternalSyncOrder($syncReport);
                 // Execute the sync instructions
                 $this->internalSyncDataExchange->executeSyncOrder($syncOrder);
-                // Save the mappings between Mautic objects and the integration's objects
-                $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getObjectMappings());
             }
 
             $this->syncIteration++;
@@ -158,6 +156,7 @@ class SyncProcess
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {
             $integrationObjectFields = $this->mappingManualDAO->getIntegrationObjectFieldNames($integrationObjectName);
+
             if (count($integrationObjectFields) === 0) {
                 // No fields configured for a sync
                 continue;
@@ -194,8 +193,8 @@ class SyncProcess
                 continue;
             }
 
-            // Sync date does not matter in this case because Mautic will simply process anything in the queue
-            $internalRequestObject = new RequestObjectDAO($internalObjectName);
+            $objectSyncFromDateTime = $this->getSyncFromDateTime(MauticSyncDataExchange::NAME, $internalObjectName);
+            $internalRequestObject  = new RequestObjectDAO($internalObjectName, $objectSyncFromDateTime, $this->syncDateTime);
             foreach ($internalObjectFields as $internalObjectField) {
                 $internalRequestObject->addField($internalObjectField);
             }
@@ -299,7 +298,7 @@ class SyncProcess
             return $this->lastObjectSyncDates[$key];
         }
 
-        if ($lastSync = $this->syncDateHelper->getLastSyncDateForObject($integration, $object)) {
+        if (MauticSyncDataExchange::NAME !== $integration && $lastSync = $this->syncDateHelper->getLastSyncDateForObject($integration, $object)) {
             // Use the latest sync date recorded
             $this->lastObjectSyncDates[$key] = new \DateTimeImmutable($lastSync, new \DateTimeZone('UTC'));
         } else {

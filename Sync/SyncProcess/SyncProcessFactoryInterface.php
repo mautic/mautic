@@ -29,7 +29,7 @@ interface SyncProcessFactoryInterface
      * @param bool                      $isFirstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
      *
-     * @return mixed
+     * @return SyncProcess
      */
     public function create(
         SyncJudgeInterface $syncJudge,

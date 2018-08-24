@@ -39,7 +39,7 @@ class InformationChangeRequestDAO
     private $field;
 
     /**
-     * @var mixed
+     * @var NormalizedValueDAO
      */
     private $newValue;
 
@@ -68,7 +68,7 @@ class InformationChangeRequestDAO
         $this->objectName  = $objectName;
         $this->objectId    = $objectId;
         $this->field       = $field;
-        $this->newValue    = $normalizedValueDAO->getNormalizedValue();
+        $this->newValue    = $normalizedValueDAO;
     }
 
     /**
@@ -104,7 +104,7 @@ class InformationChangeRequestDAO
     }
 
     /**
-     * @return mixed
+     * @return NormalizedValueDAO
      */
     public function getNewValue()
     {
@@ -120,11 +120,11 @@ class InformationChangeRequestDAO
     }
 
     /**
-     * @param \DateTimeInterface $possibleChangeDateTime
+     * @param \DateTimeInterface|null $possibleChangeDateTime
      *
      * @return InformationChangeRequestDAO
      */
-    public function setPossibleChangeDateTime(\DateTimeInterface $possibleChangeDateTime)
+    public function setPossibleChangeDateTime(\DateTimeInterface $possibleChangeDateTime = null)
     {
         $this->possibleChangeDateTime = $possibleChangeDateTime;
 
@@ -140,11 +140,11 @@ class InformationChangeRequestDAO
     }
 
     /**
-     * @param \DateTimeInterface $certainChangeDateTime
+     * @param \DateTimeInterface|null $certainChangeDateTime
      *
      * @return InformationChangeRequestDAO
      */
-    public function setCertainChangeDateTime(\DateTimeInterface $certainChangeDateTime)
+    public function setCertainChangeDateTime(\DateTimeInterface $certainChangeDateTime = null)
     {
         $this->certainChangeDateTime = $certainChangeDateTime;
 

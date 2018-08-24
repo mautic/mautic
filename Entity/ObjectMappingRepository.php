@@ -28,7 +28,7 @@ class ObjectMappingRepository  extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('*')
-            ->from(MAUTIC_TABLE_PREFIX.'integration_object', 'i')
+            ->from(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'i')
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('i.integration', ':integration'),
@@ -59,7 +59,7 @@ class ObjectMappingRepository  extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('*')
-            ->from(MAUTIC_TABLE_PREFIX.'integration_object', 'i')
+            ->from(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'i')
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('i.integration', ':integration'),

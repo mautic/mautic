@@ -13,6 +13,8 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\FieldModel;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO AS ReportFieldDAO;
@@ -24,6 +26,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\CompanyObject;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 use MauticPlugin\MagentoBundle\Exception\ObjectNotSupportedException;
 
@@ -34,7 +37,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
     const NAME = 'mautic';
     const OBJECT_CONTACT = 'lead'; // kept as lead for BC
-    const OBJECT_COMPANY = 'company'; // kept as lead for BC
+    const OBJECT_COMPANY = 'company';
 
     /**
      * @var FieldChangeRepository
@@ -62,6 +65,21 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     private $contactObjectHelper;
 
     /**
+     * @var FieldModel
+     */
+    private $fieldModel;
+
+    /**
+     * @var ValueNormalizer
+     */
+    private $valueNormalizer;
+
+    /**
+     * @var array
+     */
+    private $fieldList = [];
+
+    /**
      * MauticSyncDataExchange constructor.
      *
      * @param FieldChangeRepository            $fieldChangeRepository
@@ -69,19 +87,24 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @param MappingHelper                    $mappingHelper
      * @param CompanyObject                    $companyObjectHelper
      * @param ContactObject                    $contactObjectHelper
+     * @param FieldModel                       $fieldModel
      */
     public function __construct(
         FieldChangeRepository $fieldChangeRepository,
         VariableExpresserHelperInterface $variableExpresserHelper,
         MappingHelper $mappingHelper,
         CompanyObject $companyObjectHelper,
-        ContactObject $contactObjectHelper
-    ) {
+        ContactObject $contactObjectHelper,
+        FieldModel $fieldModel
+    )
+    {
         $this->fieldChangeRepository   = $fieldChangeRepository;
         $this->variableExpresserHelper = $variableExpresserHelper;
-        $this->mappingHelper         = $mappingHelper;
-        $this->companyObjectHelper = $companyObjectHelper;
-        $this->contactObjectHelper = $contactObjectHelper;
+        $this->mappingHelper           = $mappingHelper;
+        $this->companyObjectHelper     = $companyObjectHelper;
+        $this->contactObjectHelper     = $contactObjectHelper;
+        $this->fieldModel              = $fieldModel;
+        $this->valueNormalizer         = new ValueNormalizer();
     }
 
     /**
@@ -92,45 +115,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      */
     public function getSyncReport(RequestDAO $requestDAO)
     {
-        $requestedObjects = $requestDAO->getObjects();
-        $syncReport       = new ReportDAO(self::NAME);
-
-        foreach ($requestedObjects as $objectDAO) {
-            $fieldsChanges = $this->fieldChangeRepository->findChangesAfter(
-                $this->getFieldObjectName($objectDAO->getObject()),
-                $objectDAO->getFromDateTime()
-            );
-
-            $reportObjects = [];
-            foreach ($fieldsChanges as $fieldChange) {
-                $object   = $fieldChange['object'];
-                $objectId = $fieldChange['object_id'];
-
-                if (!array_key_exists($object, $reportObjects)) {
-                    $reportObjects[$object] = [];
-                }
-
-                if (!array_key_exists($objectId, $reportObjects[$object])) {
-                    $reportObjects[$object][$objectId] = new ReportObjectDAO($object, $objectId);
-                }
-
-                /** @var ReportObjectDAO $reportObjectDAO */
-                $reportObjectDAO = $reportObjects[$object][$objectId];
-
-                $reportObjectDAO->addField(
-                    $this->getFieldChangeObject($fieldChange)
-                );
-
-            }
-
-            foreach ($reportObjects as $objectsDAO) {
-                foreach ($objectsDAO as $reportObjectDAO) {
-                    $syncReport->addObject($reportObjectDAO);
-                }
-            }
+        if ($requestDAO->isFirstTimeSync()) {
+            return $this->buildReportFromFullObjects($requestDAO);
         }
 
-        return $syncReport;
+        return $this->buildReportFromTrackedChanges($requestDAO);
     }
 
     /**
@@ -156,10 +145,10 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         foreach ($unidentifiedObjects as $objectName => $createObjects) {
             switch ($objectName) {
                 case self::OBJECT_CONTACT:
-                    $this->contactObjectHelper->create($createObjects, $syncOrderDAO);
+                    $this->contactObjectHelper->create($createObjects);
                     break;
                 case self::OBJECT_COMPANY:
-                    $this->companyObjectHelper->create($createObjects, $syncOrderDAO);
+                    $this->companyObjectHelper->create($createObjects);
                     break;
             }
         }
@@ -168,7 +157,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     /**
      * @param MappingManualDAO $mappingManualDAO
      * @param string           $internalObjectName
-     * @param ReportObjectDAO        $integrationObjectDAO
+     * @param ReportObjectDAO  $integrationObjectDAO
      *
      * @return ReportObjectDAO
      */
@@ -220,6 +209,97 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
+     * @param RequestDAO $requestDAO
+     *
+     * @return ReportDAO
+     * @throws ObjectNotSupportedException
+     */
+    private function buildReportFromFullObjects(RequestDAO $requestDAO)
+    {
+        $syncReport       = new ReportDAO(self::NAME);
+        $requestedObjects = $requestDAO->getObjects();
+
+        $limit = 200;
+        $start = $limit * ($requestDAO->getSyncIteration() - 1);
+
+        foreach ($requestedObjects as $objectDAO) {
+            $mauticFields = $this->getFieldList($objectDAO->getObject());
+
+            switch ($objectDAO->getObject()) {
+                case self::OBJECT_CONTACT:
+                    $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates($objectDAO->getFromDateTime(), $objectDAO->getToDateTime(), $start, $limit);
+                    break;
+                case self::OBJECT_COMPANY:
+                    $foundObjects = $this->companyObjectHelper->findObjectsBetweenDates($objectDAO->getFromDateTime(), $objectDAO->getToDateTime(), $start, $limit);
+                    break;
+                default:
+                    throw new ObjectNotSupportedException(self::NAME, $objectDAO->getObject());
+            }
+
+            $fields = $objectDAO->getFields();
+            foreach ($foundObjects as $object) {
+                $objectDAO = new ReportObjectDAO($objectDAO->getObject(), $object['id']);
+                $syncReport->addObject($objectDAO);
+
+                foreach ($fields as $field) {
+                    $normalizedValue = new NormalizedValueDAO(
+                        $mauticFields[$field]['type'],
+                        $object[$field],
+                        $this->valueNormalizer->normalizeForMautic($mauticFields[$field]['type'], $object[$field])
+                    );
+
+                    $objectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
+                }
+            }
+        }
+
+        return $syncReport;
+    }
+
+    /**
+     * @param RequestDAO $requestDAO
+     *
+     * @return ReportDAO
+     * @throws ObjectNotSupportedException
+     */
+    private function buildReportFromTrackedChanges(RequestDAO $requestDAO)
+    {
+        $syncReport       = new ReportDAO(self::NAME);
+        $requestedObjects = $requestDAO->getObjects();
+
+        foreach ($requestedObjects as $objectDAO) {
+            $fieldsChanges = $this->fieldChangeRepository->findChangesAfter(
+                $this->getFieldObjectName($objectDAO->getObject()),
+                $objectDAO->getFromDateTime()
+            );
+
+            $reportObjects = [];
+            foreach ($fieldsChanges as $fieldChange) {
+                $object   = $fieldChange['object'];
+                $objectId = $fieldChange['object_id'];
+
+                if (!array_key_exists($object, $reportObjects)) {
+                    $reportObjects[$object] = [];
+                }
+
+                if (!array_key_exists($objectId, $reportObjects[$object])) {
+                    $reportObjects[$object][$objectId] = new ReportObjectDAO($object, $objectId);
+                    $syncReport->addObject($reportObjects[$object][$objectId]);
+                }
+
+                /** @var ReportObjectDAO $reportObjectDAO */
+                $reportObjectDAO = $reportObjects[$object][$objectId];
+
+                $reportObjectDAO->addField(
+                    $this->getFieldChangeObject($fieldChange)
+                );
+            }
+        }
+
+        return $syncReport;
+    }
+
+    /**
      * @param array $fieldChange
      *
      * @return ReportFieldDAO
@@ -253,5 +333,19 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
             default:
                 throw new ObjectNotSupportedException(self::NAME, $objectName);
         }
+    }
+
+    /**
+     * @param $object
+     *
+     * @return array
+     */
+    private function getFieldList($object)
+    {
+        if (!isset($this->fieldList[$object])) {
+            $this->fieldList[$object] = $this->fieldModel->getFieldListWithProperties($object);
+        }
+
+        return $this->fieldList[$object];
     }
 }

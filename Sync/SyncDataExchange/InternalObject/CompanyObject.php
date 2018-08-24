@@ -12,10 +12,13 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
 
 
+use Doctrine\DBAL\Connection;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
+use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class CompanyObject implements ObjectInterface
 {
@@ -30,12 +33,39 @@ class CompanyObject implements ObjectInterface
     private $repository;
 
     /**
-     * @param OrderDAO          $syncOrder
-     * @param ObjectChangeDAO[] $objects
+     * @var Connection
      */
-    public function create(array $objects, OrderDAO $syncOrder)
+    private $connection;
+
+    /**
+     * @param ObjectChangeDAO[] $objects
+     *
+     * @return ObjectMapping[]
+     */
+    public function create(array $objects)
     {
-        // TODO: Implement create() method.
+        $objectMappings = [];
+        foreach ($objects as $object) {
+            $company = new Company();
+            $fields  = $object->getFields();
+            foreach ($fields as $field) {
+                $company->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
+            }
+
+            $this->model->saveEntity($company);
+            $this->repository->detachEntity($company);
+
+            $objectMapping = new ObjectMapping();
+            $objectMapping->setLastSyncDate($company->getDateAdded())
+                ->setIntegration($object->getIntegration())
+                ->setIntegrationObjectName($object->getMappedObject())
+                ->setIntegrationObjectId($object->getMappedObjectId())
+                ->setInternalObjectName(MauticSyncDataExchange::OBJECT_COMPANY)
+                ->setInternalObjectId($company->getId());
+            $objectMappings[] = $objectMapping;
+        }
+
+        return $objectMappings;
     }
 
     /**
@@ -44,6 +74,57 @@ class CompanyObject implements ObjectInterface
      */
     public function update(array $ids, array $objects)
     {
-        // TODO: Implement update() method.
+        /** @var Company[] $companies */
+        $companies = $this->model->getEntities(['ids' => $ids]);
+        foreach ($companies as $company) {
+            $changedObjects = $objects[$company->getId()];
+
+            /** @var ObjectChangeDAO $changedObject */
+            foreach ($changedObjects as $changedObject) {
+                $fields = $changedObject->getFields();
+
+                foreach ($fields as $field) {
+                    $company->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
+                }
+            }
+
+            $this->model->saveEntity($company);
+            $this->repository->detachEntity($company);
+        }
+    }
+
+    /**
+     * Unfortunately the CompanyRepository doesn't give us what we need so we have to write our own queries
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int                $start
+     * @param int                $limit
+     *
+     * @return array
+     */
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit)
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
+            ->where(
+                $qb->expr()->orX(
+                    $qb->expr()->andX(
+                        $qb->expr()->isNotNull('c.date_modified'),
+                        $qb->expr()->comparison('c.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
+                    ),
+                    $qb->expr()->andX(
+                        $qb->expr()->isNull('c.date_modified'),
+                        $qb->expr()->comparison('c.date_added', 'BETWEEN', ':dateFrom and :dateTo')
+                    )
+                )
+            )
+            ->setParameter('dateFrom', $from->format('Y-m-d H:i:s'))
+            ->setParameter('dateTo', $to->format('Y-m-d H:i:s'))
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
+
+        return $qb->execute()->fetchAll();
     }
 }

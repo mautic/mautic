@@ -173,6 +173,11 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         // Build a report of objects that have been modified
         $syncReport = new ReportDAO(ExampleIntegration::NAME);
 
+        if ($requestDAO->getSyncIteration() > 1) {
+            // Prevent loop
+            return $syncReport;
+        }
+
         $requestedObjects = $requestDAO->getObjects();
         foreach ($requestedObjects as $requestedObject) {
             $objectName   = $requestedObject->getObject();
