@@ -55,6 +55,11 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     ];
 
     /**
+     * @var array
+     */
+    private $payload = ['create' => [], 'update' => []];
+
+    /**
      * @var ValueNormalizer
      */
     private $valueNormalizer;
@@ -77,7 +82,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      */
     public function executeSyncOrder(OrderDAO $syncOrderDAO)
     {
-        $payload = ['create' => [], 'update' => []];
         $byEmail = [];
 
         $orderedObjects = $syncOrderDAO->getUnidentifiedObjects();
@@ -92,6 +96,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 // Extract identifier fields for this integration to check if they exist before creating
                 // Some integrations offer a upsert feature which may make this not necessary.
                 $emailAddress = $unidentifiedObject->getField('email')->getValue()->getNormalizedValue();
+
                 // Store by email address so they can be found again when we update the OrderDAO about mapping
                 $byEmail[$emailAddress] = $unidentifiedObject;
 
@@ -102,7 +107,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 }
 
                 // Create by default because it is unknown if they exist upstream or not
-                $payload['create'][$emailAddress] = $person;
+                $this->payload['create'][$emailAddress] = $person;
             }
 
             // If applicable, do something to verify if email addresses exist and if so, update objects instead
@@ -127,7 +132,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                     $person[$field->getName()] = $this->valueNormalizer->normalizeForIntegration($field->getValue());
                 }
 
-                $payload['update'][$key] = $person;
+                $this->payload['update'][$key] = $person;
             }
         }
 
@@ -184,7 +189,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
             $fromDateTime = $requestedObject->getFromDateTime();
             $mappedFields = $requestedObject->getFields();
 
-            $updatedPeople = $this->getPayload($objectName, $fromDateTime, $mappedFields);
+            $updatedPeople = $this->getReportPayload($objectName, $fromDateTime, $mappedFields);
             foreach ($updatedPeople as $person) {
                 // If the integration knows modified timestamps per field, use that. Otherwise, we're using the complete object's
                 // last modified timestamp.
@@ -212,13 +217,20 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
+     * @return array
+     */
+    public function getOrderPayload()
+    {
+        return $this->payload;
+    }
+    /**
      * @param                    $object
      * @param \DateTimeInterface $fromDateTime
      * @param array              $mappedFields
      *
      * @return mixed
      */
-    private function getPayload($object, \DateTimeInterface $fromDateTime, array $mappedFields)
+    private function getReportPayload($object, \DateTimeInterface $fromDateTime, array $mappedFields)
     {
         // Query integration's API for objects changed since $fromDateTime with the requested fields in $mappedFields if that's
         // applicable to the integration. I.e. Salesforce supports querying for specific fields in it's SOQL

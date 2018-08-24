@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class CompanyObject implements ObjectInterface
@@ -55,6 +56,15 @@ class CompanyObject implements ObjectInterface
             $this->model->saveEntity($company);
             $this->repository->detachEntity($company);
 
+            DebugLogger::log(
+                MauticSyncDataExchange::NAME,
+                sprintf(
+                    "Created company ID %d",
+                    $company->getId()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
+
             $objectMapping = new ObjectMapping();
             $objectMapping->setLastSyncDate($company->getDateAdded())
                 ->setIntegration($object->getIntegration())
@@ -76,6 +86,16 @@ class CompanyObject implements ObjectInterface
     {
         /** @var Company[] $companies */
         $companies = $this->model->getEntities(['ids' => $ids]);
+        DebugLogger::log(
+            MauticSyncDataExchange::NAME,
+            sprintf(
+                "Found %d companies to update with ids %s",
+                count($companies),
+                implode(", ", $ids)
+            ),
+            __CLASS__.':'.__FUNCTION__
+        );
+
         foreach ($companies as $company) {
             $changedObjects = $objects[$company->getId()];
 
@@ -90,6 +110,15 @@ class CompanyObject implements ObjectInterface
 
             $this->model->saveEntity($company);
             $this->repository->detachEntity($company);
+
+            DebugLogger::log(
+                MauticSyncDataExchange::NAME,
+                sprintf(
+                    "Updated company ID %d",
+                    $company->getId()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
         }
     }
 

@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class ContactObject implements ObjectInterface
@@ -69,6 +70,15 @@ class ContactObject implements ObjectInterface
             $this->model->saveEntity($contact);
             $this->repository->detachEntity($contact);
 
+            DebugLogger::log(
+                MauticSyncDataExchange::NAME,
+                sprintf(
+                    "Created lead ID %d",
+                    $contact->getId()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
+
             $objectMapping = new ObjectMapping();
             $objectMapping->setLastSyncDate($contact->getDateAdded())
                 ->setIntegration($object->getIntegration())
@@ -90,6 +100,16 @@ class ContactObject implements ObjectInterface
     {
         /** @var Lead[] $contacts */
         $contacts = $this->model->getEntities(['ids' => $ids]);
+        DebugLogger::log(
+            MauticSyncDataExchange::NAME,
+            sprintf(
+                "Found %d leads to update with ids %s",
+                count($contacts),
+                implode(", ", $ids)
+            ),
+            __CLASS__.':'.__FUNCTION__
+        );
+
         foreach ($contacts as $contact) {
             $changedObjects = $objects[$contact->getId()];
 
@@ -104,6 +124,15 @@ class ContactObject implements ObjectInterface
 
             $this->model->saveEntity($contact);
             $this->repository->detachEntity($contact);
+
+            DebugLogger::log(
+                MauticSyncDataExchange::NAME,
+                sprintf(
+                    "Updated lead ID %d",
+                    $contact->getId()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
         }
     }
 

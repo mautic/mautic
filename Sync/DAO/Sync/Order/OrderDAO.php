@@ -183,4 +183,12 @@ class OrderDAO
     {
         return $this->isFirstTimeSync;
     }
+
+    /**
+     * @return bool
+     */
+    public function shouldSync(): bool
+    {
+        return !empty($this->changedObjects);
+    }
 }

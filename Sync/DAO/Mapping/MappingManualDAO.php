@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping;
 
+use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+
 /**
  * Class MappingManualDAO
  */
@@ -98,12 +101,13 @@ class MappingManualDAO
     /**
      * @param string $internalObjectName
      *
-     * @return string[]
+     * @return array
+     * @throws ObjectNotFoundException
      */
     public function getMappedIntegrationObjectsNames(string $internalObjectName): array
     {
         if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
-            throw new \LogicException(); // TODO
+            throw new ObjectNotFoundException($internalObjectName);
         }
 
         return $this->internalObjectsMapping[$internalObjectName];
@@ -112,12 +116,13 @@ class MappingManualDAO
     /**
      * @param string $integrationObjectName
      *
-     * @return string[]
+     * @return array
+     * @throws ObjectNotFoundException
      */
     public function getMappedInternalObjectsNames(string $integrationObjectName): array
     {
         if (!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
-            throw new \LogicException(); // TODO
+            throw new ObjectNotFoundException($integrationObjectName);
         }
 
         return $this->integrationObjectsMapping[$integrationObjectName];
@@ -135,12 +140,14 @@ class MappingManualDAO
      * @param string $internalObjectName
      *
      * @return array
+     * @throws ObjectNotFoundException
      */
     public function getInternalObjectFieldNames(string $internalObjectName): array
     {
         if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
-            throw new \LogicException(); // TODO
+            throw new ObjectNotFoundException($internalObjectName);
         }
+
         $fields                  = [];
         $integrationObjectsNames = $this->internalObjectsMapping[$internalObjectName];
         foreach ($integrationObjectsNames as $integrationObjectName) {
@@ -172,11 +179,13 @@ class MappingManualDAO
      * @param string $integrationObjectName
      *
      * @return array
+     * @throws ObjectNotFoundException
      */
     public function getIntegrationObjectFieldNames(string $integrationObjectName): array
     {
         if (!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
-            throw new \LogicException(); // TODO
+            throw new ObjectNotFoundException($integrationObjectName);
+
         }
         $fields               = [];
         $internalObjectsNames = $this->integrationObjectsMapping[$integrationObjectName];
@@ -204,15 +213,17 @@ class MappingManualDAO
      * @param string $internalFieldName
      *
      * @return string
+     * @throws FieldNotFoundException
+     * @throws ObjectNotFoundException
      */
     public function getIntegrationMappedField(string $internalObjectName, string $integrationObjectName, string $internalFieldName): string
     {
         if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
-            throw new \LogicException(); // TODO
+            throw new ObjectNotFoundException($internalObjectName);
         }
 
         if (!array_key_exists($integrationObjectName, $this->objectsMapping[$internalObjectName])) {
-            throw new \LogicException(); // TODO
+            throw new ObjectNotFoundException($integrationObjectName);
         }
 
         /** @var ObjectMappingDAO $objectMappingDAO */
@@ -224,6 +235,6 @@ class MappingManualDAO
             }
         }
 
-        throw new \LogicException(); // TODO
+        throw new FieldNotFoundException($internalFieldName, $internalObjectName, $integrationObjectName);
     }
 }
