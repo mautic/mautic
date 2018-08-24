@@ -97,6 +97,12 @@ return [
             ],
         ],
         'sync' => [
+            'mautic.sync.logger' => [
+                'class' =>  \MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                ],
+            ],
             'mautic.integrations.helper.sync_judge' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudge::class,
             ],
@@ -137,6 +143,9 @@ return [
                     'mautic.integrations.helper.sync_process_factory',
                     'mautic.integrations.helper.sync_date',
                     'mautic.integrations.sync.data_exchange.mautic',
+                ],
+                'methodCalls' => [
+                    'initiateDebugLogger' => ['mautic.sync.logger'],
                 ],
             ],
             'mautic.integrations.helper.sync_date' => [
