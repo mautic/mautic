@@ -30,7 +30,7 @@ class FieldChangeRepository extends CommonRepository
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $qb
-            ->delete(MAUTIC_TABLE_PREFIX.'object_field_change_report')
+            ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('object_id', ":objectId"),
@@ -56,7 +56,7 @@ class FieldChangeRepository extends CommonRepository
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $qb
-            ->delete(MAUTIC_TABLE_PREFIX.'object_field_change_report')
+            ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('object_id', ":objectId"),
@@ -81,7 +81,7 @@ class FieldChangeRepository extends CommonRepository
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb
             ->select('f.object_id')
-            ->from(MAUTIC_TABLE_PREFIX.'object_field_change_report', 'f')
+            ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('f.object_type', ':objectType'),
@@ -107,7 +107,7 @@ class FieldChangeRepository extends CommonRepository
         $qb
             ->resetQueryParts()
             ->select('*')
-            ->from(MAUTIC_TABLE_PREFIX.'object_field_change_report', 'f')
+            ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('f.object_type', ':objectType'),
@@ -131,7 +131,7 @@ class FieldChangeRepository extends CommonRepository
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb
             ->select('*')
-            ->from(MAUTIC_TABLE_PREFIX.'object_field_change_report', 'f')
+            ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('f.object_type', ':objectType'),
@@ -155,7 +155,7 @@ class FieldChangeRepository extends CommonRepository
 //        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 //
 //        $qb
-//            ->delete(MAUTIC_TABLE_PREFIX.'object_field_change_report')
+//            ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
 //            ->where(
 //                $qb->expr()->andX(
 //                    $qb->expr()->eq('object_type', ':objectType'),
