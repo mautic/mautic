@@ -365,6 +365,7 @@ class FieldController extends FormController
             $clone = clone $entity;
             $clone->setIsPublished(false);
             $clone->setIsFixed(false);
+            $this->get('mautic.helper.field.alias')->makeAliasUnique($clone);
             $model->saveEntity($clone);
             $objectId = $clone->getId();
         }
