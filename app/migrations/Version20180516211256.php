@@ -39,6 +39,6 @@ class Version20180516211256 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $this->addSql("CREATE INDEX {$this->prefix}campaign_actions ON {$this->prefix}campaign_lead_event_log (event_id, non_action_path_taken)");
-        $this->addSql("CREATE INDEX {$this->prefix}campaign_stats ON {$this->prefix}campaign_lead_event_log (campaign_id, event_id, date_triggered)");
+        $this->addSql("CREATE INDEX {$this->prefix}campaign_stats ON {$this->prefix}campaign_lead_event_log (campaign_id, event_id, date_triggered, non_action_path_taken)");
     }
 }
