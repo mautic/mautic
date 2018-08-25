@@ -12,7 +12,6 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order;
 
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\EntityMappingDAO;
 use MauticPlugin\IntegrationsBundle\Exception\UnexpectedValueException;
 
 /**
@@ -21,7 +20,7 @@ use MauticPlugin\IntegrationsBundle\Exception\UnexpectedValueException;
 class OrderDAO
 {
     /**
-     * @var int
+     * @var \DateTime
      */
     private $syncDateTime;
 
@@ -53,6 +52,11 @@ class OrderDAO
     private $objectMappings = [];
 
     /**
+     * @var int
+     */
+    private $objectCounter = 0;
+
+    /**
      * OrderDAO constructor.
      *
      * @param \DateTimeInterface $syncDateTime
@@ -78,6 +82,7 @@ class OrderDAO
         }
 
         $this->changedObjects[$objectChangeDAO->getObject()][] = $objectChangeDAO;
+        $this->objectCounter++;
 
         if ($knownId = $objectChangeDAO->getObjectId()) {
             $this->identifiedObjects[$objectChangeDAO->getObject()][$objectChangeDAO->getObjectId()] = $objectChangeDAO;
@@ -124,21 +129,29 @@ class OrderDAO
     }
 
     /**
-     * @param ObjectChangeDAO $objectChange
-     * @param                 $integrationObjectName
-     * @param                 $integrationObjectId
-     * @param null            $objectModifiedDate
+     * @param                $integration
+     * @param                $internalObjectName
+     * @param                $internalObjectId
+     * @param                $integrationObjectName
+     * @param                $integrationObjectId
+     * @param \DateTime|null $objectModifiedDate
      */
-    public function addObjectMapping(ObjectChangeDAO $objectChange, $integrationObjectName, $integrationObjectId, $objectModifiedDate = null)
-    {
+    public function addObjectMapping(
+        $integration,
+        $internalObjectName,
+        $internalObjectId,
+        $integrationObjectName,
+        $integrationObjectId,
+        \DateTime $objectModifiedDate = null
+    ) {
         if (null === $objectModifiedDate) {
             $objectModifiedDate = new \DateTime();
         }
 
         $objectMapping = new ObjectMapping();
-        $objectMapping->setIntegration($objectChange->getIntegration())
-            ->setInternalObjectName($objectChange->getMappedObject())
-            ->setInternalObjectId($objectChange->getMappedObjectId())
+        $objectMapping->setIntegration($integration)
+            ->setInternalObjectName($internalObjectName)
+            ->setInternalObjectId($internalObjectId)
             ->setIntegrationObjectName($integrationObjectName)
             ->setIntegrationObjectId($integrationObjectId)
             ->setLastSyncDate($objectModifiedDate);
@@ -169,9 +182,9 @@ class OrderDAO
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTime
      */
-    public function getSyncDateTime(): \DateTimeInterface
+    public function getSyncDateTime(): \DateTime
     {
         return $this->syncDateTime;
     }
@@ -190,5 +203,13 @@ class OrderDAO
     public function shouldSync(): bool
     {
         return !empty($this->changedObjects);
+    }
+
+    /**
+     * @return int
+     */
+    public function getObjectCount(): int
+    {
+        return $this->objectCounter;
     }
 }

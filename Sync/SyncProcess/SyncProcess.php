@@ -22,6 +22,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObje
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
@@ -117,8 +118,14 @@ class SyncProcess
     {
         defined('MAUTIC_INTEGRATION_ACTIVE_SYNC') or define('MAUTIC_INTEGRATION_ACTIVE_SYNC', 1);
 
-        $this->syncDateTime = new \DateTimeImmutable();
+        $this->syncDateTime = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
+        $this->executeIntegrationSync();
+        $this->executeInternalSync();
+    }
+
+    private function executeIntegrationSync()
+    {
         $this->syncIteration = 1;
         do {
             DebugLogger::log(
@@ -128,26 +135,44 @@ class SyncProcess
             );
 
             $syncReport = $this->generateIntegrationSyncReport();
-            if ($syncReport->shouldSync()) {
-                // Convert the integrations' report into an "order" or instructions for Mautic
-                $syncOrder = $this->generateInternalSyncOrder($syncReport);
-                if (!$syncOrder->shouldSync()) {
-                    DebugLogger::log(
-                        $this->mappingManualDAO->getIntegration(),
-                        "Integration to Mautic; no object changes were recorded possible due to field direction configurations",
-                        __CLASS__.':'.__FUNCTION__
-                    );
-
-                    continue;
-                }
-
-                // Execute the sync instructions
-                $this->internalSyncDataExchange->executeSyncOrder($syncOrder);
-                // Fetch the next iteration/batch
-                $this->syncIteration++;
+            if (!$syncReport->shouldSync()) {
+                DebugLogger::log(
+                    $this->mappingManualDAO->getIntegration(),
+                    "Integration to Mautic; no objects were mapped to be synced",
+                    __CLASS__.':'.__FUNCTION__
+                );
+                break;
             }
-        } while ($syncReport->shouldSync());
+            // Convert the integrations' report into an "order" or instructions for Mautic
+            $syncOrder = $this->generateInternalSyncOrder($syncReport);
+            if (!$syncOrder->shouldSync()) {
+                DebugLogger::log(
+                    $this->mappingManualDAO->getIntegration(),
+                    "Integration to Mautic; no object changes were recorded possible due to field direction configurations",
+                    __CLASS__.':'.__FUNCTION__
+                );
 
+                continue;
+            }
+
+            DebugLogger::log(
+                $this->mappingManualDAO->getIntegration(),
+                sprintf(
+                    "Integration to Mautic; syncing %d total objects",
+                    $syncOrder->getObjectCount()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
+
+            // Execute the sync instructions
+            $this->internalSyncDataExchange->executeSyncOrder($syncOrder);
+            // Fetch the next iteration/batch
+            $this->syncIteration++;
+        } while ($syncReport->shouldSync());
+    }
+
+    private function executeInternalSync()
+    {
         $this->syncIteration = 1;
         do {
             DebugLogger::log(
@@ -157,26 +182,42 @@ class SyncProcess
             );
 
             $syncReport = $this->generateInternalSyncReport();
-            if ($syncReport->shouldSync()) {
-                // Convert the internal report into an "order" or instructions for the integration
-                $syncOrder = $this->generateIntegrationSyncOrder($syncReport);
-                if (!$syncOrder->shouldSync()) {
-                    DebugLogger::log(
-                        $this->mappingManualDAO->getIntegration(),
-                        "Mautic to integration; no object changes were recorded possible due to field direction configurations",
-                        __CLASS__.':'.__FUNCTION__
-                    );
-
-                    continue;
-                }
-
-                // Execute the sync instructions
-                $this->integrationSyncDataExchange->executeSyncOrder($syncOrder);
-                // Save the mappings between Mautic objects and the integration's objects
-                $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getObjectMappings());
-                // Fetch the next iteration/batch
-                $this->syncIteration++;
+            if (!$syncReport->shouldSync()) {
+                DebugLogger::log(
+                    $this->mappingManualDAO->getIntegration(),
+                    "Mautic to integration; no objects were mapped to be synced",
+                    __CLASS__.':'.__FUNCTION__
+                );
+                break;
             }
+
+            // Convert the internal report into an "order" or instructions for the integration
+            $syncOrder = $this->generateIntegrationSyncOrder($syncReport);
+            if (!$syncOrder->shouldSync()) {
+                DebugLogger::log(
+                    $this->mappingManualDAO->getIntegration(),
+                    "Mautic to integration; no object changes were recorded possible due to field direction configurations",
+                    __CLASS__.':'.__FUNCTION__
+                );
+
+                continue;
+            }
+
+            DebugLogger::log(
+                $this->mappingManualDAO->getIntegration(),
+                sprintf(
+                    "Mautic to integration; syncing %d total objects",
+                    $syncOrder->getObjectCount()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
+
+            // Execute the sync instructions
+            $this->integrationSyncDataExchange->executeSyncOrder($syncOrder);
+            // Save the mappings between Mautic objects and the integration's objects
+            $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getObjectMappings());
+            // Fetch the next iteration/batch
+            $this->syncIteration++;
         } while ($syncReport->shouldSync());
     }
 
@@ -346,19 +387,19 @@ class SyncProcess
             $internalObjects              = $syncReport->getObjects($internalObjectName);
             $mappedIntegrationObjectNames = $this->mappingManualDAO->getMappedIntegrationObjectsNames($internalObjectName);
 
-            DebugLogger::log(
-                $this->mappingManualDAO->getIntegration(),
-                sprintf(
-                    "Mautic to integration; found %d objects for the %s object mapped to the %s integration object(s)",
-                    count($internalObjects),
-                    $internalObjectName,
-                    implode(", ", $mappedIntegrationObjectNames)
-                ),
-                __CLASS__.':'.__FUNCTION__
-            );
-
             foreach ($mappedIntegrationObjectNames as $mappedIntegrationObjectName) {
                 $objectMapping = $this->mappingManualDAO->getObjectMapping($internalObjectName, $mappedIntegrationObjectName);
+                DebugLogger::log(
+                    $this->mappingManualDAO->getIntegration(),
+                    sprintf(
+                        "Mautic to integration; syncing %d objects for the %s object mapped to the %s integration object",
+                        count($internalObjects),
+                        $internalObjectName,
+                        $mappedIntegrationObjectName
+                    ),
+                    __CLASS__.':'.__FUNCTION__
+                );
+
                 foreach ($internalObjects as $internalObject) {
                     $integrationObject = $this->internalSyncDataExchange->getMappedIntegrationObject(
                         $this->mappingManualDAO->getIntegration(),
@@ -445,7 +486,7 @@ class SyncProcess
                 $this->mappingManualDAO->getIntegration(),
                 sprintf(
                     "Integration to Mautic; found a match between Mautic's %s:%s object adn the integration %s:%s object ",
-                    $internalObject,
+                    $internalObject->getObject(),
                     (string) $internalObject->getObjectId(),
                     $integrationObject->getObject(),
                     (string) $integrationObject->getObjectId()
@@ -487,9 +528,9 @@ class SyncProcess
                     DebugLogger::log(
                         $this->mappingManualDAO->getIntegration(),
                         sprintf(
-                            "Integration to Mautic; the %s field for the %s object's ignored because it's configured to sync to the integration",
-                            $fieldMappingDAO->getInternalField(),
-                            $internalObject->getObject()
+                            "Integration to Mautic; the %s object's field %s was ignored because it's configured to sync to the integration",
+                            $internalObject->getObject(),
+                            $fieldMappingDAO->getInternalField()
                         ),
                         __CLASS__.':'.__FUNCTION__
                     );
@@ -526,8 +567,9 @@ class SyncProcess
                                 DebugLogger::log(
                                     $this->mappingManualDAO->getIntegration(),
                                     sprintf(
-                                        "Integration to Mautic; sync judge determined to sync %s to field %s with a value of %s using the %s judging mode",
+                                        "Integration to Mautic; sync judge determined to sync %s to the %s object's field %s with a value of %s using the %s judging mode",
                                         $winningChangeRequest->getIntegration(),
+                                        $winningChangeRequest->getObject(),
                                         $fieldMappingDAO->getInternalField(),
                                         $winningChangeRequest->getNewValue()->getOriginalValue(),
                                         $judgeMode
@@ -536,12 +578,13 @@ class SyncProcess
                                 );
 
                                 break;
-                            } catch (\LogicException $ex) {
+                            } catch (ConflictUnresolvedException $ex) {
                                 DebugLogger::log(
                                     $this->mappingManualDAO->getIntegration(),
                                     sprintf(
-                                        "Integration to Mautic; no winner was determined using the %s judging mode for field %s",
+                                        "Integration to Mautic; no winner was determined using the %s judging mode for object %s field %s",
                                         $judgeMode,
+                                        $internalObject->getObject(),
                                         $fieldMappingDAO->getInternalField()
                                     ),
                                     __CLASS__.':'.__FUNCTION__
@@ -564,7 +607,8 @@ class SyncProcess
                     DebugLogger::log(
                         $this->mappingManualDAO->getIntegration(),
                         sprintf(
-                            "Integration to Mautic; the sync is bidirectional but no conflicts were found so syncing %s with a value of %s",
+                            "Integration to Mautic; the sync is bidirectional but no conflicts were found so syncing the %s object's field %s with a value of %s",
+                            $internalObject->getObject(),
                             $fieldMappingDAO->getInternalField(),
                             $integrationInformationChangeRequest->getNewValue()->getOriginalValue()
                         ),
@@ -607,7 +651,7 @@ class SyncProcess
                     "Mautic to integration; found a match between the integration %s:%s object and Mautic's %s:%s object",
                     $integrationObject->getObject(),
                     (string) $integrationObject->getObjectId(),
-                    $internalObject,
+                    $internalObject->getObject(),
                     (string) $internalObject->getObjectId()
                 ),
                 __CLASS__.':'.__FUNCTION__
@@ -630,9 +674,9 @@ class SyncProcess
                     DebugLogger::log(
                         $this->mappingManualDAO->getIntegration(),
                         sprintf(
-                            "Mautic to integration; the %s field for the %s object's ignored because it's configured to sync to Mautic",
-                            $fieldMappingDAO->getIntegrationField(),
-                            $integrationObject->getObject()
+                            "Mautic to integration; the %s object's field %s ignored because it's configured to sync to Mautic",
+                            $integrationObject->getObject(),
+                            $fieldMappingDAO->getIntegrationField()
                         ),
                         __CLASS__.':'.__FUNCTION__
                     );
@@ -648,7 +692,8 @@ class SyncProcess
                     DebugLogger::log(
                         $this->mappingManualDAO->getIntegration(),
                         sprintf(
-                            "Mautic to integration; syncing %s with a value of %s",
+                            "Mautic to integration; syncing %s object's field %s with a value of %s",
+                            $integrationObject->getObject(),
                             $fieldMappingDAO->getIntegrationField(),
                             $internalInformationChangeRequest->getNewValue()->getOriginalValue()
                         ),
