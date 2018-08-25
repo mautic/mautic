@@ -65,7 +65,11 @@ class MappingHelper
             $integrationObjectDAO->getObjectId(),
             $internalObjectName
         )) {
-            return new ObjectDAO($internalObjectName, $internalObject['internal_object_id'], $internalObject['last_sync']);
+            return new ObjectDAO(
+                $internalObjectName,
+                $internalObject['internal_object_id'],
+                new \DateTime($internalObject['last_sync_date'], new \DateTimeZone('UTC'))
+            );
         }
 
         // We don't know who this is so search Mautic
@@ -90,7 +94,7 @@ class MappingHelper
         }
 
         // Match found!
-        $objectId = (int) reset($foundContacts);
+        $objectId = $foundContacts[0]['id'];
 
         // Let's store the relationship since we know it
         $objectMapping = new ObjectMapping();
@@ -120,7 +124,11 @@ class MappingHelper
             $internalObjectDAO->getObjectId(),
             $integrationObjectName
         )) {
-            return new ObjectDAO($integrationObjectName, $integrationObject['integration_object_id'], $integrationObject['last_sync']);
+            return new ObjectDAO(
+                $integrationObjectName,
+                $integrationObject['integration_object_id'],
+                new \DateTime($integrationObject['last_sync_date'], new \DateTimeZone('UTC'))
+            );
         }
 
         return new ObjectDAO($integrationObjectName, null);
