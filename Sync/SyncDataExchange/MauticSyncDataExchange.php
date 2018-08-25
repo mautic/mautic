@@ -181,14 +181,16 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
             switch ($objectName) {
                 case self::OBJECT_CONTACT:
-                    $this->contactObjectHelper->create($createObjects);
+                    $objectMappings = $this->contactObjectHelper->create($createObjects);
                     break;
                 case self::OBJECT_COMPANY:
-                    $this->companyObjectHelper->create($createObjects);
+                    $objectMappings = $this->companyObjectHelper->create($createObjects);
                     break;
                 default:
                     throw new ObjectNotSupportedException(self::NAME, $objectName);
             }
+
+            $this->saveObjectMappings($objectMappings);
         }
     }
 
@@ -262,6 +264,19 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
         foreach ($requestedObjects as $objectDAO) {
             $mauticFields = $this->getFieldList($objectDAO->getObject());
+
+            DebugLogger::log(
+                self::NAME,
+                sprintf(
+                    "Searching for %s objects between %s and %s (%d,%d)",
+                    $objectDAO->getObject(),
+                    $objectDAO->getFromDateTime()->format('Y:m:d H:i:s'),
+                    $objectDAO->getToDateTime()->format('Y:m:d H:i:s'),
+                    $start,
+                    $limit
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
 
             switch ($objectDAO->getObject()) {
                 case self::OBJECT_CONTACT:
