@@ -58,7 +58,12 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
-        $lead          = $event->getLead();
+        $lead = $event->getLead();
+        if ($lead->isAnonymous()) {
+            // Do not track visitor changes
+            return;
+        }
+
         $changes       = $lead->getChanges(true);
         $toPersist     = [];
         $changedFields = [];

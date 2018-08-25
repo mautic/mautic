@@ -152,14 +152,19 @@ class ContactObject implements ObjectInterface
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->orX(
-                    $qb->expr()->andX(
-                        $qb->expr()->isNotNull('l.date_modified'),
-                        $qb->expr()->comparison('l.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
-                    ),
-                    $qb->expr()->andX(
-                        $qb->expr()->isNull('l.date_modified'),
-                        $qb->expr()->comparison('l.date_added', 'BETWEEN', ':dateFrom and :dateTo')
+                $qb->expr()->andX(
+                    $qb->expr()->isNotNull('l.date_identified'),
+                    $qb->expr()->orX(
+                        $qb->expr()->andX(
+                            $qb->expr()->isNotNull('l.date_modified'),
+                            $qb->expr()->gte('l.date_modified', ':dateFrom'),
+                            $qb->expr()->lt('l.date_modified', ':dateTo')
+                        ),
+                        $qb->expr()->andX(
+                            $qb->expr()->isNull('l.date_modified'),
+                            $qb->expr()->gte('l.date_added', ':dateFrom'),
+                            $qb->expr()->lt('l.date_added', ':dateTo')
+                        )
                     )
                 )
             )
