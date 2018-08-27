@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncService;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncDate\SyncDateHelper;
@@ -85,6 +86,22 @@ final class SyncService implements SyncServiceInterface
             $syncFromDateTime
         );
 
+        DebugLogger::log(
+            $integrationMappingManual->getIntegration(),
+            sprintf(
+                "Starting %s sync from %s date/time",
+                ($firstTimeSync) ? "first time" : "subsequent",
+                ($syncFromDateTime) ? $syncFromDateTime->format('Y-m-d H:i:s') : "yet to be determined"
+            ),
+            __CLASS__.':'.__FUNCTION__
+        );
+
         $integrationSyncProcess->execute();
+    }
+
+    public function initiateDebugLogger(DebugLogger $logger)
+    {
+        // Yes it's a hack to prevent from having to pass the logger as a dependency into dozens of classes
+        // So not doing anything with the logger, just need Symfony to initiate the service
     }
 }

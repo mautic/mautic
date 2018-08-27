@@ -16,7 +16,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange\ExampleSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -64,7 +64,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
         // In this example, Mautic's Contact object is mapped to the Example's Lead object
         $leadObjectMapping = new ObjectMappingDAO(
             MauticSyncDataExchange::OBJECT_CONTACT,
-            ExampleSyncDataExchange::LEAD_OBJECT
+            ExampleSyncDataExchange::OBJECT_LEAD
         );
         $mappingManual->addObjectMapping($leadObjectMapping);
 
@@ -82,8 +82,8 @@ class IntegrationSubscriber implements EventSubscriberInterface
             // In this case, we're just adding each field to each of the objects
             // Of course, other integrations may need more logic
 
-            // The lead object will only sync from the integration to Mautic; it's also possible to set ObjectMappingDAO::SYNC_TO_INTEGRATION
-            $leadObjectMapping->addFieldMapping($mauticField, $integrationField, ObjectMappingDAO::SYNC_TO_MAUTIC);
+            // The lead object will only sync from Mautic to the integration; it's also possible to set ObjectMappingDAO::SYNC_TO_MAUTIC
+            $leadObjectMapping->addFieldMapping($mauticField, $integrationField, ObjectMappingDAO::SYNC_TO_INTEGRATION);
 
             // The contact object will sync by default, bidirectionally
             $contactObjectMapping->addFieldMapping($mauticField, $integrationField);

@@ -148,4 +148,12 @@ class ObjectChangeDAO
     {
         return $this->fields;
     }
+
+    /**
+     * @return bool
+     */
+    public function shouldSync(): bool
+    {
+        return !empty(count($this->fields));
+    }
 }

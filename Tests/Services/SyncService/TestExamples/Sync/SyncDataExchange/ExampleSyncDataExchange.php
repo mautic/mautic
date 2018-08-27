@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Facade\SyncDataExchange;
+namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Sync\SyncDataExchange;
 
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\EntityMappingDAO;
@@ -25,7 +25,7 @@ use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 
 class ExampleSyncDataExchange implements SyncDataExchangeInterface
 {
-    const LEAD_OBJECT = 'lead';
+    const OBJECT_LEAD = 'lead';
     const OBJECT_CONTACT = 'contact';
 
     /**
@@ -55,6 +55,11 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     ];
 
     /**
+     * @var array
+     */
+    private $payload = ['create' => [], 'update' => []];
+
+    /**
      * @var ValueNormalizer
      */
     private $valueNormalizer;
@@ -77,8 +82,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      */
     public function executeSyncOrder(OrderDAO $syncOrderDAO)
     {
-        $payload = ['create' => [], 'update' => []];
-        $byEmail = [];
+        $byEmail = [self::OBJECT_CONTACT => [], self::OBJECT_LEAD => []];
 
         $orderedObjects = $syncOrderDAO->getUnidentifiedObjects();
         foreach ($orderedObjects as $objectName => $unidentifiedObjects) {
@@ -92,8 +96,9 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 // Extract identifier fields for this integration to check if they exist before creating
                 // Some integrations offer a upsert feature which may make this not necessary.
                 $emailAddress = $unidentifiedObject->getField('email')->getValue()->getNormalizedValue();
+
                 // Store by email address so they can be found again when we update the OrderDAO about mapping
-                $byEmail[$emailAddress] = $unidentifiedObject;
+                $byEmail[$unidentifiedObject->getObject()][$emailAddress] = $unidentifiedObject;
 
                 // Build the person's profile
                 $person = ['object' => $objectName];
@@ -102,7 +107,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 }
 
                 // Create by default because it is unknown if they exist upstream or not
-                $payload['create'][$emailAddress] = $person;
+                $this->payload['create'][$emailAddress] = $person;
             }
 
             // If applicable, do something to verify if email addresses exist and if so, update objects instead
@@ -113,10 +118,10 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         foreach ($orderedObjects as $objectName => $identifiedObjects) {
             /**
              * @var mixed           $key
-             * @var ObjectChangeDAO $unidentifiedObject
+             * @var ObjectChangeDAO $identifiedObject
              */
             foreach ($identifiedObjects as $id => $identifiedObject) {
-                $fields = $unidentifiedObject->getFields();
+                $fields = $identifiedObject->getFields();
 
                 // Build the person's profile
                 $person = [
@@ -127,37 +132,29 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                     $person[$field->getName()] = $this->valueNormalizer->normalizeForIntegration($field->getValue());
                 }
 
-                $payload['update'][$key] = $person;
+                $this->payload['update'][$id] = $person;
             }
         }
 
-//        //@todo
-//        // Deliver payload and get response
-//        $response = [
-//            'results' => [
-//                [
-//                    'result'     => 'created',
-//                    'id'         => 'lead_1',
-//                    'first_name' => 'John',
-//                    'last_name'  => 'Smith',
-//                    'email'      => 'john.smith@lead.com',
-//                    'object'     => 'Lead',
-//                ], // etc
-//            ]
-//        ];
-//
-//        // Notify the order regarding IDs of created objects
-//        foreach ($response['results'] as $result) {
-//            /** @var ObjectChangeDAO $object */
-//            $object = $byEmail[$result['email']];
-//
-//            $syncOrderDAO->addObjectMapping(
-//                    $object,
-//                    $result['object'],
-//                    $result['id'],
-//                    $result['last_modified']
-//            );
-//        }
+        // Deliver payload and get response
+        $response = $this->deliverPayload();
+
+        // Notify the order regarding IDs of created objects
+        foreach ($response as $result) {
+            if (201 === $result['code']) {
+                /** @var ObjectChangeDAO $object */
+                $object = $byEmail[$result['object']][$result['email']];
+
+                $syncOrderDAO->addObjectMapping(
+                    ExampleIntegration::NAME,
+                    $object->getMappedObject(),
+                    $object->getMappedObjectId(),
+                    $result['object'],
+                    $result['id'],
+                    $result['last_modified']
+                );
+            }
+        }
     }
 
     /**
@@ -184,7 +181,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
             $fromDateTime = $requestedObject->getFromDateTime();
             $mappedFields = $requestedObject->getFields();
 
-            $updatedPeople = $this->getPayload($objectName, $fromDateTime, $mappedFields);
+            $updatedPeople = $this->getReportPayload($objectName, $fromDateTime, $mappedFields);
             foreach ($updatedPeople as $person) {
                 // If the integration knows modified timestamps per field, use that. Otherwise, we're using the complete object's
                 // last modified timestamp.
@@ -212,13 +209,21 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
+     * @return array
+     */
+    public function getOrderPayload()
+    {
+        return $this->payload;
+    }
+
+    /**
      * @param                    $object
      * @param \DateTimeInterface $fromDateTime
      * @param array              $mappedFields
      *
      * @return mixed
      */
-    private function getPayload($object, \DateTimeInterface $fromDateTime, array $mappedFields)
+    private function getReportPayload($object, \DateTimeInterface $fromDateTime, array $mappedFields)
     {
         // Query integration's API for objects changed since $fromDateTime with the requested fields in $mappedFields if that's
         // applicable to the integration. I.e. Salesforce supports querying for specific fields in it's SOQL
@@ -228,36 +233,55 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 [
                     'id'            => 1,
                     'first_name'    => 'John',
-                    'last_name'     => 'Smith',
-                    'email'         => 'john.smith@contact.com',
+                    'last_name'     => 'Contact',
+                    'email'         => 'john.contact@test.com',
                     'last_modified' => '2018-08-02T10:02:00+05:00',
                 ],
                 [
                     'id'            => 2,
                     'first_name'    => 'Jane',
-                    'last_name'     => 'Smith',
-                    'email'         => 'Jane.smith@contact.com',
+                    'last_name'     => 'Contact',
+                    'email'         => 'jane.contact@test.com',
                     'last_modified' => '2018-08-02T10:07:00+05:00',
                 ],
             ],
-            self::LEAD_OBJECT    => [
+            self::OBJECT_LEAD    => [
                 [
                     'id'            => 3,
-                    'first_name'    => 'John',
-                    'last_name'     => 'Smith',
-                    'email'         => 'john.smith@lead.com',
+                    'first_name'    => 'Overwrite',
+                    'last_name'     => 'Me',
+                    'email'         => 'NellieABaird@armyspy.com',
                     'last_modified' => '2018-08-02T10:02:00+05:00',
                 ],
                 [
                     'id'            => 4,
-                    'first_name'    => 'Jane',
-                    'last_name'     => 'Smith',
-                    'email'         => 'Jane.smith@lead.com',
+                    'first_name'    => 'Overwrite',
+                    'last_name'     => 'Me',
+                    'email'         => 'LewisTSyed@gustr.com',
                     'last_modified' => '2018-08-02T10:07:00+05:00',
                 ],
             ],
         ];
 
         return $payload[$object];
+    }
+
+    /**
+     * @return array
+     */
+    private function deliverPayload()
+    {
+        $now      = new \DateTime('now', new \DateTimeZone('UTC'));
+        $response = [];
+        $id       = 5;
+        foreach ($this->payload['create'] as $person) {
+            $person['code']          = 201;
+            $person['id']            = $id;
+            $person['last_modified'] = $now;
+            $response[]              = $person;
+            $id++;
+        }
+
+        return $response;
     }
 }

@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class ContactObject implements ObjectInterface
@@ -69,6 +70,15 @@ class ContactObject implements ObjectInterface
             $this->model->saveEntity($contact);
             $this->repository->detachEntity($contact);
 
+            DebugLogger::log(
+                MauticSyncDataExchange::NAME,
+                sprintf(
+                    "Created lead ID %d",
+                    $contact->getId()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
+
             $objectMapping = new ObjectMapping();
             $objectMapping->setLastSyncDate($contact->getDateAdded())
                 ->setIntegration($object->getIntegration())
@@ -90,6 +100,16 @@ class ContactObject implements ObjectInterface
     {
         /** @var Lead[] $contacts */
         $contacts = $this->model->getEntities(['ids' => $ids]);
+        DebugLogger::log(
+            MauticSyncDataExchange::NAME,
+            sprintf(
+                "Found %d leads to update with ids %s",
+                count($contacts),
+                implode(", ", $ids)
+            ),
+            __CLASS__.':'.__FUNCTION__
+        );
+
         foreach ($contacts as $contact) {
             $changedObjects = $objects[$contact->getId()];
 
@@ -104,6 +124,15 @@ class ContactObject implements ObjectInterface
 
             $this->model->saveEntity($contact);
             $this->repository->detachEntity($contact);
+
+            DebugLogger::log(
+                MauticSyncDataExchange::NAME,
+                sprintf(
+                    "Updated lead ID %d",
+                    $contact->getId()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
         }
     }
 
@@ -123,14 +152,19 @@ class ContactObject implements ObjectInterface
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->orX(
-                    $qb->expr()->andX(
-                        $qb->expr()->isNotNull('l.date_modified'),
-                        $qb->expr()->comparison('l.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
-                    ),
-                    $qb->expr()->andX(
-                        $qb->expr()->isNull('l.date_modified'),
-                        $qb->expr()->comparison('l.date_added', 'BETWEEN', ':dateFrom and :dateTo')
+                $qb->expr()->andX(
+                    $qb->expr()->isNotNull('l.date_identified'),
+                    $qb->expr()->orX(
+                        $qb->expr()->andX(
+                            $qb->expr()->isNotNull('l.date_modified'),
+                            $qb->expr()->gte('l.date_modified', ':dateFrom'),
+                            $qb->expr()->lt('l.date_modified', ':dateTo')
+                        ),
+                        $qb->expr()->andX(
+                            $qb->expr()->isNull('l.date_modified'),
+                            $qb->expr()->gte('l.date_added', ':dateFrom'),
+                            $qb->expr()->lt('l.date_added', ':dateTo')
+                        )
                     )
                 )
             )

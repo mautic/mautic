@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncJudge;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 
 /**
  * Class SyncJudge
@@ -23,13 +24,12 @@ final class SyncJudge implements SyncJudgeInterface
     const NO_WINNER = 'no';
 
     /**
-     * @param string $mode
+     * @param string                           $mode
      * @param InformationChangeRequestDAO|null $changeRequest1
      * @param InformationChangeRequestDAO|null $changeRequest2
      *
      * @return InformationChangeRequestDAO
-     *
-     * @throws \LogicException if conflict was not resolved
+     * @throws ConflictUnresolvedException
      */
     public function adjudicate(
         $mode = self::PRESUMPTION_OF_INNOCENCE_MODE,
@@ -65,6 +65,7 @@ final class SyncJudge implements SyncJudgeInterface
      * @param InformationChangeRequestDAO $changeRequest2
      *
      * @return InformationChangeRequestDAO
+     * @throws ConflictUnresolvedException
      */
     private function adjudicatePresumptionOfInnocence(InformationChangeRequestDAO $changeRequest1, InformationChangeRequestDAO $changeRequest2)
     {
@@ -76,7 +77,7 @@ final class SyncJudge implements SyncJudgeInterface
             );
 
             if ($possibleChangeCompare === self::NO_WINNER) {
-                throw new \LogicException('Not resolved conflict');
+                throw new ConflictUnresolvedException();
             }
 
             if ($possibleChangeCompare === self::LEF_WINNER) {
@@ -88,14 +89,14 @@ final class SyncJudge implements SyncJudgeInterface
 
         if ($certainChangeCompare === self::LEF_WINNER) {
             if ($changeRequest2->getPossibleChangeDateTime() > $changeRequest1->getCertainChangeDateTime()) {
-                throw new \LogicException('Not resolved conflict');
+                throw new ConflictUnresolvedException();
             }
 
             return $changeRequest1;
         }
 
         if ($changeRequest1->getPossibleChangeDateTime() > $changeRequest2->getCertainChangeDateTime()) {
-            throw new \LogicException('Not resolved conflict');
+            throw new ConflictUnresolvedException();
         }
 
         return $changeRequest2;
@@ -106,12 +107,13 @@ final class SyncJudge implements SyncJudgeInterface
      * @param InformationChangeRequestDAO $changeRequest2
      *
      * @return InformationChangeRequestDAO
+     * @throws ConflictUnresolvedException
      */
     private function adjudicateHardEvidence(InformationChangeRequestDAO $changeRequest1, InformationChangeRequestDAO $changeRequest2)
     {
         $certainChangeCompare = $this->compareDateTimes($changeRequest1->getCertainChangeDateTime(), $changeRequest2->getCertainChangeDateTime());
         if ($certainChangeCompare === self::NO_WINNER) {
-            throw new \LogicException('Not resolved conflict');
+            throw new ConflictUnresolvedException();
         }
 
         if ($certainChangeCompare === self::LEF_WINNER) {
@@ -126,6 +128,7 @@ final class SyncJudge implements SyncJudgeInterface
      * @param InformationChangeRequestDAO $changeRequest2
      *
      * @return InformationChangeRequestDAO
+     * @throws ConflictUnresolvedException
      */
     private function adjudicateBestEvidence(InformationChangeRequestDAO $changeRequest1, InformationChangeRequestDAO $changeRequest2)
     {
@@ -137,7 +140,7 @@ final class SyncJudge implements SyncJudgeInterface
             );
 
             if ($possibleChangeCompare === self::NO_WINNER) {
-                throw new \LogicException('Not resolved conflict');
+                throw new ConflictUnresolvedException();
             }
 
             if ($possibleChangeCompare === self::LEF_WINNER) {

@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncJudge;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 
 /**
  * Interface SyncJudgeInterface
@@ -39,6 +40,7 @@ interface SyncJudgeInterface
      * @param InformationChangeRequestDAO|null $changeRequest2
      *
      * @return InformationChangeRequestDAO
+     * @throws ConflictUnresolvedException
      */
     public function adjudicate(
         $mode = self::PRESUMPTION_OF_INNOCENCE_MODE,

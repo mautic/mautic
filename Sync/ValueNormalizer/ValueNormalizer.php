@@ -40,7 +40,7 @@ final class ValueNormalizer implements ValueNormalizerInterface
             case NormalizedValueDAO::BOOLEAN_TYPE:
                 return new NormalizedValueDAO($type, $value, (bool) $value);
             default:
-                throw new \InvalidArgumentException('Variable type not supported');
+                throw new \InvalidArgumentException('Variable type, '.$type.', not supported');
         }
     }
 
