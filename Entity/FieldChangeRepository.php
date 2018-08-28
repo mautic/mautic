@@ -69,13 +69,13 @@ class FieldChangeRepository extends CommonRepository
     }
 
     /**
-     * @param     $objectType
-     * @param     $fromTimestamp
-     * @param int $objectCount
+     * @param                    $objectType
+     * @param \DateTimeInterface $fromTimestamp
+     * @param int                $objectCount
      *
      * @return array
      */
-    public function findChangesAfter($objectType, $fromTimestamp, $objectCount = 100)
+    public function findChangesAfter($objectType, \DateTimeInterface $fromTimestamp, $objectCount = 100)
     {
         // Get a list of object IDs so that we can get complete snapshots of the objects
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -89,7 +89,7 @@ class FieldChangeRepository extends CommonRepository
                 )
             )
             ->setParameter('objectType', $objectType)
-            ->setParameter('startDateTime', (new \DateTime($fromTimestamp, new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'))
+            ->setParameter('startDateTime', $fromTimestamp->format('Y-m-d H:i:s'))
             ->groupBy('f.object_id')
             ->setMaxResults($objectCount);
 
