@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
 /**
@@ -324,12 +323,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                         $matchedFields[$companyField] = substr($value, 0, 255);
                         break;
                     case 'date':
-                        $date = new \DateTime($value);
-                        $matchedFields[$companyField] = $date->format("Y-m-d");
+                        $date                         = new \DateTime($value);
+                        $matchedFields[$companyField] = $date->format('Y-m-d');
                         break;
                     case 'datetime':
-                        $date = new \DateTime($value);
-                        $matchedFields[$companyField] = $date->format("Y-m-d H:i:s");
+                        $date                         = new \DateTime($value);
+                        $matchedFields[$companyField] = $date->format('Y-m-d H:i:s');
                         break;
                 }
             }
