@@ -342,7 +342,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
             $reportObjects = [];
             foreach ($fieldsChanges as $fieldChange) {
-                $object   = $fieldChange['object'];
+                $object   = $fieldChange['object_type'];
                 $objectId = $fieldChange['object_id'];
                 $modifiedDateTime = new \DateTime($fieldChange['modified_at'], new \DateTimeZone('UTC'));
 
