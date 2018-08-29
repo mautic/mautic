@@ -80,6 +80,7 @@ class AjaxController extends CommonAjaxController
                     $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
                     $enableDataPriority = $integrationObject->getDataPriority();
                     $formType           = $isLead ? 'integration_fields' : 'integration_company_fields';
+                    $integrationFields  = (isset($integrationFields[0])) ? $integrationFields[0] : $integrationFields;
                     $form               = $this->createForm(
                         $formType,
                         isset($featureSettings[$object.'Fields']) ? $featureSettings[$object.'Fields'] : [],
