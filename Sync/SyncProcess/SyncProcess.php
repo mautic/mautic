@@ -11,23 +11,24 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\FieldMappingDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\FieldMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
+use MauticPlugin\IntegrationsBundle\Exception\FieldNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncDate\SyncDateHelper;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
-use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncDate\SyncDateHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 
 /**
  * Class SyncProcess
@@ -498,11 +499,15 @@ class SyncProcess
         /** @var FieldMappingDAO[] $fieldMappings */
         $fieldMappings = $objectMapping->getFieldMappings();
         foreach ($fieldMappings as $fieldMappingDAO) {
-            $integrationInformationChangeRequest = $syncReport->getInformationChangeRequest(
-                $integrationObject->getObject(),
-                $integrationObject->getObjectId(),
-                $fieldMappingDAO->getIntegrationField()
-            );
+            try {
+                $integrationInformationChangeRequest = $syncReport->getInformationChangeRequest(
+                    $integrationObject->getObject(),
+                    $integrationObject->getObjectId(),
+                    $fieldMappingDAO->getIntegrationField()
+                );
+            } catch (FieldNotFoundException $e) {
+                continue;                
+            }
 
             // Perform the sync in the direction instructed
             switch ($fieldMappingDAO->getSyncDirection()) {
