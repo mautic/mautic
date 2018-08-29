@@ -111,15 +111,13 @@ class ContactObject implements ObjectInterface
         );
 
         foreach ($contacts as $contact) {
-            $changedObjects = $objects[$contact->getId()];
-
             /** @var ObjectChangeDAO $changedObject */
-            foreach ($changedObjects as $changedObject) {
-                $fields = $changedObject->getFields();
+            $changedObject = $objects[$contact->getId()];
 
-                foreach ($fields as $field) {
-                    $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
-                }
+            $fields = $changedObject->getFields();
+
+            foreach ($fields as $field) {
+                $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
             }
 
             $this->model->saveEntity($contact);
