@@ -14,6 +14,8 @@ namespace Mautic\CampaignBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\PropertiesTrait;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -89,7 +91,7 @@ class EventType extends AbstractType
                         'onchange' => 'Mautic.campaignToggleTimeframes();',
                         'tooltip'  => 'mautic.campaign.form.type.help',
                     ],
-                    'data' => $triggerMode,
+                    'data'        => $triggerMode,
                 ]
             );
 
@@ -97,8 +99,8 @@ class EventType extends AbstractType
                 'triggerDate',
                 'datetime',
                 [
-                    'label' => false,
-                    'attr'  => [
+                    'label'  => false,
+                    'attr'   => [
                         'class'       => 'form-control',
                         'preaddon'    => 'fa fa-calendar',
                         'data-toggle' => 'datetime',
@@ -118,8 +120,34 @@ class EventType extends AbstractType
                         'class'    => 'form-control',
                         'preaddon' => 'symbol-hashtag',
                     ],
-                    'data' => $data,
+                    'data'  => $data,
                 ]
+            );
+
+            // I could not get Doctrine TimeType does not play well with Symfony TimeType so hacking this workaround
+            if (!isset($options['data']['triggerHour'])) {
+                $data = new \DateTime();
+            } elseif ($options['data']['triggerHour'] instanceof \DateTime) {
+                $data = $options['data']['triggerHour'];
+            } else {
+                $data = new \DateTime($options['data']['triggerHour']);
+            }
+            $builder->add(
+                $builder->create(
+                'triggerHour',
+                TextType::class,
+                    [
+                        'label' => false,
+                        'attr'  => [
+                            'class'             => 'form-control',
+                            'preaddon'          => 'fa fa-at',
+                            'data-toggle'       => 'time',
+                            'data-format'       => 'H:i',
+                            'data-current-time' => $data->format('H:i'),
+                        ],
+                        'data'  => $data->format('H:i'),
+                    ]
+                )
             );
 
             $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';
@@ -128,17 +156,17 @@ class EventType extends AbstractType
                 'triggerIntervalUnit',
                 'choice',
                 [
-                    'choices' => [
+                    'choices'     => [
                         'i' => 'mautic.campaign.event.intervalunit.choice.i',
                         'h' => 'mautic.campaign.event.intervalunit.choice.h',
                         'd' => 'mautic.campaign.event.intervalunit.choice.d',
                         'm' => 'mautic.campaign.event.intervalunit.choice.m',
                         'y' => 'mautic.campaign.event.intervalunit.choice.y',
                     ],
-                    'multiple'   => false,
-                    'label_attr' => ['class' => 'control-label'],
-                    'label'      => false,
-                    'attr'       => [
+                    'multiple'    => false,
+                    'label_attr'  => ['class' => 'control-label'],
+                    'label'       => false,
+                    'attr'        => [
                         'class' => 'form-control',
                     ],
                     'empty_value' => false,

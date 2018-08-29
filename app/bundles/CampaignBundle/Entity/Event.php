@@ -87,6 +87,11 @@ class Event implements ChannelInterface
     /**
      * @var string
      */
+    private $triggerHour;
+
+    /**
+     * @var string
+     */
     private $triggerMode;
 
     /**
@@ -204,6 +209,11 @@ class Event implements ChannelInterface
             ->nullable()
             ->build();
 
+        $builder->createField('triggerHour', 'time')
+            ->columnName('trigger_hour')
+            ->nullable()
+            ->build();
+
         $builder->createField('triggerMode', 'string')
             ->columnName('trigger_mode')
             ->length(10)
@@ -280,6 +290,7 @@ class Event implements ChannelInterface
                     'triggerDate',
                     'triggerInterval',
                     'triggerIntervalUnit',
+                    'triggerHour',
                     'triggerMode',
                     'decisionPath',
                     'channel',
@@ -312,6 +323,7 @@ class Event implements ChannelInterface
                      'triggerDate',
                      'triggerInterval',
                      'triggerIntervalUnit',
+                     'triggerHour',
                      'triggerMode',
                      'children',
                      'parent',
@@ -332,6 +344,7 @@ class Event implements ChannelInterface
                     'triggerDate',
                     'triggerInterval',
                     'triggerIntervalUnit',
+                    'triggerHour',
                     'triggerMode',
                     'decisionPath',
                     'order',
@@ -725,6 +738,31 @@ class Event implements ChannelInterface
     {
         $this->isChanged('triggerInterval', $triggerInterval);
         $this->triggerInterval = $triggerInterval;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTriggerHour()
+    {
+        return $this->triggerHour;
+    }
+
+    /**
+     * @param string $triggerHour
+     *
+     * @return Event
+     */
+    public function setTriggerHour($triggerHour)
+    {
+        if (!$triggerHour instanceof \DateTime) {
+            $triggerHour = new \DateTime($triggerHour);
+        }
+
+        $this->isChanged('triggerHour', $triggerHour->format('H:i'));
+        $this->triggerHour = $triggerHour;
+
+        return $this;
     }
 
     /**

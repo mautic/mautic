@@ -35,12 +35,16 @@
 
         <div<?php echo ($form['triggerMode']->vars['data'] != 'interval') ? ' class="hide"' : ''; ?> id="triggerInterval">
             <div class="row">
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     <?php echo $view['form']->row($form['triggerInterval']); ?>
                 </div>
-                <div class="col-sm-8">
+                <div class="col-sm-5">
                     <?php echo $view['form']->row($form['triggerIntervalUnit']); ?>
                 </div>
+                <div class="col-sm-4">
+                    <?php echo $view['form']->row($form['triggerHour']); ?>
+                </div>
+
             </div>
         </div>
     </div>

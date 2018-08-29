@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -13,13 +13,13 @@ namespace Mautic\CoreBundle\Doctrine\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\DateTimeType;
+use Doctrine\DBAL\Types\TimeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class UTCDateTimeType.
+ * Class UTCTimeType.
  */
-class UTCDateTimeType extends DateTimeType
+class UTCTimeType extends TimeType
 {
     /**
      * @var \DateTimeZone

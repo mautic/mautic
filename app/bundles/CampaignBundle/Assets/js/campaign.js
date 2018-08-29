@@ -152,6 +152,11 @@ Mautic.campaignOnUnload = function(container) {
  * @param response
  */
 Mautic.campaignEventOnLoad = function (container, response) {
+    if (mQuery('#campaignevent_triggerHour').length) {
+        Mautic.campaignEventUpdateTriggerHour();
+        mQuery('#campaignevent_triggerIntervalUnit').on('change', Mautic.campaignEventUpdateTriggerHour)
+    }
+
     if (!response.hasOwnProperty('eventId')) {
         // There's nothing for us to do, so bail
         return;
@@ -234,6 +239,20 @@ Mautic.campaignEventOnLoad = function (container, response) {
     }
 
     Mautic.campaignBuilderInstance.repaintEverything();
+};
+
+/**
+ * Update the trigger hour based on the interval unit selected
+ */
+Mautic.campaignEventUpdateTriggerHour = function () {
+    var unit = mQuery('#campaignevent_triggerIntervalUnit').val();
+    if (unit === 'i' || unit === 'h') {
+        mQuery('#campaignevent_triggerHour').val('');
+        mQuery('#campaignevent_triggerHour').prop('disabled', true);
+    } else {
+        mQuery('#campaignevent_triggerHour').prop('disabled', false);
+        mQuery('#campaignevent_triggerHour').val(mQuery('#campaignevent_triggerHour').attr('data-current-time'));
+    }
 };
 
 /**
