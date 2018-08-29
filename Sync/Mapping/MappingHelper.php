@@ -16,7 +16,9 @@ use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MappingHelper
 {
@@ -141,5 +143,94 @@ class MappingHelper
     {
         $this->objectMappingRepository->saveEntity($objectMapping);
         $this->objectMappingRepository->clear();
+    }
+
+    /**
+     * @param UpdatedObjectMappingDAO $updatedObjectMappingDAO
+     */
+    public function updateObjectMapping(UpdatedObjectMappingDAO $updatedObjectMappingDAO)
+    {
+        $integration = $updatedObjectMappingDAO->getObjectChangeDAO()->getIntegration();
+
+        // This seems backwards but it's not. The ObjectChangeDAO object is based on where the change originated. So if it's Mautic, then the
+        // object's main object name and ID are the integration where the mapped object name and ID is Mautic's.
+        if (MauticSyncDataExchange::NAME === $integration) {
+            $objectMapping = $this->getIntegrationObjectMapping($updatedObjectMappingDAO);
+        } else {
+            $objectMapping = $this->getInternalObjectMapping($updatedObjectMappingDAO);
+        }
+
+        $objectMapping->setLastSyncDate($updatedObjectMappingDAO->getObjectModifiedDate());
+
+        $this->saveObjectMapping($objectMapping);
+    }
+
+    /**
+     * @param UpdatedObjectMappingDAO $updatedObjectMappingDAO
+     *
+     * @return ObjectMapping
+     */
+    private function getIntegrationObjectMapping(UpdatedObjectMappingDAO $updatedObjectMappingDAO)
+    {
+        $changeObject  = $updatedObjectMappingDAO->getObjectChangeDAO();
+        $objectMapping = $this->objectMappingRepository->findOneBy(
+            [
+                'integration'           => $changeObject->getIntegration(),
+                'integrationObjectName' => $changeObject->getObject(),
+                'integrationObjectId'   => $changeObject->getObjectId(),
+                'internalObjectName'    => $changeObject->getMappedObject(),
+                'internalObjectId'      => $changeObject->getMappedObjectId()
+            ]
+        );
+
+        if (!$objectMapping) {
+            // Original mapping wan't found so just create this as a new mapping
+            $objectMapping = new ObjectMapping();
+            $objectMapping->setLastSyncDate(new \DateTime())
+                ->setIntegration($changeObject->getIntegration())
+                ->setInternalObjectName($changeObject->getMappedObject())
+                ->setInternalObjectId($changeObject->getMappedObjectId());
+
+        }
+
+        $objectMapping
+            ->setIntegrationObjectName($updatedObjectMappingDAO->getObjectName())
+            ->setIntegrationObjectId($updatedObjectMappingDAO->getObjectId());
+
+        return $objectMapping;
+    }
+
+    /**
+     * @param UpdatedObjectMappingDAO $updatedObjectMappingDAO
+     *
+     * @return ObjectMapping
+     */
+    private function getInternalObjectMapping(UpdatedObjectMappingDAO $updatedObjectMappingDAO)
+    {
+        $changeObject  = $updatedObjectMappingDAO->getObjectChangeDAO();
+        $objectMapping = $this->objectMappingRepository->findOneBy(
+            [
+                'integration'           => $changeObject->getIntegration(),
+                'internalObjectName'    => $changeObject->getObject(),
+                'internalObjectId'      => $changeObject->getObjectId(),
+                'integrationObjectName' => $changeObject->getMappedObject(),
+                'integrationObjectId'   => $changeObject->getMappedObjectId(),
+            ]
+        );
+
+        if (!$objectMapping) {
+            // Original mapping wan't found so just create this as a new mapping
+            $objectMapping = new ObjectMapping();
+            $objectMapping->setLastSyncDate(new \DateTime())
+                ->setIntegration($changeObject->getIntegration())
+                ->setIntegrationObjectName($changeObject->getMappedObject())
+                ->setIntegrationObjectName($changeObject->getMappedObjectId());
+        }
+
+        $objectMapping
+            ->setInternalObjectName($updatedObjectMappingDAO->getObjectName())
+            ->setInternalObjectId($updatedObjectMappingDAO->getObjectId());
+
+        return $objectMapping;
     }
 }

@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -81,6 +82,8 @@ class CompanyObject implements ObjectInterface
     /**
      * @param array             $ids
      * @param ObjectChangeDAO[] $objects
+     *
+     * @return UpdatedObjectMappingDAO[]
      */
     public function update(array $ids, array $objects)
     {
@@ -96,6 +99,7 @@ class CompanyObject implements ObjectInterface
             __CLASS__.':'.__FUNCTION__
         );
 
+        $updatedMappedObjects = [];
         foreach ($companies as $company) {
             $changedObjects = $objects[$company->getId()];
 
@@ -119,7 +123,17 @@ class CompanyObject implements ObjectInterface
                 ),
                 __CLASS__.':'.__FUNCTION__
             );
+
+            // Integration name and ID are stored in the change's mappedObject/mappedObjectId
+            $updatedMappedObjects[] = new UpdatedObjectMappingDAO(
+                $changedObject,
+                $changedObject->getObject(),
+                $changedObject->getObjectId(),
+                $company->getDateModified()
+            );
         }
+
+        return $updatedMappedObjects;
     }
 
     /**

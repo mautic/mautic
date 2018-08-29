@@ -13,6 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
 
 
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 
 interface ObjectInterface
@@ -27,6 +28,8 @@ interface ObjectInterface
     /**
      * @param array             $ids
      * @param ObjectChangeDAO[] $objects
+     *
+     * @return UpdatedObjectMappingDAO[]
      */
     public function update(array $ids, array $objects);
 

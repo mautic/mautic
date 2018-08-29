@@ -14,6 +14,8 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
+use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper;
@@ -151,14 +153,16 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
             switch ($objectName) {
                 case self::OBJECT_CONTACT:
-                    $this->contactObjectHelper->update($identifiedObjectIds, $updateObjects);
+                    $updatedObjectMappings = $this->contactObjectHelper->update($identifiedObjectIds, $updateObjects);
                     break;
                 case self::OBJECT_COMPANY:
-                    $this->companyObjectHelper->update($identifiedObjectIds, $updateObjects);
+                    $updatedObjectMappings = $this->companyObjectHelper->update($identifiedObjectIds, $updateObjects);
                     break;
                 default:
                     throw new ObjectNotSupportedException(self::NAME, $objectName);
             }
+
+            $this->updateObjectMappings($updatedObjectMappings);
         }
 
         $unidentifiedObjects = $syncOrderDAO->getUnidentifiedObjects();
@@ -239,12 +243,22 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param array $mappings
+     * @param ObjectMapping[] $mappings
      */
     public function saveObjectMappings(array $mappings)
     {
         foreach ($mappings as $mapping) {
             $this->mappingHelper->saveObjectMapping($mapping);
+        }
+    }
+
+    /**
+     * @param UpdatedObjectMappingDAO[] $mappings
+     */
+    public function updateObjectMappings(array $mappings)
+    {
+        foreach ($mappings as $mapping) {
+            $this->mappingHelper->updateObjectMapping($mapping);
         }
     }
 

@@ -13,6 +13,8 @@ namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order;
 
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Exception\UnexpectedValueException;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 /**
  * Class OrderDAO
@@ -30,7 +32,7 @@ class OrderDAO
     private $isFirstTimeSync;
 
     /**
-     * @var array|ObjectChangeDAO[]
+     * @var array
      */
     private $identifiedObjects = [];
 
@@ -50,6 +52,11 @@ class OrderDAO
      * @var array|ObjectMapping
      */
     private $objectMappings = [];
+
+    /**
+     * @var array
+     */
+    private $updatedObjectMappings = [];
 
     /**
      * @var int
@@ -160,11 +167,47 @@ class OrderDAO
     }
 
     /**
+     * @param ObjectChangeDAO $objectChangeDAO
+     * @param mixed           $newIntegrationObjectId
+     * @param null|string     $newIntegrationObjectName
+     * @param \DateTime|null  $objectModifiedDate
+     */
+    public function updateObjectMapping(ObjectChangeDAO $objectChangeDAO, $newIntegrationObjectId, $newIntegrationObjectName = null, \DateTime $objectModifiedDate = null)
+    {
+        if (null === $objectModifiedDate) {
+            $objectModifiedDate = new \DateTime();
+        }
+
+        $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO($objectChangeDAO, $newIntegrationObjectId, $newIntegrationObjectName, $objectModifiedDate);
+    }
+
+    /**
+     * @param ObjectChangeDAO $objectChangeDAO
+     * @param \DateTime|null  $objectModifiedDate
+     */
+    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, \DateTime $objectModifiedDate = null)
+    {
+        if (null === $objectModifiedDate) {
+            $objectModifiedDate = new \DateTime();
+        }
+
+        $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO($objectChangeDAO, $objectChangeDAO->getObjectId(), $objectChangeDAO->getObject(), $objectModifiedDate);
+    }
+
+    /**
      * @return ObjectMapping[]
      */
     public function getObjectMappings(): array
     {
         return $this->objectMappings;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUpdatedObjectMappings(): array
+    {
+        return $this->updatedObjectMappings;
     }
 
     /**

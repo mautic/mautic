@@ -12,6 +12,8 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 /**
  * Class ReportDAO
@@ -63,16 +65,18 @@ class ReportDAO
     }
 
     /**
-     * @param string $objectName
-     * @param int    $objectId
-     * @param string $fieldName
+     * @param $objectName
+     * @param $objectId
+     * @param $fieldName
      *
      * @return InformationChangeRequestDAO
+     * @throws ObjectNotFoundException
+     * @throws FieldNotFoundException
      */
     public function getInformationChangeRequest($objectName, $objectId, $fieldName)
     {
         if (empty($this->objects[$objectName][$objectId])) {
-            throw new \LogicException(); //@todo better exception
+            throw new ObjectNotFoundException($objectName.":".$objectId);
         }
 
         /** @var ObjectDAO $reportObject */
