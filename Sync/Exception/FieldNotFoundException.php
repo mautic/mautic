@@ -11,18 +11,18 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Exception;
 
-
 class FieldNotFoundException extends \Exception
 {
     /**
      * FieldNotFoundException constructor.
      *
-     * @param string $field
-     * @param string $internalObject
-     * @param string $integrationObject
+     * @param                 $field
+     * @param                 $object
+     * @param int             $code
+     * @param \Exception|null $previous
      */
-    public function __construct(string $field, string $internalObject, string $integrationObject)
+    public function __construct($field, $object, $code = 0, \Exception $previous = null)
     {
-        parent::__construct("$field was not found in the mapping for $internalObject:$integrationObject");
+        parent::__construct(sprintf('The %s field is not mapped for the %s object.', $field, $object), $code, $previous);
     }
 }

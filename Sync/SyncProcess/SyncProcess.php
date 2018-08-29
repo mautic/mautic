@@ -11,13 +11,13 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess;
 
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\FieldMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
-use MauticPlugin\IntegrationsBundle\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
@@ -25,6 +25,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncDate\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
@@ -217,6 +218,9 @@ class SyncProcess
             $this->integrationSyncDataExchange->executeSyncOrder($syncOrder);
             // Save the mappings between Mautic objects and the integration's objects
             $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getObjectMappings());
+            // Update the mappings between Mautic objects and the integration's objects if applicable
+            $this->internalSyncDataExchange->updateObjectMappings($syncOrder->getUpdatedObjectMappings());
+
             // Fetch the next iteration/batch
             $this->syncIteration++;
         } while ($syncReport->shouldSync());
@@ -461,12 +465,13 @@ class SyncProcess
     /**
      * Generates a ObjectChangeDAO from Integration to Mautic
      *
-     * @param ReportDAO        $syncReport
+     * @param ReportDAO $syncReport
      * @param ObjectMappingDAO $objectMapping
      * @param ReportObjectDAO  $integrationObject
      * @param ReportObjectDAO  $internalObject
      *
      * @return ObjectChangeDAO
+     * @throws ObjectNotFoundException
      */
     private function getSyncObjectChangeIntegrationToMautic(
         ReportDAO $syncReport,
@@ -506,7 +511,7 @@ class SyncProcess
                     $fieldMappingDAO->getIntegrationField()
                 );
             } catch (FieldNotFoundException $e) {
-                continue;                
+                continue;
             }
 
             // Perform the sync in the direction instructed
@@ -542,7 +547,13 @@ class SyncProcess
 
                     break;
                 case ObjectMappingDAO::SYNC_BIDIRECTIONALLY:
-                    if ($internalField = $internalObject->getField($fieldMappingDAO->getInternalField())) {
+                    try {
+                        $internalField = $internalObject->getField($fieldMappingDAO->getInternalField());
+                    } catch (FieldNotFoundException $exception) {
+                        $internalField = null;
+                    }
+
+                    if ($internalField) {
                         $internalInformationChangeRequest = new InformationChangeRequestDAO(
                             MauticSyncDataExchange::NAME,
                             $internalObject->getObject(),
@@ -634,6 +645,8 @@ class SyncProcess
      * @param ReportObjectDAO  $integrationObject
      *
      * @return ObjectChangeDAO
+     * @throws FieldNotFoundException
+     * @throws ObjectNotFoundException
      */
     private function getSyncObjectChangeMauticToIntegration(
         ReportDAO $syncReport,
@@ -666,11 +679,15 @@ class SyncProcess
         /** @var FieldMappingDAO[] $fieldMappings */
         $fieldMappings = $objectMapping->getFieldMappings();
         foreach ($fieldMappings as $fieldMappingDAO) {
-            $internalInformationChangeRequest = $syncReport->getInformationChangeRequest(
-                $internalObject->getObject(),
-                $internalObject->getObjectId(),
-                $fieldMappingDAO->getInternalField()
-            );
+            try {
+                $internalInformationChangeRequest = $syncReport->getInformationChangeRequest(
+                    $internalObject->getObject(),
+                    $internalObject->getObjectId(),
+                    $fieldMappingDAO->getInternalField()
+                );
+            } catch (FieldNotFoundException $e) {
+                continue;
+            }
 
             // Perform the sync in the direction instructed
             switch ($fieldMappingDAO->getSyncDirection()) {
