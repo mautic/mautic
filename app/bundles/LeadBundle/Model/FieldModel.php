@@ -131,6 +131,12 @@ class FieldModel extends FormModel
             'listable' => true,
             'object'   => 'lead',
         ],
+        'timezone' => [
+            'type'     => 'timezone',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+        ],
         'attribution_date' => [
             'type'     => 'datetime',
             'fixed'    => true,
