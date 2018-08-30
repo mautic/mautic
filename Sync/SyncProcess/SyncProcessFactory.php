@@ -47,7 +47,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
             $integrationSyncDataExchange,
             $syncDateHelper,
             $isFirstTimeSync,
-            $syncFromDateTime = null
+            $syncFromDateTime
         );
     }
 }
