@@ -214,7 +214,6 @@ $dbalSettings = [
     'types'    => [
         'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
         'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType',
-        'time'     => 'Mautic\CoreBundle\Doctrine\Type\UTCTimeType',
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
     'mapping_types' => [
