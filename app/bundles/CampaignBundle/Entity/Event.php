@@ -85,7 +85,7 @@ class Event implements ChannelInterface
     private $triggerIntervalUnit;
 
     /**
-     * @var string
+     * @var null|\DateTime
      */
     private $triggerHour;
 
@@ -741,7 +741,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getTriggerHour()
     {

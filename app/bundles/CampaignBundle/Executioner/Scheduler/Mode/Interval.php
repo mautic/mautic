@@ -11,9 +11,12 @@
 
 namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DAO\GroupExecutionDateDAO;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
 class Interval implements ScheduleModeInterface
@@ -74,5 +77,46 @@ class Interval implements ScheduleModeInterface
         );
 
         return $compareFromDateTime;
+    }
+
+    /**
+     * @param Event           $event
+     * @param ArrayCollection $contacts
+     * @param \DateTime       $executionDate
+     *
+     * @return GroupExecutionDateDAO[]
+     */
+    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTime $executionDate)
+    {
+        $hour       = $event->getTriggerHour();
+        $byTimezone = [];
+
+        /** @var Lead $contact */
+        foreach ($contacts as $contact) {
+            $groupExecutionDate = clone $executionDate;
+
+            if ($timezone = $contact->getTimezone()) {
+                $groupHour = clone $hour;
+
+                try {
+                    // Set the group's timezone to the contact's
+                    $groupHour->setTimezone(new \DateTimeZone($timezone));
+                    $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
+                } catch (\Exception $exception) {
+                    // Timezone is not recognized so use the default
+                    $this->logger->debug(
+                        'CAMPAIGN: ('.$event->getId().') '.$timezone.' for contact '.$contact->getId().' is not recognized'
+                    );
+                }
+            }
+
+            if (!isset($byTimezone[$groupExecutionDate->getTimestamp()])) {
+                $byTimezone[$groupExecutionDate->getTimestamp()] = new GroupExecutionDateDAO($groupExecutionDate);
+            }
+
+            $byTimezone[$groupExecutionDate->getTimestamp()]->addContact($contact);
+        }
+
+        return $byTimezone;
     }
 }
