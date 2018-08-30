@@ -251,7 +251,6 @@ Mautic.campaignEventUpdateTriggerHour = function () {
         mQuery('#campaignevent_triggerHour').prop('disabled', true);
     } else {
         mQuery('#campaignevent_triggerHour').prop('disabled', false);
-        mQuery('#campaignevent_triggerHour').val(mQuery('#campaignevent_triggerHour').attr('data-current-time'));
     }
 };
 

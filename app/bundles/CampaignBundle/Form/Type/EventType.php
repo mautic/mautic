@@ -134,16 +134,15 @@ class EventType extends AbstractType
             }
             $builder->add(
                 $builder->create(
-                'triggerHour',
-                TextType::class,
+                    'triggerHour',
+                    TextType::class,
                     [
                         'label' => false,
                         'attr'  => [
-                            'class'             => 'form-control',
-                            'preaddon'          => 'fa fa-at',
-                            'data-toggle'       => 'time',
-                            'data-format'       => 'H:i',
-                            'data-current-time' => $data->format('H:i'),
+                            'class'       => 'form-control',
+                            'preaddon'    => 'fa fa-at',
+                            'data-toggle' => 'time',
+                            'data-format' => 'H:i',
                         ],
                         'data'  => $data->format('H:i'),
                     ]
