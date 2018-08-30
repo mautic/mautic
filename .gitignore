@@ -72,7 +72,7 @@
 !/plugins/MauticZapierBundle
 !/plugins/index.html
 
-/themes/*
+
 !/themes/aurora
 !/themes/blank
 !/themes/cards

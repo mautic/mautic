@@ -1,0 +1,8 @@
+{% extends ":"~template~":base.html.twig" %}
+
+{% block content %}
+    {{ message|raw }}
+    {% if content is defined %}
+        <div>{{ content|raw }}</div>
+    {% endif %}
+{% endblock %}
