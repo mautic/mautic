@@ -470,9 +470,6 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->scheduler->method('validateExecutionDateTime')
             ->willReturn(new \DateTime());
 
-        $this->scheduler->method('getExecutionDateTime')
-            ->willReturn(new \DateTime());
-
         $counter = $this->getExecutioner()->executeByIds([1, 2]);
 
         // Two events were evaluated
