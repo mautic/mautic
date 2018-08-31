@@ -18,6 +18,7 @@ use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MappingHelper
@@ -77,12 +78,16 @@ class MappingHelper
         // We don't know who this is so search Mautic
         $uniqueIdentifierFields = $this->fieldModel->getUniqueIdentifierFields(['object' => $internalObjectName]);
         $identifiers            = [];
-        foreach ($uniqueIdentifierFields as $field => $fieldLabel) {
-            $integrationField = $mappingManualDAO->getIntegrationMappedField($internalObjectName, $integrationObjectDAO->getObject(), $field);
 
-            if ($integrationValue = $integrationObjectDAO->getField($integrationField)) {
-                $identifiers[$integrationField] = $integrationValue->getValue()->getNormalizedValue();
-            }
+        foreach ($uniqueIdentifierFields as $field => $fieldLabel) {
+            try {
+                $integrationField = $mappingManualDAO->getIntegrationMappedField($internalObjectName, $integrationObjectDAO->getObject(), $field);
+                if ($integrationValue = $integrationObjectDAO->getField($integrationField)) {
+                    $identifiers[$integrationField] = $integrationValue->getValue()->getNormalizedValue();
+                }
+            } catch (FieldNotFoundException $e) {}
+
+
         }
 
         if (empty($identifiers)) {
