@@ -235,6 +235,6 @@ class MappingManualDAO
             }
         }
 
-        throw new FieldNotFoundException($internalFieldName, $internalObjectName, $integrationObjectName);
+        throw new FieldNotFoundException($internalFieldName, $internalObjectName);
     }
 }
