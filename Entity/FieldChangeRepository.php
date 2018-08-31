@@ -59,12 +59,12 @@ class FieldChangeRepository extends CommonRepository
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where(
                 $qb->expr()->andX(
-                    $qb->expr()->eq('object_id', ":objectId"),
-                    $qb->expr()->eq('object_type', ":objectType")
+                    $qb->expr()->eq('object_type', ":objectType"),
+                    $qb->expr()->eq('object_id', ":objectId")
                 )
             )
-            ->setParameter('objectId', $objectId)
             ->setParameter('objectType', $objectType)
+            ->setParameter('objectId', $objectId)
             ->execute();
     }
 
