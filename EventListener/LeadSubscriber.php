@@ -64,6 +64,11 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
+        if (defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS')) {
+            // Don't track changes just made by an active sync
+            return;
+        }
+
         $changes       = $lead->getChanges(true);
         $toPersist     = [];
         $changedFields = [];
@@ -105,6 +110,11 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onCompanyPostSave(Events\CompanyEvent $event)
     {
+        if (defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS')) {
+            // Don't track changes just made by an active sync
+            return;
+        }
+
         $company          = $event->getCompany();
         $changes       = $company->getChanges(true);
         $toPersist     = [];
