@@ -70,12 +70,12 @@ class FieldChangeRepository extends CommonRepository
 
     /**
      * @param                    $objectType
-     * @param \DateTimeInterface $fromTimestamp
+     * @param \DateTimeInterface $toDateTime
      * @param int                $objectCount
      *
      * @return array
      */
-    public function findChangesAfter($objectType, \DateTimeInterface $fromTimestamp, $objectCount = 100)
+    public function findChangesBefore($objectType, \DateTimeInterface $toDateTime, $objectCount = 100)
     {
         // Get a list of object IDs so that we can get complete snapshots of the objects
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -85,11 +85,11 @@ class FieldChangeRepository extends CommonRepository
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('f.object_type', ':objectType'),
-                    $qb->expr()->gte('f.modified_at', ':startDateTime')
+                    $qb->expr()->lte('f.modified_at', ':toDateTime')
                 )
             )
             ->setParameter('objectType', $objectType)
-            ->setParameter('startDateTime', $fromTimestamp->format('Y-m-d H:i:s'))
+            ->setParameter('toDateTime', $toDateTime->format('Y-m-d H:i:s'))
             ->groupBy('f.object_id')
             ->setMaxResults($objectCount);
 

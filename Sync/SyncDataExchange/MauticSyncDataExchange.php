@@ -370,9 +370,9 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         $requestedObjects = $requestDAO->getObjects();
 
         foreach ($requestedObjects as $objectDAO) {
-            $fieldsChanges = $this->fieldChangeRepository->findChangesAfter(
+            $fieldsChanges = $this->fieldChangeRepository->findChangesBefore(
                 $this->getFieldObjectName($objectDAO->getObject()),
-                $objectDAO->getFromDateTime()
+                $objectDAO->getToDateTime()
             );
 
             $reportObjects = [];
