@@ -99,8 +99,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         CompanyObject $companyObjectHelper,
         ContactObject $contactObjectHelper,
         FieldModel $fieldModel
-    )
-    {
+    ) {
         $this->fieldChangeRepository   = $fieldChangeRepository;
         $this->variableExpresserHelper = $variableExpresserHelper;
         $this->mappingHelper           = $mappingHelper;
@@ -263,6 +262,28 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
+     * @param ObjectMapping[]           $newMappings
+     * @param UpdatedObjectMappingDAO[] $updatedMappings
+     */
+    public function cleanupProcessedObjects(array $newMappings, array $updatedMappings)
+    {
+        foreach ($newMappings as $mapping) {
+            $object   = $mapping->getInternalObjectName();
+            $objectId = $mapping->getInternalObjectId();
+
+            $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object);
+        }
+
+        foreach ($updatedMappings as $mapping) {
+            $changedObjectDAO = $mapping->getObjectChangeDAO();
+            $object   = $changedObjectDAO->getMappedObject();
+            $objectId = $changedObjectDAO->getMappedObjectId();
+
+            $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object);
+        }
+    }
+
+    /**
      * @param RequestDAO $requestDAO
      *
      * @return ReportDAO
@@ -356,8 +377,8 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
             $reportObjects = [];
             foreach ($fieldsChanges as $fieldChange) {
-                $object   = $fieldChange['object_type'];
-                $objectId = $fieldChange['object_id'];
+                $object           = $fieldChange['object_type'];
+                $objectId         = $fieldChange['object_id'];
                 $modifiedDateTime = new \DateTime($fieldChange['modified_at'], new \DateTimeZone('UTC'));
 
                 if (!array_key_exists($object, $reportObjects)) {
@@ -392,6 +413,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @param array $fieldChange
      *
      * @return ReportFieldDAO
+     * @throws \Exception
      */
     private function getFieldChangeObject(array $fieldChange)
     {

@@ -220,6 +220,8 @@ class SyncProcess
             $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getObjectMappings());
             // Update the mappings between Mautic objects and the integration's objects if applicable
             $this->internalSyncDataExchange->updateObjectMappings($syncOrder->getUpdatedObjectMappings());
+            // Cleanup field tracking for successfully synced objects
+            $this->internalSyncDataExchange->cleanupProcessedObjects($syncOrder->getObjectMappings(), $syncOrder->getUpdatedObjectMappings());
 
             // Fetch the next iteration/batch
             $this->syncIteration++;
