@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @author      Jan Kozak <galvani78@gmail.com>
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Helpers;
+namespace MauticPlugin\IntegrationsBundle\Helpers;
 
 use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;

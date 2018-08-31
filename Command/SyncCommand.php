@@ -9,19 +9,45 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Command;
+namespace MauticPlugin\IntegrationsBundle\Command;
 
 use DateTimeImmutable;
+use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use MauticPlugin\MauticIntegrationsBundle\Event\SyncEvent;
-use MauticPlugin\MauticIntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SyncCommand extends ContainerAwareCommand
 {
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * @var SyncServiceInterface
+     */
+    private $syncService;
+
+    /**
+     * SyncCommand constructor.
+     *
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param SyncServiceInterface     $syncService
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher, SyncServiceInterface $syncService)
+    {
+        parent::__construct();
+
+        $this->eventDispatcher = $eventDispatcher;
+        $this->syncService     = $syncService;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -35,10 +61,17 @@ class SyncCommand extends ContainerAwareCommand
                 'Fetch objects from integration.',
                 null
             )
-            ->addOption('--start-date',
-                '-d',
+            ->addOption(
+                '--start-datetime',
+                '-t',
                 InputOption::VALUE_REQUIRED,
-                'Set start date for updated values.'
+                'Set start date/time for updated values.'
+            )
+            ->addOption(
+                '--first-time-sync',
+                '-f',
+                InputOption::VALUE_NONE,
+                'Notate if this is a first time sync where Mautic will sync existing objects instead of just tracked changes'
             );
 
         parent::configure();
@@ -49,29 +82,32 @@ class SyncCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io          = new SymfonyStyle($input, $output);
-        $integration = $input->getArgument('integration');
-        $startDateS  = $input->getOption('start-date');
-        $env         = $input->getOption('env', 'production');
+        $io                  = new SymfonyStyle($input, $output);
+        $integration         = $input->getArgument('integration');
+        $startDateTimeString = $input->getOption('start-datetime');
+        $firstTimeSync = $input->getOption('first-time-sync');
+        $env                 = $input->getOption('env');
 
         try {
-            $startDate = new DateTimeImmutable($startDateS);
+            $startDateTime = ($startDateTimeString) ? new DateTimeImmutable($startDateTimeString) : null;
         } catch (\Exception $e) {
-            $io->error("'$startDateS' is not a valid date. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00'");
+            $io->error("'$startDateTimeString' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
 
             return 1;
         }
-        
-        try {
-            $event = new SyncEvent($integration, $startDate);
-            $this->getContainer()->get('event_dispatcher')->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
-            // @todo do the syncing here
+        try {
+            defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $integration);
+
+            $event = new SyncEvent($integration, $firstTimeSync);
+            $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
+
+            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $firstTimeSync, $startDateTime);
         } catch (\Exception $e) {
-            if ($env === 'dev') {
+            if ($env === 'dev' || MAUTIC_ENV === 'dev') {
                 throw $e;
             }
-            
+
             $io->error($e->getMessage());
 
             return 1;

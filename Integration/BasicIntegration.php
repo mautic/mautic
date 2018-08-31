@@ -9,14 +9,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Integration;
+namespace MauticPlugin\IntegrationsBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\BCIntegrationFormsHelperTrait;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\BCIntegrationHelperTrait;
-use MauticPlugin\MauticIntegrationsBundle\Integration\Interfaces\BasicInterface;
+use MauticPlugin\IntegrationsBundle\Helpers\BCIntegrationFormsHelperTrait;
+use MauticPlugin\IntegrationsBundle\Helpers\BCIntegrationHelperTrait;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**

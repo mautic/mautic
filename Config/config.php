@@ -20,52 +20,56 @@ return [
         'api' => [
             'mautic_integration_api_plugin_list' => [
                 'path' => '/integration/plugin/list',
-                'controller' => 'MauticIntegrationsBundle:Api\Plugin:list',
+                'controller' => 'IntegrationsBundle:Api\Plugin:list',
             ],
         ],
     ],
     'menu' => [
     ],
     'services' => [
+        'commands' => [
+            'mautic.integrations.command.sync' => [
+                'class'     => \MauticPlugin\IntegrationsBundle\Command\SyncCommand::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.integrations.sync.service',
+                ],
+                'tag' => 'console.command',
+            ],
+        ],
         'events' => [
             'mautic.integrations.lead.subscriber' => [
-                'class'     => \MauticPlugin\MauticIntegrationsBundle\EventListener\LeadSubscriber::class,
+                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
-                    'mautic.integrations.helper.variable_expressor'
+                    'mautic.integrations.helper.variable_expresser'
                 ],
             ],
         ],
         'forms' => [
         ],
         'helpers' => [
-            'mautic.integrations.helper.variable_expressor' => [
-                'class' => \MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpressorHelper::class
+            'mautic.integrations.helper.variable_expresser' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class
             ]
         ],
         'menus' => [
         ],
         'other' => [
             'mautic.service.encryption' => [
-                'class' => \MauticPlugin\MauticIntegrationsBundle\Facade\EncryptionService::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Facade\EncryptionService::class,
                 'arguments' => [
                     'mautic.helper.encryption',
-                ],
-            ],
-            'mautic.integrations.service.sync' => [
-                'class' => \MauticPlugin\MauticIntegrationsBundle\Services\SyncService\SyncService::class,
-                'arguments' => [
-                    //'mautic.plugin.repository.integration_entity',
                 ],
             ],
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class
             ],
             'mautic.integrations.auth.factory' => [
-                'class' => MauticPlugin\MauticIntegrationsBundle\Auth\Factory::class,
+                'class' => MauticPlugin\IntegrationsBundle\Auth\Factory::class,
             ],
             'mautic.integrations.auth.provider.oauth1a' => [
-                'class' => MauticPlugin\MauticIntegrationsBundle\Auth\Provider\OAuth1aProvider::class,
+                'class' => MauticPlugin\IntegrationsBundle\Auth\Provider\OAuth1aProvider::class,
                 'arguments' => [
                     'mautic.http.client',
                 ],
@@ -81,7 +85,81 @@ return [
                 'class'     => \Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
-                    \MauticPlugin\MauticIntegrationsBundle\Entity\FieldChange::class,
+                    \MauticPlugin\IntegrationsBundle\Entity\FieldChange::class,
+                ],
+            ],
+            'mautic.integrations.repository.object_mapping' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \MauticPlugin\IntegrationsBundle\Entity\ObjectMapping::class
+                ],
+            ],
+        ],
+        'sync' => [
+            'mautic.sync.logger' => [
+                'class' =>  \MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.integrations.helper.sync_judge' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudge::class,
+            ],
+            'mautic.integrations.helper.contact_object' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\ContactObject::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.repository.lead',
+                    'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.integrations.helper.company_object' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\CompanyObject::class,
+                'arguments' => [
+                    'mautic.lead.model.company',
+                    'mautic.lead.repository.company',
+                    'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.integrations.sync.data_exchange.mautic' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange::class,
+                'arguments' => [
+                    'mautic.integrations.repository.field_change',
+                    'mautic.integrations.helper.variable_expresser',
+                    'mautic.integrations.helper.sync_mapping_helper',
+                    'mautic.integrations.helper.company_object',
+                    'mautic.integrations.helper.contact_object',
+                    'mautic.lead.model.field',
+                ],
+            ],
+            'mautic.integrations.helper.sync_process_factory' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcessFactory::class,
+            ],
+            'mautic.integrations.sync.service' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService::class,
+                'arguments' => [
+                    'mautic.integrations.helper.sync_judge',
+                    'mautic.integrations.helper.sync_process_factory',
+                    'mautic.integrations.helper.sync_date',
+                    'mautic.integrations.sync.data_exchange.mautic',
+                ],
+                'methodCalls' => [
+                    'initiateDebugLogger' => ['mautic.sync.logger'],
+                ],
+            ],
+            'mautic.integrations.helper.sync_date' => [
+                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncDate\SyncDateHelper::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.integrations.helper.sync_mapping_helper' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.repository.lead',
+                    'mautic.integrations.repository.object_mapping',
                 ],
             ],
         ],

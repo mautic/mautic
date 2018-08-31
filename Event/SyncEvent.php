@@ -9,25 +9,49 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Event;
+namespace MauticPlugin\IntegrationsBundle\Event;
 
-use DateTimeImmutable;
-use Mautic\PluginBundle\Entity\Integration;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 class SyncEvent extends Event
 {
     /**
-     * @param string            $integration
-     * @param DateTimeImmutable $startDate
+     * @var string
      */
-    public function __construct($integration, DateTimeImmutable $startDate)
+    private $integration;
+
+    /**
+     * @var SyncDataExchangeInterface
+     */
+    private $dataExchange;
+
+    /**
+     * @var MappingManualDAO
+     */
+    private $mappingManual;
+
+    /**
+     * @var bool
+     */
+    private $firstTimeSync;
+
+    /**
+     * SyncEvent constructor.
+     *
+     * @param string $integration
+     * @param bool   $firstTimeSync
+     */
+    public function __construct($integration, $firstTimeSync)
     {
-        $this->integration = $integration;
-        $this->startDate   = $startDate;
+        $this->integration   = $integration;
+        $this->firstTimeSync = (bool) $firstTimeSync;
     }
 
     /**
+     * @param $integration
+     *
      * @return bool
      */
     public function shouldIntegrationSync($integration): bool
@@ -36,10 +60,46 @@ class SyncEvent extends Event
     }
 
     /**
-     * @return DateTimeImmutable
+     * @param SyncDataExchangeInterface $dataExchange
+     * @param MappingManualDAO          $mappingManualDAO
      */
-    public function getStartDate()
+    public function setSyncServices(SyncDataExchangeInterface $dataExchange, MappingManualDAO $mappingManualDAO)
     {
-        return $this->startDate;
+        $this->dataExchange  = $dataExchange;
+        $this->mappingManual = $mappingManualDAO;
+
+        $this->stopPropagation();
+    }
+
+    /**
+     * @return SyncDataExchangeInterface
+     */
+    public function getDataExchange(): SyncDataExchangeInterface
+    {
+        return $this->dataExchange;
+    }
+
+    /**
+     * @return MappingManualDAO
+     */
+    public function getMappingManual(): MappingManualDAO
+    {
+        return $this->mappingManual;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIntegration(): string
+    {
+        return $this->integration;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFirstTimeSync(): bool
+    {
+        return $this->firstTimeSync;
     }
 }

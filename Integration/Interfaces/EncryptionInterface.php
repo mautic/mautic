@@ -1,9 +1,9 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Integration\Interfaces;
+namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-use MauticPlugin\MauticIntegrationsBundle\Facade\EncryptionService;
-use MauticPlugin\MauticIntegrationsBundle\Integration\BasicIntegration;
+use MauticPlugin\IntegrationsBundle\Facade\EncryptionService;
+use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
 
 interface EncryptionInterface {
     /**

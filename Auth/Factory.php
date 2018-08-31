@@ -1,9 +1,9 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Auth;
+namespace MauticPlugin\IntegrationsBundle\Auth;
 
-use MauticPlugin\MauticIntegrationsBundle\Auth\Provider\AuthProviderInterface;
-use MauticPlugin\MauticIntegrationsBundle\Exception\InvalidProviderException;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
+use MauticPlugin\IntegrationsBundle\Exception\InvalidProviderException;
 
 class Factory
 {

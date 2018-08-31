@@ -9,7 +9,7 @@
  * @author      Jan Kozak <galvani78@gmail.com>
  */
 
-namespace MauticPlugin\MauticIntegrationsBundle\Services;
+namespace MauticPlugin\IntegrationsBundle\Services;
 
 final class IntegrationProvider
 {

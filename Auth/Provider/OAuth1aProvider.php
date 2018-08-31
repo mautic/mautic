@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\Auth\Provider;
+namespace MauticPlugin\IntegrationsBundle\Auth\Provider;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
@@ -16,9 +16,9 @@ class OAuth1aProvider
 
     /**
      * Append auth headers to the request
-     * 
+     *
      * @param Request $request
-     * 
+     *
      * @return Request
      */
     public function appendAuthHeaders(Request $request): Request
@@ -58,7 +58,7 @@ class OAuth1aProvider
             {
                 return 'consumer_secret';
             }
-            
+
             public function getDecryptedApiKeys()
             {
                 return [
@@ -76,7 +76,7 @@ class OAuth1aProvider
 
         $uri = $request->getUri();
         $url = sprintf('%s://%s/%s', $uri->getScheme(), $uri->getHost(), ltrim($uri->getPath(), '/'));
-        
+
         parse_str($uri->getQuery(), $query);
 
         $authHeaders = $oauthHelper->getAuthorizationHeader($url, $query, $request->getMethod());
@@ -97,10 +97,10 @@ class OAuth1aProvider
     {
         return 'oauth1a';
     }
-    
+
     /**
      * @param string $consumerKey
-     * 
+     *
      * @return $this
      */
     public function setConsumerKey(string $consumerKey): self
@@ -112,7 +112,7 @@ class OAuth1aProvider
 
     /**
      * @param string $consumerSecret
-     * 
+     *
      * @return $this
      */
     public function setConsumerSecret(string $consumerSecret): self
@@ -124,7 +124,7 @@ class OAuth1aProvider
 
     /**
      * @param string $token
-     * 
+     *
      * @return $this
      */
     public function setToken(string $token): self
@@ -136,7 +136,7 @@ class OAuth1aProvider
 
     /**
      * @param string $tokenSecret
-     * 
+     *
      * @return $this
      */
     public function setTokenSecret(string $tokenSecret): self

@@ -1,15 +1,21 @@
 <?php
 
-namespace MauticPlugin\MauticIntegrationsBundle\EventListener;
+namespace MauticPlugin\IntegrationsBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChange;
-use MauticPlugin\MauticIntegrationsBundle\Entity\FieldChangeRepository;
-use MauticPlugin\MauticIntegrationsBundle\Helpers\VariableExpressor\VariableExpressorHelperInterface;
+use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
+use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 
+/**
+ * Class LeadSubscriber
+ *
+ * @todo add support to clean up after a sync is complete in the case the integration errors for some reason as we do not wan't to lose changes for temporary sync issues
+ */
 class LeadSubscriber extends CommonSubscriber
 {
     /**
@@ -18,15 +24,15 @@ class LeadSubscriber extends CommonSubscriber
     private $repo;
 
     /**
-     * @var VariableExpressorHelperInterface
+     * @var VariableExpresserHelperInterface
      */
     private $variableExpressor;
 
     /**
      * @param FieldChangeRepository            $repo
-     * @param VariableExpressorHelperInterface $variableExpressor
+     * @param VariableExpresserHelperInterface $variableExpressor
      */
-    public function __construct(FieldChangeRepository $repo, VariableExpressorHelperInterface $variableExpressor)
+    public function __construct(FieldChangeRepository $repo, VariableExpresserHelperInterface $variableExpressor)
     {
         $this->repo              = $repo;
         $this->variableExpressor = $variableExpressor;
@@ -40,17 +46,29 @@ class LeadSubscriber extends CommonSubscriber
         return [
             LeadEvents::LEAD_POST_SAVE   => ['onLeadPostSave', 0],
             LeadEvents::LEAD_POST_DELETE => ['onLeadPostDelete', 255],
+            LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
+            LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
         ];
     }
 
     /**
-     * @TODO Use VariableExpressorHelper to modify values
-     * 
+     * @todo only do this if a sync is enabled otherwise this will fill up fast
+     *
      * @param Events\LeadEvent $event
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
-        $lead          = $event->getLead();
+        $lead = $event->getLead();
+        if ($lead->isAnonymous()) {
+            // Do not track visitor changes
+            return;
+        }
+
+        if (defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS')) {
+            // Don't track changes just made by an active sync
+            return;
+        }
+
         $changes       = $lead->getChanges(true);
         $toPersist     = [];
         $changedFields = [];
@@ -70,18 +88,64 @@ class LeadSubscriber extends CommonSubscriber
                 ->setColumnType($valueDAO->getType())
                 ->setColumnValue($valueDAO->getValue());
         }
-        
+
         $this->repo->deleteEntitiesForObjectByColumnName($lead->getId(), Lead::class, $changedFields);
         $this->repo->saveEntities($toPersist);
+
+        $this->repo->clear();
     }
 
     /**
-     * @TODO Remove matching entries from FieldChangeRepository
-     * 
      * @param Events\LeadEvent $event
      */
     public function onLeadPostDelete(Events\LeadEvent $event)
     {
-        $this->repo->deleteEntitiesForObject($event->getLead()->getId(), Lead::class);
+        $this->repo->deleteEntitiesForObject($event->getLead()->deletedId, Lead::class);
+    }
+
+    /**
+     * @todo only do this if a sync is enabled otherwise this will fill up fast
+     *
+     * @param Events\CompanyEvent $event
+     */
+    public function onCompanyPostSave(Events\CompanyEvent $event)
+    {
+        if (defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS')) {
+            // Don't track changes just made by an active sync
+            return;
+        }
+
+        $company          = $event->getCompany();
+        $changes       = $company->getChanges(true);
+        $toPersist     = [];
+        $changedFields = [];
+
+        if (!isset($changes['fields'])) {
+            return;
+        }
+
+        foreach ($changes['fields'] as $key => list($oldValue, $newValue)) {
+            $valueDAO        = $this->variableExpressor->encodeVariable($newValue);
+            $changedFields[] = $key;
+            $toPersist[]     = (new FieldChange)
+                ->setObjectType(Lead::class)
+                ->setObjectId($company->getId())
+                ->setModifiedAt(new \DateTime)
+                ->setColumnName($key)
+                ->setColumnType($valueDAO->getType())
+                ->setColumnValue($valueDAO->getValue());
+        }
+
+        $this->repo->deleteEntitiesForObjectByColumnName($company->getId(), Company::class, $changedFields);
+        $this->repo->saveEntities($toPersist);
+        $this->repo->clear();
+    }
+
+    /**
+     * @param Events\CompanyEvent $event
+     */
+    public function onCompanyPostDelete(Events\CompanyEvent $event)
+    {
+        $this->repo->deleteEntitiesForObject($event->getCompany()->deletedId, Company::class);
     }
 }
