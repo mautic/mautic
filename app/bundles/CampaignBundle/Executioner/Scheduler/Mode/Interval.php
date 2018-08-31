@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DAO\GroupExecutionDateDAO;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -31,6 +32,11 @@ class Interval implements ScheduleModeInterface
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
+
+    /**
+     * @var \DateTimeZone
+     */
+    private $defaultTimezone;
 
     /**
      * Interval constructor.
@@ -88,6 +94,29 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
+     * @param LeadEventLog $log
+     * @param \DateTime    $currentDateTime
+     *
+     * @return \DateTime
+     *
+     * @throws NotSchedulableException
+     */
+    public function validateExecutionDateTime(LeadEventLog $log, \DateTime $currentDateTime)
+    {
+        $event         = $log->getEvent();
+        $dateTriggered = clone $log->getDateTriggered();
+        $hour          = $event->getTriggerHour();
+
+        if (empty($hour)) {
+            return $this->getExecutionDateTime($event, $currentDateTime, $dateTriggered);
+        }
+
+        $diff = $dateTriggered->diff($currentDateTime);
+
+        return $this->convertToHourInContactTimezone($log->getLead(), $hour, $diff, $event->getId());
+    }
+
+    /**
      * @param Event           $event
      * @param ArrayCollection $contacts
      * @param \DateTime       $executionDate
@@ -98,15 +127,12 @@ class Interval implements ScheduleModeInterface
     {
         $groupedExecutionDates = [];
         $hour                  = $event->getTriggerHour();
-        $defaultTimezone       = new \DateTimeZone(
-            $this->coreParametersHelper->getParameter('default_timezone', 'UTC')
-        );
 
         $diff = (new \Datetime())->diff($executionDate);
 
         /** @var Lead $contact */
         foreach ($contacts as $contact) {
-            $groupExecutionDate = $this->convertToHourInContactTimezone($contact, $hour, $diff, $defaultTimezone, $event->getId());
+            $groupExecutionDate = $this->convertToHourInContactTimezone($contact, $hour, $diff, $event->getId());
 
             if (!isset($groupedExecutionDates[$groupExecutionDate->getTimestamp()])) {
                 $groupedExecutionDates[$groupExecutionDate->getTimestamp()] = new GroupExecutionDateDAO($groupExecutionDate);
@@ -122,15 +148,14 @@ class Interval implements ScheduleModeInterface
      * @param Lead          $contact
      * @param \DateTime     $hour
      * @param \DateInterval $diff
-     * @param \DateTimeZone $defaultTimezone
-     * @param               $eventId
+     * @param int           $eventId
      *
      * @return \DateTime
      */
-    private function convertToHourInContactTimezone(Lead $contact, \DateTime $hour, \DateInterval $diff, \DateTimeZone $defaultTimezone, $eventId)
+    private function convertToHourInContactTimezone(Lead $contact, \DateTime $hour, \DateInterval $diff, $eventId)
     {
         $groupHour = clone $hour;
-        $now       = new \DateTime('now', $defaultTimezone);
+        $now       = new \DateTime('now', $this->getDefaultTimezone());
 
         // Set execution to UTC
         if ($timezone = $contact->getTimezone()) {
@@ -165,5 +190,21 @@ class Interval implements ScheduleModeInterface
         $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
         return $groupExecutionDate;
+    }
+
+    /**
+     * @return \DateTimeZone
+     */
+    private function getDefaultTimezone()
+    {
+        if ($this->defaultTimezone) {
+            return $this->defaultTimezone;
+        }
+
+        $this->defaultTimezone = new \DateTimeZone(
+            $this->coreParametersHelper->getParameter('default_timezone', 'UTC')
+        );
+
+        return $this->defaultTimezone;
     }
 }

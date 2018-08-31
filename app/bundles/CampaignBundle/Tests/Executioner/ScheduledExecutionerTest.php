@@ -148,7 +148,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('executeLogs');
 
         $this->scheduler->expects($this->exactly(4))
-            ->method('getExecutionDateTime')
+            ->method('validateExecutionDateTime')
             ->willReturn(new \DateTime());
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
@@ -261,7 +261,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->with([1, 2])
             ->willReturn($logs);
 
-        $this->scheduler->method('getExecutionDateTime')
+        $this->scheduler->method('validateExecutionDateTime')
             ->willReturn(new \DateTime());
 
         // Should only be executed once because the two logs were grouped by event ID
@@ -318,7 +318,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('executeLogs');
 
         $this->scheduler->expects($this->exactly(2))
-            ->method('getExecutionDateTime')
+            ->method('validateExecutionDateTime')
             ->willReturnOnConsecutiveCalls(
                 $oneMinuteDateTime,
                 $twoMinuteDateTime
@@ -385,7 +385,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $threeMinuteDateTime = new \DateTime('+3 minutes');
 
         $this->scheduler->expects($this->exactly(2))
-            ->method('getExecutionDateTime')
+            ->method('validateExecutionDateTime')
             ->willReturnOnConsecutiveCalls(
                 $twoMinuteDateTime,
                 $threeMinuteDateTime
@@ -462,6 +462,9 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $this->contactFinder->expects($this->never())
             ->method('hydrateContacts');
+
+        $this->scheduler->method('validateExecutionDateTime')
+            ->willReturn(new \DateTime());
 
         $counter = $this->getExecutioner()->executeByIds([1, 2]);
 

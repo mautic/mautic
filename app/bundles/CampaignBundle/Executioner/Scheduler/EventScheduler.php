@@ -119,7 +119,7 @@ class EventScheduler
         $this->eventLogger->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
         // If this is relative to a specific hour, process the contacts in batches by contacts' timezone
-        if ($this->checkIfContactSpecificExecutionDatesIsRequired($event)) {
+        if ($this->isContactSpecificExecutionDateRequired($event)) {
             $groupedExecutionDates = $this->intervalScheduler->groupContactsByDate($event, $contacts, $executionDate);
 
             foreach ($groupedExecutionDates as $groupExecutionDateDAO) {
@@ -265,6 +265,37 @@ class EventScheduler
     }
 
     /**
+     * @param LeadEventLog $log
+     * @param \DateTime    $currentDateTime
+     *
+     * @return \DateTime
+     *
+     * @throws NotSchedulableException
+     */
+    public function validateExecutionDateTime(LeadEventLog $log, \DateTime $currentDateTime)
+    {
+        if (!$scheduledDateTime = $log->getTriggerDate()) {
+            throw new NotSchedulableException();
+        }
+
+        $event = $log->getEvent();
+
+        switch ($event->getTriggerMode()) {
+            case Event::TRIGGER_MODE_IMMEDIATE:
+            case null: // decision
+                $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
+
+                return $currentDateTime;
+            case Event::TRIGGER_MODE_INTERVAL:
+                return $this->intervalScheduler->validateExecutionDateTime($log, $currentDateTime);
+            case Event::TRIGGER_MODE_DATE:
+                return $this->dateTimeScheduler->getExecutionDateTime($event, $currentDateTime, $scheduledDateTime);
+        }
+
+        throw new NotSchedulableException();
+    }
+
+    /**
      * @param ArrayCollection|Event[] $events
      * @param \DateTime               $lastActiveDate
      *
@@ -369,7 +400,7 @@ class EventScheduler
      *
      * @return bool
      */
-    private function checkIfContactSpecificExecutionDatesIsRequired(Event $event)
+    private function isContactSpecificExecutionDateRequired(Event $event)
     {
         if (Event::TRIGGER_MODE_INTERVAL !== $event->getTriggerMode()) {
             return false;
