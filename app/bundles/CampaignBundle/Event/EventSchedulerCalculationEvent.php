@@ -53,7 +53,7 @@ class EventSchedulerCalculationEvent extends Event
      * @param Lead     $contact
      * @param DateTime $executionDateTime
      */
-    public function __construct(Mautic\CampaignBundle\Entity\Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime, Lead $contact, \DateTime $executionDateTime)
+    public function __construct(\Mautic\CampaignBundle\Entity\Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime, Lead $contact, \DateTime $executionDateTime)
     {
         $this->event = $event;
         $this->compareFromDateTime = $compareFromDateTime;
