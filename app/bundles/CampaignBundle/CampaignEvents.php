@@ -116,6 +116,15 @@ final class CampaignEvents
     const ON_EVENT_EXECUTED_BATCH = 'mautic.campaign_on_event_executed_batch';
 
     /**
+     * The mautic.campaign_event_scheduler_post_calculate_execution_date_time event is dispatched immediately after the scheduler calculates the execution date/time. This allows for additional scheduling rules to be applied.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\EventSchedulerCalculationEvent instance.
+     *
+     * @var string
+     */
+    const EVENT_SCHEDULER_POST_CALCULATE_EXECUTION_DATE_TIME = 'mautic.campaign_event_scheduler_post_calculate_execution_date_time';
+    
+    /**
      * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled or scheduling is modified.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\ScheduledEvent instance.
