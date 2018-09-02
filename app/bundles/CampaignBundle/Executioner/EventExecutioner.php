@@ -259,7 +259,7 @@ class EventExecutioner
             return;
         }
         
-        // Loop contacts so that we can apply contact specific rules.
+        // Loop contacts so that we can apply contact-specific rules.
         foreach ($contacts as $contact) {
             
             $currentContactArr = new ArrayCollection([$contact]);

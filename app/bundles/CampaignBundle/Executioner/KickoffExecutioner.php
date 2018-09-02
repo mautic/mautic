@@ -208,21 +208,26 @@ class KickoffExecutioner implements ExecutionerInterface
                 $this->progressBar->advance($contacts->count());
                 $this->counter->advanceEvaluated($contacts->count());
 
-                // Check if the event should be scheduled (let the schedulers do the debug logging)
-                $executionDate = $this->scheduler->getExecutionDateTime($event, $now);
-                $this->logger->debug(
-                    'CAMPAIGN: Event ID# '.$event->getId().
-                    ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
-                    ' compared to '.$now->format('Y-m-d H:i:s')
-                );
+                // Loop individual contacts so that we can apply contact-specific rules.
+                foreach ($contacts as $contact) {
+                    $this->scheduler->setCurrentContact($contact);
+                
+                    // Check if the event should be scheduled (let the schedulers do the debug logging)
+                    $executionDate = $this->scheduler->getExecutionDateTime($event, $now, null, $contact);
+                    $this->logger->debug(
+                        'CAMPAIGN: Event ID# '.$event->getId().
+                        ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
+                        ' compared to '.$now->format('Y-m-d H:i:s')
+                    );
 
-                if ($this->scheduler->shouldSchedule($executionDate, $now)) {
-                    $this->counter->advanceTotalScheduled($contacts->count());
-                    $this->scheduler->schedule($event, $executionDate, $contacts);
+                    if ($this->scheduler->shouldSchedule($executionDate, $now)) {
+                        $this->counter->advanceTotalScheduled($contacts->count());
+                        $this->scheduler->schedule($event, $executionDate, $contacts);
 
-                    $rootEvents->remove($key);
+                        $rootEvents->remove($key);
 
-                    continue;
+                        continue;
+                    }
                 }
             }
 
