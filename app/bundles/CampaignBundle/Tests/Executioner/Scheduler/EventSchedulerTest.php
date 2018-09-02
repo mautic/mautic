@@ -11,7 +11,11 @@
 
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Event\EventSchedulerCalculationEvent;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
@@ -67,6 +71,32 @@ class EventSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->eventCollector      = $this->createMock(EventCollector::class);
         $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
+    }
+    
+    public function testGetExecutionDateTime()
+    {
+        // Set up test vars.
+        $event = new Event();
+        $compareFromDateTime = new \DateTime('2018-07-03 09:20:45');
+        $comparedToDateTime = new \DateTime('2018-07-03 09:20:30');
+        $contact = $this->getMockBuilder(Lead::class)->getMock();
+        $expected = new \DateTime('2018-07-03 09:20:45');
+        
+        // Spy on the event dispatcher to ensure that the expected event is dispatched.
+        $this->dispatcher->expects($this->at(0))
+            ->method('dispatch')
+            ->with(CampaignEvents::EVENT_SCHEDULER_POST_CALCULATE_EXECUTION_DATE_TIME, $this->isInstanceOf(EventSchedulerCalculationEvent::class));
+        
+        // Call the test method.
+        $executionDateTime = $this->getScheduler()->getExecutionDateTime(
+                                    $event,
+                                    $compareFromDateTime,
+                                    $comparedToDateTime,
+                                    $contact
+                                );
+        
+        // Assert that the expected response is returned.
+        $this->assertEquals($expected, $executionDateTime);
     }
 
     public function testShouldScheduleIgnoresSeconds()
