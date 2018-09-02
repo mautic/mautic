@@ -258,20 +258,32 @@ class EventScheduler
             // Prevent comparisons from modifying original object
             $comparedToDateTime = clone $comparedToDateTime;
         }
+        
+        $executionDateTime = null;
 
         switch ($event->getTriggerMode()) {
             case Event::TRIGGER_MODE_IMMEDIATE:
             case null: // decision
                 $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
 
-                return $compareFromDateTime;
+                $executionDateTime = $compareFromDateTime;
+                break;
             case Event::TRIGGER_MODE_INTERVAL:
-                return $this->intervalScheduler->getExecutionDateTime($event, $compareFromDateTime, $comparedToDateTime);
+                $executionDateTime = $this->intervalScheduler->getExecutionDateTime($event, $compareFromDateTime, $comparedToDateTime);
+                break;
             case Event::TRIGGER_MODE_DATE:
-                return $this->dateTimeScheduler->getExecutionDateTime($event, $compareFromDateTime, $comparedToDateTime);
+                $executionDateTime = $this->dateTimeScheduler->getExecutionDateTime($event, $compareFromDateTime, $comparedToDateTime);
+                break;
+            default:
+                throw new NotSchedulableException();
         }
+        
+        $this->dispatcher->dispatch(
+            CampaignEvents::EVENT_SCHEDULER_POST_CALCULATE_EXECUTION_DATE_TIME,
+            new EventSchedulerCalculationEvent($event, $compareFromDateTime, $comparedToDateTime, $contact, $executionDateTime)
+        );
 
-        throw new NotSchedulableException();
+        return $executionDateTime;
     }
 
     /**
