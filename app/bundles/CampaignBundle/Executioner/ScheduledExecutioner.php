@@ -336,7 +336,7 @@ class ScheduledExecutioner implements ExecutionerInterface
         // Check if the event should be scheduled (let the schedulers do the debug logging)
         /** @var LeadEventLog $log */
         foreach ($logs as $key => $log) {
-            $executionDate = $this->scheduler->getExecutionDateTime($event, $now, $log->getDateTriggered());
+            $executionDate = $this->scheduler->getExecutionDateTime($event, $now, $log->getDateTriggered(), $log->getLead());
             $this->logger->debug(
                 'CAMPAIGN: Log ID #'.$log->getID().
                 ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
