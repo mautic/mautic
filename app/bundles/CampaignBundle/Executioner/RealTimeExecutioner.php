@@ -198,7 +198,7 @@ class RealTimeExecutioner
 
         /** @var Event $child */
         foreach ($children as $key => $child) {
-            $executionDate = $this->scheduler->getExecutionDateTime($child, $now);
+            $executionDate = $this->scheduler->getExecutionDateTime($child, $now, null, $this->contact);
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$child->getId().
                 ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
