@@ -237,12 +237,13 @@ class EventScheduler
      * @param Event          $event
      * @param \DateTime|null $compareFromDateTime
      * @param \DateTime|null $comparedToDateTime
+     * @param Lead|null      $contact
      *
      * @return \DateTime
      *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
+    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null, Lead $contact = null)
     {
         if (null === $compareFromDateTime) {
             $compareFromDateTime = new \DateTime();
