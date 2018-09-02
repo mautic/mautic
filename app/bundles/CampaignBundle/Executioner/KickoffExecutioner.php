@@ -220,8 +220,8 @@ class KickoffExecutioner implements ExecutionerInterface
                     );
 
                     if ($this->scheduler->shouldSchedule($executionDate, $now)) {
-                        $this->counter->advanceTotalScheduled($contacts->count());
-                        $this->scheduler->schedule($event, $executionDate, $contacts);
+                        $this->counter->advanceTotalScheduled(1);
+                        $this->scheduler->schedule($event, $executionDate, new ArrayCollection(array($contact)));
 
                         $rootEvents->remove($key);
 
