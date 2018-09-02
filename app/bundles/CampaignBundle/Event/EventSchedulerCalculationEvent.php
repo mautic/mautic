@@ -47,13 +47,13 @@ class EventSchedulerCalculationEvent extends Event
     /**
      * EventSchedulerCalculationEvent constructor.
      *
-     * @param Event    $event
-     * @param DateTime $compareFromDateTime
-     * @param DateTime $comparedToDateTime
-     * @param Lead     $contact
-     * @param DateTime $executionDateTime
+     * @param Event     $event
+     * @param DateTime  $compareFromDateTime
+     * @param DateTime  $comparedToDateTime
+     * @param Lead|null $contact
+     * @param DateTime  $executionDateTime
      */
-    public function __construct(\Mautic\CampaignBundle\Entity\Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime, Lead $contact, \DateTime $executionDateTime)
+    public function __construct(\Mautic\CampaignBundle\Entity\Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime, Lead $contact = null, \DateTime $executionDateTime)
     {
         $this->event = $event;
         $this->compareFromDateTime = $compareFromDateTime;
