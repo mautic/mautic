@@ -274,7 +274,7 @@ class EventExecutioner
 
             if ($otherEvents->count()) {
                 foreach ($otherEvents as $event) {
-                    $this->executeForContact($event, $contact, $childrenCounter, $isInactive);
+                    $this->executeForContacts($event, $currentContactArr, $childrenCounter, $isInactive);
                 }
             }
 
