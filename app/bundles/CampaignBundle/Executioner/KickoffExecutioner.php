@@ -210,7 +210,6 @@ class KickoffExecutioner implements ExecutionerInterface
 
                 // Loop individual contacts so that we can apply contact-specific rules.
                 foreach ($contacts as $contact) {
-                    $this->scheduler->setCurrentContact($contact);
                 
                     // Check if the event should be scheduled (let the schedulers do the debug logging)
                     $executionDate = $this->scheduler->getExecutionDateTime($event, $now, null, $contact);
