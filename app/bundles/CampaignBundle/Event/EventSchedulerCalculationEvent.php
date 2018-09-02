@@ -32,7 +32,7 @@ class EventSchedulerCalculationEvent extends Event
     /**
      * @var \DateTime
      */
-    private $compareToDateTime;
+    private $comparedToDateTime;
 
     /**
      * @var Lead
@@ -49,15 +49,15 @@ class EventSchedulerCalculationEvent extends Event
      *
      * @param Event    $event
      * @param DateTime $compareFromDateTime
-     * @param DateTime $compareToDateTime
+     * @param DateTime $comparedToDateTime
      * @param Lead     $contact
      * @param DateTime $executionDateTime
      */
-    public function __construct(Mautic\CampaignBundle\Entity\Event $event, \DateTime $compareFromDateTime, \DateTime $compareToDateTime, Lead $contact, \DateTime $executionDateTime)
+    public function __construct(Mautic\CampaignBundle\Entity\Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime, Lead $contact, \DateTime $executionDateTime)
     {
         $this->event = $event;
         $this->compareFromDateTime = $compareFromDateTime;
-        $this->compareToDateTime = $compareToDateTime;
+        $this->comparedToDateTime = $comparedToDateTime;
         $this->contact = $contact;
         $this->executionDateTime = $executionDateTime;
     }
@@ -83,13 +83,13 @@ class EventSchedulerCalculationEvent extends Event
     }
     
     /**
-     * Returns the compareToDateTime.
+     * Returns the comparedToDateTime.
      *
      * @return \DateTime
      */
     public function getCompareToDateTime()
     {
-        return $this->compareToDateTime;
+        return $this->comparedToDateTime;
     }
     
     /**
