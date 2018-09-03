@@ -11,16 +11,16 @@
 
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler;
 
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event\EventSchedulerCalculationEvent;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -72,21 +72,21 @@ class EventSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
     }
-    
+
     public function testGetExecutionDateTime()
     {
         // Set up test vars.
-        $event = new Event();
+        $event               = new Event();
         $compareFromDateTime = new \DateTime('2018-07-03 09:20:45');
-        $comparedToDateTime = new \DateTime('2018-07-03 09:20:30');
-        $contact = $this->getMockBuilder(Lead::class)->getMock();
-        $expected = new \DateTime('2018-07-03 09:20:45');
-        
+        $comparedToDateTime  = new \DateTime('2018-07-03 09:20:30');
+        $contact             = $this->getMockBuilder(Lead::class)->getMock();
+        $expected            = new \DateTime('2018-07-03 09:20:45');
+
         // Spy on the event dispatcher to ensure that the expected event is dispatched.
         $this->dispatcher->expects($this->at(0))
             ->method('dispatch')
             ->with(CampaignEvents::EVENT_SCHEDULER_POST_CALCULATE_EXECUTION_DATE_TIME, $this->isInstanceOf(EventSchedulerCalculationEvent::class));
-        
+
         // Call the test method.
         $executionDateTime = $this->getScheduler()->getExecutionDateTime(
                                     $event,
@@ -94,7 +94,7 @@ class EventSchedulerTest extends \PHPUnit_Framework_TestCase
                                     $comparedToDateTime,
                                     $contact
                                 );
-        
+
         // Assert that the expected response is returned.
         $this->assertEquals($expected, $executionDateTime);
     }

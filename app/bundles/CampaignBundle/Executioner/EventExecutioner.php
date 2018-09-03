@@ -258,10 +258,9 @@ class EventExecutioner
         if (!$contacts->count()) {
             return;
         }
-        
+
         // Loop contacts so that we can apply contact-specific rules.
         foreach ($contacts as $contact) {
-            
             $currentContactArr = new ArrayCollection([$contact]);
 
             // Schedule then return events that need to be immediately executed

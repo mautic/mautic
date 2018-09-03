@@ -11,8 +11,8 @@
 
 namespace Mautic\CampaignBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class EventSchedulerCalculationEvent.
@@ -23,12 +23,12 @@ class EventSchedulerCalculationEvent extends Event
      * @var \Mautic\CampaignBundle\Entity\Event
      */
     private $event;
-    
+
     /**
      * @var \DateTime
      */
     private $compareFromDateTime;
-    
+
     /**
      * @var \DateTime
      */
@@ -38,7 +38,7 @@ class EventSchedulerCalculationEvent extends Event
      * @var Lead
      */
     private $contact;
-    
+
     /**
      * @var \DateTime
      */
@@ -55,11 +55,11 @@ class EventSchedulerCalculationEvent extends Event
      */
     public function __construct(\Mautic\CampaignBundle\Entity\Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime, Lead $contact = null, \DateTime $executionDateTime)
     {
-        $this->event = $event;
+        $this->event               = $event;
         $this->compareFromDateTime = $compareFromDateTime;
-        $this->comparedToDateTime = $comparedToDateTime;
-        $this->contact = $contact;
-        $this->executionDateTime = $executionDateTime;
+        $this->comparedToDateTime  = $comparedToDateTime;
+        $this->contact             = $contact;
+        $this->executionDateTime   = $executionDateTime;
     }
 
     /**
@@ -81,7 +81,7 @@ class EventSchedulerCalculationEvent extends Event
     {
         return $this->compareFromDateTime;
     }
-    
+
     /**
      * Returns the comparedToDateTime.
      *
@@ -91,7 +91,7 @@ class EventSchedulerCalculationEvent extends Event
     {
         return $this->comparedToDateTime;
     }
-    
+
     /**
      * Returns the contact (Lead) entity.
      *
@@ -101,7 +101,7 @@ class EventSchedulerCalculationEvent extends Event
     {
         return $this->contact;
     }
-    
+
     /**
      * Returns the executionDateTime.
      *
@@ -111,7 +111,7 @@ class EventSchedulerCalculationEvent extends Event
     {
         return $this->executionDateTime;
     }
-    
+
     /**
      * @param \DateTime $executionDateTime
      *

@@ -123,7 +123,7 @@ final class CampaignEvents
      * @var string
      */
     const EVENT_SCHEDULER_POST_CALCULATE_EXECUTION_DATE_TIME = 'mautic.campaign_event_scheduler_post_calculate_execution_date_time';
-    
+
     /**
      * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled or scheduling is modified.
      *

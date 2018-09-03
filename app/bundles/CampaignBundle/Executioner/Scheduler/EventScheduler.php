@@ -15,9 +15,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\EventSchedulerCalculationEvent;
 use Mautic\CampaignBundle\Event\ScheduledBatchEvent;
 use Mautic\CampaignBundle\Event\ScheduledEvent;
-use Mautic\CampaignBundle\Event\EventSchedulerCalculationEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
@@ -259,7 +259,7 @@ class EventScheduler
             // Prevent comparisons from modifying original object
             $comparedToDateTime = clone $comparedToDateTime;
         }
-        
+
         $executionDateTime = null;
 
         switch ($event->getTriggerMode()) {
@@ -278,7 +278,7 @@ class EventScheduler
             default:
                 throw new NotSchedulableException();
         }
-        
+
         $this->dispatcher->dispatch(
             CampaignEvents::EVENT_SCHEDULER_POST_CALCULATE_EXECUTION_DATE_TIME,
             new EventSchedulerCalculationEvent($event, $compareFromDateTime, $comparedToDateTime, $contact, $executionDateTime)
