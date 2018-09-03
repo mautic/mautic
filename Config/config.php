@@ -75,6 +75,9 @@ return [
                 ],
                 'tag' => 'mautic.integrations.auth.provider'
             ],
+            'mautic.integrations.oauth1a.http.factory' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Auth\Oauth1a\HttpFactory::class,
+            ],
         ],
         'models' => [
         ],
