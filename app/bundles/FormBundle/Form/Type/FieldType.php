@@ -127,7 +127,7 @@ class FieldType extends AbstractType
                     $cleanMasks['properties']['optionlist']['list']['label'] = 'strict_html';
                     break;
                 case 'file':
-                    $addShowLabel = $addDefaultValue = $addLeadFieldList = $addBehaviorFields = false;
+                    $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
             }
         }
@@ -509,6 +509,9 @@ class FieldType extends AbstractType
                     );
                     break;
                 case 'file':
+                    if (!isset($propertiesData['public'])) {
+                        $propertiesData['public'] = false;
+                    }
                     $builder->add(
                         'properties',
                         FormFieldFileType::class,
