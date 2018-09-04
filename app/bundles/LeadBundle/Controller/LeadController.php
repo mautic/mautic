@@ -350,9 +350,8 @@ class LeadController extends FormController
             }
         }
 
-        // We need the EmailRepository to check if a lead is flagged as do not contact
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo       = $this->getModel('email')->getRepository();
+        // We need the DoNotContact repository to check if a lead is flagged as do not contact
+        $dnc             = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
         $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
         return $this->delegateView(
@@ -372,7 +371,7 @@ class LeadController extends FormController
                     'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'auditlog'          => $this->getAuditlogs($lead),
-                    'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
+                    'doNotContact'      => end($dnc),
                     'leadNotes'         => $this->forward(
                         'MauticLeadBundle:Note:index',
                         [
@@ -1311,10 +1310,7 @@ class LeadController extends FormController
         $leadFields['owner_id'] = $this->get('mautic.helper.user')->getUser()->getId();
 
         // Check if lead has a bounce status
-        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-        $emailModel = $this->getModel('email');
-        $dnc        = $emailModel->getRepository()->checkDoNotEmail($leadEmail);
-
+        $dnc    = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
         $inList = ($this->request->getMethod() == 'GET')
             ? $this->request->get('list', 0)
             : $this->request->request->get(
@@ -1437,7 +1433,7 @@ class LeadController extends FormController
                 'contentTemplate' => 'MauticLeadBundle:Lead:email.html.php',
                 'viewParameters'  => [
                     'form' => $form->createView(),
-                    'dnc'  => $dnc,
+                    'dnc'  => end($dnc),
                 ],
                 'passthroughVars' => [
                     'mauticContent' => 'leadEmail',
