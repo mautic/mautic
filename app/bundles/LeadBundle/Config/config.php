@@ -375,6 +375,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
                     'mautic.lead.model.list',
+                    'mautic.lead.model.company',
                     'mautic.campaign.model.campaign',
                 ],
             ],
@@ -548,6 +549,11 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\UpdateLeadActionType',
                 'arguments' => ['mautic.factory'],
                 'alias'     => 'updatelead_action',
+            ],
+            'mautic.form.type.updatecompany_action' => [
+                'class'     => Mautic\LeadBundle\Form\Type\UpdateCompanyActionType::class,
+                'arguments' => ['mautic.lead.model.field'],
+                'alias'     => 'updatecompany_action',
             ],
             'mautic.form.type.leadnote' => [
                 'class' => Mautic\LeadBundle\Form\Type\NoteType::class,
