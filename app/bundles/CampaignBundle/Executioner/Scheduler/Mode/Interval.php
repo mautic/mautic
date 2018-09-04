@@ -113,7 +113,7 @@ class Interval implements ScheduleModeInterface
 
         $diff = $dateTriggered->diff($currentDateTime);
 
-        return $this->convertToHourInContactTimezone($log->getLead(), $hour, $diff, $event->getId());
+        return $this->convertToHourInContactTimezone($log->getLead(), $hour, $diff, $event->getId(), $currentDateTime);
     }
 
     /**
@@ -145,17 +145,18 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param Lead          $contact
-     * @param \DateTime     $hour
-     * @param \DateInterval $diff
-     * @param int           $eventId
+     * @param Lead           $contact
+     * @param \DateTime      $hour
+     * @param \DateInterval  $diff
+     * @param                $eventId
+     * @param \DateTime|null $currentDateTime
      *
      * @return \DateTime
      */
-    private function convertToHourInContactTimezone(Lead $contact, \DateTime $hour, \DateInterval $diff, $eventId)
+    private function convertToHourInContactTimezone(Lead $contact, \DateTime $hour, \DateInterval $diff, $eventId, \DateTime $currentDateTime = null)
     {
         $groupHour = clone $hour;
-        $now       = new \DateTime('now', $this->getDefaultTimezone());
+        $now       = $currentDateTime ? $currentDateTime : new \DateTime('now', $this->getDefaultTimezone());
 
         // Set execution to UTC
         if ($timezone = $contact->getTimezone()) {
