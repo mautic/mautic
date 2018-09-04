@@ -75,8 +75,6 @@ class IdentifyCompanyHelper
             $companyName = filter_var($parameters['company']);
         } elseif (isset($parameters['companyname'])) {
             $companyName = filter_var($parameters['companyname']);
-        } else {
-            // Do nothing here. Just adding this for proper syntax.
         }
 
         if (isset($parameters['email']) || isset($parameters['companyemail'])) {
@@ -135,10 +133,15 @@ class IdentifyCompanyHelper
         if (!strstr($email, '@')) { //not a valid email adress
             return false;
         }
+
         list($user, $domain) = explode('@', $email);
         $arr                 = dns_get_record($domain, DNS_MX);
 
-        if ($arr && $arr[0]['host'] === $domain) {
+        if (empty($arr)) {
+            return false;
+        }
+
+        if ($arr[0]['host'] === $domain) {
             return $domain;
         }
 
