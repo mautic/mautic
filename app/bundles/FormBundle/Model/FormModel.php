@@ -731,7 +731,18 @@ class FormModel extends CommonFormModel
         $replace = ['', '', '\"'];
         $html    = str_replace($search, $replace, $html);
 
-        return 'document.write("'.$html.'");';
+        // Write html for all browser and fallback for IE
+        $script = '
+            var scr = document.currentScript;
+            
+            if (scr !== undefined) {
+                scr.insertAdjacentHTML("afterend" , "'.$html.'");
+            } else {
+                document.write("'.$html.'");
+            }
+        ';
+
+        return $script;
     }
 
     /**
