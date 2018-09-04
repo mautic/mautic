@@ -863,7 +863,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     } elseif ($object == 'Accounts') {
-                        $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $entity                = $this->getMauticCompany($dataObject, $object);
                         $detachClass           = Company::class;
                         $mauticObjectReference = 'company';
                     } else {
@@ -1595,7 +1595,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         if (isset($fieldsToUpdate['leadFields'])) {
             // Pass in the whole config
-            $fields = $fieldsToUpdate['leadFields'];
+            $fields = $fieldsToUpdate;
         } else {
             $fields = array_flip($fieldsToUpdate);
         }
@@ -1603,6 +1603,51 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
 
         return $fieldsToUpdate;
+    }
+
+    /**
+     * @param array $fields
+     * @param array $keys
+     * @param mixed $object
+     *
+     * @return array
+     */
+    public function prepareFieldsForSync($fields, $keys, $object = null)
+    {
+        $leadFields = [];
+        if (null === $object) {
+            $object = 'Lead';
+        }
+
+        $objects = (!is_array($object)) ? [$object] : $object;
+        if (is_string($object) && 'Accounts' === $object) {
+            return isset($fields['companyFields']) ? $fields['companyFields'] : $fields;
+        }
+
+        if (isset($fields['leadFields'])) {
+            $fields = $fields['leadFields'];
+            $keys   = array_keys($fields);
+        }
+
+        foreach ($objects as $obj) {
+            if (!isset($leadFields[$obj])) {
+                $leadFields[$obj] = [];
+            }
+
+            foreach ($keys as $key) {
+                if (strpos($key, '__'.$obj)) {
+                    $newKey = str_replace('__'.$obj, '', $key);
+                    if ('Id' === $newKey) {
+                        // Don't map Id for push
+                        continue;
+                    }
+
+                    $leadFields[$obj][$newKey] = $fields[$key];
+                }
+            }
+        }
+
+        return (is_array($object)) ? $leadFields : $leadFields[$object];
     }
 
     /**
@@ -1614,12 +1659,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
     {
-        if ($object == 'company') {
-            $priority = parent::getPriorityFieldsForMautic($config, $object, 'mautic_company');
-            $fields   = array_intersect_key($config['companyFields'], $priority);
-        } else {
-            $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
-        }
+        $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
 
         return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
     }
