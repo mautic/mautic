@@ -725,6 +725,14 @@ return [
                     'mautic.helper.field.alias',
                 ],
             ],
+            \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class => [
+                'class'     => \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class,
+                'tag'       => 'validator.constraint_validator',
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'mautic.helper.field.alias',
+                ],
+            ],
             'mautic.lead.constraint.alias' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator',
                 'arguments' => ['mautic.factory'],
