@@ -1,8 +1,8 @@
 {
-  "name": "mautic/mautic-integrations-bundle",
-  "description": "This plugin enables VTiger CRM integration",
+  "name": "mautic/integrations-bundle",
+  "description": "This plugin enables tools required to integration with 3rd party integrations.",
   "type": "mautic-plugin",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "keywords": ["mautic","plugin","integration"],
   "authors": [
     {
@@ -25,8 +25,8 @@
   },
   "require": {
     "mautic/composer-plugin": "^1.0",
-    "mautic/mautic": "^2.14",
-    "php": "^7.1 || ^7.2"
+    "php": "^7.1 || ^7.2",
+    "guzzlehttp/oauth-subscriber": "^0.3"
   },
   "minimum-stability": "dev"
 }
