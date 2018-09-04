@@ -723,6 +723,15 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'mautic.helper.field.alias',
+                    '@doctrine.orm.entity_manager',
+                ],
+            ],
+            \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class => [
+                'class'     => \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class,
+                'tag'       => 'validator.constraint_validator',
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'mautic.helper.field.alias',
                 ],
             ],
             'mautic.lead.constraint.alias' => [
@@ -1109,6 +1118,7 @@ return [
                     'request_stack',
                     'mautic.helper.core_parameters',
                     'event_dispatcher',
+                    'mautic.lead.model.field',
                 ],
             ],
             'mautic.tracker.device' => [
