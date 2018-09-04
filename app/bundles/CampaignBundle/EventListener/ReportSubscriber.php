@@ -106,6 +106,11 @@ class ReportSubscriber extends CommonSubscriber
                 'type'  => 'int',
                 'alias' => $aliasPrefix.'channel_id',
             ],
+            $prefix.'rotation' => [
+                'label' => 'mautic.report.campaign.event.rotation',
+                'type'  => 'int',
+                'alias' => $eventAliasPrefix.'rotation',
+            ],
 
             // Event columns
             $eventPrefix.'name' => [

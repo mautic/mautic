@@ -266,6 +266,20 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($lead->getChanges());
     }
 
+    public function testChangingPropertiesHydratesFieldChanges()
+    {
+        $email = 'foo@bar.com';
+        $lead  = new Lead();
+        $lead->addUpdatedField('email', $email);
+        $changes = $lead->getChanges();
+
+        $this->assertFalse(empty($changes['email']));
+        $this->assertFalse(empty($changes['fields']['email']));
+
+        $this->assertEquals($email, $changes['email'][1]);
+        $this->assertEquals($email, $changes['fields']['email'][1]);
+    }
+
     /**
      * @param      $points
      * @param      $expected

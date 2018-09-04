@@ -11,6 +11,7 @@
 namespace Mautic\SmsBundle\Tests\Sms;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Api\TwilioApi;
 use Mautic\SmsBundle\Sms\TransportChain;
 
@@ -74,8 +75,11 @@ class TransportChainTest extends AbstractMauticTestCase
 
         $this->transportChain->addTransport('mautic.test.twilio.mock', $this->twilioTransport, 'mautic.test.twilio.mock', 'Twilio');
 
+        $lead = new Lead();
+        $lead->setMobile('+123456789');
+
         try {
-            $this->transportChain->sendSms('+123456789', 'Yeah');
+            $this->transportChain->sendSms($lead, 'Yeah');
         } catch (\Exception $e) {
             $message = $e->getMessage();
             $this->assertEquals('Primary SMS transport is not enabled. mautic.test.twilio.mock', $message);

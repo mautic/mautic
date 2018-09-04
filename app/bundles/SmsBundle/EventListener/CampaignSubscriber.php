@@ -15,8 +15,8 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Model\SmsModel;
+use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 
 /**
@@ -25,27 +25,27 @@ use Mautic\SmsBundle\SmsEvents;
 class CampaignSubscriber extends CommonSubscriber
 {
     /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
      * @var SmsModel
      */
     protected $smsModel;
 
     /**
+     * @var TransportChain
+     */
+    protected $transportChain;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param IntegrationHelper $integrationHelper
-     * @param SmsModel          $smsModel
+     * @param SmsModel       $smsModel
+     * @param TransportChain $transportChain
      */
     public function __construct(
-        IntegrationHelper $integrationHelper,
-        SmsModel $smsModel
+        SmsModel $smsModel,
+        TransportChain $transportChain
     ) {
-        $this->integrationHelper = $integrationHelper;
         $this->smsModel          = $smsModel;
+        $this->transportChain    = $transportChain;
     }
 
     /**
@@ -64,9 +64,7 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('Twilio');
-
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
+        if (count($this->transportChain->getEnabledTransports()) > 0) {
             $event->addAction(
                 'sms.send_text_sms',
                 [
@@ -87,11 +85,12 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @param CampaignExecutionEvent $event
      *
-     * @return mixed
+     * @return $this
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $lead  = $event->getLead();
+
         $smsId = (int) $event->getConfig()['sms'];
         $sms   = $this->smsModel->getEntity($smsId);
 
