@@ -1117,6 +1117,7 @@ return [
                     'request_stack',
                     'mautic.helper.core_parameters',
                     'event_dispatcher',
+                    'mautic.lead.model.field',
                 ],
             ],
             'mautic.tracker.device' => [
