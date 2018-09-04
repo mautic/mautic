@@ -115,6 +115,8 @@ class LeadEventLog implements ChannelInterface
             ->addIndex(['date_triggered'], 'campaign_date_triggered')
             ->addIndex(['lead_id', 'campaign_id', 'rotation'], 'campaign_leads')
             ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
+            ->addIndex(['campaign_id', 'event_id', 'date_triggered'], 'campaign_actions')
+            ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
             ->addUniqueConstraint(['event_id', 'lead_id', 'rotation'], 'campaign_rotation');
 
         $builder->addId();
