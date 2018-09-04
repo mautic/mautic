@@ -731,7 +731,9 @@ class ReportModel extends FormModel
         $countQb->select('count(*)')
             ->from('('.$qb->getSQL().')', 'c');
 
-        $debugData['count_query'] = $countQb->getSQL();
+        if (MAUTIC_ENV == 'dev') {
+            $debugData['count_query'] = $countQb->getSQL();
+        }
 
         return (int) $countQb->execute()->fetchColumn();
     }
