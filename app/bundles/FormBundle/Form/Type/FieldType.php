@@ -477,7 +477,6 @@ class FieldType extends AbstractType
                 case 'date':
                 case 'email':
                 case 'number':
-                case 'tel':
                 case 'text':
                 case 'url':
                     $builder->add(
@@ -518,6 +517,20 @@ class FieldType extends AbstractType
                             'data'  => $propertiesData,
                         ]
                     );
+                    break;
+                case 'tel':
+                    if (empty($propertiesData['international'])) {
+                        $propertiesData['international'] = false;
+                    }
+                    $builder->add(
+                        'properties',
+                        FormFieldTelType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
             }
         }
 
