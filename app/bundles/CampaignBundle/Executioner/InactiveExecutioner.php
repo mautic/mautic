@@ -248,7 +248,6 @@ class InactiveExecutioner implements ExecutionerInterface
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws NoContactsFoundException
      * @throws Scheduler\Exception\NotSchedulableException
      */
     private function executeEvents()
@@ -316,7 +315,7 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param ArrayCollection $children
+     * @param ArrayCollection $events
      * @param ArrayCollection $contacts
      * @param Counter         $childrenCounter
      * @param \DateTime       $earliestLastActiveDateTime
