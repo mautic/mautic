@@ -1662,8 +1662,8 @@ class LeadModel extends FormModel
     public function addUTMTags(Lead $lead, $params)
     {
         // known "synonym" fields expected
-        $synonyms = ['useragent' => 'user_agent',
-                    'remotehost' => 'remote_host', ];
+        $synonyms = ['useragent'  => 'user_agent',
+                     'remotehost' => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
