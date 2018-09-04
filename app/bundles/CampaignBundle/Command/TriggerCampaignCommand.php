@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -240,7 +241,8 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output       = $output;
+        $quiet              = $input->getOption('quiet');
+        $this->output       = $quiet ? new NullOutput() : $output;
         $this->kickoffOnly  = $input->getOption('kickoff-only');
         $this->scheduleOnly = $input->getOption('scheduled-only');
         $this->inactiveOnly = $input->getOption('inactive-only') || $input->getOption('negative-only');
@@ -264,7 +266,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         $id = $input->getOption('campaign-id');
-        if (!$this->checkRunStatus($input, $output, $id)) {
+        if (!$this->checkRunStatus($input, $this->output, $id)) {
             return 0;
         }
 

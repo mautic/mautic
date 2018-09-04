@@ -161,23 +161,28 @@ class KickoffExecutioner implements ExecutionerInterface
 
         $this->rootEvents = $this->campaign->getRootEvents();
         $totalRootEvents  = $this->rootEvents->count();
-        $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
-
-        $totalContacts      = $this->kickoffContactFinder->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
-        $totalKickoffEvents = $totalRootEvents * $totalContacts;
-
-        $this->output->writeln(
-            $this->translator->trans(
-                'mautic.campaign.trigger.event_count',
-                [
-                    '%events%' => $totalKickoffEvents,
-                    '%batch%'  => $this->limiter->getBatchLimit(),
-                ]
-            )
-        );
-
-        if (!$totalKickoffEvents) {
+        if (!$totalRootEvents) {
             throw new NoEventsFoundException();
+        }
+        $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
+        $totalKickoffEvents = 0;
+        if (!($this->output instanceof NullOutput)) {
+            $totalContacts      = $this->kickoffContactFinder->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
+            $totalKickoffEvents = $totalRootEvents * $totalContacts;
+
+            $this->output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.event_count',
+                    [
+                        '%events%' => $totalKickoffEvents,
+                        '%batch%'  => $this->limiter->getBatchLimit(),
+                    ]
+                )
+            );
+
+            if (!$totalKickoffEvents) {
+                throw new NoEventsFoundException();
+            }
         }
 
         $this->progressBar = ProgressBarHelper::init($this->output, $totalKickoffEvents);
@@ -199,7 +204,7 @@ class KickoffExecutioner implements ExecutionerInterface
 
         // Loop over contacts until the entire campaign is executed
         $contacts = $this->kickoffContactFinder->getContacts($this->campaign->getId(), $this->limiter);
-        while ($contacts->count()) {
+        while ($contacts && $contacts->count()) {
             $batchMinContactId = max($contacts->getKeys()) + 1;
             $rootEvents        = clone $this->rootEvents;
 
