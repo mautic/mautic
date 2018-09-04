@@ -617,6 +617,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                         'email'                             => 'Contact1@sftest.com',
                         'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
                         'mauticContactIsContactableByEmail' => 1,
+                        'mauticContactId'                   => 1,
                     ],
                     'contact2@sftest.com' => [
                         'integration_entity_id'             => 'SF2',
@@ -629,6 +630,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                         'email'                             => 'Contact2@sftest.com',
                         'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
                         'mauticContactIsContactableByEmail' => 1,
+                        'mauticContactId'                   => 2,
                     ],
                 ],
                 'FirstName,LastName,Email'

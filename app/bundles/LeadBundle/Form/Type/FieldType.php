@@ -236,10 +236,20 @@ class FieldType extends AbstractType
                         'properties',
                         'sortablelist',
                         [
-                            'required'    => false,
-                            'label'       => 'mautic.lead.field.form.properties.select',
-                            'data'        => $properties,
-                            'with_labels' => ('lookup' !== $type),
+                            'required'          => false,
+                            'label'             => 'mautic.lead.field.form.properties.select',
+                            'data'              => $properties,
+                            'with_labels'       => ('lookup' !== $type),
+                            'option_constraint' => [
+                                new Assert\Collection([
+                                    'fields' => [
+                                        'value' => [
+                                            new Assert\Regex(['pattern' => '/(^[\w-]+$)/i', 'message' => 'mautic.lead.field.value.invalid']),
+                                        ],
+                                    ],
+                                    'allowExtraFields' => true,
+                                ]),
+                            ],
                         ]
                     );
 

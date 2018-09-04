@@ -284,7 +284,6 @@ class EventExecutioner
             foreach ($jumpEvents as $key => $event) {
                 $config         = $this->collector->getEventConfig($event);
                 $jumpLogs[$key] = $this->eventLogger->fetchRotationAndGenerateLogsFromContacts($event, $config, $contacts, $isInactive);
-                $this->eventLogger->persistCollection($jumpLogs[$key]);
             }
 
             // Increment the campaign rotation for the given contacts and current campaign
