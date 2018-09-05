@@ -71,13 +71,18 @@ class ReportDAO
     }
 
     /**
-     * @param mixed $objectId
+     * @param mixed  $oldObjectId
      * @param string $oldObjectName
      * @param string $newObjectName
+     * @param mixed  $newObjectId
      */
-    public function remapObject($objectId, $oldObjectName, $newObjectName)
+    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null)
     {
-        $this->remappedObjects[$objectId] = new RemappedObjectDAO($this->integration, $objectId, $oldObjectName, $newObjectName);
+        if (null === $newObjectId) {
+            $newObjectId = $oldObjectId;
+        }
+
+        $this->remappedObjects[$oldObjectId] = new RemappedObjectDAO($this->integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId);
     }
 
     /**

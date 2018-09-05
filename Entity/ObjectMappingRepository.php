@@ -80,29 +80,32 @@ class ObjectMappingRepository  extends CommonRepository
 
     /**
      * @param string $integration
-     * @param mixed  $objectId
      * @param string $oldObjectName
+     * @param mixed  $oldObjectId
      * @param string $newObjectName
+     * @param mixed  $newObjectId
      *
      * @return int
      */
-    public function updateIntegrationObject($integration, $objectId, $oldObjectName, $newObjectName)
+    public function updateIntegrationObject($integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping')
             ->set('integration_object_name', ':newObjectName')
+            ->set('integration_object_id', ':newObjectId')
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('i.integration', ':integration'),
                     $qb->expr()->eq('i.integration_object_name', ':oldObjectName'),
-                    $qb->expr()->eq('i.integration_object_id', ':objectId')
+                    $qb->expr()->eq('i.integration_object_id', ':oldObjectId')
                 )
             )
             ->setParameter('newObjectName', $newObjectName)
+            ->setParameter('newObjectId', $newObjectId)
             ->setParameter('integration', $integration)
-            ->setParameter('oldObjectName', $objectId)
-            ->setParameter('objectId', $oldObjectName);
+            ->setParameter('oldObjectName', $oldObjectName)
+            ->setParameter('oldObjectId', $oldObjectId);
 
         return $qb->execute()->rowCount();
     }

@@ -171,9 +171,10 @@ class MappingHelper
         {
             $this->objectMappingRepository->updateIntegrationObject(
                 $mapping->getIntegration(),
-                $mapping->getObjectId(),
                 $mapping->getOldObjectName(),
-                $mapping->getNewObjectName()
+                $mapping->getOldObjectId(),
+                $mapping->getNewObjectName(),
+                $mapping->getNewObjectId()
             );
         }
     }
