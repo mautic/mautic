@@ -755,11 +755,13 @@ class Event implements ChannelInterface
      */
     public function setTriggerHour($triggerHour)
     {
-        if (!$triggerHour instanceof \DateTime) {
+        if (empty($triggerHour)) {
+            $triggerHour = null;
+        } elseif (!$triggerHour instanceof \DateTime) {
             $triggerHour = new \DateTime($triggerHour);
         }
 
-        $this->isChanged('triggerHour', $triggerHour->format('H:i'));
+        $this->isChanged('triggerHour', $triggerHour ? $triggerHour->format('H:i') : $triggerHour);
         $this->triggerHour = $triggerHour;
 
         return $this;
