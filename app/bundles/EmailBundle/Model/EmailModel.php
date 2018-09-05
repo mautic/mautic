@@ -1894,7 +1894,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         if ($flag == 'all' || $flag == 'clicked' || in_array('clicked', $datasets)) {
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', []);
-            $q->leftJoin('t', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 't.source_id = es.email_id AND t.source = "email"');
+            $q->leftJoin('t', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 't.source_id = es.email_id AND es.source = "email"');
 
             if (isset($filter['email_id'])) {
                 if (is_array($filter['email_id'])) {
