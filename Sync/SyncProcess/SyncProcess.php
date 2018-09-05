@@ -505,9 +505,19 @@ class SyncProcess
             DebugLogger::log(
                 $this->mappingManualDAO->getIntegration(),
                 sprintf(
-                    "Integration to Mautic; found a match between Mautic's %s:%s object adn the integration %s:%s object ",
+                    "Integration to Mautic; found a match between Mautic's %s:%s object and the integration %s:%s object ",
                     $internalObject->getObject(),
                     (string) $internalObject->getObjectId(),
+                    $integrationObject->getObject(),
+                    (string) $integrationObject->getObjectId()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
+        } else {
+            DebugLogger::log(
+                $this->mappingManualDAO->getIntegration(),
+                sprintf(
+                    "Integration to Mautic; no match found for %s:%s",
                     $integrationObject->getObject(),
                     (string) $integrationObject->getObjectId()
                 ),
@@ -688,7 +698,18 @@ class SyncProcess
                 ),
                 __CLASS__.':'.__FUNCTION__
             );
+        } else {
+            DebugLogger::log(
+                $this->mappingManualDAO->getIntegration(),
+                sprintf(
+                    "Mautic to integration: no match found for %s:%s",
+                    $internalObject->getObject(),
+                    (string) $internalObject->getObjectId()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
         }
+
 
         /** @var FieldMappingDAO[] $fieldMappings */
         $fieldMappings = $objectMapping->getFieldMappings();
