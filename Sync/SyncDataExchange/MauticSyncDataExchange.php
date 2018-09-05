@@ -39,7 +39,7 @@ use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelp
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
     const NAME = 'mautic';
-    const OBJECT_CONTACT = 'Lead'; // kept as lead for BC
+    const OBJECT_CONTACT = 'lead'; // kept as lead for BC
     const OBJECT_COMPANY = 'company';
 
     /**
