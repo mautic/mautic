@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
@@ -142,9 +143,45 @@ class MappingHelper
     }
 
     /**
+     * @param ObjectMapping[] $mappings
+     */
+    public function saveObjectMappings(array $mappings)
+    {
+        foreach ($mappings as $mapping) {
+            $this->saveObjectMapping($mapping);
+        }
+    }
+
+    /**
+     * @param UpdatedObjectMappingDAO[] $mappings
+     */
+    public function updateObjectMappings(array $mappings)
+    {
+        foreach ($mappings as $mapping) {
+            $this->updateObjectMapping($mapping);
+        }
+    }
+
+    /**
+     * @param RemappedObjectDAO[] $mappings
+     */
+    public function remapIntegrationObjects(array $mappings)
+    {
+        foreach ($mappings as $mapping)
+        {
+            $this->objectMappingRepository->updateIntegrationObject(
+                $mapping->getIntegration(),
+                $mapping->getObjectId(),
+                $mapping->getOldObjectName(),
+                $mapping->getNewObjectName()
+            );
+        }
+    }
+
+    /**
      * @param ObjectMapping $objectMapping
      */
-    public function saveObjectMapping(ObjectMapping $objectMapping)
+    private function saveObjectMapping(ObjectMapping $objectMapping)
     {
         $this->objectMappingRepository->saveEntity($objectMapping);
         $this->objectMappingRepository->clear();
@@ -153,7 +190,7 @@ class MappingHelper
     /**
      * @param UpdatedObjectMappingDAO $updatedObjectMappingDAO
      */
-    public function updateObjectMapping(UpdatedObjectMappingDAO $updatedObjectMappingDAO)
+    private function updateObjectMapping(UpdatedObjectMappingDAO $updatedObjectMappingDAO)
     {
         $integration = $updatedObjectMappingDAO->getObjectChangeDAO()->getIntegration();
 

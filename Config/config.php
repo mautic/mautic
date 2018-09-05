@@ -130,7 +130,7 @@ return [
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
                     'mautic.integrations.helper.variable_expresser',
-                    'mautic.integrations.helper.sync_mapping_helper',
+                    'mautic.integrations.helper.sync_mapping',
                     'mautic.integrations.helper.company_object',
                     'mautic.integrations.helper.contact_object',
                     'mautic.lead.model.field',
@@ -146,6 +146,7 @@ return [
                     'mautic.integrations.helper.sync_process_factory',
                     'mautic.integrations.helper.sync_date',
                     'mautic.integrations.sync.data_exchange.mautic',
+                    'mautic.integrations.helper.sync_mapping'
                 ],
                 'methodCalls' => [
                     'initiateDebugLogger' => ['mautic.sync.logger'],
@@ -157,7 +158,7 @@ return [
                     'doctrine.dbal.default_connection',
                 ],
             ],
-            'mautic.integrations.helper.sync_mapping_helper' => [
+            'mautic.integrations.helper.sync_mapping' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper::class,
                 'arguments' => [
                     'mautic.lead.model.field',

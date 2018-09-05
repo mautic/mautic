@@ -77,4 +77,33 @@ class ObjectMappingRepository  extends CommonRepository
 
         return $result ? $result : null;
     }
+
+    /**
+     * @param string $integration
+     * @param mixed  $objectId
+     * @param string $oldObjectName
+     * @param string $newObjectName
+     *
+     * @return int
+     */
+    public function updateIntegrationObject($integration, $objectId, $oldObjectName, $newObjectName)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping')
+            ->set('integration_object_name', ':newObjectName')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('i.integration', ':integration'),
+                    $qb->expr()->eq('i.integration_object_name', ':oldObjectName'),
+                    $qb->expr()->eq('i.integration_object_id', ':objectId')
+                )
+            )
+            ->setParameter('newObjectName', $newObjectName)
+            ->setParameter('integration', $integration)
+            ->setParameter('oldObjectName', $objectId)
+            ->setParameter('objectId', $oldObjectName);
+
+        return $qb->execute()->rowCount();
+    }
 }

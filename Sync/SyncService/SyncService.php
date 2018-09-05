@@ -13,6 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncService;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
+use MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncDate\SyncDateHelper;
@@ -45,23 +46,31 @@ final class SyncService implements SyncServiceInterface
     private $internalSyncDataExchange;
 
     /**
+     * @var MappingHelper
+     */
+    private $mappingHelper;
+
+    /**
      * SyncService constructor.
      *
      * @param SyncJudgeInterface          $syncJudge
      * @param SyncProcessFactoryInterface $integrationSyncProcessFactory
      * @param SyncDateHelper              $syncDateHelper
      * @param MauticSyncDataExchange      $internalSyncDataExchange
+     * @param MappingHelper               $mappingHelper
      */
     public function __construct(
         SyncJudgeInterface $syncJudge,
         SyncProcessFactoryInterface $integrationSyncProcessFactory,
         SyncDateHelper $syncDateHelper,
-        MauticSyncDataExchange $internalSyncDataExchange
+        MauticSyncDataExchange $internalSyncDataExchange,
+        MappingHelper $mappingHelper
     ) {
         $this->syncJudge                     = $syncJudge;
         $this->integrationSyncProcessFactory = $integrationSyncProcessFactory;
         $this->syncDateHelper                = $syncDateHelper;
         $this->internalSyncDataExchange      = $internalSyncDataExchange;
+        $this->mappingHelper                 = $mappingHelper;
     }
 
     /**
@@ -82,6 +91,7 @@ final class SyncService implements SyncServiceInterface
             $this->internalSyncDataExchange,
             $syncDataExchangeService,
             $this->syncDateHelper,
+            $this->mappingHelper,
             $firstTimeSync,
             $syncFromDateTime
         );

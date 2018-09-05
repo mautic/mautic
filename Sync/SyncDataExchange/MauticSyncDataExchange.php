@@ -161,7 +161,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                     throw new ObjectNotSupportedException(self::NAME, $objectName);
             }
 
-            $this->updateObjectMappings($updatedObjectMappings);
+            $this->mappingHelper->updateObjectMappings($updatedObjectMappings);
         }
 
         $unidentifiedObjects = $syncOrderDAO->getUnidentifiedObjects();
@@ -193,7 +193,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                     throw new ObjectNotSupportedException(self::NAME, $objectName);
             }
 
-            $this->saveObjectMappings($objectMappings);
+            $this->mappingHelper->saveObjectMappings($objectMappings);
         }
     }
 
@@ -239,26 +239,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         }
 
         return new ReportObjectDAO($integrationObjectName, null);
-    }
-
-    /**
-     * @param ObjectMapping[] $mappings
-     */
-    public function saveObjectMappings(array $mappings)
-    {
-        foreach ($mappings as $mapping) {
-            $this->mappingHelper->saveObjectMapping($mapping);
-        }
-    }
-
-    /**
-     * @param UpdatedObjectMappingDAO[] $mappings
-     */
-    public function updateObjectMappings(array $mappings)
-    {
-        foreach ($mappings as $mapping) {
-            $this->mappingHelper->updateObjectMapping($mapping);
-        }
     }
 
     /**

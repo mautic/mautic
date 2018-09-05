@@ -20,6 +20,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\FieldMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncDate\SyncDateHelper;
@@ -59,6 +60,11 @@ class SyncProcess
     private $syncDateHelper;
 
     /**
+     * @var MappingHelper
+     */
+    private $mappingHelper;
+
+    /**
      * @var \DateTimeInterface
      */
     private $syncDateTime;
@@ -91,7 +97,8 @@ class SyncProcess
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
      * @param SyncDateHelper            $syncDateHelper
-     * @param bool                      $isFirstTimeSync
+     * @param MappingHelper             $mappingHelper
+     * @param                           $isFirstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
      */
     public function __construct(
@@ -100,6 +107,7 @@ class SyncProcess
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
         SyncDateHelper $syncDateHelper,
+        MappingHelper $mappingHelper,
         $isFirstTimeSync,
         \DateTimeInterface $syncFromDateTime = null
     ) {
@@ -145,6 +153,10 @@ class SyncProcess
                 );
                 break;
             }
+
+            // Update the mappings in case objects have been converted such as Lead -> Contact
+            $this->mappingHelper->remapIntegrationObjects($syncReport->getRemappedObjects());
+
             // Convert the integrations' report into an "order" or instructions for Mautic
             $syncOrder = $this->generateInternalSyncOrder($syncReport);
             if (!$syncOrder->shouldSync()) {
@@ -217,9 +229,9 @@ class SyncProcess
             // Execute the sync instructions
             $this->integrationSyncDataExchange->executeSyncOrder($syncOrder);
             // Save the mappings between Mautic objects and the integration's objects
-            $this->internalSyncDataExchange->saveObjectMappings($syncOrder->getObjectMappings());
+            $this->mappingHelper->saveObjectMappings($syncOrder->getObjectMappings());
             // Update the mappings between Mautic objects and the integration's objects if applicable
-            $this->internalSyncDataExchange->updateObjectMappings($syncOrder->getUpdatedObjectMappings());
+            $this->mappingHelper->updateObjectMappings($syncOrder->getUpdatedObjectMappings());
             // Cleanup field tracking for successfully synced objects
             $this->internalSyncDataExchange->cleanupProcessedObjects($syncOrder->getObjectMappings(), $syncOrder->getUpdatedObjectMappings());
 

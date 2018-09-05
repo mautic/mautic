@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report;
 
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
@@ -29,6 +30,11 @@ class ReportDAO
      * @var array
      */
     private $objects = [];
+
+    /**
+     * @var array
+     */
+    private $remappedObjects = [];
 
     /**
      * SyncReportDAO constructor.
@@ -62,6 +68,16 @@ class ReportDAO
         $this->objects[$objectDAO->getObject()][$objectDAO->getObjectId()] = $objectDAO;
 
         return $this;
+    }
+
+    /**
+     * @param mixed $objectId
+     * @param string $oldObjectName
+     * @param string $newObjectName
+     */
+    public function remapObject($objectId, $oldObjectName, $newObjectName)
+    {
+        $this->remappedObjects[$objectId] = new RemappedObjectDAO($this->integration, $objectId, $oldObjectName, $newObjectName);
     }
 
     /**
@@ -118,6 +134,13 @@ class ReportDAO
         return isset($this->objects[$objectName]) ? $this->objects[$objectName] : [];
     }
 
+    /**
+     * @return RemappedObjectDAO[]
+     */
+    public function getRemappedObjects(): array
+    {
+        return $this->remappedObjects;
+    }
 
     /**
      * @param string $objectName
