@@ -34,35 +34,38 @@ Mautic.emailOnLoad = function (container, response) {
             ids.push(id);
         });
 
-        // Get all stats numbers at once
-        Mautic.ajaxActionRequest(
-            'email:getEmailCountStats',
-            {ids: ids},
-            function (response) {
-                if (response.success && response.stats) {
-                    for (var i = 0; i < response.stats.length; i++) {
-                        var stat = response.stats[i];
-                        if (mQuery('#sent-count-' + stat.id + ' div').length) {
-                            if (stat.pending) {
-                                mQuery('#pending-' + stat.id + ' > a').html(stat.pending);
-                                mQuery('#pending-' + stat.id).removeClass('hide');
-                            }
+        // Get all stats numbers in batches of 10
+        while (ids.length > 0) {
+            let batchIds = ids.splice(0, 10);
+            Mautic.ajaxActionRequest(
+                'email:getEmailCountStats',
+                {ids: batchIds},
+                function (response) {
+                    if (response.success && response.stats) {
+                        for (var i = 0; i < response.stats.length; i++) {
+                            var stat = response.stats[i];
+                            if (mQuery('#sent-count-' + stat.id + ' div').length) {
+                                if (stat.pending) {
+                                    mQuery('#pending-' + stat.id + ' > a').html(stat.pending);
+                                    mQuery('#pending-' + stat.id).removeClass('hide');
+                                }
 
-                            if (stat.queued) {
-                                mQuery('#queued-' + stat.id + ' > a').html(stat.queued);
-                                mQuery('#queued-' + stat.id).removeClass('hide');
-                            }
+                                if (stat.queued) {
+                                    mQuery('#queued-' + stat.id + ' > a').html(stat.queued);
+                                    mQuery('#queued-' + stat.id).removeClass('hide');
+                                }
 
-                            mQuery('#sent-count-' + stat.id + ' > a').html(stat.sentCount);
-                            mQuery('#read-count-' + stat.id + ' > a').html(stat.readCount);
-                            mQuery('#read-percent-' + stat.id + ' > a').html(stat.readPercent);
+                                mQuery('#sent-count-' + stat.id + ' > a').html(stat.sentCount);
+                                mQuery('#read-count-' + stat.id + ' > a').html(stat.readCount);
+                                mQuery('#read-percent-' + stat.id + ' > a').html(stat.readPercent);
+                            }
                         }
                     }
-                }
-            },
-            false,
-            true
-        );
+                },
+                false,
+                true
+            );
+        }
     }
 };
 
