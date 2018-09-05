@@ -310,7 +310,7 @@ class AjaxController extends CommonAjaxController
         /** @var EmailModel $model */
         $model = $this->getModel('email');
 
-        $id = $request->get('id');
+        $id  = $request->get('id');
         $ids = $request->get('ids');
 
         // Support for legacy calls
@@ -340,11 +340,11 @@ class AjaxController extends CommonAjaxController
 
         // Support for legacy calls
         if ($request->get('id')) {
-            $data = $data[0];            
+            $data = $data[0];
         } else {
             $data = [
                 'success' => 1,
-                'stats'   => $data
+                'stats'   => $data,
             ];
         }
 
