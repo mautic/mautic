@@ -117,6 +117,7 @@ class SyncProcess
         $this->integrationSyncDataExchange = $integrationSyncDataExchange;
         $this->mappingManualDAO            = $mappingManualDAO;
         $this->syncDateHelper              = $syncDateHelper;
+        $this->mappingHelper               = $mappingHelper;
         $this->isFirstTimeSync             = $isFirstTimeSync;
         $this->syncFromDateTime            = $syncFromDateTime;
     }
@@ -166,7 +167,7 @@ class SyncProcess
                     __CLASS__.':'.__FUNCTION__
                 );
 
-                continue;
+                break;
             }
 
             DebugLogger::log(
@@ -181,8 +182,8 @@ class SyncProcess
             // Execute the sync instructions
             $this->internalSyncDataExchange->executeSyncOrder($syncOrder);
             // Fetch the next iteration/batch
-            $this->syncIteration++;
-        } while ($syncReport->shouldSync());
+            ++$this->syncIteration;
+        } while (true);
     }
 
     private function executeInternalSync()
@@ -214,7 +215,7 @@ class SyncProcess
                     __CLASS__.':'.__FUNCTION__
                 );
 
-                continue;
+                break;
             }
 
             DebugLogger::log(
@@ -236,8 +237,8 @@ class SyncProcess
             $this->internalSyncDataExchange->cleanupProcessedObjects($syncOrder->getObjectMappings(), $syncOrder->getUpdatedObjectMappings());
 
             // Fetch the next iteration/batch
-            $this->syncIteration++;
-        } while ($syncReport->shouldSync());
+            ++$this->syncIteration;
+        } while (true);
     }
 
     /**
