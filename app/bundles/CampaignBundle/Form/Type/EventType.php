@@ -125,8 +125,8 @@ class EventType extends AbstractType
             );
 
             // I could not get Doctrine TimeType does not play well with Symfony TimeType so hacking this workaround
-            if (!isset($options['data']['triggerHour'])) {
-                $data = new \DateTime();
+            if (empty($options['data']['triggerHour'])) {
+                $data = null;
             } elseif ($options['data']['triggerHour'] instanceof \DateTime) {
                 $data = $options['data']['triggerHour'];
             } else {
@@ -144,7 +144,7 @@ class EventType extends AbstractType
                             'data-toggle' => 'time',
                             'data-format' => 'H:i',
                         ],
-                        'data'  => $data->format('H:i'),
+                        'data'  => ($data) ? $data->format('H:i') : $data,
                     ]
                 )
             );
