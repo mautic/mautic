@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PluginApiController extends CommonApiController
 {
-     /**
+    /**
      * @param $name
      *
      * @return JsonResponse|Response
