@@ -40,7 +40,7 @@ return [
         'api' => [
             'mautic_api_plugin_view_settings' => [
                 'path'       => '/plugins/settings/{name}',
-                'controller' => 'MauticPluginBundle:Plugin:viewSettings',
+                'controller' => 'MauticPluginBundle:Api\PluginApi:viewSettings',
             ],
         ],
         'public' => [

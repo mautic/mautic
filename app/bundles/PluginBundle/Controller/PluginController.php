@@ -438,20 +438,4 @@ class PluginController extends FormController
             ]
         );
     }
-
-    /**
-     * @param $name
-     *
-     * @return JsonResponse|Response
-     */
-    public function viewSettingsAction($name)
-    {
-        $integrationHelper = $this->get('mautic.helper.integration');
-        $integrationObject = $integrationHelper->getIntegrationObject($name);
-        if ($integrationObject && $integrationObject->getIntegrationSettings()->getIsPublished()) {
-            return new JsonResponse($integrationObject->getIntegrationSettings()->getFeatureSettings());
-        }
-
-        return $this->notFound();
-    }
 }
