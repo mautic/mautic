@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\PropertiesTrait;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -110,7 +111,8 @@ class EventType extends AbstractType
                 ]
             );
 
-            $data = (empty($options['data']['triggerInterval'])) ? 1 : $options['data']['triggerInterval'];
+            $data = (!isset($options['data']['triggerInterval']) || '' === $options['data']['triggerInterval']
+                || null === $options['data']['triggerInterval']) ? 1 : (int) $options['data']['triggerInterval'];
             $builder->add(
                 'triggerInterval',
                 'number',
@@ -124,33 +126,7 @@ class EventType extends AbstractType
                 ]
             );
 
-            // I could not get Doctrine TimeType does not play well with Symfony TimeType so hacking this workaround
-            if (empty($options['data']['triggerHour'])) {
-                $data = null;
-            } elseif ($options['data']['triggerHour'] instanceof \DateTime) {
-                $data = $options['data']['triggerHour'];
-            } else {
-                $data = new \DateTime($options['data']['triggerHour']);
-            }
-            $builder->add(
-                $builder->create(
-                    'triggerHour',
-                    TextType::class,
-                    [
-                        'label' => false,
-                        'attr'  => [
-                            'class'       => 'form-control',
-                            'preaddon'    => 'fa fa-at',
-                            'data-toggle' => 'time',
-                            'data-format' => 'H:i',
-                        ],
-                        'data'  => ($data) ? $data->format('H:i') : $data,
-                    ]
-                )
-            );
-
             $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';
-
             $builder->add(
                 'triggerIntervalUnit',
                 'choice',
@@ -174,6 +150,80 @@ class EventType extends AbstractType
                 ]
             );
         }
+
+        // I could not get Doctrine TimeType does not play well with Symfony TimeType so hacking this workaround
+        $data = $this->getTimeValue($options['data'], 'triggerHour');
+        $builder->add(
+            'triggerHour',
+            TextType::class,
+            [
+                'label' => false,
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'data-toggle'  => 'time',
+                    'data-format'  => 'H:i',
+                    'autocomplete' => 'off',
+                ],
+                'data'  => ($data) ? $data->format('H:i') : $data,
+            ]
+        );
+
+        $data = $this->getTimeValue($options['data'], 'triggerRestrictedStartTime');
+        $builder->add(
+            'triggerRestrictedStartTime',
+            TextType::class,
+            [
+                'label' => false,
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'data-toggle'  => 'time',
+                    'data-format'  => 'H:i',
+                    'autocomplete' => 'off',
+                ],
+                'data'  => ($data) ? $data->format('H:i') : $data,
+            ]
+        );
+
+        $data = $this->getTimeValue($options['data'], 'triggerRestrictedStopTime');
+        $builder->add(
+            'triggerRestrictedStopTime',
+            TextType::class,
+            [
+                'label' => false,
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'data-toggle'  => 'time',
+                    'data-format'  => 'H:i',
+                    'autocomplete' => 'off',
+                ],
+                'data'  => ($data) ? $data->format('H:i') : $data,
+            ]
+        );
+
+        $builder->add(
+            'triggerRestrictedDayOfWeek',
+            ChoiceType::class,
+            [
+                'label'    => true,
+                'attr'     => [
+                    'data-toggle' => 'time',
+                    'data-format' => 'H:i',
+                ],
+                'choices'  => [
+                    'monday'    => 'mautic.report.schedule.day.monday',
+                    'tuesday'   => 'mautic.report.schedule.day.tuesday',
+                    'wednesday' => 'mautic.report.schedule.day.wednesday',
+                    'thursday'  => 'mautic.report.schedule.day.thursday',
+                    'friday'    => 'mautic.report.schedule.day.friday',
+                    'saturday'  => 'mautic.report.schedule.day.saturday',
+                    'sunday'    => 'mautic.report.schedule.day.sunday',
+                    'weekdays'  => 'mautic.report.schedule.day.week_days',
+                ],
+                'expanded' => true,
+                'multiple' => true,
+                'required' => false,
+            ]
+        );
 
         if (!empty($options['settings']['formType'])) {
             $this->addPropertiesType($builder, $options, $masks);
@@ -248,5 +298,24 @@ class EventType extends AbstractType
     public function getName()
     {
         return 'campaignevent';
+    }
+
+    /**
+     * @param array $data
+     * @param       $name
+     *
+     * @return \DateTime|mixed|null
+     */
+    private function getTimeValue(array $data, $name)
+    {
+        if (empty($data[$name])) {
+            return null;
+        }
+
+        if ($data[$name] instanceof \DateTime) {
+            return $data[$name];
+        }
+
+        return new \DateTime($data[$name]);
     }
 }

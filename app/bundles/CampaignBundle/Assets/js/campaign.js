@@ -121,8 +121,7 @@ Mautic.campaignOnLoad = function (container, response) {
  * @param theSelect
  * @param destroy
  */
-Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy)
-{
+Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy) {
     mQuery('#'+theSelect+' option').each(function () {
         if (mQuery(this).attr('id')) {
             // Initiate a tooltip on each option since chosen doesn't copy over the data attributes
@@ -153,8 +152,18 @@ Mautic.campaignOnUnload = function(container) {
  */
 Mautic.campaignEventOnLoad = function (container, response) {
     if (mQuery('#campaignevent_triggerHour').length) {
-        Mautic.campaignEventUpdateTriggerHour();
-        mQuery('#campaignevent_triggerIntervalUnit').on('change', Mautic.campaignEventUpdateTriggerHour)
+        Mautic.campaignEventShowHideIntervalSettings();
+        Mautic.campaignEventUpdateIntervalHours();
+        mQuery('#campaignevent_triggerHour').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerRestrictedStartTime').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerRestrictedStopTime').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerIntervalUnit').on('change', Mautic.campaignEventShowHideIntervalSettings);
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_0').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_1').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_2').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_3').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_4').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_7').on('change', Mautic.campaignEventSelectDOW);
     }
 
     if (!response.hasOwnProperty('eventId')) {
@@ -244,14 +253,54 @@ Mautic.campaignEventOnLoad = function (container, response) {
 /**
  * Update the trigger hour based on the interval unit selected
  */
-Mautic.campaignEventUpdateTriggerHour = function () {
-    var unit = mQuery('#campaignevent_triggerIntervalUnit').val();
-    if (unit === 'i' || unit === 'h') {
+Mautic.campaignEventUpdateIntervalHours = function () {
+    var hour = mQuery('#campaignevent_triggerHour').val();
+    var start = mQuery('#campaignevent_triggerRestrictedStartTime').val();
+    var stop = mQuery('#campaignevent_triggerRestrictedStopTime').val();
+
+    if (hour) {
+        mQuery('#campaignevent_triggerRestrictedStartTime').val('');
+        mQuery('#campaignevent_triggerRestrictedStopTime').val('');
+        mQuery('#campaignevent_triggerRestrictedStartTime').prop('disabled', true);
+        mQuery('#campaignevent_triggerRestrictedStopTime').prop('disabled', true);
+    } else if (start || stop) {
         mQuery('#campaignevent_triggerHour').val('');
         mQuery('#campaignevent_triggerHour').prop('disabled', true);
     } else {
+        mQuery('#campaignevent_triggerHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStartTime').val('');
+        mQuery('#campaignevent_triggerRestrictedStopTime').val('');
         mQuery('#campaignevent_triggerHour').prop('disabled', false);
+        mQuery('#campaignevent_triggerRestrictedStartTime').prop('disabled', false);
+        mQuery('#campaignevent_triggerRestrictedStopTime').prop('disabled', false);
     }
+};
+
+/**
+ * Show/hide interval settings
+ */
+Mautic.campaignEventShowHideIntervalSettings = function() {
+    var unit = mQuery('#campaignevent_triggerIntervalUnit').val();
+    if (unit === 'i' || unit === 'h') {
+        mQuery('#interval_settings').addClass('hide');
+    } else {
+        mQuery('#interval_settings').removeClass('hide');
+    }
+};
+
+/**
+ * Update DOW for weekday selection
+ */
+Mautic.campaignEventSelectDOW = function() {
+    if (mQuery('#campaignevent_triggerRestrictedDayOfWeek_7').prop('checked')) {
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_0').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_1').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_2').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_3').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDayOfWeek_4').prop('checked', true);
+    }
+
+    mQuery('#campaignevent_triggerRestrictedDayOfWeek_7').prop('checked', false);
 };
 
 /**
