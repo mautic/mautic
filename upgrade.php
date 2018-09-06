@@ -540,6 +540,12 @@ function apply_critical_migrations()
 
     $success = true;
 
+    $minExecutionTime = 300;
+    $maxExecutionTime = (int) ini_get('max_execution_time');
+    if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
+        ini_set('max_execution_time', $minExecutionTime);
+    }
+
     if ($criticalMigrations) {
         foreach ($criticalMigrations as $version) {
             if (!run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug', $version])) {
@@ -558,6 +564,12 @@ function apply_critical_migrations()
  */
 function apply_migrations()
 {
+    $minExecutionTime = 300;
+    $maxExecutionTime = (int) ini_get('max_execution_time');
+    if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
+        ini_set('max_execution_time', $minExecutionTime);
+    }
+
     return run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug']);
 }
 
