@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Validator\Context\ExecutionContext;
 
 /**
  * Exercises CircularDependencyValidator.
@@ -21,10 +22,43 @@ class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
      *
      * @return Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator
      */
-    public function configureValidator($expectedMessage = null)
+    public function configureValidator($expectedMessage, $currentSegmentId)
     {
-        $filters  = 'a:1:{i:0;a:7:{s:4:"glue";s:3:"and";s:5:"field";s:8:"leadlist";s:6:"object";s:4:"lead";s:4:"type";s:8:"leadlist";s:6:"filter";a:1:{i:0;i:2;}s:7:"display";N;s:8:"operator";s:2:"in";}}';
-        $filters2 = 'a:1:{i:0;a:7:{s:4:"glue";s:3:"and";s:5:"field";s:8:"leadlist";s:6:"object";s:4:"lead";s:4:"type";s:8:"leadlist";s:6:"filter";a:1:{i:0;i:1;}s:7:"display";N;s:8:"operator";s:2:"in";}}';
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'leadlist',
+                'object'   => 'lead',
+                'type'     => 'leadlist',
+                'filter'   => [2],
+                'display'  => null,
+                'operator' => 'in',
+            ],
+        ];
+
+        $filters2 = [
+            [
+                'glue'     => 'and',
+                'field'    => 'leadlist',
+                'object'   => 'lead',
+                'type'     => 'leadlist',
+                'filter'   => [1],
+                'display'  => null,
+                'operator' => 'in',
+            ],
+        ];
+
+        $filters3 = [
+            [
+                'glue'     => 'and',
+                'field'    => 'first_name',
+                'object'   => 'lead',
+                'type'     => 'text',
+                'filter'   => 'John',
+                'display'  => null,
+                'operator' => '=',
+            ],
+        ];
 
         $mockListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()
@@ -33,57 +67,58 @@ class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
 
         $mockEntity = $this->getMockBuilder(LeadList::class)
             ->disableOriginalConstructor()
+            ->setMethods(['getId', 'getFilters'])
             ->getMock();
+
         $mockEntity1 = clone $mockEntity;
         $mockEntity1->expects($this->any())
             ->method('getId')
             ->willReturn(1);
+        $mockEntity1->expects($this->any())
+            ->method('getFilters')
+            ->willReturn($filters);
+
         $mockEntity2 = clone $mockEntity;
         $mockEntity2->expects($this->any())
             ->method('getId')
             ->willReturn(2);
+        $mockEntity2->expects($this->any())
+            ->method('getFilters')
+            ->willReturn($filters2);
 
-        // $mockListModel->expects($this->any())
-        //     ->method('getEntity')
-        //     ->willReturnCallback(function ($id) {
-        //         $mockEntity = $this->getMockBuilder(LeadList::class)
-        //             ->disableOriginalConstructor()
-        //             ->setMethods(['getFilters'])
-        //             ->getMock();
-        //          $mockEntity->expects($this->once())
-        //             ->method('getFilters')
-        //             ->willReturn(unserialize($filters));
-        //          return $mockEntity;
-        // });
+        $mockEntity3 = clone $mockEntity;
+        $mockEntity3->expects($this->any())
+            ->method('getId')
+            ->willReturn(3);
+        $mockEntity3->expects($this->any())
+            ->method('getFilters')
+            ->willReturn($filters3);
 
-        // mock the violation builder
-        $builder = $this->getMockBuilder('Symfony\Component\Validator\Violation\ConstraintViolationBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(['addViolation'])
-            ->getMock()
-        ;
+        $entities = [
+            1 => $mockEntity1,
+            2 => $mockEntity2,
+            3 => $mockEntity3,
+        ];
+
+        $mockListModel->expects($this->any())
+            ->method('getEntity')
+            ->willReturnCallback(function ($id) use ($entities) {
+                return $entities[$id];
+            });
 
         // mock the validator context
-        $context = $this->getMockBuilder('Symfony\Component\Validator\Context\ExecutionContext')
+        $context = $this->getMockBuilder(ExecutionContext::class)
             ->disableOriginalConstructor()
-            ->setMethods(['buildViolation'])
-            ->getMock()
-        ;
+            ->setMethods(['addViolation'])
+            ->getMock();
 
-        if ($expectedMessage) {
-            $builder->expects($this->once())
-                ->method('addViolation')
-            ;
-
+        if (!empty($expectedMessage)) {
             $context->expects($this->once())
-                ->method('buildViolation')
-                ->with($this->equalTo($expectedMessage))
-                ->willReturn($this->returnValue($builder))
-            ;
+                ->method('addViolation')
+                ->with($this->equalTo($expectedMessage));
         } else {
             $context->expects($this->never())
-                ->method('buildViolation')
-            ;
+                ->method('addViolation');
         }
 
         $request = $this
@@ -91,22 +126,23 @@ class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $request
+            ->expects($this->once())
+            ->method('get')
+            ->with('_route_params')
+            ->willReturn([
+                'objectId' => $currentSegmentId,
+            ]);
+
         $requestStack = $this->getMockBuilder(RequestStack::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getCurrentRequest', '_route_params'])
+            ->setMethods(['getCurrentRequest', 'get'])
             ->getMock();
 
         $requestStack
             ->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($request);
-
-        $requestStack
-            ->expects($this->once())
-            ->method('_route_params')
-            ->willReturn([
-                'objectId' => 1,
-            ]);
 
         // initialize the validator with the mocked context
         $validator = new CircularDependencyValidator($mockListModel, $requestStack);
@@ -117,15 +153,112 @@ class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Verify a constraint message is triggered when value is invalid.
+     * Verify a constraint message.
+     *
+     * @dataProvider validateDataProvider
      */
-    public function testValidateOnInvalid()
+    public function testValidateOnInvalid($message, $currentSegmentId, $filters)
     {
-        $filters    = 'a:1:{i:0;a:7:{s:4:"glue";s:3:"and";s:5:"field";s:8:"leadlist";s:6:"object";s:4:"lead";s:4:"type";s:8:"leadlist";s:6:"filter";a:1:{i:0;i:2;}s:7:"display";N;s:8:"operator";s:2:"in";}}';
-        $filters    = unserialize($filters);
-        $constraint = new CircularDependency();
-        $validator  = $this->configureValidator($constraint->message);
+        $this->configureValidator($message, $currentSegmentId)
+            ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
+    }
 
-        $validator->validate($filters, $constraint);
+    public function validateDataProvider()
+    {
+        $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
+
+        return [
+            // Segment 1 is dependent on Segment 2 which is dependent on segment 1 - circular
+            [
+                $constraint->message,
+                2, // current segment id
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'leadlist',
+                        'object'   => 'lead',
+                        'type'     => 'leadlist',
+                        'filter'   => [1],
+                        'display'  => null,
+                        'operator' => 'in',
+                    ],
+                ],
+            ],
+            // Segment 2 is dependent on Segment 1 which is dependent on segment 2 - circular
+            [
+                $constraint->message,
+                1, // current segment id
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'leadlist',
+                        'object'   => 'lead',
+                        'type'     => 'leadlist',
+                        'filter'   => [2],
+                        'display'  => null,
+                        'operator' => 'in',
+                    ],
+                ],
+            ],
+            // Test when there are no validation errors
+            // The segment in the filter (3) is NOT dependent on any
+            [
+                null,
+                1, // current segment id
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'leadlist',
+                        'object'   => 'lead',
+                        'type'     => 'leadlist',
+                        'filter'   => [3],
+                        'display'  => null,
+                        'operator' => 'in',
+                    ],
+                ],
+            ],
+            // Test when no lead list filters
+            [
+                null,
+                1, // current segment id
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'first_name',
+                        'object'   => 'lead',
+                        'type'     => 'text',
+                        'filter'   => 'Doe',
+                        'display'  => null,
+                        'operator' => '=',
+                    ],
+                ],
+            ],
+            // Test multiple lead list filters. Fails because 2 is dependent on 1
+            [
+                $constraint->message,
+                2, // current segment id
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'leadlist',
+                        'object'   => 'lead',
+                        'type'     => 'leadlist',
+                        'filter'   => [1],
+                        'display'  => null,
+                        'operator' => 'in',
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'leadlist',
+                        'object'   => 'lead',
+                        'type'     => 'leadlist',
+                        'filter'   => [3],
+                        'display'  => null,
+                        'operator' => 'in',
+                    ],
+                ],
+            ],
+            // @TODO: MUST ADD TEST CASES ONCE WE FIX DEEP CIRCULAR (1 depends on 2 which depends on 3 which depends on 1) TO AN ARBITRARY DEPTH
+        ];
     }
 }
