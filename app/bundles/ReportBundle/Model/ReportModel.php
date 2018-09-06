@@ -592,6 +592,13 @@ class ReportModel extends FormModel
             }
         }
 
+        $query->add('orderBy', $order);
+
+        // Allow plugin to manipulate the query
+        $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
+        $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
+        $query = $event->getQuery();
+
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
@@ -611,13 +618,6 @@ class ReportModel extends FormModel
                         ->setMaxResults($limit);
                 }
             }
-
-            $query->add('orderBy', $order);
-
-            // Allow plugin to manipulate the query
-            $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
-            $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
-            $query = $event->getQuery();
 
             $queryTime = microtime(true);
             $data      = $query->execute()->fetchAll();
