@@ -22,15 +22,9 @@ class CompanySubscriberTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetSubscribedEvents()
     {
-        $ipLookupHelper = $this->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $auditLogModel = $this->getMockBuilder(AuditLogModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $subscriber = new CompanySubscriber($ipLookupHelper, $auditLogModel);
+        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
+        $auditLogModel  = $this->createMock(AuditLogModel::class);
+        $subscriber     = new CompanySubscriber($ipLookupHelper, $auditLogModel);
 
         $this->assertEquals(
             [
@@ -62,38 +56,25 @@ class CompanySubscriberTest extends \PHPUnit_Framework_TestCase
             'ipAddress' => $ip,
         ];
 
-        $ipLookupHelper = $this->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
             ->will($this->returnValue($ip));
 
-        $auditLogModel = $this->getMockBuilder(AuditLogModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $auditLogModel = $this->createMock(AuditLogModel::class);
         $auditLogModel->expects($this->once())
             ->method('writeToLog')
             ->with($log);
 
         $subscriber = new CompanySubscriber($ipLookupHelper, $auditLogModel);
 
-        $company = $this->getMockBuilder(Company::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $company            = $this->createMock(Company::class);
         $company->deletedId = $companyId;
-
         $company->expects($this->once())
             ->method('getPrimaryIdentifier')
             ->will($this->returnValue($companyName));
 
-        $event = $this->getMockBuilder(CompanyEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())
             ->method('getCompany')
             ->will($this->returnValue($company));
@@ -121,44 +102,30 @@ class CompanySubscriberTest extends \PHPUnit_Framework_TestCase
             'ipAddress' => $ip,
         ];
 
-        $ipLookupHelper = $this->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
             ->will($this->returnValue($ip));
 
-        $auditLogModel = $this->getMockBuilder(AuditLogModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $auditLogModel = $this->createMock(AuditLogModel::class);
         $auditLogModel->expects($this->once())
             ->method('writeToLog')
             ->with($log);
 
         $subscriber = new CompanySubscriber($ipLookupHelper, $auditLogModel);
 
-        $company = $this->getMockBuilder(Company::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $company = $this->createMock(Company::class);
         $company->expects($this->once())
             ->method('getId')
             ->will($this->returnValue($companyId));
 
-        $event = $this->getMockBuilder(CompanyEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())
             ->method('getCompany')
             ->will($this->returnValue($company));
-
         $event->expects($this->once())
             ->method('getChanges')
             ->will($this->returnValue($changes));
-
         $event->expects($this->once())
             ->method('isNew')
             ->will($this->returnValue($isNew));
