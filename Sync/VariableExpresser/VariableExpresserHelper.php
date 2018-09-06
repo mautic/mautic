@@ -81,6 +81,6 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
             );
         }
 
-        throw new \InvalidArgumentException('Variable type not supported');
+        throw new \InvalidArgumentException('Variable type for '.var_export($var, true).' not supported');
     }
 }
