@@ -192,9 +192,6 @@ return [
                     'mautic.email.model.send_email_to_user',
                 ],
             ],
-            'mautic.email.calendarbundle.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\CalendarSubscriber',
-            ],
             'mautic.email.search.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\SearchSubscriber',
                 'arguments' => [
