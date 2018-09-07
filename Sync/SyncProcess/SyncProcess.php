@@ -449,7 +449,6 @@ class SyncProcess
      * @param string $object
      *
      * @return \DateTimeInterface
-     * @throws \Exception
      */
     private function getSyncFromDateTime(string $integration, string $object): \DateTimeInterface
     {
@@ -586,6 +585,8 @@ class SyncProcess
                             $internalField->getName(),
                             $internalField->getValue()
                         );
+                        $internalInformationChangeRequest->setPossibleChangeDateTime($internalObject->getChangeDateTime());
+                        $internalInformationChangeRequest->setCertainChangeDateTime($internalField->getChangeDateTime());
 
                         // There is a conflict so let the judge determine which value comes out on top
                         $judgeModes = [
@@ -670,7 +671,6 @@ class SyncProcess
      * @param ReportObjectDAO  $integrationObject
      *
      * @return ObjectChangeDAO
-     * @throws FieldNotFoundException
      * @throws ObjectNotFoundException
      */
     private function getSyncObjectChangeMauticToIntegration(
