@@ -102,7 +102,7 @@ class Event implements ChannelInterface
     /**
      * @var null|array
      */
-    private $triggerRestrictedDayOfWeek = [];
+    private $triggerRestrictedDaysOfWeek = [];
 
     /**
      * @var string
@@ -239,7 +239,7 @@ class Event implements ChannelInterface
             ->nullable()
             ->build();
 
-        $builder->createField('triggerRestrictedDayOfWeek', 'array')
+        $builder->createField('triggerRestrictedDaysOfWeek', 'array')
             ->columnName('trigger_restricted_dow')
             ->nullable()
             ->build();
@@ -323,7 +323,7 @@ class Event implements ChannelInterface
                     'triggerHour',
                     'triggerRestrictedStartTime',
                     'triggerRestrictedStopTime',
-                    'triggerRestrictedDayOfWeek',
+                    'triggerRestrictedDaysOfWeek',
                     'triggerMode',
                     'decisionPath',
                     'channel',
@@ -359,7 +359,7 @@ class Event implements ChannelInterface
                      'triggerHour',
                     'triggerRestrictedStartTime',
                     'triggerRestrictedStopTime',
-                    'triggerRestrictedDayOfWeek',
+                    'triggerRestrictedDaysOfWeek',
                      'triggerMode',
                      'children',
                      'parent',
@@ -383,7 +383,7 @@ class Event implements ChannelInterface
                     'triggerHour',
                     'triggerRestrictedStartTime',
                     'triggerRestrictedStopTime',
-                    'triggerRestrictedDayOfWeek',
+                    'triggerRestrictedDaysOfWeek',
                     'triggerMode',
                     'decisionPath',
                     'order',
@@ -838,6 +838,7 @@ class Event implements ChannelInterface
      */
     public function setEventType($eventType)
     {
+        $this->isChanged('eventType', $eventType);
         $this->eventType = $eventType;
 
         return $this;
@@ -856,6 +857,7 @@ class Event implements ChannelInterface
      */
     public function setTriggerMode($triggerMode)
     {
+        $this->isChanged('triggerMode', $triggerMode);
         $this->triggerMode = $triggerMode;
     }
 
@@ -872,6 +874,7 @@ class Event implements ChannelInterface
      */
     public function setDecisionPath($decisionPath)
     {
+        $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
     }
 
@@ -888,6 +891,7 @@ class Event implements ChannelInterface
      */
     public function setTempId($tempId)
     {
+        $this->isChanged('tempId', $tempId);
         $this->tempId = $tempId;
     }
 
@@ -904,6 +908,7 @@ class Event implements ChannelInterface
      */
     public function setChannel($channel)
     {
+        $this->isChanged('channel', $channel);
         $this->channel = $channel;
     }
 
@@ -920,6 +925,7 @@ class Event implements ChannelInterface
      */
     public function setChannelId($channelId)
     {
+        $this->isChanged('channelId', $channelId);
         $this->channelId = (int) $channelId;
     }
 
@@ -1035,25 +1041,26 @@ class Event implements ChannelInterface
     }
 
     /**
-     * Get the value of triggerRestrictedDayOfWeek.
+     * Get the value of triggerRestrictedDaysOfWeek.
      *
      * @return null|array
      */
-    public function getTriggerRestrictedDayOfWeek()
+    public function getTriggerRestrictedDaysOfWeek()
     {
-        return $this->triggerRestrictedDayOfWeek;
+        return $this->triggerRestrictedDaysOfWeek;
     }
 
     /**
-     * Set the value of triggerRestrictedDayOfWeek.
+     * Set the value of triggerRestrictedDaysOfWeek.
      *
-     * @param null|array $triggerRestrictedDayOfWeek
+     * @param null|array $triggerRestrictedDaysOfWeek
      *
      * @return self
      */
-    public function setTriggerRestrictedDayOfWeek(array $triggerRestrictedDayOfWeek = null)
+    public function setTriggerRestrictedDaysOfWeek(array $triggerRestrictedDaysOfWeek = null)
     {
-        $this->triggerRestrictedDayOfWeek = $triggerRestrictedDayOfWeek;
+        $this->triggerRestrictedDaysOfWeek = $triggerRestrictedDaysOfWeek;
+        $this->isChanged('triggerRestrictedDaysOfWeek', $triggerRestrictedDaysOfWeek);
 
         return $this;
     }

@@ -61,34 +61,34 @@
                 <div class="row">
                     <div class="col-sm-3">
                         <div class="checkbox">
-                            <label><?php echo $view['form']->widget($form['triggerRestrictedDayOfWeek'][0]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDayOfWeek'][0]->vars['label']); ?></label>
+                            <label><?php echo $view['form']->widget($form['triggerRestrictedDaysOfWeek'][0]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDaysOfWeek'][0]->vars['label']); ?></label>
                         </div>
                         <div class="checkbox">
-                            <label><?php echo $view['form']->widget($form['triggerRestrictedDayOfWeek'][1]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDayOfWeek'][1]->vars['label']); ?></label>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="checkbox">
-                            <label><?php echo $view['form']->widget($form['triggerRestrictedDayOfWeek'][2]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDayOfWeek'][2]->vars['label']); ?></label>
-                        </div>
-                        <div class="checkbox">
-                            <label><?php echo $view['form']->widget($form['triggerRestrictedDayOfWeek'][3]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDayOfWeek'][3]->vars['label']); ?></label>
+                            <label><?php echo $view['form']->widget($form['triggerRestrictedDaysOfWeek'][1]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDaysOfWeek'][1]->vars['label']); ?></label>
                         </div>
                     </div>
                     <div class="col-sm-3">
                         <div class="checkbox">
-                            <label><?php echo $view['form']->widget($form['triggerRestrictedDayOfWeek'][4]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDayOfWeek'][4]->vars['label']); ?></label>
+                            <label><?php echo $view['form']->widget($form['triggerRestrictedDaysOfWeek'][2]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDaysOfWeek'][2]->vars['label']); ?></label>
                         </div>
                         <div class="checkbox">
-                            <label><?php echo $view['form']->widget($form['triggerRestrictedDayOfWeek'][5]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDayOfWeek'][5]->vars['label']); ?></label>
+                            <label><?php echo $view['form']->widget($form['triggerRestrictedDaysOfWeek'][3]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDaysOfWeek'][3]->vars['label']); ?></label>
                         </div>
                     </div>
                     <div class="col-sm-3">
                         <div class="checkbox">
-                            <label><?php echo $view['form']->widget($form['triggerRestrictedDayOfWeek'][6]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDayOfWeek'][6]->vars['label']); ?></label>
+                            <label><?php echo $view['form']->widget($form['triggerRestrictedDaysOfWeek'][4]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDaysOfWeek'][4]->vars['label']); ?></label>
                         </div>
                         <div class="checkbox">
-                            <label><?php echo $view['form']->widget($form['triggerRestrictedDayOfWeek'][7]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDayOfWeek'][7]->vars['label']); ?></label>
+                            <label><?php echo $view['form']->widget($form['triggerRestrictedDaysOfWeek'][5]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDaysOfWeek'][5]->vars['label']); ?></label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="checkbox">
+                            <label><?php echo $view['form']->widget($form['triggerRestrictedDaysOfWeek'][6]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDaysOfWeek'][6]->vars['label']); ?></label>
+                        </div>
+                        <div class="checkbox">
+                            <label><?php echo $view['form']->widget($form['triggerRestrictedDaysOfWeek'][7]); ?> <?php echo $view['translator']->trans($form['triggerRestrictedDaysOfWeek'][7]->vars['label']); ?></label>
                         </div>
                     </div>
                 </div>

@@ -201,7 +201,7 @@ class EventType extends AbstractType
         );
 
         $builder->add(
-            'triggerRestrictedDayOfWeek',
+            'triggerRestrictedDaysOfWeek',
             ChoiceType::class,
             [
                 'label'    => true,
@@ -210,14 +210,14 @@ class EventType extends AbstractType
                     'data-format' => 'H:i',
                 ],
                 'choices'  => [
-                    'monday'    => 'mautic.report.schedule.day.monday',
-                    'tuesday'   => 'mautic.report.schedule.day.tuesday',
-                    'wednesday' => 'mautic.report.schedule.day.wednesday',
-                    'thursday'  => 'mautic.report.schedule.day.thursday',
-                    'friday'    => 'mautic.report.schedule.day.friday',
-                    'saturday'  => 'mautic.report.schedule.day.saturday',
-                    'sunday'    => 'mautic.report.schedule.day.sunday',
-                    'weekdays'  => 'mautic.report.schedule.day.week_days',
+                    1  => 'mautic.report.schedule.day.monday',
+                    2  => 'mautic.report.schedule.day.tuesday',
+                    3  => 'mautic.report.schedule.day.wednesday',
+                    4  => 'mautic.report.schedule.day.thursday',
+                    5  => 'mautic.report.schedule.day.friday',
+                    6  => 'mautic.report.schedule.day.saturday',
+                    0  => 'mautic.report.schedule.day.sunday',
+                    -1 => 'mautic.report.schedule.day.week_days',
                 ],
                 'expanded' => true,
                 'multiple' => true,
