@@ -42,6 +42,11 @@ class ObjectChangeDAO
     private $mappedId;
 
     /**
+     * @var \DateTimeInterface
+     */
+    private $changeDateTime;
+
+    /**
      * @var FieldDAO[]
      */
     private $fields = [];
@@ -155,5 +160,29 @@ class ObjectChangeDAO
     public function shouldSync(): bool
     {
         return !empty(count($this->fields));
+    }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getChangeDateTime(): \DateTimeInterface
+    {
+        return $this->changeDateTime;
+    }
+
+    /**
+     * @param \DateTimeInterface $changeDateTime
+     *
+     * @return ObjectChangeDAO
+     */
+    public function setChangeDateTime(\DateTimeInterface $changeDateTime = null)
+    {
+        if (null === $changeDateTime) {
+            $changeDateTime = new \DateTime();
+        }
+
+        $this->changeDateTime = $changeDateTime;
+
+        return $this;
     }
 }

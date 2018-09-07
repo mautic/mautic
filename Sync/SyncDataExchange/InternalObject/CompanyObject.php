@@ -50,6 +50,7 @@ class CompanyObject implements ObjectInterface
         foreach ($objects as $object) {
             $company = new Company();
             $fields  = $object->getFields();
+
             foreach ($fields as $field) {
                 $company->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
             }
@@ -67,7 +68,7 @@ class CompanyObject implements ObjectInterface
             );
 
             $objectMapping = new ObjectMapping();
-            $objectMapping->setLastSyncDate($company->getDateAdded())
+            $objectMapping->setLastSyncDate($object->getChangeDateTime())
                 ->setIntegration($object->getIntegration())
                 ->setIntegrationObjectName($object->getMappedObject())
                 ->setIntegrationObjectId($object->getMappedObjectId())
@@ -101,15 +102,12 @@ class CompanyObject implements ObjectInterface
 
         $updatedMappedObjects = [];
         foreach ($companies as $company) {
-            $changedObjects = $objects[$company->getId()];
-
             /** @var ObjectChangeDAO $changedObject */
-            foreach ($changedObjects as $changedObject) {
-                $fields = $changedObject->getFields();
+            $changedObject = $objects[$company->getId()];
+            $fields        = $changedObject->getFields();
 
-                foreach ($fields as $field) {
-                    $company->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
-                }
+            foreach ($fields as $field) {
+                $company->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
             }
 
             $this->model->saveEntity($company);
@@ -129,7 +127,7 @@ class CompanyObject implements ObjectInterface
                 $changedObject,
                 $changedObject->getObjectId(),
                 $changedObject->getObject(),
-                $company->getDateModified()
+                $changedObject->getChangeDateTime()
             );
         }
 

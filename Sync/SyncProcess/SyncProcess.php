@@ -661,6 +661,9 @@ class SyncProcess
             }
         }
 
+        // Set the change date/time from the object so that we can update last sync date based on this
+        $objectChange->setChangeDateTime($integrationObject->getChangeDateTime());
+
         return $objectChange;
     }
 
@@ -761,6 +764,9 @@ class SyncProcess
                     break;
             }
         }
+
+        // Set the change date/time from the object so that we can update last sync date based on this
+        $objectChange->setChangeDateTime($internalObject->getChangeDateTime());
 
         return $objectChange;
     }
