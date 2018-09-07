@@ -95,45 +95,57 @@ class Interval implements ScheduleModeInterface
 
     /**
      * @param LeadEventLog $log
-     * @param \DateTime    $currentDateTime
+     * @param \DateTime    $compareFromDateTime
      *
      * @return \DateTime
      *
      * @throws NotSchedulableException
      */
-    public function validateExecutionDateTime(LeadEventLog $log, \DateTime $currentDateTime)
+    public function validateExecutionDateTime(LeadEventLog $log, \DateTime $compareFromDateTime)
     {
         $event         = $log->getEvent();
         $dateTriggered = clone $log->getDateTriggered();
-        $hour          = $event->getTriggerHour();
 
-        if (empty($hour)) {
-            return $this->getExecutionDateTime($event, $currentDateTime, $dateTriggered);
+        if (!$this->isContactSpecificExecutionDateRequired($event)) {
+            return $this->getExecutionDateTime($event, $compareFromDateTime, $dateTriggered);
         }
 
-        $diff = $dateTriggered->diff($currentDateTime);
+        $hour      = $event->getTriggerHour();
+        $startTime = $event->getTriggerRestrictedStartHour();
+        $endTime   = $event->getTriggerRestrictedStopHour();
+        $dow       = $event->getTriggerRestrictedDaysOfWeek();
 
-        return $this->convertToHourInContactTimezone($log->getLead(), $hour, $diff, $event->getId(), $currentDateTime);
+        $diff = $dateTriggered->diff($compareFromDateTime);
+
+        return $this->getGroupExecutionDateTime($event->getId(), $log->getLead(), $diff, $hour, $startTime, $endTime, $dow, $compareFromDateTime);
     }
 
     /**
      * @param Event           $event
      * @param ArrayCollection $contacts
      * @param \DateTime       $executionDate
+     * @param null|\DateTime  $compareFromDateTime
      *
      * @return GroupExecutionDateDAO[]
      */
-    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTime $executionDate)
+    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTime $executionDate, \DateTime $compareFromDateTime = null)
     {
         $groupedExecutionDates = [];
         $hour                  = $event->getTriggerHour();
+        $startTime             = $event->getTriggerRestrictedStartHour();
+        $endTime               = $event->getTriggerRestrictedStopHour();
+        $daysOfWeek            = $event->getTriggerRestrictedDaysOfWeek();
 
-        $diff = (new \Datetime())->diff($executionDate);
+        // Get the difference between now and the date we're supposed to be executing
+        $compareFromDateTime = $compareFromDateTime ? clone $compareFromDateTime : new \DateTime('now');
+        $compareFromDateTime->setTimezone($this->getDefaultTimezone());
+
+        $diff    = $compareFromDateTime->diff($executionDate);
+        $diff->f = 0; // we don't care about microseconds
 
         /** @var Lead $contact */
         foreach ($contacts as $contact) {
-            $groupExecutionDate = $this->convertToHourInContactTimezone($contact, $hour, $diff, $event->getId());
-
+            $groupExecutionDate = $this->getGroupExecutionDateTime($event->getId(), $contact, $diff, $compareFromDateTime, $hour, $startTime, $endTime, $daysOfWeek);
             if (!isset($groupedExecutionDates[$groupExecutionDate->getTimestamp()])) {
                 $groupedExecutionDates[$groupExecutionDate->getTimestamp()] = new GroupExecutionDateDAO($groupExecutionDate);
             }
@@ -145,18 +157,80 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param Lead           $contact
-     * @param \DateTime      $hour
-     * @param \DateInterval  $diff
+     * Checks if an event has a relative time configured.
+     *
+     * @param Event $event
+     *
+     * @return bool
+     */
+    public function isContactSpecificExecutionDateRequired(Event $event)
+    {
+        if (Event::TRIGGER_MODE_INTERVAL !== $event->getTriggerMode()) {
+            return false;
+        }
+
+        if (
+            null === $event->getTriggerHour() && (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour())
+            && empty($event->getTriggerRestrictedDaysOfWeek())
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param                $eventId
-     * @param \DateTime|null $currentDateTime
+     * @param Lead           $contact
+     * @param \DateInterval  $diff
+     * @param \DateTime      $compareFromDateTime
+     * @param \DateTime|null $hour
+     * @param \DateTime|null $startTime
+     * @param \DateTime|null $endTime
+     * @param array          $daysOfWeek
      *
      * @return \DateTime
      */
-    private function convertToHourInContactTimezone(Lead $contact, \DateTime $hour, \DateInterval $diff, $eventId, \DateTime $currentDateTime = null)
+    private function getGroupExecutionDateTime(
+        $eventId,
+        Lead $contact,
+        \DateInterval $diff,
+        \DateTime $compareFromDateTime,
+        \DateTime $hour = null,
+        \DateTime $startTime = null,
+        \DateTime $endTime = null,
+        array $daysOfWeek = []
+    ) {
+        if ($hour) {
+            $groupDateTime = $this->getExecutionDateTimeFromHour($contact, $hour, $diff, $eventId, $compareFromDateTime);
+        } elseif ($startTime && $endTime) {
+            $groupDateTime = $this->getExecutionDateTimeBetweenHours($contact, $startTime, $endTime, $diff, $eventId, $compareFromDateTime);
+        } else {
+            $groupDateTime = $compareFromDateTime;
+        }
+
+        if ($daysOfWeek) {
+            // Schedule for the next day of the week if applicable
+            while (!in_array((int) $groupDateTime->format('w'), $daysOfWeek)) {
+                $groupDateTime->modify('+1 day');
+            }
+        }
+
+        return $groupDateTime;
+    }
+
+    /**
+     * @param Lead          $contact
+     * @param \DateTime     $hour
+     * @param \DateInterval $diff
+     * @param               $eventId
+     * @param \DateTime     $compareFromDateTime
+     *
+     * @return \DateTime
+     */
+    private function getExecutionDateTimeFromHour(Lead $contact, \DateTime $hour, \DateInterval $diff, $eventId, \DateTime $compareFromDateTime)
     {
         $groupHour = clone $hour;
-        $now       = $currentDateTime ? $currentDateTime : new \DateTime('now', $this->getDefaultTimezone());
 
         // Set execution to UTC
         if ($timezone = $contact->getTimezone()) {
@@ -169,10 +243,10 @@ class Interval implements ScheduleModeInterface
                 );
 
                 // Get now in the contacts timezone then add the number of days from now and the original execution date
-                $now->setTimezone($contactTimezone);
+                $groupExecutionDate = clone $compareFromDateTime;
+                $groupExecutionDate->setTimezone($contactTimezone);
 
-                $groupExecutionDate = clone $now;
-                $groupExecutionDate->modify(sprintf('+%d days', $diff->days));
+                $groupExecutionDate->add($diff);
 
                 $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
@@ -185,10 +259,81 @@ class Interval implements ScheduleModeInterface
             }
         }
 
-        $groupExecutionDate = clone $now;
-        $groupExecutionDate->modify(sprintf('+%d days', $diff->days));
+        $groupExecutionDate = clone $compareFromDateTime;
+        $groupExecutionDate->add($diff);
 
         $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
+
+        return $groupExecutionDate;
+    }
+
+    /**
+     * @param Lead          $contact
+     * @param \DateTime     $startTime
+     * @param \DateTime     $endTime
+     * @param \DateInterval $diff
+     * @param               $eventId
+     * @param \DateTime     $compareFromDateTime
+     *
+     * @return \DateTime
+     */
+    private function getExecutionDateTimeBetweenHours(
+        Lead $contact,
+        \DateTime $startTime,
+        \DateTime $endTime,
+        \DateInterval $diff,
+        $eventId,
+        \DateTime $compareFromDateTime
+    ) {
+        $startTime = clone $startTime;
+        $endTime   = clone $endTime;
+
+        if ($endTime < $startTime) {
+            // End time is after start time so switch them
+            $tempStartTime = clone $startTime;
+            $startTime     = clone $endTime;
+            $endTime       = clone $tempStartTime;
+            unset($tempStartTime);
+        }
+
+        // Set execution to UTC
+        if ($timezone = $contact->getTimezone()) {
+            try {
+                // Set the group's timezone to the contact's
+                $contactTimezone = new \DateTimeZone($timezone);
+
+                $this->logger->debug(
+                    'CAMPAIGN: ('.$eventId.') Setting '.$timezone.' for contact '.$contact->getId()
+                );
+
+                // Get now in the contacts timezone then add the number of days from now and the original execution date
+                $groupExecutionDate = clone $compareFromDateTime;
+                $groupExecutionDate->setTimezone($contactTimezone);
+
+                $groupExecutionDate->add($diff);
+            } catch (\Exception $exception) {
+                // Timezone is not recognized so use the default
+                $this->logger->debug(
+                    'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'
+                );
+            }
+        }
+
+        if (!isset($groupExecutionDate)) {
+            $groupExecutionDate = clone $compareFromDateTime;
+            $groupExecutionDate->add($diff);
+        }
+
+        // Is the time between the start and end hours?
+        $testStartDateTime = clone $groupExecutionDate;
+        $testStartDateTime->setTime($startTime->format('H'), $startTime->format('i'));
+
+        $testStopDateTime = clone $groupExecutionDate;
+        $testStopDateTime->setTime($endTime->format('H'), $endTime->format('i'));
+
+        if ($groupExecutionDate < $testStartDateTime || $groupExecutionDate > $testStopDateTime) {
+            $groupExecutionDate->modify('+1 day')->setTime($startTime->format('H'), $startTime->format('i'));
+        }
 
         return $groupExecutionDate;
     }

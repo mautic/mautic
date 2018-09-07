@@ -119,7 +119,7 @@ class EventScheduler
         $this->eventLogger->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
         // If this is relative to a specific hour, process the contacts in batches by contacts' timezone
-        if ($this->isContactSpecificExecutionDateRequired($event)) {
+        if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
             $groupedExecutionDates = $this->intervalScheduler->groupContactsByDate($event, $contacts, $executionDate);
 
             foreach ($groupedExecutionDates as $groupExecutionDateDAO) {
@@ -391,26 +391,6 @@ class EventScheduler
             CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
             new ScheduledBatchEvent($config, $event, $logs, $isReschedule)
         );
-    }
-
-    /**
-     * Checks if an event has a relative time configured.
-     *
-     * @param Event $event
-     *
-     * @return bool
-     */
-    private function isContactSpecificExecutionDateRequired(Event $event)
-    {
-        if (Event::TRIGGER_MODE_INTERVAL !== $event->getTriggerMode()) {
-            return false;
-        }
-
-        if (null === $event->getTriggerHour()) {
-            return false;
-        }
-
-        return true;
     }
 
     /**

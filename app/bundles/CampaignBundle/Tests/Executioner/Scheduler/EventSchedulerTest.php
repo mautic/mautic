@@ -116,6 +116,8 @@ class EventSchedulerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 new \DateTime('1970-01-01 09:00:00')
             );
+        $event->method('getTriggerRestrictedDaysOfWeek')
+            ->willReturn([]);
         $event->method('getCampaign')
             ->willReturn($campaign);
 
@@ -169,6 +171,8 @@ class EventSchedulerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 new \DateTime('1970-01-01 11:00:00')
             );
+        $event->method('getTriggerRestrictedDaysOfWeek')
+            ->willReturn([]);
         $event->method('getCampaign')
             ->willReturn($campaign);
 
