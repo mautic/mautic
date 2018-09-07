@@ -427,7 +427,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param string $objectName
+     * @param string $entityName
      *
      * @return string
      * @throws ObjectNotSupportedException
@@ -440,7 +440,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
             case Company::class:
                 return self::OBJECT_COMPANY;
             default:
-                throw new ObjectNotSupportedException(self::NAME, $objectName);
+                throw new ObjectNotSupportedException(self::NAME, $entityName);
         }
     }
 
