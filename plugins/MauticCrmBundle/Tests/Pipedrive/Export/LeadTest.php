@@ -86,9 +86,7 @@ class LeadTest extends PipedriveTest
                 'token' => 'token',
             ]
         );
-
         $lead = $this->createLead();
-        $this->createLeadIntegrationEntity($integrationId, $lead->getId());
 
         $this->client->request(
             'POST',
@@ -104,20 +102,19 @@ class LeadTest extends PipedriveTest
                 ],
             ]
         );
-
         $requests = $GLOBALS['requests'];
-        $request  = $requests['PUT/Api/Put/persons/'.$integrationId][0];
+        $request  = $requests['POST/Api/Put/persons'];
 
-        $this->assertSame(count($requests), 1);
-        $this->assertEquals($request['form_params']['first_name'], 'Test');
-        $this->assertEquals($request['form_params']['last_name'], 'User');
-        $this->assertEquals($request['form_params']['email'], 'test@test.pl');
-        $this->assertEquals($request['form_params']['phone'], '123456789');
+        $this->assertSame(count($request), 1);
+        $this->assertEquals($request[0]['form_params']['first_name'], 'Test');
+        $this->assertEquals($request[0]['form_params']['last_name'], 'User');
+        $this->assertEquals($request[0]['form_params']['email'], 'test@test.pl');
+        $this->assertEquals($request[0]['form_params']['phone'], '123456789');
     }
 
     public function testUpdatePersonWithCompanyWhenFeatureIsDisabled()
     {
-        $integrationId         = 99;
+        $integrationId         = 97;
         $integrationCompanyId  = 66;
         $integrationCompany2Id = 77;
 
@@ -134,7 +131,6 @@ class LeadTest extends PipedriveTest
         $company2 = $this->createCompany('Main Company', 'Main Company Address1');
         $lead     = $this->createLead([$company, $company2]);
 
-        $this->createLeadIntegrationEntity($integrationId, $lead->getId());
         $this->createCompanyIntegrationEntity($integrationCompanyId, $company->getId());
         $this->createCompanyIntegrationEntity($integrationCompany2Id, $company2->getId());
 
@@ -154,9 +150,9 @@ class LeadTest extends PipedriveTest
         );
 
         $requests = $GLOBALS['requests'];
-        $request  = $requests['PUT/Api/Put/persons/'.$integrationId][0];
+        $request  = $requests['PUT/Api/Put/persons/'.$integrationId][1];
 
-        $this->assertSame(count($requests), 1);
+        $this->assertSame(count($requests), 3);
         $this->assertEquals($request['form_params']['first_name'], 'Test');
         $this->assertEquals($request['form_params']['last_name'], 'User');
         $this->assertEquals($request['form_params']['email'], 'test@test.pl');
@@ -180,7 +176,6 @@ class LeadTest extends PipedriveTest
 
         $owner = $this->createUser(true, 'user@email.com', 'new_user');
         $lead  = $this->createLead();
-        $this->createLeadIntegrationEntity($integrationId, $lead->getId());
         $this->addPipedriveOwner($pipedriveOwnerId, $owner->getEmail());
 
         $this->client->request(
@@ -200,9 +195,9 @@ class LeadTest extends PipedriveTest
         );
 
         $requests = $GLOBALS['requests'];
-        $request  = $requests['PUT/Api/Put/persons/'.$integrationId][0];
+        $request  = $requests['POST/Api/Put/persons'][0];
 
-        $this->assertSame(count($requests), 1);
+        $this->assertSame(count($requests['POST/Api/Put/persons']), 1);
         $this->assertEquals($request['form_params']['first_name'], 'Test');
         $this->assertEquals($request['form_params']['last_name'], 'User');
         $this->assertEquals($request['form_params']['email'], 'test@test.pl');

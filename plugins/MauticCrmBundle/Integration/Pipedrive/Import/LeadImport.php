@@ -51,12 +51,12 @@ class LeadImport extends AbstractImport
         if ($integrationEntity) {
             throw new \Exception('Lead already have integration', Response::HTTP_CONFLICT);
         }
-
-        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::PERSON_ENTITY_TYPE));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
-        $lead = new Lead();
-
+        if (!$lead =  $this->leadModel->checkForDuplicateContact($dataToUpdate)) {
+            $lead = new Lead();
+        }
         // prevent listeners from exporting
         $lead->setEventData('pipedrive.webhook', 1);
 
@@ -65,9 +65,14 @@ class LeadImport extends AbstractImport
         if (isset($data['owner_id'])) {
             $this->addOwnerToLead($data['owner_id'], $lead);
         }
-        $this->leadModel->saveEntity($lead);
 
-        $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $data['id'], $lead->getId());
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        $integrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $data['id']]);
+        if (!$integrationEntity) {
+            $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $data['id'], $lead->getId());
+        }
 
         $this->em->persist($integrationEntity);
         $this->em->flush();
@@ -102,10 +107,18 @@ class LeadImport extends AbstractImport
 
         // prevent listeners from exporting
         $lead->setEventData('pipedrive.webhook', 1);
-        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
 
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::PERSON_ENTITY_TYPE));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
+        $lastSyncDate      = $integrationEntity->getLastSyncDate();
+        $leadDateModified  = $lead->getDateModified();
+
+        if ($lastSyncDate->format('Y-m-d H:i:s') >= $data['update_time']) {
+            return false;
+        } //Do not push lead if contact was modified in Mautic, and we don't wanna mofify it
+
+        $lead->setDateModified(new \DateTime());
         $this->leadModel->setFieldValues($lead, $dataToUpdate);
 
         if (!isset($data['owner_id']) && $lead->getOwner()) {
@@ -123,7 +136,7 @@ class LeadImport extends AbstractImport
             return;
         }
 
-        if (!isset($data['org_id']) && $lead->getCompany()) {
+        if (empty($data['org_id']) && $lead->getCompany()) {
             $this->removeLeadFromCompany($lead->getCompany(), $lead);
         } elseif (isset($data['org_id'])) {
             $this->addLeadToCompany($data['org_id'], $lead);
