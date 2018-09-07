@@ -117,7 +117,7 @@ class Interval implements ScheduleModeInterface
 
         $diff = $dateTriggered->diff($compareFromDateTime);
 
-        return $this->getGroupExecutionDateTime($event->getId(), $log->getLead(), $diff, $hour, $startTime, $endTime, $dow, $compareFromDateTime);
+        return $this->getGroupExecutionDateTime($event->getId(), $log->getLead(), $diff, $dateTriggered, $hour, $startTime, $endTime, $dow);
     }
 
     /**
