@@ -125,8 +125,12 @@ class ConfigEvent extends CommonEvent
     /**
      * Set error message.
      *
-     * @param string $message     (untranslated)
-     * @param array  $messageVars for translation
+     * @param string      $message     (untranslated)
+     * @param array       $messageVars for translation
+     * @param string|null $key
+     * @param string|null $field
+     *
+     * @return ConfigEvent
      */
     public function setError($message, $messageVars = [], $key = null, $field = null)
     {

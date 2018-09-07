@@ -21,8 +21,14 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
  */
 class ConfigSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CoreParametersHelper
+     */
     protected $paramHelper;
 
+    /**
+     * @param CoreParametersHelper $paramHelper
+     */
     public function __construct(CoreParametersHelper $paramHelper)
     {
         $this->paramHelper = $paramHelper;
