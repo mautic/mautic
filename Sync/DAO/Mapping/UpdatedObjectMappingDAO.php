@@ -47,7 +47,10 @@ class UpdatedObjectMappingDAO
         $this->objectChangeDAO    = $objectChangeDAO;
         $this->objectId           = $objectId;
         $this->objectName         = $objectName;
-        $this->objectModifiedDate = $objectModifiedDate;
+        $this->objectModifiedDate = ($objectModifiedDate instanceof \DateTimeImmutable) ? new \DateTime(
+            $objectModifiedDate->format('Y-m-d H:i:s'),
+            $objectModifiedDate->getTimezone()
+        ) : $objectModifiedDate;
     }
 
     /**

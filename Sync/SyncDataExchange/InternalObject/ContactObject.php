@@ -64,6 +64,7 @@ class ContactObject implements ObjectInterface
         foreach ($objects as $object) {
             $contact = new Lead();
             $fields  = $object->getFields();
+
             foreach ($fields as $field) {
                 $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
             }
@@ -81,7 +82,7 @@ class ContactObject implements ObjectInterface
             );
 
             $objectMapping = new ObjectMapping();
-            $objectMapping->setLastSyncDate($contact->getDateAdded())
+            $objectMapping->setLastSyncDate($object->getChangeDateTime())
                 ->setIntegration($object->getIntegration())
                 ->setIntegrationObjectName($object->getMappedObject())
                 ->setIntegrationObjectId($object->getMappedObjectId())
@@ -141,7 +142,7 @@ class ContactObject implements ObjectInterface
                 $changedObject,
                 $changedObject->getObjectId(),
                 $changedObject->getObject(),
-                $contact->getDateModified()
+                $changedObject->getChangeDateTime()
             );
         }
 
