@@ -218,6 +218,12 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'foreign_table' => 'lead_utmtags',
         ];
 
+        $this->translations['campaign'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'campaign_leads',
+            'field'         => 'campaign_id',
+        ];
+
         parent::__construct($this->translations);
     }
 }
