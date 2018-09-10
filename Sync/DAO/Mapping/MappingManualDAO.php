@@ -137,6 +137,8 @@ class MappingManualDAO
     }
 
     /**
+     * Get a list of fields that should sync from Mautic to the integration
+     *
      * @param string $internalObjectName
      *
      * @return array
@@ -155,8 +157,8 @@ class MappingManualDAO
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
             $fieldMappings    = $objectMappingDAO->getFieldMappings();
             foreach ($fieldMappings as $fieldMapping) {
-                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_INTEGRATION) {
-                    // Ignore because this field is a one way sync
+                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_MAUTIC) {
+                    // Ignore because this field is a one way sync from the integration to Mautic
                     continue;
                 }
 
@@ -176,6 +178,8 @@ class MappingManualDAO
     }
 
     /**
+     * Get a list of fields that should sync from the integration to Mautic
+     *
      * @param string $integrationObjectName
      *
      * @return array
@@ -195,8 +199,8 @@ class MappingManualDAO
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
             $fieldMappings    = $objectMappingDAO->getFieldMappings();
             foreach ($fieldMappings as $fieldMapping) {
-                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_MAUTIC) {
-                    // Ignore because this field is a one way sync
+                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_INTEGRATION) {
+                    // Ignore because this field is a one way sync from Mautic to the integration
                     continue;
                 }
 
