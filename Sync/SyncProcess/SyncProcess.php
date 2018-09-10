@@ -550,7 +550,7 @@ class SyncProcess
                         sprintf(
                             "Integration to Mautic; syncing %s with a value of %s",
                             $fieldMappingDAO->getInternalField(),
-                            $integrationInformationChangeRequest->getNewValue()->getOriginalValue()
+                            var_export($integrationInformationChangeRequest->getNewValue()->getOriginalValue(), true)
                         ),
                         __CLASS__.':'.__FUNCTION__
                     );
@@ -613,7 +613,7 @@ class SyncProcess
                                         $winningChangeRequest->getIntegration(),
                                         $winningChangeRequest->getObject(),
                                         $fieldMappingDAO->getInternalField(),
-                                        $winningChangeRequest->getNewValue()->getOriginalValue(),
+                                        var_export($winningChangeRequest->getNewValue()->getOriginalValue(), true),
                                         $judgeMode
                                     ),
                                     __CLASS__.':'.__FUNCTION__
@@ -652,7 +652,7 @@ class SyncProcess
                             "Integration to Mautic; the sync is bidirectional but no conflicts were found so syncing the %s object's field %s with a value of %s",
                             $internalObject->getObject(),
                             $fieldMappingDAO->getInternalField(),
-                            $integrationInformationChangeRequest->getNewValue()->getOriginalValue()
+                            var_export($integrationInformationChangeRequest->getNewValue()->getOriginalValue(), true)
                         ),
                         __CLASS__.':'.__FUNCTION__
                     );
@@ -756,7 +756,7 @@ class SyncProcess
                             "Mautic to integration; syncing %s object's field %s with a value of %s",
                             $integrationObject->getObject(),
                             $fieldMappingDAO->getIntegrationField(),
-                            $internalInformationChangeRequest->getNewValue()->getOriginalValue()
+                            var_export($internalInformationChangeRequest->getNewValue()->getOriginalValue(), true)
                         ),
                         __CLASS__.':'.__FUNCTION__
                     );
