@@ -558,40 +558,38 @@ class CommonController extends Controller implements MauticController
         }
         $name = 'mautic.'.$name;
 
-        if (!empty($name)) {
-            if ($this->request->query->has('orderby')) {
-                $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
-                $dir     = $session->get("$name.orderbydir", 'ASC');
-                $dir     = ($dir == 'ASC') ? 'DESC' : 'ASC';
-                $session->set("$name.orderby", $orderBy);
-                $session->set("$name.orderbydir", $dir);
-            }
+        if ($this->request->query->has('orderby')) {
+            $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
+            $dir     = $session->get("$name.orderbydir", 'ASC');
+            $dir     = ($dir == 'ASC') ? 'DESC' : 'ASC';
+            $session->set("$name.orderby", $orderBy);
+            $session->set("$name.orderbydir", $dir);
+        }
 
-            if ($this->request->query->has('limit')) {
-                $limit = InputHelper::int($this->request->query->get('limit'));
-                $session->set("$name.limit", $limit);
-            }
+        if ($this->request->query->has('limit')) {
+            $limit = InputHelper::int($this->request->query->get('limit'));
+            $session->set("$name.limit", $limit);
+        }
 
-            if ($this->request->query->has('filterby')) {
-                $filter  = InputHelper::clean($this->request->query->get('filterby'), true);
-                $value   = InputHelper::clean($this->request->query->get('value'), true);
-                $filters = $session->get("$name.filters", []);
+        if ($this->request->query->has('filterby')) {
+            $filter  = InputHelper::clean($this->request->query->get('filterby'), true);
+            $value   = InputHelper::clean($this->request->query->get('value'), true);
+            $filters = $session->get("$name.filters", []);
 
-                if ($value == '') {
-                    if (isset($filters[$filter])) {
-                        unset($filters[$filter]);
-                    }
-                } else {
-                    $filters[$filter] = [
-                        'column' => $filter,
-                        'expr'   => 'like',
-                        'value'  => $value,
-                        'strict' => false,
-                    ];
+            if ($value == '') {
+                if (isset($filters[$filter])) {
+                    unset($filters[$filter]);
                 }
-
-                $session->set("$name.filters", $filters);
+            } else {
+                $filters[$filter] = [
+                    'column' => $filter,
+                    'expr'   => 'like',
+                    'value'  => $value,
+                    'strict' => false,
+                ];
             }
+
+            $session->set("$name.filters", $filters);
         }
     }
 
@@ -802,7 +800,7 @@ class CommonController extends Controller implements MauticController
         $filename    = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
         $handler     = Handler::create($sourceIterator, $writer);
 
-        return new StreamedResponse(function () use ($handler, $sourceIterator, $writer) {
+        return new StreamedResponse(function () use ($handler) {
             $handler->export();
         }, 200, ['Content-Type' => $contentType, 'Content-Disposition' => sprintf('attachment; filename=%s', $filename)]);
     }

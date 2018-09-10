@@ -65,7 +65,7 @@ class LeadListFilteringEvent extends CommonEvent
      * @param QueryBuilder  $queryBuilder
      * @param EntityManager $entityManager
      */
-    public function __construct($details, $leadId, $alias, $func, QueryBuilder $queryBuilder, EntityManager $entityManager)
+    public function __construct($details, $leadId, $alias, $func, $queryBuilder, EntityManager $entityManager)
     {
         $this->details         = $details;
         $this->leadId          = $leadId;

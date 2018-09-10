@@ -44,6 +44,12 @@ class SortableListType extends AbstractType
             $constraints[] = $options['constraint_callback'];
         }
 
+        if ($options['option_notblank']) {
+            $options['option_constraint'][] = new NotBlank(
+                ['message' => 'mautic.form.lists.notblank']
+            );
+        }
+
         $builder->add(
             $builder->create(
                 'list',
@@ -62,11 +68,7 @@ class SortableListType extends AbstractType
                             ],
                             'postaddon' => $options['sortable'],
                         ],
-                        'constraints' => ($options['option_notblank']) ? [
-                            new NotBlank(
-                                ['message' => 'mautic.form.lists.notblank']
-                            ),
-                        ] : [],
+                        'constraints'    => $options['option_constraint'],
                         'error_bubbling' => true,
                     ],
                     'allow_add'      => true,
@@ -76,7 +78,7 @@ class SortableListType extends AbstractType
                     'error_bubbling' => false,
                 ]
             )
-        )->addModelTransformer(new SortableListTransformer($options['option_notblank'], $options['with_labels']));
+        )->addModelTransformer(new SortableListTransformer($options['option_notblank'], $options['with_labels'], $options['key_value_pairs']));
     }
 
     /**
@@ -104,6 +106,9 @@ class SortableListType extends AbstractType
                 'with_labels'         => false,
                 'entry_type'          => 'text',
                 'add_value_button'    => 'mautic.core.form.list.additem',
+                // Stores as [label => value] array instead of [list => [[label => the label, value => the value], ...]]
+                'key_value_pairs'          => false,
+                'option_constraint'        => [],
             ]
         );
 

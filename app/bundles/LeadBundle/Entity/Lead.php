@@ -298,6 +298,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
             ->addLifecycleEvent('checkAttributionDate', 'prePersist')
+            ->addLifecycleEvent('checkDateAdded', 'prePersist')
             ->addIndex(['date_added'], 'lead_date_added')
             ->addIndex(['date_identified'], 'date_identified');
 
@@ -1595,6 +1596,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
+     * Set date added if not already set.
+     */
+    public function checkDateAdded()
+    {
+        if (null === $this->getDateAdded()) {
+            $this->setDateAdded(new \DateTime());
+        }
+    }
+
+    /**
      * @return mixed
      */
     public function getPrimaryCompany()
@@ -1738,6 +1749,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->mobile = $mobile;
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLeadPhoneNumber()
+    {
+        return $this->getMobile() ?: $this->getPhone();
     }
 
     /**

@@ -25,6 +25,7 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\Exception\FileValidationException;
@@ -119,6 +120,11 @@ class SubmissionModel extends CommonFormModel
     private $deviceTrackingService;
 
     /**
+     * @var FieldValueTransformer
+     */
+    private $fieldValueTransformer;
+
+    /**
      * @param IpLookupHelper                 $ipLookupHelper
      * @param TemplatingHelper               $templatingHelper
      * @param FormModel                      $formModel
@@ -131,6 +137,7 @@ class SubmissionModel extends CommonFormModel
      * @param UploadFieldValidator           $uploadFieldValidator
      * @param FormUploader                   $formUploader
      * @param DeviceTrackingServiceInterface $deviceTrackingService
+     * @param FieldValueTransformer          $fieldValueTransformer
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -144,7 +151,8 @@ class SubmissionModel extends CommonFormModel
         FormFieldHelper $fieldHelper,
         UploadFieldValidator $uploadFieldValidator,
         FormUploader $formUploader,
-        DeviceTrackingServiceInterface $deviceTrackingService
+        DeviceTrackingServiceInterface $deviceTrackingService,
+        FieldValueTransformer $fieldValueTransformer
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->templatingHelper       = $templatingHelper;
@@ -158,6 +166,7 @@ class SubmissionModel extends CommonFormModel
         $this->uploadFieldValidator   = $uploadFieldValidator;
         $this->formUploader           = $formUploader;
         $this->deviceTrackingService  = $deviceTrackingService;
+        $this->fieldValueTransformer  = $fieldValueTransformer;
     }
 
     /**
@@ -367,11 +376,10 @@ class SubmissionModel extends CommonFormModel
             $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
         }
 
-        // Get updated lead if applicable with tracking ID
-        /** @var Lead $lead */
         $lead          = $this->leadModel->getCurrentLead();
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
         $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
             ->setLead($lead);
@@ -410,7 +418,7 @@ class SubmissionModel extends CommonFormModel
 
         // Save the submission
         $this->saveEntity($submission);
-
+        $this->fieldValueTransformer->transformValuesAfterSubmit($submissionEvent);
         // Now handle post submission actions
         try {
             $this->executeFormActions($submissionEvent);
@@ -423,6 +431,12 @@ class SubmissionModel extends CommonFormModel
             }
 
             return ['errors' => [$exception->getMessage()]];
+        }
+
+        // update contact fields with transform values
+        if (!empty($this->fieldValueTransformer->getContactFieldsToUpdate())) {
+            $this->leadModel->setFieldValues($lead, $this->fieldValueTransformer->getContactFieldsToUpdate());
+            $this->leadModel->saveEntity($lead, false);
         }
 
         if (!$form->isStandalone()) {
@@ -484,6 +498,7 @@ class SubmissionModel extends CommonFormModel
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
+        $queryArgs['simpleResults']  = true;
         $results                     = $this->getEntities($queryArgs);
         $translator                  = $this->translator;
 
@@ -520,8 +535,8 @@ class SubmissionModel extends CommonFormModel
                         foreach ($results as $k => $s) {
                             $row = [
                                 $s['id'],
-                                $s['dateSubmitted']->format('Y-m-d H:i:s'),
-                                $s['ipAddress']['ipAddress'],
+                                $s['dateSubmitted'],
+                                $s['ipAddress'],
                                 $s['referer'],
                             ];
                             foreach ($s['results'] as $k2 => $r) {
@@ -597,8 +612,8 @@ class SubmissionModel extends CommonFormModel
                             foreach ($results as $k => $s) {
                                 $row = [
                                     $s['id'],
-                                    $s['dateSubmitted']->format('Y-m-d H:i:s'),
-                                    $s['ipAddress']['ipAddress'],
+                                    $s['dateSubmitted'],
+                                    $s['ipAddress'],
                                     $s['referer'],
                                 ];
                                 foreach ($s['results'] as $k2 => $r) {
@@ -884,6 +899,8 @@ class SubmissionModel extends CommonFormModel
         // Closure to get data and unique fields
         $getCompanyData = function ($currentFields) use ($companyFields) {
             $companyData = [];
+            // force add company contact field to company fields check
+            $companyFields = array_merge($companyFields, ['company'=> 'company']);
             foreach ($companyFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {
                     $value               = $currentFields[$alias];
@@ -1034,6 +1051,9 @@ class SubmissionModel extends CommonFormModel
             list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+            } elseif ($companyEntity instanceof Company) {
+                $this->companyModel->setFieldValues($companyEntity, $companyFieldMatches);
+                $this->companyModel->saveEntity($companyEntity);
             }
 
             if (!empty($company) and $companyEntity instanceof Company) {

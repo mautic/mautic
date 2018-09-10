@@ -280,9 +280,6 @@ return [
                     'setCatInUrl' => [
                         '%mautic.cat_in_page_url%',
                     ],
-                    'setTrackByFingerprint' => [
-                        '%mautic.track_by_fingerprint%',
-                    ],
                 ],
             ],
             'mautic.page.model.redirect' => [
@@ -292,9 +289,10 @@ return [
                 ],
             ],
             'mautic.page.model.trackable' => [
-                'class'     => 'Mautic\PageBundle\Model\TrackableModel',
+                'class'     => \Mautic\PageBundle\Model\TrackableModel::class,
                 'arguments' => [
                     'mautic.page.model.redirect',
+                    'mautic.lead.repository.field',
                 ],
             ],
             'mautic.page.model.video' => [
@@ -302,6 +300,15 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.helper.ip_lookup',
+                ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.page.repository.redirect' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\PageBundle\Entity\Redirect::class,
                 ],
             ],
         ],
@@ -327,7 +334,7 @@ return [
         'google_analytics'      => false,
         'track_contact_by_ip'   => false,
         'track_by_fingerprint'  => false,
-        'track_by_tracking_url' => true,
+        'track_by_tracking_url' => false,
         'redirect_list_types'   => [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',
@@ -335,6 +342,7 @@ return [
         'google_analytics_id'                   => null,
         'google_analytics_trackingpage_enabled' => false,
         'google_analytics_landingpage_enabled'  => false,
+        'google_analytics_anonymize_ip'         => false,
         'facebook_pixel_id'                     => null,
         'facebook_pixel_trackingpage_enabled'   => false,
         'facebook_pixel_landingpage_enabled'    => false,

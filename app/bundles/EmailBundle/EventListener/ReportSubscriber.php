@@ -44,11 +44,6 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * @var bool Property is used to avoid Joining DNC table more times
-     */
-    private $dncWasAddedToQb = false;
-
-    /**
      * ReportSubscriber constructor.
      *
      * @param Connection        $db
@@ -406,7 +401,11 @@ class ReportSubscriber extends CommonSubscriber
     {
         $graphs = $event->getRequestedGraphs();
 
-        if (!$event->checkContext(self::CONTEXT_EMAIL_STATS) || ($event->checkContext(self::CONTEXT_EMAILS) && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs))) {
+        if (!$event->checkContext([self::CONTEXT_EMAIL_STATS, self::CONTEXT_EMAILS])) {
+            return;
+        }
+
+        if ($event->checkContext(self::CONTEXT_EMAILS) && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)) {
             return;
         }
 
@@ -612,17 +611,33 @@ class ReportSubscriber extends CommonSubscriber
      */
     private function addDNCTable(QueryBuilder $qb)
     {
-        if ($this->dncWasAddedToQb) {
-            return;
+        $fromAlias = 'e';
+        $table     = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
+        $alias     = 'dnc';
+
+        if (!$this->isJoined($qb, $table, $fromAlias, $alias)) {
+            $qb->leftJoin(
+                $fromAlias,
+                $table,
+                $alias,
+                'e.id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
+            );
+        }
+    }
+
+    private function isJoined($query, $table, $fromAlias, $alias)
+    {
+        $joins = $query->getQueryParts()['join'];
+        if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) {
+            return false;
         }
 
-        $qb->leftJoin(
-            'e',
-            MAUTIC_TABLE_PREFIX.'lead_donotcontact',
-            'dnc',
-            'e.id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
-        );
+        foreach ($joins[$fromAlias] as $join) {
+            if ($join['joinTable'] == $table && $join['joinAlias'] == $alias) {
+                return true;
+            }
+        }
 
-        $this->dncWasAddedToQb = true;
+        return false;
     }
 }

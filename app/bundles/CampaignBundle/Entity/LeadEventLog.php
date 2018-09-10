@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 /**
  * Class LeadEventLog.
  */
-class LeadEventLog
+class LeadEventLog implements ChannelInterface
 {
     /**
      * @var
@@ -112,9 +112,12 @@ class LeadEventLog
         $builder->setTable('campaign_lead_event_log')
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadEventLogRepository')
             ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
+            ->addIndex(['campaign_id', 'is_scheduled', 'trigger_date'], 'campaign_event_schedule_counts')
             ->addIndex(['date_triggered'], 'campaign_date_triggered')
             ->addIndex(['lead_id', 'campaign_id', 'rotation'], 'campaign_leads')
             ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
+            ->addIndex(['campaign_id', 'event_id', 'date_triggered'], 'campaign_actions')
+            ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
             ->addUniqueConstraint(['event_id', 'lead_id', 'rotation'], 'campaign_rotation');
 
         $builder->addId();
@@ -298,7 +301,7 @@ class LeadEventLog
      *
      * @return $this
      */
-    public function setEvent($event)
+    public function setEvent(Event $event)
     {
         $this->event = $event;
 
@@ -365,7 +368,7 @@ class LeadEventLog
     }
 
     /**
-     * @return mixed
+     * @return Campaign
      */
     public function getCampaign()
     {
@@ -430,6 +433,19 @@ class LeadEventLog
     public function getMetadata()
     {
         return $this->metadata;
+    }
+
+    /**
+     * @param $metadata
+     */
+    public function appendToMetadata($metadata)
+    {
+        if (!is_array($metadata)) {
+            // Assumed output for timeline BC for <2.14
+            $metadata = ['timeline' => $metadata];
+        }
+
+        $this->metadata = array_merge($this->metadata, $metadata);
     }
 
     /**

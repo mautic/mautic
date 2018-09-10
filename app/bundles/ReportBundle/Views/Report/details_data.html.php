@@ -33,6 +33,8 @@ function getTotal($a, $f, $t, $allrows, $ac)
             return ((int) $a >= (int) $t) ? (int) $a : (int) $t;
         case 'MIN':
             return ((int) $a <= (int) $t) ? (int) $a : (int) $t;
+        case 'GROUP_CONCAT':
+            return '';
         default:
             return (int) $t;
     }

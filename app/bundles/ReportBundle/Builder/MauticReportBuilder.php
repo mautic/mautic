@@ -460,6 +460,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                             case 'string':
                             case 'email':
+                            case 'url':
                                 switch ($exprFunction) {
                                     case 'startsWith':
                                         $exprFunction    = 'like';

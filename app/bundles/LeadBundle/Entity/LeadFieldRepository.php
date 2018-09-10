@@ -160,29 +160,36 @@ class LeadFieldRepository extends CommonRepository
                 return false;
             }
         } else {
-            // Standard field
+            // Standard field / UTM field
+            $utmField = in_array($field, ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term']);
+            if ($utmField) {
+                $q->join('l', MAUTIC_TABLE_PREFIX.'lead_utmtags', 'u', 'l.id = u.lead_id');
+                $property = 'u.'.$field;
+            } else {
+                $property = 'l.'.$field;
+            }
             if ($operatorExpr === 'empty' || $operatorExpr === 'notEmpty') {
                 $q->where(
                     $q->expr()->andX(
                         $q->expr()->eq('l.id', ':lead'),
                         ($operatorExpr === 'empty') ?
                             $q->expr()->orX(
-                                $q->expr()->isNull('l.'.$field),
-                                $q->expr()->eq('l.'.$field, $q->expr()->literal(''))
+                                $q->expr()->isNull($property),
+                                $q->expr()->eq($property, $q->expr()->literal(''))
                             )
                         :
                         $q->expr()->andX(
-                            $q->expr()->isNotNull('l.'.$field),
-                            $q->expr()->neq('l.'.$field, $q->expr()->literal(''))
+                            $q->expr()->isNotNull($property),
+                            $q->expr()->neq($property, $q->expr()->literal(''))
                         )
                     )
                 )
                   ->setParameter('lead', (int) $lead);
             } elseif ($operatorExpr === 'regexp' || $operatorExpr === 'notRegexp') {
                 if ($operatorExpr === 'regexp') {
-                    $where = 'l.'.$field.' REGEXP  :value';
+                    $where = $property.' REGEXP  :value';
                 } else {
-                    $where = 'l.'.$field.' NOT REGEXP  :value';
+                    $where = $property.' NOT REGEXP  :value';
                 }
 
                 $q->where(
@@ -224,8 +231,8 @@ class LeadFieldRepository extends CommonRepository
                     // include null
                     $expr->add(
                         $q->expr()->orX(
-                            $q->expr()->$operatorExpr('l.'.$field, ':value'),
-                            $q->expr()->isNull('l.'.$field)
+                            $q->expr()->$operatorExpr($property, ':value'),
+                            $q->expr()->isNull($property)
                         )
                     );
                 } else {
@@ -245,13 +252,18 @@ class LeadFieldRepository extends CommonRepository
                     }
 
                     $expr->add(
-                        $q->expr()->$operatorExpr('l.'.$field, ':value')
+                        $q->expr()->$operatorExpr($property, ':value')
                     );
                 }
 
                 $q->where($expr)
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
+            }
+            if ($utmField) {
+                // Match only against the latest UTM properties.
+                $q->orderBy('u.date_added', 'DESC');
+                $q->setMaxResults(1);
             }
             $result = $q->execute()->fetch();
 
@@ -316,5 +328,15 @@ class LeadFieldRepository extends CommonRepository
         $result = $q->execute()->fetch();
 
         return !empty($result['id']);
+    }
+
+    /**
+     * @param $type
+     *
+     * @return LeadField[]
+     */
+    public function getFieldsByType($type)
+    {
+        return $this->findBy(['type' => $type]);
     }
 }
