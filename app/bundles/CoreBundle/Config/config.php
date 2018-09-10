@@ -917,8 +917,8 @@ return [
 
     'ip_lookup_services' => [
         'freegeoip' => [
-            'display_name' => 'Freegeoip.net',
-            'class'        => 'Mautic\CoreBundle\IpLookup\FreegeoipLookup',
+            'display_name' => 'Ipstack.com',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IpstackLookup',
         ],
         'geobytes' => [
             'display_name' => 'Geobytes',

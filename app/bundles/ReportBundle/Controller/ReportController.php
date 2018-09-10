@@ -53,9 +53,7 @@ class ReportController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         //set limits
         $limit = $this->container->get('session')->get('mautic.report.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
@@ -588,10 +586,7 @@ class ReportController extends FormController
             return $this->accessDenied();
         }
 
-        // Set filters
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         $mysqlFormat = 'Y-m-d';
         $session     = $this->container->get('session');

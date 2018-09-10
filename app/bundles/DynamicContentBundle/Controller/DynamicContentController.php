@@ -52,9 +52,7 @@ class DynamicContentController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         //set limits
         $limit = $this->get('session')->get('mautic.dynamicContent.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));

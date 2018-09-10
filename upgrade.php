@@ -473,6 +473,15 @@ function clear_mautic_cache()
         return false;
     }
 
+    // Follow the same pattern as the console command and flush opcache/apc as appropriate.
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+    }
+
+    if (function_exists('apc_clear_cache')) {
+        apc_clear_cache();
+    }
+
     return true;
 }
 
@@ -531,6 +540,12 @@ function apply_critical_migrations()
 
     $success = true;
 
+    $minExecutionTime = 300;
+    $maxExecutionTime = (int) ini_get('max_execution_time');
+    if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
+        ini_set('max_execution_time', $minExecutionTime);
+    }
+
     if ($criticalMigrations) {
         foreach ($criticalMigrations as $version) {
             if (!run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug', $version])) {
@@ -549,6 +564,12 @@ function apply_critical_migrations()
  */
 function apply_migrations()
 {
+    $minExecutionTime = 300;
+    $maxExecutionTime = (int) ini_get('max_execution_time');
+    if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
+        ini_set('max_execution_time', $minExecutionTime);
+    }
+
     return run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug']);
 }
 
@@ -1184,11 +1205,11 @@ function recursive_remove_directory($directory)
         return true;
     } elseif (!is_dir($directory)) {
         return false;
-        // ... if the path is not readable
+    // ... if the path is not readable
     } elseif (!is_readable($directory)) {
         // ... we return false and exit the function
         return false;
-        // ... else if the path is readable
+    // ... else if the path is readable
     } else {
         // we open the directory
         $handle = opendir($directory);
@@ -1204,7 +1225,7 @@ function recursive_remove_directory($directory)
                 if (is_dir($path)) {
                     // we call this function with the new path
                     recursive_remove_directory($path);
-                    // if the new path is a file
+                // if the new path is a file
                 } else {
                     // we remove the file
                     @unlink($path);
