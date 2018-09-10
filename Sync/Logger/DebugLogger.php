@@ -37,7 +37,7 @@ class DebugLogger
      * @param string $message
      * @param array  $context
      */
-    public static function log($integration, $message, $loggedFrom = null, array $context = [])
+    public static function log($integration, $message, $loggedFrom = null, array $context = [], $urgency = 'debug')
     {
         if (!static::$logger) {
             return;
@@ -47,6 +47,6 @@ class DebugLogger
             $context['logged from'] = $loggedFrom;
         }
 
-        static::$logger->debug(strtoupper($integration)." SYNC: ".$message, $context);
+        static::$logger->$urgency(strtoupper($integration)." SYNC: ".$message, $context);
     }
 }
