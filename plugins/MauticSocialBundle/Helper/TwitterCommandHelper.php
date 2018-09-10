@@ -22,6 +22,7 @@ use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class TwitterCommandHelper
 {
@@ -336,7 +337,9 @@ class TwitterCommandHelper
                 $leadEntity->setPreferredProfileImage('Twitter');
 
                 // save the lead now
-                $leadEntity->setLastActive($lastActive->format('Y-m-d H:i:s'));
+                if ($lastActive instanceof DateTime) {
+                    $leadEntity->setLastActive($lastActive->format('Y-m-d H:i:s'));
+                }
 
                 try {
                     // save the lead entity

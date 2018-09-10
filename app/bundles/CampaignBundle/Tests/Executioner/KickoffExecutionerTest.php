@@ -23,6 +23,7 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,10 +68,6 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
     public function testNoContactsResultInEmptyResults()
     {
-        $this->kickoffContactFinder->expects($this->once())
-            ->method('getContactCount')
-            ->willReturn(0);
-
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
         $campaign->expects($this->once())
@@ -79,7 +76,7 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
-        $counter = $this->getExecutioner()->execute($campaign, $limiter);
+        $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -137,7 +134,7 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $counter = $this->getExecutioner()->execute($campaign, $limiter);
+        $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
         $this->assertEquals(4, $counter->getTotalEvaluated());
         $this->assertEquals(2, $counter->getTotalScheduled());

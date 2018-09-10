@@ -102,12 +102,7 @@ class TransportChain
      */
     public function sendSms(Lead $lead, $content)
     {
-        $number = $lead->getLeadPhoneNumber();
-
-        $this->logger->addInfo('Sending an SMS message using '
-                            .$this->transports[$this->primaryTransport]['integrationAlias'].' to '
-                            .(is_array($number) ? join(',', $number) : $number));
-        $response = $this->getPrimaryTransport()->sendSms($number, $content);
+        $response = $this->getPrimaryTransport()->sendSms($lead, $content);
 
         return $response;
     }
@@ -130,7 +125,7 @@ class TransportChain
     public function getEnabledTransports()
     {
         $enabled = [];
-        foreach ($this->transports as $alias=>$transport) {
+        foreach ($this->transports as $alias => $transport) {
             if (!isset($transport['published'])) {
                 $integration = $this->integrationHelper->getIntegrationObject($transport['integrationAlias']);
                 if (!$integration) {

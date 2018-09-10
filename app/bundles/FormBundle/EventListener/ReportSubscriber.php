@@ -84,6 +84,10 @@ class ReportSubscriber extends CommonSubscriber
             $submissionPrefix  = 'fs.';
             $pagePrefix        = 'p.';
             $submissionColumns = [
+                $submissionPrefix.'id' => [
+                    'label'          => 'mautic.form.report.submission.id',
+                    'type'           => 'int',
+                ],
                 $submissionPrefix.'date_submitted' => [
                     'label'          => 'mautic.form.report.submit.date_submitted',
                     'type'           => 'datetime',
