@@ -136,12 +136,12 @@ class OrderDAO
     }
 
     /**
-     * @param                $integration
-     * @param                $internalObjectName
-     * @param                $internalObjectId
-     * @param                $integrationObjectName
-     * @param                $integrationObjectId
-     * @param \DateTime|null $objectModifiedDate
+     * @param string                  $integration
+     * @param string                  $internalObjectName
+     * @param string|int              $internalObjectId
+     * @param string                  $integrationObjectName
+     * @param string|int              $integrationObjectId
+     * @param \DateTimeInterface|null $objectModifiedDate
      */
     public function addObjectMapping(
         $integration,
@@ -149,7 +149,7 @@ class OrderDAO
         $internalObjectId,
         $integrationObjectName,
         $integrationObjectId,
-        \DateTime $objectModifiedDate = null
+        \DateTimeInterface $objectModifiedDate = null
     ) {
         if (null === $objectModifiedDate) {
             $objectModifiedDate = new \DateTime();
@@ -183,9 +183,9 @@ class OrderDAO
 
     /**
      * @param ObjectChangeDAO $objectChangeDAO
-     * @param \DateTime|null  $objectModifiedDate
+     * @param \DateTimeInterface|null  $objectModifiedDate
      */
-    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, \DateTime $objectModifiedDate = null)
+    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, \DateTimeInterface $objectModifiedDate = null)
     {
         if (null === $objectModifiedDate) {
             $objectModifiedDate = new \DateTime();
