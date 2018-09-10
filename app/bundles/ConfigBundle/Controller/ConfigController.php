@@ -119,6 +119,11 @@ class ConfigController extends FormController
                             }
 
                             $configurator->write();
+                            /** @var \Mautic\ConfigBundle\Service\ConfigChangeLogger $formConfigs */
+                            $changeLogger = $this->get('mautic.config.config_change_logger');
+                            $changeLogger
+                                ->setOriginalNormData($form->getNormData())
+                                ->log($form->getNormData());
 
                             $this->addFlash('mautic.config.config.notice.updated');
 
