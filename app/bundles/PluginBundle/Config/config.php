@@ -51,6 +51,12 @@ return [
                 'controller' => 'MauticPluginBundle:Auth:authStatus',
             ],
         ],
+        'api' => [
+            'mautic_api_plugin_reload' => [
+                'path'       => '/reload/plugins',
+                'controller' => 'MauticPluginBundle:Api\PluginApi:reload',
+            ],
+        ],
     ],
     'menu' => [
         'admin' => [
