@@ -64,7 +64,7 @@ $container->loadFromExtension('doctrine', [
                 'dbname'   => getenv('DB_NAME') ?: '%mautic.db_name%',
                 'user'     => getenv('DB_USER') ?: '%mautic.db_user%',
                 'password' => getenv('DB_PASSWD') ?: '%mautic.db_password%',
-                'charset'  => 'UTF8',
+                'charset'  => 'utf8mb4',
                 // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
                 'mapping_types' => [
                     'enum'  => 'string',
