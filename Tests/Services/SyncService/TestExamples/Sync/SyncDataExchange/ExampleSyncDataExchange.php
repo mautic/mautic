@@ -110,7 +110,8 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 $this->payload['create'][$emailAddress] = $person;
             }
 
-            // If applicable, do something to verify if email addresses exist and if so, update objects instead
+            // If applicable, do something to verify if email addresses exist and if so, update objects instead to prevent duplicates.
+            // This just depends on if the integration has an upsert feature or not.
             // $api->searchByEmail(array_keys($byEmail));
         }
 
@@ -141,18 +142,41 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
 
         // Notify the order regarding IDs of created objects
         foreach ($response as $result) {
-            if (201 === $result['code']) {
-                /** @var ObjectChangeDAO $object */
-                $object = $byEmail[$result['object']][$result['email']];
+            /** @var ObjectChangeDAO $object */
+            $object = $byEmail[$result['object']][$result['email']];
 
-                $syncOrderDAO->addObjectMapping(
-                    ExampleIntegration::NAME,
-                    $object->getMappedObject(),
-                    $object->getMappedObjectId(),
-                    $result['object'],
-                    $result['id'],
-                    $result['last_modified']
-                );
+            switch ($result['code']) {
+                case 200: // updated
+                    $syncOrderDAO->updateLastSyncDate(
+                        $object,
+                        $result['last_modified']
+                    );
+                    break;
+                case 201: //created
+                    $syncOrderDAO->addObjectMapping(
+                        ExampleIntegration::NAME,
+                        $object->getMappedObject(),
+                        $object->getMappedObjectId(),
+                        $result['object'],
+                        $result['id'],
+                        $result['last_modified']
+                    );
+                    break;
+                case 404: // assume this object has been deleted
+                    $syncOrderDAO->deleteObject($object);
+                    break;
+                case 405: // simulated "this lead has been converted to a contact"
+                    $syncOrderDAO->updateObjectMapping(
+                        $object,
+                        $result['converted_id'],
+                        self::OBJECT_CONTACT,
+                        $result['last_modified']
+                    );
+                case 500: // there was some kind of temporary issue so just retry this later
+                    $syncOrderDAO->retrySyncLater($object);
+                    break;
+                default:
+                    // Assume the rest are just failures so don't do anything and the sync process will not continue to sync the objects
             }
         }
     }
@@ -280,6 +304,12 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
             $person['last_modified'] = $now;
             $response[]              = $person;
             $id++;
+        }
+
+        foreach ($this->payload['update'] as $person) {
+            $person['code']          = 200;
+            $person['last_modified'] = $now;
+            $response[]              = $person;
         }
 
         return $response;
