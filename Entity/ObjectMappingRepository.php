@@ -109,4 +109,27 @@ class ObjectMappingRepository  extends CommonRepository
 
         return $qb->execute()->rowCount();
     }
+
+    /**
+     * @param string $integration
+     * @param string $objectName
+     * @param mixed  $objectId
+     */
+    public function markAsDeleted($integration, $objectName, $objectId)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping')
+            ->set('is_deleted', 1)
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('i.integration', ':integration'),
+                    $qb->expr()->eq('i.integration_object_name', ':objectName'),
+                    $qb->expr()->eq('i.integration_object_id', ':objectId')
+                )
+            )
+            ->setParameter('integration', $integration)
+            ->setParameter('objectName', $objectName)
+            ->setParameter('objectId', $objectId);
+    }
 }

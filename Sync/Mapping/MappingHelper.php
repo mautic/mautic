@@ -18,8 +18,10 @@ use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MappingHelper
@@ -123,6 +125,7 @@ class MappingHelper
      * @param ObjectDAO $internalObjectDAO
      *
      * @return ObjectDAO
+     * @throws ObjectDeletedException
      */
     public function findIntegrationObject(string $integration, string $integrationObjectName, ObjectDAO $internalObjectDAO)
     {
@@ -132,6 +135,10 @@ class MappingHelper
             $internalObjectDAO->getObjectId(),
             $integrationObjectName
         )) {
+            if ($integrationObject['is_deleted']) {
+                throw new ObjectDeletedException();
+            }
+
             return new ObjectDAO(
                 $integrationObjectName,
                 $integrationObject['integration_object_id'],
@@ -176,6 +183,16 @@ class MappingHelper
                 $mapping->getNewObjectName(),
                 $mapping->getNewObjectId()
             );
+        }
+    }
+
+    /**
+     * @param ObjectChangeDAO[] $objects
+     */
+    public function markAsDeleted(array $objects)
+    {
+        foreach ($objects as $object) {
+            $this->objectMappingRepository->markAsDeleted($object->getIntegration(), $object->getObject(), $object->getObjectId());
         }
     }
 

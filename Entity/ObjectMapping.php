@@ -63,6 +63,11 @@ class ObjectMapping
     private $internalStorage = [];
 
     /**
+     * @var bool
+     */
+    private $isDeleted = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      *
      * @return void
@@ -119,6 +124,11 @@ class ObjectMapping
         $builder
             ->createField('internalStorage', Type::JSON_ARRAY)
             ->columnName('internal_storage')
+            ->build();
+
+        $builder
+            ->createField('isDeleted', Type::BOOLEAN)
+            ->columnName('is_deleted')
             ->build();
     }
 
@@ -317,4 +327,23 @@ class ObjectMapping
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    /**
+     * @param bool $isDeleted
+     *
+     * @return ObjectMapping
+     */
+    public function setIsDeleted($isDeleted)
+    {
+        $this->isDeleted = $isDeleted;
+
+        return $this;
+    }
 }

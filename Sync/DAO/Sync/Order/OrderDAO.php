@@ -54,9 +54,14 @@ class OrderDAO
     private $objectMappings = [];
 
     /**
-     * @var array
+     * @var UpdatedObjectMappingDAO[]
      */
     private $updatedObjectMappings = [];
+
+    /**
+     * @var ObjectChangeDAO[]
+     */
+    private $deletedObjects = [];
 
     /**
      * @var int
@@ -136,6 +141,8 @@ class OrderDAO
     }
 
     /**
+     * Create a new mapping between the Mautic and Integration objects
+     *
      * @param string                  $integration
      * @param string                  $internalObjectName
      * @param string|int              $internalObjectId
@@ -167,6 +174,8 @@ class OrderDAO
     }
 
     /**
+     * Update an existing object mapping in the case the object changed (i.e. a Lead was converted to a Contact)
+     *
      * @param ObjectChangeDAO $objectChangeDAO
      * @param mixed           $newIntegrationObjectId
      * @param null|string     $newIntegrationObjectName
@@ -195,6 +204,16 @@ class OrderDAO
     }
 
     /**
+     * Mark an object as deleted in the integration so Mautic doesn't continue to attempt to sync it
+     *
+     * @param ObjectChangeDAO $objectChangeDAO
+     */
+    public function deleteObject(ObjectChangeDAO $objectChangeDAO)
+    {
+        $this->deletedObjects[] = $objectChangeDAO;
+    }
+
+    /**
      * @return ObjectMapping[]
      */
     public function getObjectMappings(): array
@@ -203,11 +222,19 @@ class OrderDAO
     }
 
     /**
-     * @return array
+     * @return UpdatedObjectMappingDAO[]
      */
     public function getUpdatedObjectMappings(): array
     {
         return $this->updatedObjectMappings;
+    }
+
+    /**
+     * @return ObjectChangeDAO[]
+     */
+    public function getDeletedObjects(): array
+    {
+        return $this->deletedObjects;
     }
 
     /**

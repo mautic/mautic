@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
@@ -242,6 +243,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @param ReportObjectDAO $internalObjectDAO
      *
      * @return ReportObjectDAO
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
      */
     public function getMappedIntegrationObject(string $integration, string $integrationObjectName, ReportObjectDAO $internalObjectDAO)
     {
@@ -255,20 +257,26 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param ObjectMapping[]           $newMappings
-     * @param UpdatedObjectMappingDAO[] $updatedMappings
+     * @param OrderDAO $syncOrder
      */
-    public function cleanupProcessedObjects(array $newMappings, array $updatedMappings)
+    public function cleanupProcessedObjects(OrderDAO $syncOrder)
     {
-        foreach ($newMappings as $mapping) {
+        foreach ($syncOrder->getObjectMappings() as $mapping) {
             $object   = $mapping->getInternalObjectName();
             $objectId = $mapping->getInternalObjectId();
 
             $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object);
         }
 
-        foreach ($updatedMappings as $mapping) {
+        foreach ($syncOrder->getUpdatedObjectMappings() as $mapping) {
             $changedObjectDAO = $mapping->getObjectChangeDAO();
+            $object   = $changedObjectDAO->getMappedObject();
+            $objectId = $changedObjectDAO->getMappedObjectId();
+
+            $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object);
+        }
+
+        foreach ($syncOrder->getDeletedObjects() as $changedObjectDAO) {
             $object   = $changedObjectDAO->getMappedObject();
             $objectId = $changedObjectDAO->getMappedObjectId();
 

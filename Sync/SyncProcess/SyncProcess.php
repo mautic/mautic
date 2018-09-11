@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess;
 
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
@@ -228,12 +229,18 @@ class SyncProcess
 
             // Execute the sync instructions
             $this->integrationSyncDataExchange->executeSyncOrder($syncOrder);
+
             // Save the mappings between Mautic objects and the integration's objects
             $this->mappingHelper->saveObjectMappings($syncOrder->getObjectMappings());
+
             // Update the mappings between Mautic objects and the integration's objects if applicable
             $this->mappingHelper->updateObjectMappings($syncOrder->getUpdatedObjectMappings());
+
+            // Tell sync that these objects have been deleted and not to continue re-syncing them
+            $this->mappingHelper->markAsDeleted($syncOrder->getDeletedObjects());
+
             // Cleanup field tracking for successfully synced objects
-            $this->internalSyncDataExchange->cleanupProcessedObjects($syncOrder->getObjectMappings(), $syncOrder->getUpdatedObjectMappings());
+            $this->internalSyncDataExchange->cleanupProcessedObjects($syncOrder);
 
             // Fetch the next iteration/batch
             ++$this->syncIteration;
@@ -431,21 +438,35 @@ class SyncProcess
                 );
 
                 foreach ($internalObjects as $internalObject) {
-                    $integrationObject = $this->internalSyncDataExchange->getMappedIntegrationObject(
-                        $this->mappingManualDAO->getIntegration(),
-                        $mappedIntegrationObjectName,
-                        $internalObject
-                    );
+                    try {
+                        $integrationObject = $this->internalSyncDataExchange->getMappedIntegrationObject(
+                            $this->mappingManualDAO->getIntegration(),
+                            $mappedIntegrationObjectName,
+                            $internalObject
+                        );
 
-                    $objectChange = $this->getSyncObjectChangeMauticToIntegration(
-                        $syncReport,
-                        $objectMapping,
-                        $internalObject,
-                        $integrationObject
-                    );
+                        $objectChange = $this->getSyncObjectChangeMauticToIntegration(
+                            $syncReport,
+                            $objectMapping,
+                            $internalObject,
+                            $integrationObject
+                        );
 
-                    if ($objectChange->shouldSync()) {
-                        $syncOrder->addObjectChange($objectChange);
+                        if ($objectChange->shouldSync()) {
+                            $syncOrder->addObjectChange($objectChange);
+                        }
+                    } catch (ObjectDeletedException $exception) {
+                        DebugLogger::log(
+                            $this->mappingManualDAO->getIntegration(),
+                            sprintf(
+                                "Mautic to integration; Mautic's %s:%s object was deleted from the integration so don't try to sync",
+                                $internalObject->getObject(),
+                                $internalObject->getObjectId()
+                            ),
+                            __CLASS__.':'.__FUNCTION__
+                        );
+
+                        continue;
                     }
                 }
             }
