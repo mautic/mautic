@@ -64,7 +64,13 @@ class SyncCommand extends ContainerAwareCommand
             ->addOption(
                 '--start-datetime',
                 '-t',
-                InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_OPTIONAL,
+                'Set start date/time for updated values.'
+            )
+            ->addOption(
+                '--end-datetime',
+                null,
+                InputOption::VALUE_OPTIONAL,
                 'Set start date/time for updated values.'
             )
             ->addOption(
@@ -85,7 +91,8 @@ class SyncCommand extends ContainerAwareCommand
         $io                  = new SymfonyStyle($input, $output);
         $integration         = $input->getArgument('integration');
         $startDateTimeString = $input->getOption('start-datetime');
-        $firstTimeSync = $input->getOption('first-time-sync');
+        $endDateTimeString = $input->getOption('end-datetime');
+        $firstTimeSync       = $input->getOption('first-time-sync');
         $env                 = $input->getOption('env');
 
         try {
@@ -97,12 +104,20 @@ class SyncCommand extends ContainerAwareCommand
         }
 
         try {
+            $endDateTime = ($endDateTimeString) ? new DateTimeImmutable($endDateTimeString) : null;
+        } catch (\Exception $e) {
+            $io->error("'$endDateTimeString' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
+
+            return 1;
+        }
+
+        try {
             defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $integration);
 
             $event = new SyncEvent($integration, $firstTimeSync);
             $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
 
-            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $firstTimeSync, $startDateTime);
+            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $firstTimeSync, $startDateTime, $endDateTime);
         } catch (\Exception $e) {
             if ($env === 'dev' || MAUTIC_ENV === 'dev') {
                 throw $e;

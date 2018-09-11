@@ -30,6 +30,7 @@ interface SyncProcessFactoryInterface
      * @param MappingHelper             $mappingHelper
      * @param bool                      $isFirstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
+     * @param \DateTimeInterface|null   $syncToDateTime
      *
      * @return SyncProcess
      */
@@ -41,6 +42,7 @@ interface SyncProcessFactoryInterface
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
         $isFirstTimeSync,
-        \DateTimeInterface $syncFromDateTime = null
+        \DateTimeInterface $syncFromDateTime = null,
+        \DateTimeInterface $syncToDateTime = null
     );
 }

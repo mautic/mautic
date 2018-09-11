@@ -30,6 +30,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
      * @param MappingHelper             $mappingHelper
      * @param \DateTimeInterface|null   $isFirstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
+     * @param \DateTimeInterface|null   $syncToDateTime
      *
      * @return SyncProcess
      */
@@ -41,7 +42,8 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
         $isFirstTimeSync,
-        \DateTimeInterface $syncFromDateTime = null
+        \DateTimeInterface $syncFromDateTime = null,
+        \DateTimeInterface $syncToDateTime = null
     ) {
         return new SyncProcess(
             $syncJudge,
@@ -51,7 +53,8 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
             $syncDateHelper,
             $mappingHelper,
             $isFirstTimeSync,
-            $syncFromDateTime
+            $syncFromDateTime,
+            $syncToDateTime
         );
     }
 }
