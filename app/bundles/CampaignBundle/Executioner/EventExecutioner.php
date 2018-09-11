@@ -259,48 +259,59 @@ class EventExecutioner
             return;
         }
 
-        // Loop contacts so that we can apply contact-specific rules.
-        foreach ($contacts as $contact) {
-            $currentContactArr = new ArrayCollection([$contact]);
+        // Keep track of any events (with their corresponding contacts) that weren't scheduled.
+        $executeThese = new ArrayCollection();
 
-            // Schedule then return events that need to be immediately executed
-            $executeThese = $this->scheduleEvents($events, $contact, $childrenCounter, $isInactive);
+        // Loop through the events and do any scheduling.
+        foreach ($events as $event) {
+            // Keep track of any contacts that weren't scheduled.
+            $executeOnThese = new ArrayCollection();
 
-            // Execute non jump-to events normally
-            $otherEvents = $executeThese->filter(function (Event $event) {
-                return CampaignActionJumpToEventSubscriber::EVENT_NAME !== $event->getType();
-            });
+            // Loop contacts so that we can apply contact-specific scheduling rules.
+            foreach ($contacts as $contact) {
+                $wasScheduled = $this->scheduleEvent($event, $contact, $childrenCounter, $isInactive);
 
-            if ($otherEvents->count()) {
-                foreach ($otherEvents as $event) {
-                    $this->executeForContacts($event, $currentContactArr, $childrenCounter, $isInactive);
+                if (!$wasScheduled) {
+                    $executeOnThese->add($contact);
                 }
             }
 
-            // Now execute jump to events
-            $jumpEvents = $executeThese->filter(function (Event $event) {
-                return CampaignActionJumpToEventSubscriber::EVENT_NAME === $event->getType();
-            });
-            if ($jumpEvents->count()) {
-                $jumpLogs = [];
+            // If any contacts weren't scheduled, queue up the event and contacts for execution (below).
+            if ($executeOnThese->count()) {
+                $executeThese->add(['event' => $event, 'contacts' => $executeOnThese]);
+            }
+        }
 
+        // Keep track of any jump to events (with their logs). We do these last.
+        $jumpLogs = new ArrayCollection();
+
+        // Loop through anything that wasn't scheduled.
+        foreach ($executeThese as $entry) {
+            $event    = $entry['event'];
+            $contacts = $entry['contacts'];
+
+            if (CampaignActionJumpToEventSubscriber::EVENT_NAME !== $event->getType()) {
+                // Execute non jump-to events normally
+                $this->executeForContacts($event, $contacts, $childrenCounter, $isInactive);
+            } else {
                 // Create logs for the jump to events before the rotation is incremented
-                foreach ($jumpEvents as $key => $event) {
-                    $config         = $this->collector->getEventConfig($event);
-                    $jumpLogs[$key] = $this->eventLogger->fetchRotationAndGenerateLogsFromContacts($event, $config, $currentContactArr, $isInactive);
-                }
+                $config         = $this->collector->getEventConfig($event);
+                $logs           = $this->eventLogger->fetchRotationAndGenerateLogsFromContacts($event, $config, $contacts, $isInactive);
+                $jumpLogs->add(['event' => $event, 'logs' => $logs]);
 
                 // Increment the campaign rotation for the given contacts and current campaign
                 $this->leadRepository->incrementCampaignRotationForContacts(
-                    $currentContactArr->getKeys(),
-                    $jumpEvents->first()->getCampaign()->getId()
+                    $contacts->getKeys(),
+                    $event->getCampaign()->getId()
                 );
-
-                // Process the jump to events
-                foreach ($jumpLogs as $key => $logs) {
-                    $this->executeLogs($jumpEvents->get($key), $logs, $childrenCounter);
-                }
             }
+        }
+
+        // Execute the jump to events (queued up in the loop above).
+        foreach ($jumpLogs as $entry) {
+            $event = $entry['event'];
+            $logs  = $entry['logs'];
+            $this->executeLogs($event, $logs, $childrenCounter);
         }
     }
 
@@ -328,48 +339,45 @@ class EventExecutioner
     }
 
     /**
-     * @param ArrayCollection $events
-     * @param Lead            $contact
-     * @param Counter|null    $childrenCounter
-     * @param bool            $isInactive
+     * @param Event        $events
+     * @param Lead         $contact
+     * @param Counter|null $childrenCounter
+     * @param bool         $isInactive
      *
-     * @return ArrayCollection
+     * @return bool returns true if the event was scheduled, otherwise, returns false
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function scheduleEvents(ArrayCollection $events, Lead $contact, Counter $childrenCounter = null, $isInactive = false)
+    private function scheduleEvent(Event $event, Lead $contact, Counter $childrenCounter = null, $isInactive = false)
     {
-        $events = clone $events;
+        // Ignore decisions
+        if (Event::TYPE_DECISION == $event->getEventType()) {
+            $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$event->getId().' as a decision');
 
-        foreach ($events as $key => $event) {
-            // Ignore decisions
-            if (Event::TYPE_DECISION == $event->getEventType()) {
-                $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$event->getId().' as a decision');
-                continue;
-            }
-
-            $executionDate = $this->scheduler->getExecutionDateTime($event, $this->executionDate, null, $contact);
-
-            $this->logger->debug(
-                'CAMPAIGN: Event ID# '.$event->getId().
-                ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
-            );
-
-            // Check if we need to schedule this if it is not an inactivity check
-            if (!$isInactive && $this->scheduler->shouldSchedule($executionDate, $this->executionDate)) {
-                if ($childrenCounter) {
-                    $childrenCounter->advanceTotalScheduled($contacts->count());
-                }
-
-                $this->scheduler->schedule($event, $executionDate, new ArrayCollection([$contact]), $isInactive);
-
-                $events->remove($key);
-
-                continue;
-            }
+            return false;
         }
 
-        return $events;
+        $wasScheduled = false;
+
+        $executionDate = $this->scheduler->getExecutionDateTime($event, $this->executionDate, null, $contact);
+
+        $this->logger->debug(
+            'CAMPAIGN: Event ID# '.$event->getId().
+            ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
+        );
+
+        // Check if we need to schedule this if it is not an inactivity check
+        if (!$isInactive && $this->scheduler->shouldSchedule($executionDate, $this->executionDate)) {
+            if ($childrenCounter) {
+                $childrenCounter->advanceTotalScheduled($contacts->count());
+            }
+
+            $this->scheduler->schedule($event, $executionDate, new ArrayCollection([$contact]), $isInactive);
+
+            $wasScheduled = true;
+        }
+
+        return $wasScheduled;
     }
 
     /**
