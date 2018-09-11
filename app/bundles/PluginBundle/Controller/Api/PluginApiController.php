@@ -54,4 +54,22 @@ class PluginApiController extends CommonApiController
 
         return $this->notFound();
     }
+
+    /**
+     * @param $package
+     *
+     * @return Response
+     */
+    public function installAction()
+    {
+        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
+            return $this->accessDenied();
+        }
+        $package = $this->get('request_stack')->getCurrentRequest()->get('package');
+        @set_time_limit(9999);
+        $response = shell_exec('composer require '.$package);
+        $view     = $this->view(['response' => $response], Codes::HTTP_OK);
+
+        return $this->handleView($view);
+    }
 }

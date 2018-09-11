@@ -60,6 +60,10 @@ return [
                 'path'       => '/plugins/settings/{integrationName}',
                 'controller' => 'MauticPluginBundle:Api\PluginApi:viewSettings',
             ],
+            'mautic_api_plugin_install' => [
+                'path'       => '/plugins/install',
+                'controller' => 'MauticPluginBundle:Api\PluginApi:install',
+            ],
         ],
     ],
     'menu' => [
