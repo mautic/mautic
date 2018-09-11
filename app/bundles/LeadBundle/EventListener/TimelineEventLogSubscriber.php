@@ -75,6 +75,10 @@ class TimelineEventLogSubscriber implements EventSubscriberInterface
         $eventTypeName = $this->translator->trans($eventTypeName);
         $event->addEventType($eventType, $eventTypeName);
 
+        if (!$event->isApplicable($eventType)) {
+            return;
+        }
+
         $action = str_replace('lead.source.', '', $eventType).'_contact';
         $events = $this->leadEventLogRepository->getEventsByAction($action, $event->getLead(), $event->getQueryOptions());
 

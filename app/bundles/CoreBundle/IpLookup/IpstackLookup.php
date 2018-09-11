@@ -11,14 +11,14 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class FreegeoipLookup extends AbstractRemoteDataLookup
+class IpstackLookup extends AbstractRemoteDataLookup
 {
     /**
      * @return string
      */
     public function getAttribution()
     {
-        return '<a href="https://freegeoip.net/" target="_blank">freegeoip.net</a> is a free lookup service that leverages GeoLite2 data created by MaxMind.';
+        return '<a href="https://ipstack.com/" target="_blank">ipstack.com</a> is a free lookup service that leverages GeoLite2 data created by MaxMind.';
     }
 
     /**
@@ -26,7 +26,11 @@ class FreegeoipLookup extends AbstractRemoteDataLookup
      */
     protected function getUrl()
     {
-        return "http://freegeoip.net/json/{$this->ip}";
+        if (empty($this->auth)) {
+            $this->logger->warning('FreeGeoIP has become IPStack and now requires an API key.');
+        }
+
+        return 'http://api.ipstack.com/'.$this->ip.'?access_key='.$this->auth.'&output=json&legacy=1';
     }
 
     /**

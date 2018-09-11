@@ -14,8 +14,10 @@ namespace Mautic\CampaignBundle\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\TypeNotFoundException;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Executioner\Event\ActionExecutioner;
 use Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
@@ -81,6 +83,11 @@ class EventExecutioner
     private $executionDate;
 
     /**
+     * @var LeadRepository
+     */
+    private $leadRepository;
+
+    /**
      * EventExecutioner constructor.
      *
      * @param EventCollector       $eventCollector
@@ -90,6 +97,7 @@ class EventExecutioner
      * @param DecisionExecutioner  $decisionExecutioner
      * @param LoggerInterface      $logger
      * @param EventScheduler       $scheduler
+     * @param LeadRepository       $leadRepository
      */
     public function __construct(
         EventCollector $eventCollector,
@@ -99,7 +107,8 @@ class EventExecutioner
         DecisionExecutioner $decisionExecutioner,
         LoggerInterface $logger,
         EventScheduler $scheduler,
-        RemovedContactTracker $removedContactTracker
+        RemovedContactTracker $removedContactTracker,
+        LeadRepository $leadRepository
     ) {
         $this->actionExecutioner     = $actionExecutioner;
         $this->conditionExecutioner  = $conditionExecutioner;
@@ -109,6 +118,7 @@ class EventExecutioner
         $this->logger                = $logger;
         $this->scheduler             = $scheduler;
         $this->removedContactTracker = $removedContactTracker;
+        $this->leadRepository        = $leadRepository;
 
         // Be sure that all events are compared using the exact same \DateTime
         $this->executionDate = new \DateTime();
@@ -134,6 +144,28 @@ class EventExecutioner
         $contacts = new ArrayCollection([$contact->getId() => $contact]);
 
         $this->executeForContacts($event, $contacts, $counter);
+    }
+
+    /**
+     * @param ArrayCollection $events
+     * @param Lead            $contact
+     * @param Responses|null  $responses
+     * @param Counter|null    $counter
+     *
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
+     */
+    public function executeEventsForContact(ArrayCollection $events, Lead $contact, Responses $responses = null, Counter $counter = null)
+    {
+        if ($responses) {
+            $this->responses = $responses;
+        }
+
+        $contacts = new ArrayCollection([$contact->getId() => $contact]);
+
+        $this->executeEventsForContacts($events, $contacts, $counter);
     }
 
     /**
@@ -211,42 +243,59 @@ class EventExecutioner
     }
 
     /**
-     * @param ArrayCollection $children
+     * @param ArrayCollection $events
      * @param ArrayCollection $contacts
-     * @param Counter         $childrenCounter
+     * @param Counter|null    $childrenCounter
+     * @param bool            $isInactive
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter)
+    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false)
     {
         if (!$contacts->count()) {
             return;
         }
 
-        foreach ($events as $event) {
-            // Ignore decisions
-            if (Event::TYPE_DECISION == $event->getEventType()) {
-                $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$event->getId().' as a decision');
-                continue;
+        // Schedule then return those that need to be immediately executed
+        $executeThese = $this->scheduleEvents($events, $contacts, $childrenCounter, $isInactive);
+
+        // Execute non jump-to events normally
+        $otherEvents = $executeThese->filter(function (Event $event) {
+            return CampaignActionJumpToEventSubscriber::EVENT_NAME !== $event->getType();
+        });
+
+        if ($otherEvents->count()) {
+            foreach ($otherEvents as $event) {
+                $this->executeForContacts($event, $contacts, $childrenCounter, $isInactive);
+            }
+        }
+
+        // Now execute jump to events
+        $jumpEvents = $executeThese->filter(function (Event $event) {
+            return CampaignActionJumpToEventSubscriber::EVENT_NAME === $event->getType();
+        });
+        if ($jumpEvents->count()) {
+            $jumpLogs = [];
+
+            // Create logs for the jump to events before the rotation is incremented
+            foreach ($jumpEvents as $key => $event) {
+                $config         = $this->collector->getEventConfig($event);
+                $jumpLogs[$key] = $this->eventLogger->fetchRotationAndGenerateLogsFromContacts($event, $config, $contacts, $isInactive);
             }
 
-            $executionDate = $this->scheduler->getExecutionDateTime($event, $this->executionDate);
-
-            $this->logger->debug(
-                'CAMPAIGN: Event ID# '.$event->getId().
-                ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
+            // Increment the campaign rotation for the given contacts and current campaign
+            $this->leadRepository->incrementCampaignRotationForContacts(
+                $contacts->getKeys(),
+                $jumpEvents->first()->getCampaign()->getId()
             );
 
-            if ($this->scheduler->shouldSchedule($executionDate, $this->executionDate)) {
-                $childrenCounter->advanceTotalScheduled($contacts->count());
-                $this->scheduler->schedule($event, $executionDate, $contacts);
-                continue;
+            // Process the jump to events
+            foreach ($jumpLogs as $key => $logs) {
+                $this->executeLogs($jumpEvents->get($key), $logs, $childrenCounter);
             }
-
-            $this->executeForContacts($event, $contacts, $childrenCounter);
         }
     }
 
@@ -262,7 +311,7 @@ class EventExecutioner
 
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
-            ->clear();
+            ->clearCollection($logs);
     }
 
     /**
@@ -271,6 +320,51 @@ class EventExecutioner
     public function getExecutionDate()
     {
         return $this->executionDate;
+    }
+
+    /**
+     * @param ArrayCollection $events
+     * @param ArrayCollection $contacts
+     * @param Counter|null    $childrenCounter
+     * @param bool            $isInactive
+     *
+     * @return ArrayCollection
+     *
+     * @throws Scheduler\Exception\NotSchedulableException
+     */
+    private function scheduleEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false)
+    {
+        $events = clone $events;
+
+        foreach ($events as $key => $event) {
+            // Ignore decisions
+            if (Event::TYPE_DECISION == $event->getEventType()) {
+                $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$event->getId().' as a decision');
+                continue;
+            }
+
+            $executionDate = $this->scheduler->getExecutionDateTime($event, $this->executionDate);
+
+            $this->logger->debug(
+                'CAMPAIGN: Event ID# '.$event->getId().
+                ' to be executed on '.$executionDate->format('Y-m-d H:i:s')
+            );
+
+            // Check if we need to schedule this if it is not an inactivity check
+            if (!$isInactive && $this->scheduler->shouldSchedule($executionDate, $this->executionDate)) {
+                if ($childrenCounter) {
+                    $childrenCounter->advanceTotalScheduled($contacts->count());
+                }
+
+                $this->scheduler->schedule($event, $executionDate, $contacts, $isInactive);
+
+                $events->remove($key);
+
+                continue;
+            }
+        }
+
+        return $events;
     }
 
     /**
@@ -287,7 +381,7 @@ class EventExecutioner
 
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
-            ->clear();
+            ->clearCollection($logs);
     }
 
     /**

@@ -1700,6 +1700,7 @@ abstract class AbstractIntegration
         $missingRequiredFields  = [];
 
         // add special case in order to prevent it from being removed
+        $mauticLeadFields['mauticContactId']                   = '';
         $mauticLeadFields['mauticContactTimelineLink']         = '';
         $mauticLeadFields['mauticContactIsContactableByEmail'] = '';
 
@@ -1874,6 +1875,10 @@ abstract class AbstractIntegration
                 if ('mauticContactIsContactableByEmail' === $leadFields[$integrationKey]) {
                     $matched[$integrationKey] = $this->getLeadDoNotContact($leadId);
 
+                    continue;
+                }
+                if ('mauticContactId' === $leadFields[$integrationKey]) {
+                    $matched[$integrationKey] = $lead->getId();
                     continue;
                 }
                 $mauticKey = $leadFields[$integrationKey];
@@ -2757,6 +2762,7 @@ abstract class AbstractIntegration
     public function getCompoundMauticFields($lead)
     {
         if ($lead['internal_entity_id']) {
+            $lead['mauticContactId']                   = $lead['internal_entity_id'];
             $lead['mauticContactTimelineLink']         = $this->getContactTimelineLink($lead['internal_entity_id']);
             $lead['mauticContactIsContactableByEmail'] = $this->getLeadDoNotContact($lead['internal_entity_id']);
         }
@@ -2773,6 +2779,7 @@ abstract class AbstractIntegration
     {
         $compoundFields = [
             'mauticContactTimelineLink' => 'mauticContactTimelineLink',
+            'mauticContactId'           => 'mauticContactId',
         ];
 
         if ($this->updateDncByDate() === true) {

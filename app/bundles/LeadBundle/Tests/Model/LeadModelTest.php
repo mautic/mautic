@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -12,44 +13,49 @@ use Mautic\UserBundle\Entity\User;
 
 class LeadModelTest extends \PHPUnit_Framework_TestCase
 {
+    private $fieldModelMock;
+    private $leadRepositoryMock;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->fieldModelMock     = $this->createMock(FieldModel::class);
+        $this->leadRepositoryMock = $this->createMock(LeadRepository::class);
+    }
+
     public function testCheckForDuplicateContact()
     {
-        $mockFieldModel = $this->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getFieldList', 'getUniqueIdentifierFields', 'getEntities'])
-            ->getMock();
-
-        $mockFieldModel->expects($this->exactly(2))
+        $this->fieldModelMock->expects($this->at(0))
             ->method('getFieldList')
-            ->withConsecutive(
-                [false, false, ['isPublished' => true]],
-                [false, false, ['isPublished' => true, 'isPubliclyUpdatable' => true]]
-            )
-            ->will($this->onConsecutiveCalls(
-                ['a' => 1],
-                ['a' => 3]
-            ));
+            ->with(false, false, ['isPublished' => true, 'object' => 'lead'])
+            ->willReturn(['email' => 'Email', 'firstname' => 'First Name']);
 
-        $mockFieldModel->expects($this->exactly(2))
+        $this->fieldModelMock->expects($this->at(1))
             ->method('getUniqueIdentifierFields')
-            ->will($this->onConsecutiveCalls(
-                ['b' => 2],
-                ['b' => 4]
-            ));
+            ->willReturn(['email' => 'Email']);
 
-        $mockFieldModel->expects($this->once())
+        $this->fieldModelMock->expects($this->once())
             ->method('getEntities')
             ->willReturn([
-                'b' => ['label' => 'b', 'alias' => 'b', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
-                'a' => ['label' => 'a', 'alias' => 'a', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
+                4 => ['label' => 'Email', 'alias' => 'email', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'email'],
+                5 => ['label' => 'First Name', 'alias' => 'firstname', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
             ]);
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(null)
+            ->setMethods(['getRepository'])
             ->getMock();
 
-        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $mockFieldModel);
+        $mockLeadModel->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->leadRepositoryMock);
+
+        $this->leadRepositoryMock->expects($this->once())
+            ->method('getLeadsByUniqueFields')
+            ->with(['email' => 'john@doe.com'], null)
+            ->willReturn([]);
+
+        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
 
         $this->assertAttributeEquals(
             [],
@@ -58,13 +64,58 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
             'The availableLeadFields property should start empty'
         );
 
-        $mockLeadModel->checkForDuplicateContact([]);
-        $this->assertAttributeEquals(['a' => 1], 'availableLeadFields', $mockLeadModel);
+        $contact = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John']);
+        $this->assertAttributeEquals(['email' => 'Email', 'firstname' => 'First Name'], 'availableLeadFields', $mockLeadModel);
+        $this->assertEquals('john@doe.com', $contact->getEmail());
+        $this->assertEquals('John', $contact->getFirstname());
+    }
 
-        $this->setProperty($mockLeadModel, LeadModel::class, 'availableLeadFields', []);
+    public function testCheckForDuplicateContactForOnlyPubliclyUpdatable()
+    {
+        $this->fieldModelMock->expects($this->at(0))
+            ->method('getFieldList')
+            ->with(false, false, ['isPublished' => true, 'object' => 'lead', 'isPubliclyUpdatable' => true])
+            ->willReturn(['email' => 'Email']);
 
-        $mockLeadModel->checkForDuplicateContact([], null, false, true);
-        $this->assertAttributeEquals(['a' => 3], 'availableLeadFields', $mockLeadModel);
+        $this->fieldModelMock->expects($this->at(1))
+            ->method('getUniqueIdentifierFields')
+            ->willReturn(['email' => 'Email']);
+
+        $this->fieldModelMock->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([
+                4 => ['label' => 'Email', 'alias' => 'email', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'email'],
+                5 => ['label' => 'First Name', 'alias' => 'firstname', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
+            ]);
+
+        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getRepository'])
+            ->getMock();
+
+        $mockLeadModel->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->leadRepositoryMock);
+
+        $this->leadRepositoryMock->expects($this->once())
+            ->method('getLeadsByUniqueFields')
+            ->with(['email' => 'john@doe.com'], null)
+            ->willReturn([]);
+
+        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
+
+        $this->assertAttributeEquals(
+            [],
+            'availableLeadFields',
+            $mockLeadModel,
+            'The availableLeadFields property should start empty'
+        );
+
+        list($contact, $fields) = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], null, true, true);
+        $this->assertAttributeEquals(['email' => 'Email'], 'availableLeadFields', $mockLeadModel);
+        $this->assertEquals('john@doe.com', $contact->getEmail());
+        $this->assertNull($contact->getFirstname());
+        $this->assertEquals(['email' => 'john@doe.com'], $fields);
     }
 
     /**
