@@ -144,6 +144,13 @@ return [
             'mautic.user.route.subscriber' => [
                 'class' => 'Mautic\UserBundle\EventListener\RouteSubscriber',
             ],
+            'mautic.user.security_subscriber' => [
+                'class'     => 'Mautic\UserBundle\EventListener\SecuritySubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.user' => [
