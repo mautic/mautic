@@ -57,6 +57,11 @@ class ConfigChangeLogger
     }
 
     /**
+     * Log changes if something was changed.
+     * Diff is based on form normalized data before and after post.
+     *
+     * @see Form::getNormData()
+     *
      * @param array $postNormData
      */
     public function log(array $postNormData)

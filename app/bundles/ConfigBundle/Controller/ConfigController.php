@@ -58,6 +58,8 @@ class ConfigController extends FormController
             ]
         );
 
+        $originalNormData = $form->getNormData();
+
         /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $configurator = $this->get('mautic.configurator');
         $isWritabale  = $configurator->isFileWritable();
@@ -73,6 +75,9 @@ class ConfigController extends FormController
 
                     // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save
                     $configEvent = new ConfigEvent($formData, $post);
+                    $configEvent
+                        ->setOriginalNormData($originalNormData)
+                        ->setNormData($form->getNormData());
                     $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
                     $formValues = $configEvent->getConfig();
 
@@ -119,11 +124,7 @@ class ConfigController extends FormController
                             }
 
                             $configurator->write();
-                            /** @var \Mautic\ConfigBundle\Service\ConfigChangeLogger $formConfigs */
-                            $changeLogger = $this->get('mautic.config.config_change_logger');
-                            $changeLogger
-                                ->setOriginalNormData($form->getNormData())
-                                ->log($form->getNormData());
+                            $dispatcher->dispatch(ConfigEvents::CONFIG_POST_SAVE, $configEvent);
 
                             $this->addFlash('mautic.config.config.notice.updated');
 
