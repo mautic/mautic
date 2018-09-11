@@ -90,6 +90,8 @@ class ConfigEvent extends CommonEvent
      * Returns the POST.
      *
      * @return \Symfony\Component\HttpFoundation\ParameterBag
+     *
+     * @deprecated 2.14.1; to be removed in 3.0 as unused
      */
     public function getPost()
     {
