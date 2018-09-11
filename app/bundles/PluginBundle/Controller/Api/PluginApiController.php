@@ -33,4 +33,25 @@ class PluginApiController extends CommonApiController
 
         return $this->handleView($view);
     }
+
+    /**
+     * @param $integrationName
+     *
+     * @return Response
+     */
+    public function viewSettingsAction($integrationName)
+    {
+        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
+            return $this->accessDenied();
+        }
+        $integrationHelper = $this->get('mautic.helper.integration');
+        $integrationObject = $integrationHelper->getIntegrationObject($integrationName);
+        if ($integrationObject && $integrationObject->getIntegrationSettings()->getIsPublished()) {
+            $view = $this->view($integrationObject->getIntegrationSettings()->getFeatureSettings(), Codes::HTTP_OK);
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
+    }
 }

@@ -53,8 +53,12 @@ return [
         ],
         'api' => [
             'mautic_api_plugin_reload' => [
-                'path'       => '/reload/plugins',
+                'path'       => '/plugins/reload',
                 'controller' => 'MauticPluginBundle:Api\PluginApi:reload',
+            ],
+            'mautic_api_plugin_view_settings' => [
+                'path'       => '/plugins/settings/{integrationName}',
+                'controller' => 'MauticPluginBundle:Api\PluginApi:viewSettings',
             ],
         ],
     ],

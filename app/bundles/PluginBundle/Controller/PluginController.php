@@ -63,7 +63,7 @@ class PluginController extends FormController
         $session->set('mautic.integrations.filter', $pluginFilter);
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper  = $this->factory->getHelper('integration');
+        $integrationHelper  = $this->get('mautic.helper.integration');
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
         $integrations       = $foundPlugins       = [];
 
@@ -156,7 +156,7 @@ class PluginController extends FormController
         $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationHelper = $this->get('mautic.helper.integration');
         /** @var AbstractIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject($name);
 
@@ -388,7 +388,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationHelper = $this->get('mautic.helper.integration');
 
         $bundle->splitDescriptions();
 
