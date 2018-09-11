@@ -2,6 +2,7 @@
 
 namespace Mautic\ConfigBundle\Tests\EventListener;
 
+use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\EventListener\ConfigSubscriber;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
@@ -9,6 +10,21 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetSubscribedEvents()
+    {
+        $paramHelper = $this->createMock(CoreParametersHelper::class);
+        $logger      = $this->createMock(ConfigChangeLogger::class);
+        $subscriber  = new ConfigSubscriber($paramHelper, $logger);
+
+        $this->assertEquals(
+            [
+                ConfigEvents::CONFIG_PRE_SAVE  => ['escapePercentCharacters', 1000],
+                ConfigEvents::CONFIG_POST_SAVE => ['onConfigPostSave', 0],
+            ],
+            $subscriber->getSubscribedEvents()
+        );
+    }
+
     public function testEscapePercentCharacters()
     {
         $config = [
