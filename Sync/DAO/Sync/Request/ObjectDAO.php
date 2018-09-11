@@ -23,14 +23,24 @@ class ObjectDAO
     private $object;
 
     /**
+     * Date/time based on last synced date for the object or the start date/time fed through the command's arguments.
+     * This value does not change between iterations.
+     *
      * @var \DateTimeInterface|null
      */
     private $fromDateTime;
 
     /**
+     * Date/Time the sync started
+     *
      * @var \DateTimeInterface|null
      */
     private $toDateTime;
+
+    /**
+     * @var \DateTimeInterface|null
+     */
+    private $objectLastSyncDateTime;
 
     /**
      * @var string[]
@@ -40,15 +50,21 @@ class ObjectDAO
     /**
      * ObjectDAO constructor.
      *
-     * @param string             $object
-     * @param \DateTimeInterface $fromDateTime
-     * @param \DateTimeInterface $toDateTime
+     * @param string                  $object
+     * @param \DateTimeInterface|null $fromDateTime
+     * @param \DateTimeInterface|null $toDateTime
+     * @param \DateTimeInterface|null $objectLastSyncDateTime
      */
-    public function __construct(string $object, \DateTimeInterface $fromDateTime = null, \DateTimeInterface $toDateTime = null)
-    {
-        $this->object       = $object;
-        $this->fromDateTime = $fromDateTime;
-        $this->toDateTime   = $toDateTime;
+    public function __construct(
+        string $object,
+        \DateTimeInterface $fromDateTime = null,
+        \DateTimeInterface $toDateTime = null,
+        \DateTimeInterface $objectLastSyncDateTime = null
+    ) {
+        $this->object                 = $object;
+        $this->fromDateTime           = $fromDateTime;
+        $this->toDateTime             = $toDateTime;
+        $this->objectLastSyncDateTime = $objectLastSyncDateTime;
     }
 
     /**
@@ -93,5 +109,13 @@ class ObjectDAO
     public function getToDateTime(): ?\DateTimeInterface
     {
         return $this->toDateTime;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getObjectLastSyncDateTime(): ?\DateTimeInterface
+    {
+        return $this->objectLastSyncDateTime;
     }
 }
