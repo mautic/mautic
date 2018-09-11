@@ -13,6 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncDate;
 
 
 use Doctrine\DBAL\Connection;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class SyncDateHelper
 {
@@ -20,6 +21,26 @@ class SyncDateHelper
      * @var Connection
      */
     private $connection;
+
+    /**
+     * @var \DateTimeInterface|null
+     */
+    private $syncFromDateTime;
+
+    /**
+     * @var \DateTimeInterface|null
+     */
+    private $syncToDateTime;
+
+    /**
+     * @var \DateTimeInterface|null
+     */
+    private $syncDateTime;
+
+    /**
+     * @var \DateTimeInterface[]
+     */
+    private $lastObjectSyncDates = [];
 
     /**
      * SyncDateHelper constructor.
@@ -32,16 +53,79 @@ class SyncDateHelper
     }
 
     /**
+     * @param \DateTimeInterface|null $fromDateTime
+     * @param \DateTimeInterface|null $toDateTime
+     */
+    public function setSyncDateTimes(\DateTimeInterface $fromDateTime = null, \DateTimeInterface $toDateTime = null)
+    {
+        $this->syncFromDateTime = $fromDateTime;
+        $this->syncToDateTime   = $toDateTime;
+        $this->syncDateTime     = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
      * @param string $integration
      * @param string $object
      *
-     * @return bool|string
+     * @return \DateTimeInterface
      */
-    public function getLastSyncDateForObject(string $integration, string $object)
+    public function getSyncFromDateTime(string $integration, string $object): \DateTimeInterface
+    {
+        if ($this->syncFromDateTime) {
+            // The command requested a specific start date so use it
+
+            return $this->syncFromDateTime;
+        }
+
+        $key = $integration.$object;
+        if (isset($this->lastObjectSyncDates[$key])) {
+            // Use the same sync date for integrations to paginate properly
+
+            return $this->lastObjectSyncDates[$key];
+        }
+
+        if (MauticSyncDataExchange::NAME !== $integration && $lastSync = $this->getLastSyncDateForObject($integration, $object)) {
+            // Use the latest sync date recorded
+            $this->lastObjectSyncDates[$key] = $lastSync;
+        } else {
+            // Otherwise, just sync the last 24 hours
+            $this->lastObjectSyncDates[$key] = new \DateTimeImmutable('-24 hours', new \DateTimeZone('UTC'));
+        }
+
+        return $this->lastObjectSyncDates[$key];
+    }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getSyncToDateTime(): \DateTimeInterface
+    {
+        if ($this->syncToDateTime) {
+            return $this->syncToDateTime;
+        }
+
+        return $this->syncDateTime;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getSyncDateTime(): ?\DateTimeInterface
+    {
+        return $this->syncDateTime;
+    }
+
+    /**
+     * @param string $integration
+     * @param string $object
+     *
+     * @return \DateTimeImmutable|null
+     */
+    public function getLastSyncDateForObject(string $integration, string $object): ?\DateTimeInterface
     {
         $qb = $this->connection->createQueryBuilder();
 
-        return $qb
+        $result = $qb
             ->select('max(m.last_sync_date)')
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'm')
             ->where(
@@ -52,5 +136,23 @@ class SyncDateHelper
             ->setParameter('object', $object)
             ->execute()
             ->fetchColumn();
+
+        if (!$result) {
+            return null;
+        }
+
+        $lastSync = new \DateTimeImmutable($result, new \DateTimeZone('UTC'));
+
+        // The last sync is out of the requested sync date/time range
+        if ($this->syncFromDateTime && $lastSync < $this->syncFromDateTime) {
+            return null;
+        }
+
+        // The last sync is out of the requested sync date/time range
+        if ($lastSync > $this->getSyncToDateTime()) {
+            return null;
+        }
+
+        return $lastSync;
     }
 }
