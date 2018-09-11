@@ -99,7 +99,7 @@ class ConfigChangeLogger
      *
      * @return array
      */
-    public function normalizeData(array $data)
+    private function normalizeData(array $data)
     {
         $key = 'parameters';
 
