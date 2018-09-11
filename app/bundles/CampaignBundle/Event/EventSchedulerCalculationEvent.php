@@ -25,12 +25,12 @@ class EventSchedulerCalculationEvent extends Event
     private $event;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $compareFromDateTime;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $comparedToDateTime;
 
@@ -40,20 +40,20 @@ class EventSchedulerCalculationEvent extends Event
     private $contact;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $executionDateTime;
 
     /**
      * EventSchedulerCalculationEvent constructor.
      *
-     * @param Event     $event
-     * @param DateTime  $compareFromDateTime
-     * @param DateTime  $comparedToDateTime
-     * @param Lead|null $contact
-     * @param DateTime  $executionDateTime
+     * @param Event             $event
+     * @param DateTimeInterface $compareFromDateTime
+     * @param DateTimeInterface $comparedToDateTime
+     * @param Lead|null         $contact
+     * @param DateTimeInterface $executionDateTime
      */
-    public function __construct(\Mautic\CampaignBundle\Entity\Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime, Lead $contact = null, \DateTime $executionDateTime)
+    public function __construct(\Mautic\CampaignBundle\Entity\Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime, Lead $contact = null, \DateTimeInterface $executionDateTime)
     {
         $this->event               = $event;
         $this->compareFromDateTime = $compareFromDateTime;
@@ -75,7 +75,7 @@ class EventSchedulerCalculationEvent extends Event
     /**
      * Returns the compareFromDateTime.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getCompareFromDateTime()
     {
@@ -85,7 +85,7 @@ class EventSchedulerCalculationEvent extends Event
     /**
      * Returns the comparedToDateTime.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getCompareToDateTime()
     {
@@ -105,7 +105,7 @@ class EventSchedulerCalculationEvent extends Event
     /**
      * Returns the executionDateTime.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getExecutionDateTime()
     {
@@ -113,7 +113,7 @@ class EventSchedulerCalculationEvent extends Event
     }
 
     /**
-     * @param \DateTime $executionDateTime
+     * @param \DateTimeInterface $executionDateTime
      *
      * @return $this
      */
