@@ -257,26 +257,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param OrderDAO $syncOrder
+     * @param ObjectChangeDAO[] $objectChanges
      */
-    public function cleanupProcessedObjects(OrderDAO $syncOrder)
+    public function cleanupProcessedObjects(array $objectChanges)
     {
-        foreach ($syncOrder->getObjectMappings() as $mapping) {
-            $object   = $mapping->getInternalObjectName();
-            $objectId = $mapping->getInternalObjectId();
-
-            $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object);
-        }
-
-        foreach ($syncOrder->getUpdatedObjectMappings() as $mapping) {
-            $changedObjectDAO = $mapping->getObjectChangeDAO();
-            $object   = $changedObjectDAO->getMappedObject();
-            $objectId = $changedObjectDAO->getMappedObjectId();
-
-            $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object);
-        }
-
-        foreach ($syncOrder->getDeletedObjects() as $changedObjectDAO) {
+        foreach ($objectChanges as $changedObjectDAO) {
             $object   = $changedObjectDAO->getMappedObject();
             $objectId = $changedObjectDAO->getMappedObjectId();
 

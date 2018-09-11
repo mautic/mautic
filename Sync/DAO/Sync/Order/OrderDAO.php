@@ -61,7 +61,12 @@ class OrderDAO
     /**
      * @var ObjectChangeDAO[]
      */
-    private $deletedObjects = [];
+    private $deleteTheseObjects = [];
+
+    /**
+     * @var array
+     */
+    private $retryTheseLater = [];
 
     /**
      * @var int
@@ -210,7 +215,22 @@ class OrderDAO
      */
     public function deleteObject(ObjectChangeDAO $objectChangeDAO)
     {
-        $this->deletedObjects[] = $objectChangeDAO;
+        $this->deleteTheseObjects[] = $objectChangeDAO;
+    }
+
+    /**
+     * If there is a temporary issue with syncing the object, tell the sync engine to not wipe out the tracked changes on Mautic's object fields
+     * so that they are attempted again for the next sync
+     *
+     * @param ObjectChangeDAO $objectChangeDAO
+     */
+    public function retrySyncLater(ObjectChangeDAO $objectChangeDAO)
+    {
+        if (!isset($this->retryTheseLater[$objectChangeDAO->getMappedObject()])) {
+            $this->retryTheseLater[$objectChangeDAO->getMappedObject()] = [];
+        }
+
+        $this->retryTheseLater[$objectChangeDAO->getMappedObject()][$objectChangeDAO->getMappedObjectId()] = $objectChangeDAO;
     }
 
     /**
@@ -234,7 +254,31 @@ class OrderDAO
      */
     public function getDeletedObjects(): array
     {
-        return $this->deletedObjects;
+        return $this->deleteTheseObjects;
+    }
+
+    /**
+     * @return ObjectChangeDAO[]
+     */
+    public function getSuccessfullySyncedObjects()
+    {
+        $synced = [];
+        foreach ($this->changedObjects as $object => $objectChanges) {
+            /** @var ObjectChangeDAO $objectChange */
+            foreach ($objectChanges as $objectChange) {
+                if (isset($this->retryTheseLater[$objectChange->getMappedObject()])) {
+                    continue;
+                }
+
+                if (isset($this->retryTheseLater[$objectChange->getMappedObject()][$objectChange->getMappedObjectId()])) {
+                    continue;
+                }
+
+                $synced[] = $objectChange;
+            }
+        }
+
+        return $synced;
     }
 
     /**

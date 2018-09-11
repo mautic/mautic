@@ -240,7 +240,7 @@ class SyncProcess
             $this->mappingHelper->markAsDeleted($syncOrder->getDeletedObjects());
 
             // Cleanup field tracking for successfully synced objects
-            $this->internalSyncDataExchange->cleanupProcessedObjects($syncOrder);
+            $this->internalSyncDataExchange->cleanupProcessedObjects($syncOrder->getSuccessfullySyncedObjects());
 
             // Fetch the next iteration/batch
             ++$this->syncIteration;
