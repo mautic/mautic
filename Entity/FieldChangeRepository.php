@@ -49,26 +49,36 @@ class FieldChangeRepository extends CommonRepository
      *
      * @param int    $objectId
      * @param string $objectType
+     * @param string|null $integration
      *
      */
-    public function deleteEntitiesForObject(int $objectId, string $objectType)
+    public function deleteEntitiesForObject(int $objectId, string $objectType, string $integration = null)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
+        $expr = $qb->expr()->andX();
+        if ($integration) {
+            $expr->add(
+                $qb->expr()->eq('integration', ':integration')
+            );
+            $qb->setParameter('integration', $integration);
+        }
+
+        $expr->addMultiple([
+            $qb->expr()->eq('object_type', ":objectType"),
+            $qb->expr()->eq('object_id', ":objectId")
+        ]);
+        $qb->setParameter('objectType', $objectType)
+            ->setParameter('objectId', (int) $objectId);
+
         $qb
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('object_type', ":objectType"),
-                    $qb->expr()->eq('object_id', ":objectId")
-                )
-            )
-            ->setParameter('objectType', $objectType)
-            ->setParameter('objectId', $objectId)
+            ->where($expr)
             ->execute();
     }
 
     /**
+     * @param string             $integration
      * @param string             $objectType
      * @param \DateTimeInterface $toDateTime
      * @param null|int           $afterObjectId
@@ -76,7 +86,7 @@ class FieldChangeRepository extends CommonRepository
      *
      * @return array
      */
-    public function findChangesBefore($objectType, \DateTimeInterface $toDateTime, $afterObjectId = null, $objectCount = 100)
+    public function findChangesBefore(string $integration, string $objectType, \DateTimeInterface $toDateTime, $afterObjectId = null, $objectCount = 100)
     {
         // Get a list of object IDs so that we can get complete snapshots of the objects
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -85,10 +95,12 @@ class FieldChangeRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
                 $qb->expr()->andX(
+                    $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->lte('f.modified_at', ':toDateTime')
                 )
             )
+            ->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
             ->setParameter('toDateTime', $toDateTime->format('Y-m-d H:i:s'))
             ->orderBy('f.object_id')
@@ -97,7 +109,7 @@ class FieldChangeRepository extends CommonRepository
 
         if ($afterObjectId) {
             $qb->andWhere(
-                $qb->expr()->gt('f.object_id', $afterObjectId)
+                $qb->expr()->gt('f.object_id', (int) $afterObjectId)
             );
         }
 
@@ -118,22 +130,25 @@ class FieldChangeRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
                 $qb->expr()->andX(
+                    $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->in('f.object_id', $objectIds)
                 )
             )
+            ->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType);
 
         return $qb->execute()->fetchAll();
     }
 
     /**
-     * @param $objectType
-     * @param $objectId
+     * @param string $integration
+     * @param string $objectType
+     * @param int    $objectId
      *
      * @return array
      */
-    public function findChangesForObject($objectType, $objectId)
+    public function findChangesForObject(string $integration, string $objectType, $objectId)
     {
         // Get a list of object IDs so that we can get complete snapshots of the objects
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -142,12 +157,14 @@ class FieldChangeRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
                 $qb->expr()->andX(
+                    $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->gte('f.object_id', ':objectId')
                 )
             )
+            ->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
-            ->setParameter('objectId', $objectId);
+            ->setParameter('objectId', (int) $objectId);
 
         return $qb->execute()->fetchAll();
     }

@@ -42,21 +42,28 @@ class FieldMappingDAO
     private $syncDirection;
 
     /**
+     * @var bool
+     */
+    private $isRequired;
+
+    /**
      * FieldMappingDAO constructor.
      *
-     * @param $internalObject
-     * @param $internalField
-     * @param $integrationObject
-     * @param $integrationField
-     * @param $syncDirection
+     * @param string $internalObject
+     * @param string $internalField
+     * @param string $integrationObject
+     * @param string $integrationField
+     * @param string $syncDirection
+     * @param bool   $isRequired
      */
-    public function __construct($internalObject, $internalField, $integrationObject, $integrationField, $syncDirection)
+    public function __construct($internalObject, $internalField, $integrationObject, $integrationField, $syncDirection, $isRequired)
     {
         $this->internalObject    = $internalObject;
         $this->internalField     = $internalField;
         $this->integrationObject = $integrationObject;
         $this->integrationField  = $integrationField;
         $this->syncDirection     = $syncDirection;
+        $this->isRequired        = (bool) $isRequired;
     }
 
     /**
@@ -97,5 +104,13 @@ class FieldMappingDAO
     public function getSyncDirection()
     {
         return $this->syncDirection;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequired(): bool
+    {
+        return $this->isRequired;
     }
 }

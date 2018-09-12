@@ -10,18 +10,17 @@ use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncIntegrationsHelper;
 
 /**
  * Class LeadSubscriber
- *
- * @todo add support to clean up after a sync is complete in the case the integration errors for some reason as we do not wan't to lose changes for temporary sync issues
  */
 class LeadSubscriber extends CommonSubscriber
 {
     /**
      * @var FieldChangeRepository
      */
-    private $repo;
+    private $fieldChangeRepo;
 
     /**
      * @var VariableExpresserHelperInterface
@@ -29,13 +28,25 @@ class LeadSubscriber extends CommonSubscriber
     private $variableExpressor;
 
     /**
-     * @param FieldChangeRepository            $repo
-     * @param VariableExpresserHelperInterface $variableExpressor
+     * @var SyncIntegrationsHelper
      */
-    public function __construct(FieldChangeRepository $repo, VariableExpresserHelperInterface $variableExpressor)
-    {
-        $this->repo              = $repo;
-        $this->variableExpressor = $variableExpressor;
+    private $syncIntegrationsHelper;
+
+    /**
+     * LeadSubscriber constructor.
+     *
+     * @param FieldChangeRepository            $fieldChangeRepo
+     * @param VariableExpresserHelperInterface $variableExpressor
+     * @param SyncIntegrationsHelper           $syncIntegrationsHelper
+     */
+    public function __construct(
+        FieldChangeRepository $fieldChangeRepo,
+        VariableExpresserHelperInterface $variableExpressor,
+        SyncIntegrationsHelper $syncIntegrationsHelper
+    ) {
+        $this->fieldChangeRepo        = $fieldChangeRepo;
+        $this->variableExpressor      = $variableExpressor;
+        $this->syncIntegrationsHelper = $syncIntegrationsHelper;
     }
 
     /**
@@ -44,16 +55,14 @@ class LeadSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            LeadEvents::LEAD_POST_SAVE   => ['onLeadPostSave', 0],
-            LeadEvents::LEAD_POST_DELETE => ['onLeadPostDelete', 255],
+            LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
+            LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
             LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
             LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
         ];
     }
 
     /**
-     * @todo only do this if a sync is enabled otherwise this will fill up fast
-     *
      * @param Events\LeadEvent $event
      */
     public function onLeadPostSave(Events\LeadEvent $event)
@@ -69,6 +78,10 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
+        if (!$this->syncIntegrationsHelper->hasEnabledIntegrations()) {
+            return;
+        }
+
         $changes       = $lead->getChanges(true);
         $toPersist     = [];
         $changedFields = [];
@@ -78,21 +91,28 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         foreach ($changes['fields'] as $key => list($oldValue, $newValue)) {
-            $valueDAO        = $this->variableExpressor->encodeVariable($newValue);
-            $changedFields[] = $key;
-            $toPersist[]     = (new FieldChange)
+            $valueDAO          = $this->variableExpressor->encodeVariable($newValue);
+            $changedFields[]   = $key;
+            $fieldChangeEntity = (new FieldChange)
                 ->setObjectType(Lead::class)
                 ->setObjectId($lead->getId())
                 ->setModifiedAt(new \DateTime)
                 ->setColumnName($key)
                 ->setColumnType($valueDAO->getType())
                 ->setColumnValue($valueDAO->getValue());
+
+            foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
+                $integrationFieldChangeEntity = clone $fieldChangeEntity;
+                $integrationFieldChangeEntity->setIntegration($integrationName);
+
+                $toPersist[] = $integrationFieldChangeEntity;
+            }
         }
 
-        $this->repo->deleteEntitiesForObjectByColumnName($lead->getId(), Lead::class, $changedFields);
-        $this->repo->saveEntities($toPersist);
+        $this->fieldChangeRepo->deleteEntitiesForObjectByColumnName($lead->getId(), Lead::class, $changedFields);
+        $this->fieldChangeRepo->saveEntities($toPersist);
 
-        $this->repo->clear();
+        $this->fieldChangeRepo->clear();
     }
 
     /**
@@ -100,12 +120,10 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadPostDelete(Events\LeadEvent $event)
     {
-        $this->repo->deleteEntitiesForObject($event->getLead()->deletedId, Lead::class);
+        $this->fieldChangeRepo->deleteEntitiesForObject($event->getLead()->deletedId, Lead::class);
     }
 
     /**
-     * @todo only do this if a sync is enabled otherwise this will fill up fast
-     *
      * @param Events\CompanyEvent $event
      */
     public function onCompanyPostSave(Events\CompanyEvent $event)
@@ -115,7 +133,11 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $company          = $event->getCompany();
+        if (!$this->syncIntegrationsHelper->hasEnabledIntegrations()) {
+            return;
+        }
+
+        $company       = $event->getCompany();
         $changes       = $company->getChanges(true);
         $toPersist     = [];
         $changedFields = [];
@@ -125,20 +147,27 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         foreach ($changes['fields'] as $key => list($oldValue, $newValue)) {
-            $valueDAO        = $this->variableExpressor->encodeVariable($newValue);
-            $changedFields[] = $key;
-            $toPersist[]     = (new FieldChange)
+            $valueDAO          = $this->variableExpressor->encodeVariable($newValue);
+            $changedFields[]   = $key;
+            $fieldChangeEntity = (new FieldChange)
                 ->setObjectType(Lead::class)
                 ->setObjectId($company->getId())
                 ->setModifiedAt(new \DateTime)
                 ->setColumnName($key)
                 ->setColumnType($valueDAO->getType())
                 ->setColumnValue($valueDAO->getValue());
+
+            foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
+                $integrationFieldChangeEntity = clone $fieldChangeEntity;
+                $integrationFieldChangeEntity->setIntegration($integrationName);
+
+                $toPersist[] = $integrationFieldChangeEntity;
+            }
         }
 
-        $this->repo->deleteEntitiesForObjectByColumnName($company->getId(), Company::class, $changedFields);
-        $this->repo->saveEntities($toPersist);
-        $this->repo->clear();
+        $this->fieldChangeRepo->deleteEntitiesForObjectByColumnName($company->getId(), Company::class, $changedFields);
+        $this->fieldChangeRepo->saveEntities($toPersist);
+        $this->fieldChangeRepo->clear();
     }
 
     /**
@@ -146,6 +175,6 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onCompanyPostDelete(Events\CompanyEvent $event)
     {
-        $this->repo->deleteEntitiesForObject($event->getCompany()->deletedId, Company::class);
+        $this->fieldChangeRepo->deleteEntitiesForObject($event->getCompany()->deletedId, Company::class);
     }
 }

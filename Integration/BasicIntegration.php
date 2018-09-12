@@ -27,16 +27,24 @@ abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInt
     use BCIntegrationHelperTrait;
     use BCIntegrationFormsHelperTrait;
 
-    /** @var Integration */
+    /**
+     * @var Integration
+     */
     private $integrationEntity;
 
-    /** @var RouterInterface */
+    /**
+     * @var RouterInterface
+     */
     private $router;
 
-    /** @var EntityManager */
+    /**
+     * @var EntityManager
+     */
     private $entityManager;
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     */
     public function isCoreIntegration(): bool
     {
         return false;
@@ -60,6 +68,16 @@ abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInt
         $this->integrationEntity = $integrationEntity;
 
         return $this;
+    }
+
+    /**
+     * Check if Integration entity has been set to prevent PHP fatal error with using getIntegrationEntity
+     *
+     * @return bool
+     */
+    public function hasIntegrationEntity()
+    {
+        return !empty($this->integrationEntity);
     }
 
     /**

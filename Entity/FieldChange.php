@@ -23,6 +23,11 @@ class FieldChange
     private $id;
 
     /**
+     * @var string
+     */
+    private $integration;
+
+    /**
      * @var int
      */
     private $objectId;
@@ -65,9 +70,14 @@ class FieldChange
             ->setTable('sync_object_field_change_report')
             ->setCustomRepositoryClass(FieldChangeRepository::class)
             ->addIndex(['object_type', 'object_id', 'column_name'], 'object_composite_key')
-            ->addIndex(['object_type', 'modified_at'], 'object_type_modification_composite_key');
+            ->addIndex(['integration', 'object_type', 'object_id', 'column_name'], 'integration_object_composite_key')
+            ->addIndex(['integration', 'object_type', 'modified_at'], 'integration_object_type_modification_composite_key');
 
         $builder->addId();
+
+        $builder
+            ->createField('integration', Type::STRING)
+            ->build();
 
         $builder
             ->createField('objectId', Type::INTEGER)
@@ -106,6 +116,26 @@ class FieldChange
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIntegration(): string
+    {
+        return $this->integration;
+    }
+
+    /**
+     * @param string $integration
+     *
+     * @return FieldChange
+     */
+    public function setIntegration($integration)
+    {
+        $this->integration = $integration;
+
+        return $this;
     }
 
     /**

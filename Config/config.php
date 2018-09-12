@@ -42,7 +42,8 @@ return [
                 'class'     => \MauticPlugin\IntegrationsBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
-                    'mautic.integrations.helper.variable_expresser'
+                    'mautic.integrations.helper.variable_expresser',
+                    'mautic.integrations.helper.sync_integrations',
                 ],
             ],
         ],
@@ -96,6 +97,14 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\IntegrationsBundle\Entity\ObjectMapping::class
+                ],
+            ],
+            // Placeholder till the plugin bundle implements this
+            'mautic.plugin.integrations.repository.integration' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\PluginBundle\Entity\Integration::class
                 ],
             ],
         ],
@@ -153,17 +162,23 @@ return [
                 ],
             ],
             'mautic.integrations.helper.sync_date' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncDate\SyncDateHelper::class,
+                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.integrations.helper.sync_mapping' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\Mapping\MappingHelper::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper::class,
                 'arguments' => [
                     'mautic.lead.model.field',
                     'mautic.lead.repository.lead',
                     'mautic.integrations.repository.object_mapping',
+                ],
+            ],
+            'mautic.integrations.helper.sync_integrations' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Helper\SyncIntegrationsHelper::class,
+                'arguments' => [
+                  'mautic.plugin.integrations.repository.integration',
                 ],
             ],
         ],
