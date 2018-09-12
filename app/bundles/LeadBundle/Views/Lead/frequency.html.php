@@ -51,7 +51,9 @@ $leadName = $lead->getPrimaryIdentifier();
                         <input type="checkbox" id="<?php echo $channel->value ?>"
                                name="lead_contact_frequency_rules[subscribed_channels][]" class="control-label"
                                onclick="Mautic.togglePreferredChannel(this.value);"
-                               value="<?php echo $view->escape($channel->value) ?>" <?php echo $checked; ?>>
+                               value="<?php echo $view->escape($channel->value) ?>" <?php echo $checked; ?>
+                               <?php echo ($contactMe === false) ? 'disabled' : '' ?>
+                        >
                     </th>
                     <td class="col-md-1" style="vertical-align: top">
                         <div id="is-contactable-<?php echo $channel->value ?>" class="<?php echo $isContactable; ?> fw-sb">
