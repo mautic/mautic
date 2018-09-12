@@ -82,6 +82,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     private $fieldList = [];
 
     /**
+     * @var array
+     */
+    private $lastProcessedTrackedId = [];
+
+    /**
      * MauticSyncDataExchange constructor.
      *
      * @param FieldChangeRepository            $fieldChangeRepository
@@ -342,15 +347,27 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
         foreach ($requestedObjects as $objectDAO) {
             try {
+                if (!isset($this->lastProcessedTrackedId[$objectDAO->getObject()])) {
+                    $this->lastProcessedTrackedId[$objectDAO->getObject()] = 0;
+                }
+
                 $fieldsChanges = $this->fieldChangeRepository->findChangesBefore(
                     $this->getFieldObjectName($objectDAO->getObject()),
-                    $objectDAO->getToDateTime()
+                    $objectDAO->getToDateTime(),
+                    $this->lastProcessedTrackedId[$objectDAO->getObject()]
                 );
 
                 $reportObjects = [];
                 foreach ($fieldsChanges as $fieldChange) {
+                    $objectId = (int) $fieldChange['object_id'];
+
+                    // Track the last processed ID to prevent loops for objects that were set to be retried later
+                    if ($objectId > $this->lastProcessedTrackedId[$objectDAO->getObject()]) {
+                        $this->lastProcessedTrackedId[$objectDAO->getObject()] = $objectId;
+                    }
+
                     $object           = $this->getObjectNameFromEntityName($fieldChange['object_type']);
-                    $objectId         = $fieldChange['object_id'];
+                    $objectId         = (int) $fieldChange['object_id'];
                     $modifiedDateTime = new \DateTime($fieldChange['modified_at'], new \DateTimeZone('UTC'));
 
                     if (!array_key_exists($object, $reportObjects)) {
