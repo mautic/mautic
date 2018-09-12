@@ -37,6 +37,12 @@ class SyncServiceTest extends MauticMysqlTestCase
         // Sleep one second to ensure that the modified date/time stamps of the contacts just created are in the past
         sleep(1);
 
+        // Record now because we're going to sync again
+        $now = new \DateTime();
+
+        $prefix = $this->container->getParameter('mautic.db_table_prefix');
+        $connection = $this->container->get('doctrine.dbal.default_connection');
+
         /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->container->get('event_dispatcher');
 
@@ -50,13 +56,20 @@ class SyncServiceTest extends MauticMysqlTestCase
         $syncService = $this->container->get('mautic.integrations.sync.service');
 
         $syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), true);
-
         $payload = $dataExchange->getOrderPayload();
 
         // Created the 50 known contacts already in Mautic
         $this->assertCount(50, $payload['create']);
+        $this->assertCount(0, $payload['update']);
 
-        // Updated the 2 contacts that were already in Mautic
+        // Sleep to pass time
+        sleep(5);
+
+        // Sync again
+        $syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), true, $now);
+        $payload = $dataExchange->getOrderPayload();
+
+        // Now we should have updated the 2 contacts that were already in Mautic
         $this->assertCount(2, $payload['update']);
         $this->assertEquals(
             [
@@ -82,8 +95,7 @@ class SyncServiceTest extends MauticMysqlTestCase
 
         // Validate mapping table
         /** @var Connection $connection */
-        $prefix = $this->container->getParameter('mautic.db_table_prefix');
-        $connection = $this->container->get('doctrine.dbal.default_connection');
+
         $qb = $connection->createQueryBuilder();
         $results = $qb->select('count(*) as the_count, m.integration_object_name, m.integration')
             ->from($prefix.'sync_object_mapping', 'm')

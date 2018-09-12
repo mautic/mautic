@@ -205,7 +205,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         foreach ($requestedObjects as $requestedObject) {
             $objectName   = $requestedObject->getObject();
             $fromDateTime = $requestedObject->getFromDateTime();
-            $toDatetime = $requestedObject->getToDateTime();
+            $toDatetime   = $requestedObject->getToDateTime();
             $mappedFields = $requestedObject->getFields();
 
             $updatedPeople = $this->getReportPayload($objectName, $fromDateTime, $toDatetime, $mappedFields);
