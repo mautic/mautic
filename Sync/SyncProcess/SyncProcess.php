@@ -181,6 +181,7 @@ class SyncProcess
 
             // Execute the sync instructions
             $this->internalSyncDataExchange->executeSyncOrder($syncOrder);
+
             // Fetch the next iteration/batch
             ++$this->syncIteration;
         } while (true);
@@ -233,7 +234,10 @@ class SyncProcess
             // Save the mappings between Mautic objects and the integration's objects
             $this->mappingHelper->saveObjectMappings($syncOrder->getObjectMappings());
 
-            // Update the mappings between Mautic objects and the integration's objects if applicable
+            // Remap integration objects to Mautic objects if applicable
+            $this->mappingHelper->remapIntegrationObjects($syncOrder->getRemappedObjects());
+
+            // Update last sync dates on existing object mappings
             $this->mappingHelper->updateObjectMappings($syncOrder->getUpdatedObjectMappings());
 
             // Tell sync that these objects have been deleted and not to continue re-syncing them
@@ -373,7 +377,7 @@ class SyncProcess
      */
     private function generateInternalSyncOrder(ReportDAO $syncReport)
     {
-        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->isFirstTimeSync);
+        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->isFirstTimeSync, $this->mappingManualDAO->getIntegration());
 
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {
@@ -417,7 +421,7 @@ class SyncProcess
      */
     private function generateIntegrationSyncOrder(ReportDAO $syncReport)
     {
-        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->isFirstTimeSync);
+        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->isFirstTimeSync, $this->mappingManualDAO->getIntegration());
 
         $internalObjectNames = $this->mappingManualDAO->getInternalObjectsNames();
         foreach ($internalObjectNames as $internalObjectName) {
@@ -439,7 +443,7 @@ class SyncProcess
 
                 foreach ($internalObjects as $internalObject) {
                     try {
-                        $integrationObject = $this->internalSyncDataExchange->getMappedIntegrationObject(
+                        $integrationObject = $this->mappingHelper->findIntegrationObject(
                             $this->mappingManualDAO->getIntegration(),
                             $mappedIntegrationObjectName,
                             $internalObject
@@ -493,7 +497,7 @@ class SyncProcess
         ReportObjectDAO $internalObject
     ) {
         $objectChange = new ObjectChangeDAO(
-            $syncReport->getIntegration(),
+            $this->mappingManualDAO->getIntegration(),
             $internalObject->getObject(),
             $internalObject->getObjectId(),
             $integrationObject->getObject(),
@@ -682,7 +686,7 @@ class SyncProcess
         ReportObjectDAO $integrationObject
     ) {
         $objectChange = new ObjectChangeDAO(
-            $syncReport->getIntegration(),
+            $this->mappingManualDAO->getIntegration(),
             $integrationObject->getObject(),
             $integrationObject->getObjectId(),
             $internalObject->getObject(),

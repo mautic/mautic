@@ -140,40 +140,42 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         // Deliver payload and get response
         $response = $this->deliverPayload();
 
-        // Notify the order regarding IDs of created objects
+        // Notify the order regarding the status of objects
         foreach ($response as $result) {
-            /** @var ObjectChangeDAO $object */
-            $object = $byEmail[$result['object']][$result['email']];
+            if (empty($byEmail[$result['object']][$result['email']])) {
+                continue;
+            }
+
+            /** @var ObjectChangeDAO $changeObject */
+            $changeObject = $byEmail[$result['object']][$result['email']];
 
             switch ($result['code']) {
                 case 200: // updated
                     $syncOrderDAO->updateLastSyncDate(
-                        $object,
+                        $changeObject,
                         $result['last_modified']
                     );
                     break;
                 case 201: //created
                     $syncOrderDAO->addObjectMapping(
-                        ExampleIntegration::NAME,
-                        $object->getMappedObject(),
-                        $object->getMappedObjectId(),
+                        $changeObject,
                         $result['object'],
                         $result['id'],
                         $result['last_modified']
                     );
                     break;
                 case 404: // assume this object has been deleted
-                    $syncOrderDAO->deleteObject($object);
+                    $syncOrderDAO->deleteObject($changeObject);
                     break;
                 case 405: // simulated "this lead has been converted to a contact"
-                    $syncOrderDAO->updateObjectMapping(
-                        $object,
+                    $syncOrderDAO->remapObject(
+                        $changeObject->getObject(),
+                        $changeObject->getObjectId(),
                         $result['converted_id'],
-                        self::OBJECT_CONTACT,
-                        $result['last_modified']
+                        self::OBJECT_CONTACT
                     );
                 case 500: // there was some kind of temporary issue so just retry this later
-                    $syncOrderDAO->retrySyncLater($object);
+                    $syncOrderDAO->retrySyncLater($changeObject);
                     break;
                 default:
                     // Assume the rest are just failures so don't do anything and the sync process will not continue to sync the objects
@@ -203,9 +205,10 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         foreach ($requestedObjects as $requestedObject) {
             $objectName   = $requestedObject->getObject();
             $fromDateTime = $requestedObject->getFromDateTime();
+            $toDatetime = $requestedObject->getToDateTime();
             $mappedFields = $requestedObject->getFields();
 
-            $updatedPeople = $this->getReportPayload($objectName, $fromDateTime, $mappedFields);
+            $updatedPeople = $this->getReportPayload($objectName, $fromDateTime, $toDatetime, $mappedFields);
             foreach ($updatedPeople as $person) {
                 // If the integration knows modified timestamps per field, use that. Otherwise, we're using the complete object's
                 // last modified timestamp.
@@ -247,9 +250,9 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      *
      * @return mixed
      */
-    private function getReportPayload($object, \DateTimeInterface $fromDateTime, array $mappedFields)
+    private function getReportPayload($object, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, array $mappedFields)
     {
-        // Query integration's API for objects changed since $fromDateTime with the requested fields in $mappedFields if that's
+        // Query integration's API for objects changed between $fromDateTime and $toDateTime with the requested fields in $mappedFields if that's
         // applicable to the integration. I.e. Salesforce supports querying for specific fields in it's SOQL
 
         $payload = [

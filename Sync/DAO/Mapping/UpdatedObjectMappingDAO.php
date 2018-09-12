@@ -11,25 +11,22 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping;
 
-
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-
 class UpdatedObjectMappingDAO
 {
     /**
-     * @var ObjectChangeDAO
+     * @var string
      */
-    private $objectChangeDAO;
-
-    /**
-     * @var mixed
-     */
-    private $objectId;
+    private $integration;
 
     /**
      * @var string
      */
-    private $objectName;
+    private $integrationObjectName;
+
+    /**
+     * @var mixed
+     */
+    private $integrationObjectId;
 
     /**
      * @var \DateTime
@@ -37,44 +34,50 @@ class UpdatedObjectMappingDAO
     private $objectModifiedDate;
 
     /**
-     * @param ObjectChangeDAO    $objectChangeDAO
-     * @param mixed              $objectId
-     * @param string             $objectName
+     * UpdatedObjectMappingDAO constructor.
+     *
+     * @param string             $integration
+     * @param string             $integrationObjectName
+     * @param mixed              $integrationObjectId
      * @param \DateTimeInterface $objectModifiedDate
      */
-    public function __construct(ObjectChangeDAO $objectChangeDAO, $objectId, $objectName, \DateTimeInterface $objectModifiedDate)
-    {
-        $this->objectChangeDAO    = $objectChangeDAO;
-        $this->objectId           = $objectId;
-        $this->objectName         = $objectName;
-        $this->objectModifiedDate = ($objectModifiedDate instanceof \DateTimeImmutable) ? new \DateTime(
+    public function __construct(
+        $integration,
+        $integrationObjectName,
+        $integrationObjectId,
+        \DateTimeInterface $objectModifiedDate
+    ) {
+        $this->integration           = $integration;
+        $this->integrationObjectName = $integrationObjectName;
+        $this->integrationObjectId   = $integrationObjectId;
+        $this->objectModifiedDate    = ($objectModifiedDate instanceof \DateTimeImmutable) ? new \DateTime(
             $objectModifiedDate->format('Y-m-d H:i:s'),
             $objectModifiedDate->getTimezone()
         ) : $objectModifiedDate;
     }
 
     /**
-     * @return ObjectChangeDAO
+     * @return string
      */
-    public function getObjectChangeDAO(): ObjectChangeDAO
+    public function getIntegration(): string
     {
-        return $this->objectChangeDAO;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getObjectId()
-    {
-        return $this->objectId;
+        return $this->integration;
     }
 
     /**
      * @return string
      */
-    public function getObjectName(): string
+    public function getIntegrationObjectName(): string
     {
-        return $this->objectName;
+        return $this->integrationObjectName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIntegrationObjectId()
+    {
+        return $this->integrationObjectId;
     }
 
     /**

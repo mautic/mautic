@@ -61,6 +61,7 @@ class SyncDateHelper
         $this->syncFromDateTime = $fromDateTime;
         $this->syncToDateTime   = $toDateTime;
         $this->syncDateTime     = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->lastObjectSyncDates = [];
     }
 
     /**

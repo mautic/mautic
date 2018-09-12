@@ -14,8 +14,6 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
-use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
@@ -235,25 +233,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         }
 
         return $internalObjectDAO;
-    }
-
-    /**
-     * @param string          $integration
-     * @param string          $integrationObjectName
-     * @param ReportObjectDAO $internalObjectDAO
-     *
-     * @return ReportObjectDAO
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
-     */
-    public function getMappedIntegrationObject(string $integration, string $integrationObjectName, ReportObjectDAO $internalObjectDAO)
-    {
-        $integrationObject = $this->mappingHelper->findIntegrationObject($integration, $integrationObjectName, $internalObjectDAO);
-
-        if ($integrationObject) {
-            return $integrationObject;
-        }
-
-        return new ReportObjectDAO($integrationObjectName, null);
     }
 
     /**
