@@ -19,7 +19,7 @@ class FieldMappingDAO
     /**
      * @var string
      */
-    private $internalEntity;
+    private $internalObject;
 
     /**
      * @var string
@@ -29,7 +29,7 @@ class FieldMappingDAO
     /**
      * @var string
      */
-    private $integrationEntity;
+    private $integrationObject;
 
     /**
      * @var string
@@ -44,17 +44,17 @@ class FieldMappingDAO
     /**
      * FieldMappingDAO constructor.
      *
-     * @param $internalEntity
+     * @param $internalObject
      * @param $internalField
-     * @param $integrationEntity
+     * @param $integrationObject
      * @param $integrationField
      * @param $syncDirection
      */
-    public function __construct($internalEntity, $internalField, $integrationEntity, $integrationField, $syncDirection)
+    public function __construct($internalObject, $internalField, $integrationObject, $integrationField, $syncDirection)
     {
-        $this->internalEntity    = $internalEntity;
+        $this->internalObject    = $internalObject;
         $this->internalField     = $internalField;
-        $this->integrationEntity = $integrationEntity;
+        $this->integrationObject = $integrationObject;
         $this->integrationField  = $integrationField;
         $this->syncDirection     = $syncDirection;
     }
@@ -62,9 +62,9 @@ class FieldMappingDAO
     /**
      * @return string
      */
-    public function getInternalEntity()
+    public function getInternalObject()
     {
-        return $this->internalEntity;
+        return $this->internalObject;
     }
 
     /**
@@ -78,9 +78,9 @@ class FieldMappingDAO
     /**
      * @return string
      */
-    public function getIntegrationEntity()
+    public function getIntegrationObject()
     {
-        return $this->integrationEntity;
+        return $this->integrationObject;
     }
 
     /**
