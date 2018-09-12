@@ -59,7 +59,7 @@ class SchemaHelper
             }
         }
 
-        $dbParams['charset'] = 'UTF8';
+        $dbParams['charset'] = 'utf8mb4';
         if (isset($dbParams['name'])) {
             $dbParams['dbname'] = $dbParams['name'];
             unset($dbParams['name']);
