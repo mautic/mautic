@@ -348,6 +348,10 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
             $field->nullable();
         }
 
+        if ($type === 'string') {
+            $field->length(191);
+        }
+
         $field->build();
 
         return $this;
