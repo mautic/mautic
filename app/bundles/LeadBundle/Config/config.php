@@ -214,6 +214,11 @@ return [
                 'controller' => 'MauticLeadBundle:Api\ListApi:addLead',
                 'method'     => 'POST',
             ],
+            'mautic_api_segmentaddcontacts' => [
+                'path'       => '/segments/{id}/contacts/add',
+                'controller' => 'MauticLeadBundle:Api\ListApi:addLeads',
+                'method'     => 'POST',
+            ],
             'mautic_api_segmentremovecontact' => [
                 'path'       => '/segments/{id}/contact/{leadId}/remove',
                 'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
