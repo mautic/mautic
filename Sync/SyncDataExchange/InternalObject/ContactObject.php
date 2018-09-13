@@ -188,4 +188,21 @@ class ContactObject implements ObjectInterface
 
         return $qb->execute()->fetchAll();
     }
+
+    /**
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function findObjectsByIds(array $ids)
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where(
+                $qb->expr()->in('id', $ids)
+            );
+
+        return $qb->execute()->fetchAll();
+    }
 }

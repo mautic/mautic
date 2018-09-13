@@ -85,6 +85,11 @@ class OrderDAO
     private $objectCounter = 0;
 
     /**
+     * @var array
+     */
+    private $requiredFields = [];
+
+    /**
      * OrderDAO constructor.
      *
      * @param \DateTimeInterface $syncDateTime

@@ -252,6 +252,8 @@ class SyncProcess
     }
 
     /**
+     * Generate a report of integration objects to sync to Mautic
+     *
      * @return ReportDAO
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException
      */
@@ -299,9 +301,13 @@ class SyncProcess
                 $objectSyncToDateTime,
                 $lastObjectSyncDateTime
             );
+
             foreach ($integrationObjectFields as $integrationObjectField) {
                 $integrationRequestObject->addField($integrationObjectField);
             }
+
+            $integrationRequestObject->setRequiredFields($this->mappingManualDAO->getIntegrationObjectRequiredFieldNames($integrationObjectName));
+
             $integrationRequestDAO->addObject($integrationRequestObject);
         }
 
@@ -314,6 +320,8 @@ class SyncProcess
     }
 
     /**
+     * Generate a report of Mautic objects to sync to the integration
+     *
      * @return ReportDAO
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException
      */
@@ -356,6 +364,10 @@ class SyncProcess
             foreach ($internalObjectFields as $internalObjectField) {
                 $internalRequestObject->addField($internalObjectField);
             }
+
+            // Set required fields for easy access; mainly for Mautic
+            $internalRequestObject->setRequiredFields($this->mappingManualDAO->getInternalObjectRequiredFieldNames($internalObjectName));
+
             $internalRequestDAO->addObject($internalRequestObject);
         }
 
@@ -561,6 +573,25 @@ class SyncProcess
                     break;
 
                 case ObjectMappingDAO::SYNC_TO_INTEGRATION:
+                    if ($fieldMappingDAO->isRequired()) {
+                        // We still need to add this value because it's required
+                        $objectChange->addRequiredField(
+                            new FieldDAO($fieldMappingDAO->getInternalField(), $integrationInformationChangeRequest->getNewValue())
+                        );
+
+                        DebugLogger::log(
+                            $this->mappingManualDAO->getIntegration(),
+                            sprintf(
+                                "Integration to Mautic; the %s object's field %s was added to the list of required fields because it's configured to sync to the integration",
+                                $internalObject->getObject(),
+                                $fieldMappingDAO->getInternalField()
+                            ),
+                            __CLASS__.':'.__FUNCTION__
+                        );
+
+                        continue;
+                    }
+
                     // Ignore this field
                     DebugLogger::log(
                         $this->mappingManualDAO->getIntegration(),
@@ -734,6 +765,25 @@ class SyncProcess
             // Perform the sync in the direction instructed
             switch ($fieldMappingDAO->getSyncDirection()) {
                 case ObjectMappingDAO::SYNC_TO_MAUTIC:
+                    if ($fieldMappingDAO->isRequired()) {
+                        // We still need to add this value because it's required
+                        $objectChange->addRequiredField(
+                            new FieldDAO($fieldMappingDAO->getIntegrationField(), $internalInformationChangeRequest->getNewValue())
+                        );
+
+                        DebugLogger::log(
+                            $this->mappingManualDAO->getIntegration(),
+                            sprintf(
+                                "Mautic to integration; the %s object's field %s was added to the list of required fields because it's configured to sync to the integration",
+                                $integrationObject->getObject(),
+                                $fieldMappingDAO->getIntegrationField()
+                            ),
+                            __CLASS__.':'.__FUNCTION__
+                        );
+
+                        continue;
+                    }
+
                     // Ignore this field
                     DebugLogger::log(
                         $this->mappingManualDAO->getIntegration(),

@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\VariableExpresser;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 /**
  * Interface VariableExpresserHelperInterface
@@ -21,7 +22,7 @@ interface VariableExpresserHelperInterface
     /**
      * @param EncodedValueDAO $EncodedValueDAO
      *
-     * @return mixed
+     * @return NormalizedValueDAO
      */
     public function decodeVariable(EncodedValueDAO $EncodedValueDAO);
 

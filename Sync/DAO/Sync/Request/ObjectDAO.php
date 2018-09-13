@@ -48,6 +48,11 @@ class ObjectDAO
     private $fields = [];
 
     /**
+     * @var string[]
+     */
+    private $requiredFields = [];
+
+    /**
      * ObjectDAO constructor.
      *
      * @param string                  $object
@@ -93,6 +98,22 @@ class ObjectDAO
     public function getFields(): array
     {
         return $this->fields;
+    }
+
+    /**
+     * @param array $fields
+     */
+    public function setRequiredFields(array $fields)
+    {
+        $this->requiredFields = $fields;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRequiredFields(): array
+    {
+        return $this->requiredFields;
     }
 
     /**

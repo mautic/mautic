@@ -157,8 +157,40 @@ class MappingManualDAO
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
             $fieldMappings    = $objectMappingDAO->getFieldMappings();
             foreach ($fieldMappings as $fieldMapping) {
-                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_MAUTIC) {
-                    // Ignore because this field is a one way sync from the integration to Mautic
+                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_MAUTIC && !$fieldMapping->isRequired()) {
+                    // Ignore because this field is a one way sync from the integration to Mautic nor is required
+                    continue;
+                }
+
+                $fields[$fieldMapping->getInternalField()] = true;
+            }
+        }
+
+        return array_keys($fields);
+    }
+
+    /**
+     * Get a list of internal fields that are required
+     *
+     * @param string $internalObjectName
+     *
+     * @return array
+     * @throws ObjectNotFoundException
+     */
+    public function getInternalObjectRequiredFieldNames(string $internalObjectName): array
+    {
+        if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
+            throw new ObjectNotFoundException($internalObjectName);
+        }
+
+        $fields                  = [];
+        $integrationObjectsNames = $this->internalObjectsMapping[$internalObjectName];
+        foreach ($integrationObjectsNames as $integrationObjectName) {
+            /** @var ObjectMappingDAO $objectMappingDAO */
+            $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
+            $fieldMappings    = $objectMappingDAO->getFieldMappings();
+            foreach ($fieldMappings as $fieldMapping) {
+                if (!$fieldMapping->isRequired()) {
                     continue;
                 }
 
@@ -189,8 +221,8 @@ class MappingManualDAO
     {
         if (!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
             throw new ObjectNotFoundException($integrationObjectName);
-
         }
+
         $fields               = [];
         $internalObjectsNames = $this->integrationObjectsMapping[$integrationObjectName];
 
@@ -199,8 +231,41 @@ class MappingManualDAO
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
             $fieldMappings    = $objectMappingDAO->getFieldMappings();
             foreach ($fieldMappings as $fieldMapping) {
-                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_INTEGRATION) {
-                    // Ignore because this field is a one way sync from Mautic to the integration
+                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_INTEGRATION && !$fieldMapping->isRequired()) {
+                    // Ignore because this field is a one way sync from Mautic to the integration nor a required field
+                    continue;
+                }
+
+                $fields[$fieldMapping->getIntegrationField()] = true;
+            }
+        }
+
+        return array_keys($fields);
+    }
+
+    /**
+     * Get a list of integration fields that are required
+     *
+     * @param string $integrationObjectName
+     *
+     * @return array
+     * @throws ObjectNotFoundException
+     */
+    public function getIntegrationObjectRequiredFieldNames(string $integrationObjectName): array
+    {
+        if (!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
+            throw new ObjectNotFoundException($integrationObjectName);
+        }
+
+        $fields               = [];
+        $internalObjectsNames = $this->integrationObjectsMapping[$integrationObjectName];
+
+        foreach ($internalObjectsNames as $internalObjectName) {
+            /** @var ObjectMappingDAO $objectMappingDAO */
+            $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
+            $fieldMappings    = $objectMappingDAO->getFieldMappings();
+            foreach ($fieldMappings as $fieldMapping) {
+                if (!$fieldMapping->isRequired()) {
                     continue;
                 }
 

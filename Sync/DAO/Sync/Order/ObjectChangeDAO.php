@@ -52,6 +52,11 @@ class ObjectChangeDAO
     private $fields = [];
 
     /**
+     * @var FieldDAO[]
+     */
+    private $requiredFields = [];
+
+    /**
      * ObjectChangeDAO constructor.
      *
      * @param string $integration
@@ -85,6 +90,19 @@ class ObjectChangeDAO
     public function addField(FieldDAO $fieldDAO): ObjectChangeDAO
     {
         $this->fields[$fieldDAO->getName()] = $fieldDAO;
+
+        return $this;
+    }
+
+    /**
+     * @param FieldDAO $fieldDAO
+     *
+     * @return ObjectChangeDAO
+     */
+    public function addRequiredField(FieldDAO $fieldDAO): ObjectChangeDAO
+    {
+        $this->requiredFields[$fieldDAO->getName()] = $fieldDAO;
+
         return $this;
     }
 
@@ -139,11 +157,15 @@ class ObjectChangeDAO
      */
     public function getField($name)
     {
-        if (!isset($this->fields[$name])) {
-            return null;
+        if (isset($this->fields[$name])) {
+            return $this->fields[$name];
         }
 
-        return $this->fields[$name];
+        if (isset($this->requiredFields[$name])) {
+            return $this->requiredFields[$name];
+        }
+
+        return null;
     }
 
     /**
@@ -152,6 +174,22 @@ class ObjectChangeDAO
     public function getFields(): array
     {
         return $this->fields;
+    }
+
+    /**
+     * @return FieldDAO[]
+     */
+    public function getRequiredFields(): array
+    {
+        return $this->requiredFields;
+    }
+
+    /**
+     * @return FieldDAO[]
+     */
+    public function getAllFields()
+    {
+        return array_merge($this->fields, $this->requiredFields);
     }
 
     /**

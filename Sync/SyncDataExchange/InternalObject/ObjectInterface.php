@@ -39,7 +39,14 @@ interface ObjectInterface
      * @param int                $start
      * @param int                $limit
      *
-     * @return mixed
+     * @return array
      */
     public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit);
+
+    /**
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function findObjectsByIds(array $ids);
 }
