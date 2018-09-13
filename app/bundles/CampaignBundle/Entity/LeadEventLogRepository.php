@@ -552,14 +552,14 @@ class LeadEventLogRepository extends CommonRepository
         $prefix = MAUTIC_TABLE_PREFIX;
         $sql    = <<<SQL
 REPLACE INTO {$prefix}campaign_lead_event_failed_log( `log_id`, `date_added`, `reason`)
-SELECT id, :dateAdded as date_added, :message as reason from {$prefix}campaign_lead_event_log
+SELECT id, :dateAdded as date_added, :reason as reason from {$prefix}campaign_lead_event_log
 WHERE is_scheduled = 1 AND lead_id = :contactId AND campaign_id = :campaignId AND rotation = :rotation
 SQL;
 
         $connection = $this->getEntityManager()->getConnection();
         $stmt       = $connection->prepare($sql);
         $stmt->bindParam('dateAdded', $dateAdded, \PDO::PARAM_STR);
-        $stmt->bindParam('message', $message, \PDO::PARAM_STR);
+        $stmt->bindParam('reason', $message, \PDO::PARAM_STR);
         $stmt->bindParam('contactId', $contactId, \PDO::PARAM_INT);
         $stmt->bindParam('campaignId', $campaignId, \PDO::PARAM_INT);
         $stmt->bindParam('rotation', $rotation, \PDO::PARAM_INT);
