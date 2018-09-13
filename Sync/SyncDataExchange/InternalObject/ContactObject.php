@@ -196,6 +196,9 @@ class ContactObject implements ObjectInterface
      */
     public function findObjectsByIds(array $ids)
     {
+        if (!count($ids)) {
+            return [];
+        }
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
