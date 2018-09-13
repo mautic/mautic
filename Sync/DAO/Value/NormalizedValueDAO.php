@@ -17,6 +17,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Value;
 class NormalizedValueDAO
 {
     const STRING_TYPE = 'string';
+    const URL_TYPE = 'url';
     const INT_TYPE = 'int';
     const FLOAT_TYPE = 'float';
     const DOUBLE_TYPE = 'double';
