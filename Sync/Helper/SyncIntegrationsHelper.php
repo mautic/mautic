@@ -21,7 +21,7 @@ class SyncIntegrationsHelper
     /**
      * @var BasicIntegration[]
      */
-    private $integrations;
+    private $integrations = [];
 
     /**
      * @var IntegrationRepository
