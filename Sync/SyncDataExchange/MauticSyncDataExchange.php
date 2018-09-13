@@ -248,8 +248,8 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     public function cleanupProcessedObjects(array $objectChanges)
     {
         foreach ($objectChanges as $changedObjectDAO) {
-            $object   = $changedObjectDAO->getMappedObject();
-            $objectId = $changedObjectDAO->getMappedObjectId();
+            $object   = $this->getFieldObjectName($changedObjectDAO->getObject());
+            $objectId = $changedObjectDAO->getObjectId();
 
             $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object, $changedObjectDAO->getIntegration());
         }
