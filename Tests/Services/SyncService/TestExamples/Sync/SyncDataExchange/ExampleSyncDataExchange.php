@@ -90,7 +90,8 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
              * @var ObjectChangeDAO $unidentifiedObject
              */
             foreach ($unidentifiedObjects as $unidentifiedObject) {
-                $fields = $unidentifiedObject->getFields();
+                // Use getAllFields here to ensure we have values for required fields in addition to one way mapped fields
+                $fields = $unidentifiedObject->getAllFields();
 
                 // Extract identifier fields for this integration to check if they exist before creating
                 // Some integrations offer a upsert feature which may make this not necessary.
