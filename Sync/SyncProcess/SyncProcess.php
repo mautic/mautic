@@ -209,6 +209,7 @@ class SyncProcess
 
             // Convert the internal report into an "order" or instructions for the integration
             $syncOrder = $this->generateIntegrationSyncOrder($syncReport);
+
             if (!$syncOrder->shouldSync()) {
                 DebugLogger::log(
                     $this->mappingManualDAO->getIntegration(),
@@ -367,12 +368,11 @@ class SyncProcess
 
             // Set required fields for easy access; mainly for Mautic
             $internalRequestObject->setRequiredFields($this->mappingManualDAO->getInternalObjectRequiredFieldNames($internalObjectName));
-
             $internalRequestDAO->addObject($internalRequestObject);
         }
 
         $internalSyncReport = $internalRequestDAO->shouldSync()
-            ? $this->internalSyncDataExchange->getSyncReport($internalRequestDAO)
+            ? $this->internalSyncDataExchange->getSyncReport($internalRequestDAO, $this->mappingManualDAO->getIntegration())
             :
             new ReportDAO(MauticSyncDataExchange::NAME);
 
@@ -467,7 +467,6 @@ class SyncProcess
                             $internalObject,
                             $integrationObject
                         );
-
                         if ($objectChange->shouldSync()) {
                             $syncOrder->addObjectChange($objectChange);
                         }
@@ -718,10 +717,10 @@ class SyncProcess
     ) {
         $objectChange = new ObjectChangeDAO(
             $this->mappingManualDAO->getIntegration(),
-            $integrationObject->getObject(),
-            $integrationObject->getObjectId(),
             $internalObject->getObject(),
-            $internalObject->getObjectId()
+            $internalObject->getObjectId(),
+            $integrationObject->getObject(),
+            $integrationObject->getObjectId()
         );
 
         if ($integrationObject->getObjectId()) {
