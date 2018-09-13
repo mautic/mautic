@@ -224,8 +224,8 @@ class OrderDAO
 
         $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO(
             $this->integration,
-            $objectChangeDAO->getObjectId(),
             $objectChangeDAO->getObject(),
+            $objectChangeDAO->getObjectId(),
             $objectModifiedDate
         );
     }
