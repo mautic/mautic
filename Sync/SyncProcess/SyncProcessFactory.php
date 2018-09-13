@@ -44,7 +44,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
         $isFirstTimeSync,
         \DateTimeInterface $syncFromDateTime = null,
         \DateTimeInterface $syncToDateTime = null
-    ) {
+    ): SyncProcess {
         return new SyncProcess(
             $syncJudge,
             $integrationMappingManual,

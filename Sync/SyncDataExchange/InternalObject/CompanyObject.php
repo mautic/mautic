@@ -52,7 +52,7 @@ class CompanyObject implements ObjectInterface
      *
      * @return ObjectMapping[]
      */
-    public function create(array $objects)
+    public function create(array $objects): array
     {
         $objectMappings = [];
         foreach ($objects as $object) {
@@ -94,7 +94,7 @@ class CompanyObject implements ObjectInterface
      *
      * @return UpdatedObjectMappingDAO[]
      */
-    public function update(array $ids, array $objects)
+    public function update(array $ids, array $objects): array
     {
         /** @var Company[] $companies */
         $companies = $this->model->getEntities(['ids' => $ids]);
@@ -152,7 +152,7 @@ class CompanyObject implements ObjectInterface
      *
      * @return array
      */
-    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit)
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit): array
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
@@ -182,11 +182,12 @@ class CompanyObject implements ObjectInterface
      *
      * @return array
      */
-    public function findObjectsByIds(array $ids)
+    public function findObjectsByIds(array $ids): array
     {
         if (!count($ids)) {
             return [];
         }
+
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')

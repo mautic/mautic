@@ -41,7 +41,7 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
      *
      * @return NormalizedValueDAO
      */
-    public function decodeVariable(EncodedValueDAO $encodedValueDAO)
+    public function decodeVariable(EncodedValueDAO $encodedValueDAO): NormalizedValueDAO
     {
         $value = $encodedValueDAO->getValue();
 
@@ -53,7 +53,7 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
      *
      * @return EncodedValueDAO
      */
-    public function encodeVariable($var)
+    public function encodeVariable($var): EncodedValueDAO
     {
         if (is_int($var)) {
             return new EncodedValueDAO(EncodedValueDAO::INT_TYPE, (string) $var);

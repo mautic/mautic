@@ -44,5 +44,5 @@ interface SyncProcessFactoryInterface
         $isFirstTimeSync,
         \DateTimeInterface $syncFromDateTime = null,
         \DateTimeInterface $syncToDateTime = null
-    );
+    ): SyncProcess;
 }

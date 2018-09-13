@@ -58,7 +58,7 @@ class ContactObject implements ObjectInterface
      *
      * @return ObjectMapping[]
      */
-    public function create(array $objects)
+    public function create(array $objects): array
     {
         $objectMappings = [];
         foreach ($objects as $object) {
@@ -100,7 +100,7 @@ class ContactObject implements ObjectInterface
      *
      * @return UpdatedObjectMappingDAO[]
      */
-    public function update(array $ids, array $objects)
+    public function update(array $ids, array $objects): array
     {
         /** @var Lead[] $contacts */
         $contacts = $this->model->getEntities(['ids' => $ids]);
@@ -159,7 +159,7 @@ class ContactObject implements ObjectInterface
      *
      * @return array
      */
-    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit)
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit): array
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
@@ -194,11 +194,12 @@ class ContactObject implements ObjectInterface
      *
      * @return array
      */
-    public function findObjectsByIds(array $ids)
+    public function findObjectsByIds(array $ids): array
     {
         if (!count($ids)) {
             return [];
         }
+
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')

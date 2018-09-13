@@ -23,7 +23,7 @@ interface ObjectInterface
      *
      * @return ObjectMapping[]
      */
-    public function create(array $objects);
+    public function create(array $objects): array;
 
     /**
      * @param array             $ids
@@ -31,7 +31,7 @@ interface ObjectInterface
      *
      * @return UpdatedObjectMappingDAO[]
      */
-    public function update(array $ids, array $objects);
+    public function update(array $ids, array $objects): array;
 
     /**
      * @param \DateTimeInterface $from
@@ -41,12 +41,12 @@ interface ObjectInterface
      *
      * @return array
      */
-    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit);
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit): array;
 
     /**
      * @param array $ids
      *
      * @return array
      */
-    public function findObjectsByIds(array $ids);
+    public function findObjectsByIds(array $ids): array;
 }

@@ -24,12 +24,12 @@ interface VariableExpresserHelperInterface
      *
      * @return NormalizedValueDAO
      */
-    public function decodeVariable(EncodedValueDAO $EncodedValueDAO);
+    public function decodeVariable(EncodedValueDAO $EncodedValueDAO): NormalizedValueDAO;
 
     /**
      * @param mixed $var
      *
      * @return EncodedValueDAO
      */
-    public function encodeVariable($var);
+    public function encodeVariable($var): EncodedValueDAO;
 }
