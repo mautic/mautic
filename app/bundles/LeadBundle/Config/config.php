@@ -925,6 +925,7 @@ return [
                 'arguments' => [
                     'mautic.schema.helper.index',
                     'mautic.schema.helper.column',
+                    'mautic.lead.model.list',
                 ],
             ],
             'mautic.lead.model.list' => [
