@@ -23,7 +23,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 class OrderDAO
 {
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $syncDateTime;
 
@@ -328,7 +328,7 @@ class OrderDAO
     /**
      * @return \DateTime
      */
-    public function getSyncDateTime(): \DateTime
+    public function getSyncDateTime(): \DateTimeInterface
     {
         return $this->syncDateTime;
     }
