@@ -39,6 +39,14 @@ class CompanyObject implements ObjectInterface
      */
     private $connection;
 
+
+    public function __construct(CompanyModel $model, CompanyRepository $repository, Connection $connection)
+    {
+        $this->model      = $model;
+        $this->repository = $repository;
+        $this->connection = $connection;
+    }
+
     /**
      * @param ObjectChangeDAO[] $objects
      *
@@ -176,6 +184,9 @@ class CompanyObject implements ObjectInterface
      */
     public function findObjectsByIds(array $ids)
     {
+        if (!count($ids)) {
+            return [];
+        }
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
