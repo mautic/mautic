@@ -120,13 +120,13 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      *
      * @return ReportDAO
      */
-    public function getSyncReport(RequestDAO $requestDAO)
+    public function getSyncReport(RequestDAO $requestDAO, string $integrationName = '')
     {
         if ($requestDAO->isFirstTimeSync()) {
             return $this->buildReportFromFullObjects($requestDAO);
         }
 
-        return $this->buildReportFromTrackedChanges($requestDAO);
+        return $this->buildReportFromTrackedChanges($requestDAO, $integrationName);
     }
 
     /**
@@ -232,7 +232,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
             return new ReportObjectDAO($internalObjectName, null);
         }
 
-        $fieldChanges = $this->fieldChangeRepository->findChangesForObject($internalObjectName, $internalObjectDAO->getObjectId());
+        $fieldChanges = $this->fieldChangeRepository->findChangesForObject($mappingManualDAO->getIntegration(), $internalObjectName, $internalObjectDAO->getObjectId());
         foreach ($fieldChanges as $fieldChange) {
             $internalObjectDAO->addField(
                 $this->getFieldChangeObject($fieldChange)
@@ -341,7 +341,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      *
      * @return ReportDAO
      */
-    private function buildReportFromTrackedChanges(RequestDAO $requestDAO)
+    private function buildReportFromTrackedChanges(RequestDAO $requestDAO, $integrationName = '')
     {
         $syncReport       = new ReportDAO(self::NAME);
         $requestedObjects = $requestDAO->getObjects();
@@ -353,6 +353,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 }
 
                 $fieldsChanges = $this->fieldChangeRepository->findChangesBefore(
+                    $integrationName,
                     $this->getFieldObjectName($objectDAO->getObject()),
                     $objectDAO->getToDateTime(),
                     $this->lastProcessedTrackedId[$objectDAO->getObject()]
@@ -531,7 +532,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 $mauticObjects = $this->contactObjectHelper->findObjectsByIds(array_keys($objectsWithMissingFields));
                 break;
             case self::OBJECT_COMPANY:
-                $mauticObjects = $this->contactObjectHelper->findObjectsByIds(array_keys($objectsWithMissingFields));
+                $mauticObjects = $this->companyObjectHelper->findObjectsByIds(array_keys($objectsWithMissingFields));
                 break;
             default:
                 throw new ObjectNotFoundException($objectName);
