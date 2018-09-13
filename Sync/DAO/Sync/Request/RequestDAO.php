@@ -28,6 +28,11 @@ class RequestDAO
     private $isFirstTimeSync;
 
     /**
+     * @var string
+     */
+    private $syncToIntegration;
+
+    /**
      * @var ObjectDAO[]
      */
     private $objects = [];
@@ -35,13 +40,15 @@ class RequestDAO
     /**
      * RequestDAO constructor.
      *
-     * @param $syncIteration
-     * @param $isFirstTimeSync
+     * @param int    $syncIteration
+     * @param bool   $isFirstTimeSync
+     * @param string $syncToIntegration
      */
-    public function __construct($syncIteration, $isFirstTimeSync)
+    public function __construct($syncIteration, $isFirstTimeSync, string $syncToIntegration)
     {
-        $this->syncIteration = (int) $syncIteration;
-        $this->isFirstTimeSync = $isFirstTimeSync;
+        $this->syncIteration     = (int) $syncIteration;
+        $this->isFirstTimeSync   = $isFirstTimeSync;
+        $this->syncToIntegration = $syncToIntegration;
     }
 
     /**
@@ -78,6 +85,16 @@ class RequestDAO
     public function isFirstTimeSync(): bool
     {
         return $this->isFirstTimeSync;
+    }
+
+    /**
+     * The integration that will be synced to
+     *
+     * @return string
+     */
+    public function getSyncToIntegration(): string
+    {
+        return $this->syncToIntegration;
     }
 
     /**

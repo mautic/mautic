@@ -26,11 +26,10 @@ interface SyncDataExchangeInterface
      * Sync to integration
      *
      * @param RequestDAO $requestDAO
-     * @param string $integrationName
      *
      * @return ReportDAO
      */
-    public function getSyncReport(RequestDAO $requestDAO, string $integrationName = '');
+    public function getSyncReport(RequestDAO $requestDAO): ReportDAO;
 
     /**
      * Sync from integration

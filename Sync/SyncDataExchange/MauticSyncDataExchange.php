@@ -120,13 +120,13 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      *
      * @return ReportDAO
      */
-    public function getSyncReport(RequestDAO $requestDAO, string $integrationName = '')
+    public function getSyncReport(RequestDAO $requestDAO): ReportDAO
     {
         if ($requestDAO->isFirstTimeSync()) {
             return $this->buildReportFromFullObjects($requestDAO);
         }
 
-        return $this->buildReportFromTrackedChanges($requestDAO, $integrationName);
+        return $this->buildReportFromTrackedChanges($requestDAO);
     }
 
     /**
@@ -248,10 +248,14 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     public function cleanupProcessedObjects(array $objectChanges)
     {
         foreach ($objectChanges as $changedObjectDAO) {
-            $object   = $this->getFieldObjectName($changedObjectDAO->getObject());
-            $objectId = $changedObjectDAO->getObjectId();
+            try {
+                $object   = $this->getFieldObjectName($changedObjectDAO->getObject());
+                $objectId = $changedObjectDAO->getObjectId();
 
-            $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object, $changedObjectDAO->getIntegration());
+                $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object, $changedObjectDAO->getIntegration());
+            } catch (ObjectNotSupportedException $exception) {
+                // Process the others
+            }
         }
     }
 
@@ -341,7 +345,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      *
      * @return ReportDAO
      */
-    private function buildReportFromTrackedChanges(RequestDAO $requestDAO, $integrationName = '')
+    private function buildReportFromTrackedChanges(RequestDAO $requestDAO)
     {
         $syncReport       = new ReportDAO(self::NAME);
         $requestedObjects = $requestDAO->getObjects();
@@ -353,7 +357,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 }
 
                 $fieldsChanges = $this->fieldChangeRepository->findChangesBefore(
-                    $integrationName,
+                    $requestDAO->getSyncToIntegration(),
                     $this->getFieldObjectName($objectDAO->getObject()),
                     $objectDAO->getToDateTime(),
                     $this->lastProcessedTrackedId[$objectDAO->getObject()]
@@ -396,7 +400,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                     }
                 }
 
-                $this->fillInMissingRequiredFields($objectDAO->getObject(), $syncReport, $objectDAO->getRequiredFields());
+                try {
+                    $this->fillInMissingRequiredFields($objectDAO->getObject(), $syncReport, $objectDAO->getRequiredFields());
+                } catch (ObjectNotFoundException $exception) {
+                    // Process the others
+                }
             } catch (ObjectNotSupportedException $exception) {
                 DebugLogger::log(
                     self::NAME,

@@ -260,7 +260,7 @@ class SyncProcess
      */
     private function generateIntegrationSyncReport()
     {
-        $integrationRequestDAO = new RequestDAO($this->syncIteration, $this->isFirstTimeSync);
+        $integrationRequestDAO = new RequestDAO($this->syncIteration, $this->isFirstTimeSync, MauticSyncDataExchange::NAME);
 
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectsNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {
@@ -328,7 +328,7 @@ class SyncProcess
      */
     private function generateInternalSyncReport()
     {
-        $internalRequestDAO = new RequestDAO($this->syncIteration, $this->isFirstTimeSync);
+        $internalRequestDAO = new RequestDAO($this->syncIteration, $this->isFirstTimeSync, $this->mappingManualDAO->getIntegration());
 
         $internalObjectsNames = $this->mappingManualDAO->getInternalObjectsNames();
         foreach ($internalObjectsNames as $internalObjectName) {
@@ -372,7 +372,7 @@ class SyncProcess
         }
 
         $internalSyncReport = $internalRequestDAO->shouldSync()
-            ? $this->internalSyncDataExchange->getSyncReport($internalRequestDAO, $this->mappingManualDAO->getIntegration())
+            ? $this->internalSyncDataExchange->getSyncReport($internalRequestDAO)
             :
             new ReportDAO(MauticSyncDataExchange::NAME);
 
