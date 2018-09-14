@@ -111,9 +111,9 @@ class OrderDAO
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): OrderDAO
     {
         if (!isset($this->identifiedObjects[$objectChangeDAO->getObject()])) {
-            $this->identifiedObjects[$objectChangeDAO->getObject()]   = [];
-            $this->unidentifiedObjects[$objectChangeDAO->getObject()] = [];
-            $this->changedObjects[$objectChangeDAO->getMappedObject()]      = [];
+            $this->identifiedObjects[$objectChangeDAO->getObject()]    = [];
+            $this->unidentifiedObjects[$objectChangeDAO->getObject()]  = [];
+            $this->changedObjects[$objectChangeDAO->getMappedObject()] = [];
         }
 
         $this->changedObjects[$objectChangeDAO->getMappedObject()][] = $objectChangeDAO;
@@ -183,8 +183,8 @@ class OrderDAO
 
         $objectMapping = new ObjectMapping();
         $objectMapping->setIntegration($this->integration)
-            ->setInternalObjectName($objectChangeDAO->getMappedObject())
-            ->setInternalObjectId($objectChangeDAO->getMappedObjectId())
+            ->setInternalObjectName($objectChangeDAO->getObject())
+            ->setInternalObjectId($objectChangeDAO->getObjectId())
             ->setIntegrationObjectName($integrationObjectName)
             ->setIntegrationObjectId($integrationObjectId)
             ->setLastSyncDate($objectModifiedDate);
