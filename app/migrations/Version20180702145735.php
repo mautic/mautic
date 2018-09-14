@@ -44,9 +44,12 @@ class Version20180702145735 extends AbstractMauticMigration
         $sql = <<<SQL
 INSERT INTO `{$this->prefix}lead_fields` (`is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `properties`, `object`) 
 VALUES 
-    (1,'Date Last Active', 'last_active', 'datetime', 'core', NULL , 0, 1, 1, 0, 1, 0, 0, 24, 'a:0:{}', 'lead')
+    (1, 'Date Last Active', 'last_active', 'datetime', 'core', NULL , 0, 1, 1, 0, 1, 0, 0, 24, 'a:0:{}', 'lead')
 SQL;
         $this->addSql($sql);
-        $this->addSql("CREATE INDEX {$this->prefix}last_active_search ON {$this->prefix}leads (last_active)");
+        // create index just if not exist
+        if (!$schema->getTable($this->prefix.'leads')->hasIndex($this->prefix.'last_active_search')) {
+            $this->addSql("CREATE INDEX {$this->prefix}last_active_search ON {$this->prefix}leads (last_active)");
+        }
     }
 }
