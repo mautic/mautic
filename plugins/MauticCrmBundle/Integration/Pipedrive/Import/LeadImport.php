@@ -66,8 +66,7 @@ class LeadImport extends AbstractImport
             $this->addOwnerToLead($data['owner_id'], $lead);
         }
 
-        $this->em->persist($lead);
-        $this->em->flush();
+        $this->leadModel->saveEntity($lead);
 
         $integrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $data['id']]);
         if (!$integrationEntity) {
