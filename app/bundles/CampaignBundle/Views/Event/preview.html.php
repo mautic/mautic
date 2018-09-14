@@ -22,8 +22,9 @@ $eventName = ('dev' === MAUTIC_ENV) ? "{$event['name']} <small>{$event['id']}</s
 <?php endif;?>
     <div class="campaign-event-content">
         <div>
-            <span class="campaign-event-name ellipsis">
-                <i class="fa fa-info-circle" title="<?php echo ucwords($view['translator']->trans('mautic.campaign.' . $event['type'])); ?>"></i> <?php echo $eventName ?>
+            <span class="campaign-event-name ellipsis" style="display: block; text-overflow: ellipsis;">
+                <i class="fa fa-info-circle" title="<?php echo ucwords($view['translator']->trans('mautic.campaign.' . $event['type'])); ?>"></i>
+                <span title="<?php echo $eventName ?>"><?php echo $eventName ?></span>
             </span>
         </div>
     </div>
