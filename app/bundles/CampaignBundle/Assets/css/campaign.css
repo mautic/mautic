@@ -304,3 +304,256 @@
   top: 0;
   left: 0;
 }
+
+#CampaignCanvas {
+    background-color: #FFFFFF;
+    background-position: 0 0 !important;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9Ijc1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc3Ryb2tlPSIjRUNGNEY2Ij48cGF0aCBkPSJNLjUgNDkuNXYtMjRoOTl2MjR6Ii8+PHBhdGggZD0iTTI1LjUgNzQuNVYuNWgyNHY3NHpNNzUuNSA3NC41Vi41aDI0djc0eiIvPjxwYXRoIGQ9Ik0uNSA3NC41Vi41aDk5djc0eiIvPjwvZz48L3N2Zz4=") !important;
+    background-size: 100px 75px !important;
+}
+
+/* Preview */
+#CampaignCanvas .preview .list-campaign-event, #CampaignCanvas .preview .list-campaign-source {
+    width: 125px;
+    height: 100px;
+}
+
+/* Campaign Builder */
+#CampaignCanvas .list-campaign-event, #CampaignCanvas .list-campaign-leadsource {
+    font-size: 12px;
+    width: 100px;
+    height: 75px;
+    padding: 7px 5px;
+    transition: box-shadow 0.4s ease;
+    text-align: center;
+}
+#CampaignCanvas .list-campaign-leadsource {
+    width: 150px;
+    height: 75px;
+}
+
+#CampaignCanvas svg circle {
+    transition: all .4s ease;
+}
+
+/* Source */
+#CampaignCanvas .list-campaign-leadsource .campaign-event-name i {
+    font-size: 20px;
+    line-height: 40px;
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin: 0 calc(50% - 20px) 5px;
+    color: #f9b74f;
+    border-radius: 50%;
+    background: rgba(249, 183, 79, .15);
+}
+#CampaignCanvas .list-campaign-leadsource.CampaignEvent_lists .campaign-event-name i::before {
+    content: '\f200';
+}
+#CampaignCanvas .list-campaign-leadsource.CampaignEvent_forms .campaign-event-name i::before {
+    content: '\f298';
+}
+
+/* Events */
+#CampaignCanvas .list-campaign-event > .campaign-event-content::before {
+    font-family: FontAwesome;
+    font-size: 20px;
+    line-height: 40px;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 5px;
+    border-radius: 50%;
+}
+#CampaignCanvas .list-campaign-action > .campaign-event-content::before {
+    color: #505f99;
+    background: rgba(81, 97, 149, .15);
+}
+#CampaignCanvas .list-campaign-decision > .campaign-event-content::before {
+    color: #2ab29d;
+    background: rgba(42, 178, 157, .15);
+}
+#CampaignCanvas .list-campaign-condition > .campaign-event-content::before {
+    color: #f86b4f;
+    background: rgba(248, 107, 79, .15);
+}
+#CampaignCanvas .list-campaign-leadsource:hover {
+    box-shadow: 0 0 10px 5px rgba(249, 183, 79, .25);
+}
+#CampaignCanvas .list-campaign-action:hover {
+    box-shadow: 0 0 10px 5px rgba(81, 97, 149, .25);
+}
+#CampaignCanvas .list-campaign-decision:hover {
+    box-shadow: 0 0 10px 5px rgba(42, 178, 157, .25);
+}
+#CampaignCanvas .list-campaign-condition:hover {
+    box-shadow: 0 0 10px 5px rgba(248, 107, 79, .25);
+}
+
+/* Buttons */
+.btn-apply-builder::before, .btn-close-campaign-builder::before {
+    font-family: FontAwesome;
+    margin-right: 5px;
+}
+.btn-apply-builder::before {
+    content: '\f0c7';
+}
+.btn-close-campaign-builder::before {
+    content: '\f00d';
+}
+
+
+#CampaignCanvas .campaign-event-buttons {
+    top: 0;
+    right: 0;
+    width: 100%;
+}
+#CampaignCanvas .campaign-event-buttons .btn-edit {
+    float: left;
+    border-radius: 0 0 10px 0;
+}
+#CampaignCanvas .campaign-event-buttons .btn-delete {
+    float: right;
+    border-radius: 0 0 0 10px;
+}
+
+/* Actions */
+#CampaignCanvas .list-campaign-action[data-event='lead.addtocompany'] > .campaign-event-content::before {
+    content: '\f1ad';
+}
+#CampaignCanvas .list-campaign-action[data-event='lead.changepoints'] > .campaign-event-content::before {
+    content: '\f1ec';
+}
+#CampaignCanvas .list-campaign-action[data-event='stage.change'] > .campaign-event-content::before {
+    content: '\f0e4';
+}
+#CampaignCanvas .list-campaign-action[data-event='lead.deletecontact'] > .campaign-event-content::before {
+    content: '\f014';
+    color: #f86b4f;
+    background: rgba(248, 107, 79, .15);
+}
+#CampaignCanvas .list-campaign-action[data-event='campaign.addremovelead'] > .campaign-event-content::before {
+    content: '\f0e8';
+}
+#CampaignCanvas .list-campaign-action[data-event='lead.changetags'] > .campaign-event-content::before {
+    content: '\f02c';
+}
+#CampaignCanvas .list-campaign-action[data-event='lead.scorecontactscompanies'] > .campaign-event-content::before {
+    content: '\f1ec';
+}
+#CampaignCanvas .list-campaign-action[data-event='lead.changelist'] > .campaign-event-content::before {
+    content: '\f200';
+}
+#CampaignCanvas .list-campaign-action[data-event='plugin.leadpush'] > .campaign-event-content::before {
+    content: '\f1e6';
+}
+#CampaignCanvas .list-campaign-action[data-event='campaign.sendwebhook'] > .campaign-event-content::before {
+    content: '\f0ec';
+}
+#CampaignCanvas .list-campaign-action[data-event='email.send'] > .campaign-event-content::before {
+    content: '\f0e0';
+}
+#CampaignCanvas .list-campaign-action[data-event='email.send.to.user'] > .campaign-event-content::before {
+    content: '\f2bd';
+}
+#CampaignCanvas .list-campaign-action[data-event='message.send'] > .campaign-event-content::before {
+    content: '\f27a';
+}
+#CampaignCanvas .list-campaign-action[data-event='notification.send_notification'] > .campaign-event-content::before {
+    content: '\f0f3';
+}
+#CampaignCanvas .list-campaign-action[data-event='notification.send_mobile_notification'] > .campaign-event-content::before {
+    content: '\f10b';
+}
+#CampaignCanvas .list-campaign-action[data-event='twitter.tweet'] > .campaign-event-content::before {
+    content: '\f099';
+}
+#CampaignCanvas .list-campaign-action[data-event='lead.updatelead'] > .campaign-event-content::before {
+    content: '\f044';
+}
+#CampaignCanvas .list-campaign-action[data-event='lead.changeowner'] > .campaign-event-content::before {
+    content: '\f2b9';
+}
+#CampaignCanvas .list-campaign-action[data-event='sms.send_text_sms'] > .campaign-event-content::before {
+    content: '\f086';
+}
+#CampaignCanvas .list-campaign-action[data-event='campaign.recurring.remove.logs'] > .campaign-event-content::before {
+    content: '\f01e';
+}
+#CampaignCanvas .list-campaign-action[data-event='campaign.jump_to_event'] > .campaign-event-content::before {
+    content: '\f021'; 
+}
+#CampaignCanvas .list-campaign-action[data-event='campaign.jump_to_event'] .highlight-jump-target {
+    border-radius: 25px;
+    height: 25px;
+    width: 25px;
+    padding: 3px 0 0 1px;
+}
+
+/* Decision */
+#CampaignCanvas .list-campaign-decision[data-event='email.click'] > .campaign-event-content::before {
+    content: '\f0a6';
+}
+#CampaignCanvas .list-campaign-decision[data-event='page.devicehit'] > .campaign-event-content::before {
+    content: '\f109';
+}
+#CampaignCanvas .list-campaign-decision[data-event='asset.download'] > .campaign-event-content::before {
+    content: '\f019';
+}
+#CampaignCanvas .list-campaign-decision[data-event='email.open'] > .campaign-event-content::before {
+    content: '\f2b6';
+}
+#CampaignCanvas .list-campaign-decision[data-event='email.reply'] > .campaign-event-content::before {
+    content: '\f122';
+}
+#CampaignCanvas .list-campaign-decision[data-event='dwc.decision'] > .campaign-event-content::before {
+    content: '\f2bb';
+}
+#CampaignCanvas .list-campaign-decision[data-event='form.submit'] > .campaign-event-content::before {
+    content: '\f298';
+}
+#CampaignCanvas .list-campaign-decision[data-event='page.pagehit'] > .campaign-event-content::before {
+    content: '\f21d';
+}
+
+/* Condition */
+#CampaignCanvas .list-campaign-condition[data-event='lead.campaigns'] > .campaign-event-content::before {
+    content: '\f0e8';
+}
+#CampaignCanvas .list-campaign-condition[data-event='lead.device'] > .campaign-event-content::before {
+    content: '\f109';
+}
+#CampaignCanvas .list-campaign-condition[data-event='lead.field_value'] > .campaign-event-content::before {
+    content: '\f2c1';
+}
+#CampaignCanvas .list-campaign-condition[data-event='lead.owner'] > .campaign-event-content::before {
+    content: '\f2b9';
+}
+#CampaignCanvas .list-campaign-condition[data-event='lead.segments'] > .campaign-event-content::before {
+    content: '\f200';
+}
+#CampaignCanvas .list-campaign-condition[data-event='lead.tags'] > .campaign-event-content::before {
+    content: '\f02c';
+}
+#CampaignCanvas .list-campaign-condition[data-event='form.field_value'] > .campaign-event-content::before {
+    content: '\f298';
+}
+#CampaignCanvas .list-campaign-condition[data-event='email.validate.address'] > .campaign-event-content::before {
+    content: '\f058';
+}
+/* Connector */
+#CampaignCanvas .jtk-label {
+    font-size: 10px;
+    padding: 3px 5px;
+    line-height: 16px;
+    border-radius: 4px;
+}
+
+#CampaignCanvas .jtk-label::before {
+    font-family: FontAwesome;
+    font-size: 12px;
+    content: '\f017';
+    line-height: 16px;
+    margin-right: 5px;
+}

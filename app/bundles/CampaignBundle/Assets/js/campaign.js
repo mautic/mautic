@@ -402,7 +402,7 @@ Mautic.campaignBuilderUpdateLabel = function (domEventId) {
             if (theLabel) {
                 conn.addOverlay(["Label", {
                     label: theLabel,
-                    location: 0.65,
+                    location: 0.9,
                     cssClass: "jtk-label",
                     id: conn.sourceId + "_" + conn.targetId + "_connectionLabel"
                 }]);
@@ -607,6 +607,7 @@ Mautic.prepareCampaignCanvas = function() {
 
         var startingPosition;
         Mautic.campaignDragOptions = {
+            grid:[ 25, 25 ],
             start: function (params) {
                 //double clicking activates the stop function so add a catch to prevent unnecessary ajax calls
                 startingPosition =
@@ -1226,7 +1227,7 @@ Mautic.campaignBuilderRegisterEndpoint = function (name, params) {
     if (params.connectorStyle) {
         connectorStyle = params.connectorStyle;
     } else {
-        connectorStyle = ["Bezier", {curviness: 25}];
+        connectorStyle = [ "Flowchart", { cornerRadius: 5, stub: 20, gap: 0 } ];
     }
 
     isTarget = params.isTarget;
@@ -1256,7 +1257,7 @@ Mautic.campaignBuilderRegisterEndpoint = function (name, params) {
             strokeWidth: 1
         },
         connector: connectorStyle,
-        connectorOverlays: [["Arrow", {width: 8, length: 8, location: 0.5}]],
+        connectorOverlays: [["Arrow", {width: 8, length: 8, location: 0.25}], ["Arrow", {width: 8, length: 8, location: 0.75}]],
         maxConnections: -1,
         isTarget: isTarget,
         isSource: isSource,
