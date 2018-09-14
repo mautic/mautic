@@ -56,6 +56,24 @@ class UpdateLeadActionType extends AbstractType
         $options['fields']                      = $leadFields;
         $options['ignore_required_constraints'] = true;
 
+        $builder->add(
+            'nullable',
+            'leadfields_choices',
+            [
+                'label'       => 'mautic.lead.campaign.event.field',
+                'label_attr'  => ['class' => 'control-label'],
+                'multiple'    => true,
+                'with_tags'   => false,
+                'with_utm'    => false,
+                'empty_value' => 'mautic.core.select',
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.lead.campaign.event.field_descr',
+                ],
+                'required'    => true,
+            ]
+        );
+
         $this->getFormFields($builder, $options);
     }
 
