@@ -19,6 +19,7 @@ class NormalizedValueDAO
     const STRING_TYPE = 'string';
     const TEXT_TYPE = 'text';
     const URL_TYPE = 'url';
+    const EMAIL_TYPE = 'email';
     const INT_TYPE = 'int';
     const FLOAT_TYPE = 'float';
     const DOUBLE_TYPE = 'double';

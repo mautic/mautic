@@ -30,6 +30,7 @@ final class ValueNormalizer implements ValueNormalizerInterface
             case NormalizedValueDAO::STRING_TYPE:
             case NormalizedValueDAO::TEXT_TYPE:
             case NormalizedValueDAO::URL_TYPE:
+            case NormalizedValueDAO::EMAIL_TYPE:
                 return new NormalizedValueDAO($type, $value, (string) $value);
             case NormalizedValueDAO::INT_TYPE:
                 return new NormalizedValueDAO($type, $value, (int) $value);
