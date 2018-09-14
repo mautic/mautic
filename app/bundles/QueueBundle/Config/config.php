@@ -54,6 +54,10 @@ return [
         'rabbitmq_user'      => 'guest',
         // The password for the RabbitMQ server
         'rabbitmq_password'  => 'guest',
+        // The number of seconds after which the queue consumer should timeout when idle
+        'rabbitmq_idle_timeout' => 0,
+        // The exit code to be returned when the consumer exits due to idle timeout
+        'rabbitmq_idle_timeout_exit_code' => 0,
         // The hostname of the Beanstalkd server
         'beanstalkd_host'    => 'localhost',
         // The port that the Beanstalkd server is listening on

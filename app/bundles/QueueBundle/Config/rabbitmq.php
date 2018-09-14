@@ -54,7 +54,9 @@ $container->loadFromExtension(
                     'auto_delete' => false,
                     'durable'     => true,
                 ],
-                'callback' => 'mautic.queue.helper.rabbitmq_consumer',
+                'callback'               => 'mautic.queue.helper.rabbitmq_consumer',
+                'idle_timeout'           => '%mautic.rabbitmq_idle_timeout%',
+                'idle_timeout_exit_code' => '%mautic.rabbitmq_idle_timeout_exit_code%',
             ],
         ],
     ]
