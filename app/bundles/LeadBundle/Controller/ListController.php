@@ -54,9 +54,7 @@ class ListController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         //set limits
         $limit = $session->get('mautic.segment.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
@@ -268,7 +266,7 @@ class ListController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        $postActionVars = $this->getPostActionVars();
+        $postActionVars = $this->getPostActionVars($objectId);
 
         try {
             $segment = $this->getSegment($objectId);
@@ -418,20 +416,29 @@ class ListController extends FormController
     /**
      * Get variables for POST action.
      *
+     * @param null $objectId
+     *
      * @return array
      */
-    private function getPostActionVars()
+    private function getPostActionVars($objectId = null)
     {
-        //set the page we came from
-        $page = $this->get('session')->get('mautic.segment.page', 1);
-
         //set the return URL
-        $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
+        if ($objectId) {
+            $returnUrl       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
+            $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
+            $contentTemplate = 'MauticLeadBundle:List:view';
+        } else {
+            //set the page we came from
+            $page            = $this->get('session')->get('mautic.segment.page', 1);
+            $returnUrl       = $this->generateUrl('mautic_segment_index', ['page' => $page]);
+            $viewParameters  = ['page' => $page];
+            $contentTemplate = 'MauticLeadBundle:List:index';
+        }
 
         return [
             'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:List:index',
+            'viewParameters'  => $viewParameters,
+            'contentTemplate' => $contentTemplate,
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'leadlist',

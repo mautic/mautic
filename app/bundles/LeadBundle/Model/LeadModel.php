@@ -930,8 +930,8 @@ class LeadModel extends FormModel
     public function checkForDuplicateContact(array $queryFields, Lead $lead = null, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
     {
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
-        if (null == $this->availableLeadFields) {
-            $filter = ['isPublished' => true];
+        if (empty($this->availableLeadFields)) {
+            $filter = ['isPublished' => true, 'object' => 'lead'];
 
             if ($onlyPubliclyUpdateable) {
                 $filter['isPubliclyUpdatable'] = true;
@@ -948,13 +948,14 @@ class LeadModel extends FormModel
             $lead = new Lead();
         }
 
-        // Run values through setFieldValues to clean them first
-        $this->setFieldValues($lead, $queryFields, false, false);
-        $cleanFields = $lead->getFields();
-
         $uniqueFields    = $this->leadFieldModel->getUniqueIdentifierFields();
         $uniqueFieldData = [];
         $inQuery         = array_intersect_key($queryFields, $this->availableLeadFields);
+        $values          = $onlyPubliclyUpdateable ? $inQuery : $queryFields;
+
+        // Run values through setFieldValues to clean them first
+        $this->setFieldValues($lead, $values, false, false);
+        $cleanFields = $lead->getFields();
 
         foreach ($inQuery as $k => $v) {
             if (empty($queryFields[$k])) {
@@ -1661,8 +1662,8 @@ class LeadModel extends FormModel
     public function addUTMTags(Lead $lead, $params)
     {
         // known "synonym" fields expected
-        $synonyms = ['useragent' => 'user_agent',
-                    'remotehost' => 'remote_host', ];
+        $synonyms = ['useragent'  => 'user_agent',
+                     'remotehost' => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
@@ -1768,13 +1769,16 @@ class LeadModel extends FormModel
             $tags = explode(',', $tags);
         }
 
-        if (empty($tags)) {
+        if (empty($tags) && empty($removeTags)) {
             return false;
         }
 
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
-        array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+        array_walk($tags, function (&$val) {
+            $val = trim($val);
+            InputHelper::clean($val);
+        });
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
@@ -1809,7 +1813,10 @@ class LeadModel extends FormModel
         if (!empty($removeTags)) {
             $this->logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
-            array_walk($removeTags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+            array_walk($removeTags, function (&$val) {
+                $val = trim($val);
+                InputHelper::clean($val);
+            });
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);

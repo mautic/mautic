@@ -127,8 +127,13 @@ class ContactMerger
             $winner->setLastActive($loser->getLastActive());
         }
 
-        // The winner should keep the oldest date identified timestamp
-        if ($loser->getDateIdentified() < $winner->getDateIdentified()) {
+        /*
+         * The winner should keep the oldest date identified timestamp
+         * as long as the loser's date identified is not null.
+         * Alternatively, if the winner's date identified is null,
+         * use the loser's date identified (doesn't matter if it is null).
+         */
+        if (($loser->getDateIdentified() !== null && $loser->getDateIdentified() < $winner->getDateIdentified()) || $winner->getDateIdentified() === null) {
             $winner->setDateIdentified($loser->getDateIdentified());
         }
 
@@ -173,6 +178,15 @@ class ContactMerger
         // When it comes to data, keep the newest value regardless of the winner/loser
         $newest = ($loserDate > $winnerDate) ? $loser : $winner;
         $oldest = ($newest->getId() === $winner->getId()) ? $loser : $winner;
+
+        // It may happen that the Lead entities doesn't have fields fill in. Fill them in if not.
+        if (!$newest->hasFields()) {
+            $newest->setFields($this->leadModel->getRepository()->getFieldValues($newest->getId()));
+        }
+
+        if (!$oldest->hasFields()) {
+            $oldest->setFields($this->leadModel->getRepository()->getFieldValues($oldest->getId()));
+        }
 
         $newestFields = $newest->getProfileFields();
         $oldestFields = $oldest->getProfileFields();

@@ -127,7 +127,7 @@ class FieldType extends AbstractType
                     $cleanMasks['properties']['optionlist']['list']['label'] = 'strict_html';
                     break;
                 case 'file':
-                    $addShowLabel = $addDefaultValue = $addLeadFieldList = $addBehaviorFields = false;
+                    $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
             }
         }
@@ -477,7 +477,6 @@ class FieldType extends AbstractType
                 case 'date':
                 case 'email':
                 case 'number':
-                case 'tel':
                 case 'text':
                 case 'url':
                     $builder->add(
@@ -510,6 +509,9 @@ class FieldType extends AbstractType
                     );
                     break;
                 case 'file':
+                    if (!isset($propertiesData['public'])) {
+                        $propertiesData['public'] = false;
+                    }
                     $builder->add(
                         'properties',
                         FormFieldFileType::class,
@@ -518,6 +520,20 @@ class FieldType extends AbstractType
                             'data'  => $propertiesData,
                         ]
                     );
+                    break;
+                case 'tel':
+                    if (empty($propertiesData['international'])) {
+                        $propertiesData['international'] = false;
+                    }
+                    $builder->add(
+                        'properties',
+                        FormFieldTelType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
             }
         }
 
