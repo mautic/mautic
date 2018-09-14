@@ -113,10 +113,10 @@ class OrderDAO
         if (!isset($this->identifiedObjects[$objectChangeDAO->getObject()])) {
             $this->identifiedObjects[$objectChangeDAO->getObject()]   = [];
             $this->unidentifiedObjects[$objectChangeDAO->getObject()] = [];
-            $this->changedObjects[$objectChangeDAO->getObject()]      = [];
+            $this->changedObjects[$objectChangeDAO->getMappedObject()]      = [];
         }
 
-        $this->changedObjects[$objectChangeDAO->getObject()][] = $objectChangeDAO;
+        $this->changedObjects[$objectChangeDAO->getMappedObject()][] = $objectChangeDAO;
         $this->objectCounter++;
 
         if ($knownId = $objectChangeDAO->getObjectId()) {
@@ -224,8 +224,8 @@ class OrderDAO
 
         $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO(
             $this->integration,
-            $objectChangeDAO->getObject(),
-            $objectChangeDAO->getObjectId(),
+            $objectChangeDAO->getMappedObject(),
+            $objectChangeDAO->getMappedObjectId(),
             $objectModifiedDate
         );
     }
