@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class UpdateCompanyActionType.
@@ -59,6 +60,18 @@ class UpdateCompanyActionType extends AbstractType
         $options['ignore_required_constraints'] = true;
 
         $this->getFormFields($builder, $options, 'company');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'field_choices' => [],
+            ]
+        );
     }
 
     /**

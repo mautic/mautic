@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\ChangeOwnerType;
+use Mautic\LeadBundle\Form\Type\LeadFieldsType;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -138,7 +139,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'field_choices' => [
                     'alias' => 'nullable',
                     'type'  => 'leadfields_choices',
-                    'label' => 'mautic.lead.lead.update.action.nullable.help',
+                    'label' => 'mautic.lead.lead.update.action.nullable',
                 ],
             ],
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
@@ -146,10 +147,18 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addAction('lead.updatelead', $action);
 
         $action = [
-            'label'       => 'mautic.lead.lead.events.updatecompany',
-            'description' => 'mautic.lead.lead.events.updatecompany_descr',
-            'formType'    => 'updatecompany_action',
-            'formTheme'   => 'MauticLeadBundle:FormTheme\ActionUpdateCompany',
+            'label'                  => 'mautic.lead.lead.events.updatecompany',
+            'description'            => 'mautic.lead.lead.events.updatecompany_descr',
+            'formType'               => 'updatecompany_action',
+            'formTheme'              => 'MauticLeadBundle:FormTheme\ActionUpdateCompany',
+            'formTypeOptions'        => [
+                'field_choices' => [
+                    'alias' => 'nullable',
+                    'type'  => LeadFieldsType::class,
+                    'object'=> 'company',
+                    'label' => 'mautic.lead.lead.update.action.nullable',
+                ],
+            ],
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('lead.updatecompany', $action);
@@ -427,6 +436,9 @@ class CampaignSubscriber extends CommonSubscriber
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
+                if (!empty($config['nullable'])) {
+                    $this->companyModel->setFieldValues($companyEntity, array_fill_keys($config['nullable'], ''), true);
+                }
                 $this->companyModel->setFieldValues($companyEntity, $config);
                 $this->companyModel->saveEntity($companyEntity);
             }
@@ -437,6 +449,9 @@ class CampaignSubscriber extends CommonSubscriber
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
             }
         } else {
+            if (!empty($config['nullable'])) {
+                $this->companyModel->setFieldValues($primaryCompany, array_fill_keys($config['nullable'], ''), true);
+            }
             $this->companyModel->setFieldValues($primaryCompany, $config, false);
             $this->companyModel->saveEntity($primaryCompany);
         }

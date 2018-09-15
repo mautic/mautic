@@ -40,7 +40,7 @@ class LeadFieldsType extends AbstractType
         $model = $this->model;
         $resolver->setDefaults([
             'choices' => function (Options $options) use ($model) {
-                $fieldList = $model->getFieldList();
+                $fieldList = $model->getFieldList(true, true, ['isPublished' => true, 'object' => $options['object']]);
                 if ($options['with_tags']) {
                     $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
                 }
@@ -58,6 +58,7 @@ class LeadFieldsType extends AbstractType
             'required'    => false,
             'with_tags'   => false,
             'with_utm'    => false,
+            'object'      => 'lead',
         ]);
     }
 

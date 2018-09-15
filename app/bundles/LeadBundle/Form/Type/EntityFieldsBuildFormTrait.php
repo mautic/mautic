@@ -294,6 +294,7 @@ trait EntityFieldsBuildFormTrait
                     'label'       => $options['field_choices']['label'],
                     'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => true,
+                    'object'      => isset($options['field_choices']['object']) ? $options['field_choices']['object'] : 'lead',
                     'empty_value' => 'mautic.core.select',
                     'attr'        => [
                         'class'   => 'form-control',
