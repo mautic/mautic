@@ -23,7 +23,7 @@
 <?php endforeach; ?>
     <?php if (isset($form['nullable'])): ?>
         <div class="col-xs-12">
-            <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.lead.lead.update.action.nullable.help'); ?></h4>
+            <h4 class="mb-sm"><?php echo $view['translator']->trans($form['nullable']->vars['label']); ?></h4>
             <div class="form-group">
                 <?php echo $view['form']->widget($form['nullable']); ?>
             </div>

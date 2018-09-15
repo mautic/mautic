@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class UpdateLeadActionType.
@@ -56,11 +57,12 @@ class UpdateLeadActionType extends AbstractType
         $options['fields']                      = $leadFields;
         $options['ignore_required_constraints'] = true;
 
-        $builder->add(
-            'nullable',
+        if (!empty($options['field_choices']) && is_array($options['field_choices'])) {
+            $builder->add(
+            $options['field_choices']['alias'],
             'leadfields_choices',
             [
-                'label'       => 'mautic.lead.campaign.event.field',
+                'label'       => $options['field_choices']['label'],
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => true,
                 'with_tags'   => false,
@@ -68,13 +70,25 @@ class UpdateLeadActionType extends AbstractType
                 'empty_value' => 'mautic.core.select',
                 'attr'        => [
                     'class'    => 'form-control',
-                    'tooltip'  => 'mautic.lead.campaign.event.field_descr',
+                    'tooltip'  => isset($options['field_choices']['tooltip']) ? $options['field_choices']['tooltip'] : false,
                 ],
                 'required'    => true,
             ]
         );
-
+        }
         $this->getFormFields($builder, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'field_choices' => [],
+            ]
+        );
     }
 
     /**

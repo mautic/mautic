@@ -130,12 +130,19 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addAction('lead.changelist', $action);
 
         $action = [
-            'label'       => 'mautic.lead.lead.events.updatelead',
-            'description' => 'mautic.lead.lead.events.updatelead_descr',
-            'formType'    => 'updatelead_action',
-            'formTheme'   => 'MauticLeadBundle:FormTheme\ActionUpdateLead',
+            'label'                  => 'mautic.lead.lead.events.updatelead',
+            'description'            => 'mautic.lead.lead.events.updatelead_descr',
+            'formType'               => 'updatelead_action',
+            'formTheme'              => 'MauticLeadBundle:FormTheme\ActionUpdateLead',
+            'formTypeOptions'        => [
+                'field_choices' => [
+                    'alias' => 'nullable',
+                    'label' => 'mautic.lead.lead.update.action.nullable.help',
+                ],
+            ],
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
+
         $event->addAction('lead.updatelead', $action);
 
         $action = [
@@ -306,9 +313,14 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $lead = $event->getLead();
+        $lead           = $event->getLead();
+        $fieldsToUpdate = $event->getConfig();
 
-        $this->leadModel->setFieldValues($lead, $event->getConfig(), false);
+        if (!empty($fieldsToUpdate['nullable'])) {
+            $this->leadModel->setFieldValues($lead, array_fill_keys($fieldsToUpdate['nullable'], ''), true);
+        }
+
+        $this->leadModel->setFieldValues($lead, $fieldsToUpdate, false);
         $this->leadModel->saveEntity($lead);
 
         return $event->setResult(true);
