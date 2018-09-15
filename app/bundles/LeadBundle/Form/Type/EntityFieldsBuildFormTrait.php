@@ -285,5 +285,25 @@ trait EntityFieldsBuildFormTrait
                     break;
             }
         }
+
+        if (!empty($options['field_choices']) && is_array($options['field_choices'])) {
+            $builder->add(
+                $options['field_choices']['alias'],
+                'leadfields_choices',
+                [
+                    'label'       => $options['field_choices']['label'],
+                    'label_attr'  => ['class' => 'control-label'],
+                    'multiple'    => true,
+                    'with_tags'   => false,
+                    'with_utm'    => false,
+                    'empty_value' => 'mautic.core.select',
+                    'attr'        => [
+                        'class'   => 'form-control',
+                        'tooltip' => isset($options['field_choices']['tooltip']) ? $options['field_choices']['tooltip'] : false,
+                    ],
+                    'required'    => true,
+                ]
+            );
+        }
     }
 }
