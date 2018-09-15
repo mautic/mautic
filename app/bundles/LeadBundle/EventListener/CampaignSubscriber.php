@@ -137,12 +137,12 @@ class CampaignSubscriber extends CommonSubscriber
             'formTypeOptions'        => [
                 'field_choices' => [
                     'alias' => 'nullable',
+                    'type'  => 'leadfields_choices',
                     'label' => 'mautic.lead.lead.update.action.nullable.help',
                 ],
             ],
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
-
         $event->addAction('lead.updatelead', $action);
 
         $action = [
