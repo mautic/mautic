@@ -183,8 +183,8 @@ class OrderDAO
 
         $objectMapping = new ObjectMapping();
         $objectMapping->setIntegration($this->integration)
-            ->setInternalObjectName($objectChangeDAO->getObject())
-            ->setInternalObjectId($objectChangeDAO->getObjectId())
+            ->setInternalObjectName($objectChangeDAO->getMappedObject())
+            ->setInternalObjectId($objectChangeDAO->getMappedObjectId())
             ->setIntegrationObjectName($integrationObjectName)
             ->setIntegrationObjectId($integrationObjectId)
             ->setLastSyncDate($objectModifiedDate);
@@ -224,8 +224,8 @@ class OrderDAO
 
         $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO(
             $this->integration,
-            $objectChangeDAO->getMappedObject(),
-            $objectChangeDAO->getMappedObjectId(),
+            $objectChangeDAO->getObject(),
+            $objectChangeDAO->getObjectId(),
             $objectModifiedDate
         );
     }
