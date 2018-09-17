@@ -131,7 +131,8 @@ final class ExampleIntegration extends BasicIntegration implements BasicInterfac
         return [
             'first_name' => 'firstname',
             'last_name'  => 'lastname',
-            'email'      => 'email'
+            'email'      => 'email',
+            'street1'    => 'address1',
         ];
     }
 }

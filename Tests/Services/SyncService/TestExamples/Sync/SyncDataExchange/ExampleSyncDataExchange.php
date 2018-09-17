@@ -90,8 +90,9 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
              * @var ObjectChangeDAO $unidentifiedObject
              */
             foreach ($unidentifiedObjects as $unidentifiedObject) {
-                // Use getAllFields here to ensure we have values for required fields in addition to one way mapped fields
-                $fields = $unidentifiedObject->getAllFields();
+                // Use getFields here to ensure we have values for required fields in addition to one way mapped fields
+                // Can also use getUnchangedFields, getChangedFields, or getRequiredFields
+                $fields = $unidentifiedObject->getFields();
 
                 // Extract identifier fields for this integration to check if they exist before creating
                 // Some integrations offer a upsert feature which may make this not necessary.
@@ -122,7 +123,8 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
              * @var ObjectChangeDAO $identifiedObject
              */
             foreach ($identifiedObjects as $id => $identifiedObject) {
-                $fields = $identifiedObject->getFields();
+                // Use getChangedFields in order to update only fields that have been modified since
+                $fields = $identifiedObject->getChangedFields();
 
                 // Build the person's profile
                 $person = [

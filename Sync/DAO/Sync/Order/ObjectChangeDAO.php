@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order;
 
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
+
 /**
  * Class ObjectChangeDAO
  */
@@ -54,7 +56,11 @@ class ObjectChangeDAO
     /**
      * @var FieldDAO[]
      */
-    private $requiredFields = [];
+    private $fieldsByState = [
+        ReportFieldDAO::FIELD_CHANGED => [],
+        ReportFieldDAO::FIELD_UNCHANGED => [],
+        ReportFieldDAO::FIELD_REQUIRED => [],
+    ];
 
     /**
      * ObjectChangeDAO constructor.
@@ -84,24 +90,14 @@ class ObjectChangeDAO
 
     /**
      * @param FieldDAO $fieldDAO
+     * @param string   $state
      *
      * @return ObjectChangeDAO
      */
-    public function addField(FieldDAO $fieldDAO): ObjectChangeDAO
+    public function addField(FieldDAO $fieldDAO, string $state = ReportFieldDAO::FIELD_CHANGED): ObjectChangeDAO
     {
-        $this->fields[$fieldDAO->getName()] = $fieldDAO;
-
-        return $this;
-    }
-
-    /**
-     * @param FieldDAO $fieldDAO
-     *
-     * @return ObjectChangeDAO
-     */
-    public function addRequiredField(FieldDAO $fieldDAO): ObjectChangeDAO
-    {
-        $this->requiredFields[$fieldDAO->getName()] = $fieldDAO;
+        $this->fields[$fieldDAO->getName()]                = $fieldDAO;
+        $this->fieldsByState[$state][$fieldDAO->getName()] = $fieldDAO;
 
         return $this;
     }
@@ -161,10 +157,6 @@ class ObjectChangeDAO
             return $this->fields[$name];
         }
 
-        if (isset($this->requiredFields[$name])) {
-            return $this->requiredFields[$name];
-        }
-
         return null;
     }
 
@@ -179,17 +171,25 @@ class ObjectChangeDAO
     /**
      * @return FieldDAO[]
      */
-    public function getRequiredFields(): array
+    public function getChangedFields(): array
     {
-        return $this->requiredFields;
+        return $this->fieldsByState[ReportFieldDAO::FIELD_CHANGED];
     }
 
     /**
      * @return FieldDAO[]
      */
-    public function getAllFields()
+    public function getUnchangedFields(): array
     {
-        return array_merge($this->fields, $this->requiredFields);
+        return $this->fieldsByState[ReportFieldDAO::FIELD_UNCHANGED];
+    }
+
+    /**
+     * @return FieldDAO[]
+     */
+    public function getRequiredFields(): array
+    {
+        return $this->fieldsByState[ReportFieldDAO::FIELD_REQUIRED];
     }
 
     /**
