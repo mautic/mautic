@@ -467,6 +467,7 @@ class SyncProcess
                             $internalObject,
                             $integrationObject
                         );
+
                         if ($objectChange->shouldSync()) {
                             $syncOrder->addObjectChange($objectChange);
                         }
@@ -710,10 +711,10 @@ class SyncProcess
     ) {
         $objectChange = new ObjectChangeDAO(
             $this->mappingManualDAO->getIntegration(),
-            $internalObject->getObject(),
-            $internalObject->getObjectId(),
             $integrationObject->getObject(),
-            $integrationObject->getObjectId()
+            $integrationObject->getObjectId(),
+            $internalObject->getObject(),
+            $internalObject->getObjectId()
         );
 
         if ($integrationObject->getObjectId()) {
