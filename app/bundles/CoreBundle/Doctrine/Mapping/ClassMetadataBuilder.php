@@ -351,7 +351,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
             $field->nullable();
         }
 
-        if ($type === 'string') {
+        // all indexed
+        if ($type === 'string' || isset($this->getClassMetadata()->table['indexes'][$columnName])) {
             $field->length(191);
         }
 
