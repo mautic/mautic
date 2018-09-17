@@ -23,11 +23,11 @@ trait BCIntegrationHelperTrait
     private $keys;
 
     /**
-     * @param Integration $integrationEntity
+     * @param Integration $integration
      */
-    public function setIntegrationSettings(Integration $integrationEntity)
+    public function setIntegrationSettings(Integration $integration)
     {
-        $this->integrationEntity = $integrationEntity;
+        $this->integration = $integration;
     }
 
     /**
@@ -35,7 +35,7 @@ trait BCIntegrationHelperTrait
      */
     public function getIntegrationSettings(): Integration
     {
-        return $this->integrationEntity;
+        return $this->integration;
     }
 
     /**

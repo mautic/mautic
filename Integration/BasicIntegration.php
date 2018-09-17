@@ -30,17 +30,7 @@ abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInt
     /**
      * @var Integration
      */
-    private $integrationEntity;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private $integration;
 
     /**
      * @inheritdoc
@@ -53,21 +43,17 @@ abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInt
     /**
      * @return Integration
      */
-    public function getIntegrationEntity(): Integration
+    public function getIntegration(): Integration
     {
-        return $this->integrationEntity;
+        return $this->integration;
     }
 
     /**
-     * @param Integration $integrationEntity
-     *
-     * @return BasicIntegration
+     * @param Integration $integration
      */
-    public function setIntegrationEntity(Integration $integrationEntity): BasicIntegration
+    public function setIntegration(Integration $integration)
     {
-        $this->integrationEntity = $integrationEntity;
-
-        return $this;
+        $this->integration = $integration;
     }
 
     /**
@@ -75,48 +61,8 @@ abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInt
      *
      * @return bool
      */
-    public function hasIntegrationEntity()
+    public function hasIntegration(): bool
     {
-        return !empty($this->integrationEntity);
-    }
-
-    /**
-     * @return RouterInterface
-     */
-    public function getRouter(): RouterInterface
-    {
-        return $this->router;
-    }
-
-    /**
-     * @param RouterInterface $router
-     *
-     * @return BasicIntegration
-     */
-    public function setRouter(RouterInterface $router): BasicIntegration
-    {
-        $this->router = $router;
-
-        return $this;
-    }
-
-    /**
-     * @return EntityManager
-     */
-    public function getEntityManager(): EntityManager
-    {
-        return $this->entityManager;
-    }
-
-    /**
-     * @param EntityManager $entityManager
-     *
-     * @return BasicIntegration
-     */
-    public function setEntityManager(EntityManager $entityManager): BasicIntegration
-    {
-        $this->entityManager = $entityManager;
-
-        return $this;
+        return !empty($this->integration);
     }
 }
