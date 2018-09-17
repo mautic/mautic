@@ -14,13 +14,14 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService;
 
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\EventListener\IntegrationSubscriber;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SyncServiceTest extends MauticMysqlTestCase
 {
@@ -40,22 +41,24 @@ class SyncServiceTest extends MauticMysqlTestCase
         // Record now because we're going to sync again
         $now = new \DateTime();
 
-        $prefix = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix     = $this->container->getParameter('mautic.db_table_prefix');
         $connection = $this->container->get('doctrine.dbal.default_connection');
 
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->container->get('event_dispatcher');
+        $dataExchange       = new ExampleSyncDataExchange();
+        $exampleIntegration = new ExampleIntegration($dataExchange);
 
-        $dataExchange = new ExampleSyncDataExchange();
-        $dispatcher->addSubscriber(new IntegrationSubscriber($dataExchange));
+        $settings = new Integration();
+        $settings->setFeatureSettings(['objects' => [MauticSyncDataExchange::OBJECT_CONTACT]]);
+        $settings->setIsPublished(true);
+        $exampleIntegration->setIntegration($settings);
 
-        $event = new SyncEvent(ExampleIntegration::NAME, true);
-        $dispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
+        $syncIntegrationsHelper = $this->container->get('mautic.integrations.helper.sync_integrations');
+        $syncIntegrationsHelper->addIntegration($exampleIntegration);
 
         /** @var SyncService $syncService */
         $syncService = $this->container->get('mautic.integrations.sync.service');
 
-        $syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), true);
+        $syncService->processIntegrationSync(ExampleIntegration::NAME, true);
         $payload = $dataExchange->getOrderPayload();
 
         // Created the 50 known contacts already in Mautic
@@ -66,7 +69,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         sleep(5);
 
         // Sync again
-        $syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), true, $now);
+        $syncService->processIntegrationSync(ExampleIntegration::NAME, true, $now);
         $payload = $dataExchange->getOrderPayload();
 
         // Now we should have updated the 2 contacts that were already in Mautic
@@ -96,7 +99,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         // Validate mapping table
         /** @var Connection $connection */
 
-        $qb = $connection->createQueryBuilder();
+        $qb      = $connection->createQueryBuilder();
         $results = $qb->select('count(*) as the_count, m.integration_object_name, m.integration')
             ->from($prefix.'sync_object_mapping', 'm')
             ->groupBy('m.integration, m.integration_object_name')

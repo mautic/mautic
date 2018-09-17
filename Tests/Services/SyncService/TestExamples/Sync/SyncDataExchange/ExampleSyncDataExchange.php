@@ -191,7 +191,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      *
      * @return ReportDAO
      */
-    public function getSyncReport(RequestDAO $requestDAO)
+    public function getSyncReport(RequestDAO $requestDAO): ReportDAO
     {
         // Build a report of objects that have been modified
         $syncReport = new ReportDAO(ExampleIntegration::NAME);

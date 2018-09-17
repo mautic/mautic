@@ -118,7 +118,6 @@ class SyncIntegrationsHelper
             // Find what object is mapped to Mautic's object
             $mappingManual     = $integration->getMappingManual();
             $mappedObjectNames = $mappingManual->getMappedIntegrationObjectsNames($mauticObject);
-
             foreach ($mappedObjectNames as $mappedObjectName) {
                 if (in_array($mappedObjectName, $featureSettings['objects'])) {
                     return true;
