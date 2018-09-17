@@ -111,12 +111,12 @@ class OrderDAO
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): OrderDAO
     {
         if (!isset($this->identifiedObjects[$objectChangeDAO->getObject()])) {
-            $this->identifiedObjects[$objectChangeDAO->getObject()]   = [];
-            $this->unidentifiedObjects[$objectChangeDAO->getObject()] = [];
-            $this->changedObjects[$objectChangeDAO->getObject()]      = [];
+            $this->identifiedObjects[$objectChangeDAO->getObject()]    = [];
+            $this->unidentifiedObjects[$objectChangeDAO->getObject()]  = [];
+            $this->changedObjects[$objectChangeDAO->getMappedObject()] = [];
         }
 
-        $this->changedObjects[$objectChangeDAO->getObject()][] = $objectChangeDAO;
+        $this->changedObjects[$objectChangeDAO->getMappedObject()][] = $objectChangeDAO;
         $this->objectCounter++;
 
         if ($knownId = $objectChangeDAO->getObjectId()) {
@@ -183,8 +183,8 @@ class OrderDAO
 
         $objectMapping = new ObjectMapping();
         $objectMapping->setIntegration($this->integration)
-            ->setInternalObjectName($objectChangeDAO->getMappedObject())
-            ->setInternalObjectId($objectChangeDAO->getMappedObjectId())
+            ->setInternalObjectName($objectChangeDAO->getObject())
+            ->setInternalObjectId($objectChangeDAO->getObjectId())
             ->setIntegrationObjectName($integrationObjectName)
             ->setIntegrationObjectId($integrationObjectId)
             ->setLastSyncDate($objectModifiedDate);
@@ -224,8 +224,8 @@ class OrderDAO
 
         $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO(
             $this->integration,
-            $objectChangeDAO->getObject(),
-            $objectChangeDAO->getObjectId(),
+            $objectChangeDAO->getMappedObject(),
+            $objectChangeDAO->getMappedObjectId(),
             $objectModifiedDate
         );
     }
