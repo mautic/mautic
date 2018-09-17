@@ -14,12 +14,17 @@ namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
 
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
-use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\SyncInterface;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\IntegrationNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 
 class SyncIntegrationsHelper
 {
     /**
-     * @var BasicIntegration[]
+     * @var SyncInterface[]
      */
     private $integrations = [];
 
@@ -44,9 +49,9 @@ class SyncIntegrationsHelper
     }
 
     /**
-     * @param BasicIntegration $integration
+     * @param SyncInterface $integration
      */
-    public function addIntegration(BasicIntegration $integration)
+    public function addIntegration(SyncInterface $integration)
     {
         $this->integrations[$integration->getName()] = $integration;
     }
@@ -62,8 +67,8 @@ class SyncIntegrationsHelper
 
         $this->enabled = [];
         foreach ($this->integrations as $name => $integrationObject) {
-            if ($integrationObject->hasIntegrationEntity()) {
-                $integrationEntity = $integrationObject->getIntegrationEntity();
+            if ($integrationObject->hasIntegration()) {
+                $integrationEntity = $integrationObject->getIntegration();
 
                 if ($integrationEntity->getIsPublished()) {
                     $this->enabled[] = $name;
@@ -77,7 +82,7 @@ class SyncIntegrationsHelper
                 continue;
             }
 
-            $integrationObject->setIntegrationEntity($integrationEntity);
+            $integrationObject->setIntegration($integrationEntity);
             if ($integrationEntity->getIsPublished()) {
                 $this->enabled[] = $name;
             }
@@ -87,10 +92,83 @@ class SyncIntegrationsHelper
     }
 
     /**
+     * @param string $integration
+     * @param string $mauticObject
+     *
      * @return bool
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
      */
-    public function hasEnabledIntegrations()
+    public function hasObjectSyncEnabled(string $mauticObject)
     {
-        return (bool) count($this->getEnabledIntegrations());
+        if (MauticSyncDataExchange::OBJECT_CONTACT !== $mauticObject && MauticSyncDataExchange::OBJECT_COMPANY !== $mauticObject) {
+            throw new ObjectNotFoundException($mauticObject);
+        }
+
+        $enabledIntegrations = $this->getEnabledIntegrations();
+
+        foreach ($enabledIntegrations as $integration) {
+            $integration     = $this->getIntegration($integration);
+            $featureSettings = $integration->getIntegration()->getFeatureSettings();
+
+            if (!isset($featureSettings['objects'])) {
+                continue;
+            }
+
+            // Find what object is mapped to Mautic's object
+            $mappingManual     = $integration->getMappingManual();
+            $mappedObjectNames = $mappingManual->getMappedIntegrationObjectsNames($mauticObject);
+
+            foreach ($mappedObjectNames as $mappedObjectName) {
+                if (in_array($mappedObjectName, $featureSettings['objects'])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $integration
+     *
+     * @return MappingManualDAO
+     * @throws IntegrationNotFoundException
+     */
+    public function getMappingManual(string $integration): MappingManualDAO
+    {
+        $integration = $this->getIntegration($integration);
+
+        return $integration->getMappingManual();
+    }
+
+    /**
+     * @param string $integration
+     *
+     * @return SyncDataExchangeInterface
+     * @throws IntegrationNotFoundException
+     */
+    public function getSyncDataExchange(string $integration): SyncDataExchangeInterface
+    {
+        $integration = $this->getIntegration($integration);
+
+        return $integration->getSyncDataExchange();
+    }
+
+    /**
+     * @param string $integration
+     *
+     * @return SyncInterface
+     * @throws IntegrationNotFoundException
+     */
+    private function getIntegration(string $integration)
+    {
+        $this->getEnabledIntegrations();
+
+        if (!isset($this->integrations[$integration])){
+            throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.sync_integration");
+        }
+
+        return $this->integrations[$integration];
     }
 }

@@ -25,11 +25,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class SyncCommand extends ContainerAwareCommand
 {
     /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
      * @var SyncServiceInterface
      */
     private $syncService;
@@ -37,14 +32,12 @@ class SyncCommand extends ContainerAwareCommand
     /**
      * SyncCommand constructor.
      *
-     * @param EventDispatcherInterface $eventDispatcher
      * @param SyncServiceInterface     $syncService
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher, SyncServiceInterface $syncService)
+    public function __construct(SyncServiceInterface $syncService)
     {
         parent::__construct();
 
-        $this->eventDispatcher = $eventDispatcher;
         $this->syncService     = $syncService;
     }
 
@@ -114,10 +107,7 @@ class SyncCommand extends ContainerAwareCommand
         try {
             defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $integration);
 
-            $event = new SyncEvent($integration, $firstTimeSync);
-            $this->eventDispatcher->dispatch(IntegrationEvents::ON_SYNC_TRIGGERED, $event);
-
-            $this->syncService->processIntegrationSync($event->getDataExchange(), $event->getMappingManual(), $firstTimeSync, $startDateTime, $endDateTime);
+            $this->syncService->processIntegrationSync($integration, $firstTimeSync, $startDateTime, $endDateTime);
         } catch (\Exception $e) {
             if ($env === 'dev' || MAUTIC_ENV === 'dev') {
                 throw $e;

@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncService;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -51,6 +52,11 @@ final class SyncService implements SyncServiceInterface
     private $mappingHelper;
 
     /**
+     * @var SyncIntegrationsHelper
+     */
+    private $syncIntegrationsHelper;
+
+    /**
      * SyncService constructor.
      *
      * @param SyncJudgeInterface          $syncJudge
@@ -58,40 +64,43 @@ final class SyncService implements SyncServiceInterface
      * @param SyncDateHelper              $syncDateHelper
      * @param MauticSyncDataExchange      $internalSyncDataExchange
      * @param MappingHelper               $mappingHelper
+     * @param SyncIntegrationsHelper      $syncIntegrationsHelper
      */
     public function __construct(
         SyncJudgeInterface $syncJudge,
         SyncProcessFactoryInterface $integrationSyncProcessFactory,
         SyncDateHelper $syncDateHelper,
         MauticSyncDataExchange $internalSyncDataExchange,
-        MappingHelper $mappingHelper
+        MappingHelper $mappingHelper,
+        SyncIntegrationsHelper $syncIntegrationsHelper
     ) {
         $this->syncJudge                     = $syncJudge;
         $this->integrationSyncProcessFactory = $integrationSyncProcessFactory;
         $this->syncDateHelper                = $syncDateHelper;
         $this->internalSyncDataExchange      = $internalSyncDataExchange;
         $this->mappingHelper                 = $mappingHelper;
+        $this->syncIntegrationsHelper        = $syncIntegrationsHelper;
     }
 
     /**
-     * @param SyncDataExchangeInterface $syncDataExchangeService
-     * @param MappingManualDAO          $integrationMappingManual
-     * @param bool                      $firstTimeSync
-     * @param \DateTimeInterface|null   $syncFromDateTime
-     * @param \DateTimeInterface|null   $syncToDateTime
+     * @param string                  $integration
+     * @param bool                    $firstTimeSync
+     * @param \DateTimeInterface|null $syncFromDateTime
+     * @param \DateTimeInterface|null $syncToDateTime
+     *
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\IntegrationNotFoundException
      */
     public function processIntegrationSync(
-        SyncDataExchangeInterface $syncDataExchangeService,
-        MappingManualDAO $integrationMappingManual,
+        string $integration,
         $firstTimeSync,
         \DateTimeInterface $syncFromDateTime = null,
         \DateTimeInterface $syncToDateTime = null
     ) {
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
             $this->syncJudge,
-            $integrationMappingManual,
+            $this->syncIntegrationsHelper->getMappingManual($integration),
             $this->internalSyncDataExchange,
-            $syncDataExchangeService,
+            $this->syncIntegrationsHelper->getSyncDataExchange($integration),
             $this->syncDateHelper,
             $this->mappingHelper,
             $firstTimeSync,
@@ -100,7 +109,7 @@ final class SyncService implements SyncServiceInterface
         );
 
         DebugLogger::log(
-            $integrationMappingManual->getIntegration(),
+            $integration,
             sprintf(
                 "Starting %s sync from %s date/time",
                 ($firstTimeSync) ? "first time" : "subsequent",

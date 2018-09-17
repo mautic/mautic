@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncIntegrationsHelper;
 
@@ -78,7 +79,8 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        if (!$this->syncIntegrationsHelper->hasEnabledIntegrations()) {
+        if (!$this->syncIntegrationsHelper->hasObjectSyncEnabled(MauticSyncDataExchange::OBJECT_CONTACT)) {
+            // Only track if an integration is syncing with contacts
             return;
         }
 
@@ -133,7 +135,8 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        if (!$this->syncIntegrationsHelper->hasEnabledIntegrations()) {
+        if (!$this->syncIntegrationsHelper->hasObjectSyncEnabled(MauticSyncDataExchange::OBJECT_COMPANY)) {
+            // Only track if an integration is syncing with companies
             return;
         }
 

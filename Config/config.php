@@ -31,7 +31,6 @@ return [
             'mautic.integrations.command.sync' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\Command\SyncCommand::class,
                 'arguments' => [
-                    'event_dispatcher',
                     'mautic.integrations.sync.service',
                 ],
                 'tag' => 'console.command',
@@ -155,7 +154,8 @@ return [
                     'mautic.integrations.helper.sync_process_factory',
                     'mautic.integrations.helper.sync_date',
                     'mautic.integrations.sync.data_exchange.mautic',
-                    'mautic.integrations.helper.sync_mapping'
+                    'mautic.integrations.helper.sync_mapping',
+                    'mautic.integrations.helper.sync_integrations',
                 ],
                 'methodCalls' => [
                     'initiateDebugLogger' => ['mautic.sync.logger'],

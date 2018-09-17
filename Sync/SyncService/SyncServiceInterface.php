@@ -11,24 +11,19 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncService;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
-
 /**
  * Interface SyncServiceInterface
  */
 interface SyncServiceInterface
 {
     /**
-     * @param SyncDataExchangeInterface $syncDataExchangeService
-     * @param MappingManualDAO          $integrationMappingManual
-     * @param  bool                     $firstTimeSync
-     * @param \DateTimeInterface|null   $syncFromDateTime
-     * @param \DateTimeInterface|null   $syncToDateTime
+     * @param string                  $integration
+     * @param bool                    $firstTimeSync
+     * @param \DateTimeInterface|null $syncFromDateTime
+     * @param \DateTimeInterface|null $syncToDateTime
      */
     public function processIntegrationSync(
-        SyncDataExchangeInterface $syncDataExchangeService,
-        MappingManualDAO $integrationMappingManual,
+        string $integration,
         $firstTimeSync,
         \DateTimeInterface $syncFromDateTime = null,
         \DateTimeInterface $syncToDateTime = null
