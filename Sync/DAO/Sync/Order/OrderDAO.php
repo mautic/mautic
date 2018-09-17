@@ -111,22 +111,22 @@ class OrderDAO
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): OrderDAO
     {
         if (!isset($this->identifiedObjects[$objectChangeDAO->getObject()])) {
-            $this->identifiedObjects[$objectChangeDAO->getObject()]    = [];
-            $this->unidentifiedObjects[$objectChangeDAO->getObject()]  = [];
+            $this->identifiedObjects[$objectChangeDAO->getMappedObject()]    = [];
+            $this->unidentifiedObjects[$objectChangeDAO->getMappedObject()]  = [];
             $this->changedObjects[$objectChangeDAO->getMappedObject()] = [];
         }
 
         $this->changedObjects[$objectChangeDAO->getMappedObject()][] = $objectChangeDAO;
         $this->objectCounter++;
 
-        if ($knownId = $objectChangeDAO->getObjectId()) {
-            $this->identifiedObjects[$objectChangeDAO->getObject()][$objectChangeDAO->getObjectId()] = $objectChangeDAO;
+        if ($knownId = $objectChangeDAO->getMappedObjectId()) {
+            $this->identifiedObjects[$objectChangeDAO->getMappedObject()][$knownId] = $objectChangeDAO;
 
             return $this;
         }
 
         // These objects are not already tracked and thus possibly need to be created
-        $this->unidentifiedObjects[$objectChangeDAO->getObject()][$objectChangeDAO->getMappedObjectId()] = $objectChangeDAO;
+        $this->unidentifiedObjects[$objectChangeDAO->getMappedObject()][$objectChangeDAO->getObjectId()] = $objectChangeDAO;
 
         return $this;
     }
