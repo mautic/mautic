@@ -11,34 +11,44 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Oauth1a;
+namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
-use MauticPlugin\IntegrationsBundle\Auth\Oauth1a\CredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
  * Factory for building HTTP clients that will sign the requests with Oauth1a headers.
  */
-class HttpFactory
+class HttpFactory implements AuthProviderInterface
 {
+    const NAME = 'oauth1a_two_legged';
+
     /**
      * Cache of initialized clients.
-     * 
+     *
      * @var Client[]
      */
     private $initializedClients = [];
 
     /**
-     * @param CredentialsInteface $credentials
-     * 
-     * @return Client
-     * 
+     * @return string
+     */
+    public function getAuthType(): string
+    {
+        return self::NAME;
+    }
+
+    /**
+     * @param CredentialsInterface $credentials
+     *
+     * @return ClientInterface
      * @throws PluginNotConfiguredException
      */
-    public function getClient(CredentialsInterface $credentials)
+    public function getClient($credentials): ClientInterface
     {
         // Return cached initialized client if there is one.
         if (!empty($this->initializedClients[$credentials->getConsumerKey()])) {
@@ -56,7 +66,7 @@ class HttpFactory
 
     /**
      * @param CredentialsInterface $credentials
-     * 
+     *
      * @return Client
      */
     private function buildClient(CredentialsInterface $credentials)
@@ -73,7 +83,7 @@ class HttpFactory
 
     /**
      * @param CredentialsInterface $credentials
-     * 
+     *
      * @return Oauth1
      */
     private function createOauth1(CredentialsInterface $credentials)
@@ -93,7 +103,7 @@ class HttpFactory
 
     /**
      * @param CredentialsInterface $credentials
-     * 
+     *
      * @return bool
      */
     private function credentialsAreConfigured(CredentialsInterface $credentials)
