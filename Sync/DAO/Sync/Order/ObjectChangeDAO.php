@@ -99,6 +99,12 @@ class ObjectChangeDAO
         $this->fields[$fieldDAO->getName()]                = $fieldDAO;
         $this->fieldsByState[$state][$fieldDAO->getName()] = $fieldDAO;
 
+        if (ReportFieldDAO::FIELD_REQUIRED === $state) {
+            // Make this field also available to the unchanged fields array so the integration can get which
+            // ever one it wants based on it's implementation (i.e. patch vs put)
+            $this->fieldsByState[ReportFieldDAO::FIELD_UNCHANGED][$fieldDAO->getName()] = $fieldDAO;
+        }
+
         return $this;
     }
 
@@ -161,6 +167,8 @@ class ObjectChangeDAO
     }
 
     /**
+     * Returns all fields whether changed, unchanged required.
+     *
      * @return FieldDAO[]
      */
     public function getFields(): array
@@ -169,6 +177,8 @@ class ObjectChangeDAO
     }
 
     /**
+     * Returns only fields that we assume have been changed/modified.
+     *
      * @return FieldDAO[]
      */
     public function getChangedFields(): array
@@ -177,19 +187,23 @@ class ObjectChangeDAO
     }
 
     /**
-     * @return FieldDAO[]
-     */
-    public function getUnchangedFields(): array
-    {
-        return $this->fieldsByState[ReportFieldDAO::FIELD_UNCHANGED];
-    }
-
-    /**
+     * Returns only fields that are required but were not updated.
+     *
      * @return FieldDAO[]
      */
     public function getRequiredFields(): array
     {
         return $this->fieldsByState[ReportFieldDAO::FIELD_REQUIRED];
+    }
+
+    /**
+     * Returns fields that were mapped that values were known even though the value was not updated. It does include FieldDAO::FIELD_REQUIRED fields.
+     *
+     * @return FieldDAO[]
+     */
+    public function getUnchangedFields(): array
+    {
+        return $this->fieldsByState[ReportFieldDAO::FIELD_UNCHANGED];
     }
 
     /**
