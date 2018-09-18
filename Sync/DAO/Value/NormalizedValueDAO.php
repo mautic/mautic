@@ -25,6 +25,7 @@ class NormalizedValueDAO
     const DOUBLE_TYPE = 'double';
     const DATETIME_TYPE = 'datetime';
     const BOOLEAN_TYPE = 'boolean';
+    const PHONE_TYPE = 'phone';
 
     /**
      * @var string
