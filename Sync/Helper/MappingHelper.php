@@ -99,7 +99,7 @@ class MappingHelper
             try {
                 $integrationField = $mappingManualDAO->getIntegrationMappedField($internalObjectName, $integrationObjectDAO->getObject(), $field);
                 if ($integrationValue = $integrationObjectDAO->getField($integrationField)) {
-                    $identifiers[$integrationField] = $integrationValue->getValue()->getNormalizedValue();
+                    $identifiers[$field] = $integrationValue->getValue()->getNormalizedValue();
                 }
             } catch (FieldNotFoundException $e) {}
         }
@@ -111,10 +111,10 @@ class MappingHelper
 
         switch ($internalObjectName) {
             case MauticSyncDataExchange::OBJECT_CONTACT:
-                $foundObjects = $this->contactObjectHelper->findBy($identifiers);
+                $foundObjects = $this->contactObjectHelper->findObjectsByFieldValues($identifiers);
                 break;
             case MauticSyncDataExchange::OBJECT_COMPANY:
-                $foundObjects = $this->companyObjectHelper->findBy($identifiers);
+                $foundObjects = $this->companyObjectHelper->findObjectsByFieldValues($identifiers);
                 break;
             default:
                 throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObjectName);
