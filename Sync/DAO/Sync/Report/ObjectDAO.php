@@ -119,7 +119,7 @@ class ObjectDAO
     /**
      * @return FieldDAO[]
      */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }

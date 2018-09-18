@@ -15,6 +15,8 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
@@ -319,6 +321,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                     $syncReport->addObject($objectDAO);
 
                     foreach ($fields as $field) {
+                        if (!isset($mauticFields[$field])) {
+                            // Field must have been deleted or something so let's skip
+                            continue;
+                        }
+
                         $fieldType       = $this->getNormalizedFieldType($mauticFields[$field]['type']);
                         $normalizedValue = new NormalizedValueDAO(
                             $fieldType,
@@ -401,7 +408,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 }
 
                 try {
-                    $this->fillInMissingRequiredFields($objectDAO->getObject(), $syncReport, $objectDAO->getRequiredFields());
+                    $this->fillInMissingFields($syncReport, $objectDAO);
                 } catch (ObjectNotFoundException $exception) {
                     // Process the others
                 }
@@ -507,14 +514,16 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param string    $objectName
-     * @param ReportDAO $syncReport
-     * @param array     $requiredFields
+     * @param ReportDAO        $syncReport
+     * @param RequestObjectDAO $objectDAO
      *
      * @throws ObjectNotFoundException
      */
-    private function fillInMissingRequiredFields(string $objectName, ReportDAO $syncReport, array $requiredFields)
+    private function fillInMissingFields(ReportDAO $syncReport, RequestObjectDAO $objectDAO)
     {
+        $objectName               = $objectDAO->getObject();
+        $fields                   = $objectDAO->getFields();
+        $requiredFields           = $objectDAO->getRequiredFields();
         $objectsWithMissingFields = [];
         $syncObjects              = $syncReport->getObjects($objectName);
 
@@ -522,11 +531,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
             $syncObject->getObjectId();
 
             $missingFields = [];
-            foreach ($requiredFields as $requiredField) {
+            foreach ($fields as $field) {
                 try {
-                    $syncObject->getField($requiredField);
+                    $syncObject->getField($field);
                 } catch (FieldNotFoundException $exception) {
-                    $missingFields[] = $requiredField;
+                    $missingFields[] = $field;
                 }
             }
 
@@ -555,7 +564,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
                 foreach ($missingFields as $field) {
                     $syncObject->addField(
-                        new ReportFieldDAO($field, $this->valueNormalizer->normalizeForMautic($mauticFields[$field]['type'], $mauticObject[$field]))
+                        new ReportFieldDAO(
+                            $field,
+                            $this->valueNormalizer->normalizeForMautic($mauticFields[$field]['type'], $mauticObject[$field]),
+                            (in_array($field, $requiredFields)) ? FieldDAO::FIELD_REQUIRED : FieldDAO::FIELD_UNCHANGED
+                        )
                     );
                 }
             }

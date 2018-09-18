@@ -161,12 +161,16 @@ class MappingHelper
     }
 
     /**
-     * @param UpdatedObjectMappingDAO[] $mappings
+     * @param array $mappings
      */
     public function updateObjectMappings(array $mappings)
     {
         foreach ($mappings as $mapping) {
-            $this->updateObjectMapping($mapping);
+            try {
+                $this->updateObjectMapping($mapping);
+            } catch (ObjectNotFoundException $exception) {
+                continue;
+            }
         }
     }
 
