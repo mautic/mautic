@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api\Zoho\Xml;
 
-class Object
+class XmlObject
 {
     /**
      * @var
@@ -24,7 +24,7 @@ class Object
     protected $rows = [];
 
     /**
-     * Object constructor.
+     * XmlObject constructor.
      *
      * @param $object
      */

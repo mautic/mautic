@@ -33,5 +33,4 @@
             </exclude>
         </whitelist>
     </filter>
-
 </phpunit>
