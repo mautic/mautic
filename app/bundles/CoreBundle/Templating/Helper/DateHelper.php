@@ -35,14 +35,19 @@ class DateHelper extends Helper
     /**
      * DateHelper constructor.
      *
-     * @param                     $dateFullFormat
-     * @param                     $dateShortFormat
-     * @param                     $dateOnlyFormat
-     * @param                     $timeOnlyFormat
+     * @param string              $dateFullFormat
+     * @param string              $dateShortFormat
+     * @param string              $dateOnlyFormat
+     * @param string              $timeOnlyFormat
      * @param TranslatorInterface $translator
      */
-    public function __construct($dateFullFormat, $dateShortFormat, $dateOnlyFormat, $timeOnlyFormat, TranslatorInterface $translator)
-    {
+    public function __construct(
+        $dateFullFormat,
+        $dateShortFormat,
+        $dateOnlyFormat,
+        $timeOnlyFormat,
+        TranslatorInterface $translator
+    ) {
         $this->formats = [
             'datetime' => $dateFullFormat,
             'short'    => $dateShortFormat,
