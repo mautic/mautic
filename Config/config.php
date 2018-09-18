@@ -171,8 +171,9 @@ return [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper::class,
                 'arguments' => [
                     'mautic.lead.model.field',
-                    'mautic.lead.repository.lead',
                     'mautic.integrations.repository.object_mapping',
+                    'mautic.integrations.helper.company_object',
+                    'mautic.integrations.helper.contact_object',
                 ],
             ],
             'mautic.integrations.helper.sync_integrations' => [

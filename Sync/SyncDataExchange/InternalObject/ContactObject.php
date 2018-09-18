@@ -209,4 +209,26 @@ class ContactObject implements ObjectInterface
 
         return $qb->execute()->fetchAll();
     }
+
+    /**
+     * @param array $fields
+     *
+     * @return array
+     */
+    public function findObjectsByFieldValues(array $fields): array
+    {
+        $q = $this->connection->createQueryBuilder()
+            ->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        foreach ($fields as $col => $val) {
+            // Use andWhere because Mautic treats conflicting unique identifiers as different objects
+            $q->andWhere("l.$col = :".$col)
+                ->setParameter($col, $val);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
 }

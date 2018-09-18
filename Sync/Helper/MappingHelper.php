@@ -23,6 +23,9 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\CompanyObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\ContactObject;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MappingHelper
@@ -33,9 +36,14 @@ class MappingHelper
     private $fieldModel;
 
     /**
-     * @var LeadRepository
+     * @var ContactObject
      */
-    private $leadRepository;
+    private $contactObjectHelper;
+
+    /**
+     * @var CompanyObject
+     */
+    private $companyObjectHelper;
 
     /**
      * @var ObjectMappingRepository
@@ -46,14 +54,16 @@ class MappingHelper
      * MappingHelper constructor.
      *
      * @param FieldModel              $fieldModel
-     * @param LeadRepository          $leadRepository
      * @param ObjectMappingRepository $objectMappingRepository
+     * @param ContactObject           $contactObjectHelper
+     * @param CompanyObject           $companyObjectHelper
      */
-    public function __construct(FieldModel $fieldModel, LeadRepository $leadRepository, ObjectMappingRepository $objectMappingRepository)
+    public function __construct(FieldModel $fieldModel, ObjectMappingRepository $objectMappingRepository, ContactObject $contactObjectHelper, CompanyObject $companyObjectHelper)
     {
         $this->fieldModel              = $fieldModel;
-        $this->leadRepository          = $leadRepository;
         $this->objectMappingRepository = $objectMappingRepository;
+        $this->contactObjectHelper     = $contactObjectHelper;
+        $this->companyObjectHelper     = $companyObjectHelper;
     }
 
     /**
@@ -62,6 +72,8 @@ class MappingHelper
      * @param ObjectDAO        $integrationObjectDAO
      *
      * @return ObjectDAO
+     * @throws ObjectNotFoundException
+     * @throws ObjectNotSupportedException
      */
     public function findMauticObject(MappingManualDAO $mappingManualDAO, string $internalObjectName, ObjectDAO $integrationObjectDAO)
     {
@@ -90,8 +102,6 @@ class MappingHelper
                     $identifiers[$integrationField] = $integrationValue->getValue()->getNormalizedValue();
                 }
             } catch (FieldNotFoundException $e) {}
-
-
         }
 
         if (empty($identifiers)) {
@@ -99,13 +109,24 @@ class MappingHelper
             return new ObjectDAO($internalObjectName, null);
         }
 
-        if (!$foundContacts = $this->leadRepository->getLeadIdsByUniqueFields($identifiers)) {
+        switch ($internalObjectName) {
+            case MauticSyncDataExchange::OBJECT_CONTACT:
+                $foundObjects = $this->contactObjectHelper->findBy($identifiers);
+                break;
+            case MauticSyncDataExchange::OBJECT_COMPANY:
+                $foundObjects = $this->companyObjectHelper->findBy($identifiers);
+                break;
+            default:
+                throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObjectName);
+        }
+
+        if (!$foundObjects) {
             // No contacts were found
             return new ObjectDAO($internalObjectName, null);
         }
 
         // Match found!
-        $objectId = $foundContacts[0]['id'];
+        $objectId = $foundObjects[0]['id'];
 
         // Let's store the relationship since we know it
         $objectMapping = new ObjectMapping();

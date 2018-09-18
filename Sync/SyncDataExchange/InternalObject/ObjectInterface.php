@@ -49,4 +49,11 @@ interface ObjectInterface
      * @return array
      */
     public function findObjectsByIds(array $ids): array;
+
+    /**
+     * @param array $fields
+     *
+     * @return array
+     */
+    public function findObjectsByFieldValues(array $fields): array;
 }
