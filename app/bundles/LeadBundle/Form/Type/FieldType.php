@@ -240,16 +240,7 @@ class FieldType extends AbstractType
                             'label'             => 'mautic.lead.field.form.properties.select',
                             'data'              => $properties,
                             'with_labels'       => ('lookup' !== $type),
-                            'option_constraint' => [
-                                new Assert\Collection([
-                                    'fields' => [
-                                        'value' => [
-                                            new Assert\Regex(['pattern' => '/(^[\w-]+$)/i', 'message' => 'mautic.lead.field.value.invalid']),
-                                        ],
-                                    ],
-                                    'allowExtraFields' => true,
-                                ]),
-                            ],
+                            'option_constraint' => [],
                         ]
                     );
 
