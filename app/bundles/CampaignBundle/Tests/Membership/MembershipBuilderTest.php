@@ -70,6 +70,14 @@ class MembershipBuilderTest extends \PHPUnit_Framework_TestCase
         $this->campaignMemberRepository->expects($this->never())
             ->method('getCountsForOrphanedContactsBySegments');
 
+        $this->campaignMemberRepository->expects($this->once())
+            ->method('getCampaignContactsBySegments')
+            ->willReturn([]);
+
+        $this->campaignMemberRepository->expects($this->once())
+            ->method('getOrphanedContacts')
+            ->willReturn([]);
+
         $builder->build($campaign, $contactLimiter, 1000);
     }
 
@@ -103,14 +111,14 @@ class MembershipBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->campaignMemberRepository->expects($this->exactly(4))
             ->method('getCampaignContactsBySegments')
-            ->willReturnOnConsecutiveCalls([20], [21], [22]);
+            ->willReturnOnConsecutiveCalls([20], [21], [22], []);
 
         $this->manager->expects($this->exactly(3))
             ->method('addContacts');
 
         $this->campaignMemberRepository->expects($this->exactly(4))
             ->method('getOrphanedContacts')
-            ->willReturnOnConsecutiveCalls([23], [24], [25]);
+            ->willReturnOnConsecutiveCalls([23], [24], [25], []);
 
         $this->manager->expects($this->exactly(3))
             ->method('removeContacts');
