@@ -62,6 +62,12 @@ class ConfigChangeLoggerTest extends \PHPUnit_Framework_TestCase
             'key2' => 'changedValue',
         ];
 
+        $filterMe = [
+            'transifex_password' => 'dhjsakjfda',
+            'mailer_api_key'     => 'fsjkdah',
+            'mailer_is_owner'    => 'lksajhd',
+        ];
+
         $log     = [
             'bundle'    => 'config',
             'object'    => 'config',
@@ -92,7 +98,7 @@ class ConfigChangeLoggerTest extends \PHPUnit_Framework_TestCase
             'bundle' => [
                 'key' => 'value',
             ],
-            'bundle2' => $change,
+            'bundle2' => array_merge($change, $filterMe),
         ];
 
         $this->assertEquals($logger, $logger->setOriginalNormData($originalData));

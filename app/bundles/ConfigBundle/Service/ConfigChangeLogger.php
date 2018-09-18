@@ -20,6 +20,17 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 class ConfigChangeLogger
 {
     /**
+     * Keys to remove from log.
+     *
+     * @var array
+     */
+    private $filterKeys = [
+        'transifex_password',
+        'mailer_api_key',
+        'mailer_is_owner',
+    ];
+
+    /**
      * @var AuditLogModel
      */
     private $auditLogModel;
@@ -71,11 +82,11 @@ class ConfigChangeLogger
         }
 
         $originalData = $this->normalizeData($this->originalNormData);
-        $postData     = $this->normalizeData($postNormData);
+        $postData     = $this->filterData($this->normalizeData($postNormData));
 
         $diff = [];
         foreach ($postData as $key => $value) {
-            if ($originalData[$key] != $value) {
+            if (array_key_exists($key, $originalData) && $originalData[$key] != $value) {
                 $diff[$key] = $value;
             }
         }
@@ -118,5 +129,22 @@ class ConfigChangeLogger
         }
 
         return $normData;
+    }
+
+    /**
+     * Filter unused keys from post data.
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    private function filterData(array $data)
+    {
+        $keys = $this->filterKeys;
+
+        return array_filter($data, function ($key) use ($keys) {
+            return !in_array($key, $keys);
+        },
+            ARRAY_FILTER_USE_KEY);
     }
 }
