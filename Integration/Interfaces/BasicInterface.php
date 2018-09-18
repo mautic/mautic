@@ -2,8 +2,11 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-interface BasicInterface {
+interface BasicInterface
+{
     /**
+     * Return the integration's name
+     *
      * @return string
      */
     public function getName(): string;

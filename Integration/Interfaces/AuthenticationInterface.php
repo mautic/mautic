@@ -2,15 +2,28 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
+use MauticPlugin\IntegrationsBundle\Auth\Exception\FailedToAuthenticateException;
+
 interface AuthenticationInterface
 {
-    public function getRequiredKeyFields(): array;
+    /**
+     * Return the integration's name
+     *
+     * @return string
+     */
+    public function getName(): string;
 
-    public function getClientIdKey(): string;
+    /**
+     * Returns true if the integration has already been authorized with the 3rd party service
+     *
+     * @return bool
+     */
+    public function isAuthenticated(): bool;
 
-    public function getClientSecretKey(): string;
-
-    public function getAuthTokenKey(): string;
-
-    public function getApiUrl(): string;
+    /**
+     * Authenticate the integration with the 3rd party service
+     *
+     * @throws FailedToAuthenticateException
+     */
+    public function authenticateIntegration(): bool;
 }

@@ -51,9 +51,10 @@ return [
         'helpers' => [
             'mautic.integrations.helper.variable_expresser' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class
-            ]
-        ],
-        'menus' => [
+            ],
+            'mautic.integrations.helper.auth_integrations' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Auth\Helper\AuthIntegrationsHelper::class,
+            ],
         ],
         'other' => [
             'mautic.service.encryption' => [
@@ -65,23 +66,6 @@ return [
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class
             ],
-            'mautic.integrations.auth.factory' => [
-                'class' => MauticPlugin\IntegrationsBundle\Auth\Factory::class,
-            ],
-            'mautic.integrations.auth.provider.oauth1a' => [
-                'class' => MauticPlugin\IntegrationsBundle\Auth\Provider\OAuth1aProvider::class,
-                'arguments' => [
-                    'mautic.http.client',
-                ],
-                'tag' => 'mautic.integrations.auth.provider'
-            ],
-            'mautic.integrations.oauth1a.http.factory' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Auth\Oauth1a\HttpFactory::class,
-            ],
-        ],
-        'models' => [
-        ],
-        'validator' => [
         ],
         'repositories' => [
             'mautic.integrations.repository.field_change' => [
@@ -183,9 +167,5 @@ return [
                 ],
             ],
         ],
-    ],
-
-    'parameters' => [
-        'plugin_dir' => '%kernel.root_dir%/../plugins',
     ],
 ];

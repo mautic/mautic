@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Oauth1a;
 
 use PHPUnit_Framework_TestCase;
-use MauticPlugin\IntegrationsBundle\Auth\Oauth1a\HttpFactory;
-use MauticPlugin\IntegrationsBundle\Auth\Oauth1a\CredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\CredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 class HttpFactoryTest extends PHPUnit_Framework_TestCase

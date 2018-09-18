@@ -18,6 +18,13 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterf
 interface SyncInterface
 {
     /**
+     * Return the integration's name
+     *
+     * @return string
+     */
+    public function getName(): string;
+
+    /**
      * @return MappingManualDAO
      */
     public function getMappingManual(): MappingManualDAO;

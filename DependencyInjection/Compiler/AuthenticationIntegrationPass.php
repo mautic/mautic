@@ -1,9 +1,10 @@
 <?php
+
 /*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
+ * @copyright   2018 Mautic, Inc. All rights reserved
+ * @author      Mautic, Inc.
  *
- * @link        http://mautic.org
+ * @link        https://mautic.com
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -12,6 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class AuthenticationIntegrationPass implements CompilerPassInterface
 {
@@ -20,11 +22,11 @@ class AuthenticationIntegrationPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $taggedServices = $container->findTaggedServiceIds('mautic.authentication_integration');
+        $taggedServices     = $container->findTaggedServiceIds('mautic.authentication_integration');
+        $integrationsHelper = $container->findDefinition('mautic.integrations.helper.auth_integrations');
 
         foreach ($taggedServices as $id => $tags) {
-            //$definition = $container->findDefinition($id);
-            //$definition->addMethodCall('setEncryption', [new Reference('mautic.service.encryption')]);
+            $integrationsHelper->addMethodCall('addIntegration', [new Reference($id)]);
         }
     }
 }
