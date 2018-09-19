@@ -490,6 +490,16 @@
     width: 25px;
     padding: 3px 0 0 1px;
 }
+#CampaignCanvas .list-campaign-action[data-event='dncevent.addDnc']>.campaign-event-content::before {
+    content: '\f057';
+    color: #f86b4f;
+    background: rgba(248, 107, 79, 0.15);
+}
+#CampaignCanvas .list-campaign-action[data-event='dncevent.removeDnc']>.campaign-event-content::before {
+    content: '\f058';
+    color: #2ab29d;
+    background: rgba(42, 178, 157, 0.15);
+}
 
 /* Decision */
 #CampaignCanvas .list-campaign-decision[data-event='email.click'] > .campaign-event-content::before {
