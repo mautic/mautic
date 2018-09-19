@@ -718,4 +718,12 @@ class LeadField extends FormEntity
     {
         $this->isUniqueIdentifier = $this->isUniqueIdentifer;
     }
+
+    /**
+     * @return bool
+     */
+    public function isNew()
+    {
+        return $this->getId() ? false : true;
+    }
 }
