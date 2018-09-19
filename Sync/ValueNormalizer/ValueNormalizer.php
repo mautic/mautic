@@ -47,6 +47,8 @@ final class ValueNormalizer implements ValueNormalizerInterface
             case NormalizedValueDAO::DATETIME_TYPE:
                 return new NormalizedValueDAO($type, $value, new \DateTime($value));
             case NormalizedValueDAO::BOOLEAN_TYPE:
+                $value = ($value === 'false') ? false : $value;
+                $value = ($value === 'true') ? true : $value;
                 return new NormalizedValueDAO($type, $value, (bool) $value);
             default:
                 throw new \InvalidArgumentException('Variable type, '.$type.', not supported');
