@@ -44,6 +44,7 @@ class PluginApiController extends CommonApiController
         if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
+
         $integrationHelper = $this->get('mautic.helper.integration');
         $integrationObject = $integrationHelper->getIntegrationObject($integrationName);
         if ($integrationObject && $integrationObject->getIntegrationSettings()->getIsPublished()) {
@@ -65,6 +66,11 @@ class PluginApiController extends CommonApiController
         if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
+
+        if (!is_callable('shell_exec') || false !== stripos(ini_get('disable_functions'), 'shell_exec')) {
+            return $this->returnError($this->translator->trans('mautic.plugin.extension.shell_exec'), Codes::HTTP_BAD_REQUEST);
+        }
+
         $package = $this->get('request_stack')->getCurrentRequest()->get('package');
         @set_time_limit(9999);
         $response = shell_exec('composer require '.$package);
