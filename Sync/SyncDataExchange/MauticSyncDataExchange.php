@@ -566,7 +566,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                     $syncObject->addField(
                         new ReportFieldDAO(
                             $field,
-                            $this->valueNormalizer->normalizeForMautic($mauticFields[$field]['type'], $mauticObject[$field]),
+                            $this->valueNormalizer->normalizeForMautic($this->getNormalizedFieldType($mauticFields[$field]['type']), $mauticObject[$field]),
                             (in_array($field, $requiredFields)) ? FieldDAO::FIELD_REQUIRED : FieldDAO::FIELD_UNCHANGED
                         )
                     );

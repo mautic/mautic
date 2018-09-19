@@ -31,6 +31,7 @@ class NormalizedValueDAO
     const SELECT_TYPE = 'select';
     const MULTISELECT_TYPE = 'multiselect';
     const LOOKUP_TYPE = 'lookup';
+    const PHONE_TYPE = 'phone';
 
     /**
      * @var string
