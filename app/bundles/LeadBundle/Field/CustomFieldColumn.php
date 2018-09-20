@@ -14,18 +14,12 @@ namespace Mautic\LeadBundle\Field;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
-use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
 use Monolog\Logger;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldColumn
 {
-    /**
-     * @var IndexSchemaHelper
-     */
-    private $indexSchemaHelper;
-
     /**
      * @var ColumnSchemaHelper
      */
@@ -47,40 +41,37 @@ class CustomFieldColumn
     private $translator;
 
     /**
-     * @var FieldsWithUniqueIdentifier
-     */
-    private $fieldsWithUniqueIdentifier;
-
-    /**
      * @var LeadFieldSaver
      */
     private $leadFieldSaver;
 
     /**
-     * @param IndexSchemaHelper          $indexSchemaHelper
-     * @param ColumnSchemaHelper         $columnSchemaHelper
-     * @param SchemaDefinition           $schemaDefinition
-     * @param Logger                     $logger
-     * @param TranslatorInterface        $translator
-     * @param FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
-     * @param LeadFieldSaver             $leadFieldSaver
+     * @var CustomFieldIndex
+     */
+    private $customFieldIndex;
+
+    /**
+     * @param ColumnSchemaHelper  $columnSchemaHelper
+     * @param SchemaDefinition    $schemaDefinition
+     * @param Logger              $logger
+     * @param TranslatorInterface $translator
+     * @param LeadFieldSaver      $leadFieldSaver
+     * @param CustomFieldIndex    $customFieldIndex
      */
     public function __construct(
-        IndexSchemaHelper $indexSchemaHelper,
         ColumnSchemaHelper $columnSchemaHelper,
         SchemaDefinition $schemaDefinition,
         Logger $logger,
         TranslatorInterface $translator,
-        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        LeadFieldSaver $leadFieldSaver
+        LeadFieldSaver $leadFieldSaver,
+        CustomFieldIndex $customFieldIndex
     ) {
-        $this->indexSchemaHelper          = $indexSchemaHelper;
-        $this->columnSchemaHelper         = $columnSchemaHelper;
-        $this->schemaDefinition           = $schemaDefinition;
-        $this->logger                     = $logger;
-        $this->translator                 = $translator;
-        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
-        $this->leadFieldSaver             = $leadFieldSaver;
+        $this->columnSchemaHelper = $columnSchemaHelper;
+        $this->schemaDefinition   = $schemaDefinition;
+        $this->logger             = $logger;
+        $this->translator         = $translator;
+        $this->leadFieldSaver     = $leadFieldSaver;
+        $this->customFieldIndex   = $customFieldIndex;
     }
 
     /**
@@ -97,7 +88,6 @@ class CustomFieldColumn
         // Create the field as its own column in the leads table.
         /** @var ColumnSchemaHelper $leadsSchema */
         $leadsSchema = $this->columnSchemaHelper->setName($object);
-        $isUnique    = $entity->getIsUniqueIdentifier();
         $alias       = $entity->getAlias();
 
         // We do not need to do anything if the column already exists
@@ -105,7 +95,7 @@ class CustomFieldColumn
             return;
         }
 
-        $schemaDefinition = $this->schemaDefinition::getSchemaDefinition($alias, $entity->getType(), $isUnique);
+        $schemaDefinition = $this->schemaDefinition::getSchemaDefinition($alias, $entity->getType(), $entity->getIsUniqueIdentifier());
 
         $leadsSchema->addColumn($schemaDefinition);
 
@@ -126,39 +116,8 @@ class CustomFieldColumn
             $this->leadFieldSaver->saveLeadFieldEntity($entity, true);
         }
 
-        // Update the unique_identifier_search index and add an index for this field
-        /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-        $modifySchema = $this->indexSchemaHelper->setName($object);
-
-        if ('string' !== $schemaDefinition['type']) {
-            return;
-        }
-
-        try {
-            $modifySchema->addIndex([$alias], $alias.'_search');
-            $modifySchema->allowColumn($alias);
-
-            if ($isUnique) {
-                // Get list of current uniques
-                $uniqueIdentifierFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
-
-                // Always use email
-                $indexColumns   = ['email'];
-                $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
-                $indexColumns[] = $alias;
-
-                // Only use three to prevent max key length errors
-                $indexColumns = array_slice($indexColumns, 0, 3);
-                $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
-            }
-
-            $modifySchema->executeChanges();
-        } catch (DriverException $e) {
-            if ($e->getErrorCode() === 1069 /* ER_TOO_MANY_KEYS */) {
-                $this->logger->addWarning($e->getMessage());
-            } else {
-                throw $e;
-            }
+        if ('string' === $schemaDefinition['type']) {
+            $this->customFieldIndex->addIndexOnColumn($entity, $object);
         }
     }
 }
