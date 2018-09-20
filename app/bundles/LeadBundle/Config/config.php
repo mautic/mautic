@@ -1278,13 +1278,20 @@ return [
             'mautic.lead.field.custom_field_column' => [
                 'class'     => Mautic\LeadBundle\Field\CustomFieldColumn::class,
                 'arguments' => [
-                    'mautic.schema.helper.index',
                     'mautic.schema.helper.column',
                     'mautic.lead.field.schema_definition',
                     'monolog.logger.mautic',
                     'translator',
-                    'mautic.lead.field.fields_with_unique_identifier',
                     'mautic.lead.field.lead_field_saver',
+                    'mautic.lead.field.custom_field_index',
+                ],
+            ],
+            'mautic.lead.field.custom_field_index' => [
+                'class'     => Mautic\LeadBundle\Field\CustomFieldIndex::class,
+                'arguments' => [
+                    'mautic.schema.helper.index',
+                    'monolog.logger.mautic',
+                    'mautic.lead.field.fields_with_unique_identifier',
                 ],
             ],
             'mautic.lead.field.field_dispatcher' => [
