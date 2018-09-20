@@ -223,8 +223,8 @@ if (!$isEmbedded) {
 
             <?php
             $isVariant = $showTranslations || $showVariants ?: 0;
-            $dateFrom = new \DateTime($dateRangeForm->children['date_from']->vars['data']);
-            $dateTo   = new \DateTime($dateRangeForm->children['date_to']->vars['data']);
+            $dateFrom  = new \DateTime($dateRangeForm->children['date_from']->vars['data']);
+            $dateTo    = new \DateTime($dateRangeForm->children['date_to']->vars['data']);
             ?>
             <div id="emailGraphStats" data-graph-url="<?php echo $view['router']->path('mautic_email_graph_stats', ['objectId' => $email->getId(), 'isVariant' => $isVariant, 'dateFrom' => $dateFrom->format('Y-m-d'), 'dateTo' => $dateTo->format('Y-m-d')]); ?>">
                 <div class="spinner">

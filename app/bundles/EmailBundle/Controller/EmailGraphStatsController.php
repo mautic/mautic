@@ -17,7 +17,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class EmailGraphStatsController extends Controller
 {
-
     /**
      * Loads a specific form into the detailed panel.
      *
@@ -93,10 +92,10 @@ class EmailGraphStatsController extends Controller
         return $this->render(
             'MauticEmailBundle:Email:graph.html.php',
             [
-                'email'        => $email,
-                'stats'        => $stats,
-                'statsDevices' => $statsDevices,
-                'showAllStats' => $includeVariants,
+                'email'         => $email,
+                'stats'         => $stats,
+                'statsDevices'  => $statsDevices,
+                'showAllStats'  => $includeVariants,
                 'dateRangeForm' => $dateRangeForm->createView(),
                 'isVariant'     => $isVariant,
             ]
