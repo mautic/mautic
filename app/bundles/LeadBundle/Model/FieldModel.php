@@ -463,25 +463,19 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
 
-        $isNew = $entity->isNew();
+        $this->setTimestamps($entity, $entity->isNew(), $unlock);
 
-        //set some defaults
-        $this->setTimestamps($entity, $isNew, $unlock);
-        $objects = ['lead' => 'leads', 'company' => 'companies'];
-        $object  = $objects[$entity->getObject()];
-        $type    = $entity->getType();
-
-        if ($type === 'time') {
+        if ('time' === $entity->getType()) {
             //time does not work well with list filters
             $entity->setIsListable(false);
         }
 
         // Save the entity now if it's an existing entity
-        if (!$isNew) {
+        if (!$entity->isNew()) {
             $this->leadFieldSaver->saveLeadFieldEntity($entity, false);
         }
 
-        $this->customFieldColumn->createLeadColumn($entity, $object);
+        $this->customFieldColumn->createLeadColumn($entity);
 
         // Update order of the other fields.
         $this->reorderFieldsByEntity($entity);
