@@ -67,18 +67,16 @@ class CustomFieldColumn
     }
 
     /**
-     * @param string $object - 'leads' or 'companies'
-     *
      * @throws DBALException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function createLeadColumn(LeadField $entity, $object)
+    public function createLeadColumn(LeadField $entity)
     {
         // Create the field as its own column in the leads table.
         /** @var ColumnSchemaHelper $leadsSchema */
-        $leadsSchema = $this->columnSchemaHelper->setName($object);
+        $leadsSchema = $this->columnSchemaHelper->setName($entity->getCustomFieldObject());
         $alias       = $entity->getAlias();
 
         // We do not need to do anything if the column already exists
@@ -108,7 +106,7 @@ class CustomFieldColumn
         }
 
         if ('string' === $schemaDefinition['type']) {
-            $this->customFieldIndex->addIndexOnColumn($entity, $object);
+            $this->customFieldIndex->addIndexOnColumn($entity);
         }
     }
 }

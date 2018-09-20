@@ -46,17 +46,15 @@ class CustomFieldIndex
     /**
      * Update the unique_identifier_search index and add an index for this field.
      *
-     * @param string $object
-     *
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function addIndexOnColumn(LeadField $entity, $object)
+    public function addIndexOnColumn(LeadField $entity)
     {
         try {
             /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-            $modifySchema = $this->indexSchemaHelper->setName($object);
+            $modifySchema = $this->indexSchemaHelper->setName($entity->getCustomFieldObject());
 
             $alias = $entity->getAlias();
 

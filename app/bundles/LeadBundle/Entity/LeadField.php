@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -112,6 +113,11 @@ class LeadField extends FormEntity
      * @var array
      */
     private $properties = [];
+
+    /**
+     * @var CustomFieldObject
+     */
+    private $customFieldObject;
 
     public function __clone()
     {
@@ -470,6 +476,18 @@ class LeadField extends FormEntity
     public function getObject()
     {
         return $this->object;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomFieldObject()
+    {
+        if (!$this->customFieldObject) {
+            $this->customFieldObject = new CustomFieldObject($this);
+        }
+
+        return $this->customFieldObject->getObject();
     }
 
     /**
