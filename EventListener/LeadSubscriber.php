@@ -11,7 +11,7 @@ use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
-use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncIntegrationsHelper;
+use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 
 /**
  * Class LeadSubscriber
