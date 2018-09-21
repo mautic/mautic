@@ -95,13 +95,10 @@ class CustomFieldColumn
      */
     public function createLeadColumn(LeadField $leadField)
     {
-        // Create the field as its own column in the leads table.
-        /** @var ColumnSchemaHelper $leadsSchema */
         $leadsSchema = $this->columnSchemaHelper->setName($leadField->getCustomFieldObject());
-        $alias       = $leadField->getAlias();
 
         // We do not need to do anything if the column already exists
-        if ($leadsSchema->checkColumnExists($alias)) {
+        if ($leadsSchema->checkColumnExists($leadField->getAlias())) {
             return;
         }
 
@@ -109,10 +106,32 @@ class CustomFieldColumn
             $this->fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
         } catch (NoListenerException $e) {
         } catch (AbortColumnCreateException $e) {
+            $this->leadFieldSaver->saveLeadFieldEntityWithoutColumnCreated($leadField);
+
             return;
         }
 
-        $schemaDefinition = $this->schemaDefinition::getSchemaDefinition($alias, $leadField->getType(), $leadField->getIsUniqueIdentifier());
+        $this->processCreateLeadColumn($leadField, $leadsSchema);
+    }
+
+    /**
+     * Create the field as its own column in the leads table.
+     *
+     * @param LeadField          $leadField
+     * @param ColumnSchemaHelper $leadsSchema
+     *
+     * @throws DBALException
+     * @throws DriverException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     */
+    private function processCreateLeadColumn(LeadField $leadField, ColumnSchemaHelper $leadsSchema)
+    {
+        $schemaDefinition = $this->schemaDefinition::getSchemaDefinition(
+            $leadField->getAlias(),
+            $leadField->getType(),
+            $leadField->getIsUniqueIdentifier()
+        );
 
         $leadsSchema->addColumn($schemaDefinition);
 
@@ -128,10 +147,8 @@ class CustomFieldColumn
             throw $e;
         }
 
-        // If this is a new contact field, and it was successfully added to the contacts table, save it
-        if ($leadField->isNew() === true) {
-            $this->leadFieldSaver->saveLeadFieldEntity($leadField, true);
-        }
+        //$leadField is a new entity (this method is not executed for update), it was successfully added to the lead table > save it
+        $this->leadFieldSaver->saveLeadFieldEntity($leadField, true);
 
         if ('string' === $schemaDefinition['type']) {
             $this->customFieldIndex->addIndexOnColumn($leadField);

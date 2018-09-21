@@ -1261,5 +1261,6 @@ return [
     'parameters' => [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
+        'create_custom_field_in_background'   => false,
     ],
 ];
