@@ -605,14 +605,16 @@ class PageModel extends FormModel
 
         // Set info from request
         $hitUrl = InputHelper::url((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
+        $hitReferrer = InputHelper::url((isset($query['page_referrer'])) ? $query['page_referrer'] : '');
+       
         $query  = InputHelper::cleanArray($query);
 
         $hit->setQuery($query);
         $hit->setUrl($hitUrl);
 
-        if (isset($query['page_referrer'])) {
-            $hit->setReferer($query['page_referrer']);
-        }
+        if ($hitReferrer) {
+            $hit->setReferer($hitReferrer);
+        }      
         if (isset($query['page_language'])) {
             $hit->setPageLanguage($query['page_language']);
         }
