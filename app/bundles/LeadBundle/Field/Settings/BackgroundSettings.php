@@ -30,6 +30,6 @@ class BackgroundSettings
      */
     public function shouldProcessColumnChangeInBackground()
     {
-        return $this->coreParametersHelper->getParameter('create_custom_field_in_background', false);
+        return (bool) $this->coreParametersHelper->getParameter('create_custom_field_in_background', false);
     }
 }

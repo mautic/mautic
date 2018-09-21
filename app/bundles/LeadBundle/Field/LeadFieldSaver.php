@@ -37,18 +37,25 @@ class LeadFieldSaver
     /**
      * @param bool $isNew
      */
-    public function saveLeadFieldEntity(LeadField $entity, $isNew)
+    public function saveLeadFieldEntity(LeadField $leadField, $isNew)
     {
         try {
-            $this->fieldSaveDispatcher->dispatchPreSaveEvent($entity, $isNew);
+            $this->fieldSaveDispatcher->dispatchPreSaveEvent($leadField, $isNew);
         } catch (NoListenerException $e) {
         }
 
-        $this->leadFieldRepository->saveEntity($entity);
+        $this->leadFieldRepository->saveEntity($leadField);
 
         try {
-            $this->fieldSaveDispatcher->dispatchPostSaveEvent($entity, $isNew);
+            $this->fieldSaveDispatcher->dispatchPostSaveEvent($leadField, $isNew);
         } catch (NoListenerException $e) {
         }
+    }
+
+    public function saveLeadFieldEntityWithoutColumnCreated(LeadField $leadField)
+    {
+        $leadField->setColumnIsNotCreated();
+
+        $this->saveLeadFieldEntity($leadField, true);
     }
 }

@@ -46,7 +46,7 @@ class AddColumnEvent extends Event
     /**
      * @return bool
      */
-    public function isShouldProcessInBackground()
+    public function shouldProcessInBackground()
     {
         return $this->shouldProcessInBackground;
     }

@@ -115,6 +115,22 @@ class LeadField extends FormEntity
     private $properties = [];
 
     /**
+     * The column in lead_fields table was not created yet if this property is true.
+     * Entity cannot be published and we cannot work with it until column is created.
+     *
+     * @var bool
+     */
+    private $columnIsNotCreated = false;
+
+    /**
+     * This property contains an original value for $isPublished.
+     * $isPublished is always set on false if $columnIsNotCreated is true.
+     *
+     * @var bool
+     */
+    private $originalIsPublishedValue = false;
+
+    /**
      * @var CustomFieldObject
      */
     private $customFieldObject;
@@ -192,6 +208,14 @@ class LeadField extends FormEntity
 
         $builder->createField('properties', 'array')
             ->nullable()
+            ->build();
+
+        $builder->createField('columnIsNotCreated', 'boolean')
+            ->columnName('column_is_not_created')
+            ->build();
+
+        $builder->createField('originalIsPublishedValue', 'boolean')
+            ->columnName('original_is_published_value')
             ->build();
     }
 
@@ -446,7 +470,7 @@ class LeadField extends FormEntity
     /**
      * Get properties.
      *
-     * @return string
+     * @return array
      */
     public function getProperties()
     {
@@ -737,5 +761,26 @@ class LeadField extends FormEntity
     public function isNew()
     {
         return $this->getId() ? false : true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getColumnIsNotCreated()
+    {
+        return $this->columnIsNotCreated;
+    }
+
+    public function setColumnIsNotCreated()
+    {
+        $this->columnIsNotCreated       = true;
+        $this->originalIsPublishedValue = $this->getIsPublished();
+        $this->setIsPublished(false);
+    }
+
+    public function setColumnWasCreated()
+    {
+        $this->columnIsNotCreated = false;
+        $this->setIsPublished($this->originalIsPublishedValue);
     }
 }

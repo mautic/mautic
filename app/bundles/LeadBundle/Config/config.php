@@ -1392,5 +1392,6 @@ return [
             '5' => 'last_active',
             '6' => 'id',
         ],
+        'create_custom_field_in_background'   => false,
     ],
 ];
