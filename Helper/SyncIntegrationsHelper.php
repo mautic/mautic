@@ -9,11 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
+namespace MauticPlugin\IntegrationsBundle\Helper;
 
-
-use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\IntegrationRepository;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\SyncInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -29,23 +26,24 @@ class SyncIntegrationsHelper
     private $integrations = [];
 
     /**
-     * @var IntegrationRepository
-     */
-    private $integrationRepository;
-
-    /**
      * @var null|array
      */
     private $enabled;
 
+
     /**
-     * SyncIntegrationHelper constructor.
-     *
-     * @param IntegrationRepository $integrationRepository
+     * @var IntegrationsHelper
      */
-    public function __construct(IntegrationRepository $integrationRepository)
+    private $integrationsHelper;
+
+    /**
+     * SyncIntegrationsHelper constructor.
+     *
+     * @param IntegrationsHelper $integrationsHelper
+     */
+    public function __construct(IntegrationsHelper $integrationsHelper)
     {
-        $this->integrationRepository = $integrationRepository;
+        $this->integrationsHelper = $integrationsHelper;
     }
 
     /**
@@ -58,6 +56,7 @@ class SyncIntegrationsHelper
 
     /**
      * @return array|null
+     * @throws IntegrationNotFoundException
      */
     public function getEnabledIntegrations()
     {
@@ -66,24 +65,10 @@ class SyncIntegrationsHelper
         }
 
         $this->enabled = [];
-        foreach ($this->integrations as $name => $integrationObject) {
-            if ($integrationObject->hasIntegration()) {
-                $integrationEntity = $integrationObject->getIntegration();
+        foreach ($this->integrations as $name => $syncIntegration) {
+            $integrationConfiguration = $this->integrationsHelper->getIntegrationConfiguration($syncIntegration);
 
-                if ($integrationEntity->getIsPublished()) {
-                    $this->enabled[] = $name;
-                    continue;
-                }
-            }
-
-            /** @var Integration $integrationEntity */
-            $integrationEntity = $this->integrationRepository->findOneBy(['name' => $name]);
-            if (!$integrationEntity) {
-                continue;
-            }
-
-            $integrationObject->setIntegration($integrationEntity);
-            if ($integrationEntity->getIsPublished()) {
+            if ($integrationConfiguration->getIsPublished()) {
                 $this->enabled[] = $name;
             }
         }
@@ -92,7 +77,6 @@ class SyncIntegrationsHelper
     }
 
     /**
-     * @param string $integration
      * @param string $mauticObject
      *
      * @return bool
@@ -108,15 +92,15 @@ class SyncIntegrationsHelper
         $enabledIntegrations = $this->getEnabledIntegrations();
 
         foreach ($enabledIntegrations as $integration) {
-            $integration     = $this->getIntegration($integration);
-            $featureSettings = $integration->getIntegration()->getFeatureSettings();
+            $syncIntegration     = $this->getIntegration($integration);
+            $featureSettings = $syncIntegration->getIntegrationConfiguration()->getFeatureSettings();
 
             if (!isset($featureSettings['objects'])) {
                 continue;
             }
 
             // Find what object is mapped to Mautic's object
-            $mappingManual     = $integration->getMappingManual();
+            $mappingManual     = $syncIntegration->getMappingManual();
             $mappedObjectNames = $mappingManual->getMappedIntegrationObjectsNames($mauticObject);
             foreach ($mappedObjectNames as $mappedObjectName) {
                 if (in_array($mappedObjectName, $featureSettings['objects'])) {
