@@ -15,6 +15,7 @@ use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\AuthenticationIntegrationPass;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\DispatcherIntegrationPass;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\EncryptionIntegrationPass;
+use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\IntegrationsPass;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\SyncIntegrationsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -29,6 +30,8 @@ class IntegrationsBundle extends PluginBundleBase
     {
         $container->addCompilerPass(new EncryptionIntegrationPass());
         $container->addCompilerPass(new DispatcherIntegrationPass());
+
+        $container->addCompilerPass(new IntegrationsPass());
         $container->addCompilerPass(new AuthenticationIntegrationPass());
         $container->addCompilerPass(new SyncIntegrationsPass());
     }

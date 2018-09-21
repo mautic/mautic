@@ -12,16 +12,12 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_integration_core' => [
-                'path' => '/integration',
-                'controller' => 'MauticIntegrationBundle:Default:index',
+            'mautic_integration_config' => [
+                'path'       => '/integration/{integration}/config/{page}',
+                'controller' => 'IntegrationsBundle:Config:edit',
             ],
         ],
         'api' => [
-            'mautic_integration_api_plugin_list' => [
-                'path' => '/integration/plugin/list',
-                'controller' => 'IntegrationsBundle:Api\Plugin:list',
-            ],
         ],
     ],
     'menu' => [
@@ -52,8 +48,23 @@ return [
             'mautic.integrations.helper.variable_expresser' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class
             ],
+            'mautic.integrations.helper' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper::class,
+                'arguments' => [
+                    'mautic.plugin.integrations.repository.integration',
+                ],
+            ],
             'mautic.integrations.helper.auth_integrations' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Auth\Helper\AuthIntegrationsHelper::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Helper\AuthIntegrationsHelper::class,
+                'arugments' => [
+                    'mautic.integrations.helper',
+                ]
+            ],
+            'mautic.integrations.helper.sync_integrations' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                ],
             ],
         ],
         'other' => [
@@ -65,6 +76,9 @@ return [
             ],
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class
+            ],
+            'mautic.integration.auth_provider.oauth1atwolegged' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory::class,
             ],
         ],
         'repositories' => [
@@ -158,12 +172,6 @@ return [
                     'mautic.integrations.repository.object_mapping',
                     'mautic.integrations.helper.contact_object',
                     'mautic.integrations.helper.company_object',
-                ],
-            ],
-            'mautic.integrations.helper.sync_integrations' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\Helper\SyncIntegrationsHelper::class,
-                'arguments' => [
-                  'mautic.plugin.integrations.repository.integration',
                 ],
             ],
         ],
