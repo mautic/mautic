@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Helper;
+namespace MauticPlugin\IntegrationsBundle\Helper;
 
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\AuthenticationInterface;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -20,6 +20,21 @@ class AuthIntegrationsHelper
      * @var AuthenticationInterface[]
      */
     private $integrations = [];
+
+    /**
+     * @var IntegrationsHelper
+     */
+    private $integrationsHelper;
+
+    /**
+     * AuthIntegrationsHelper constructor.
+     *
+     * @param IntegrationsHelper $integrationsHelper
+     */
+    public function __construct(IntegrationsHelper $integrationsHelper)
+    {
+        $this->integrationsHelper = $integrationsHelper;
+    }
 
     /**
      * @param AuthenticationInterface $integration
@@ -40,6 +55,9 @@ class AuthIntegrationsHelper
         if (!isset($this->integrations[$integration])){
             throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.authentication_integration");
         }
+
+        // Ensure the configuration is hydrated
+        $this->integrationsHelper->getIntegrationConfiguration($this->integrations[$integration]);
 
         return $this->integrations[$integration];
     }
