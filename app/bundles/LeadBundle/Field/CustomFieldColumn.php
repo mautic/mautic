@@ -15,6 +15,9 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Exception\NoListenerException;
+use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
+use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Monolog\Logger;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -50,20 +53,27 @@ class CustomFieldColumn
      */
     private $customFieldIndex;
 
+    /**
+     * @var FieldColumnDispatcher
+     */
+    private $fieldColumnDispatcher;
+
     public function __construct(
         ColumnSchemaHelper $columnSchemaHelper,
         SchemaDefinition $schemaDefinition,
         Logger $logger,
         TranslatorInterface $translator,
         LeadFieldSaver $leadFieldSaver,
-        CustomFieldIndex $customFieldIndex
+        CustomFieldIndex $customFieldIndex,
+        FieldColumnDispatcher $fieldColumnDispatcher
     ) {
-        $this->columnSchemaHelper = $columnSchemaHelper;
-        $this->schemaDefinition   = $schemaDefinition;
-        $this->logger             = $logger;
-        $this->translator         = $translator;
-        $this->leadFieldSaver     = $leadFieldSaver;
-        $this->customFieldIndex   = $customFieldIndex;
+        $this->columnSchemaHelper    = $columnSchemaHelper;
+        $this->schemaDefinition      = $schemaDefinition;
+        $this->logger                = $logger;
+        $this->translator            = $translator;
+        $this->leadFieldSaver        = $leadFieldSaver;
+        $this->customFieldIndex      = $customFieldIndex;
+        $this->fieldColumnDispatcher = $fieldColumnDispatcher;
     }
 
     /**
@@ -72,19 +82,26 @@ class CustomFieldColumn
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function createLeadColumn(LeadField $entity)
+    public function createLeadColumn(LeadField $leadField)
     {
         // Create the field as its own column in the leads table.
         /** @var ColumnSchemaHelper $leadsSchema */
-        $leadsSchema = $this->columnSchemaHelper->setName($entity->getCustomFieldObject());
-        $alias       = $entity->getAlias();
+        $leadsSchema = $this->columnSchemaHelper->setName($leadField->getCustomFieldObject());
+        $alias       = $leadField->getAlias();
 
         // We do not need to do anything if the column already exists
         if ($leadsSchema->checkColumnExists($alias)) {
             return;
         }
 
-        $schemaDefinition = $this->schemaDefinition::getSchemaDefinition($alias, $entity->getType(), $entity->getIsUniqueIdentifier());
+        try {
+            $this->fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
+        } catch (NoListenerException $e) {
+        } catch (AbortColumnCreateException $e) {
+            return;
+        }
+
+        $schemaDefinition = $this->schemaDefinition::getSchemaDefinition($alias, $leadField->getType(), $leadField->getIsUniqueIdentifier());
 
         $leadsSchema->addColumn($schemaDefinition);
 
@@ -101,12 +118,12 @@ class CustomFieldColumn
         }
 
         // If this is a new contact field, and it was successfully added to the contacts table, save it
-        if (true === $entity->isNew()) {
-            $this->leadFieldSaver->saveLeadFieldEntity($entity, true);
+        if (true === $leadField->isNew()) {
+            $this->leadFieldSaver->saveLeadFieldEntity($leadField, true);
         }
 
         if ('string' === $schemaDefinition['type']) {
-            $this->customFieldIndex->addIndexOnColumn($entity);
+            $this->customFieldIndex->addIndexOnColumn($leadField);
         }
     }
 }

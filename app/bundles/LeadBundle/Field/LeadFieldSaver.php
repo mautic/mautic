@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Field;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Exception\NoListenerException;
+use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 
 class LeadFieldSaver
 {
@@ -23,14 +24,14 @@ class LeadFieldSaver
     private $leadFieldRepository;
 
     /**
-     * @var FieldDispatcher
+     * @var FieldSaveDispatcher
      */
-    private $fieldDispatcher;
+    private $fieldSaveDispatcher;
 
-    public function __construct(LeadFieldRepository $leadFieldRepository, FieldDispatcher $fieldDispatcher)
+    public function __construct(LeadFieldRepository $leadFieldRepository, FieldSaveDispatcher $fieldSaveDispatcher)
     {
         $this->leadFieldRepository = $leadFieldRepository;
-        $this->fieldDispatcher     = $fieldDispatcher;
+        $this->fieldSaveDispatcher = $fieldSaveDispatcher;
     }
 
     /**
@@ -39,14 +40,14 @@ class LeadFieldSaver
     public function saveLeadFieldEntity(LeadField $entity, $isNew)
     {
         try {
-            $this->fieldDispatcher->dispatchPreSaveEvent($entity, $isNew);
+            $this->fieldSaveDispatcher->dispatchPreSaveEvent($entity, $isNew);
         } catch (NoListenerException $e) {
         }
 
         $this->leadFieldRepository->saveEntity($entity);
 
         try {
-            $this->fieldDispatcher->dispatchPostSaveEvent($entity, $isNew);
+            $this->fieldSaveDispatcher->dispatchPostSaveEvent($entity, $isNew);
         } catch (NoListenerException $e) {
         }
     }

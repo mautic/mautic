@@ -50,18 +50,18 @@ class CustomFieldIndex
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function addIndexOnColumn(LeadField $entity)
+    public function addIndexOnColumn(LeadField $leadField)
     {
         try {
             /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-            $modifySchema = $this->indexSchemaHelper->setName($entity->getCustomFieldObject());
+            $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
-            $alias = $entity->getAlias();
+            $alias = $leadField->getAlias();
 
             $modifySchema->addIndex([$alias], $alias.'_search');
             $modifySchema->allowColumn($alias);
 
-            if ($entity->getIsUniqueIdentifier()) {
+            if ($leadField->getIsUniqueIdentifier()) {
                 // Get list of current uniques
                 $uniqueIdentifierFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
 
