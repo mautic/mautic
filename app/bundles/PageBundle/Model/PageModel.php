@@ -605,7 +605,7 @@ class PageModel extends FormModel
 
         // Set info from request
         $hitUrl = InputHelper::url((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
-        $hitReferrer = InputHelper::url((isset($query['page_referrer'])) ? $query['page_referrer'] : '');
+        $hitReferrer = isset($query['page_referrer']) ? InputHelper::url($query['page_referrer']) : '';
        
         $query  = InputHelper::cleanArray($query);
 
