@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Field;
+namespace Mautic\LeadBundle\Field\Dispatcher;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FieldDispatcher
+class FieldSaveDispatcher
 {
     /**
      * @var EventDispatcherInterface
