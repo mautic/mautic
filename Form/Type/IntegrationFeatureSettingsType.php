@@ -11,13 +11,11 @@
 
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
-
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -36,38 +34,12 @@ class IntegrationFeatureSettingsType extends AbstractType
             throw new IntegrationNotFoundException("{$options['integrationObject']} is not recognized");
         }
 
+        if ($integrationObject instanceof ConfigFormFeatureSettingsInterface) {
+            $builder->add('integration', $integrationObject->getFeatureSettingsConfigFormName());
+        }
+
         if ($integrationObject instanceof ConfigFormSyncInterface) {
-            // Build field mapping
-            $objects       = $integrationObject->getSyncConfigObjects();
-            $mappingManual = $integrationObject->getMappingManual();
-
-            $builder->add(
-                'objects',
-                ChoiceType::class,
-                [
-                    'choices' => $objects,
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.integration.sync_objects',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => [],
-                    'required'    => false,
-                ]
-            );
-
-            // @todo
-            $builder->add(
-                'updateBlanks',
-                YesNoButtonGroupType::class,
-                [
-                    'label'       => 'mautic.integrations.form.blanks',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                ]
-            );
-
-            // @todo - pass each object to IntegrationSyncFieldMappingType
+            $builder->add('sync', IntegrationSyncSettingsType::class, ['integrationObject' => $integrationObject]);
         }
     }
 

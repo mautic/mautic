@@ -12,12 +12,19 @@
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
 
-interface ConfigFormEnabledFeatureInterface
+interface ConfigFormFeaturesInterface
 {
     /**
      * Return the name of the form type service for the enabled features tab
      *
-     * @return string
+     * @return string|null
      */
-    public function getEnabledFeaturesConfigFormName(): string;
+    public function getFeaturesConfigFormName(): ?string;
+
+    /**
+     * Return an array of value => label pairs for the features this integration supports
+     *
+     * @return array
+     */
+    public function getSupportedFeatures(): array;
 }

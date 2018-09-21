@@ -1,0 +1,89 @@
+<?php
+
+/*
+ * @copyright   2018 Mautic, Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace MauticPlugin\IntegrationsBundle\Form\Type;
+
+
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class IntegrationSyncSettingsType extends AbstractType
+{
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     *
+     * @throws IntegrationNotFoundException
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $integrationObject = $options['integrationObject'];
+        if (!$integrationObject instanceof IntegrationInterface || !$integrationObject instanceof ConfigFormSyncInterface) {
+            throw new IntegrationNotFoundException("{$options['integrationObject']} is not recognized");
+        }
+
+        // Build field mapping
+        $objects = $integrationObject->getSyncConfigObjects();
+
+        $builder->add(
+            'objects',
+            ChoiceType::class,
+            [
+                'choices'     => $objects,
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.integration.sync_objects',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => [],
+                'required'    => false,
+            ]
+        );
+
+        // @todo
+        $builder->add(
+            'updateBlanks',
+            YesNoButtonGroupType::class,
+            [
+                'label'       => 'mautic.integrations.form.blanks',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => false,
+                'required'    => false,
+            ]
+        );
+
+        $builder->add(
+            'fieldMappings',
+            IntegrationSyncSettingsFieldMappingsType::class,
+            [
+                'integrationObject' => $integrationObject,
+                'objects'           => $objects
+            ]
+        );
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setRequired(
+            [
+                'integrationObject'
+            ]
+        );
+    }
+}

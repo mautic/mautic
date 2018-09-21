@@ -17,9 +17,11 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormEnabledFeatureInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -51,22 +53,40 @@ class IntegrationConfigType extends AbstractType
     {
         $integrationObject = $this->integrationsHelper->getIntegration($options['integration']);
 
+        // isPublished
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
+        // apiKeys
         if ($integrationObject instanceof ConfigFormAuthInterface) {
             // @todo decrypt/encrypt
             $builder->add('apiKeys', $integrationObject->getAuthConfigFormName());
         }
 
-        if ($integrationObject instanceof ConfigFormEnabledFeatureInterface) {
-            $builder->add('supportedFeatures', $integrationObject->getEnabledFeaturesConfigFormName());
+        // supportedFeatures
+        if ($integrationObject instanceof ConfigFormFeaturesInterface) {
+            $customFeaturesFormField = $integrationObject->getFeaturesConfigFormName();
+
+            if ($customFeaturesFormField) {
+                $builder->add('supportedFeatures', $customFeaturesFormField);
+            } else {
+                // @todo add tooltip support
+                $builder->add(
+                    'supportedFeatures',
+                    ChoiceType::class,
+                    [
+                        'choices'     => $integrationObject->getSupportedFeatures(),
+                        'expanded'    => true,
+                        'label_attr'  => ['class' => 'control-label'],
+                        'multiple'    => true,
+                        'label'       => 'mautic.integration.features',
+                        'required'    => false,
+                    ]
+                );
+            }
         }
 
-        if ($integrationObject instanceof ConfigFormFeatureSettingsInterface) {
-            $builder->add('featureSettings', $integrationObject->getFeatureSettingsConfigFormName());
-        } else {
-            $builder->add('featureSettings', IntegrationFeatureSettingsType::class, ['integrationObject' => $integrationObject]);
-        }
+        // featureSettings
+        $builder->add('featureSettings', IntegrationFeatureSettingsType::class, ['integrationObject' => $integrationObject]);
 
         $builder->setAction($options['action']);
     }

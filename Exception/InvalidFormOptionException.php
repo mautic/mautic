@@ -9,12 +9,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Form\Type;
+namespace MauticPlugin\IntegrationsBundle\Exception;
 
 
-use Symfony\Component\Form\AbstractType;
-
-class IntegrationSyncFieldMappingType extends AbstractType
+class InvalidFormOptionException extends \Exception
 {
 
 }

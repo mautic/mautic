@@ -15,6 +15,9 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 
 interface ConfigFormSyncInterface
 {
+    const FEATURE_SYNC_PUSH = 'sync_push';
+    const FEATURE_SYNC_PULL = 'sync_pull';
+
     /**
      * Return an array of Integration objects in the format of [$object => $translatableObjectNameString].
      * i.e. ['Customer' => 'mautic.something.object.customer', 'Account' => 'mautic.something.object.account'];
@@ -24,16 +27,35 @@ interface ConfigFormSyncInterface
     public function getSyncConfigObjects(): array;
 
     /**
+     * Return an array of Integration objects and what Mautic objects they are mapped to.
+     * i.e. ['Customer' => MauticSyncDataExchange::OBJECT_CONTACT, 'Account' =>  MauticSyncDataExchange::OBJECT_COMPANY];
+     *
+     * @return array
+     */
+    public function getSyncMappedObjects(): array;
+
+    /**
+     * Return an array of required fields in the format of [$key => $label]
+     *
+     * @param string $object
+     *
+     * @return array
+     */
+    public function getRequiredFieldsForMapping(string $object): array;
+
+    /**
+     * Return an array of optional fields in the format of [$key => $label]
+     *
+     * @param string $object
+     *
+     * @return array
+     */
+    public function getOptionalFieldsForMapping(string $object): array;
+
+    /**
      * Return a custom form field name to be included in the features array specific to sync
      *
      * @return string|null
      */
     public function getSyncConfigFormName(): ?string;
-
-    /**
-     * Return the MappingManual so the form knows what objects to map to what fields
-     *
-     * @return MappingManualDAO
-     */
-    public function getMappingManual(): MappingManualDAO;
 }
