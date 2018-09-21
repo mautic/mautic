@@ -9,11 +9,10 @@
  * @author      Jan Kozak <galvani78@gmail.com>
  */
 
-namespace MauticPlugin\IntegrationsBundle\Helpers;
+namespace MauticPlugin\IntegrationsBundle\Helper\BC;
 
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\PluginEvents;
-use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
 
 /**
  * Class BCPluginHelper provides interfacing between requirements for old AsbtractIntegration and new integrations.

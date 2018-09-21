@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration;
 
-trait AuthenticationIntegration
+trait AuthenticationIntegrationTrait
 {
     /**
      * @var array Decrypted keys

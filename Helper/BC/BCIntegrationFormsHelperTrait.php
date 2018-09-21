@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @author      Jan Kozak <galvani78@gmail.com>
  */
 
-namespace MauticPlugin\IntegrationsBundle\Helpers;
+namespace MauticPlugin\IntegrationsBundle\Helper\BC;
 
 use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
@@ -25,22 +25,19 @@ use Symfony\Component\Form\FormBuilder;
 trait BCIntegrationFormsHelperTrait
 {
     /** @inheritdoc */
-    public function getDescription()
-    : string
+    public function getDescription(): string
     {
         return '';
     }
 
     /** @inheritdoc */
-    public function getDisplayName()
-    : string
+    public function getDisplayName(): string
     {
         return $this->getName();
     }
 
     /** @inheritdoc */
-    public function getPriority()
-    : int
+    public function getPriority(): int
     {
         return 9999;
     }
@@ -76,7 +73,7 @@ trait BCIntegrationFormsHelperTrait
 
     /**
      * @param FormBuilder $builder
-     * @param array $options
+     * @param array       $options
      */
     public function modifyForm($builder, $options)
     {
@@ -127,7 +124,7 @@ trait BCIntegrationFormsHelperTrait
      */
     public function getFormSettings()
     {
-        $type = $this->getAuthenticationType();
+        $type               = $this->getAuthenticationType();
         $enableDataPriority = $this->getDataPriority();
         switch ($type) {
             case 'oauth1a':
@@ -180,8 +177,8 @@ trait BCIntegrationFormsHelperTrait
      * Allows appending extra data to the config.
      *
      * @param FormBuilder|Form $builder
-     * @param array $data
-     * @param string $formArea           Section of form being built keys|features|integration
+     * @param array            $data
+     * @param string           $formArea Section of form being built keys|features|integration
      *                                   keys can be used to store login/request related settings; keys are encrypted
      *                                   features can be used for configuring share buttons, etc
      *                                   integration is called when adding an integration to events like point triggers,
@@ -216,7 +213,7 @@ trait BCIntegrationFormsHelperTrait
             return false;
         }
 
-        $type = $this->getAuthenticationType();
+        $type         = $this->getAuthenticationType();
         $authTokenKey = $this->getAuthTokenKey();
 
         switch ($type) {
@@ -225,8 +222,7 @@ trait BCIntegrationFormsHelperTrait
                 $refreshTokenKeys = $this->getRefreshTokenKeys();
                 if (!isset($this->keys[$authTokenKey])) {
                     $valid = false;
-                }
-                elseif (!empty($refreshTokenKeys)) {
+                } elseif (!empty($refreshTokenKeys)) {
                     list($refreshTokenKey, $expiryKey) = $refreshTokenKeys;
                     if (!empty($this->keys[$refreshTokenKey]) && !empty($expiryKey) && isset($this->keys[$expiryKey])
                         && time() > $this->keys[$expiryKey]
@@ -234,13 +230,11 @@ trait BCIntegrationFormsHelperTrait
                         //token has expired so try to refresh it
                         $error = $this->authCallback(['refresh_token' => $refreshTokenKey]);
                         $valid = (empty($error));
-                    }
-                    else {
+                    } else {
                         // The refresh token doesn't have an expiry so the integration will have to check for expired sessions and request new token
                         $valid = true;
                     }
-                }
-                else {
+                } else {
                     $valid = true;
                 }
                 break;
@@ -289,8 +283,7 @@ trait BCIntegrationFormsHelperTrait
     {
         if ($section == 'leadfield_match') {
             return ['mautic.integration.form.field_match_notes', 'info'];
-        }
-        else {
+        } else {
             return ['', 'info'];
         }
     }

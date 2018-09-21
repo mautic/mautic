@@ -13,7 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\Integration;
 
 use MauticPlugin\IntegrationsBundle\Facade\EncryptionService;
 
-trait EncryptionIntegration
+trait EncryptionIntegrationTrait
 {
     /** @var EncryptionService */
     private $encryption;

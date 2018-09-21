@@ -11,19 +11,11 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 
-interface SyncInterface
+interface SyncInterface extends IntegrationInterface
 {
-    /**
-     * Return the integration's name
-     *
-     * @return string
-     */
-    public function getName(): string;
-
     /**
      * @return MappingManualDAO
      */
@@ -33,21 +25,4 @@ interface SyncInterface
      * @return SyncDataExchangeInterface
      */
     public function getSyncDataExchange(): SyncDataExchangeInterface;
-
-    /**
-     * @return bool
-     */
-    public function hasIntegration(): bool;
-
-    /**
-     * @return Integration
-     */
-    public function getIntegration(): Integration;
-
-    /**
-     * @param Integration $integration
-     *
-     * @return mixed
-     */
-    public function setIntegration(Integration $integration);
 }

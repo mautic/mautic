@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @package Mautic\IntegrationsBundle\Integration
  */
-trait DispatcherIntegration
+trait DispatcherIntegrationTrait
 {
     /** @var EventDispatcherInterface */
     protected $dispatcher;

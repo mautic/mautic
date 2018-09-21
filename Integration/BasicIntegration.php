@@ -11,18 +11,16 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
-use MauticPlugin\IntegrationsBundle\Helpers\BCIntegrationFormsHelperTrait;
-use MauticPlugin\IntegrationsBundle\Helpers\BCIntegrationHelperTrait;
+use MauticPlugin\IntegrationsBundle\Helper\BC\BCIntegrationFormsHelperTrait;
+use MauticPlugin\IntegrationsBundle\Helper\BC\BCIntegrationHelperTrait;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\BasicInterface;
-use Symfony\Component\Routing\RouterInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 
 /**
  * Class AbstractIntegration.
  */
-abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInterface
+abstract class BasicIntegration implements BasicInterface, IntegrationInterface
 {
     use BCIntegrationHelperTrait;
     use BCIntegrationFormsHelperTrait;
@@ -43,7 +41,7 @@ abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInt
     /**
      * @return Integration
      */
-    public function getIntegration(): Integration
+    public function getIntegrationConfiguration(): Integration
     {
         return $this->integration;
     }
@@ -51,7 +49,7 @@ abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInt
     /**
      * @param Integration $integration
      */
-    public function setIntegration(Integration $integration)
+    public function setIntegrationConfiguration(Integration $integration)
     {
         $this->integration = $integration;
     }
@@ -61,7 +59,7 @@ abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInt
      *
      * @return bool
      */
-    public function hasIntegration(): bool
+    public function hasIntegrationConfiguration(): bool
     {
         return !empty($this->integration);
     }

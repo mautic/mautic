@@ -11,7 +11,10 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-interface BasicInterface
+
+use Mautic\PluginBundle\Entity\Integration;
+
+interface IntegrationInterface
 {
     /**
      * Return the integration's name
@@ -21,17 +24,19 @@ interface BasicInterface
     public function getName(): string;
 
     /**
-     * @return string
-     */
-    public function getDisplayName(): string;
-
-    /**
-     * @return int
-     */
-    public function getPriority(): int;
-
-    /**
      * @return bool
      */
-    public function isCoreIntegration(): bool;
+    public function hasIntegrationConfiguration(): bool;
+
+    /**
+     * @return Integration
+     */
+    public function getIntegrationConfiguration(): Integration;
+
+    /**
+     * @param Integration $integration
+     *
+     * @return mixed
+     */
+    public function setIntegrationConfiguration(Integration $integration);
 }
