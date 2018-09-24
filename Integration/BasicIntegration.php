@@ -12,8 +12,6 @@
 namespace MauticPlugin\IntegrationsBundle\Integration;
 
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Helper\BC\BCIntegrationFormsHelperTrait;
-use MauticPlugin\IntegrationsBundle\Helper\BC\BCIntegrationHelperTrait;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 
@@ -22,16 +20,13 @@ use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
  */
 abstract class BasicIntegration implements BasicInterface, IntegrationInterface
 {
-    use BCIntegrationHelperTrait;
-    use BCIntegrationFormsHelperTrait;
-
     /**
      * @var Integration
      */
     private $integration;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isCoreIntegration(): bool
     {
@@ -55,7 +50,7 @@ abstract class BasicIntegration implements BasicInterface, IntegrationInterface
     }
 
     /**
-     * Check if Integration entity has been set to prevent PHP fatal error with using getIntegrationEntity
+     * Check if Integration entity has been set to prevent PHP fatal error with using getIntegrationEntity.
      *
      * @return bool
      */
