@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
@@ -209,6 +210,8 @@ class ScheduledExecutioner implements ExecutionerInterface
         $organized = $this->organizeByEvent($logs);
         $now       = new \DateTime();
         foreach ($organized as $organizedLogs) {
+            $this->progressBar->advance($organizedLogs->count());
+
             $event = $organizedLogs->first()->getEvent();
 
             // Validate that the schedule is still appropriate
@@ -241,7 +244,7 @@ class ScheduledExecutioner implements ExecutionerInterface
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
-        $totalScheduledCount   = array_sum($scheduledEvents);
+        $totalScheduledCount   = $scheduledEvents ? array_sum($scheduledEvents) : 0;
         $this->scheduledEvents = array_keys($scheduledEvents);
         $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
 
@@ -373,18 +376,29 @@ class ScheduledExecutioner implements ExecutionerInterface
      */
     private function organizeByEvent(ArrayCollection $logs)
     {
-        $organized = [];
+        $jumpTo = [];
+        $other  = [];
+
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
-            $event = $log->getEvent();
+            $event     = $log->getEvent();
+            $eventType = $event->getType();
 
-            if (!isset($organized[$event->getId()])) {
-                $organized[$event->getId()] = new ArrayCollection();
+            if (CampaignActionJumpToEventSubscriber::EVENT_NAME === $eventType) {
+                if (!isset($jumpTo[$event->getId()])) {
+                    $jumpTo[$event->getId()] = new ArrayCollection();
+                }
+
+                $jumpTo[$event->getId()]->set($log->getId(), $log);
+            } else {
+                if (!isset($other[$event->getId()])) {
+                    $other[$event->getId()] = new ArrayCollection();
+                }
+
+                $other[$event->getId()]->set($log->getId(), $log);
             }
-
-            $organized[$event->getId()]->set($log->getId(), $log);
         }
 
-        return $organized;
+        return array_merge($other, $jumpTo);
     }
 }

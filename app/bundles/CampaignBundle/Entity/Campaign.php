@@ -195,6 +195,7 @@ class Campaign extends FormEntity
             )
             ->addProperties(
                 [
+                    'allowRestart',
                     'publishUp',
                     'publishDown',
                     'events',
@@ -209,6 +210,7 @@ class Campaign extends FormEntity
                     'id',
                     'name',
                     'description',
+                    'allowRestart',
                     'events',
                     'publishUp',
                     'publishDown',
@@ -302,6 +304,22 @@ class Campaign extends FormEntity
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Calls $this->addEvent on every item in the collection.
+     *
+     * @param array $events
+     *
+     * @return Campaign
+     */
+    public function addEvents(array $events)
+    {
+        foreach ($events as $id => $event) {
+            $this->addEvent($id, $event);
+        }
+
+        return $this;
     }
 
     /**
