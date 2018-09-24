@@ -45,6 +45,7 @@ return [
                 'class' => \MauticPlugin\IntegrationsBundle\EventListener\ControllerSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.helper',
+                    'controller_resolver',
                 ],
             ],
         ],

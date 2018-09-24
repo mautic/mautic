@@ -14,6 +14,7 @@ namespace MauticPlugin\IntegrationsBundle\EventListener;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -25,13 +26,20 @@ class ControllerSubscriber implements EventSubscriberInterface
     private $integrationsHelper;
 
     /**
+     * @var ControllerResolverInterface
+     */
+    private $resolver;
+
+    /**
      * ControllerSubscriber constructor.
      *
-     * @param IntegrationsHelper $integrationsHelper
+     * @param IntegrationsHelper          $integrationsHelper
+     * @param ControllerResolverInterface $resolver
      */
-    public function __construct(IntegrationsHelper $integrationsHelper)
+    public function __construct(IntegrationsHelper $integrationsHelper, ControllerResolverInterface $resolver)
     {
         $this->integrationsHelper = $integrationsHelper;
+        $this->resolver           = $resolver;
     }
 
     /**
@@ -49,24 +57,27 @@ class ControllerSubscriber implements EventSubscriberInterface
      */
     public function onKernelController(FilterControllerEvent $event)
     {
-        $controller = $event->getController();
-        $request    = $event->getRequest();
+        $request = $event->getRequest();
 
         if ('Mautic\PluginBundle\Controller\PluginController::configAction' === $request->get('_controller')) {
-            $integrationName = $request->attributes->get('_route_params')['name'];
-
+            $integrationName = $request->get('name');
+            $page            = $request->get('page');
             try {
-                $integrationObject = $this->integrationsHelper->getIntegration($integrationName);
-
-                // This is a new integration so let's "hijack" the controller
-                $event->setController('IntegrationsBundle:Config:edit');
-                $request->attributes->set('_controller', 'MauticPlugin\IntegrationsBundle\Controller\ConfigController::editAction');
-                $request->attributes->set('_route_params',
+                $this->integrationsHelper->getIntegration($integrationName);
+                $request->attributes->add(
                     [
-                        'integration' => $integrationName,
-                        'page'        => $request->attributes->get('_route_params')['page'],
+                        'integration'   => $integrationName,
+                        'page'          => $page,
+                        '_controller'   => 'MauticPlugin\IntegrationsBundle\Controller\ConfigController::editAction',
+                        '_route_params' => [
+                            'integration' => $integrationName,
+                            'page'        => $page,
+                        ],
                     ]
                 );
+
+                $controller = $this->resolver->getController($request);
+                $event->setController($controller);
             } catch (IntegrationNotFoundException $exception) {
                 // Old integration so ignore and let old PluginBundle code handle it
             }
