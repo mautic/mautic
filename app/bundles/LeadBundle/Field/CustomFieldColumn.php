@@ -18,8 +18,8 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Monolog\Logger;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldColumn
 {
@@ -37,11 +37,6 @@ class CustomFieldColumn
      * @var Logger
      */
     private $logger;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
 
     /**
      * @var LeadFieldSaver
@@ -62,7 +57,6 @@ class CustomFieldColumn
         ColumnSchemaHelper $columnSchemaHelper,
         SchemaDefinition $schemaDefinition,
         Logger $logger,
-        TranslatorInterface $translator,
         LeadFieldSaver $leadFieldSaver,
         CustomFieldIndex $customFieldIndex,
         FieldColumnDispatcher $fieldColumnDispatcher
@@ -70,7 +64,6 @@ class CustomFieldColumn
         $this->columnSchemaHelper    = $columnSchemaHelper;
         $this->schemaDefinition      = $schemaDefinition;
         $this->logger                = $logger;
-        $this->translator            = $translator;
         $this->leadFieldSaver        = $leadFieldSaver;
         $this->customFieldIndex      = $customFieldIndex;
         $this->fieldColumnDispatcher = $fieldColumnDispatcher;
@@ -81,6 +74,7 @@ class CustomFieldColumn
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws CustomFieldLimitException
      */
     public function createLeadColumn(LeadField $leadField)
     {
@@ -95,24 +89,31 @@ class CustomFieldColumn
             $this->fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
         } catch (NoListenerException $e) {
         } catch (AbortColumnCreateException $e) {
-            $this->leadFieldSaver->saveLeadFieldEntityWithoutColumnCreated($leadField);
-
             return;
         }
 
-        $this->processCreateLeadColumn($leadField, $leadsSchema);
+        $this->processCreateLeadColumn($leadField);
     }
 
     /**
      * Create the field as its own column in the leads table.
      *
-     * @throws DBALException
+     * @param bool $saveLeadField
+     *
+     * @throws CustomFieldLimitException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    private function processCreateLeadColumn(LeadField $leadField, ColumnSchemaHelper $leadsSchema)
+    public function processCreateLeadColumn(LeadField $leadField, $saveLeadField = true)
     {
+        $leadsSchema = $this->columnSchemaHelper->setName($leadField->getCustomFieldObject());
+
+        // Check if column do not exist. This method could be called from plugins too.
+        if ($leadsSchema->checkColumnExists($leadField->getAlias())) {
+            return;
+        }
+
         $schemaDefinition = $this->schemaDefinition::getSchemaDefinition(
             $leadField->getAlias(),
             $leadField->getType(),
@@ -127,14 +128,16 @@ class CustomFieldColumn
             $this->logger->addWarning($e->getMessage());
 
             if (1118 === $e->getErrorCode() /* ER_TOO_BIG_ROWSIZE */) {
-                throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
+                throw new CustomFieldLimitException('mautic.core.error.max.field');
             }
 
             throw $e;
         }
 
-        //$leadField is a new entity (this method is not executed for update), it was successfully added to the lead table > save it
-        $this->leadFieldSaver->saveLeadFieldEntity($leadField, true);
+        if ($saveLeadField) {
+            //$leadField is a new entity (this is not executed for update), it was successfully added to the lead table > save it
+            $this->leadFieldSaver->saveLeadFieldEntity($leadField, true);
+        }
 
         if ('string' === $schemaDefinition['type']) {
             $this->customFieldIndex->addIndexOnColumn($leadField);

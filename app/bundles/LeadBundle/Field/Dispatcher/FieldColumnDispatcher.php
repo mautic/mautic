@@ -55,7 +55,7 @@ class FieldColumnDispatcher
 
         $this->dispatcher->dispatch($action, $event);
 
-        if ($shouldProcessInBackground) {
+        if ($event->shouldProcessInBackground()) {
             throw new AbortColumnCreateException('Column change will be processed in background job');
         }
     }

@@ -1281,7 +1281,6 @@ return [
                     'mautic.schema.helper.column',
                     'mautic.lead.field.schema_definition',
                     'monolog.logger.mautic',
-                    'translator',
                     'mautic.lead.field.lead_field_saver',
                     'mautic.lead.field.custom_field_index',
                     'mautic.lead.field.dispatcher.field_column_dispatcher',
@@ -1335,12 +1334,28 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.lead.field.settings.background_service' => [
+                'class'     => Mautic\LeadBundle\Field\BackgroundService::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.field.custom_field_column',
+                    'mautic.lead.field.lead_field_saver',
+                ],
+            ],
         ],
         'command' => [
             'mautic.lead.command.deduplicate' => [
                 'class'     => \Mautic\LeadBundle\Command\DeduplicateCommand::class,
                 'arguments' => [
                     'mautic.lead.deduper',
+                    'translator',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.lead.command.create_custom_field' => [
+                'class'     => \Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class,
+                'arguments' => [
+                    'mautic.lead.field.settings.background_service',
                     'translator',
                 ],
                 'tag' => 'console.command',

@@ -19,7 +19,7 @@ class AddColumnEvent extends Event
     /**
      * @var LeadField
      */
-    private $entity;
+    private $leadField;
 
     /**
      * @var bool
@@ -29,18 +29,18 @@ class AddColumnEvent extends Event
     /**
      * @param bool $shouldProcessInBackground
      */
-    public function __construct(LeadField $entity, $shouldProcessInBackground)
+    public function __construct(LeadField $leadField, $shouldProcessInBackground)
     {
-        $this->entity                    = $entity;
+        $this->leadField                 = $leadField;
         $this->shouldProcessInBackground = $shouldProcessInBackground;
     }
 
     /**
      * @return LeadField
      */
-    public function getEntity()
+    public function getLeadField()
     {
-        return $this->entity;
+        return $this->leadField;
     }
 
     /**
