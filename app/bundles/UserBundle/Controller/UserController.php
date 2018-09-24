@@ -46,13 +46,13 @@ class UserController extends FormController
         $orderByDir = $this->get('session')->get('mautic.user.orderbydir', 'ASC');
 
         $search = $this->request->get('search', $this->get('session')->get('mautic.user.filter', ''));
+        $search = html_entity_decode($search);
         $this->get('session')->set('mautic.user.filter', $search);
 
         //do some default filtering
         $filter = ['string' => $search, 'force' => ''];
-
-        $tmpl  = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        $users = $this->getModel('user.user')->getEntities(
+        $tmpl   = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $users  = $this->getModel('user.user')->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
