@@ -33,12 +33,18 @@ return [
             ],
         ],
         'events' => [
-            'mautic.integrations.lead.subscriber' => [
+            'mautic.integrations.subscriber.lead' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
                     'mautic.integrations.helper.variable_expresser',
                     'mautic.integrations.helper.sync_integrations',
+                ],
+            ],
+            'mautic.integrations.subscriber.controller' => [
+                'class' => \MauticPlugin\IntegrationsBundle\EventListener\ControllerSubscriber::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
                 ],
             ],
         ],
