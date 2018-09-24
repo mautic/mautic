@@ -11,8 +11,6 @@
 
 namespace Mautic\FormBundle\Tests\Model;
 
-namespace Symfony\Component\HttpFoundation\File;
-
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Tests\FormTestAbstract;
