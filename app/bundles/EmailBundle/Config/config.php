@@ -816,6 +816,13 @@ return [
                     \Mautic\EmailBundle\Entity\Stat::class,
                 ],
             ],
+            'mautic.email.repository.email' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\Email::class,
+                ],
+            ],
         ],
         'fixtures' => [
             'mautic.email.fixture.email' => [

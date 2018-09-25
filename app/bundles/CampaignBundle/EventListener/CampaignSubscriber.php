@@ -12,7 +12,10 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event as Events;
+use Mautic\CampaignBundle\Service\Campaign as CampaignService;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -29,10 +32,19 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
+    /**
+     * @var CampaignService
+     */
+    private $campaignService;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        CampaignService $campaignService
+    ) {
         $this->ipLookupHelper   = $ipLookupHelper;
         $this->auditLogModel    = $auditLogModel;
+        $this->campaignService  = $campaignService;
     }
 
     /**
@@ -53,6 +65,10 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $campaign = $event->getCampaign();
         $details  = $event->getChanges();
+
+        if ($campaign->isPublished() && $this->campaignService->hasUnpublishedEmail($campaign->getId())) {
+            $this->setUnpublishedMailFlashMessage($campaign);
+        }
 
         //don't set leads
         unset($details['leads']);
@@ -85,5 +101,15 @@ class CampaignSubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    private function setUnpublishedMailFlashMessage(Campaign $campaign)
+    {
+        $this->flashBag->add(
+            'mautic.core.notice.campaign.unpublished.email',
+            [
+                '%name%' => $campaign->getName(),
+            ]
+        );
     }
 }

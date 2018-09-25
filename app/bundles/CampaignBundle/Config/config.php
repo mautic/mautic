@@ -118,6 +118,7 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.campaign.service.campaign',
                 ],
             ],
             'mautic.campaign.leadbundle.subscriber'     => [
@@ -595,6 +596,15 @@ return [
                 'class'    => \Mautic\CampaignBundle\Tests\DataFixtures\Orm\CampaignData::class,
                 'tag'      => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'optional' => true,
+            ],
+        ],
+        'services' => [
+            'mautic.campaign.service.campaign'=> [
+                'class'     => \Mautic\CampaignBundle\Service\Campaign::class,
+                'arguments' => [
+                    'mautic.campaign.repository.campaign',
+                    'mautic.email.repository.email',
+                ],
             ],
         ],
     ],
