@@ -27,7 +27,7 @@ class Version20180921144421 extends AbstractMauticMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE lead_fields ADD column_is_not_created TINYINT(1) NOT NULL, ADD original_is_published_value TINYINT(1) NOT NULL');
+        $this->addSql("ALTER TABLE {$this->prefix}lead_fields ADD column_is_not_created TINYINT(1) NOT NULL, ADD original_is_published_value TINYINT(1) NOT NULL");
     }
 
     public function down(Schema $schema)
@@ -35,6 +35,6 @@ class Version20180921144421 extends AbstractMauticMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE lead_fields DROP column_is_not_created, DROP original_is_published_value');
+        $this->addSql("ALTER TABLE {$this->prefix}lead_fields DROP column_is_not_created, DROP original_is_published_value");
     }
 }
