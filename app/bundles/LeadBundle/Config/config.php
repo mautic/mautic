@@ -1219,6 +1219,12 @@ return [
                     'mautic.lead.field.settings.background_settings',
                 ],
             ],
+            'mautic.lead.field.dispatcher.field_column_background_dispatcher' => [
+                'class'     => Mautic\LeadBundle\Field\Dispatcher\FieldColumnBackgroundJobDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
             'mautic.lead.field.fields_with_unique_identifier' => [
                 'class'     => Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier::class,
                 'arguments' => [
@@ -1251,6 +1257,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.field.custom_field_column',
                     'mautic.lead.field.lead_field_saver',
+                    'mautic.lead.field.dispatcher.field_column_background_dispatcher',
                 ],
             ],
         ],
