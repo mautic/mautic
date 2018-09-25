@@ -51,6 +51,7 @@ class SummaryRepository extends CommonRepository
                     $summary->getCampaign()->getId(),
                     $summary->getEvent()->getId(),
                     'FROM_UNIXTIME('.$timeStamp.')',
+                    $summary->getScheduledCount(),
                     $summary->getTriggeredCount(),
                     $summary->getNonActionPathTakenCount(),
                     $summary->getFailedCount(),
@@ -59,9 +60,10 @@ class SummaryRepository extends CommonRepository
         }
 
         $query = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
-            '(campaign_id, event_id, date_triggered, triggered_count, non_action_path_taken_count, failed_count) '.
+            '(campaign_id, event_id, date_triggered, scheduled_count, triggered_count, non_action_path_taken_count, failed_count) '.
             'VALUES ('.implode('),(', $values).') '.
             'ON DUPLICATE KEY UPDATE '.
+            'scheduled_count=scheduled_count+VALUES(scheduled_count), '.
             'triggered_count=triggered_count+VALUES(triggered_count), '.
             'non_action_path_taken_count=non_action_path_taken_count+VALUES(non_action_path_taken_count), '.
             'failed_count=failed_count+VALUES(failed_count) ';

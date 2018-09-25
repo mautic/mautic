@@ -20,11 +20,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class Summary
 {
     /**
-     * @var bool
-     */
-    private $new = true;
-
-    /**
      * @var int
      */
     private $id;
@@ -33,6 +28,11 @@ class Summary
      * @var \DateTime
      **/
     private $dateTriggered;
+
+    /**
+     * @var int
+     */
+    private $scheduledCount = 0;
 
     /**
      * @var int
@@ -87,6 +87,10 @@ class Summary
             ->nullable()
             ->build();
 
+        $builder->createField('scheduledCount', 'integer')
+            ->columnName('scheduled_count')
+            ->build();
+
         $builder->createField('triggeredCount', 'integer')
             ->columnName('triggered_count')
             ->build();
@@ -98,6 +102,26 @@ class Summary
         $builder->createField('failedCount', 'integer')
             ->columnName('failed_count')
             ->build();
+    }
+
+    /**
+     * @return int
+     */
+    public function getScheduledCount()
+    {
+        return $this->scheduledCount;
+    }
+
+    /**
+     * @param int $scheduledCount
+     *
+     * @return $this
+     */
+    public function setScheduledCount($scheduledCount)
+    {
+        $this->scheduledCount = $scheduledCount;
+
+        return $this;
     }
 
     /**
@@ -230,25 +254,5 @@ class Summary
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getNew()
-    {
-        return $this->new;
-    }
-
-    /**
-     * @param $new
-     *
-     * @return $this
-     */
-    public function setNew($new)
-    {
-        $this->new = $new;
-
-        return $this;
     }
 }

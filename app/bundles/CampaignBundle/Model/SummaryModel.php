@@ -27,11 +27,8 @@ class SummaryModel extends AbstractCommonModel
     public function updateSummary($logs)
     {
         $summaries = [];
+        $now       = new \DateTime();
         foreach ($logs as $log) {
-            if ($log->getIsScheduled() && $log->getTriggerDate() > new \DateTime()) {
-                // We are intentionally excluding scheduled events from charts and summaries at this time.
-                continue;
-            }
             // Universally round down to the hour.
             $timestamp = $log->getDateTriggered()->getTimestamp();
             $timestamp = $timestamp - ($timestamp % 3600);
@@ -50,7 +47,9 @@ class SummaryModel extends AbstractCommonModel
                 $summary = $summaries[$key];
             }
 
-            if ($log->getNonActionPathTaken()) {
+            if ($log->getIsScheduled() && $log->getTriggerDate() > $now) {
+                $summary->setScheduledCount($summary->getScheduledCount() + 1);
+            } elseif ($log->getNonActionPathTaken()) {
                 $summary->setNonActionPathTakenCount($summary->getNonActionPathTakenCount() + 1);
             } elseif ($log->getFailedLog()) {
                 $summary->setFailedCount($summary->getFailedCount() + 1);
