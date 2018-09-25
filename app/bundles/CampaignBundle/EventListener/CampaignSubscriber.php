@@ -12,7 +12,9 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event as Events;
+use Mautic\CampaignBundle\Service\Campaign as CampaignService;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -33,15 +35,23 @@ class CampaignSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * CampaignSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
+     * @var CampaignService
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
+    private $campaignService;
+
+    /**
+     * @param IpLookupHelper  $ipLookupHelper
+     * @param AuditLogModel   $auditLogModel
+     * @param CampaignService $campaignService
+     */
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        CampaignService $campaignService
+    ) {
         $this->ipLookupHelper   = $ipLookupHelper;
         $this->auditLogModel    = $auditLogModel;
+        $this->campaignService  = $campaignService;
     }
 
     /**
@@ -64,6 +74,10 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $campaign = $event->getCampaign();
         $details  = $event->getChanges();
+
+        if ($campaign->isPublished() && $this->campaignService->hasUnpublishedEmail($campaign->getId())) {
+            $this->setUnpublishedMailFlashMessage($campaign);
+        }
 
         //don't set leads
         unset($details['leads']);
@@ -98,5 +112,18 @@ class CampaignSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * @param Campaign $campaign
+     */
+    private function setUnpublishedMailFlashMessage(Campaign $campaign)
+    {
+        $this->flashBag->add(
+            'mautic.core.notice.campaign.unpublished.email',
+            [
+                '%name%' => $campaign->getName(),
+            ]
+        );
     }
 }

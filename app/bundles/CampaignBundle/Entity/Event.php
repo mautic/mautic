@@ -34,6 +34,8 @@ class Event implements ChannelInterface
     const TRIGGER_MODE_INTERVAL  = 'interval';
     const TRIGGER_MODE_IMMEDIATE = 'immediate';
 
+    const CHANNEL_EMAIL = 'email';
+
     /**
      * @var int
      */
@@ -147,7 +149,7 @@ class Event implements ChannelInterface
     private $contactLog = [];
 
     /**
-     * @var
+     * @var null|string
      */
     private $channel;
 
