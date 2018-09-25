@@ -210,6 +210,8 @@ class ScheduledExecutioner implements ExecutionerInterface
         $organized = $this->organizeByEvent($logs);
         $now       = new \DateTime();
         foreach ($organized as $organizedLogs) {
+            $this->progressBar->advance($organizedLogs->count());
+
             $event = $organizedLogs->first()->getEvent();
 
             // Validate that the schedule is still appropriate
@@ -242,7 +244,7 @@ class ScheduledExecutioner implements ExecutionerInterface
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
-        $totalScheduledCount   = array_sum($scheduledEvents);
+        $totalScheduledCount   = $scheduledEvents ? array_sum($scheduledEvents) : 0;
         $this->scheduledEvents = array_keys($scheduledEvents);
         $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
 

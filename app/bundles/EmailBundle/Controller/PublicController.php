@@ -74,17 +74,7 @@ class PublicController extends CommonFormController
                 $content = '';
             }
 
-            // Add analytics
-            $analytics = $this->factory->getHelper('template.analytics')->getCode();
-
-            // Check for html doc
-            if (strpos($content, '<html') === false) {
-                $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
-            } elseif (strpos($content, '<head>') === false) {
-                $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
-            } elseif (!empty($analytics)) {
-                $content = str_replace('</head>', $analytics."\n</head>", $content);
-            }
+            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
 
             // Add subject as title
             if (!empty($subject)) {
@@ -220,10 +210,7 @@ class PublicController extends CommonFormController
                     // check if tokens are present
                     $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
                                         false !== strpos($html, BuilderSubscriber::saveprefsRegex);
-                    $frequencyPresent = false !== strpos($html, 'data-slot="channelfrequency"') ||
-                                        false !== strpos($html, BuilderSubscriber::channelfrequency);
-                    $tokensPresent = $savePrefsPresent && $frequencyPresent;
-                    if ($tokensPresent) {
+                    if ($savePrefsPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
                         $params = array_merge(
@@ -231,6 +218,7 @@ class PublicController extends CommonFormController
                             [
                                 'form'                         => $formView,
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
+                                'showContactFrequency'         => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency),
                                 'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
                                 'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
                                 'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
@@ -517,6 +505,10 @@ class PublicController extends CommonFormController
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
 
         $content = $event->getContent(true);
+
+        if ($this->get('mautic.security')->isAnonymous()) {
+            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
+        }
 
         return new Response($content);
     }

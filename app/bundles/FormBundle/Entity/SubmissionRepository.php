@@ -444,6 +444,22 @@ class SubmissionRepository extends CommonRepository
      */
     public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr)
     {
+        // Modify operator
+        switch ($operatorExpr) {
+            case 'startsWith':
+                $operatorExpr    = 'like';
+                $value           = $value.'%';
+                break;
+            case 'endsWith':
+                $operatorExpr   = 'like';
+                $value          = '%'.$value;
+                break;
+            case 'contains':
+                $operatorExpr   = 'like';
+                $value          = '%'.$value.'%';
+                break;
+        }
+
         //use DBAL to get entity fields
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.id')
