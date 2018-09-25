@@ -26,12 +26,13 @@ class IntegrationSyncSettingsObjectFieldDirectionsType extends AbstractType
                 $field,
                 ChoiceType::class,
                 [
-                    'choices'    => [
+                    'choices' => [
                         ObjectMappingDAO::SYNC_TO_INTEGRATION  => 'mautic.integration.sync_direction_integration',
                         ObjectMappingDAO::SYNC_TO_MAUTIC       => 'mautic.integration.sync_direction_mautic',
                         ObjectMappingDAO::SYNC_BIDIRECTIONALLY => 'mautic.integration.sync_direction_bidirectional',
                     ],
-                    'label'      => false,
+                    'label'   => false,
+                    'data'    => (empty($options['data'])) ? ObjectMappingDAO::SYNC_BIDIRECTIONALLY : $options['data']
                 ]
             );
         }

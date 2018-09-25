@@ -58,7 +58,7 @@ class IntegrationSyncSettingsType extends AbstractType
             'updateBlanks',
             YesNoButtonGroupType::class,
             [
-                'label'       => 'mautic.integrations.form.blanks',
+                'label'       => 'mautic.integration.sync.update_blanks',
                 'label_attr'  => ['class' => 'control-label'],
                 'empty_value' => false,
                 'required'    => false,

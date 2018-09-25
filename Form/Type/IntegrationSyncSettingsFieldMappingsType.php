@@ -12,9 +12,9 @@
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
 
+use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -28,13 +28,20 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
     private $translator;
 
     /**
+     * @var FieldModel
+     */
+    private $fieldModel;
+
+    /**
      * IntegrationSyncSettingsFieldMappingsType constructor.
      *
      * @param TranslatorInterface $translator
+     * @param FieldModel          $fieldModel
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, FieldModel $fieldModel)
     {
         $this->translator = $translator;
+        $this->fieldModel = $fieldModel;
     }
 
     /**
@@ -65,7 +72,7 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                     'label'                     => false,
                     'requiredIntegrationFields' => $requiredFields,
                     'optionalIntegrationFields' => $optionalFields,
-                    'mauticFields'              => $this->getMauticFields($objectName),
+                    'mauticFields'              => $this->fieldModel->getFieldList(false),
                 ]
             );
         }
@@ -82,16 +89,5 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                 'objects'
             ]
         );
-    }
-
-    /**
-     * @param string $object
-     *
-     * @return array
-     */
-    private function getMauticFields(string $object): array
-    {
-        // @todo
-        return [];
     }
 }

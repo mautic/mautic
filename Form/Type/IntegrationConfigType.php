@@ -62,7 +62,6 @@ class IntegrationConfigType extends AbstractType
 
         // apiKeys
         if ($integrationObject instanceof ConfigFormAuthInterface) {
-            // @todo decrypt/encrypt
             $builder->add('apiKeys', $integrationObject->getAuthConfigFormName(), ['label' => false]);
         }
 

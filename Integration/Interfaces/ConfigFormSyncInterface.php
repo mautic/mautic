@@ -11,12 +11,9 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-
 interface ConfigFormSyncInterface
 {
-    const FEATURE_SYNC_PUSH = 'sync_push';
-    const FEATURE_SYNC_PULL = 'sync_pull';
+    const FEATURE_SYNC = 'sync';
 
     /**
      * Return an array of Integration objects in the format of [$object => $translatableObjectNameString].

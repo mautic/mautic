@@ -16,9 +16,29 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * IntegrationSyncSettingsObjectFieldMappingType constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // @todo pagination
@@ -27,9 +47,14 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
                 $field,
                 ChoiceType::class,
                 [
-                    'label'    => $label,
-                    'choices'  => $options['mauticFields'],
-                    'required' => true,
+                    'label'       => $label,
+                    'choices'     => $options['mauticFields'],
+                    'required'    => true,
+                    'empty_value' => '',
+                    'attr'        => [
+                        'class'            => 'form-control',
+                        'data-placeholder' => $this->translator->trans('mautic.integration.sync_mautic_field'),
+                    ],
                 ]
             );
         }
@@ -42,6 +67,10 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
                     'label'    => $label,
                     'choices'  => $options['mauticFields'],
                     'required' => false,
+                    'attr'        => [
+                        'class'            => 'form-control',
+                        'data-placeholder' => $this->translator->trans('mautic.integration.sync_mautic_field'),
+                    ],
                 ]
             );
         }

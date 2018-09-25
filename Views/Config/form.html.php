@@ -24,7 +24,6 @@ $hasFeatureErrors =
     ($integrationObject instanceof ConfigFormFeatureSettingsInterface && $view['form']->containsErrors($form['featureSettings']['integration'])) ||
     ($integrationObject instanceof ConfigFormSyncInterface && $view['form']->containsErrors($form['featureSettings']['sync'])) ||
     (isset($form['featureSettings']['sync']['integration']) && $view['form']->containsErrors($form['featureSettings']['sync']['integration']));
-
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -81,10 +80,18 @@ $hasFeatureErrors =
         <?php
         if ($integrationObject instanceof ConfigFormFeaturesInterface):
             echo $view['form']->row($form['supportedFeatures']);
+
+            if ($integrationObject instanceof ConfigFormFeatureSettingsInterface || $integrationObject instanceof ConfigFormSyncInterface):
+                echo "<hr />";
+            endif;
         endif;
 
         if ($integrationObject instanceof ConfigFormFeatureSettingsInterface):
             echo $view['form']->row($form['featureSettings']['integration']);
+
+            if ($integrationObject instanceof ConfigFormSyncInterface):
+                echo "<hr />";
+            endif;
         endif;
 
         if ($integrationObject instanceof ConfigFormSyncInterface):
@@ -104,10 +111,16 @@ $hasFeatureErrors =
     <?php if ($integrationObject instanceof ConfigFormSyncInterface): ?>
     <?php foreach ($form['featureSettings']['sync']['fieldMappings'] as $object => $objectFieldMapping): ?>
     <div class="tab-pane fade <?php if ($activeTab == "field-mapping-{$object}"): echo 'in active'; endif; ?> bdr-w-0" id="<?php echo "field-mappings-{$object}"; ?>-container">
-        <?php
-            echo $view['form']->row($form['featureSettings']['sync']['fieldMappings'][$object]);
-            echo $view['form']->row($form['featureSettings']['sync']['fieldDirections'][$object]);
-        ?>
+        <?php foreach ($form['featureSettings']['sync']['fieldMappings'][$object] as $fieldName => $fieldForm): ?>
+            <div class="row">
+                <div class="col-sm-12"><?php echo $view['form']->label($fieldForm); ?></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6"><?php echo $view['form']->widget($fieldForm); ?></div>
+                <div class="col-sm-6"><?php echo $view['form']->widget($form['featureSettings']['sync']['fieldDirections'][$object][$fieldName]); ?></div>
+            </div>
+            <hr />
+        <?php endforeach; ?>
     </div>
     <?php endforeach; ?>
     <?php endif; ?>
