@@ -9,6 +9,22 @@ Mautic.campaignOnLoad = function (container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
     }
 
+    // hide or show data toggle selector on tab content
+    mQuery('ul.nav-tabs > li > a').on('click', function () {
+        var showTabs = ['#actions-container', '#decisions-container', '#conditions-container'];
+        if (showTabs.indexOf(this.hash) !== -1) {
+            mQuery('#campaignTabDataToggle').show();
+        }
+        else {
+            mQuery('#campaignTabDataToggle').hide();
+        }
+    });
+
+    // register click event to reload tab data using ajax
+    mQuery('input[name=tabDataMode]').change(function(){
+        Mautic.toggleCampaignTabData(this);
+    });
+
     if (mQuery('#CampaignEventPanel').length) {
         // setup button clicks
         mQuery('#CampaignEventPanelGroups button').on('click', function() {
@@ -1889,6 +1905,49 @@ Mautic.cancelScheduledCampaignEvent = function(eventId, contactId) {
 };
 
 /**
+ * Toggle Campaign Actions Tab Results
+ *
+ * @param elem
+ */
+Mautic.toggleCampaignTabData = function (elem) {
+    var $elem = mQuery(elem),
+        mode = $elem.data('mode'),
+        cid = $elem.data('campaignid'),
+        daterangeForm = '';
+
+    $elem.parent('label').siblings('label.btn-success').removeClass('btn-success');
+    $elem.parent('label').addClass('btn-success');
+
+    if (mode === 'byDate') {
+        daterangeForm = '&fromDate=' + mQuery('#daterange_date_from').val() + '&toDate=' + mQuery('#daterange_date_to').val();
+    }
+
+    Mautic.activateBackdrop();
+
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: 'POST',
+        data: 'action=campaign:toggleCampaignTabData&mode=' + mode + '&campaignId=' + cid + daterangeForm,
+        dataType: 'json',
+        success: function (response) {
+            if (mQuery('#decisions-container').length > 0 && typeof response.decisions !== 'undefined') {
+                mQuery('#decisions-container').html(response.decisions);
+            }
+            if (mQuery('#actions-container').length > 0 && typeof response.actions !== 'undefined') {
+                mQuery('#actions-container').html(response.actions);
+            }
+            if (mQuery('#conditions-container').length > 0 && typeof response.conditions !== 'undefined') {
+                mQuery('#conditions-container').html(response.conditions);
+            }
+            mQuery('#mautic-backdrop').hide();
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        }
+    });
+};
+
+/**
  * Update the "Jump to Event" select list to be available events.
  */
 Mautic.updateJumpToEventOptions = function() {
@@ -1935,6 +1994,3 @@ Mautic.highlightJumpTarget = function(event, el) {
         jumpTarget.css("z-index", 2010);
     }
 };
-
-
-

@@ -55,6 +55,19 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
+        $builder->add(
+            'event_log_date_toggle',
+            'yesno_button_group',
+            [
+                'label'       => 'mautic.campaignconfig.event_log_date_toggle',
+                'data'        => (bool) $options['data']['event_log_date_toggle'],
+                'no_label'    => 'mautic.campaignconfig.event_log_date_toggle_bydate',
+                'yes_label'   => 'mautic.campaignconfig.event_log_date_toggle_todate',
+                'attr'        => [
+                    'tooltip' => 'mautic.campaignconfig.event_log_date_toggle_tooltip',
+                ],
+            ]
+        );
     }
 
     /**

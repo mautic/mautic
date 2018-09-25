@@ -51,6 +51,10 @@ class ConfigSubscriber extends CommonSubscriber
             $values['campaignconfig']['campaign_time_wait_on_event_false'] = htmlspecialchars($values['campaignconfig']['campaign_time_wait_on_event_false']);
         }
 
+        if (!empty($values['campaignconfig']['event_log_date_toggle'])) {
+            $values['campaignconfig']['event_log_date_toggle'] = htmlspecialchars($values['campaignconfig']['event_log_date_toggle']);
+        }
+
         // Set updated values
         $event->setConfig($values);
     }

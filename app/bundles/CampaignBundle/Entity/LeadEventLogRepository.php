@@ -12,10 +12,12 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -216,12 +218,14 @@ class LeadEventLogRepository extends CommonRepository
      * @param bool $excludeScheduled
      *
      * @return array
+     *
+     * @throws \Doctrine\DBAL\Cache\CacheException
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true)
+    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $dateRangeValues = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
-                       ->innerJoin(
+                       ->leftJoin(
                            'o',
                            MAUTIC_TABLE_PREFIX.'campaign_leads',
                            'l',
@@ -259,6 +263,18 @@ class LeadEventLogRepository extends CommonRepository
             ->where(
                 $failedSq->expr()->eq('fe.log_id', 'o.id')
             );
+
+        if (!empty($dateRangeValues)) {
+            $dateFrom = new DateTimeHelper($dateRangeValues['date_from']);
+            $dateTo   = new DateTimeHelper($dateRangeValues['date_to']);
+            $failedSq->andWhere(
+                $failedSq->expr()->gte('fe.date_added', ':dateFrom'),
+                $failedSq->expr()->lte('fe.date_added', ':dateTo')
+            );
+            $failedSq->setParameter('dateFrom', $dateFrom->toUtcString());
+            $failedSq->setParameter('dateTo', $dateTo->toUtcString());
+        }
+
         $expr->add(
             sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
         );
@@ -267,7 +283,26 @@ class LeadEventLogRepository extends CommonRepository
           ->setParameter('false', false, 'boolean')
           ->groupBy($groupBy);
 
-        $results = $q->execute()->fetchAll();
+        if (isset($dateFrom) && isset($dateTo)) {
+            $q->andWhere(
+                $q->expr()->gte('o.date_triggered', ':dateFrom'),
+                $q->expr()->lte('o.date_triggered', ':dateTo')
+            );
+            $q->setParameter('dateFrom', $dateFrom->toUtcString());
+            $q->setParameter('dateTo', $dateTo->toUtcString());
+        }
+
+        // At large scale this can easily become the heaviest query in Mautic.
+        if ($q->getConnection()->getConfiguration()->getResultCacheImpl()) {
+            $results = $q->getConnection()->executeCacheQuery(
+                $q->getSQL(),
+                $q->getParameters(),
+                $q->getParameterTypes(),
+                new QueryCacheProfile(600, __METHOD__)
+            )->fetchAll();
+        } else {
+            $results = $q->execute()->fetchAll();
+        }
 
         $return = [];
 
