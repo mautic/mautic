@@ -20,26 +20,6 @@ use Mautic\CoreBundle\Model\AbstractCommonModel;
 class SummaryModel extends AbstractCommonModel
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
-     */
-    public function getRepository()
-    {
-        return $this->em->getRepository('MauticCampaignBundle:Summary');
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
-    {
-        return 'campaign:campaigns';
-    }
-
-    /**
      * Collapse Event Log entities into insert/update queries for the campaign summary.
      *
      * @param $logs
@@ -70,25 +50,38 @@ class SummaryModel extends AbstractCommonModel
                 $summary = $summaries[$key];
             }
 
-            if ($log->getSystemTriggered()) {
-                $summary->setTriggeredCount($summary->getTriggeredCount() + 1);
-            }
-
             if ($log->getNonActionPathTaken()) {
                 $summary->setNonActionPathTakenCount($summary->getNonActionPathTakenCount() + 1);
-            }
-
-            if ($log->getFailedLog()) {
+            } elseif ($log->getFailedLog()) {
                 $summary->setFailedCount($summary->getFailedCount() + 1);
-            }
-
-            if ($log->getId()) {
-                // @todo - handle changes a bit differently for log entries already summarized.
-                $summary->setNew(false);
+            } elseif ($log->getSystemTriggered()) {
+                $summary->setTriggeredCount($summary->getTriggeredCount() + 1);
+            } else {
+                unset($summaries[$key]);
             }
         }
         if ($summaries) {
             $this->getRepository()->saveEntities($summaries);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
+     */
+    public function getRepository()
+    {
+        return $this->em->getRepository('MauticCampaignBundle:Summary');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return 'campaign:campaigns';
     }
 }
