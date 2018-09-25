@@ -28,7 +28,7 @@ class SummaryModel extends AbstractCommonModel
     {
         $summaries = [];
         foreach ($logs as $log) {
-            if ($log->getIsScheduled()) {
+            if ($log->getIsScheduled() && $log->getTriggerDate() > new \DateTime()) {
                 // We are intentionally excluding scheduled events from charts and summaries at this time.
                 continue;
             }
@@ -56,8 +56,6 @@ class SummaryModel extends AbstractCommonModel
                 $summary->setFailedCount($summary->getFailedCount() + 1);
             } elseif ($log->getSystemTriggered()) {
                 $summary->setTriggeredCount($summary->getTriggeredCount() + 1);
-            } else {
-                unset($summaries[$key]);
             }
         }
         if ($summaries) {
