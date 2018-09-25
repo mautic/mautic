@@ -430,7 +430,7 @@ class LeadRepository extends CommonRepository
                 )
             );
 
-        $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
+        $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
         $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb);
 
         if (!$campaignCanBeRestarted) {
