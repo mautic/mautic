@@ -25,7 +25,7 @@ class EncryptionIntegrationPass implements CompilerPassInterface
 
         foreach ($taggedServices as $id => $tags) {
             $definition = $container->findDefinition($id);
-            $definition->addMethodCall('setEncryption', [new Reference('mautic.service.encryption')]);
+            $definition->addMethodCall('setEncryption', [new Reference('mautic.integrations.service.encryption')]);
         }
     }
 }

@@ -74,9 +74,11 @@ class HttpFactory implements AuthProviderInterface
         $stack = HandlerStack::create();
         $stack->push($this->createOauth1($credentials));
 
+        $url = str_replace('https', 'http', $credentials->getAuthUrl());
+
         return new Client([
             'handler'  => $stack,
-            'base_uri' => $credentials->getAuthUrl(),
+            'base_uri' => $url, //$credentials->getAuthUrl(),
             'auth'     => 'oauth'
         ]);
     }
