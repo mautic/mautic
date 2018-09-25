@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -76,13 +77,45 @@ class SummaryRepository extends CommonRepository
 
     /**
      * @param      $campaignId
-     * @param bool $excludeScheduled
+     * @param null $dateRangeValues
      *
      * @return array
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true)
-    {
-        // @todo - Create alternative to the standard LeadEventLogRepository
+    public function getCampaignLogCounts(
+        $campaignId,
+        $dateRangeValues = null
+    ) {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select(
+                'cs.event_id, SUM(cs.scheduled_count) as scheduled_count, SUM(cs.triggered_count) as triggered_count, SUM(cs.non_action_path_taken_count) as non_action_path_taken_count, SUM(cs.failed_count) as failed_count'
+            )
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_summary', 'cs')
+            ->where('cs.campaign_id = '.(int) $campaignId)
+            ->groupBy('cs.event_id');
+
+        if (!empty($dateRangeValues)) {
+            $dateFrom = new DateTimeHelper($dateRangeValues['date_from']);
+            $dateTo   = new DateTimeHelper($dateRangeValues['date_to']);
+            $q->andWhere(
+                $q->expr()->gte('cs.date_triggered', ':dateFrom'),
+                $q->expr()->lte('cs.date_triggered', ':dateTo')
+            );
+            $q->setParameter('dateFrom', $dateFrom->toUtcString());
+            $q->setParameter('dateTo', $dateTo->toUtcString());
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        $return = [];
+        // Group by event id
+        foreach ($results as $row) {
+            $return[$row['event_id']] = [
+                0 => (int) $row['non_action_path_taken_count'],
+                1 => (int) $row['triggered_count'],
+            ];
+        }
+
+        return $return;
     }
 
     /**
