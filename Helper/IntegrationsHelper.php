@@ -7,6 +7,7 @@ namespace MauticPlugin\IntegrationsBundle\Helper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use MauticPlugin\IntegrationsBundle\Facade\EncryptionService;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 
 class IntegrationsHelper
@@ -22,13 +23,25 @@ class IntegrationsHelper
     private $integrationRepository;
 
     /**
-     * AuthIntegrationsHelper constructor.
+     * @var EncryptionService
+     */
+    private $encryptionService;
+
+    /**
+     * @var array
+     */
+    private $decryptedIntegrationConfigurations = [];
+
+    /**
+     * IntegrationsHelper constructor.
      *
      * @param IntegrationRepository $integrationRepository
+     * @param EncryptionService     $encryptionService
      */
-    public function __construct(IntegrationRepository $integrationRepository)
+    public function __construct(IntegrationRepository $integrationRepository, EncryptionService $encryptionService)
     {
         $this->integrationRepository = $integrationRepository;
+        $this->encryptionService     = $encryptionService;
     }
 
     /**
@@ -71,6 +84,14 @@ class IntegrationsHelper
 
             if (!$configuration) {
                 throw new IntegrationNotFoundException("{$integration->getName()} doesn't exist in the database");
+            }
+
+            if (!isset($this->decryptedIntegrationConfigurations[$integration->getName()])) {
+                $encryptedApiKeys = $configuration->getApiKeys();
+                $decryptedApiKeys = $this->encryptionService->decrypt($encryptedApiKeys);
+                $configuration->setApiKeys($decryptedApiKeys);
+
+                $this->decryptedIntegrationConfigurations[$integration->getName()] = true;
             }
 
             $integration->setIntegrationConfiguration($configuration);

@@ -66,6 +66,7 @@ return [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
                 'arguments' => [
                     'translator',
+                    'mautic.lead.model.field',
                 ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field_directions' => [
@@ -73,6 +74,9 @@ return [
             ],
             'mautic.integrations.form.config.sync_settings_object_field_mapping' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType::class,
+                'arguments' => [
+                    'translator',
+                ]
             ],
             'mautic.integrations.form.config.sync_settings_field_directions' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldDirectionsType::class,
@@ -86,6 +90,7 @@ return [
                 'class' => \MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper::class,
                 'arguments' => [
                     'mautic.plugin.integrations.repository.integration',
+                    'mautic.integrations.service.encryption',
                 ],
             ],
             'mautic.integrations.helper.auth_integrations' => [
@@ -108,7 +113,7 @@ return [
             ],
         ],
         'other' => [
-            'mautic.service.encryption' => [
+            'mautic.integrations.service.encryption' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Facade\EncryptionService::class,
                 'arguments' => [
                     'mautic.helper.encryption',
@@ -117,7 +122,7 @@ return [
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class
             ],
-            'mautic.integration.auth_provider.oauth1atwolegged' => [
+            'mautic.integrations.auth_provider.oauth1atwolegged' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory::class,
             ],
         ],
