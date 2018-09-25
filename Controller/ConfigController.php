@@ -11,16 +11,17 @@
 
 namespace MauticPlugin\IntegrationsBundle\Controller;
 
-
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Form\Type\IntegrationConfigType;
+use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
+use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
 use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ConfigController extends AbstractFormController
@@ -34,6 +35,11 @@ class ConfigController extends AbstractFormController
      * @var Form
      */
     private $form;
+
+    /**
+     * @var BasicIntegration
+     */
+    private $integrationObject;
 
     /**
      * @var Integration
@@ -55,11 +61,11 @@ class ConfigController extends AbstractFormController
         }
 
         // Find the integration
-        /** @var IntegrationsHelper $integrationsHelper */
-        $integrationsHelper = $this->get('mautic.integrations.helper');
+        /** @var ConfigIntegrationsHelper $integrationsHelper */
+        $integrationsHelper = $this->get('mautic.integrations.helper.config_integrations');
         try {
-            $integrationObject              = $integrationsHelper->getIntegration($integration);
-            $this->integrationConfiguration = $integrationObject->getIntegrationConfiguration();
+            $this->integrationObject        = $integrationsHelper->getIntegration($integration);
+            $this->integrationConfiguration = $this->integrationObject->getIntegrationConfiguration();
         } catch (IntegrationNotFoundException $exception) {
             return $this->notFound();
         }
@@ -111,11 +117,12 @@ class ConfigController extends AbstractFormController
     {
         return $this->delegateView(
             [
-                'viewParameters' => [
-                    'form'         => $this->form,
-                    'activeTab'    => $this->request->get('activeTab'),
+                'viewParameters'  => [
+                    'integrationObject' => $this->integrationObject,
+                    'form'              => $this->form->createView(),
+                    'activeTab'         => $this->request->get('activeTab'),
                 ],
-                'contentTemplate' => $this->setFormTheme($this->form, 'IntegrationsBundle:Config:form.html.php'),
+                'contentTemplate' => 'IntegrationsBundle:Config:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationConfig',
@@ -132,7 +139,7 @@ class ConfigController extends AbstractFormController
     {
         return new JsonResponse(
             [
-                'closeForm'    => 1,
+                'closeForm'     => 1,
                 'enabled'       => $this->integrationConfiguration->getIsPublished(),
                 'name'          => $this->integrationConfiguration->getName(),
                 'mauticContent' => 'integrationConfig',

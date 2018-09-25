@@ -62,6 +62,7 @@ class IntegrationSyncSettingsType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'empty_value' => false,
                 'required'    => false,
+                'data'        => !empty($options['data']['updateBlanks'])
             ]
         );
 
@@ -69,10 +70,31 @@ class IntegrationSyncSettingsType extends AbstractType
             'fieldMappings',
             IntegrationSyncSettingsFieldMappingsType::class,
             [
+                'label'             => false,
                 'integrationObject' => $integrationObject,
                 'objects'           => $objects
             ]
         );
+
+        $builder->add(
+            'fieldDirections',
+            IntegrationSyncSettingsFieldDirectionsType::class,
+            [
+                'label'             => false,
+                'integrationObject' => $integrationObject,
+                'objects'           => $objects
+            ]
+        );
+
+        if ($customSettings = $integrationObject->getSyncConfigFormName()) {
+            $builder->add(
+                'integration',
+                $customSettings,
+                [
+                    'label' => false,
+                ]
+            );
+        }
     }
 
     /**

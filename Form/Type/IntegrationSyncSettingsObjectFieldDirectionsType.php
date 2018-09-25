@@ -31,7 +31,6 @@ class IntegrationSyncSettingsObjectFieldDirectionsType extends AbstractType
                         ObjectMappingDAO::SYNC_TO_MAUTIC       => 'mautic.integration.sync_direction_mautic',
                         ObjectMappingDAO::SYNC_BIDIRECTIONALLY => 'mautic.integration.sync_direction_bidirectional',
                     ],
-                    'label_attr' => ['class' => 'control-label'],
                     'label'      => false,
                 ]
             );

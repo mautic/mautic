@@ -35,11 +35,24 @@ class IntegrationFeatureSettingsType extends AbstractType
         }
 
         if ($integrationObject instanceof ConfigFormFeatureSettingsInterface) {
-            $builder->add('integration', $integrationObject->getFeatureSettingsConfigFormName());
+            $builder->add(
+                'integration',
+                $integrationObject->getFeatureSettingsConfigFormName(),
+                [
+                    'label' => false
+                ]
+            );
         }
 
         if ($integrationObject instanceof ConfigFormSyncInterface) {
-            $builder->add('sync', IntegrationSyncSettingsType::class, ['integrationObject' => $integrationObject]);
+            $builder->add(
+                'sync',
+                IntegrationSyncSettingsType::class,
+                [
+                    'label'             => false,
+                    'integrationObject' => $integrationObject
+                ]
+            );
         }
     }
 

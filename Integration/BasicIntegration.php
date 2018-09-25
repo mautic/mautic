@@ -22,11 +22,7 @@ use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 abstract class BasicIntegration implements BasicInterface, IntegrationInterface
 {
     use BcIntegrationSettingsTrait;
-
-    /**
-     * @var Integration
-     */
-    private $integration;
+    use ConfigurationTrait;
 
     /**
      * @return string
@@ -36,29 +32,4 @@ abstract class BasicIntegration implements BasicInterface, IntegrationInterface
         return $this->getName();
     }
 
-    /**
-     * @return Integration
-     */
-    public function getIntegrationConfiguration(): Integration
-    {
-        return $this->integration;
-    }
-
-    /**
-     * @param Integration $integration
-     */
-    public function setIntegrationConfiguration(Integration $integration)
-    {
-        $this->integration = $integration;
-    }
-
-    /**
-     * Check if Integration entity has been set to prevent PHP fatal error with using getIntegrationEntity.
-     *
-     * @return bool
-     */
-    public function hasIntegrationConfiguration(): bool
-    {
-        return !empty($this->integration);
-    }
 }

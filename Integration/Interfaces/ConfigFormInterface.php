@@ -12,7 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
 
-interface ConfigFormInterface
+interface ConfigFormInterface extends IntegrationInterface
 {
     /**
      * @return string
@@ -20,9 +20,9 @@ interface ConfigFormInterface
     public function getDisplayName(): string;
 
     /**
-     * Override default config form with something custom
+     * Return the name/class of the form type to override the default or just return NULL to use the default
      *
-     * @return string Name of the form type service
+     * @return string|null Name of the form type service
      */
-    public function getConfigFormName(): string;
+    public function getConfigFormName(): ?string;
 }

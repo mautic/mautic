@@ -9,36 +9,33 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
-
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
+use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 
 class IntegrationConfigType extends AbstractType
 {
     /**
-     * @var IntegrationsHelper
+     * @var ConfigIntegrationsHelper
      */
     private $integrationsHelper;
 
     /**
      * IntegrationConfigType constructor.
      *
-     * @param IntegrationsHelper $integrationsHelper
+     * @param ConfigIntegrationsHelper $integrationsHelper
      */
-    public function __construct(IntegrationsHelper $integrationsHelper)
+    public function __construct(ConfigIntegrationsHelper $integrationsHelper)
     {
         $this->integrationsHelper = $integrationsHelper;
     }
@@ -54,39 +51,49 @@ class IntegrationConfigType extends AbstractType
         $integrationObject = $this->integrationsHelper->getIntegration($options['integration']);
 
         // isPublished
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add(
+            'isPublished',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.integration.enabled',
+                'label_attr' => ['class' => 'control-label'],
+            ]
+        );
 
         // apiKeys
         if ($integrationObject instanceof ConfigFormAuthInterface) {
             // @todo decrypt/encrypt
-            $builder->add('apiKeys', $integrationObject->getAuthConfigFormName());
+            $builder->add('apiKeys', $integrationObject->getAuthConfigFormName(), ['label' => false]);
         }
 
         // supportedFeatures
         if ($integrationObject instanceof ConfigFormFeaturesInterface) {
-            $customFeaturesFormField = $integrationObject->getFeaturesConfigFormName();
-
-            if ($customFeaturesFormField) {
-                $builder->add('supportedFeatures', $customFeaturesFormField);
-            } else {
-                // @todo add tooltip support
-                $builder->add(
-                    'supportedFeatures',
-                    ChoiceType::class,
-                    [
-                        'choices'     => $integrationObject->getSupportedFeatures(),
-                        'expanded'    => true,
-                        'label_attr'  => ['class' => 'control-label'],
-                        'multiple'    => true,
-                        'label'       => 'mautic.integration.features',
-                        'required'    => false,
-                    ]
-                );
-            }
+            // @todo add tooltip support
+            $builder->add(
+                'supportedFeatures',
+                ChoiceType::class,
+                [
+                    'label'      => 'mautic.integration.features',
+                    'label_attr' => ['class' => 'control-label'],
+                    'choices'    => $integrationObject->getSupportedFeatures(),
+                    'expanded'   => true,
+                    'multiple'   => true,
+                    'required'   => false,
+                ]
+            );
         }
 
         // featureSettings
-        $builder->add('featureSettings', IntegrationFeatureSettingsType::class, ['integrationObject' => $integrationObject]);
+        $builder->add(
+            'featureSettings',
+            IntegrationFeatureSettingsType::class,
+            [
+                'label'             => false,
+                'integrationObject' => $integrationObject
+            ]
+        );
+
+        $builder->add('buttons', FormButtonsType::class);
 
         $builder->setAction($options['action']);
     }
@@ -98,7 +105,7 @@ class IntegrationConfigType extends AbstractType
     {
         $resolver->setRequired(
             [
-                'integration'
+                'integration',
             ]
         );
 

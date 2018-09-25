@@ -24,6 +24,11 @@ interface IntegrationInterface
     public function getName(): string;
 
     /**
+     * @return string
+     */
+    public function getDisplayName(): string;
+
+    /**
      * @return bool
      */
     public function hasIntegrationConfiguration(): bool;

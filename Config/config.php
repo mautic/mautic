@@ -50,10 +50,37 @@ return [
             ],
         ],
         'forms' => [
+            'mautic.integrations.form.config.integration' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationConfigType::class,
+                'arguments' => [
+                    'mautic.integrations.helper.config_integrations',
+                ],
+            ],
+            'mautic.integrations.form.config.feature_settings' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationFeatureSettingsType::class,
+            ],
+            'mautic.integrations.form.config.sync_settings' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsType::class,
+            ],
+            'mautic.integrations.form.config.sync_settings_field_mappings' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.integrations.form.config.sync_settings_object_field_directions' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldDirectionsType::class,
+            ],
+            'mautic.integrations.form.config.sync_settings_object_field_mapping' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType::class,
+            ],
+            'mautic.integrations.form.config.sync_settings_field_directions' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldDirectionsType::class,
+            ],
         ],
         'helpers' => [
             'mautic.integrations.helper.variable_expresser' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class,
             ],
             'mautic.integrations.helper' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper::class,
@@ -69,6 +96,12 @@ return [
             ],
             'mautic.integrations.helper.sync_integrations' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                ],
+            ],
+            'mautic.integrations.helper.config_integrations' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],

@@ -19,9 +19,4 @@ interface BasicInterface
      * @return string
      */
     public function getName(): string;
-
-    /**
-     * @return string
-     */
-    public function getDisplayName(): string;
 }

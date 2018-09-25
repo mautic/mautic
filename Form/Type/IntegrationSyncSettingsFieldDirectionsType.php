@@ -14,29 +14,12 @@ namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
 use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
-class IntegrationSyncSettingsFieldMappingsType extends AbstractType
+class IntegrationSyncSettingsFieldDirectionsType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * IntegrationSyncSettingsFieldMappingsType constructor.
-     *
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -60,12 +43,13 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
 
             $builder->add(
                 $objectName,
-                IntegrationSyncSettingsObjectFieldMappingType::class,
+                IntegrationSyncSettingsObjectFieldDirectionsType::class,
                 [
-                    'label'                     => false,
-                    'requiredIntegrationFields' => $requiredFields,
-                    'optionalIntegrationFields' => $optionalFields,
-                    'mauticFields'              => $this->getMauticFields($objectName),
+                    'label'             => false,
+                    'integrationFields' => array_merge(
+                        array_keys($requiredFields),
+                        array_keys($optionalFields)
+                    ),
                 ]
             );
         }
@@ -82,16 +66,5 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                 'objects'
             ]
         );
-    }
-
-    /**
-     * @param string $object
-     *
-     * @return array
-     */
-    private function getMauticFields(string $object): array
-    {
-        // @todo
-        return [];
     }
 }
