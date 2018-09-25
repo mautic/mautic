@@ -52,6 +52,16 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
+        $builder->add('campaign_use_summary',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.campaignconfig.use_summary',
+                'attr'  => [
+                    'tooltip' => 'mautic.campaignconfig.use_summary.tooltip',
+                ],
+                'data'  => isset($options['data']['campaign_use_summary']) ? (bool) $options['data']['campaign_use_summary'] : false,
+            ]
+        );
     }
 
     public function getBlockPrefix()

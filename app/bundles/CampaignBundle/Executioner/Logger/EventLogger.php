@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
+use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -38,6 +39,11 @@ class EventLogger
      * @var LeadEventLogRepository
      */
     private $leadEventLogRepository;
+
+    /**
+     * @var SummaryModel
+     */
+    private $summaryModel;
 
     /**
      * @var LeadRepository
@@ -66,12 +72,14 @@ class EventLogger
         IpLookupHelper $ipLookupHelper,
         ContactTracker $contactTracker,
         LeadEventLogRepository $leadEventLogRepository,
-        LeadRepository $leadRepository
+        LeadRepository $leadRepository,
+        SummaryModel $summaryModel
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->contactTracker         = $contactTracker;
         $this->leadEventLogRepository = $leadEventLogRepository;
         $this->leadRepository         = $leadRepository;
+        $this->summaryModel           = $summaryModel;
 
         $this->persistQueue = new ArrayCollection();
         $this->logs         = new ArrayCollection();
@@ -88,6 +96,7 @@ class EventLogger
 
     public function persistLog(LeadEventLog $log)
     {
+        $this->summaryModel->updateSummary([$log]);
         $this->leadEventLogRepository->saveEntity($log);
     }
 
@@ -154,6 +163,7 @@ class EventLogger
             return $this;
         }
 
+        $this->summaryModel->updateSummary($collection->getValues());
         $this->leadEventLogRepository->saveEntities($collection->getValues());
 
         return $this;
@@ -238,6 +248,7 @@ class EventLogger
             return;
         }
 
+        $this->summaryModel->updateSummary($this->persistQueue->getValues());
         $this->leadEventLogRepository->saveEntities($this->persistQueue->getValues());
 
         // Push them into the logs ArrayCollection to be used later.
