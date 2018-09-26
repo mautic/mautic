@@ -19,8 +19,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Provides translated flash messages.
- *
- * @todo define types from Log PSR
  */
 class FlashBag
 {
@@ -65,10 +63,6 @@ class FlashBag
      */
     public function add($message, $messageVars = [], $type = 'notice', $domain = 'flashes', $addNotification = false)
     {
-        if (null == $domain) {
-            $domain = 'flashes';
-        }
-
         if (false === $domain) {
             //message is already translated
             $translatedMessage = $message;
@@ -102,19 +96,7 @@ class FlashBag
             $lastActive = $this->requestStack->getCurrentRequest()->get('mauticUserLastActive', 0);
             $isRead     = $lastActive > 30 ? 0 : 1;
 
-            $this->addNotification($translatedMessage, null, $isRead, null, $iconClass);
+            $this->notificationModel->addNotification($message, $type, $isRead, null, $iconClass);
         }
-    }
-
-    /**
-     * @param string    $message
-     * @param null      $type
-     * @param bool|true $isRead
-     * @param null      $header
-     * @param null      $iconClass
-     */
-    private function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
-    {
-        $this->notificationModel->addNotification($message, $type, $isRead, $header, $iconClass, $datetime);
     }
 }
