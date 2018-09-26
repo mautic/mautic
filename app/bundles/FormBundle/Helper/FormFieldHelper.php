@@ -167,7 +167,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     continue;
                 }
 
-                if ($f !== null && $f->getType() === 'tel' && empty($f->getProperties()['international'])) {
+                if ($f !== null && $f->getType() === 'tel' && empty($f->getProperties()['international']) && !empty($value)) {
                     continue;
                 }
                 if ($type == 'captcha') {
