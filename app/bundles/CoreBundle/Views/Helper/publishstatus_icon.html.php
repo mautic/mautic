@@ -57,6 +57,10 @@ switch (true) {
         break;
 }
 
+if (isset($aditionalLabel)) {
+    $text .= $aditionalLabel;
+}
+
 if (!empty($disableToggle)) {
     $icon = str_replace(['success', 'danger', 'warning'], 'muted', $icon);
 }
