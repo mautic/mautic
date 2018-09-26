@@ -149,6 +149,17 @@ return [
         ],
     ],
     'services' => [
+        'main' => [
+            'mautic.core.service.flashbag' => [
+                'class'     => \Mautic\CoreBundle\Service\FlashBag::class,
+                'arguments' => [
+                    '@session',
+                    'translator',
+                    'request_stack',
+                    'mautic.core.model.notification',
+                ],
+            ],
+        ],
         'events' => [
             'mautic.core.subscriber' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\CoreSubscriber',

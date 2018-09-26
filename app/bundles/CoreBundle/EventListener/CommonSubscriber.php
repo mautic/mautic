@@ -16,6 +16,7 @@ use JMS\Serializer\Serializer;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -86,6 +87,11 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $translator;
 
     /**
+     * @var FlashBag
+     */
+    protected $flashBag;
+
+    /**
      * @var \Doctrine\ORM\EntityManager
      */
     protected $em;
@@ -154,6 +160,14 @@ class CommonSubscriber implements EventSubscriberInterface
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
+    }
+
+    /**
+     * @param FlashBag $flashBag
+     */
+    public function setFlashBag(FlashBag $flashBag)
+    {
+        $this->flashBag = $flashBag;
     }
 
     /**

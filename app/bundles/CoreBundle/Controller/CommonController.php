@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
@@ -74,6 +75,11 @@ class CommonController extends Controller implements MauticController
     protected $translator;
 
     /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
+    /**
      * @param Request $request
      */
     public function setRequest(Request $request)
@@ -119,6 +125,14 @@ class CommonController extends Controller implements MauticController
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
+    }
+
+    /**
+     * @param FlashBag $flashBag
+     */
+    public function setFlashBag(FlashBag $flashBag)
+    {
+        $this->flashBag = $flashBag;
     }
 
     /**
@@ -643,6 +657,8 @@ class CommonController extends Controller implements MauticController
      * @param null           $header
      * @param null           $iconClass
      * @param \DateTime|null $datetime
+     *
+     * @deprecated Will be removed in Mautic 3.0 as unused.
      */
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {
@@ -652,51 +668,17 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param        $message
-     * @param array  $messageVars
-     * @param string $type
-     * @param string $domain
-     * @param bool   $addNotification
+     * @param string      $message
+     * @param array|null  $messageVars
+     * @param string|null $type
+     * @param string|null $domain
+     * @param bool|null   $addNotification
+     *
+     * @deprecated Will be removed in Mautic 3.0. Use CommonController::flashBag->addFlash() instead.
      */
     public function addFlash($message, $messageVars = [], $type = 'notice', $domain = 'flashes', $addNotification = false)
     {
-        if ($domain == null) {
-            $domain = 'flashes';
-        }
-
-        if ($domain === false) {
-            //message is already translated
-            $translatedMessage = $message;
-        } else {
-            if (isset($messageVars['pluralCount'])) {
-                $translatedMessage = $this->get('translator')->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
-            } else {
-                $translatedMessage = $this->get('translator')->trans($message, $messageVars, $domain);
-            }
-        }
-
-        $this->get('session')->getFlashBag()->add($type, $translatedMessage);
-
-        if (!defined('MAUTIC_INSTALLER') && $addNotification) {
-            switch ($type) {
-                case 'warning':
-                    $iconClass = 'text-warning fa-exclamation-triangle';
-                    break;
-                case 'error':
-                    $iconClass = 'text-danger fa-exclamation-circle';
-                    break;
-                case 'notice':
-                    $iconClass = 'fa-info-circle';
-                default:
-                    break;
-            }
-
-            //If the user has not interacted with the browser for the last 30 seconds, consider the message unread
-            $lastActive = $this->request->get('mauticUserLastActive', 0);
-            $isRead     = $lastActive > 30 ? 0 : 1;
-
-            $this->addNotification($translatedMessage, null, $isRead, null, $iconClass);
-        }
+        $this->flashBag->add($message, $messageVars, $type, $domain, $addNotification);
     }
 
     /**
@@ -707,6 +689,8 @@ class CommonController extends Controller implements MauticController
      * @param null   $icon
      * @param bool   $addNotification
      * @param string $type
+     *
+     * @deprecated Will be removed in Mautic 3.0 as unused
      */
     public function addBrowserNotification($message, $messageVars = [], $domain = 'flashes', $title = null, $icon = null, $addNotification = true, $type = 'notice')
     {

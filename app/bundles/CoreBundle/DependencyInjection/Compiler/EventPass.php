@@ -43,6 +43,7 @@ class EventPass implements CompilerPassInterface
             $definition->addMethodCall('setSystemParameters', [new Parameter('mautic.parameters')]);
             $definition->addMethodCall('setDispatcher', [new Reference('event_dispatcher')]);
             $definition->addMethodCall('setTranslator', [new Reference('translator')]);
+            $definition->addMethodCall('setFlashBag', [new Reference('mautic.core.service.flashbag')]);
             $definition->addMethodCall('setEntityManager', [new Reference('doctrine.orm.entity_manager')]);
             $definition->addMethodCall('setRouter', [new Reference('router')]);
 

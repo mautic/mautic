@@ -219,6 +219,9 @@ class CoreSubscriber extends CommonSubscriber
             // and the translator
             $controller[0]->setTranslator($this->translator);
 
+            // and the flash bag
+            $controller[0]->setFlashBag($this->flashBag);
+
             //run any initialize functions
             $controller[0]->initialize($event);
 
