@@ -611,7 +611,8 @@ return [
                 'class' => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher::class,
             ],
             'mautic.cipher.openssl' => [
-                'class' => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
+                'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
+                'arguments' => ['%kernel.environment%'],
             ],
             'mautic.factory' => [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
@@ -916,8 +917,8 @@ return [
 
     'ip_lookup_services' => [
         'freegeoip' => [
-            'display_name' => 'Freegeoip.net',
-            'class'        => 'Mautic\CoreBundle\IpLookup\FreegeoipLookup',
+            'display_name' => 'Ipstack.com',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IpstackLookup',
         ],
         'geobytes' => [
             'display_name' => 'Geobytes',

@@ -13,9 +13,11 @@ namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CampaignListType.
@@ -23,14 +25,14 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class CampaignListType extends AbstractType
 {
     /**
-     * @var string
-     */
-    protected $thisString;
-
-    /**
      * @var CampaignModel
      */
     private $model;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
 
     /**
      * @var bool
@@ -40,45 +42,44 @@ class CampaignListType extends AbstractType
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
     {
-        $this->model        = $factory->getModel('campaign');
-        $this->thisString   = $factory->getTranslator()->trans('mautic.campaign.form.thiscampaign');
-        $this->canViewOther = $factory->getSecurity()->isGranted('campaign:campaigns:viewother');
+        $this->model        = $campaignModel;
+        $this->translator   = $translator;
+        $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $model        = $this->model;
-        $msg          = $this->thisString;
-        $canViewOther = $this->canViewOther;
+        $resolver->setDefaults(
+            [
+                'choices'      => function (Options $options) {
+                    $choices   = [];
+                    $campaigns = $this->model->getRepository()->getPublishedCampaigns(null, null, true, $this->canViewOther);
+                    foreach ($campaigns as $campaign) {
+                        $choices[$campaign['id']] = $campaign['name'];
+                    }
 
-        $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model, $msg, $canViewOther) {
-                $choices = [];
-                $campaigns = $model->getRepository()->getPublishedCampaigns(null, null, true, $canViewOther);
-                foreach ($campaigns as $campaign) {
-                    $choices[$campaign['id']] = $campaign['name'];
-                }
+                    //sort by language
+                    asort($choices);
 
-                //sort by language
-                asort($choices);
+                    if ($options['include_this']) {
+                        $choices = ['this' => $options['this_translation']] + $choices;
+                    }
 
-                if ($options['include_this']) {
-                    $choices = ['this' => $msg] + $choices;
-                }
-
-                return $choices;
-            },
-            'empty_value'  => false,
-            'expanded'     => false,
-            'multiple'     => true,
-            'required'     => false,
-            'include_this' => false,
-        ]);
+                    return $choices;
+                },
+                'empty_value'      => false,
+                'expanded'         => false,
+                'multiple'         => true,
+                'required'         => false,
+                'include_this'     => false,
+                'this_translation' => 'mautic.campaign.form.thiscampaign',
+            ]
+        );
     }
 
     /**

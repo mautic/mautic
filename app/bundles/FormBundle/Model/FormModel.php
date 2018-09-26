@@ -731,7 +731,18 @@ class FormModel extends CommonFormModel
         $replace = ['', '', '\"'];
         $html    = str_replace($search, $replace, $html);
 
-        return 'document.write("'.$html.'");';
+        // Write html for all browser and fallback for IE
+        $script = '
+            var scr = document.currentScript;
+            
+            if (scr !== undefined) {
+                scr.insertAdjacentHTML("afterend" , "'.$html.'");
+            } else {
+                document.write("'.$html.'");
+            }
+        ';
+
+        return $script;
     }
 
     /**
@@ -787,24 +798,32 @@ class FormModel extends CommonFormModel
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
         $formName = $form->generateFormName();
-        $lead     = $this->leadModel->getCurrentLead();
+        $fields   = $form->getFields();
+        /** @var \Mautic\FormBundle\Entity\Field $field */
+        foreach ($fields as $key => $field) {
+            $leadField  = $field->getLeadField();
+            $isAutoFill = $field->getIsAutoFill();
 
+            // we want work just with matched autofill fields
+            if (!isset($leadField) || !$isAutoFill) {
+                unset($fields[$key]);
+            }
+        }
+        // no fields for populate
+        if (!count($fields)) {
+            return;
+        }
+
+        $lead = $this->leadModel->getCurrentLead();
         if (!$lead instanceof Lead) {
             return;
         }
 
-        $fields = $form->getFields();
-        /** @var \Mautic\FormBundle\Entity\Field $f */
-        foreach ($fields as $f) {
-            $leadField  = $f->getLeadField();
-            $isAutoFill = $f->getIsAutoFill();
+        foreach ($fields as $field) {
+            $value = $lead->getFieldValue($field->getLeadField());
 
-            if (isset($leadField) && $isAutoFill) {
-                $value = $lead->getFieldValue($leadField);
-
-                if (!empty($value)) {
-                    $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
-                }
+            if (!empty($value)) {
+                $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }
     }
@@ -856,6 +875,21 @@ class FormModel extends CommonFormModel
                 'label'       => 'mautic.lead.list.form.operator.isnotlike',
                 'expr'        => 'notLike',
                 'negate_expr' => 'like',
+            ],
+            'startsWith' => [
+                'label'       => 'mautic.core.operator.starts.with',
+                'expr'        => 'startsWith',
+                'negate_expr' => 'startsWith',
+            ],
+            'endsWith' => [
+                'label'       => 'mautic.core.operator.ends.with',
+                'expr'        => 'endsWith',
+                'negate_expr' => 'endsWith',
+            ],
+            'contains' => [
+                'label'       => 'mautic.core.operator.contains',
+                'expr'        => 'contains',
+                'negate_expr' => 'contains',
             ],
         ];
 

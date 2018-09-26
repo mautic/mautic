@@ -166,6 +166,14 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
             <div id="slotNameDiv" class="<?php echo $form->vars['value']->isCampaignBased() ? 'hide' : ''; ?>">
                 <?php echo $view['form']->row($form['slotName']); ?>
             </div>
+            <hr/>
+            <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+            <br/>
+            <?php
+            foreach ($form['utmTags'] as $utmTag):
+                echo $view['form']->row($utmTag);
+            endforeach;
+            ?>
             <div class="hide">
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>

@@ -15,7 +15,7 @@ $header = ($entity->getId())
     ?
     $view['translator']->trans(
         'mautic.company.menu.edit',
-        ['%name%' => $entity->getName()]
+        ['%name%' => $view->escape($entity->getName())]
     )
     :
     $view['translator']->trans('mautic.company.menu.new');
