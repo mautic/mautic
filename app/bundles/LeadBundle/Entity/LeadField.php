@@ -789,4 +789,9 @@ class LeadField extends FormEntity
         $this->columnIsNotCreated = false;
         $this->setIsPublished($this->originalIsPublishedValue);
     }
+
+    public function disablePublishChange()
+    {
+        return $this->getAlias() === 'email' || $this->getColumnIsNotCreated();
+    }
 }
