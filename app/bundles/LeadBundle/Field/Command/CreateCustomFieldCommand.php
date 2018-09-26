@@ -51,6 +51,7 @@ class CreateCustomFieldCommand extends ContainerAwareCommand
         $this->setName('mautic:custom-field:create-column')
             ->setDescription('Create custom field column in the background')
             ->addOption('--id', '-i', InputOption::VALUE_REQUIRED, 'LeadField ID.')
+            ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
             ->setHelp(
                 <<<'EOT'
 The <info>%command.name%</info> command will create a column in a lead_fields table if the proces should run in background.
@@ -66,8 +67,10 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $leadFieldId = (int) $input->getOption('id');
+        $userId      = (int) $input->getOption('user');
+
         try {
-            $this->backgroundService->addColumn($leadFieldId);
+            $this->backgroundService->addColumn($leadFieldId, $userId);
         } catch (LeadFieldWasNotFoundException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
 
