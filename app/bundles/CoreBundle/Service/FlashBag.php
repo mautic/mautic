@@ -60,11 +60,11 @@ class FlashBag
     /**
      * @param string     $message
      * @param array|null $messageVars
-     * @param string     $type
+     * @param string     $level
      * @param string     $domain
      * @param bool       $addNotification
      */
-    public function add($message, $messageVars = [], $type = 'notice', $domain = 'flashes', $addNotification = false)
+    public function add($message, $messageVars = [], $level = self::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
     {
         if (false === $domain) {
             //message is already translated
@@ -77,18 +77,15 @@ class FlashBag
             }
         }
 
-        $this->session->getFlashBag()->add($type, $translatedMessage);
+        $this->session->getFlashBag()->add($level, $translatedMessage);
 
         if (!defined('MAUTIC_INSTALLER') && $addNotification) {
-            switch ($type) {
-                case 'warning':
+            switch ($level) {
+                case self::LEVEL_WARNING:
                     $iconClass = 'text-warning fa-exclamation-triangle';
                     break;
-                case 'error':
+                case self::LEVEL_ERROR:
                     $iconClass = 'text-danger fa-exclamation-circle';
-                    break;
-                case 'notice':
-                    $iconClass = 'fa-info-circle';
                     break;
                 default:
                     $iconClass = 'fa-info-circle';
@@ -99,7 +96,7 @@ class FlashBag
             $lastActive = $this->requestStack->getCurrentRequest()->get('mauticUserLastActive', 0);
             $isRead     = $lastActive > 30 ? 0 : 1;
 
-            $this->notificationModel->addNotification($message, $type, $isRead, null, $iconClass);
+            $this->notificationModel->addNotification($message, $level, $isRead, null, $iconClass);
         }
     }
 }

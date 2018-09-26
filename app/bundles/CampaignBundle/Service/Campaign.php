@@ -35,7 +35,7 @@ class Campaign
     /**
      * Has campaign at least one unpublished e-mail?
      *
-     * @param $id
+     * @param int $id
      *
      * @return bool
      */

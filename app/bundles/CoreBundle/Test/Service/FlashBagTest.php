@@ -26,16 +26,16 @@ class FlashBagTest extends TestCase
     {
         // define('MAUTIC_INSTALLER', true); - this is dangerous for further tests, not used
 
-        $message         = 'message';
-        $messageVars     = [];
-        $type            = FlashBag::LEVEL_NOTICE;
-        $domain          = false;
-        $addNotification = false;
-        $symfonyFlashBag = $this->createMock(SymfonyFlashBag::class);
+        $message          = 'message';
+        $messageVars      = [];
+        $level            = FlashBag::LEVEL_NOTICE;
+        $domain           = false;
+        $addNotification  = false;
+        $symfonyFlashBag  = $this->createMock(SymfonyFlashBag::class);
         $symfonyFlashBag
             ->expects($this->once())
             ->method('add')
-            ->with($type, $message);
+            ->with($level, $message);
         $session = $this->createMock(Session::class);
         $session
             ->expects($this->once())
@@ -46,19 +46,19 @@ class FlashBagTest extends TestCase
         $notificationModel = $this->createMock(NotificationModel::class);
         $flashBag          = new FlashBag($session, $translator, $requestStack, $notificationModel);
 
-        $flashBag->add($message, $messageVars, $type, $domain, $addNotification);
+        $flashBag->add($message, $messageVars, $level, $domain, $addNotification);
 
-        $message                    = 'message';
-        $messageVars['pluralCount'] = 2;
-        $translatedMessage          = 'translatedMessage';
-        $type                       = FlashBag::LEVEL_NOTICE;
-        $domain                     = 'flashes';
-        $addNotification            = false;
-        $symfonyFlashBag            = $this->createMock(SymfonyFlashBag::class);
+        $message                     = 'message';
+        $messageVars['pluralCount']  = 2;
+        $translatedMessage           = 'translatedMessage';
+        $level                       = FlashBag::LEVEL_NOTICE;
+        $domain                      = 'flashes';
+        $addNotification             = false;
+        $symfonyFlashBag             = $this->createMock(SymfonyFlashBag::class);
         $symfonyFlashBag
             ->expects($this->once())
             ->method('add')
-            ->with($type, $translatedMessage);
+            ->with($level, $translatedMessage);
         $session = $this->createMock(Session::class);
         $session
             ->expects($this->once())
@@ -74,19 +74,19 @@ class FlashBagTest extends TestCase
         $notificationModel = $this->createMock(NotificationModel::class);
         $flashBag          = new FlashBag($session, $translator, $requestStack, $notificationModel);
 
-        $flashBag->add($message, $messageVars, $type, $domain, $addNotification);
+        $flashBag->add($message, $messageVars, $level, $domain, $addNotification);
 
-        $message           = 'message';
-        $messageVars       = [];
-        $translatedMessage = 'translatedMessage';
-        $type              = FlashBag::LEVEL_NOTICE;
-        $domain            = 'flashes';
-        $addNotification   = false;
-        $symfonyFlashBag   = $this->createMock(SymfonyFlashBag::class);
+        $message            = 'message';
+        $messageVars        = [];
+        $translatedMessage  = 'translatedMessage';
+        $level              = FlashBag::LEVEL_NOTICE;
+        $domain             = 'flashes';
+        $addNotification    = false;
+        $symfonyFlashBag    = $this->createMock(SymfonyFlashBag::class);
         $symfonyFlashBag
             ->expects($this->once())
             ->method('add')
-            ->with($type, $translatedMessage);
+            ->with($level, $translatedMessage);
         $session = $this->createMock(Session::class);
         $session
             ->expects($this->once())
@@ -102,7 +102,7 @@ class FlashBagTest extends TestCase
         $notificationModel = $this->createMock(NotificationModel::class);
         $flashBag          = new FlashBag($session, $translator, $requestStack, $notificationModel);
 
-        $flashBag->add($message, $messageVars, $type, $domain, $addNotification);
+        $flashBag->add($message, $messageVars, $level, $domain, $addNotification);
 
         $this->testReadStatus(1, true);
         $this->testReadStatus(31, false);
@@ -115,18 +115,18 @@ class FlashBagTest extends TestCase
 
     private function testReadStatus($mauticUserLastActive, $isRead)
     {
-        $message           = 'message';
-        $messageVars       = [];
-        $type              = FlashBag::LEVEL_NOTICE;
-        $translatedMessage = 'translatedMessage';
-        $domain            = 'flashes';
-        $addNotification   = true;
-        $isRead            = $mauticUserLastActive > 30 ? 0 : 1;
-        $symfonyFlashBag   = $this->createMock(SymfonyFlashBag::class);
+        $message            = 'message';
+        $messageVars        = [];
+        $level              = FlashBag::LEVEL_NOTICE;
+        $translatedMessage  = 'translatedMessage';
+        $domain             = 'flashes';
+        $addNotification    = true;
+        $isRead             = $mauticUserLastActive > 30 ? 0 : 1;
+        $symfonyFlashBag    = $this->createMock(SymfonyFlashBag::class);
         $symfonyFlashBag
             ->expects($this->once())
             ->method('add')
-            ->with($type, $translatedMessage);
+            ->with($level, $translatedMessage);
         $session = $this->createMock(Session::class);
         $session
             ->expects($this->once())
@@ -153,13 +153,13 @@ class FlashBagTest extends TestCase
         $notificationModel
             ->expects($this->once())
             ->method('addNotification')
-            ->with($message, $type, $isRead, null, 'fa-info-circle');
+            ->with($message, $level, $isRead, null, 'fa-info-circle');
         $flashBag = new FlashBag($session, $translator, $requestStack, $notificationModel);
 
-        $flashBag->add($message, $messageVars, $type, $domain, $addNotification);
+        $flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
 
-    private function testAddTypeCases($type, $expectedIcon)
+    private function testAddTypeCases($level, $expectedIcon)
     {
         $message              = 'message';
         $messageVars          = [];
@@ -171,7 +171,7 @@ class FlashBagTest extends TestCase
         $symfonyFlashBag
             ->expects($this->once())
             ->method('add')
-            ->with($type, $translatedMessage);
+            ->with($level, $translatedMessage);
         $session = $this->createMock(Session::class);
         $session
             ->expects($this->once())
@@ -198,9 +198,9 @@ class FlashBagTest extends TestCase
         $notificationModel
             ->expects($this->once())
             ->method('addNotification')
-            ->with($message, $type, 1, null, $expectedIcon);
+            ->with($message, $level, 1, null, $expectedIcon);
         $flashBag = new FlashBag($session, $translator, $requestStack, $notificationModel);
 
-        $flashBag->add($message, $messageVars, $type, $domain, $addNotification);
+        $flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
 }
