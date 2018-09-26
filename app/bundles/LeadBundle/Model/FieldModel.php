@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
+use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
@@ -569,9 +570,10 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param object $entity
-     * @param bool   $unlock
+     * @param LeadField $entity
+     * @param bool      $unlock
      *
+     * @throws AbortColumnCreateException
      * @throws DBALException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
@@ -614,6 +616,7 @@ class FieldModel extends FormModel
      *
      * @return array|void
      *
+     * @throws AbortColumnCreateException
      * @throws DBALException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
