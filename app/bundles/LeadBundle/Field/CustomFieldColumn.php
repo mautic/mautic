@@ -80,11 +80,12 @@ class CustomFieldColumn
     /**
      * @param LeadField $leadField
      *
+     * @throws AbortColumnCreateException
+     * @throws CustomFieldLimitException
      * @throws DBALException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
-     * @throws CustomFieldLimitException
      */
     public function createLeadColumn(LeadField $leadField)
     {
@@ -98,8 +99,6 @@ class CustomFieldColumn
         try {
             $this->fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
         } catch (NoListenerException $e) {
-        } catch (AbortColumnCreateException $e) {
-            return;
         }
 
         $this->processCreateLeadColumn($leadField);
@@ -139,7 +138,7 @@ class CustomFieldColumn
             $this->logger->addWarning($e->getMessage());
 
             if ($e->getErrorCode() === 1118 /* ER_TOO_BIG_ROWSIZE */) {
-                throw new CustomFieldLimitException('mautic.core.error.max.field');
+                throw new CustomFieldLimitException('mautic.lead.field.max_column_error');
             }
 
             throw $e;
