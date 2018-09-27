@@ -288,6 +288,12 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.form.type.field_propertytel' => [
+                'class'     => \Mautic\FormBundle\Form\Type\FormFieldTelType::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             'mautic.form.type.field_propertyfile' => [
                 'class'     => FormFieldFileType::class,
                 'arguments' => [
