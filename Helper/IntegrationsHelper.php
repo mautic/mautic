@@ -71,6 +71,23 @@ class IntegrationsHelper
     }
 
     /**
+     * @param Integration $configuration
+     */
+    public function saveIntegrationConfiguration(Integration $configuration)
+    {
+        // Encrypt the keys before saving
+        $decryptedApiKeys = $configuration->getApiKeys();
+        $encryptedApiKeys = $this->encryptionService->encrypt($decryptedApiKeys);
+        $configuration->setApiKeys($encryptedApiKeys);
+
+        // Save
+        $this->integrationRepository->saveEntity($configuration);
+
+        // Restore decrypted for use
+        $configuration->setApiKeys($decryptedApiKeys);
+    }
+
+    /**
      * @param IntegrationInterface $integration
      *
      * @return Integration

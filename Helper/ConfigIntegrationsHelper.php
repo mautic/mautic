@@ -11,11 +11,12 @@
 
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
+use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 
 /**
- * Class ConfigIntegrationsHelper
+ * Class ConfigIntegrationsHelper.
  */
 class ConfigIntegrationsHelper
 {
@@ -51,11 +52,12 @@ class ConfigIntegrationsHelper
      * @param string $integration
      *
      * @return ConfigFormInterface
+     *
      * @throws IntegrationNotFoundException
      */
     public function getIntegration(string $integration)
     {
-        if (!isset($this->integrations[$integration])){
+        if (!isset($this->integrations[$integration])) {
             throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.config_integration");
         }
 
@@ -63,5 +65,13 @@ class ConfigIntegrationsHelper
         $this->integrationsHelper->getIntegrationConfiguration($this->integrations[$integration]);
 
         return $this->integrations[$integration];
+    }
+
+    /**
+     * @param Integration $integrationConfiguration
+     */
+    public function saveIntegrationConfiguration(Integration $integrationConfiguration)
+    {
+        $this->integrationsHelper->saveIntegrationConfiguration($integrationConfiguration);
     }
 }

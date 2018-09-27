@@ -11,9 +11,9 @@
 
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
+use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\SyncInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
@@ -29,7 +29,6 @@ class SyncIntegrationsHelper
      * @var null|array
      */
     private $enabled;
-
 
     /**
      * @var IntegrationsHelper
@@ -55,7 +54,24 @@ class SyncIntegrationsHelper
     }
 
     /**
+     * @param string $integration
+     *
+     * @return SyncInterface
+     *
+     * @throws IntegrationNotFoundException
+     */
+    public function getIntegration(string $integration)
+    {
+        if (!isset($this->integrations[$integration])) {
+            throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.sync_integration");
+        }
+
+        return $this->integrations[$integration];
+    }
+
+    /**
      * @return array|null
+     *
      * @throws IntegrationNotFoundException
      */
     public function getEnabledIntegrations()
@@ -80,6 +96,7 @@ class SyncIntegrationsHelper
      * @param string $mauticObject
      *
      * @return bool
+     *
      * @throws IntegrationNotFoundException
      * @throws ObjectNotFoundException
      */
@@ -93,7 +110,7 @@ class SyncIntegrationsHelper
 
         foreach ($enabledIntegrations as $integration) {
             $syncIntegration     = $this->getIntegration($integration);
-            $featureSettings = $syncIntegration->getIntegrationConfiguration()->getFeatureSettings();
+            $featureSettings     = $syncIntegration->getIntegrationConfiguration()->getFeatureSettings();
 
             if (!isset($featureSettings['objects'])) {
                 continue;
@@ -116,6 +133,7 @@ class SyncIntegrationsHelper
      * @param string $integration
      *
      * @return MappingManualDAO
+     *
      * @throws IntegrationNotFoundException
      */
     public function getMappingManual(string $integration): MappingManualDAO
@@ -129,6 +147,7 @@ class SyncIntegrationsHelper
      * @param string $integration
      *
      * @return SyncDataExchangeInterface
+     *
      * @throws IntegrationNotFoundException
      */
     public function getSyncDataExchange(string $integration): SyncDataExchangeInterface
@@ -136,22 +155,5 @@ class SyncIntegrationsHelper
         $integration = $this->getIntegration($integration);
 
         return $integration->getSyncDataExchange();
-    }
-
-    /**
-     * @param string $integration
-     *
-     * @return SyncInterface
-     * @throws IntegrationNotFoundException
-     */
-    private function getIntegration(string $integration)
-    {
-        $this->getEnabledIntegrations();
-
-        if (!isset($this->integrations[$integration])){
-            throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.sync_integration");
-        }
-
-        return $this->integrations[$integration];
     }
 }

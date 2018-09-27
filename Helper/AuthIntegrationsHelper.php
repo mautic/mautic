@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
+use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\AuthenticationInterface;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 
@@ -60,5 +61,13 @@ class AuthIntegrationsHelper
         $this->integrationsHelper->getIntegrationConfiguration($this->integrations[$integration]);
 
         return $this->integrations[$integration];
+    }
+
+    /**
+     * @param Integration $integrationConfiguration
+     */
+    public function saveIntegrationConfiguration(Integration $integrationConfiguration)
+    {
+        $this->integrationsHelper->saveIntegrationConfiguration($integrationConfiguration);
     }
 }
