@@ -149,81 +149,81 @@ class EventType extends AbstractType
                     'data'        => $data,
                 ]
             );
+
+            // I could not get Doctrine TimeType does not play well with Symfony TimeType so hacking this workaround
+            $data = $this->getTimeValue($options['data'], 'triggerHour');
+            $builder->add(
+                'triggerHour',
+                TextType::class,
+                [
+                    'label' => false,
+                    'attr'  => [
+                        'class'        => 'form-control',
+                        'data-toggle'  => 'time',
+                        'data-format'  => 'H:i',
+                        'autocomplete' => 'off',
+                    ],
+                    'data'  => ($data) ? $data->format('H:i') : $data,
+                ]
+            );
+
+            $data = $this->getTimeValue($options['data'], 'triggerRestrictedStartTime');
+            $builder->add(
+                'triggerRestrictedStartTime',
+                TextType::class,
+                [
+                    'label' => false,
+                    'attr'  => [
+                        'class'        => 'form-control',
+                        'data-toggle'  => 'time',
+                        'data-format'  => 'H:i',
+                        'autocomplete' => 'off',
+                    ],
+                    'data'  => ($data) ? $data->format('H:i') : $data,
+                ]
+            );
+
+            $data = $this->getTimeValue($options['data'], 'triggerRestrictedStopTime');
+            $builder->add(
+                'triggerRestrictedStopTime',
+                TextType::class,
+                [
+                    'label' => false,
+                    'attr'  => [
+                        'class'        => 'form-control',
+                        'data-toggle'  => 'time',
+                        'data-format'  => 'H:i',
+                        'autocomplete' => 'off',
+                    ],
+                    'data'  => ($data) ? $data->format('H:i') : $data,
+                ]
+            );
+
+            $builder->add(
+                'triggerRestrictedDaysOfWeek',
+                ChoiceType::class,
+                [
+                    'label'    => true,
+                    'attr'     => [
+                        'data-toggle' => 'time',
+                        'data-format' => 'H:i',
+                    ],
+                    'choices'  => [
+                        1  => 'mautic.report.schedule.day.monday',
+                        2  => 'mautic.report.schedule.day.tuesday',
+                        3  => 'mautic.report.schedule.day.wednesday',
+                        4  => 'mautic.report.schedule.day.thursday',
+                        5  => 'mautic.report.schedule.day.friday',
+                        6  => 'mautic.report.schedule.day.saturday',
+                        0  => 'mautic.report.schedule.day.sunday',
+                        -1 => 'mautic.report.schedule.day.week_days',
+                    ],
+                    'expanded' => true,
+                    'multiple' => true,
+                    'required' => false,
+                ]
+            );
         }
-
-        // I could not get Doctrine TimeType does not play well with Symfony TimeType so hacking this workaround
-        $data = $this->getTimeValue($options['data'], 'triggerHour');
-        $builder->add(
-            'triggerHour',
-            TextType::class,
-            [
-                'label' => false,
-                'attr'  => [
-                    'class'        => 'form-control',
-                    'data-toggle'  => 'time',
-                    'data-format'  => 'H:i',
-                    'autocomplete' => 'off',
-                ],
-                'data'  => ($data) ? $data->format('H:i') : $data,
-            ]
-        );
-
-        $data = $this->getTimeValue($options['data'], 'triggerRestrictedStartTime');
-        $builder->add(
-            'triggerRestrictedStartTime',
-            TextType::class,
-            [
-                'label' => false,
-                'attr'  => [
-                    'class'        => 'form-control',
-                    'data-toggle'  => 'time',
-                    'data-format'  => 'H:i',
-                    'autocomplete' => 'off',
-                ],
-                'data'  => ($data) ? $data->format('H:i') : $data,
-            ]
-        );
-
-        $data = $this->getTimeValue($options['data'], 'triggerRestrictedStopTime');
-        $builder->add(
-            'triggerRestrictedStopTime',
-            TextType::class,
-            [
-                'label' => false,
-                'attr'  => [
-                    'class'        => 'form-control',
-                    'data-toggle'  => 'time',
-                    'data-format'  => 'H:i',
-                    'autocomplete' => 'off',
-                ],
-                'data'  => ($data) ? $data->format('H:i') : $data,
-            ]
-        );
-
-        $builder->add(
-            'triggerRestrictedDaysOfWeek',
-            ChoiceType::class,
-            [
-                'label'    => true,
-                'attr'     => [
-                    'data-toggle' => 'time',
-                    'data-format' => 'H:i',
-                ],
-                'choices'  => [
-                    1  => 'mautic.report.schedule.day.monday',
-                    2  => 'mautic.report.schedule.day.tuesday',
-                    3  => 'mautic.report.schedule.day.wednesday',
-                    4  => 'mautic.report.schedule.day.thursday',
-                    5  => 'mautic.report.schedule.day.friday',
-                    6  => 'mautic.report.schedule.day.saturday',
-                    0  => 'mautic.report.schedule.day.sunday',
-                    -1 => 'mautic.report.schedule.day.week_days',
-                ],
-                'expanded' => true,
-                'multiple' => true,
-                'required' => false,
-            ]
-        );
 
         if (!empty($options['settings']['formType'])) {
             $this->addPropertiesType($builder, $options, $masks);
