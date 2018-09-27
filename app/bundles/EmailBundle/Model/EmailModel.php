@@ -563,9 +563,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
     {
         $createdByUserId = null;
-        if (!empty($options['canViewOthers'])) {
+        $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
+
+        if (!$canViewOthers) {
             $createdByUserId = $this->userHelper->getUser()->getId();
         }
+
         $stats = $this->getStatRepository()->getSentEmailToContactData($limit, $dateFrom, $dateTo, $createdByUserId, $companyId, $campaignId, $segmentId);
         $data  = [];
 
