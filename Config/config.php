@@ -13,8 +13,15 @@ return [
     'routes' => [
         'main' => [
             'mautic_integration_config' => [
-                'path'       => '/integration/{integration}/config/{page}',
+                'path'       => '/integration/{integration}/config',
                 'controller' => 'IntegrationsBundle:Config:edit',
+            ],
+            'mautic_integration_config_field_pagination' => [
+                'path'       => '/integration/{integration}/config/{object}/{page}',
+                'controller' => 'IntegrationsBundle:FieldPagination:paginate',
+                'defaults' => [
+                    'page' => 1,
+                ],
             ],
         ],
         'api' => [
@@ -67,10 +74,11 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.field',
+                    'request_stack',
                 ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field_directions' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldDirectionsType::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
             ],
             'mautic.integrations.form.config.sync_settings_object_field_mapping' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType::class,
@@ -78,8 +86,8 @@ return [
                     'translator',
                 ]
             ],
-            'mautic.integrations.form.config.sync_settings_field_directions' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldDirectionsType::class,
+            'mautic.integrations.form.config.sync_settings_object_field' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
             ],
         ],
         'helpers' => [

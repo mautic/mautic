@@ -47,13 +47,13 @@ class ConfigController extends AbstractFormController
     private $integrationConfiguration;
 
     /**
-     * @param string  $integration
      * @param Request $request
+     * @param string  $integration
      * @param int     $page
      *
-     * @return JsonResponse|RedirectResponse|Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(string $integration, Request $request, $page = 1)
+    public function editAction(Request $request, string $integration)
     {
         // Check ACL
         if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
@@ -78,7 +78,7 @@ class ConfigController extends AbstractFormController
             IntegrationConfigType::class,
             $this->integrationConfiguration,
             [
-                'action'      => $this->generateUrl('mautic_integration_config', ['integration' => $integration, 'page' => $page]),
+                'action'      => $this->generateUrl('mautic_integration_config', ['integration' => $integration]),
                 'integration' => $integration,
             ]
         );
@@ -102,7 +102,7 @@ class ConfigController extends AbstractFormController
         // Submit the form
         $this->form->handleRequest($this->request);
 
-        // Show the form if validation failed or the appy button as clicked
+        // Show the form if validation failed or the apply button as clicked
         if (!$this->form->isValid() || $this->isFormApplied($this->form)) {
             return $this->showForm();
         }
@@ -125,7 +125,7 @@ class ConfigController extends AbstractFormController
                 'contentTemplate' => 'IntegrationsBundle:Config:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
-                    'mauticContent' => 'integrationConfig',
+                    'mauticContent' => 'integrationsConfig',
                     'route'         => false,
                 ],
             ]
@@ -142,7 +142,7 @@ class ConfigController extends AbstractFormController
                 'closeForm'     => 1,
                 'enabled'       => $this->integrationConfiguration->getIsPublished(),
                 'name'          => $this->integrationConfiguration->getName(),
-                'mauticContent' => 'integrationConfig',
+                'mauticContent' => 'integrationsConfig',
             ]
         );
     }

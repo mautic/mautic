@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-interface ConfigFormSyncInterface
+interface ConfigFormSyncInterface extends IntegrationInterface
 {
     const FEATURE_SYNC = 'sync';
 

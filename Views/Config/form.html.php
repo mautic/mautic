@@ -13,6 +13,8 @@ use \MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesIn
 use \MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use \MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
 
+echo $view['assets']->includeScript('plugins/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad');
+
 /** @var \MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface $integrationObject Set through buildView */
 
 $activeTab = $activeTab ?: 'details-container';
@@ -70,6 +72,7 @@ $hasFeatureErrors =
     <!-- Enabled\Auth -->
     <div class="tab-pane fade <?php if ($activeTab == 'details-container'): echo 'in active'; endif; ?> bdr-w-0" id="details-container">
         <?php echo $view['form']->row($form['isPublished']); ?>
+        <hr />
         <?php echo $view['form']->row($form['apiKeys']); ?>
     </div>
     <!-- Enabled\Auth -->
@@ -111,16 +114,18 @@ $hasFeatureErrors =
     <?php if ($integrationObject instanceof ConfigFormSyncInterface): ?>
     <?php foreach ($form['featureSettings']['sync']['fieldMappings'] as $object => $objectFieldMapping): ?>
     <div class="tab-pane fade <?php if ($activeTab == "field-mapping-{$object}"): echo 'in active'; endif; ?> bdr-w-0" id="<?php echo "field-mappings-{$object}"; ?>-container">
-        <?php foreach ($form['featureSettings']['sync']['fieldMappings'][$object] as $fieldName => $fieldForm): ?>
-            <div class="row">
-                <div class="col-sm-12"><?php echo $view['form']->label($fieldForm); ?></div>
-            </div>
-            <div class="row">
-                <div class="col-sm-6"><?php echo $view['form']->widget($fieldForm); ?></div>
-                <div class="col-sm-6"><?php echo $view['form']->widget($form['featureSettings']['sync']['fieldDirections'][$object][$fieldName]); ?></div>
-            </div>
-            <hr />
-        <?php endforeach; ?>
+        <?php echo $view['form']->row($objectFieldMapping['filter-keyword']); ?>
+
+        <div id="<?php echo "field-mappings-{$object}"; ?>">
+        <?php
+        echo $view->render('IntegrationsBundle:Config:field_mapping.html.php',
+            [
+                'form'        => $form['featureSettings']['sync']['fieldMappings'][$object],
+                'integration' => $integrationObject->getName(),
+                'object'      => $object,
+            ]
+        ); ?>
+        </div>
     </div>
     <?php endforeach; ?>
     <?php endif; ?>

@@ -76,16 +76,6 @@ class IntegrationSyncSettingsType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'fieldDirections',
-            IntegrationSyncSettingsFieldDirectionsType::class,
-            [
-                'label'             => false,
-                'integrationObject' => $integrationObject,
-                'objects'           => $objects
-            ]
-        );
-
         if ($customSettings = $integrationObject->getSyncConfigFormName()) {
             $builder->add(
                 'integration',

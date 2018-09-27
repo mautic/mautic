@@ -13,7 +13,8 @@ namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -41,39 +42,57 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // @todo pagination
-        foreach ($options['requiredIntegrationFields'] as $field => $label) {
+        foreach ($options['integrationFields'] as $field => $label) {
             $builder->add(
                 $field,
-                ChoiceType::class,
+                IntegrationSyncSettingsObjectFieldType::class,
                 [
-                    'label'       => $label,
-                    'choices'     => $options['mauticFields'],
-                    'required'    => true,
-                    'empty_value' => '',
-                    'attr'        => [
-                        'class'            => 'form-control',
-                        'data-placeholder' => $this->translator->trans('mautic.integration.sync_mautic_field'),
+                    'label'        => $label,
+                    'mauticFields' => $options['mauticFields'],
+                    'required'     => isset($options['requiredIntegrationFields'][$field]),
+                    'placeholder'  => $this->translator->trans('mautic.integration.sync_mautic_field'),
+                    'attr'         => [
+                        'class' => 'form-control',
                     ],
                 ]
             );
         }
 
-        foreach ($options['optionalIntegrationFields'] as $field => $label) {
-            $builder->add(
-                $field,
-                ChoiceType::class,
-                [
-                    'label'    => $label,
-                    'choices'  => $options['mauticFields'],
-                    'required' => false,
-                    'attr'        => [
-                        'class'            => 'form-control',
-                        'data-placeholder' => $this->translator->trans('mautic.integration.sync_mautic_field'),
-                    ],
-                ]
-            );
-        }
+        $builder->add(
+            'filter-page',
+            HiddenType::class,
+            [
+                'label'  => false,
+                'mapped' => false,
+                'data'   => $options['page']
+            ]
+        );
+
+        $builder->add(
+            'filter-keyword',
+            TextType::class,
+            [
+                'label'  => false,
+                'mapped' => false,
+                'data'   => $options['keyword'],
+                'attr'   => [
+                    'class'            => 'form-control integration-keyword-filter',
+                    'placeholder'      => $this->translator->trans('mautic.integration.sync_filter_fields'),
+                    'data-object'      => $options['object'],
+                    'data-integration' => $options['integration'],
+                ],
+            ]
+        );
+
+        $builder->add(
+            'filter-totalFieldCount',
+            HiddenType::class,
+            [
+                'label'  => false,
+                'mapped' => false,
+                'data'   => $options['totalFieldCount']
+            ]
+        );
     }
 
     /**
@@ -84,8 +103,13 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
         $resolver->setRequired(
             [
                 'requiredIntegrationFields',
-                'optionalIntegrationFields',
+                'integrationFields',
                 'mauticFields',
+                'page',
+                'keyword',
+                'totalFieldCount',
+                'object',
+                'integration',
             ]
         );
     }
