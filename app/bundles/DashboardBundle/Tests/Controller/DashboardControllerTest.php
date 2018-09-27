@@ -13,12 +13,12 @@ namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\DashboardBundle\Controller\DashboardController;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\RouterInterface;
@@ -48,12 +48,13 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
         $this->routerMock         = $this->createMock(RouterInterface::class);
         $this->sessionMock        = $this->createMock(Session::class);
-        $this->flashBagMock       = $this->createMock(FlashBagInterface::class);
+        $this->flashBagMock       = $this->createMock(FlashBag::class);
         $this->containerMock      = $this->createMock(Container::class);
         $this->controller         = new DashboardController();
         $this->controller->setRequest($this->requestMock);
         $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);
+        $this->controller->setFlashBag($this->flashBagMock);
         $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
     }
 
