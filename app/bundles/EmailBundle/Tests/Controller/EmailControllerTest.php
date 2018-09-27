@@ -12,12 +12,12 @@
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -28,8 +28,10 @@ class EmailControllerTest extends \PHPUnit_Framework_TestCase
     private $sessionMock;
     private $modelFactoryMock;
     private $containerMock;
+    private $routerMock;
     private $modelMock;
     private $emailMock;
+    private $flashBagMock;
     private $controller;
 
     protected function setUp()
@@ -43,10 +45,11 @@ class EmailControllerTest extends \PHPUnit_Framework_TestCase
         $this->routerMock       = $this->createMock(Router::class);
         $this->modelMock        = $this->createMock(EmailModel::class);
         $this->emailMock        = $this->createMock(Email::class);
-        $this->flashBagMock     = $this->createMock(FlashBagInterface::class);
+        $this->flashBagMock     = $this->createMock(FlashBag::class);
         $this->controller       = new EmailController();
         $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);
+        $this->controller->setFlashBag($this->flashBagMock);
         $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
         $this->controller->setRequest(new Request());
     }

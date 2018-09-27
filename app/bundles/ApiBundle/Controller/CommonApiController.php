@@ -28,6 +28,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
@@ -164,6 +165,11 @@ class CommonApiController extends FOSRestController implements MauticController
      * @var TranslatorInterface
      */
     protected $translator;
+
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
 
     /**
      * @var User
@@ -679,6 +685,14 @@ class CommonApiController extends FOSRestController implements MauticController
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
+    }
+
+    /**
+     * @param FlashBag $flashBag
+     */
+    public function setFlashBag(FlashBag $flashBag)
+    {
+        $this->flashBag = $flashBag;
     }
 
     /**
