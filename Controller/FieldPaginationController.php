@@ -116,8 +116,12 @@ class FieldPaginationController extends CommonController
 
         // Pull those changed from session
         $session       = $this->get('session');
-        $sessionFields = $session->get(sprintf("%s-%s-fields", $integration, $object), []);
+        $sessionFields = $session->get(sprintf("%s-fields", $integration), []);
 
-        return array_merge($fields, $sessionFields);
+        if (!isset($sessionFields[$object])) {
+            return $fields;
+        }
+
+        return array_merge_recursive($fields, $sessionFields[$object]);
     }
 }

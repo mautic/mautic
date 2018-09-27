@@ -18,6 +18,7 @@ echo $view['assets']->includeScript('plugins/IntegrationsBundle/Assets/js/integr
 /** @var \MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface $integrationObject Set through buildView */
 
 $activeTab = $activeTab ?: 'details-container';
+
 $showFeaturesTab =
     $integrationObject instanceof ConfigFormFeaturesInterface ||
     $integrationObject instanceof ConfigFormSyncInterface ||
@@ -99,7 +100,7 @@ $hasFeatureErrors =
 
         if ($integrationObject instanceof ConfigFormSyncInterface):
             echo $view['form']->row($form['featureSettings']['sync']['objects']);
-            echo $view['form']->row($form['featureSettings']['sync']['updateBlanks']);
+            // @todo echo $view['form']->row($form['featureSettings']['sync']['updateBlanks']);
 
             if (isset($form['featureSettings']['sync']['custom'])):
                 echo $view['form']->row($form['featureSettings']['sync']['integration']);

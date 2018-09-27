@@ -30,8 +30,11 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
                 'required'    => !empty($options['required']),
                 'empty_value' => '',
                 'attr'        => [
-                    'class'            => 'form-control',
+                    'class'            => 'form-control integration-mapped-field',
                     'data-placeholder' => $options['placeholder'],
+                    'data-object'      => $options['object'],
+                    'data-integration' => $options['integration'],
+                    'data-field'       => $options['field'],
                 ],
             ]
         );
@@ -40,13 +43,19 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
             'syncDirection',
             ChoiceType::class,
             [
-                'choices' => [
+                'choices'    => [
+                    ObjectMappingDAO::SYNC_BIDIRECTIONALLY => 'mautic.integration.sync_direction_bidirectional',
                     ObjectMappingDAO::SYNC_TO_INTEGRATION  => 'mautic.integration.sync_direction_integration',
                     ObjectMappingDAO::SYNC_TO_MAUTIC       => 'mautic.integration.sync_direction_mautic',
-                    ObjectMappingDAO::SYNC_BIDIRECTIONALLY => 'mautic.integration.sync_direction_bidirectional',
                 ],
-                'label'   => false,
-                'data'    => (empty($options['data']['syncDirection'])) ? ObjectMappingDAO::SYNC_BIDIRECTIONALLY : $options['data']['syncDirection']
+                'label'      => false,
+                'empty_data' => ObjectMappingDAO::SYNC_BIDIRECTIONALLY,
+                'attr'       => [
+                    'class'            => 'integration-sync-direction',
+                    'data-object'      => $options['object'],
+                    'data-integration' => $options['integration'],
+                    'data-field'       => $options['field'],
+                ],
             ]
         );
     }
@@ -59,7 +68,10 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
         $resolver->setRequired(
             [
                 'mauticFields',
-                'placeholder'
+                'placeholder',
+                'integration',
+                'object',
+                'field',
             ]
         );
     }

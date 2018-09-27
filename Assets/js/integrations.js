@@ -1,7 +1,4 @@
 Mautic.integrationsConfigOnLoad = function () {
-    // Hide the dismiss button, yes a hack
-    mQuery('form[name=integration_config]').closest('.modal').find('button.close').hide();
-
     mQuery('.integration-keyword-filter').each(function() {
         var integration = mQuery(this).attr('data-integration');
         var object = mQuery(this).attr('data-object');
@@ -17,6 +14,24 @@ Mautic.integrationsConfigOnLoad = function () {
                     this
                 );
             }
+        });
+    });
+
+    mQuery('.integration-mapped-field').each(function() {
+        var integration = mQuery(this).attr('data-integration');
+        var object = mQuery(this).attr('data-object');
+        var field = mQuery(this).attr('data-field');
+        mQuery(this).on("change", function (event) {
+            Mautic.updateIntegrationField(integration, object, field, 'mappedField', mQuery(this).val());
+        });
+    });
+
+    mQuery('.integration-sync-direction').each(function() {
+        var integration = mQuery(this).attr('data-integration');
+        var object = mQuery(this).attr('data-object');
+        var field = mQuery(this).attr('data-field');
+        mQuery(this).on("change", function (event) {
+            Mautic.updateIntegrationField(integration, object, field, 'syncDirection', mQuery(this).val());
         });
     });
 };
@@ -73,6 +88,42 @@ Mautic.getPaginatedIntegrationFields = function(settings, page, element) {
         },
         complete: function () {
             delete Mautic.activeActions[requestName]
+        }
+    });
+};
+
+Mautic.updateIntegrationField = function(integration, object, field, fieldOption, fieldValue) {
+    var action = mauticBaseUrl + 's/integration/' + integration + '/config/' + object + '/field/' + field;
+    var modal = mQuery('form[name=integration_config]').closest('.modal');
+    var requestName = integration + object + field + fieldOption;
+
+    // Disable submit buttons until the action is done so nothing is lost
+    mQuery(modal).find('.modal-form-buttons .btn').prop('disabled', true);
+
+    if (typeof Mautic.activeActions == 'undefined') {
+        Mautic.activeActions = {};
+    } else if (typeof Mautic.activeActions[requestName] != 'undefined') {
+        Mautic.activeActions[requestName].abort();
+    }
+
+    Mautic.startModalLoadingBar(mQuery(modal).attr('id'));
+
+    // Must use bracket notation to use variable for key
+    var obj = {};
+    obj[fieldOption] = fieldValue;
+
+    Mautic.activeActions[requestName] = mQuery.ajax({
+        showLoadingBar: false,
+        url: action,
+        type: "POST",
+        dataType: "json",
+        data: obj,
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        },
+        complete: function () {
+            modal.find('.modal-form-buttons .btn').prop('disabled', false);
+            delete Mautic.activeActions[requestName];
         }
     });
 };

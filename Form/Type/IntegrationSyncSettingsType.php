@@ -54,6 +54,7 @@ class IntegrationSyncSettingsType extends AbstractType
         );
 
         // @todo
+        /*
         $builder->add(
             'updateBlanks',
             YesNoButtonGroupType::class,
@@ -65,6 +66,7 @@ class IntegrationSyncSettingsType extends AbstractType
                 'data'        => !empty($options['data']['updateBlanks'])
             ]
         );
+        */
 
         $builder->add(
             'fieldMappings',

@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
-
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 
 trait FilteredFieldsTrait
@@ -52,9 +51,9 @@ trait FilteredFieldsTrait
 
             // Paginate filtered fields
             $this->totalFieldCount = count($this->filteredFields);
-            $this->filteredFields = $this->getPageOfFields($this->filteredFields, $page);
+            $this->filteredFields  = $this->getPageOfFields($this->filteredFields, $page);
         } else {
-            $this->filteredFields = $this->getPageOfFields($allFields, $page);
+            $this->filteredFields  = $this->getPageOfFields($allFields, $page);
             $this->totalFieldCount = count($allFields);
         }
     }
@@ -66,7 +65,7 @@ trait FilteredFieldsTrait
      *
      * @return array
      */
-    private function getPageOfFields(array $fields,int $page, int $limit = 15)
+    private function getPageOfFields(array $fields, int $page, int $limit = 15)
     {
         $offset = ($page - 1) * $limit;
 

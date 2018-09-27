@@ -88,7 +88,7 @@ class IntegrationConfigType extends AbstractType
             IntegrationFeatureSettingsType::class,
             [
                 'label'             => false,
-                'integrationObject' => $integrationObject
+                'integrationObject' => $integrationObject,
             ]
         );
 

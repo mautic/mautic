@@ -14,15 +14,20 @@ namespace MauticPlugin\IntegrationsBundle\Controller;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use MauticPlugin\IntegrationsBundle\Exception\RequiredFieldsMissingException;
 use MauticPlugin\IntegrationsBundle\Form\Type\IntegrationConfigType;
 use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
+use MauticPlugin\IntegrationsBundle\Helper\FieldMergerHelper;
 use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
+use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class ConfigController extends AbstractFormController
 {
@@ -47,9 +52,13 @@ class ConfigController extends AbstractFormController
     private $integrationConfiguration;
 
     /**
+     * @var ConfigIntegrationsHelper
+     */
+    private $integrationsHelper;
+
+    /**
      * @param Request $request
      * @param string  $integration
-     * @param int     $page
      *
      * @return array|JsonResponse|RedirectResponse|Response
      */
@@ -62,9 +71,9 @@ class ConfigController extends AbstractFormController
 
         // Find the integration
         /** @var ConfigIntegrationsHelper $integrationsHelper */
-        $integrationsHelper = $this->get('mautic.integrations.helper.config_integrations');
+        $this->integrationsHelper = $this->get('mautic.integrations.helper.config_integrations');
         try {
-            $this->integrationObject        = $integrationsHelper->getIntegration($integration);
+            $this->integrationObject        = $this->integrationsHelper->getIntegration($integration);
             $this->integrationConfiguration = $this->integrationObject->getIntegrationConfiguration();
         } catch (IntegrationNotFoundException $exception) {
             return $this->notFound();
@@ -74,18 +83,16 @@ class ConfigController extends AbstractFormController
         $this->request = $request;
 
         // Create the form
-        $this->form = $this->get('form.factory')->create(
-            IntegrationConfigType::class,
-            $this->integrationConfiguration,
-            [
-                'action'      => $this->generateUrl('mautic_integration_config', ['integration' => $integration]),
-                'integration' => $integration,
-            ]
-        );
+        $this->form = $this->getForm();
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $this->submitForm();
+            return $this->submitForm();
         }
+
+        // Clear the session of previously stored fields in case it got stuck
+        /** @var Session $session */
+        $session = $this->get('session');
+        $session->remove("$integration-fields");
 
         return $this->showForm();
     }
@@ -99,15 +106,86 @@ class ConfigController extends AbstractFormController
             return $this->closeForm();
         }
 
+        // Get the fields before the form binds partial data due to pagination
+        $settings      = $this->integrationConfiguration->getFeatureSettings();
+        $fieldMappings = (isset($settings['sync']['fieldMappings'])) ? $settings['sync']['fieldMappings'] : [];
+
         // Submit the form
         $this->form->handleRequest($this->request);
 
-        // Show the form if validation failed or the apply button as clicked
-        if (!$this->form->isValid() || $this->isFormApplied($this->form)) {
+        if ($this->integrationObject instanceof ConfigFormSyncInterface) {
+            $integration   = $this->integrationObject->getName();
+            $features      = $this->integrationConfiguration->getSupportedFeatures();
+            $session       = $this->get('session');
+            $updatedFields = $session->get("$integration-fields", []);
+
+            $fieldMapper = new FieldMergerHelper($this->integrationObject, $fieldMappings);
+
+            foreach ($updatedFields as $object => $fields) {
+                try {
+                    $fieldMapper->mergeSyncFieldMapping($object, $fields);
+                } catch (RequiredFieldsMissingException $exception) {
+                    if (!$this->integrationConfiguration->getIsPublished()) {
+                        // Don't bind form errors if the integration is not published
+                        continue;
+                    }
+
+                    if (in_array(ConfigFormSyncInterface::FEATURE_SYNC, $features)) {
+                        // Don't bind form errors if sync is not enabled
+                        continue;
+                    }
+
+                    if (!in_array($object, $settings['sync']['objects'])) {
+                        // Don't bind form errors if the object is not enabled
+                        continue;
+                    }
+
+                    foreach ($exception->getFields() as $field) {
+                        /** @var Form $formField */
+                        $formField = $this->form['featureSettings']['sync']['fieldMappings'][$object][$field];
+                        $formField->addError($this->get('translator')->trans('mautic.core.value.required', [], 'validators'));
+                    }
+                }
+            }
+
+            $settings['sync']['fieldMappings'] = $fieldMapper->getFieldMappings();
+
+            $this->integrationConfiguration->setFeatureSettings($settings);
+        }
+
+        // Show the form if there are errors
+        if (!$this->form->isValid()) {
             return $this->showForm();
         }
 
+        // Save the integration configuration
+        $this->integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
+
+        // Show the form if the apply button was clicked
+        if ($this->isFormApplied($this->form)) {
+            // Regenerate the form
+            $this->form = $this->getForm();
+
+            return $this->showForm();
+        }
+
+        // Otherwise close the modal
         return $this->closeForm();
+    }
+
+    /**
+     * @return Form
+     */
+    private function getForm()
+    {
+        return $this->get('form.factory')->create(
+            IntegrationConfigType::class,
+            $this->integrationConfiguration,
+            [
+                'action'      => $this->generateUrl('mautic_integration_config', ['integration' => $this->integrationObject->getName()]),
+                'integration' => $this->integrationObject->getName(),
+            ]
+        );
     }
 
     /**
@@ -137,9 +215,13 @@ class ConfigController extends AbstractFormController
      */
     private function closeForm()
     {
+        /** @var Session $session */
+        $session = $this->get('session');
+        $session->remove("{$this->integrationObject->getName()}-fields");
+
         return new JsonResponse(
             [
-                'closeForm'     => 1,
+                'closeModal'    => 1,
                 'enabled'       => $this->integrationConfiguration->getIsPublished(),
                 'name'          => $this->integrationConfiguration->getName(),
                 'mauticContent' => 'integrationsConfig',

@@ -51,9 +51,9 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
                     'mauticFields' => $options['mauticFields'],
                     'required'     => isset($options['requiredIntegrationFields'][$field]),
                     'placeholder'  => $this->translator->trans('mautic.integration.sync_mautic_field'),
-                    'attr'         => [
-                        'class' => 'form-control',
-                    ],
+                    'object'       => $options['object'],
+                    'integration'  => $options['integration'],
+                    'field'        => $field,
                 ]
             );
         }

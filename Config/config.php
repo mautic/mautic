@@ -23,6 +23,10 @@ return [
                     'page' => 1,
                 ],
             ],
+            'mautic_integration_config_field_update' => [
+                'path'       => '/integration/{integration}/config/{object}/field/{field}',
+                'controller' => 'IntegrationsBundle:UpdateField:update',
+            ],
         ],
         'api' => [
         ],
@@ -74,7 +78,6 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.field',
-                    'request_stack',
                 ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field_directions' => [

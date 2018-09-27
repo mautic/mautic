@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
 
+use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -26,8 +27,9 @@ trait NotBlankIfPublishedConstraintTrait
     {
         return new Callback(
             function ($validateMe, ExecutionContextInterface $context) {
+                /** @var Integration $data */
                 $data = $context->getRoot()->getData();
-                if (!empty($data['is_published']) && empty($validateMe)) {
+                if (!empty($data->getIsPublished()) && empty($validateMe)) {
                     $context->buildViolation('mautic.core.value.required')->addViolation();
                 }
             }

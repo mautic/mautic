@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
-
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
@@ -45,13 +44,11 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
      *
      * @param TranslatorInterface $translator
      * @param FieldModel          $fieldModel
-     * @param RequestStack        $requestStack
      */
-    public function __construct(TranslatorInterface $translator, FieldModel $fieldModel, RequestStack $requestStack)
+    public function __construct(TranslatorInterface $translator, FieldModel $fieldModel)
     {
         $this->translator = $translator;
         $this->fieldModel = $fieldModel;
-        $this->request    = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -63,19 +60,16 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!is_array($options['objects'])) {
-            throw new InvalidFormOptionException("objects must be an array");
+            throw new InvalidFormOptionException('objects must be an array');
         }
 
         $integrationObject = $options['integrationObject'];
         if (!$integrationObject instanceof ConfigFormSyncInterface) {
-            throw new InvalidFormOptionException("integrationObject must be an instance of ConfigFormSyncInterface");
+            throw new InvalidFormOptionException('integrationObject must be an instance of ConfigFormSyncInterface');
         }
 
-        $page    = $this->request ? $this->request->get('page', 1) : 1;
-        $keyword = $this->request ? $this->request->get('keyword', null) : null;
-
         foreach ($options['objects'] as $objectName => $objectLabel) {
-            $this->filterFields($integrationObject, $objectName, $keyword, $page);
+            $this->filterFields($integrationObject, $objectName, null, 1);
 
             $builder->add(
                 $objectName,
@@ -85,11 +79,11 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                     'requiredIntegrationFields' => $this->getRequiredFields(),
                     'integrationFields'         => $this->getFilteredFields(),
                     'mauticFields'              => $this->fieldModel->getFieldList(false),
-                    'page'                      => $page ? $page : 1,
-                    'keyword'                   => $keyword,
+                    'page'                      => 1,
+                    'keyword'                   => null,
                     'totalFieldCount'           => $this->getTotalFieldCount(),
                     'object'                    => $objectName,
-                    'integration'               => $integrationObject->getName()
+                    'integration'               => $integrationObject->getName(),
                 ]
             );
         }
@@ -103,9 +97,8 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
         $resolver->setRequired(
             [
                 'integrationObject',
-                'objects'
+                'objects',
             ]
         );
     }
-
 }
