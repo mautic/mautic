@@ -11,14 +11,20 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\Summary;
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Symfony\Component\Console\Output\Output;
 
 /**
  * Class SummaryModel.
  */
 class SummaryModel extends AbstractCommonModel
 {
+    /** @var ProgressBarHelper */
+    private $progressBar;
+
     /**
      * Collapse Event Log entities into insert/update queries for the campaign summary.
      *
@@ -29,8 +35,9 @@ class SummaryModel extends AbstractCommonModel
         $summaries = [];
         $now       = new \DateTime();
         foreach ($logs as $log) {
-            // Universally round down to the hour.
+            /** @var LeadEventLog $log */
             $timestamp = $log->getDateTriggered()->getTimestamp();
+            // Universally round down to the hour.
             $timestamp = $timestamp - ($timestamp % 3600);
             $campaign  = $log->getCampaign();
             $event     = $log->getEvent();
@@ -65,7 +72,7 @@ class SummaryModel extends AbstractCommonModel
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
+     * @return \Mautic\CampaignBundle\Entity\SummaryRepository
      */
     public function getRepository()
     {
@@ -80,5 +87,48 @@ class SummaryModel extends AbstractCommonModel
     public function getPermissionBase()
     {
         return 'campaign:campaigns';
+    }
+
+    /**
+     * @param Output $output
+     */
+    public function summarizeHistory(Output $output)
+    {
+        /** @var \DateTime $oldestSumamryDate */
+        $start = $this->getRepository()->getOldestTriggered();
+
+        /** @var LeadEventLog $oldestTriggeredEventLog */
+        $oldestTriggeredEventLogs = $this->getCampaignLeadEventLogRepository()->getEntities(
+            [
+                'limit'            => 1,
+                'orderBy'          => 'll.dateTriggered, ll.id',
+                'orderByDir'       => 'ASC',
+                'ignore_paginator' => true,
+            ]
+        );
+        if ($oldestTriggeredEventLog = reset($oldestTriggeredEventLogs)) {
+            $end               = $oldestTriggeredEventLog->getDateTriggered();
+            $totalHours        = abs(intval(($start->getTimestamp() - $end->getTimestamp()) / 60 / 60));
+            $this->progressBar = ProgressBarHelper::init($output, $totalHours);
+            $this->progressBar->start();
+
+            // Forcibly update or drop the first hour of summaries.
+
+            // Insert/update/increment other hours.
+
+            // @todo - Batch query to run through events prior to that moment to write/overwrite the summary entries.
+
+            // @todo - Get up to 100k rows, starting with the ID of the last one, and go backward till there are no more.
+
+            $do = 'THITYNGSS';
+        }
+    }
+
+    /**
+     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
+     */
+    public function getCampaignLeadEventLogRepository()
+    {
+        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
     }
 }
