@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2017 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticFocusBundle\Event;
 
-use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -20,11 +19,6 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class FocusViewEvent extends Event
 {
-    /**
-     * @var Focus
-     */
-    private $focus;
-
     /**
      * @var Stat
      */
@@ -36,17 +30,6 @@ class FocusViewEvent extends Event
     public function __construct(Stat $stat)
     {
         $this->stat  = $stat;
-        $this->focus = $stat->getFocus();
-    }
-
-    /**
-     * Returns the Focus entity.
-     *
-     * @return Focus
-     */
-    public function getFocus()
-    {
-        return $this->focus;
     }
 
     /**
