@@ -18,9 +18,8 @@ use MauticPlugin\IntegrationsBundle\Exception\RequiredFieldsMissingException;
 use MauticPlugin\IntegrationsBundle\Form\Type\IntegrationConfigType;
 use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Helper\FieldMergerHelper;
-use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
-use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
@@ -43,7 +42,7 @@ class ConfigController extends AbstractFormController
     private $form;
 
     /**
-     * @var BasicIntegration
+     * @var BasicIntegration|ConfigFormInterface
      */
     private $integrationObject;
 
@@ -159,7 +158,7 @@ class ConfigController extends AbstractFormController
     private function getForm()
     {
         return $this->get('form.factory')->create(
-            IntegrationConfigType::class,
+            $this->integrationObject->getConfigFormName() ? $this->integrationObject->getConfigFormName() : IntegrationConfigType::class,
             $this->integrationConfiguration,
             [
                 'action'      => $this->generateUrl('mautic_integration_config', ['integration' => $this->integrationObject->getName()]),
@@ -180,7 +179,9 @@ class ConfigController extends AbstractFormController
                     'form'              => $this->setFormTheme($this->form, 'IntegrationsBundle:Config:form.html.php'),
                     'activeTab'         => $this->request->get('activeTab'),
                 ],
-                'contentTemplate' => 'IntegrationsBundle:Config:form.html.php',
+                'contentTemplate' => $this->integrationObject->getConfigFormContentTemplate()
+                    ? $this->integrationObject->getConfigFormContentTemplate()
+                    : 'IntegrationsBundle:Config:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationsConfig',
