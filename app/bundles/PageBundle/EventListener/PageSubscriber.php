@@ -188,12 +188,19 @@ class PageSubscriber extends CommonSubscriber
         $trackingNewlyGenerated = $payload['isNew'];
         $pageId                 = $payload['pageId'];
         $leadId                 = $payload['leadId'];
+        $isRedirect             = $payload['isRedirect'];
         $hitRepo                = $this->em->getRepository('MauticPageBundle:Hit');
         $pageRepo               = $this->em->getRepository('MauticPageBundle:Page');
+        $redirectRepo           = $this->em->getRepository('MauticPageBundle:Redirect');
         $leadRepo               = $this->em->getRepository('MauticLeadBundle:Lead');
         $hit                    = $hitRepo->find((int) $payload['hitId']);
-        $page                   = $pageId ? $pageRepo->find((int) $pageId) : null;
         $lead                   = $leadId ? $leadRepo->find((int) $leadId) : null;
+
+        if ($isRedirect) {
+            $page = $pageId ? $redirectRepo->find((int) $pageId) : null;
+        } else {
+            $page = $pageId ? $pageRepo->find((int) $pageId) : null;
+        }
 
         $this->pageModel->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated, false);
         $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
