@@ -82,10 +82,14 @@ class SyncIntegrationsHelper
 
         $this->enabled = [];
         foreach ($this->integrations as $name => $syncIntegration) {
-            $integrationConfiguration = $this->integrationsHelper->getIntegrationConfiguration($syncIntegration);
+            try {
+                $integrationConfiguration = $this->integrationsHelper->getIntegrationConfiguration($syncIntegration);
 
-            if ($integrationConfiguration->getIsPublished()) {
-                $this->enabled[] = $name;
+                if ($integrationConfiguration->getIsPublished()) {
+                    $this->enabled[] = $name;
+                }
+            } catch (IntegrationNotFoundException $exception) {
+                // Just ignore as the plugin hasn't been installed yet
             }
         }
 
