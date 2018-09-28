@@ -485,6 +485,7 @@ return [
                     'mautic.transport.sendgrid_api.mail.personalization',
                     'mautic.transport.sendgrid_api.mail.metadata',
                     'mautic.transport.sendgrid_api.mail.attachment',
+                    'mautic.transport.sendgrid_api.mail.categories',
                 ],
             ],
             'mautic.transport.sendgrid_api.response' => [

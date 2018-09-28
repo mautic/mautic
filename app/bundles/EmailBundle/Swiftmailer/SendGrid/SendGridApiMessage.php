@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Swiftmailer\SendGrid;
 
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase;
+use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailCategories;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization;
 use SendGrid\Mail;
@@ -39,16 +40,23 @@ class SendGridApiMessage
      */
     private $sendGridMailAttachment;
 
+    /**
+     * @var SendGridMailCategories
+     */
+    private $sendGridMailCategories;
+
     public function __construct(
         SendGridMailBase $sendGridMailBase,
         SendGridMailPersonalization $sendGridMailPersonalization,
         SendGridMailMetadata $sendGridMailMetadata,
-        SendGridMailAttachment $sendGridMailAttachment
+        SendGridMailAttachment $sendGridMailAttachment,
+        SendGridMailCategories $sendGridMailCategories
     ) {
         $this->sendGridMailBase            = $sendGridMailBase;
         $this->sendGridMailPersonalization = $sendGridMailPersonalization;
         $this->sendGridMailMetadata        = $sendGridMailMetadata;
         $this->sendGridMailAttachment      = $sendGridMailAttachment;
+        $this->sendGridMailCategories      = $sendGridMailCategories;
     }
 
     /**
@@ -63,6 +71,7 @@ class SendGridApiMessage
         $this->sendGridMailPersonalization->addPersonalizedDataToMail($mail, $message);
         $this->sendGridMailMetadata->addMetadataToMail($mail, $message);
         $this->sendGridMailAttachment->addAttachmentsToMail($mail, $message);
+        $this->sendGridMailCategories->addCategoriesToMail($mail, $message);
 
         return $mail;
     }
