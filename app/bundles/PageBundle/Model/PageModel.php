@@ -538,7 +538,7 @@ class PageModel extends FormModel
                 'request'       => $request,
                 'leadId'        => $lead ? $lead->getId() : null,
                 'isNew'         => $this->deviceTracker->wasDeviceChanged(),
-                'isRedirect'    => $page instanceof Redirect ? true : false,
+                'isRedirect'    => ($page instanceof Redirect),
             ];
             $this->queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
         } else {
