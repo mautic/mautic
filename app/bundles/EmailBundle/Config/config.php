@@ -542,6 +542,7 @@ return [
                     'mautic.transport.sendgrid_api.mail.personalization',
                     'mautic.transport.sendgrid_api.mail.metadata',
                     'mautic.transport.sendgrid_api.mail.attachment',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.transport.sendgrid_api.response' => [
