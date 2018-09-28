@@ -29,9 +29,6 @@ class IntegrationsBundle extends PluginBundleBase
 {
     public function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new EncryptionIntegrationPass());
-        $container->addCompilerPass(new DispatcherIntegrationPass());
-
         $container->addCompilerPass(new IntegrationsPass());
         $container->addCompilerPass(new AuthenticationIntegrationPass());
         $container->addCompilerPass(new SyncIntegrationsPass());

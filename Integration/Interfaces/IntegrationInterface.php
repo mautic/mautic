@@ -13,8 +13,9 @@ namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
 
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-interface IntegrationInterface
+interface IntegrationInterface extends UnifiedIntegrationInterface
 {
     /**
      * Return the integration's name

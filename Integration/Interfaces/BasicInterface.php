@@ -11,7 +11,9 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-interface BasicInterface
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
+
+interface BasicInterface extends UnifiedIntegrationInterface
 {
     /**
      * Return the integration's name
@@ -19,4 +21,10 @@ interface BasicInterface
      * @return string
      */
     public function getName(): string;
+
+    /**
+     * @return string
+     */
+    public function getIcon(): string;
+
 }

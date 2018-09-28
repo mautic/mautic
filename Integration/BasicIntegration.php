@@ -11,15 +11,13 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration;
 
-use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Integration\BC\BcIntegrationSettingsTrait;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 
 /**
  * Class AbstractIntegration.
  */
-abstract class BasicIntegration implements BasicInterface, IntegrationInterface
+abstract class BasicIntegration implements IntegrationInterface
 {
     use BcIntegrationSettingsTrait;
     use ConfigurationTrait;
