@@ -15,15 +15,15 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AuthenticationIntegrationPass implements CompilerPassInterface
+class ConfigIntegrationPass implements CompilerPassInterface
 {
     /**
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
-        $taggedServices     = $container->findTaggedServiceIds('mautic.authentication_integration');
-        $integrationsHelper = $container->findDefinition('mautic.integrations.helper.auth_integrations');
+        $taggedServices     = $container->findTaggedServiceIds('mautic.config_integration');
+        $integrationsHelper = $container->findDefinition('mautic.integrations.helper.config_integrations');
 
         foreach ($taggedServices as $id => $tags) {
             $integrationsHelper->addMethodCall('addIntegration', [new Reference($id)]);

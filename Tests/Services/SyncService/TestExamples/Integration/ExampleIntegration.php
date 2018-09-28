@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration;
 
 use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\BasicInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\SyncInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
@@ -22,7 +22,7 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 
-final class ExampleIntegration extends BasicIntegration implements BasicInterface, SyncInterface
+final class ExampleIntegration extends BasicIntegration implements IntegrationInterface, SyncInterface
 {
     const NAME = 'Example';
 
@@ -74,7 +74,6 @@ final class ExampleIntegration extends BasicIntegration implements BasicInterfac
     {
         return true;
     }
-
 
     public function getSyncDataExchange(): SyncDataExchangeInterface
     {

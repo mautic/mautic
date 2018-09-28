@@ -11,58 +11,23 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
-use MauticPlugin\IntegrationsBundle\Helpers\BCIntegrationFormsHelperTrait;
-use MauticPlugin\IntegrationsBundle\Helpers\BCIntegrationHelperTrait;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\BasicInterface;
-use Symfony\Component\Routing\RouterInterface;
+use MauticPlugin\IntegrationsBundle\Integration\BC\BcIntegrationSettingsTrait;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 
 /**
  * Class AbstractIntegration.
  */
-abstract class BasicIntegration implements BasicInterface, UnifiedIntegrationInterface
+abstract class BasicIntegration implements IntegrationInterface
 {
-    use BCIntegrationHelperTrait;
-    use BCIntegrationFormsHelperTrait;
+    use BcIntegrationSettingsTrait;
+    use ConfigurationTrait;
 
     /**
-     * @var Integration
+     * @return string
      */
-    private $integration;
-
-    /**
-     * @inheritdoc
-     */
-    public function isCoreIntegration(): bool
+    public function getDisplayName(): string
     {
-        return false;
+        return $this->getName();
     }
 
-    /**
-     * @return Integration
-     */
-    public function getIntegration(): Integration
-    {
-        return $this->integration;
-    }
-
-    /**
-     * @param Integration $integration
-     */
-    public function setIntegration(Integration $integration)
-    {
-        $this->integration = $integration;
-    }
-
-    /**
-     * Check if Integration entity has been set to prevent PHP fatal error with using getIntegrationEntity
-     *
-     * @return bool
-     */
-    public function hasIntegration(): bool
-    {
-        return !empty($this->integration);
-    }
 }

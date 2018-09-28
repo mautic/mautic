@@ -1,16 +1,31 @@
 <?php
 
+/*
+ * @copyright   2018 Mautic, Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-interface AuthenticationInterface
+use MauticPlugin\IntegrationsBundle\Auth\Exception\FailedToAuthenticateException;
+
+interface AuthenticationInterface extends IntegrationInterface
 {
-    public function getRequiredKeyFields(): array;
+    /**
+     * Returns true if the integration has already been authorized with the 3rd party service
+     *
+     * @return bool
+     */
+    public function isAuthenticated(): bool;
 
-    public function getClientIdKey(): string;
-
-    public function getClientSecretKey(): string;
-
-    public function getAuthTokenKey(): string;
-
-    public function getApiUrl(): string;
+    /**
+     * Authenticate the integration with the 3rd party service
+     *
+     * @throws FailedToAuthenticateException
+     */
+    public function authenticateIntegration(): bool;
 }

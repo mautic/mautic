@@ -11,20 +11,13 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-interface BasicInterface extends UnifiedIntegrationInterface
+interface ConfigFormAuthInterface
 {
     /**
-     * Return the integration's name
+     * Return the name of the form type service for the authorization tab which should include all the fields required for the API to work
      *
      * @return string
      */
-    public function getName(): string;
-
-    /**
-     * @return string
-     */
-    public function getIcon(): string;
-
+    public function getAuthConfigFormName(): string;
 }

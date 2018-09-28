@@ -11,20 +11,13 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-interface BasicInterface extends UnifiedIntegrationInterface
+interface ConfigFormFeatureSettingsInterface
 {
     /**
-     * Return the integration's name
+     * Return the name of the form type service for the feature settings
      *
      * @return string
      */
-    public function getName(): string;
-
-    /**
-     * @return string
-     */
-    public function getIcon(): string;
-
+    public function getFeatureSettingsConfigFormName(): string;
 }

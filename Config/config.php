@@ -12,16 +12,23 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_integration_core' => [
-                'path' => '/integration',
-                'controller' => 'MauticIntegrationBundle:Default:index',
+            'mautic_integration_config' => [
+                'path'       => '/integration/{integration}/config',
+                'controller' => 'IntegrationsBundle:Config:edit',
+            ],
+            'mautic_integration_config_field_pagination' => [
+                'path'       => '/integration/{integration}/config/{object}/{page}',
+                'controller' => 'IntegrationsBundle:FieldPagination:paginate',
+                'defaults' => [
+                    'page' => 1,
+                ],
+            ],
+            'mautic_integration_config_field_update' => [
+                'path'       => '/integration/{integration}/config/{object}/field/{field}',
+                'controller' => 'IntegrationsBundle:UpdateField:update',
             ],
         ],
         'api' => [
-            'mautic_integration_api_plugin_list' => [
-                'path' => '/integration/plugin/list',
-                'controller' => 'IntegrationsBundle:Api\Plugin:list',
-            ],
         ],
     ],
     'menu' => [
@@ -37,7 +44,7 @@ return [
             ],
         ],
         'events' => [
-            'mautic.integrations.lead.subscriber' => [
+            'mautic.integrations.subscriber.lead' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
@@ -45,18 +52,85 @@ return [
                     'mautic.integrations.helper.sync_integrations',
                 ],
             ],
+            'mautic.integrations.subscriber.controller' => [
+                'class' => \MauticPlugin\IntegrationsBundle\EventListener\ControllerSubscriber::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                    'controller_resolver',
+                ],
+            ],
         ],
         'forms' => [
+            'mautic.integrations.form.config.integration' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationConfigType::class,
+                'arguments' => [
+                    'mautic.integrations.helper.config_integrations',
+                ],
+            ],
+            'mautic.integrations.form.config.feature_settings' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationFeatureSettingsType::class,
+            ],
+            'mautic.integrations.form.config.sync_settings' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsType::class,
+            ],
+            'mautic.integrations.form.config.sync_settings_field_mappings' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.model.field',
+                ],
+            ],
+            'mautic.integrations.form.config.sync_settings_object_field_directions' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
+            ],
+            'mautic.integrations.form.config.sync_settings_object_field_mapping' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType::class,
+                'arguments' => [
+                    'translator',
+                ]
+            ],
+            'mautic.integrations.form.config.sync_settings_object_field' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
+            ],
+            'mautic.integrations.form.config.feature_settings.activity_list' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\ActivityListType::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.integrations.helper.variable_expresser' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class
-            ]
-        ],
-        'menus' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class,
+            ],
+            'mautic.integrations.helper' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper::class,
+                'arguments' => [
+                    'mautic.plugin.integrations.repository.integration',
+                    'mautic.integrations.service.encryption',
+                ],
+            ],
+            'mautic.integrations.helper.auth_integrations' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Helper\AuthIntegrationsHelper::class,
+                'arugments' => [
+                    'mautic.integrations.helper',
+                ]
+            ],
+            'mautic.integrations.helper.sync_integrations' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                ],
+            ],
+            'mautic.integrations.helper.config_integrations' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                ],
+            ],
         ],
         'other' => [
-            'mautic.service.encryption' => [
+            'mautic.integrations.service.encryption' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Facade\EncryptionService::class,
                 'arguments' => [
                     'mautic.helper.encryption',
@@ -65,23 +139,9 @@ return [
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class
             ],
-            'mautic.integrations.auth.factory' => [
-                'class' => MauticPlugin\IntegrationsBundle\Auth\Factory::class,
+            'mautic.integrations.auth_provider.oauth1atwolegged' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory::class,
             ],
-            'mautic.integrations.auth.provider.oauth1a' => [
-                'class' => MauticPlugin\IntegrationsBundle\Auth\Provider\OAuth1aProvider::class,
-                'arguments' => [
-                    'mautic.http.client',
-                ],
-                'tag' => 'mautic.integrations.auth.provider'
-            ],
-            'mautic.integrations.oauth1a.http.factory' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Auth\Oauth1a\HttpFactory::class,
-            ],
-        ],
-        'models' => [
-        ],
-        'validator' => [
         ],
         'repositories' => [
             'mautic.integrations.repository.field_change' => [
@@ -176,16 +236,6 @@ return [
                     'mautic.integrations.helper.company_object',
                 ],
             ],
-            'mautic.integrations.helper.sync_integrations' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\Helper\SyncIntegrationsHelper::class,
-                'arguments' => [
-                  'mautic.plugin.integrations.repository.integration',
-                ],
-            ],
         ],
-    ],
-
-    'parameters' => [
-        'plugin_dir' => '%kernel.root_dir%/../plugins',
     ],
 ];

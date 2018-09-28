@@ -12,10 +12,11 @@
 namespace MauticPlugin\IntegrationsBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
-use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\AuthPass;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\AuthenticationIntegrationPass;
+use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\ConfigIntegrationPass;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\DispatcherIntegrationPass;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\EncryptionIntegrationPass;
+use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\IntegrationsPass;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\SyncIntegrationsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -28,10 +29,9 @@ class IntegrationsBundle extends PluginBundleBase
 {
     public function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new AuthPass());
-        $container->addCompilerPass(new EncryptionIntegrationPass());
-        $container->addCompilerPass(new DispatcherIntegrationPass());
+        $container->addCompilerPass(new IntegrationsPass());
         $container->addCompilerPass(new AuthenticationIntegrationPass());
         $container->addCompilerPass(new SyncIntegrationsPass());
+        $container->addCompilerPass(new ConfigIntegrationPass());
     }
 }
