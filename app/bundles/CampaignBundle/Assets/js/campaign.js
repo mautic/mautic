@@ -155,8 +155,8 @@ Mautic.campaignEventOnLoad = function (container, response) {
         Mautic.campaignEventShowHideIntervalSettings();
         Mautic.campaignEventUpdateIntervalHours();
         mQuery('#campaignevent_triggerHour').on('change', Mautic.campaignEventUpdateIntervalHours);
-        mQuery('#campaignevent_triggerRestrictedStartTime').on('change', Mautic.campaignEventUpdateIntervalHours);
-        mQuery('#campaignevent_triggerRestrictedStopTime').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerRestrictedStartHour').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerRestrictedStopHour').on('change', Mautic.campaignEventUpdateIntervalHours);
         mQuery('#campaignevent_triggerIntervalUnit').on('change', Mautic.campaignEventShowHideIntervalSettings);
         mQuery('#campaignevent_triggerRestrictedDaysOfWeek_0').on('change', Mautic.campaignEventSelectDOW);
         mQuery('#campaignevent_triggerRestrictedDaysOfWeek_1').on('change', Mautic.campaignEventSelectDOW);
@@ -255,24 +255,24 @@ Mautic.campaignEventOnLoad = function (container, response) {
  */
 Mautic.campaignEventUpdateIntervalHours = function () {
     var hour = mQuery('#campaignevent_triggerHour').val();
-    var start = mQuery('#campaignevent_triggerRestrictedStartTime').val();
-    var stop = mQuery('#campaignevent_triggerRestrictedStopTime').val();
+    var start = mQuery('#campaignevent_triggerRestrictedStartHour').val();
+    var stop = mQuery('#campaignevent_triggerRestrictedStopHour').val();
 
     if (hour) {
-        mQuery('#campaignevent_triggerRestrictedStartTime').val('');
-        mQuery('#campaignevent_triggerRestrictedStopTime').val('');
-        mQuery('#campaignevent_triggerRestrictedStartTime').prop('disabled', true);
-        mQuery('#campaignevent_triggerRestrictedStopTime').prop('disabled', true);
+        mQuery('#campaignevent_triggerRestrictedStartHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStopHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStartHour').prop('disabled', true);
+        mQuery('#campaignevent_triggerRestrictedStopHour').prop('disabled', true);
     } else if (start || stop) {
         mQuery('#campaignevent_triggerHour').val('');
         mQuery('#campaignevent_triggerHour').prop('disabled', true);
     } else {
         mQuery('#campaignevent_triggerHour').val('');
-        mQuery('#campaignevent_triggerRestrictedStartTime').val('');
-        mQuery('#campaignevent_triggerRestrictedStopTime').val('');
+        mQuery('#campaignevent_triggerRestrictedStartHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStopHour').val('');
         mQuery('#campaignevent_triggerHour').prop('disabled', false);
-        mQuery('#campaignevent_triggerRestrictedStartTime').prop('disabled', false);
-        mQuery('#campaignevent_triggerRestrictedStopTime').prop('disabled', false);
+        mQuery('#campaignevent_triggerRestrictedStartHour').prop('disabled', false);
+        mQuery('#campaignevent_triggerRestrictedStopHour').prop('disabled', false);
     }
 };
 

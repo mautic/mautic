@@ -49,9 +49,9 @@
                         <div style="display:inline-block; font-weight: 600;"><?php echo $view['translator']->trans('mautic.campaign.form.type.interval_schedule_at'); ?> </div>
                         <div style="width: 75px; display:inline-block; margin:0 10px 0 10px;"><?php echo $view['form']->widget($form['triggerHour']); ?></div>
                         <div style="display:inline-block; font-weight: 600;"> <?php echo $view['translator']->trans('mautic.campaign.form.type.interval_schedule_between_hours'); ?> </div>
-                        <div style="width: 75px;display:inline-block; margin:0 10px 0 10px;"><?php echo $view['form']->widget($form['triggerRestrictedStartTime']); ?></div>
+                        <div style="width: 75px;display:inline-block; margin:0 10px 0 10px;"><?php echo $view['form']->widget($form['triggerRestrictedStartHour']); ?></div>
                         <div style="display:inline-block; font-weight: 600;"> <?php echo $view['translator']->trans('mautic.core.and'); ?> </div>
-                        <div style="width: 75px; display:inline-block; margin:0 10px 0 10px;"><?php echo $view['form']->widget($form['triggerRestrictedStopTime']); ?></div>
+                        <div style="width: 75px; display:inline-block; margin:0 10px 0 10px;"><?php echo $view['form']->widget($form['triggerRestrictedStopHour']); ?></div>
                     </div>
                 </div>
                 <hr />

@@ -167,9 +167,9 @@ class EventType extends AbstractType
                 ]
             );
 
-            $data = $this->getTimeValue($options['data'], 'triggerRestrictedStartTime');
+            $data = $this->getTimeValue($options['data'], 'triggerRestrictedStartHour');
             $builder->add(
-                'triggerRestrictedStartTime',
+                'triggerRestrictedStartHour',
                 TextType::class,
                 [
                     'label' => false,
@@ -183,9 +183,9 @@ class EventType extends AbstractType
                 ]
             );
 
-            $data = $this->getTimeValue($options['data'], 'triggerRestrictedStopTime');
+            $data = $this->getTimeValue($options['data'], 'triggerRestrictedStopHour');
             $builder->add(
-                'triggerRestrictedStopTime',
+                'triggerRestrictedStopHour',
                 TextType::class,
                 [
                     'label' => false,
