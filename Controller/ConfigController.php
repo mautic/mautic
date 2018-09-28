@@ -19,6 +19,7 @@ use MauticPlugin\IntegrationsBundle\Form\Type\IntegrationConfigType;
 use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Helper\FieldMergerHelper;
 use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Symfony\Component\Form\Form;
@@ -222,7 +223,7 @@ class ConfigController extends AbstractFormController
         }
 
         $features = $this->integrationConfiguration->getSupportedFeatures();
-        if (!in_array(ConfigFormSyncInterface::FEATURE_SYNC, $features)) {
+        if (!in_array(ConfigFormFeaturesInterface::FEATURE_SYNC, $features)) {
             // Don't bind form errors if sync is not enabled
             return;
         }

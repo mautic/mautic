@@ -92,6 +92,12 @@ return [
             'mautic.integrations.form.config.sync_settings_object_field' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
             ],
+            'mautic.integrations.form.config.feature_settings.activity_list' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\ActivityListType::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.integrations.helper.variable_expresser' => [
