@@ -177,7 +177,7 @@ class ConfigController extends AbstractFormController
             [
                 'viewParameters'  => [
                     'integrationObject' => $this->integrationObject,
-                    'form'              => $this->form->createView(),
+                    'form'              => $this->setFormTheme($this->form, 'IntegrationsBundle:Config:form.html.php'),
                     'activeTab'         => $this->request->get('activeTab'),
                 ],
                 'contentTemplate' => 'IntegrationsBundle:Config:form.html.php',
