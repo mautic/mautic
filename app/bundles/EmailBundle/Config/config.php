@@ -472,6 +472,12 @@ return [
             'mautic.transport.sendgrid_api.mail.attachment' => [
                 'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment::class,
             ],
+            'mautic.transport.sendgrid_api.mail.categories' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailCategories::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
             'mautic.transport.sendgrid_api.message' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage::class,
                 'arguments' => [
