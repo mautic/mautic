@@ -128,16 +128,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with('router')
             ->willReturn($this->routerMock);
 
-        $this->containerMock->expects($this->at(3))
-            ->method('get')
-            ->with('translator')
-            ->willReturn($this->translatorMock);
-
-        $this->containerMock->expects($this->at(4))
-            ->method('get')
-            ->with('session')
-            ->willReturn($this->sessionMock);
-
         $this->routerMock->expects($this->any())
             ->method('generate')
             ->willReturn('https://some.url');
@@ -183,16 +173,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with('router')
             ->willReturn($this->routerMock);
-
-        $this->containerMock->expects($this->at(2))
-            ->method('get')
-            ->with('translator')
-            ->willReturn($this->translatorMock);
-
-        $this->containerMock->expects($this->at(3))
-            ->method('get')
-            ->with('session')
-            ->willReturn($this->sessionMock);
 
         $this->modelFactoryMock->expects($this->at(0))
             ->method('getModel')
