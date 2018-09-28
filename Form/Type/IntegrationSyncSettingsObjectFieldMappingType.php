@@ -59,16 +59,6 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
         }
 
         $builder->add(
-            'filter-page',
-            HiddenType::class,
-            [
-                'label'  => false,
-                'mapped' => false,
-                'data'   => $options['page']
-            ]
-        );
-
-        $builder->add(
             'filter-keyword',
             TextType::class,
             [

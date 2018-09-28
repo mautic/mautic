@@ -42,8 +42,6 @@ class FieldMergerHelper
     /**
      * @param string $object
      * @param array  $updatedFieldMappings
-     *
-     * @throws RequiredFieldsMissingException
      */
     public function mergeSyncFieldMapping(string $object, array $updatedFieldMappings)
     {
@@ -52,8 +50,25 @@ class FieldMergerHelper
         $this->removeNonExistentFieldMappings($object, $requiredFields);
 
         $this->bindUpdatedFieldMappings($object, $updatedFieldMappings);
+    }
 
-        $this->findMissingRequiredFieldMappings($object, $requiredFields);
+    /**
+     * @param string $object
+     *
+     * @return array
+     */
+    public function findMissingRequiredFieldMappings(string $object)
+    {
+        $requiredFields = $this->integrationObject->getRequiredFieldsForMapping($object);
+
+        $missingFields = [];
+        foreach ($requiredFields as $field => $label) {
+            if (empty($this->currentFieldMappings[$object][$field]['mappedField'])) {
+                $missingFields[] = $field;
+            }
+        }
+
+        return $missingFields;
     }
 
     /**
@@ -109,26 +124,6 @@ class FieldMergerHelper
             }
 
             $this->currentFieldMappings[$object][$fieldName] = $fieldMapping;
-        }
-    }
-
-    /**
-     * @param string $object
-     * @param array  $requiredFields
-     *
-     * @throws RequiredFieldsMissingException
-     */
-    private function findMissingRequiredFieldMappings(string $object, array $requiredFields)
-    {
-        $missingFields = [];
-        foreach ($requiredFields as $field => $label) {
-            if (empty($this->currentFieldMappings[$object][$field]['mappedField'])) {
-                $missingFields[] = $field;
-            }
-        }
-
-        if (!empty($missingFields)) {
-            throw new RequiredFieldsMissingException($missingFields);
         }
     }
 }

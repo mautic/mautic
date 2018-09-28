@@ -23,6 +23,7 @@ use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -115,40 +116,19 @@ class ConfigController extends AbstractFormController
 
         if ($this->integrationObject instanceof ConfigFormSyncInterface) {
             $integration   = $this->integrationObject->getName();
-            $features      = $this->integrationConfiguration->getSupportedFeatures();
+            $settings      = $this->integrationConfiguration->getFeatureSettings();
             $session       = $this->get('session');
             $updatedFields = $session->get("$integration-fields", []);
 
-            $fieldMapper = new FieldMergerHelper($this->integrationObject, $fieldMappings);
+            $fieldMerger = new FieldMergerHelper($this->integrationObject, $fieldMappings);
 
             foreach ($updatedFields as $object => $fields) {
-                try {
-                    $fieldMapper->mergeSyncFieldMapping($object, $fields);
-                } catch (RequiredFieldsMissingException $exception) {
-                    if (!$this->integrationConfiguration->getIsPublished()) {
-                        // Don't bind form errors if the integration is not published
-                        continue;
-                    }
-
-                    if (in_array(ConfigFormSyncInterface::FEATURE_SYNC, $features)) {
-                        // Don't bind form errors if sync is not enabled
-                        continue;
-                    }
-
-                    if (!in_array($object, $settings['sync']['objects'])) {
-                        // Don't bind form errors if the object is not enabled
-                        continue;
-                    }
-
-                    foreach ($exception->getFields() as $field) {
-                        /** @var Form $formField */
-                        $formField = $this->form['featureSettings']['sync']['fieldMappings'][$object][$field];
-                        $formField->addError($this->get('translator')->trans('mautic.core.value.required', [], 'validators'));
-                    }
-                }
+                $fieldMerger->mergeSyncFieldMapping($object, $fields);
             }
 
-            $settings['sync']['fieldMappings'] = $fieldMapper->getFieldMappings();
+            $this->validateRequiredFields($fieldMerger, $settings['sync']['objects']);
+
+            $settings['sync']['fieldMappings'] = $fieldMerger->getFieldMappings();
 
             $this->integrationConfiguration->setFeatureSettings($settings);
         }
@@ -227,5 +207,60 @@ class ConfigController extends AbstractFormController
                 'mauticContent' => 'integrationsConfig',
             ]
         );
+    }
+
+    /**
+     * @param FieldMergerHelper $fieldMergerHelper
+     * @param array             $objects
+     */
+    private function validateRequiredFields(FieldMergerHelper $fieldMergerHelper, array $objects)
+    {
+        if (!$this->integrationConfiguration->getIsPublished()) {
+            // Don't bind form errors if the integration is not published
+            return;
+        }
+
+        $features = $this->integrationConfiguration->getSupportedFeatures();
+        if (!in_array(ConfigFormSyncInterface::FEATURE_SYNC, $features)) {
+            // Don't bind form errors if sync is not enabled
+            return;
+        }
+
+        foreach ($objects as $object) {
+            $hasMissingFields  = false;
+            $errorsOnGivenPage = false;
+
+            $missingFields = $fieldMergerHelper->findMissingRequiredFieldMappings($object);
+            if (!$hasMissingFields && !empty($missingFields)) {
+                $hasMissingFields = true;
+            }
+
+            foreach ($missingFields as $field) {
+                if (!isset($this->form['featureSettings']['sync']['fieldMappings'][$object][$field])) {
+                    continue;
+                }
+
+                $errorsOnGivenPage = true;
+
+                /** @var Form $formField */
+                $formField = $this->form['featureSettings']['sync']['fieldMappings'][$object][$field]['mappedField'];
+                $formField->addError(
+                    new FormError(
+                        $this->get('translator')->trans('mautic.core.value.required', [], 'validators')
+                    )
+                );
+            }
+
+            if (!$errorsOnGivenPage && $hasMissingFields) {
+                // A hidden page has required fields that are missing so we have to tell the form there is an error
+                /** @var Form $formField */
+                $formField = $this->form['featureSettings']['sync']['fieldMappings'][$object];
+                $formField->addError(
+                    new FormError(
+                        $this->get('translator')->trans('mautic.core.value.required', [], 'validators')
+                    )
+                );
+            }
+        }
     }
 }

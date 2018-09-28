@@ -25,11 +25,12 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
             'mappedField',
             ChoiceType::class,
             [
-                'label'       => false,
-                'choices'     => $options['mauticFields'],
-                'required'    => !empty($options['required']),
-                'empty_value' => '',
-                'attr'        => [
+                'label'          => false,
+                'choices'        => $options['mauticFields'],
+                'required'       => !empty($options['required']),
+                'empty_value'    => '',
+                'error_bubbling' => false,
+                'attr'           => [
                     'class'            => 'form-control integration-mapped-field',
                     'data-placeholder' => $options['placeholder'],
                     'data-object'      => $options['object'],

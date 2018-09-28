@@ -25,7 +25,6 @@ $showFeaturesTab =
     $integrationObject instanceof ConfigFormFeatureSettingsInterface;
 $hasFeatureErrors =
     ($integrationObject instanceof ConfigFormFeatureSettingsInterface && $view['form']->containsErrors($form['featureSettings']['integration'])) ||
-    ($integrationObject instanceof ConfigFormSyncInterface && $view['form']->containsErrors($form['featureSettings']['sync'])) ||
     (isset($form['featureSettings']['sync']['integration']) && $view['form']->containsErrors($form['featureSettings']['sync']['integration']));
 ?>
 
@@ -90,14 +89,6 @@ $hasFeatureErrors =
             endif;
         endif;
 
-        if ($integrationObject instanceof ConfigFormFeatureSettingsInterface):
-            echo $view['form']->row($form['featureSettings']['integration']);
-
-            if ($integrationObject instanceof ConfigFormSyncInterface):
-                echo "<hr />";
-            endif;
-        endif;
-
         if ($integrationObject instanceof ConfigFormSyncInterface):
             echo $view['form']->row($form['featureSettings']['sync']['objects']);
             // @todo echo $view['form']->row($form['featureSettings']['sync']['updateBlanks']);
@@ -105,7 +96,16 @@ $hasFeatureErrors =
             if (isset($form['featureSettings']['sync']['custom'])):
                 echo $view['form']->row($form['featureSettings']['sync']['integration']);
             endif;
+
+            if ($integrationObject instanceof ConfigFormFeatureSettingsInterface):
+                echo "<hr />";
+            endif;
         endif;
+
+        if ($integrationObject instanceof ConfigFormFeatureSettingsInterface):
+            echo $view['form']->row($form['featureSettings']['integration']);
+        endif;
+
         ?>
     </div>
     <?php endif; ?>
@@ -124,6 +124,7 @@ $hasFeatureErrors =
                 'form'        => $form['featureSettings']['sync']['fieldMappings'][$object],
                 'integration' => $integrationObject->getName(),
                 'object'      => $object,
+                'page'        => 1,
             ]
         ); ?>
         </div>

@@ -17,23 +17,7 @@ Mautic.integrationsConfigOnLoad = function () {
         });
     });
 
-    mQuery('.integration-mapped-field').each(function() {
-        var integration = mQuery(this).attr('data-integration');
-        var object = mQuery(this).attr('data-object');
-        var field = mQuery(this).attr('data-field');
-        mQuery(this).on("change", function (event) {
-            Mautic.updateIntegrationField(integration, object, field, 'mappedField', mQuery(this).val());
-        });
-    });
-
-    mQuery('.integration-sync-direction').each(function() {
-        var integration = mQuery(this).attr('data-integration');
-        var object = mQuery(this).attr('data-object');
-        var field = mQuery(this).attr('data-field');
-        mQuery(this).on("change", function (event) {
-            Mautic.updateIntegrationField(integration, object, field, 'syncDirection', mQuery(this).val());
-        });
-    });
+    Mautic.activateIntegrationFieldUpdateActions();
 };
 
 Mautic.getPaginatedIntegrationFields = function(settings, page, element) {
@@ -69,7 +53,7 @@ Mautic.getPaginatedIntegrationFields = function(settings, page, element) {
             if (response.success) {
                 mQuery(fieldsContainer).html(response.html);
                 Mautic.onPageLoad(fieldsContainer);
-                Mautic.integrationConfigOnLoad(fieldsContainer);
+                Mautic.activateIntegrationFieldUpdateActions();
                 if (mQuery(fieldsTab).length) {
                     mQuery(fieldsTab).removeClass('hide');
                 }
@@ -125,5 +109,25 @@ Mautic.updateIntegrationField = function(integration, object, field, fieldOption
             modal.find('.modal-form-buttons .btn').prop('disabled', false);
             delete Mautic.activeActions[requestName];
         }
+    });
+};
+
+Mautic.activateIntegrationFieldUpdateActions = function () {
+    mQuery('.integration-mapped-field').each(function() {
+        mQuery(this).on("change", function (event) {
+            var integration = mQuery(this).attr('data-integration');
+            var object = mQuery(this).attr('data-object');
+            var field = mQuery(this).attr('data-field');
+            Mautic.updateIntegrationField(integration, object, field, 'mappedField', mQuery(this).val());
+        });
+    });
+
+    mQuery('.integration-sync-direction').each(function() {
+        mQuery(this).on("change", function (event) {
+            var integration = mQuery(this).attr('data-integration');
+            var object = mQuery(this).attr('data-object');
+            var field = mQuery(this).attr('data-field');
+            Mautic.updateIntegrationField(integration, object, field, 'syncDirection', mQuery(this).val());
+        });
     });
 };

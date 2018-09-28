@@ -10,15 +10,16 @@
  */
 
 ?>
-<?php echo $view['form']->row($form['filter-page']); ?>
 <?php echo $view['form']->row($form['filter-totalFieldCount']); ?>
 <?php foreach ($form as $fieldName => $fieldForm): ?>
-<?php if (!in_array($fieldName, ['filter-page', 'filter-keyword', 'filter-totalFieldCount'])): ?>
+<?php if (!in_array($fieldName, ['filter-keyword', 'filter-totalFieldCount'])): ?>
     <div class="row">
         <div class="col-sm-12"><?php echo $view['form']->label($fieldForm); ?></div>
     </div>
     <div class="row">
-        <div class="col-sm-6"><?php echo $view['form']->widget($fieldForm['mappedField']); ?></div>
+        <div class="col-sm-6<?php if ($view['form']->containsErrors($fieldForm['mappedField'])) echo ' has-error'; ?>">
+            <?php echo $view['form']->widget($fieldForm['mappedField']); ?>
+        </div>
         <div class="col-sm-6"><?php echo $view['form']->widget($fieldForm['syncDirection']); ?></div>
     </div>
     <hr />
@@ -28,7 +29,7 @@
     'MauticCoreBundle:Helper:pagination.html.php',
     [
         'totalItems' => $form['filter-totalFieldCount']->vars['data'],
-        'page'       => $form['filter-page']->vars['data'],
+        'page'       => $page,
         'limit'      => 15,
         'fixedLimit' => true,
         'sessionVar' => $integration."-".$object,

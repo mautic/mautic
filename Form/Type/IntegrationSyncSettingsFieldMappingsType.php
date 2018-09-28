@@ -84,6 +84,8 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                     'totalFieldCount'           => $this->getTotalFieldCount(),
                     'object'                    => $objectName,
                     'integration'               => $integrationObject->getName(),
+                    'error_bubbling'            => false,
+                    'allow_extra_fields'        => true,
                 ]
             );
         }

@@ -81,7 +81,8 @@ class FieldPaginationController extends CommonController
             [
                 'form'        => $form->createView(),
                 'integration' => $integration,
-                'object'      => $object
+                'object'      => $object,
+                'page'        => $page,
             ]
         )->getContent();
 
