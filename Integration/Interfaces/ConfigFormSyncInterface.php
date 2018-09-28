@@ -13,8 +13,6 @@ namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
 interface ConfigFormSyncInterface extends IntegrationInterface
 {
-    const FEATURE_SYNC = 'sync';
-
     /**
      * Return an array of Integration objects in the format of [$object => $translatableObjectNameString].
      * i.e. ['Customer' => 'mautic.something.object.customer', 'Account' => 'mautic.something.object.account'];
