@@ -1,16 +1,16 @@
 Mautic.integrationsConfigOnLoad = function () {
     mQuery('.integration-keyword-filter').each(function() {
-        var integration = mQuery(this).attr('data-integration');
-        var object = mQuery(this).attr('data-object');
         mQuery(this).on("keydown", function (event) {
             if (event.which == 13) {
+                var integration = mQuery(this).attr('data-integration');
+                var object = mQuery(this).attr('data-object');
                 Mautic.getPaginatedIntegrationFields(
                     {
                         'integration': integration,
                         'object': object,
                         'keyword': mQuery(this).val()
                     },
-                    mQuery('#integration_config_featureSettings_sync_fieldMappings_' + object + '_filter-page').val(),
+                    1,
                     this
                 );
             }
