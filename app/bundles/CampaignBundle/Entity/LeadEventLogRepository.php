@@ -522,6 +522,24 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
+     * Get the oldest triggered date.
+     *
+     * @return \DateTime|null
+     */
+    public function getOldestTriggeredDate()
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('log.date_triggered')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->orderBy('log.date_triggered', 'ASC')
+            ->setMaxResults(1);
+
+        $results = $qb->execute()->fetchAll();
+
+        return isset($results[0]['date_triggered']) ? new \DateTime($results[0]['date_triggered']) : null;
+    }
+
+    /**
      * @param int $contactId
      * @param int $campaignId
      * @param int $rotation

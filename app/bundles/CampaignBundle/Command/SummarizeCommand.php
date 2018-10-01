@@ -72,7 +72,7 @@ class SummarizeCommand extends ModeratedCommand
                 '-l',
                 InputOption::VALUE_OPTIONAL,
                 'Number of days to process per batch.',
-                7
+                1
             )
             ->addOption(
                 '--max-days',
@@ -99,8 +99,8 @@ class SummarizeCommand extends ModeratedCommand
             return 0;
         }
 
-        $batchLimit = max(1, intval($input->getOption('batch-limit')));
-        $maxDays    = max(1, intval($input->getOption('max-days')));
+        $batchLimit = $input->getOption('batch-limit');
+        $maxDays    = $input->getOption('max-days');
 
         $output->writeln(
             '<info>'.$this->translator->trans('mautic.campaign.summarizing', ['%batch%' => $batchLimit]).'</info>'

@@ -101,22 +101,15 @@ class SummaryModel extends AbstractCommonModel
     public function summarizeDays(OutputInterface $output, $daysPerBatch = 1, $maxDays = null)
     {
         /** @var \DateTime $oldestSumamryDate */
-        $start = $this->getRepository()->getOldestTriggered();
+        $start = $this->getRepository()->getOldestTriggeredDate();
+        $start = $start ? $start : new \DateTime();
 
         /** @var LeadEventLog $oldestTriggeredEventLog */
-        $oldestTriggeredEventLogs = $this->getCampaignLeadEventLogRepository()->getEntities(
-            [
-                'limit'            => 1,
-                'orderBy'          => 'll.dateTriggered, ll.id',
-                'orderByDir'       => 'ASC',
-                'ignore_paginator' => true,
-            ]
-        );
-        if ($oldestTriggeredEventLog = reset($oldestTriggeredEventLogs)) {
-            $end = $oldestTriggeredEventLog->getDateTriggered();
+        $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
+        if ($end && $end <= $start) {
             if ($maxDays && $end->diff($start)->days > $maxDays) {
                 $end = clone $start;
-                $end = $end->sub(new \DateInterval('P'.$maxDays.'D'));
+                $end = $end->sub(new \DateInterval('P'.intval($maxDays).'D'));
             }
             $totalDays         = abs(intval(($start->getTimestamp() - $end->getTimestamp()) / 60 / 60 / 24));
             $this->progressBar = ProgressBarHelper::init($output, $totalDays);
@@ -127,6 +120,7 @@ class SummaryModel extends AbstractCommonModel
             $dateTo   = clone $start;
             do {
                 $dateFrom->sub($interval);
+                $output->write("\t".$dateFrom->format('Y-m-d'));
                 $this->getRepository()->summarizeByDate($dateFrom, $dateTo);
                 $this->progressBar->advance($daysPerBatch);
                 $dateTo->sub($interval);
