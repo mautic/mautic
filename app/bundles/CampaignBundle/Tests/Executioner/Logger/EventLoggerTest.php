@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
+use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 
@@ -41,12 +42,16 @@ class EventLoggerTest extends \PHPUnit\Framework\TestCase
      */
     private $leadRepository;
 
+    /** @var SummaryModel */
+    private $summaryModel;
+
     protected function setUp()
     {
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
         $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
         $this->leadRepository         = $this->createMock(LeadRepository::class);
+        $this->summaryModel           = $this->createMock(summaryModel::class);
     }
 
     public function testAllLogsAreReturnedWithFinalPersist()
@@ -80,7 +85,8 @@ class EventLoggerTest extends \PHPUnit\Framework\TestCase
             $this->ipLookupHelper,
             $this->contactTracker,
             $this->leadEventLogRepository,
-            $this->leadRepository
+            $this->leadRepository,
+            $this->summaryModel
         );
     }
 }
