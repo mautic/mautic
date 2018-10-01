@@ -111,8 +111,7 @@ class SummaryModel extends AbstractCommonModel
                 $end = clone $start;
                 $end = $end->sub(new \DateInterval('P'.intval($maxDays).'D'));
             }
-            $totalDays         = abs(intval(($start->getTimestamp() - $end->getTimestamp()) / 60 / 60 / 24));
-            $this->progressBar = ProgressBarHelper::init($output, $totalDays);
+            $this->progressBar = ProgressBarHelper::init($output, $end->diff($start)->days);
             $this->progressBar->start();
 
             $interval = new \DateInterval('P'.$daysPerBatch.'D');
