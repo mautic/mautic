@@ -91,14 +91,15 @@ class EventExecutioner
     /**
      * EventExecutioner constructor.
      *
-     * @param EventCollector       $eventCollector
-     * @param EventLogger          $eventLogger
-     * @param ActionExecutioner    $actionExecutioner
-     * @param ConditionExecutioner $conditionExecutioner
-     * @param DecisionExecutioner  $decisionExecutioner
-     * @param LoggerInterface      $logger
-     * @param EventScheduler       $scheduler
-     * @param LeadRepository       $leadRepository
+     * @param EventCollector        $eventCollector
+     * @param EventLogger           $eventLogger
+     * @param ActionExecutioner     $actionExecutioner
+     * @param ConditionExecutioner  $conditionExecutioner
+     * @param DecisionExecutioner   $decisionExecutioner
+     * @param LoggerInterface       $logger
+     * @param EventScheduler        $scheduler
+     * @param RemovedContactTracker $removedContactTracker
+     * @param LeadRepository        $leadRepository
      */
     public function __construct(
         EventCollector $eventCollector,
@@ -173,7 +174,7 @@ class EventExecutioner
      * @param Event           $event
      * @param ArrayCollection $contacts
      * @param Counter|null    $counter
-     * @param bool            $validatingInaction
+     * @param bool            $isInactiveEvent
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException

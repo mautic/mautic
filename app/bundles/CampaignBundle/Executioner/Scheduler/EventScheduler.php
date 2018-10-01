@@ -363,6 +363,53 @@ class EventScheduler
     }
 
     /**
+     * @param Event           $event
+     * @param \DateTime       $comparedFromDateTime
+     * @param ArrayCollection $contacts
+     *
+     * @throws NotSchedulableException
+     */
+    public function validateAndScheduleEventForContacts(Event $event, \DateTime $comparedFromDateTime, ArrayCollection $contacts)
+    {
+        if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
+            $this->logger->debug(
+                'CAMPAIGN: Event ID# '.$event->getId().
+                ' has to be scheduled based on contact specific parameters '.
+                ' compared to '.$comparedFromDateTime->format('Y-m-d H:i:s')
+            );
+
+            $groupedExecutionDates = $this->intervalScheduler->groupContactsByDate($event, $contacts, $comparedFromDateTime);
+            $config                = $this->collector->getEventConfig($event);
+
+            foreach ($groupedExecutionDates as $groupExecutionDateDAO) {
+                $this->scheduleEventForContacts(
+                    $event,
+                    $config,
+                    $groupExecutionDateDAO->getExecutionDate(),
+                    $groupExecutionDateDAO->getContacts()
+                );
+            }
+
+            return;
+        }
+
+        $executionDateTime = $this->getExecutionDateTime($event, $comparedFromDateTime);
+        $this->logger->debug(
+            'CAMPAIGN: Event ID# '.$event->getId().
+            ' to be executed on '.$executionDateTime->format('Y-m-d H:i:s').
+            ' compared to '.$comparedFromDateTime->format('Y-m-d H:i:s')
+        );
+
+        if ($this->shouldSchedule($executionDateTime, $comparedFromDateTime)) {
+            $this->schedule($event, $executionDateTime, $contacts);
+
+            return;
+        }
+
+        throw new NotSchedulableException();
+    }
+
+    /**
      * @param AbstractEventAccessor $config
      * @param LeadEventLog          $log
      * @param bool                  $isReschedule
