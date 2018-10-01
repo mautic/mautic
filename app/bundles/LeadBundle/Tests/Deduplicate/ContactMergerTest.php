@@ -119,8 +119,8 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $winner->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails('from winner'));
 
         $loser = new Lead();
-        $loser->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails('from looser'));
-        $loser->addIpAddress((new IpAddress('8.7.6.5'))->setIpDetails('from looser'));
+        $loser->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails('from loser'));
+        $loser->addIpAddress((new IpAddress('8.7.6.5'))->setIpDetails('from loser'));
 
         $this->getMerger()->mergeIpAddressHistory($winner, $loser);
 
@@ -133,7 +133,7 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             '1.2.3.4' => 'from winner',
             '4.3.2.1' => 'from winner',
             '5.6.7.8' => 'from winner',
-            '8.7.6.5' => 'from looser',
+            '8.7.6.5' => 'from loser',
         ];
 
         foreach ($expectedIpAddressArray as $ipAddress => $ipId) {
