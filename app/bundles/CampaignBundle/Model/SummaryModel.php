@@ -15,7 +15,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class SummaryModel.
@@ -90,9 +90,15 @@ class SummaryModel extends AbstractCommonModel
     }
 
     /**
-     * @param Output $output
+     * Summarize all of history.
+     *
+     * @param OutputInterface $output
+     * @param int             $daysPerBatch
+     * @param int             $maxDays
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
-    public function summarizeHistory(Output $output)
+    public function summarizeDays(OutputInterface $output, $daysPerBatch = 1, $maxDays = null)
     {
         /** @var \DateTime $oldestSumamryDate */
         $start = $this->getRepository()->getOldestTriggered();
@@ -107,20 +113,25 @@ class SummaryModel extends AbstractCommonModel
             ]
         );
         if ($oldestTriggeredEventLog = reset($oldestTriggeredEventLogs)) {
-            $end               = $oldestTriggeredEventLog->getDateTriggered();
-            $totalHours        = abs(intval(($start->getTimestamp() - $end->getTimestamp()) / 60 / 60));
-            $this->progressBar = ProgressBarHelper::init($output, $totalHours);
+            $end = $oldestTriggeredEventLog->getDateTriggered();
+            if ($maxDays && $end->diff($start)->days > $maxDays) {
+                $end = clone $start;
+                $end = $end->sub(new \DateInterval('P'.$maxDays.'D'));
+            }
+            $totalDays         = abs(intval(($start->getTimestamp() - $end->getTimestamp()) / 60 / 60 / 24));
+            $this->progressBar = ProgressBarHelper::init($output, $totalDays);
             $this->progressBar->start();
 
-            // Forcibly update or drop the first hour of summaries.
-
-            // Insert/update/increment other hours.
-
-            // @todo - Batch query to run through events prior to that moment to write/overwrite the summary entries.
-
-            // @todo - Get up to 100k rows, starting with the ID of the last one, and go backward till there are no more.
-
-            $do = 'THITYNGSS';
+            $interval = new \DateInterval('P'.$daysPerBatch.'D');
+            $dateFrom = clone $start;
+            $dateTo   = clone $start;
+            do {
+                $dateFrom->sub($interval);
+                $this->getRepository()->summarizeByDate($dateFrom, $dateTo);
+                $this->progressBar->advance($daysPerBatch);
+                $dateTo->sub($interval);
+            } while ($end < $dateFrom);
+            $this->progressBar->finish();
         }
     }
 
