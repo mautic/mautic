@@ -65,9 +65,6 @@ class EventLogger
      */
     private $contactRotations = [];
 
-    /**
-     * EventLogger constructor.
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         ContactTracker $contactTracker,
