@@ -179,6 +179,11 @@ class LeadModel extends FormModel
     private $legacyLeadModel;
 
     /**
+     * @var IpAddressModel
+     */
+    private $ipAddressModel;
+
+    /**
      * @var bool
      */
     private $repoSetup = false;
@@ -194,8 +199,6 @@ class LeadModel extends FormModel
     private $fieldsByGroup = [];
 
     /**
-     * LeadModel constructor.
-     *
      * @param RequestStack         $requestStack
      * @param CookieHelper         $cookieHelper
      * @param IpLookupHelper       $ipLookupHelper
@@ -213,6 +216,7 @@ class LeadModel extends FormModel
      * @param ContactTracker       $contactTracker
      * @param DeviceTracker        $deviceTracker
      * @param LegacyLeadModel      $legacyLeadModel
+     * @param IpAddressModel       $ipAddressModel
      */
     public function __construct(
         RequestStack $requestStack,
@@ -231,7 +235,8 @@ class LeadModel extends FormModel
         UserProvider $userProvider,
         ContactTracker $contactTracker,
         DeviceTracker $deviceTracker,
-        LegacyLeadModel $legacyLeadModel
+        LegacyLeadModel $legacyLeadModel,
+        IpAddressModel $ipAddressModel
     ) {
         $this->request              = $requestStack->getCurrentRequest();
         $this->cookieHelper         = $cookieHelper;
@@ -250,6 +255,7 @@ class LeadModel extends FormModel
         $this->contactTracker       = $contactTracker;
         $this->deviceTracker        = $deviceTracker;
         $this->legacyLeadModel      = $legacyLeadModel;
+        $this->ipAddressModel       = $ipAddressModel;
     }
 
     /**
@@ -534,6 +540,8 @@ class LeadModel extends FormModel
         $this->processManipulator($entity);
 
         $this->setEntityDefaultValues($entity);
+
+        $this->ipAddressModel->saveIpAddressesReferencesForContact($entity);
 
         parent::saveEntity($entity, $unlock);
 
