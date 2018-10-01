@@ -39,4 +39,14 @@ trait BcIntegrationSettingsTrait
     {
         return ($this->hasIntegrationConfiguration()) ? $this->getIntegrationConfiguration() : null;
     }
+
+    /**
+     * @deprecated Implement ConfigFormFeaturesInterface instead
+     *
+     * @return array
+     */
+    public function getSupportedFeatures(): array
+    {
+        return [];
+    }
 }
