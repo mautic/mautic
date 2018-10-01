@@ -603,6 +603,15 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'mautic.campaign.command.summarize' => [
+                'class'     => \Mautic\CampaignBundle\Command\SummarizeCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.template.formatter',
+                    'mautic.campaign.model.summary',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'services' => [
             'mautic.campaign.service.campaign'=> [
