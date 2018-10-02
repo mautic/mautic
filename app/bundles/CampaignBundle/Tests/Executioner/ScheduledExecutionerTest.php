@@ -212,7 +212,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('executeLogs');
 
         $this->scheduler->expects($this->exactly(4))
-            ->method('getExecutionDateTime')
+            ->method('validateExecutionDateTime')
             ->willReturn(new \DateTime());
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
