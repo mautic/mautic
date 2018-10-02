@@ -802,21 +802,24 @@ class ReportController extends FormController
         if ($format === 'csv') {
             $response = new HttpFoundation\StreamedResponse(
                 function () use ($model, $entity, $format, $options) {
-                    $options['paginate'] = true;
+                    $options['paginate']        = true;
                     $options['ignoreGraphData'] = true;
-                    $options['limit'] =
-                    $reportData['totalResults'] = 10000;
-                    $options['page'] = 1;
-                    $handle = fopen('php://output', 'r+');
-                    while ($reportData['totalResults'] >= ($options['page'] - 1) * $options['limit']) {
+                    $options['limit']           = 1000;
+                    $options['page']            = 1;
+                    $handle                     = fopen('php://output', 'r+');
+                    do {
                         $reportData = $model->getReportData($entity, null, $options);
+
+                        // Note this so that it's not recalculated on each batch
+                        $options['totalResults'] = $reportData['totalResults'];
+
                         $model->exportResults($format, $entity, $reportData, $handle, $options['page']);
                         ++$options['page'];
-                    }
+                    } while (!empty($reportData['data']));
+
                     fclose($handle);
                 }
             );
-
             $fileName = $name.'.'.$format;
             ExportResponse::setResponseHeaders($response, $fileName);
         } else {
