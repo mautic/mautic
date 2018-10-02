@@ -80,6 +80,12 @@ class SummarizeCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Optionally specify how many days back in time you wish to summarize.'
             )
+            ->addOption(
+                '--rebuild',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Rebuild existing data. To be used only if database exceptions have been known to cause inaccuracies.'
+            )
             ->setDescription('Builds historical campaign summary statistics if they do not already exist.');
 
         parent::configure();
@@ -101,12 +107,13 @@ class SummarizeCommand extends ModeratedCommand
 
         $batchLimit = $input->getOption('batch-limit');
         $maxDays    = $input->getOption('max-days');
+        $rebuild    = $input->getOption('rebuild');
 
         $output->writeln(
             '<info>'.$this->translator->trans('mautic.campaign.summarizing', ['%batch%' => $batchLimit]).'</info>'
         );
 
-        $this->summaryModel->summarizeDays($output, $batchLimit, $maxDays);
+        $this->summaryModel->summarizeDays($output, $batchLimit, $maxDays, $rebuild);
 
         $this->completeRun();
 

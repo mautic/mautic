@@ -94,14 +94,18 @@ class SummaryModel extends AbstractCommonModel
      *
      * @param OutputInterface $output
      * @param int             $daysPerBatch
-     * @param int             $maxDays
+     * @param null            $maxDays
+     * @param bool            $rebuild
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function summarizeDays(OutputInterface $output, $daysPerBatch = 1, $maxDays = null)
+    public function summarizeDays(OutputInterface $output, $daysPerBatch = 1, $maxDays = null, $rebuild = false)
     {
-        /** @var \DateTime $oldestSumamryDate */
-        $start = $this->getRepository()->getOldestTriggeredDate();
+        $start = null;
+        if (!$rebuild) {
+            /** @var \DateTime $oldestSumamryDate */
+            $start = $this->getRepository()->getOldestTriggeredDate();
+        }
         $start = $start ? $start : new \DateTime();
 
         /** @var LeadEventLog $oldestTriggeredEventLog */
