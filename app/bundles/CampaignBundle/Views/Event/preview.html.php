@@ -19,7 +19,7 @@ $eventName = ('dev' === MAUTIC_ENV) ? "{$event['name']} <small>{$event['id']}</s
 ?>
 <?php if (empty($update)): ?>
 <div id="CampaignEvent_<?php echo $event['id'] ?>" data-type="<?php echo $event['eventType']; ?>" class="draggable list-campaign-event list-campaign-<?php echo $event['eventType']; ?>" data-event="<?php echo $event['type']; ?>" data-event-id="<?php echo $event['id']; ?>">
-<?php endif;?>
+<?php endif; ?>
     <div class="campaign-event-content">
         <div>
             <span class="campaign-event-name ellipsis" style="display: block; text-overflow: ellipsis; overflow: hidden;">
@@ -38,4 +38,4 @@ $eventName = ('dev' === MAUTIC_ENV) ? "{$event['name']} <small>{$event['id']}</s
         </a>
     </div>
 </div>
-<?php endif;?>
+<?php endif; ?>
