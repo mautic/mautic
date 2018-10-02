@@ -235,6 +235,7 @@ class AppKernel extends Kernel
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
             $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
+            $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
         }
 
         if (in_array($this->getEnvironment(), ['test'])) {
