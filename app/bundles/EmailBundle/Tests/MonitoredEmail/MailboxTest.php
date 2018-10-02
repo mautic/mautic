@@ -23,12 +23,13 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
     {
         $config = [
             'general' => [
-                'address'    => 'foo@bar.com',
-                'host'       => 'imap.bar.com',
-                'port'       => '993',
-                'encryption' => '/ssl',
-                'user'       => 'foo@bar.com',
-                'password'   => 'topsecret',
+                'address'         => 'foo@bar.com',
+                'host'            => 'imap.bar.com',
+                'port'            => '993',
+                'encryption'      => '/ssl',
+                'user'            => 'foo@bar.com',
+                'password'        => 'topsecret',
+                'use_attachments' => true,
             ],
             'EmailBundle_bounces' => [
                 'address'           => null,
@@ -69,12 +70,13 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
     {
         $config = [
             'general' => [
-                'address'    => 'foo@bar.com',
-                'host'       => 'imap.bar.com',
-                'port'       => '993',
-                'encryption' => '/ssl',
-                'user'       => 'foo@bar.com',
-                'password'   => 'topsecret',
+                'address'         => 'foo@bar.com',
+                'host'            => 'imap.bar.com',
+                'port'            => '993',
+                'encryption'      => '/ssl',
+                'user'            => 'foo@bar.com',
+                'password'        => 'topsecret',
+                'use_attachments' => true,
             ],
             'EmailBundle_bounces' => [
                 'address'           => 'bar@foo.com',

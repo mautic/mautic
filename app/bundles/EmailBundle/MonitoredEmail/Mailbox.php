@@ -182,20 +182,23 @@ class Mailbox
             $this->settings = $this->mailboxes['general'];
         } else {
             $this->settings = [
-                'host'       => '',
-                'port'       => '',
-                'password'   => '',
-                'user'       => '',
-                'encryption' => '',
+                'host'            => '',
+                'port'            => '',
+                'password'        => '',
+                'user'            => '',
+                'encryption'      => '',
+                'use_attachments' => true,
             ];
         }
 
-        // Check that cache attachments directory exists
-        $cacheDir             = $pathsHelper->getSystemPath('cache', true);
-        $this->attachmentsDir = $cacheDir.'/attachments';
+        if ($this->settings['use_attachments']) {
+            // Check that cache attachments directory exists
+            $cacheDir             = $pathsHelper->getSystemPath('tmp', true);
+            $this->attachmentsDir = $cacheDir.'/attachments';
 
-        if (!file_exists($this->attachmentsDir)) {
-            mkdir($this->attachmentsDir);
+            if (!file_exists($this->attachmentsDir)) {
+                mkdir($this->attachmentsDir);
+            }
         }
 
         if ($this->settings['host'] == 'imap.gmail.com') {
@@ -981,32 +984,34 @@ class Mailbox
             : (isset($params['filename']) || isset($params['name']) ? mt_rand().mt_rand() : null);
 
         if ($attachmentId) {
-            if (empty($params['filename']) && empty($params['name'])) {
-                $fileName = $attachmentId.'.'.strtolower($partStructure->subtype);
-            } else {
-                $fileName = !empty($params['filename']) ? $params['filename'] : $params['name'];
-                $fileName = $this->decodeMimeStr($fileName, $this->serverEncoding);
-                $fileName = $this->decodeRFC2231($fileName, $this->serverEncoding);
+            if ($this->settings['use_attachments']) {
+                if (empty($params['filename']) && empty($params['name'])) {
+                    $fileName = $attachmentId.'.'.strtolower($partStructure->subtype);
+                } else {
+                    $fileName = !empty($params['filename']) ? $params['filename'] : $params['name'];
+                    $fileName = $this->decodeMimeStr($fileName, $this->serverEncoding);
+                    $fileName = $this->decodeRFC2231($fileName, $this->serverEncoding);
+                }
+                $attachment       = new Attachment();
+                $attachment->id   = $attachmentId;
+                $attachment->name = $fileName;
+                if ($this->attachmentsDir) {
+                    $replace = [
+                        '/\s/'                   => '_',
+                        '/[^0-9a-zа-яіїє_\.]/iu' => '',
+                        '/_+/'                   => '_',
+                        '/(^_)|(_$)/'            => '',
+                    ];
+                    $fileSysName = preg_replace(
+                        '~[\\\\/]~',
+                        '',
+                        $mail->id.'_'.$attachmentId.'_'.preg_replace(array_keys($replace), $replace, $fileName)
+                    );
+                    $attachment->filePath = $this->attachmentsDir.DIRECTORY_SEPARATOR.$fileSysName;
+                    file_put_contents($attachment->filePath, $data);
+                }
+                $mail->addAttachment($attachment);
             }
-            $attachment       = new Attachment();
-            $attachment->id   = $attachmentId;
-            $attachment->name = $fileName;
-            if ($this->attachmentsDir) {
-                $replace = [
-                    '/\s/'                   => '_',
-                    '/[^0-9a-zа-яіїє_\.]/iu' => '',
-                    '/_+/'                   => '_',
-                    '/(^_)|(_$)/'            => '',
-                ];
-                $fileSysName = preg_replace(
-                    '~[\\\\/]~',
-                    '',
-                    $mail->id.'_'.$attachmentId.'_'.preg_replace(array_keys($replace), $replace, $fileName)
-                );
-                $attachment->filePath = $this->attachmentsDir.DIRECTORY_SEPARATOR.$fileSysName;
-                file_put_contents($attachment->filePath, $data);
-            }
-            $mail->addAttachment($attachment);
         } else {
             if (!empty($params['charset'])) {
                 $data = $this->convertStringEncoding($data, $params['charset'], $this->serverEncoding);
