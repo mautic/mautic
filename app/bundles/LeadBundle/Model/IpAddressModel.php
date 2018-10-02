@@ -40,25 +40,33 @@ class IpAddressModel
 
     /**
      * Saving IP Address references sometimes throws UniqueConstraintViolationException exception on Lead entity save.
-     * Rather pre-save theme here, catch the exception and set the IP ID back to the entity.
+     * Rather pre-save theme here, catch the exception and remove the IP from the Lead the entity.
      *
      * @param Lead $contact
      */
     public function saveIpAddressesReferencesForContact(Lead $contact)
     {
-        foreach ($contact->getIpAddresses() as $key => $ipAddress) {
+        $ipAddresses = $contact->getIpAddresses();
+
+        foreach ($ipAddresses as $key => $ipAddress) {
             if ($ipAddress->getId() && $contact->getId()) {
                 $this->insertIpAddressReference($ipAddress->getId(), $contact->getId());
 
                 // Remove the IP Address from the Lead entity as it has been handled here.
-                $contact->getIpAddresses()->remove($key);
+                $ipAddresses->remove($key);
             }
         }
     }
 
+    /**
+     * Tries to insert the Lead/IP relation and continues even if UniqueConstraintViolationException is thrown.
+     *
+     * @param int $contactId
+     * @param int $ipId
+     */
     private function insertIpAddressReference($contactId, $ipId)
     {
-        $qb     = $this->em->getConnection()->createQueryBuilder();
+        $qb     = $this->entityManager->getConnection()->createQueryBuilder();
         $values = [
             'lead_id' => ':leadId',
             'ip_id'   => ':ipId',
