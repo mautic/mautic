@@ -12,10 +12,8 @@
 namespace Mautic\EmailBundle\Swiftmailer\Exception;
 
 /**
- * Class SendFailedException
- * @package Mautic\EmailBundle\Swiftmailer\Exception
+ * Class SendFailedException.
  */
 class SendFailedException extends \Swift_TransportException
 {
-
 }
