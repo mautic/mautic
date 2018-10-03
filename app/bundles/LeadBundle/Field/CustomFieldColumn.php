@@ -124,7 +124,7 @@ class CustomFieldColumn
             return;
         }
 
-        $schemaDefinition = $this->schemaDefinition::getSchemaDefinition(
+        $schemaDefinition = $this->schemaDefinition->getSchemaDefinitionNonStatic(
             $leadField->getAlias(),
             $leadField->getType(),
             $leadField->getIsUniqueIdentifier()
