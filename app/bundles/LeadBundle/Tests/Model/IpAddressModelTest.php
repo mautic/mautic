@@ -98,11 +98,11 @@ class IpAddressModelTest extends \PHPUnit_Framework_TestCase
             ->method('getIpAddresses')
             ->willReturn($ipAddresses);
 
-        $contact->expects($this->exactly(2))
+        $contact->expects($this->exactly(3))
             ->method('getId')
             ->willReturn(55);
 
-        $ipAddress->expects($this->exactly(2))
+        $ipAddress->expects($this->exactly(3))
             ->method('getId')
             ->willReturn(44);
 

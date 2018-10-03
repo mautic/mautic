@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Model;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
@@ -48,20 +49,22 @@ class IpAddressModel
     public function saveIpAddressesReferencesForContact(Lead $contact)
     {
         foreach ($contact->getIpAddresses() as $key => $ipAddress) {
-            if ($ipAddress->getId() && $contact->getId()) {
-                $this->insertIpAddressReference($ipAddress->getId(), $contact->getId());
-            }
+            $this->insertIpAddressReference($contact, $ipAddress);
         }
     }
 
     /**
      * Tries to insert the Lead/IP relation and continues even if UniqueConstraintViolationException is thrown.
      *
-     * @param int $contactId
-     * @param int $ipId
+     * @param Lead      $contact
+     * @param IpAddress $ipAddress
      */
-    private function insertIpAddressReference($contactId, $ipId)
+    private function insertIpAddressReference(Lead $contact, IpAddress $ipAddress)
     {
+        if (!$ipAddress->getId() || !$contact->getId()) {
+            return;
+        }
+
         $qb     = $this->entityManager->getConnection()->createQueryBuilder();
         $values = [
             'lead_id' => ':leadId',
@@ -70,15 +73,17 @@ class IpAddressModel
 
         $qb->insert(MAUTIC_TABLE_PREFIX.'lead_ips_xref');
         $qb->values($values);
-        $qb->setParameter('leadId', $contactId);
-        $qb->setParameter('ipId', $ipId);
+        $qb->setParameter('leadId', $contact->getId());
+        $qb->setParameter('ipId', $ipAddress->getId());
 
         try {
             $qb->execute();
         } catch (UniqueConstraintViolationException $e) {
-            $this->logger->warning("The reference for contact $contactId and IP address $ipId is already there. (Unique constraint)");
+            $this->logger->warning("The reference for contact {$contact->getId()} and IP address {$ipAddress->getId()} is already there. (Unique constraint)");
         } catch (ForeignKeyConstraintViolationException $e) {
-            $this->logger->warning("The reference for contact $contactId and IP address $ipId is already there. (Foreign key constraint)");
+            $this->logger->warning("The reference for contact {$contact->getId()} and IP address {$ipAddress->getId()} is already there. (Foreign key constraint)");
         }
+
+        $this->entityManager->detach($ipAddress);
     }
 }
