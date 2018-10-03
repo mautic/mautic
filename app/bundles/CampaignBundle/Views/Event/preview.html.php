@@ -12,7 +12,7 @@ if (empty($route)) {
     $route = 'mautic_campaignevent_action';
 }
 
-$eventType = $event['eventType'];
+$eventType  = $event['eventType'];
 $eventLogic = '';
 // Show ID in dev mode to help with debugging
 $eventName = ('dev' === MAUTIC_ENV) ? "{$event['name']} <small>{$event['id']}</small>" : $event['name'];
@@ -23,7 +23,7 @@ $eventName = ('dev' === MAUTIC_ENV) ? "{$event['name']} <small>{$event['id']}</s
     <div class="campaign-event-content">
         <div>
             <span class="campaign-event-name ellipsis" style="display: block; text-overflow: ellipsis; overflow: hidden;">
-                <i class="fa fa-info-circle" title="<?php echo ucwords($view['translator']->trans('mautic.campaign.' . $event['type'])); ?>"></i>
+                <i class="fa fa-info-circle" title="<?php echo ucwords($view['translator']->trans('mautic.campaign.'.$event['type'])); ?>"></i>
                 <span title="<?php echo $eventName ?>"><?php echo $eventName ?></span>
             </span>
         </div>
