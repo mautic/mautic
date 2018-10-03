@@ -71,4 +71,18 @@ class SchemaDefinition
             'options' => ['notnull' => false],
         ];
     }
+
+    /**
+     * Get the MySQL database type based on the field type.
+     *
+     * @param string $alias
+     * @param string $type
+     * @param bool   $isUnique
+     *
+     * @return array
+     */
+    public function getSchemaDefinitionNonStatic($alias, $type, $isUnique = false)
+    {
+        return self::getSchemaDefinition($alias, $type, $isUnique);
+    }
 }
