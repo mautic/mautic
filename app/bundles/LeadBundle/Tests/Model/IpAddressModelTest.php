@@ -83,7 +83,7 @@ class IpAddressModelTest extends \PHPUnit_Framework_TestCase
 
         $this->ipAddressModel->saveIpAddressesReferencesForContact($contact);
 
-        $this->assertCount(0, $contact->getIpAddresses());
+        $this->assertCount(1, $contact->getIpAddresses());
     }
 
     public function testSaveIpAddressReferencesForContactWhenSomeIpsIfTheReferenceExistsAlready()
@@ -120,6 +120,6 @@ class IpAddressModelTest extends \PHPUnit_Framework_TestCase
 
         $this->ipAddressModel->saveIpAddressesReferencesForContact($contact);
 
-        $this->assertCount(0, $contact->getIpAddresses());
+        $this->assertCount(1, $contact->getIpAddresses());
     }
 }

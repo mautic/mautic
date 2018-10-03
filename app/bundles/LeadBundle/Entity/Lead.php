@@ -23,9 +23,6 @@ use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class Lead.
- */
 class Lead extends FormEntity implements CustomFieldEntityInterface
 {
     use CustomFieldEntityTrait;
@@ -269,9 +266,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     private $channelRules = [];
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->ipAddresses      = new ArrayCollection();
@@ -345,8 +339,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addInverseJoinColumn('ip_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('ipAddress')
-            ->cascadeMerge()
-            ->cascadePersist()
             ->cascadeDetach()
             ->build();
 

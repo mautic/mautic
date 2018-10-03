@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
@@ -40,20 +41,15 @@ class IpAddressModel
 
     /**
      * Saving IP Address references sometimes throws UniqueConstraintViolationException exception on Lead entity save.
-     * Rather pre-save theme here, catch the exception and remove the IP from the Lead the entity.
+     * Rather pre-save the IP references here and catch the exception.
      *
      * @param Lead $contact
      */
     public function saveIpAddressesReferencesForContact(Lead $contact)
     {
-        $ipAddresses = $contact->getIpAddresses();
-
-        foreach ($ipAddresses as $key => $ipAddress) {
+        foreach ($contact->getIpAddresses() as $key => $ipAddress) {
             if ($ipAddress->getId() && $contact->getId()) {
                 $this->insertIpAddressReference($ipAddress->getId(), $contact->getId());
-
-                // Remove the IP Address from the Lead entity as it has been handled here.
-                $ipAddresses->remove($key);
             }
         }
     }
@@ -80,7 +76,9 @@ class IpAddressModel
         try {
             $qb->execute();
         } catch (UniqueConstraintViolationException $e) {
-            $this->logger->warning("The reference for contact $contactId and IP address $ipId is already there.");
+            $this->logger->warning("The reference for contact $contactId and IP address $ipId is already there. (Unique constraint)");
+        } catch (ForeignKeyConstraintViolationException $e) {
+            $this->logger->warning("The reference for contact $contactId and IP address $ipId is already there. (Foreign key constraint)");
         }
     }
 }
