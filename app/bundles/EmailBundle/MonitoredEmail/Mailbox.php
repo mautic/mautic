@@ -191,7 +191,7 @@ class Mailbox
             ];
         }
 
-        if ($this->settings['use_attachments']) {
+        if (isset($this->settings['use_attachments']) && $this->settings['use_attachments']) {
             // Check that cache attachments directory exists
             $cacheDir             = $pathsHelper->getSystemPath('tmp', true);
             $this->attachmentsDir = $cacheDir.'/attachments';
@@ -984,7 +984,7 @@ class Mailbox
             : (isset($params['filename']) || isset($params['name']) ? mt_rand().mt_rand() : null);
 
         if ($attachmentId) {
-            if ($this->settings['use_attachments']) {
+            if (isset($this->settings['use_attachments']) && $this->settings['use_attachments']) {
                 if (empty($params['filename']) && empty($params['name'])) {
                     $fileName = $attachmentId.'.'.strtolower($partStructure->subtype);
                 } else {
