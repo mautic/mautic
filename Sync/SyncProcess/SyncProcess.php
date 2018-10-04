@@ -88,8 +88,9 @@ class SyncProcess
      * @var int
      */
     private $syncIteration;
+
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     private $eventDispatcher;
 
@@ -144,7 +145,7 @@ class SyncProcess
 
         $this->executeIntegrationSync();
         $this->executeInternalSync();
-        
+
         $this->eventDispatcher->dispatch(SyncEvents::INTEGRATION_POST_EXECUTE, new SyncEvent($this->mappingManualDAO->getIntegration(), $this->syncFromDateTime, $this->syncToDateTime));
     }
 

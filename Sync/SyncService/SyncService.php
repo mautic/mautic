@@ -19,7 +19,6 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterf
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcessFactoryInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -57,7 +56,7 @@ final class SyncService implements SyncServiceInterface
      */
     private $syncIntegrationsHelper;
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     private $eventDispatcher;
 
@@ -70,7 +69,7 @@ final class SyncService implements SyncServiceInterface
      * @param MauticSyncDataExchange      $internalSyncDataExchange
      * @param MappingHelper               $mappingHelper
      * @param SyncIntegrationsHelper      $syncIntegrationsHelper
-     * @param EventDispatcher             $eventDispatcher
+     * @param EventDispatcherInterface    $eventDispatcher
      */
     public function __construct(
         SyncJudgeInterface $syncJudge,
@@ -96,7 +95,7 @@ final class SyncService implements SyncServiceInterface
      * @param \DateTimeInterface|null $syncFromDateTime
      * @param \DateTimeInterface|null $syncToDateTime
      *
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\IntegrationNotFoundException
+     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
      */
     public function processIntegrationSync(
         string $integration,
