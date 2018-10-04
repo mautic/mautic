@@ -108,7 +108,7 @@ class SalesforceApi extends CrmApi
             $fields      = $this->integration->getFieldsForQuery('Contact');
             $fields[]    = 'Id';
             $fields      = implode(', ', array_unique($fields));
-            $findContact = 'select '.$fields.' from Contact where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Contact']['Email'])).'\'';
+            $findContact = 'select '.$fields.' from Contact where email = \''.$this->escapeQueryValue($data['Contact']['Email']).'\'';
             $response    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
@@ -120,7 +120,7 @@ class SalesforceApi extends CrmApi
             $fields   = $this->integration->getFieldsForQuery('Lead');
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
-            $findLead = 'select '.$fields.' from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
+            $findLead = 'select '.$fields.' from Lead where email = \''.$this->escapeQueryValue($data['Lead']['Email']).'\' and ConvertedContactId = NULL';
             $response = $this->request('queryAll', ['q' => $findLead], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
@@ -152,20 +152,20 @@ class SalesforceApi extends CrmApi
         if (isset($config['objects']) && false !== array_search('company', $config['objects']) && !empty($data['company']['Name'])) {
             $fields = $this->integration->getFieldsForQuery('Account');
 
-            if (isset($data['company']['BillingCountry']) && !empty($data['company']['BillingCountry'])) {
-                $appendToQuery .= ' and BillingCountry =  \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['BillingCountry'])).'\'';
+            if (!empty($data['company']['BillingCountry'])) {
+                $appendToQuery .= ' and BillingCountry =  \''.$this->escapeQueryValue($data['company']['BillingCountry']).'\'';
             }
-            if (isset($data['company']['BillingCity']) && !empty($data['company']['BillingCity'])) {
-                $appendToQuery .= ' and BillingCity =  \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['BillingCity'])).'\'';
+            if (!empty($data['company']['BillingCity'])) {
+                $appendToQuery .= ' and BillingCity =  \''.$this->escapeQueryValue($data['company']['BillingCity']).'\'';
             }
-            if (isset($data['company']['BillingState']) && !empty($data['company']['BillingState'])) {
-                $appendToQuery .= ' and BillingState =  \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['BillingState'])).'\'';
+            if (!empty($data['company']['BillingState'])) {
+                $appendToQuery .= ' and BillingState =  \''.$this->escapeQueryValue($data['company']['BillingState']).'\'';
             }
 
-            $fields[]    = 'Id';
-            $fields      = implode(', ', array_unique($fields));
-            $findContact = 'select '.$fields.' from Account where Name = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['Name'])).'\''.$appendToQuery;
-            $response    = $this->request('queryAll', ['q' => $findContact], 'GET', false, null, $queryUrl);
+            $fields[] = 'Id';
+            $fields   = implode(', ', array_unique($fields));
+            $query    = 'select '.$fields.' from Account where Name = \''.$this->escapeQueryValue($data['company']['Name']).'\''.$appendToQuery;
+            $response = $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
                 $sfRecords['company'] = $response['records'];
@@ -325,14 +325,17 @@ class SalesforceApi extends CrmApi
     {
         $queryUrl = $this->integration->getQueryUrl();
 
+        if (defined('MAUTIC_ENV') && MAUTIC_ENV === 'dev') {
+            // Easier for testing
+            $this->requestSettings['headers']['Sforce-Query-Options'] = 'batchSize=200';
+        }
+
         if (!is_array($query)) {
             return $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
         }
 
         if (!empty($query['nextUrl'])) {
-            $queryType = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
-
-            return $this->request('query'.$queryType, [], 'GET', false, null, $queryUrl);
+            return $this->request(null, [], 'GET', false, null, $query['nextUrl']);
         }
 
         $organizationCreatedDate = $this->getOrganizationCreatedDate();
@@ -352,7 +355,7 @@ class SalesforceApi extends CrmApi
 
             $ignoreConvertedLeads = ($object == 'Lead') ? ' and ConvertedContactId = NULL' : '';
 
-            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end']
+            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
                 .$ignoreConvertedLeads;
 
             return $this->request('queryAll', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
@@ -421,7 +424,7 @@ class SalesforceApi extends CrmApi
 
         $query = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
         if ($modifiedSince) {
-            $query .= ' and LastModifiedDate >= '.$modifiedSince;
+            $query .= ' and SystemModStamp >= '.$modifiedSince;
         }
 
         $results = $this->request(null, ['q' => $query], 'GET', false, null, $queryUrl);
@@ -485,6 +488,39 @@ class SalesforceApi extends CrmApi
         $this->apiRequestCounter = 0;
 
         return $count;
+    }
+
+    /**
+     * @param array $names
+     * @param null  $requiredFieldString
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function getCompaniesByName(array $names, $requiredFieldString)
+    {
+        $names     = array_map([$this, 'escapeQueryValue'], $names);
+        $queryUrl  = $this->integration->getQueryUrl();
+        $findQuery = 'select Id, '.$requiredFieldString.' from Account where isDeleted = false and Name in (\''.implode("','", $names).'\')';
+
+        return $this->request('query', ['q' => $findQuery], 'GET', false, null, $queryUrl);
+    }
+
+    /**
+     * @param array $ids
+     * @param       $requiredFieldString
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function getCompaniesById(array $ids, $requiredFieldString)
+    {
+        $findQuery = 'select isDeleted, Id, '.$requiredFieldString.' from Account where  Id in (\''.implode("','", $ids).'\')';
+        $queryUrl  = $this->integration->getQueryUrl();
+
+        return $this->request('queryAll', ['q' => $findQuery], 'GET', false, null, $queryUrl);
     }
 
     /**
@@ -573,5 +609,25 @@ class SalesforceApi extends CrmApi
         $this->requestCounter = 1;
 
         return false;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return bool|float|mixed|string
+     */
+    private function escapeQueryValue($value)
+    {
+        // SF uses backslashes as escape delimeter
+        // Remember that PHP uses \ as an escape. Therefore, to replace a single backslash with 2, must use 2 and 4
+        $value = str_replace('\\', '\\\\', $value);
+
+        // Escape single quotes
+        $value = str_replace("'", "\'", $value);
+
+        // Apply general formatting/cleanup
+        $value = $this->integration->cleanPushData($value);
+
+        return $value;
     }
 }

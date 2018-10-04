@@ -24,11 +24,11 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\SmsBundle\Api\AbstractSmsApi;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Event\SmsEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
+use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -57,7 +57,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @var
      */
-    protected $smsApi;
+    protected $transport;
 
     /**
      * SmsModel constructor.
@@ -65,14 +65,14 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @param TrackableModel    $pageTrackableModel
      * @param LeadModel         $leadModel
      * @param MessageQueueModel $messageQueueModel
-     * @param AbstractSmsApi    $smsApi
+     * @param TransportChain    $transport
      */
-    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, AbstractSmsApi $smsApi)
+    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport)
     {
         $this->pageTrackableModel = $pageTrackableModel;
         $this->leadModel          = $leadModel;
         $this->messageQueueModel  = $messageQueueModel;
-        $this->smsApi             = $smsApi;
+        $this->transport          = $transport;
     }
 
     /**
@@ -113,7 +113,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     {
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
-        foreach ($entities as $k => $entity) {
+        $i         = 0;
+        foreach ($entities as $entity) {
             $isNew = ($entity->getId()) ? false : true;
 
             //set some defaults
@@ -129,7 +130,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
 
-            if ((($k + 1) % $batchSize) === 0) {
+            if (++$i % $batchSize === 0) {
                 $this->em->flush();
             }
         }
@@ -263,21 +264,22 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             }
 
             $stats = [];
+            // @todo we should allow batch sending based on transport, MessageBird does support 20 SMS at once
+            // the transport chain is already prepared for it
             if (count($contacts)) {
                 /** @var Lead $lead */
                 foreach ($contacts as $lead) {
                     $leadId = $lead->getId();
 
-                    $leadPhoneNumber = $lead->getMobile();
-                    if (empty($leadPhoneNumber)) {
-                        $leadPhoneNumber = $lead->getPhone();
-                    }
+                    $leadPhoneNumber = $lead->getLeadPhoneNumber();
 
                     if (empty($leadPhoneNumber)) {
                         $results[$leadId] = [
                             'sent'   => false,
                             'status' => 'mautic.sms.campaign.failed.missing_number',
                         ];
+
+                        continue;
                     }
 
                     $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
@@ -302,7 +304,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         'content' => $tokenEvent->getContent(),
                     ];
 
-                    $metadata = $this->smsApi->sendSms($leadPhoneNumber, $tokenEvent->getContent());
+                    $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent());
 
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
@@ -322,6 +324,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         if ($sentCount) {
             $this->getRepository()->upCount($sms->getId(), 'sent', $sentCount);
             $this->getStatRepository()->saveEntities($stats);
+            // send statId to results
+            $stat = reset($stats);
+            if ($stat instanceof Stat) {
+                $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
+            }
             $this->em->clear(Stat::class);
         }
 

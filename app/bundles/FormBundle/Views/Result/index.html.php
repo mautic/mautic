@@ -30,7 +30,6 @@ $buttons[] = [
 
 $buttons[] = [
     'attr' => [
-        'data-toggle' => 'download',
         'data-toggle' => '',
         'class'       => 'btn btn-default btn-nospin',
         'href'        => $view['router']->path('mautic_form_export', ['objectId' => $form->getId(), 'format' => 'csv']),
@@ -43,7 +42,6 @@ $buttons[] = [
 if (class_exists('PHPExcel')) {
     $buttons[] = [
         'attr' => [
-            'data-toggle' => 'download',
             'data-toggle' => '',
             'class'       => 'btn btn-default btn-nospin',
             'href'        => $view['router']->path('mautic_form_export', ['objectId' => $form->getId(), 'format' => 'xlsx']),
@@ -53,6 +51,17 @@ if (class_exists('PHPExcel')) {
         'primary'   => true,
     ];
 }
+
+$buttons[] =
+    [
+        'attr' => [
+                'class'       => 'btn btn-default',
+                'href'        => $view['router']->path('mautic_form_action', ['objectAction' => 'view', 'objectId'=> $form->getId()]),
+                'data-toggle' => 'ajax',
+            ],
+        'iconClass' => 'fa fa-remove',
+        'btnText'   => $view['translator']->trans('mautic.core.form.close'),
+    ];
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', ['customButtons' => $buttons]));
 ?>

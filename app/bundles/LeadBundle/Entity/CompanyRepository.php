@@ -45,10 +45,17 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $entity = null;
         }
 
-        if ($entity != null) {
-            $fieldValues = $this->getFieldValues($id, true, 'company');
-            $entity->setFields($fieldValues);
+        if (null === $entity) {
+            return $entity;
         }
+
+        if ($entity->getFields()) {
+            // Pulled from Doctrine memory so don't make unnecessary queries as this has already happened
+            return $entity;
+        }
+
+        $fieldValues = $this->getFieldValues($id, true, 'company');
+        $entity->setFields($fieldValues);
 
         return $entity;
     }

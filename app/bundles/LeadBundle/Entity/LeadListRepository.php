@@ -25,6 +25,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -311,16 +312,26 @@ class LeadListRepository extends CommonRepository
         return ($returnArray) ? $return : $return[$listIds[0]];
     }
 
+    private function format_period($inputSeconds)
+    {
+        $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
+
+        return $now->format('H:i:s.u');
+    }
+
     /**
-     * @param       $lists
-     * @param array $args
+     * @deprecated in 2.14, to be removed in Mautic 3 - Use methods in the ContactSegmentService class
+     *
+     * @param        $lists
+     * @param array  $args
+     * @param Logger $logger
      *
      * @return array
      */
-    public function getLeadsByList($lists, $args = [])
+    public function getLeadsByList($lists, $args = [], Logger $logger = null)
     {
         // Return only IDs
-        $idOnly = (!array_key_exists('idOnly', $args)) ? false : $args['idOnly'];
+        $idOnly = (!array_key_exists('idOnly', $args)) ? false : $args['idOnly']; //Always TRUE
         // Return counts
         $countOnly = (!array_key_exists('countOnly', $args)) ? false : $args['countOnly'];
         // Return only leads that have not been added or manually manipulated to the lists yet
@@ -328,7 +339,7 @@ class LeadListRepository extends CommonRepository
         // Return leads that do not belong to a list based on filters
         $nonMembersOnly = (!array_key_exists('nonMembersOnly', $args)) ? false : $args['nonMembersOnly'];
         // Use filters to dynamically generate the list
-        $dynamic = ($newOnly || $nonMembersOnly || (!$newOnly && !$nonMembersOnly && $countOnly));
+        $dynamic = ($newOnly || $nonMembersOnly || (!$newOnly && !$nonMembersOnly && $countOnly)); ///This is always true - we can ommit conditions
         // Limiters
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
         $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
@@ -359,7 +370,7 @@ class LeadListRepository extends CommonRepository
             if ($dynamic && count($filters)) {
                 $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 if ($countOnly) {
-                    $count  = ($this->hasCompanyFilter) ? 'count(distinct(l.id))' : 'count(l.id)';
+                    $count  = 'count(distinct(l.id))';
                     $select = $count.' as lead_count, max(l.id) as max_id';
                     if ($withMinId) {
                         $select .= ', min(l.id) as min_id';
@@ -389,7 +400,6 @@ class LeadListRepository extends CommonRepository
 
                 if ($newOnly || !$nonMembersOnly) { // !$nonMembersOnly is mainly used for tests as we just want a live count
                     $expr = $this->generateSegmentExpression($filters, $parameters, $q, null, $id);
-
                     if (!$this->hasCompanyFilter && !$expr->count()) {
                         // Treat this as if it has no filters since all the filters are now invalid (fields were deleted)
                         $return[$id] = [];
@@ -418,7 +428,7 @@ class LeadListRepository extends CommonRepository
                         // Only leads in the list at the time of count
                         $listOnExpr->add(
                             $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
-                        );
+                         );
                     }
 
                     $q->leftJoin(
@@ -508,7 +518,27 @@ class LeadListRepository extends CommonRepository
                     $q->resetQueryPart('groupBy');
                 }
 
+                $params  = $q->getParameters();
+                $sqlT    = $q->getSQL();
+                foreach ($params as $key=>$val) {
+                    if (!is_int($val) and !is_float($val) and !is_array($val)) {
+                        $val = "'$val'";
+                    }
+                    if (is_array($val)) {
+                        $val = join(',', $val);
+                    }
+                    $sqlT                    = str_replace(":{$key}", $val, $sqlT);
+                }
+
+                if (null !== $logger) {
+                    $logger->debug(sprintf('Old version SQL: %s', $sqlT));
+                }
+                $timer   = microtime(true);
                 $results = $q->execute()->fetchAll();
+                $timer   = microtime(true) - $timer;
+                if (null !== $logger) {
+                    $logger->debug(sprintf('Old version SQL took: %s', $this->format_period($timer)));
+                }
 
                 foreach ($results as $r) {
                     if ($countOnly) {
@@ -618,6 +648,7 @@ class LeadListRepository extends CommonRepository
                     } else {
                         continue;
                     }
+                    // no break
                 case is_bool($v):
                     $paramType = 'boolean';
                     break;
@@ -1618,6 +1649,32 @@ class LeadListRepository extends CommonRepository
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
 
                     break;
+                case 'utm_campaign':
+                case 'utm_content':
+                case 'utm_medium':
+                case 'utm_source':
+                case 'utm_term':
+                    // Special handling of lead lists and utmtags
+                    $func = in_array($func, ['eq', 'in']) ? 'EXISTS' : 'NOT EXISTS';
+
+                    $ignoreAutoFilter = true;
+
+                    $table  = 'lead_utmtags';
+                    $column = $details['field'];
+
+                    $subQb = $this->createFilterExpressionSubQuery(
+                        $table,
+                        $alias,
+                        $column,
+                        $details['filter'],
+                        $parameters,
+                        $leadId
+                    );
+
+                    $groupExpr->add(
+                        sprintf('%s (%s)', $func, $subQb->getSQL())
+                    );
+                    break;
                 default:
                     if (!$column) {
                         // Column no longer exists so continue
@@ -1679,7 +1736,7 @@ class LeadListRepository extends CommonRepository
                         case 'notIn':
                             foreach ($details['filter'] as &$value) {
                                 $value = $q->expr()->literal(
-                                    InputHelper::clean($value)
+                                    InputHelper::string($value)
                                 );
                             }
                             if ($details['type'] == 'multiselect') {
@@ -1693,7 +1750,7 @@ class LeadListRepository extends CommonRepository
                                     }
 
                                     $groupExpr->add(
-                                        $field." $operator '\\\\|?$filter\\\\|?'"
+                                        $field." $operator '(([|]|^)$filter([|]|$))'"
                                     );
                                 }
                             } else {
