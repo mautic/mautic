@@ -27,6 +27,13 @@
 1. 
 2. 
 
+#### Testing this PR requires running the following commands:
+Action |  Command  | Required
+| --- | --- | ---
+clear cache | php app/console cache:clear | 
+regenerate assets | php app/console mautic:assets:generate | 
+update db schema | run command php app/console doctrine:schema:update --force | 
+
 #### List deprecations along with the new alternative:
 1. 
 2. 
