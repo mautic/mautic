@@ -11,14 +11,14 @@
 
 namespace MauticPlugin\IntegrationsBundle\Event;
 
-use Mautic\CoreBundle\Event\CommonEvent;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class SyncEvent
  *
  * @package MauticPlugin\IntegrationsBundle\Event
  */
-class SyncEvent extends CommonEvent
+class SyncEvent extends Event
 {
     /** @var string */
     private $integrationName;
