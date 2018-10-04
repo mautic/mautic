@@ -14,6 +14,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * Class FormFieldSelectType.
  */
@@ -58,7 +59,7 @@ class FormDNCAddType extends AbstractType
             [
                 'choices'    => [
                     'email' => 'Email',
-                    'sms'   => 'SMS'
+                    'sms'   => 'SMS',
                 ],
                 'label'       => 'plugin.dncevent.form.channel.label',
                 'label_attr'  => ['class' => 'control-label'],

@@ -59,7 +59,7 @@ class FormDNCRemoveType extends AbstractType
             [
                 'choices'    => [
                     'email' => 'Email',
-                    'sms'   => 'SMS'
+                    'sms'   => 'SMS',
                 ],
                 'label'       => 'plugin.dncevent.form.channel.label',
                 'label_attr'  => ['class' => 'control-label'],

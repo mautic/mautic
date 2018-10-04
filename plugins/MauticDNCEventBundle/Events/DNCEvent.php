@@ -1,4 +1,5 @@
 <?php
+
 namespace MauticPlugin\MauticDNCEventBundle\Events;
 
 use Mautic\CampaignBundle\CampaignEvents;
