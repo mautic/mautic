@@ -144,6 +144,8 @@ class SyncProcess
 
         $this->executeIntegrationSync();
         $this->executeInternalSync();
+        
+        $this->eventDispatcher->dispatch(SyncEvents::INTEGRATION_POST_EXECUTE, new SyncEvent($this->mappingManualDAO->getIntegration(), $this->syncFromDateTime, $this->syncToDateTime));
     }
 
     private function executeIntegrationSync()
@@ -216,7 +218,6 @@ class SyncProcess
                     "Mautic to integration; no objects were mapped to be synced",
                     __CLASS__.':'.__FUNCTION__
                 );
-                $this->eventDispatcher->dispatch(SyncEvents::INTEGRATION_POST_EXECUTE, new SyncEvent($this->mappingManualDAO->getIntegration(), $this->syncFromDateTime, $this->syncToDateTime));
                 break;
             }
 
@@ -230,7 +231,6 @@ class SyncProcess
                     __CLASS__.':'.__FUNCTION__
                 );
 
-                $this->eventDispatcher->dispatch(SyncEvents::INTEGRATION_POST_EXECUTE, new SyncEvent($this->mappingManualDAO->getIntegration(), $this->syncFromDateTime, $this->syncToDateTime));
                 break;
             }
 
@@ -264,7 +264,6 @@ class SyncProcess
             // Fetch the next iteration/batch
             ++$this->syncIteration;
         } while (true);
-        $this->eventDispatcher->dispatch(SyncEvents::INTEGRATION_POST_EXECUTE, new SyncEvent($this->mappingManualDAO->getIntegration(), $this->syncFromDateTime, $this->syncToDateTime));
     }
 
     /**
