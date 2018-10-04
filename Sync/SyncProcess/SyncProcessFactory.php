@@ -15,6 +15,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class SyncProcessFactory
@@ -29,6 +30,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
      * @param SyncDateHelper            $syncDateHelper
      * @param MappingHelper             $mappingHelper
      * @param \DateTimeInterface|null   $isFirstTimeSync
+     * @param EventDispatcherInterface  $eventDispatcher
      * @param \DateTimeInterface|null   $syncFromDateTime
      * @param \DateTimeInterface|null   $syncToDateTime
      *
@@ -42,6 +44,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
         $isFirstTimeSync,
+        EventDispatcherInterface $eventDispatcher,
         \DateTimeInterface $syncFromDateTime = null,
         \DateTimeInterface $syncToDateTime = null
     ): SyncProcess {
@@ -53,6 +56,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
             $syncDateHelper,
             $mappingHelper,
             $isFirstTimeSync,
+            $eventDispatcher,
             $syncFromDateTime,
             $syncToDateTime
         );

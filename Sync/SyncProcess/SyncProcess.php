@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess;
 
+use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
@@ -32,6 +33,9 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
+use MauticPlugin\IntegrationsBundle\SyncEvents;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class SyncProcess
@@ -84,6 +88,10 @@ class SyncProcess
      * @var int
      */
     private $syncIteration;
+    /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
 
     /**
      * SyncProcess constructor.
@@ -97,6 +105,7 @@ class SyncProcess
      * @param                           $isFirstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
      * @param \DateTimeInterface|null   $syncToDateTime
+     * @param EventDispatcherInterface  $eventDispatcher
      */
     public function __construct(
         SyncJudgeInterface $syncJudge,
@@ -106,6 +115,7 @@ class SyncProcess
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
         $isFirstTimeSync,
+        EventDispatcherInterface $eventDispatcher,
         \DateTimeInterface $syncFromDateTime = null,
         \DateTimeInterface $syncToDateTime = null
     )
@@ -120,6 +130,7 @@ class SyncProcess
         $this->isFirstTimeSync             = $isFirstTimeSync;
         $this->syncFromDateTime            = $syncFromDateTime;
         $this->syncToDateTime              = $syncToDateTime;
+        $this->eventDispatcher             = $eventDispatcher;
     }
 
     /**
@@ -198,12 +209,14 @@ class SyncProcess
             );
 
             $syncReport = $this->generateInternalSyncReport();
+
             if (!$syncReport->shouldSync()) {
                 DebugLogger::log(
                     $this->mappingManualDAO->getIntegration(),
                     "Mautic to integration; no objects were mapped to be synced",
                     __CLASS__.':'.__FUNCTION__
                 );
+                $this->eventDispatcher->dispatch(SyncEvents::INTEGRATION_POST_EXECUTE, new SyncEvent($this->mappingManualDAO->getIntegration(), $this->syncFromDateTime, $this->syncToDateTime));
                 break;
             }
 
@@ -217,6 +230,7 @@ class SyncProcess
                     __CLASS__.':'.__FUNCTION__
                 );
 
+                $this->eventDispatcher->dispatch(SyncEvents::INTEGRATION_POST_EXECUTE, new SyncEvent($this->mappingManualDAO->getIntegration(), $this->syncFromDateTime, $this->syncToDateTime));
                 break;
             }
 
@@ -250,6 +264,7 @@ class SyncProcess
             // Fetch the next iteration/batch
             ++$this->syncIteration;
         } while (true);
+        $this->eventDispatcher->dispatch(SyncEvents::INTEGRATION_POST_EXECUTE, new SyncEvent($this->mappingManualDAO->getIntegration(), $this->syncFromDateTime, $this->syncToDateTime));
     }
 
     /**

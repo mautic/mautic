@@ -216,6 +216,7 @@ return [
                     'mautic.integrations.sync.data_exchange.mautic',
                     'mautic.integrations.helper.sync_mapping',
                     'mautic.integrations.helper.sync_integrations',
+                    'event_dispatcher'
                 ],
                 'methodCalls' => [
                     'initiateDebugLogger' => ['mautic.sync.logger'],
