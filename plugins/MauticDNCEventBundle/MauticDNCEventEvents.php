@@ -24,7 +24,7 @@ final class MauticDNCEventEvents
      *
      * @var string
      */
-    const DNCEVENT_ADD_DNC = 'Mautic.dncevent.event.addDnc';
+    const DNCEVENT_ADD_DNC    = 'Mautic.dncevent.event.addDnc';
     const DNCEVENT_REMOVE_DNC = 'Mautic.dncevent.event.removeDnc';
 
 }

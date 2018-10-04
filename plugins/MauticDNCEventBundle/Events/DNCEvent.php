@@ -1,16 +1,17 @@
 <?php
 namespace MauticPlugin\MauticDNCEventBundle\Events;
 
-use MauticPlugin\MauticDNCEventBundle\MauticDNCEventEvents;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use MauticPlugin\MauticDNCEventBundle\MauticDNCEventEvents;
 
 class DNCEvent extends CommonSubscriber
 {
     protected $factory;
+
     /**
      * CampaignSubscriber constructor.
      *
@@ -46,14 +47,7 @@ class DNCEvent extends CommonSubscriber
                 'label'       => 'plugin.dncevent.campaign.addDnc.label',
                 'eventName'   => MauticDNCEventEvents::DNCEVENT_ADD_DNC,
                 'description' => 'plugin.dncevent.campaign.addDnc.desc',
-                // Set custom parameters to configure the decision
                 'formType'    => 'dncevent_add_type_form',
-                // Set a custom formTheme to customize the layout of elements in formType
-                //'formTheme'       => 'HelloWorldBundle:FormTheme\SubmitAction',
-                // Set custom options to pass to the form type, if applicable
-                //'formTypeOptions' => array(
-                //    'even.loc.model.business' => 'mars'
-                //)
             ]
         );
     }
@@ -70,7 +64,7 @@ class DNCEvent extends CommonSubscriber
         $config = $event->getConfig();
 
         $model = $this->factory->getModel('dncevent.model');
-        $res = $model->addDoNotContact($lead, $config['properties']);
+        $res   = $model->addDoNotContact($lead, $config['properties']);
 
         $event->setResult($res);
     }

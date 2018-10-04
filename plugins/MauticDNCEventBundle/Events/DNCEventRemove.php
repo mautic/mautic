@@ -1,16 +1,17 @@
 <?php
 namespace MauticPlugin\MauticDNCEventBundle\Events;
 
-use MauticPlugin\MauticDNCEventBundle\MauticDNCEventEvents;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use MauticPlugin\MauticDNCEventBundle\MauticDNCEventEvents;
 
 class DNCEventRemove extends CommonSubscriber
 {
     protected $factory;
+
     /**
      * CampaignSubscriber constructor.
      *
@@ -45,14 +46,7 @@ class DNCEventRemove extends CommonSubscriber
                 'label'       => 'plugin.dncevent.campaign.removeDnc.label',
                 'eventName'   => MauticDNCEventEvents::DNCEVENT_REMOVE_DNC,
                 'description' => 'plugin.dncevent.campaign.removeDnc.desc',
-                // Set custom parameters to configure the decision
                 'formType'    => 'dncevent_remove_type_form',
-                // Set a custom formTheme to customize the layout of elements in formType
-                //'formTheme'       => 'HelloWorldBundle:FormTheme\SubmitAction',
-                // Set custom options to pass to the form type, if applicable
-                //'formTypeOptions' => array(
-                //    'even.loc.model.business' => 'mars'
-                //)
             ]
         );
     }
@@ -69,7 +63,7 @@ class DNCEventRemove extends CommonSubscriber
         $config = $event->getConfig();
 
         $model = $this->factory->getModel('dncevent.model');
-        $res = $model->removeDoNotContact($lead, $config['properties']);
+        $res   = $model->removeDoNotContact($lead, $config['properties']);
 
         $event->setResult($res);
     }

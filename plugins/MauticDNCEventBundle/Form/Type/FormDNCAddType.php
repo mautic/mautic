@@ -8,13 +8,12 @@
 
 namespace MauticPlugin\MauticDNCEventBundle\Form\Type;
 
-use MauticPlugin\MauticDNCEventBundle\Model\DNCEventModel;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use MauticPlugin\MauticDNCEventBundle\Model\DNCEventModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
 /**
  * Class FormFieldSelectType.
  */
@@ -59,11 +58,11 @@ class FormDNCAddType extends AbstractType
             [
                 'choices'    => [
                     'email' => 'Email',
-                    'sms' => 'SMS'
+                    'sms'   => 'SMS'
                 ],
-                'label'      => 'plugin.dncevent.form.channel.label',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'label'       => 'plugin.dncevent.form.channel.label',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
                 'constraints' => [
                     new NotBlank(
                         [
@@ -76,7 +75,7 @@ class FormDNCAddType extends AbstractType
     }
 
     /**
-     * return alias name of form in config.php
+     * return alias name of form in config.php.
      */
     public function getName()
     {
