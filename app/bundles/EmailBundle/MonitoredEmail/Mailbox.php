@@ -187,7 +187,7 @@ class Mailbox
                 'password'        => '',
                 'user'            => '',
                 'encryption'      => '',
-                'use_attachments' => true,
+                'use_attachments' => false,
             ];
         }
 
