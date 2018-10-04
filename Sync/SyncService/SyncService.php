@@ -19,6 +19,7 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterf
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcessFactoryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class SyncService
@@ -54,6 +55,10 @@ final class SyncService implements SyncServiceInterface
      * @var SyncIntegrationsHelper
      */
     private $syncIntegrationsHelper;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
      * SyncService constructor.
@@ -64,6 +69,7 @@ final class SyncService implements SyncServiceInterface
      * @param MauticSyncDataExchange      $internalSyncDataExchange
      * @param MappingHelper               $mappingHelper
      * @param SyncIntegrationsHelper      $syncIntegrationsHelper
+     * @param EventDispatcherInterface    $eventDispatcher
      */
     public function __construct(
         SyncJudgeInterface $syncJudge,
@@ -71,7 +77,8 @@ final class SyncService implements SyncServiceInterface
         SyncDateHelper $syncDateHelper,
         MauticSyncDataExchange $internalSyncDataExchange,
         MappingHelper $mappingHelper,
-        SyncIntegrationsHelper $syncIntegrationsHelper
+        SyncIntegrationsHelper $syncIntegrationsHelper,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->syncJudge                     = $syncJudge;
         $this->integrationSyncProcessFactory = $integrationSyncProcessFactory;
@@ -79,6 +86,7 @@ final class SyncService implements SyncServiceInterface
         $this->internalSyncDataExchange      = $internalSyncDataExchange;
         $this->mappingHelper                 = $mappingHelper;
         $this->syncIntegrationsHelper        = $syncIntegrationsHelper;
+        $this->eventDispatcher               = $eventDispatcher;
     }
 
     /**
@@ -87,7 +95,7 @@ final class SyncService implements SyncServiceInterface
      * @param \DateTimeInterface|null $syncFromDateTime
      * @param \DateTimeInterface|null $syncToDateTime
      *
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\IntegrationNotFoundException
+     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
      */
     public function processIntegrationSync(
         string $integration,
@@ -103,6 +111,7 @@ final class SyncService implements SyncServiceInterface
             $this->syncDateHelper,
             $this->mappingHelper,
             $firstTimeSync,
+            $this->eventDispatcher,
             $syncFromDateTime,
             $syncToDateTime
         );
