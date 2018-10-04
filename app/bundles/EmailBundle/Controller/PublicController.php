@@ -510,6 +510,10 @@ class PublicController extends CommonFormController
 
         $content = $event->getContent(true);
 
+        if ($this->get('mautic.security')->isAnonymous()) {
+            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
+        }
+
         return new Response($content);
     }
 
