@@ -45,7 +45,6 @@ class BuilderSubscriber extends CommonSubscriber
      * @var PageModel
      */
     protected $pageModel;
-
     protected $pageTokenRegex      = '{pagelink=(.*?)}';
     protected $dwcTokenRegex       = '{dwc=(.*?)}';
     protected $langBarRegex        = '{langbar}';
