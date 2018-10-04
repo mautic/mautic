@@ -244,7 +244,7 @@ class AjaxController extends CommonController
         $dataArray      = ['success' => 0];
         $name           = InputHelper::clean($request->request->get('model'));
         $id             = InputHelper::int($request->request->get('id'));
-        $customToogle   = InputHelper::clean($request->request->get('customToogle'));
+        $customToggle   = InputHelper::clean($request->request->get('customToggle'));
         $model          = $this->getModel($name);
 
         $post = $request->request->all();
@@ -280,11 +280,11 @@ class AjaxController extends CommonController
             if ($hasPermission) {
                 $dataArray['success'] = 1;
                 //toggle permission state
-                if ($customToogle) {
-                    $getCustomToogle = 'get'.ucfirst($customToogle);
-                    $setCustomToogle = 'set'.ucfirst($customToogle);
-                    if (method_exists($entity, $setCustomToogle) && method_exists($entity, $getCustomToogle)) {
-                        $entity->$setCustomToogle(!(bool) call_user_func([$entity, $getCustomToogle]));
+                if ($customToggle) {
+                    $getCustomToggle = 'get'.ucfirst($customToggle);
+                    $setCustomToggle = 'set'.ucfirst($customToggle);
+                    if (method_exists($entity, $setCustomToggle) && method_exists($entity, $getCustomToggle)) {
+                        $entity->$setCustomToggle(!(bool) call_user_func([$entity, $getCustomToggle]));
                         $model->getRepository()->saveEntity($entity);
                     }
                 } else {

@@ -10,11 +10,11 @@
  */
 $query  = (!isset($query)) ? '' : $query;
 
-// Custom toogle
+// Custom toggle
 if ($query) {
     parse_str($query, $queryParam);
-    if (isset($queryParam['customToogle'])) {
-        $getCustomToogle = 'get'.ucfirst($queryParam['customToogle']);
+    if (isset($queryParam['customToggle'])) {
+        $getCustomToogle = 'get'.ucfirst($queryParam['customToggle']);
         if (!method_exists($item, $getCustomToogle)) {
             return;
         }

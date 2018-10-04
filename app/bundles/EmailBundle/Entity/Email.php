@@ -127,7 +127,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var bool
      */
-    private $publicPreview;
+    private $publicPreview = 1;
 
     /**
      * @var int

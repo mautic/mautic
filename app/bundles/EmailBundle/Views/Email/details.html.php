@@ -308,7 +308,7 @@ if (!$isEmbedded) {
             </div>
             <div class="panel-body pt-xs">
                 <div class="input-group">
-                    <div class="input-group-addon"><?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $email, 'model' => 'email', 'query' => 'customToogle=publicPreview']); ?></div>
+                    <div class="input-group-addon"><?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $email, 'model' => 'email', 'query' => 'customToggle=publicPreview']); ?></div>
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly
                            value="<?php echo $view->escape($previewUrl); ?>"/>
