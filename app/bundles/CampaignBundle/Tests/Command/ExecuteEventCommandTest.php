@@ -73,6 +73,9 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=0');
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testSoftDelete()
     {
         $campaignModel = $this->container->get('mautic.campaign.model.campaign');

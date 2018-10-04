@@ -83,6 +83,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
 
     /**
      * @param array $ids
+     * @param int   $campaignId
      *
      * @return array
      */

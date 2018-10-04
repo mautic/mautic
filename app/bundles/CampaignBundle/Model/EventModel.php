@@ -95,10 +95,6 @@ class EventModel extends LegacyEventModel
                 unset($deletedEvents[$k]);
             }
 
-            // if (isset($currentEvents[$deleteMe])) {
-            //     unset($deletedEvents[$k]);
-            // }
-
             if (isset($deletedEvents[$k])) {
                 $deletedKeys[] = $deleteMe;
             }
@@ -108,9 +104,6 @@ class EventModel extends LegacyEventModel
             // wipe out any references to these events to prevent restraint violations
             $this->getRepository()->nullEventRelationships($deletedKeys);
             $this->getRepository()->removeParentFromSoftDeletedEvent($deletedKeys);
-
-            // delete the events
-            //  $this->deleteEntities($deletedEvents);
 
             // soft delete the events in a loop using togglePublishStatus
             foreach ($deletedKeys as $deletedKey) {
