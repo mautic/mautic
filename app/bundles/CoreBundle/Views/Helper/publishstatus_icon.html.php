@@ -14,16 +14,13 @@ $query  = (!isset($query)) ? '' : $query;
 if ($query) {
     parse_str($query, $queryParam);
     if (isset($queryParam['customToggle'])) {
-        $getCustomToogle = 'get'.ucfirst($queryParam['customToggle']);
-        if (!method_exists($item, $getCustomToogle)) {
-            return;
-        }
-        $status =  (bool) call_user_func([$item, $getCustomToogle]);
+        $accessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
+        $status   =   (bool) $accessor->getValue($item, $queryParam['customToggle']);
     }
 }
 
 // continue as standard published status
-if (!isset($getCustomToogle)) {
+if (!isset($status)) {
     $status = $item->getPublishStatus();
 }
 $size   = (empty($size)) ? 'fa-lg' : $size;
@@ -49,7 +46,6 @@ switch ($status) {
         ]);
         break;
 }
-
 switch (true) {
     case $status === true:
         $icon = ' fa-toggle-on text-success';

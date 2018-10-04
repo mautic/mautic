@@ -304,7 +304,7 @@ if (!$isEmbedded) {
         <!-- preview URL -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
-                <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.urlvariant'); ?></div>
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.preview.url'); ?></div>
             </div>
             <div class="panel-body pt-xs">
                 <div class="input-group">

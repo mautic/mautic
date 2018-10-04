@@ -24,6 +24,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Class AjaxController.
@@ -281,12 +282,9 @@ class AjaxController extends CommonController
                 $dataArray['success'] = 1;
                 //toggle permission state
                 if ($customToggle) {
-                    $getCustomToggle = 'get'.ucfirst($customToggle);
-                    $setCustomToggle = 'set'.ucfirst($customToggle);
-                    if (method_exists($entity, $setCustomToggle) && method_exists($entity, $getCustomToggle)) {
-                        $entity->$setCustomToggle(!(bool) call_user_func([$entity, $getCustomToggle]));
-                        $model->getRepository()->saveEntity($entity);
-                    }
+                    $accessor = PropertyAccess::createPropertyAccessor();
+                    $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
+                    $model->getRepository()->saveEntity($entity);
                 } else {
                     $refresh = $model->togglePublishStatus($entity);
                 }
