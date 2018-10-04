@@ -22,10 +22,20 @@ class SyncEvent extends CommonEvent
 {
     /** @var string */
     private $integrationName;
+    /**
+     * @var \DateTimeInterface|null
+     */
+    private $fromDateTime;
+    /**
+     * @var \DateTimeInterface|null
+     */
+    private $toDateTime;
 
-    public function __construct(string $integrationName)
+    public function __construct(string $integrationName, \DateTimeInterface $fromDateTime = null, \DateTimeInterface $toDateTime = null)
     {
         $this->integrationName = $integrationName;
+        $this->fromDateTime = $fromDateTime;
+        $this->toDateTime = $toDateTime;
     }
 
     /**
@@ -44,4 +54,22 @@ class SyncEvent extends CommonEvent
     public function isIntegration(string $integrationName): bool {
         return $this->getIntegrationName() === $integrationName;
     }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getFromDateTime(): ?\DateTimeInterface
+    {
+        return $this->fromDateTime;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getToDateTime(): ?\DateTimeInterface
+    {
+        return $this->toDateTime;
+    }
+
+
 }
