@@ -191,15 +191,7 @@ class Mailbox
             ];
         }
 
-        if (isset($this->settings['use_attachments']) && $this->settings['use_attachments']) {
-            // Check that cache attachments directory exists
-            $cacheDir             = $pathsHelper->getSystemPath('tmp', true);
-            $this->attachmentsDir = $cacheDir.'/attachments';
-
-            if (!file_exists($this->attachmentsDir)) {
-                mkdir($this->attachmentsDir);
-            }
-        }
+        $this->createAttachmentsDir($pathsHelper);
 
         if ($this->settings['host'] == 'imap.gmail.com') {
             $this->isGmail = true;
@@ -1191,6 +1183,27 @@ class Mailbox
             imap_alerts();
 
             @imap_close($this->imapStream, CL_EXPUNGE);
+        }
+    }
+
+    /**
+     * @param PathsHelper $pathsHelper
+     */
+    private function createAttachmentsDir(PathsHelper $pathsHelper)
+    {
+        if (!isset($this->settings['use_attachments']) || !$this->settings['use_attachments']) {
+            return;
+        }
+
+        $this->attachmentsDir = $pathsHelper->getSystemPath('tmp', true);
+
+        if (!file_exists($this->attachmentsDir)) {
+            mkdir($this->attachmentsDir);
+        }
+        $this->attachmentsDir .= '/attachments';
+
+        if (!file_exists($this->attachmentsDir)) {
+            mkdir($this->attachmentsDir);
         }
     }
 
