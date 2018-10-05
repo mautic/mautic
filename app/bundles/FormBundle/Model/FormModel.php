@@ -736,18 +736,20 @@ class FormModel extends CommonFormModel
 
         // Write html for all browser and fallback for IE
         $script = '
-            var scr = document.currentScript;
+            var scr        = document.currentScript;
+            var formHtml   = "'.$html.'";
+            var formScript = "'.$formScriptWithoutTag.'";
             
             if (scr !== undefined) {
-                scr.insertAdjacentHTML("afterend" , "'.$html.'");
+                scr.insertAdjacentHTML("afterend", formHtml);
                 
-                var head            = document.getElementsByTagName("head")[0];
-                var inlineScript    = document.createTextNode("'.$formScriptWithoutTag.'");
-                var script          = document.createElement("script");
+                var head         = document.getElementsByTagName("head")[0];
+                var inlineScript = document.createTextNode(formScript);
+                var script       = document.createElement("script");
                 script.appendChild(inlineScript);
                 head.appendChild(script);
             } else {
-                document.write("'.$formScript.$html.'");
+                document.write("<script type=\"text/javascript\">"+formScript+"</script>"+formHtml);
             }
         ';
 
