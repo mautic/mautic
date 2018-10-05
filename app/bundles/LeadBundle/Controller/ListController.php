@@ -80,7 +80,7 @@ class ListController extends FormController
             $translator      = $this->get('translator');
             $mine            = $translator->trans('mautic.core.searchcommand.ismine');
             $global          = $translator->trans('mautic.lead.list.searchcommand.isglobal');
-            $filter['force'] = " ($mine or $global)";
+            $filter['force'] = "($mine or $global)";
         }
 
         $items = $model->getEntities(
