@@ -724,21 +724,32 @@ class FormModel extends CommonFormModel
      */
     public function getAutomaticJavascript(Form $form)
     {
-        $html = $this->getContent($form);
+        $html       = $this->getContent($form, false);
+        $formScript = $this->getFormScript($form);
 
         //replace line breaks with literal symbol and escape quotations
-        $search  = ["\r\n", "\n", '"'];
-        $replace = ['', '', '\"'];
-        $html    = str_replace($search, $replace, $html);
+        $search                = ["\r\n", "\n", '"'];
+        $replace               = ['', '', '\"'];
+        $html                  = str_replace($search, $replace, $html);
+        $formScript            = str_replace($search, $replace, $formScript);
+        $formScriptWithoutTag  = str_replace(['<script type=\"text/javascript\">', '</script>'], '', $formScript);
 
         // Write html for all browser and fallback for IE
         $script = '
-            var scr = document.currentScript;
+            var scr        = document.currentScript;
+            var formHtml   = "'.$html.'";
+            var formScript = "'.$formScriptWithoutTag.'";
             
             if (scr !== undefined) {
-                scr.insertAdjacentHTML("afterend" , "'.$html.'");
+                scr.insertAdjacentHTML("afterend", formHtml);
+                
+                var head         = document.getElementsByTagName("head")[0];
+                var inlineScript = document.createTextNode(formScript);
+                var script       = document.createElement("script");
+                script.appendChild(inlineScript);
+                head.appendChild(script);
             } else {
-                document.write("'.$html.'");
+                document.write("<script type=\"text/javascript\">"+formScript+"</script>"+formHtml);
             }
         ';
 
