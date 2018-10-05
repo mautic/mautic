@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -24,6 +25,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 class FieldType extends AbstractType
 {
     use FormFieldTrait;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * FieldType constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
@@ -223,7 +239,11 @@ class FieldType extends AbstractType
                 [
                     'label'      => 'mautic.form.field.form.validationmsg',
                     'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
+                    'attr'       => [
+                        'class'        => 'form-control',
+                        'tooltip'      => $this->translator->trans('mautic.core.form.default').': '.$this->translator->trans('mautic.form.field.generic.required', [], 'validators'),
+                        'data-show-on' => '{"formfield_isRequired_1": "checked"}',
+                    ],
                     'required'   => false,
                 ]
             );
@@ -421,6 +441,7 @@ class FieldType extends AbstractType
 
         // Put properties last so that the other values are available to form events
         $propertiesData = (isset($options['data']['properties'])) ? $options['data']['properties'] : [];
+        $validationData = (isset($options['data']['validation'])) ? $options['data']['validation'] : [];
         if (!empty($options['customParameters'])) {
             $formTypeOptions = array_merge($formTypeOptions, ['data' => $propertiesData]);
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
@@ -522,18 +543,17 @@ class FieldType extends AbstractType
                     );
                     break;
                 case 'tel':
-                    if (empty($propertiesData['international'])) {
-                        $propertiesData['international'] = false;
+                    if (empty($validationData['international'])) {
+                        $validationData['international'] = false;
                     }
                     $builder->add(
-                        'properties',
+                        'validation',
                         FormFieldTelType::class,
                         [
                             'label' => false,
-                            'data'  => $propertiesData,
+                            'data'  => $validationData,
                         ]
                     );
-                    break;
             }
         }
 

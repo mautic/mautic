@@ -11,6 +11,7 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -43,7 +44,7 @@ class FormFieldTelType extends AbstractType
     {
         $builder->add(
             'international',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.field.type.tel.international',
             ]
@@ -58,7 +59,7 @@ class FormFieldTelType extends AbstractType
                 'attr'       => [
                     'class'        => 'form-control',
                     'tooltip'      => $this->translator->trans('mautic.core.form.default').': '.$this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'),
-                    'data-show-on' => '{"formfield_properties_international_1": "checked"}',
+                    'data-show-on' => '{"formfield_validation_international_1": "checked"}',
                 ],
             ]
         );

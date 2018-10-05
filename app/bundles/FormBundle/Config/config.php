@@ -253,6 +253,9 @@ return [
             'mautic.form.type.field' => [
                 'class'       => FieldType::class,
                 'alias'       => 'formfield',
+                'arguments'   => [
+                    'translator',
+                ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
