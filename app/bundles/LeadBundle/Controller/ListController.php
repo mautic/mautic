@@ -728,9 +728,8 @@ class ListController extends FormController
                 ],
             ]);
         } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'lead:leads:viewown',
             'lead:lists:viewother',
-            'lead:lists:editother',
-            'lead:lists:deleteother',
             $list->getCreatedBy()
         )
         ) {
