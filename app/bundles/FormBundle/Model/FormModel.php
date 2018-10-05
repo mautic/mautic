@@ -969,7 +969,7 @@ class FormModel extends CommonFormModel
     {
         libxml_use_internal_errors(true);
         $dom = new DOMDocument();
-        $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $items = $dom->getElementsByTagName('script');
 
         $scripts = [];
@@ -991,7 +991,7 @@ class FormModel extends CommonFormModel
     {
         libxml_use_internal_errors(true);
         $dom = new DOMDocument();
-        $dom->loadHTML('<div>'.$html.'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $items = $dom->getElementsByTagName('script');
 
         $remove = [];
@@ -1023,7 +1023,7 @@ class FormModel extends CommonFormModel
     {
         libxml_use_internal_errors(true);
         $dom = new DOMDocument();
-        $dom->loadHTML('<div>'.$html.'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $items = $dom->getElementsByTagName('script');
 
         $javascript = '';
