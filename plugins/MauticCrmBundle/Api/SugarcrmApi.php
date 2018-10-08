@@ -359,13 +359,13 @@ class SugarcrmApi extends CrmApi
                     'name_value_lists' => $set_name_value_lists,
                 ];
             if ($tokenData['version'] == '6') {
-                $resp = $this->request('set_entries', $parameters, 'POST', 'mtc_WebActivities');
+                $resp = $this->request('set_entries', $parameters, 'POST', 'mtc_webactivities');
             } else {
                 $requests = [];
                 foreach ($s7_records as $fields) {
                     //Create record
                     $request['data']   = $fields;
-                    $request['url']    = '/v10/'.'mtc_WebActivities';
+                    $request['url']    = '/v10/'.'mtc_webactivities';
                     $request['method'] = 'POST';
                     $requests[]        = $request;
                 }
@@ -427,7 +427,10 @@ class SugarcrmApi extends CrmApi
                                 continue;
                             } //current Web activity was not created
                             $wa_id = $resp[$nbAct]['contents']['id'];
-                            $resp2 = $this->request("mtc_WebActivities/$wa_id/link/$link_field_name/$sugarId", [], 'POST');
+                            try {
+                                $resp2 = $this->request("mtc_webactivities/$wa_id/link/$link_field_name/$sugarId", [], 'POST');
+                            } catch (\Exception $e) {
+                            }
                             ++$nbAct;
                         }
                     }
