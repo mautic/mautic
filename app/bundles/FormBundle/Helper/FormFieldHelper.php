@@ -167,13 +167,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     continue;
                 }
 
-                if ($f !== null && $f->getType() === 'tel') {
-                    if (empty($f->getProperties()['international'])) {
-                        continue;
-                    } elseif (!empty($f->getProperties()['international_validationmsg'])) {
-                        $opts['message'] = $f->getProperties()['international_validationmsg'];
-                    }
-                }
                 if ($type == 'captcha') {
                     $captcha = $f->getProperties()['captcha'];
                     if (empty($captcha) && Blank::class !== $constraint) {
