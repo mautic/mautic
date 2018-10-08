@@ -11,12 +11,15 @@
 
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid;
 
+use Mautic\EmailBundle\Swiftmailer\SendGrid\Event\GetMailMessageEvent;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage;
+use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridMailEvents;
 use SendGrid\Mail;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SendGridApiMessageTest extends \PHPUnit\Framework\TestCase
 {
@@ -38,6 +41,8 @@ class SendGridApiMessageTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $dispatcher = $this->createMock(EventDispatcher::class);
+
         $mail = $this->getMockBuilder(Mail::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -46,7 +51,7 @@ class SendGridApiMessageTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridApiMessage = new SendGridApiMessage($sendGridMailBase, $sendGridMailPersonalization, $sendGridMailMetadata, $sendGridMailAttachment);
+        $sendGridApiMessage = new SendGridApiMessage($sendGridMailBase, $sendGridMailPersonalization, $sendGridMailMetadata, $sendGridMailAttachment, $dispatcher);
 
         $sendGridMailBase->expects($this->once())
             ->method('getSendGridMail')
@@ -64,6 +69,13 @@ class SendGridApiMessageTest extends \PHPUnit\Framework\TestCase
         $sendGridMailAttachment->expects($this->once())
             ->method('addAttachmentsToMail')
             ->with($mail, $message);
+
+        $dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->equalTo(SendGridMailEvents::GET_MAIL_MESSAGE),
+                $this->isInstanceOf(GetMailMessageEvent::class)
+            );
 
         $result = $sendGridApiMessage->getMessage($message);
 
