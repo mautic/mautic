@@ -1043,11 +1043,11 @@ class Event implements ChannelInterface
     /**
      * Get the value of triggerRestrictedDaysOfWeek.
      *
-     * @return null|array
+     * @return array
      */
     public function getTriggerRestrictedDaysOfWeek()
     {
-        return $this->triggerRestrictedDaysOfWeek;
+        return (array) $this->triggerRestrictedDaysOfWeek;
     }
 
     /**
