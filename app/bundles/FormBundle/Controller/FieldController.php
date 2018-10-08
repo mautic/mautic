@@ -13,6 +13,8 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Event\ValidationBuilderEvent;
+use Mautic\FormBundle\FormEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -396,6 +398,11 @@ class FieldController extends CommonFormController
             ['customParameters' => $customParams]
         );
         $form->get('formId')->setData($formId);
+
+        $event      = new ValidationBuilderEvent($formField);
+        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher->dispatch(FormEvents::FORM_VALIDATION_TAB_ON_BUILD, $event);
+        $event->setValidatorsToForm($form);
 
         return $form;
     }

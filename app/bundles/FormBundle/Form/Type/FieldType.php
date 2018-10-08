@@ -441,7 +441,6 @@ class FieldType extends AbstractType
 
         // Put properties last so that the other values are available to form events
         $propertiesData = (isset($options['data']['properties'])) ? $options['data']['properties'] : [];
-        $validationData = (isset($options['data']['validation'])) ? $options['data']['validation'] : [];
         if (!empty($options['customParameters'])) {
             $formTypeOptions = array_merge($formTypeOptions, ['data' => $propertiesData]);
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
@@ -542,18 +541,6 @@ class FieldType extends AbstractType
                         ]
                     );
                     break;
-                case 'tel':
-                    if (empty($validationData['international'])) {
-                        $validationData['international'] = false;
-                    }
-                    $builder->add(
-                        'validation',
-                        FormFieldTelType::class,
-                        [
-                            'label' => false,
-                            'data'  => $validationData,
-                        ]
-                    );
             }
         }
 

@@ -178,6 +178,9 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.form.validation.subscriber' => [
+                'class'     => \Mautic\FormBundle\EventListener\FormValidationSubsriber::class,
+            ],
             'mautic.form.pagebundle.subscriber' => [
                 'class'     => PageSubscriber::class,
                 'arguments' => [

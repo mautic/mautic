@@ -47,6 +47,7 @@ class FormFieldTelType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.field.type.tel.international',
+                'data'  => isset($options['data']['international']) ? $options['data']['international'] : false,
             ]
         );
 
