@@ -103,15 +103,17 @@ class IntegrationsHelper
                 throw new IntegrationNotFoundException("{$integration->getName()} doesn't exist in the database");
             }
 
-            if (!isset($this->decryptedIntegrationConfigurations[$integration->getName()])) {
-                $encryptedApiKeys = $configuration->getApiKeys();
-                $decryptedApiKeys = $this->encryptionService->decrypt($encryptedApiKeys);
-                $configuration->setApiKeys($decryptedApiKeys);
-
-                $this->decryptedIntegrationConfigurations[$integration->getName()] = true;
-            }
-
             $integration->setIntegrationConfiguration($configuration);
+        }
+
+        // Make sure the keys are decrypted
+        if (!isset($this->decryptedIntegrationConfigurations[$integration->getName()])) {
+            $configuration = $integration->getIntegrationConfiguration();
+            $encryptedApiKeys = $configuration->getApiKeys();
+            $decryptedApiKeys = $this->encryptionService->decrypt($encryptedApiKeys);
+            $configuration->setApiKeys($decryptedApiKeys);
+
+            $this->decryptedIntegrationConfigurations[$integration->getName()] = true;
         }
 
         return $integration->getIntegrationConfiguration();
