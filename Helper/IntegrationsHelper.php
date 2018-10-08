@@ -108,7 +108,7 @@ class IntegrationsHelper
 
         // Make sure the keys are decrypted
         if (!isset($this->decryptedIntegrationConfigurations[$integration->getName()])) {
-            $configuration = $integration->getIntegrationConfiguration();
+            $configuration    = $integration->getIntegrationConfiguration();
             $encryptedApiKeys = $configuration->getApiKeys();
             $decryptedApiKeys = $this->encryptionService->decrypt($encryptedApiKeys);
             $configuration->setApiKeys($decryptedApiKeys);
