@@ -1,5 +1,4 @@
 <?php
-
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
