@@ -11,12 +11,15 @@
 
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -35,20 +38,22 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
     private $fieldModel;
 
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var ChannelListHelper
      */
-    private $request;
+    private $channelListHelper;
 
     /**
      * IntegrationSyncSettingsFieldMappingsType constructor.
      *
      * @param TranslatorInterface $translator
      * @param FieldModel          $fieldModel
+     * @param ChannelListHelper   $channelListHelper
      */
-    public function __construct(TranslatorInterface $translator, FieldModel $fieldModel)
+    public function __construct(TranslatorInterface $translator, FieldModel $fieldModel, ChannelListHelper $channelListHelper)
     {
-        $this->translator = $translator;
-        $this->fieldModel = $fieldModel;
+        $this->translator        = $translator;
+        $this->fieldModel        = $fieldModel;
+        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -56,6 +61,7 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
      * @param array                $options
      *
      * @throws InvalidFormOptionException
+     * @throws ObjectNotFoundException
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -78,7 +84,8 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                     'label'                     => false,
                     'requiredIntegrationFields' => $this->getRequiredFields(),
                     'integrationFields'         => $this->getFilteredFields(),
-                    'mauticFields'              => $this->fieldModel->getFieldList(false),
+                    'mauticFields'              => $this->getMauticFields($integrationObject, $objectName),
+                    'oneWayFields'              => $integrationObject->getOneWayFields(),
                     'page'                      => 1,
                     'keyword'                   => null,
                     'totalFieldCount'           => $this->getTotalFieldCount(),
@@ -102,5 +109,48 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                 'objects',
             ]
         );
+    }
+
+    /**
+     * @param ConfigFormSyncInterface $integrationObject
+     * @param string                  $objectName
+     *
+     * @return array
+     * @throws ObjectNotFoundException
+     */
+    private function getMauticFields(ConfigFormSyncInterface $integrationObject, string $objectName)
+    {
+        $mappedObjects = $integrationObject->getSyncMappedObjects();
+        if (!isset($mappedObjects[$objectName])) {
+            throw new ObjectNotFoundException($objectName);
+        }
+
+        $mauticObject = $mappedObjects[$objectName];
+
+        $coreFields = $this->fieldModel->getFieldList(
+            false,
+            true,
+            [
+                'isPublished' => true,
+                'object'      => $mauticObject
+            ]
+        );
+
+        if (MauticSyncDataExchange::OBJECT_CONTACT !== $mauticObject) {
+            return $coreFields;
+        }
+
+        // Mautic contacts have "pseudo" fields such as channel do not contact, timeline, etc.
+        $channels = $this->channelListHelper->getFeatureChannels([LeadModel::CHANNEL_FEATURE], true);
+        foreach ($channels as $label => $channel) {
+            $coreFields['mautic_dnc_'.$channel] = $this->translator->trans('mautic.integration.sync.channel_dnc', ['%channel%' => $label]);
+        }
+
+        // Add the timeline link
+        $coreFields['mautic_contact_timeline'] = $this->translator->trans('mautic.integration.sync.contact_timeline');
+
+        uasort($coreFields, 'strnatcmp');
+
+        return $coreFields;
     }
 }
