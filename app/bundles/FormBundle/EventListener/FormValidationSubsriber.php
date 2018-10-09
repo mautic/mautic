@@ -27,7 +27,6 @@ class FormValidationSubsriber extends CommonSubscriber
     {
         return [
             FormEvents::FORM_ON_BUILD                => ['onFormBuilder', 0],
-            FormEvents::FORM_VALIDATION_TAB_ON_BUILD => ['onValidationBuilder', 0],
             FormEvents::ON_FORM_VALIDATE             => ['onFormValidate', 0],
         ];
     }
@@ -44,6 +43,7 @@ class FormValidationSubsriber extends CommonSubscriber
             [
                 'eventName' => FormEvents::ON_FORM_VALIDATE,
                 'fieldType' => 'tel',
+                'formType'  => \Mautic\FormBundle\Form\Type\FormFieldTelType::class,
             ]
         );
     }
@@ -60,16 +60,6 @@ class FormValidationSubsriber extends CommonSubscriber
             } else {
                 $event->failedValidation('mautic.form.submission.phone.invalid');
             }
-        }
-    }
-
-    /**
-     * @param Events\ValidationBuilderEvent $event
-     */
-    public function onValidationBuilder(Events\ValidationBuilderEvent $event)
-    {
-        if ($event->getFormField()['type'] == 'tel') {
-            $event->setValidator(\Mautic\FormBundle\Form\Type\FormFieldTelType::class);
         }
     }
 }
