@@ -447,16 +447,6 @@ class BuilderSubscriber extends CommonSubscriber
         $event->setContent($content);
     }
 
-    public function appendHTML(DOMNode $parent, $source)
-    {
-        $tmpDoc = new DOMDocument();
-        $tmpDoc->loadHTML($source);
-        foreach ($tmpDoc->getElementsByTagName('body')->item(0)->childNodes as $node) {
-            $node = $parent->ownerDocument->importNode($node, true);
-            $parent->appendChild($node);
-        }
-    }
-
     /**
      * Renders the HTML for the social share buttons.
      *
