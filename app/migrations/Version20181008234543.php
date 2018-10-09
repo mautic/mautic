@@ -11,6 +11,7 @@
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Migrations\SkipMigrationException;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
@@ -37,14 +38,21 @@ class Version20181008234543 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("ALTER TABLE {$this->prefix}form_fields ADD validation LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';");
+        $this->addSql(
+            "ALTER TABLE {$this->prefix}form_fields ADD validation LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';"
+        );
+    }
 
+    /**
+     * @param Schema $schema
+     */
+    public function postUp(Schema $schema)
+    {
         // Check if there are even boolean fields to worry about
         $qb = $this->connection->createQueryBuilder();
-        $qb->select('ff.properties')
+        $qb->select('ff.id, ff.properties')
             ->from($this->prefix.'form_fields', 'ff');
         $fields = $qb->execute()->fetchAll();
-
         if (count($fields)) {
             foreach ($fields as $key => $field) {
                 $properties = unserialize($field['properties']);
