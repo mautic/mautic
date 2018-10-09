@@ -20,21 +20,17 @@ use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilde
 class CompanyDecorator extends BaseDecorator
 {
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
-    public function getRelationJoinTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getRelationJoinTable()
     {
         return MAUTIC_TABLE_PREFIX.'companies_leads';
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
-    public function getRelationJoinTableField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getRelationJoinTableField()
     {
         return 'company_id';
     }

@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
-use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 
 /**
  * Class DateDecorator.
@@ -36,47 +35,5 @@ class DateDecorator extends CustomMappedDecorator
     public function getDefaultDate()
     {
         return new DateTimeHelper('midnight today', null, 'local');
-    }
-
-    /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
-    {
-        if ($contactSegmentFilterCrate->isCompanyType()) {
-            return ComplexRelationValueFilterQueryBuilder::getServiceId();
-        }
-
-        return parent::getQueryType($contactSegmentFilterCrate);
-    }
-
-    /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return string
-     */
-    public function getRelationJoinTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
-    {
-        if ($contactSegmentFilterCrate->isCompanyType()) {
-            return MAUTIC_TABLE_PREFIX.'companies_leads';
-        }
-
-        return null;
-    }
-
-    /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return string
-     */
-    public function getRelationJoinTableField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
-    {
-        if ($contactSegmentFilterCrate->isCompanyType()) {
-            return 'company_id';
-        }
-
-        return null;
     }
 }

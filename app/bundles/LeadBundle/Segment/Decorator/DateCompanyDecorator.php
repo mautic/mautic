@@ -9,32 +9,27 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
+namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
-use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
-use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 
-class DateDefault implements FilterDecoratorInterface
+/**
+ * Class DateCompanyDecorator.
+ */
+class DateCompanyDecorator implements FilterDecoratorInterface
 {
     /**
-     * @var DateDecorator
+     * @var FilterDecoratorInterface
      */
     private $dateDecorator;
 
     /**
-     * @var string
+     * @param FilterDecoratorInterface $dateDecorator
      */
-    private $originalValue;
-
-    /**
-     * @param DateDecorator $dateDecorator
-     * @param string        $originalValue
-     */
-    public function __construct(DateDecorator $dateDecorator, $originalValue)
+    public function __construct(FilterDecoratorInterface $dateDecorator)
     {
         $this->dateDecorator = $dateDecorator;
-        $this->originalValue = $originalValue;
     }
 
     /**
@@ -85,21 +80,7 @@ class DateDefault implements FilterDecoratorInterface
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $filter = $this->originalValue;
-
-        switch ($contactSegmentFilterCrate->getOperator()) {
-            case 'like':
-            case '!like':
-                return strpos($filter, '%') === false ? '%'.$filter.'%' : $filter;
-            case 'contains':
-                return '%'.$filter.'%';
-            case 'startsWith':
-                return $filter.'%';
-            case 'endsWith':
-                return '%'.$filter;
-        }
-
-        return $this->originalValue;
+        return $this->dateDecorator->getParameterValue($contactSegmentFilterCrate);
     }
 
     /**
@@ -109,7 +90,7 @@ class DateDefault implements FilterDecoratorInterface
      */
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
+        return ComplexRelationValueFilterQueryBuilder::getServiceId();
     }
 
     /**
@@ -130,5 +111,21 @@ class DateDefault implements FilterDecoratorInterface
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelationJoinTable()
+    {
+        return MAUTIC_TABLE_PREFIX.'companies_leads';
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelationJoinTableField()
+    {
+        return 'company_id';
     }
 }

@@ -230,12 +230,12 @@ class ContactSegmentFilter
 
     public function getRelationJoinTable()
     {
-        return method_exists($this->filterDecorator, 'getRelationJoinTable') ? $this->filterDecorator->getRelationJoinTable($this->contactSegmentFilterCrate) : null;
+        return method_exists($this->filterDecorator, 'getRelationJoinTable') ? $this->filterDecorator->getRelationJoinTable() : null;
     }
 
     public function getRelationJoinTableField()
     {
         return method_exists($this->filterDecorator, 'getRelationJoinTableField') ?
-            $this->filterDecorator->getRelationJoinTableField($this->contactSegmentFilterCrate) : null;
+            $this->filterDecorator->getRelationJoinTableField() : null;
     }
 }

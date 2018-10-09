@@ -112,24 +112,4 @@ class DateAnniversary implements FilterDecoratorInterface
     {
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
     }
-
-    /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return string
-     */
-    public function getRelationJoinTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
-    {
-        return $this->dateDecorator->getRelationJoinTable($contactSegmentFilterCrate);
-    }
-
-    /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return string
-     */
-    public function getRelationJoinTableField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
-    {
-        return $this->dateDecorator->getRelationJoinTableField($contactSegmentFilterCrate);
-    }
 }
