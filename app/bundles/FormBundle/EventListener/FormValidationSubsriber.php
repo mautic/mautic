@@ -55,7 +55,7 @@ class FormValidationSubsriber extends CommonSubscriber
     {
         $field = $event->getField();
         if ($field->getType() === 'tel' && !empty($field->getValidation()['international'])) {
-            if (empty($field->getValidation()['international_validationmsg'])) {
+            if (!empty($field->getValidation()['international_validationmsg'])) {
                 $event->failedValidation($field->getValidation()['international_validationmsg']);
             } else {
                 $event->failedValidation('mautic.form.submission.phone.invalid');

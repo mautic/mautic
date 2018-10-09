@@ -38,5 +38,40 @@ class Version20181008234543 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $this->addSql("ALTER TABLE {$this->prefix}form_fields ADD validation LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';");
+
+        // Check if there are even boolean fields to worry about
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('ff.properties')
+            ->from($this->prefix.'form_fields', 'ff');
+        $fields = $qb->execute()->fetchAll();
+
+        if (count($fields)) {
+            foreach ($fields as $key => $field) {
+                $properties = unserialize($field['properties']);
+                if (!empty($properties['international'])) {
+                    $validation = ['international' => 1];
+                    unset($properties['international']);
+                    $this->fixRow($qb, $field['id'], $validation, $properties);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param              $id
+     * @param              $validation
+     * @param              $properties
+     */
+    protected function fixRow(QueryBuilder $qb, $id, $validation, $properties)
+    {
+        $qb->resetQueryParts()
+            ->update($this->prefix.'form_fields')
+            ->set('validation', $qb->expr()->literal(serialize($validation)))
+            ->set('properties', $qb->expr()->literal(serialize($properties)))
+            ->where(
+                $qb->expr()->eq('id', $id)
+            )
+            ->execute();
     }
 }
