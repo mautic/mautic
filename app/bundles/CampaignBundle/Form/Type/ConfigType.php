@@ -52,7 +52,19 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
-        $builder->add('campaign_use_summary',
+        $builder->add(
+            'campaign_by_range',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.campaignconfig.campaign_by_range',
+                'attr'  => [
+                    'tooltip' => 'mautic.campaignconfig.campaign_by_range.tooltip',
+                ],
+                'data'  => isset($options['data']['campaign_by_range']) ? (bool) $options['data']['campaign_by_range'] : false,
+            ]
+        );
+        $builder->add(
+            'campaign_use_summary',
             'yesno_button_group',
             [
                 'label' => 'mautic.campaignconfig.use_summary',
