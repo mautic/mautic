@@ -78,6 +78,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.field',
+                    'mautic.channel.helper.channel_list',
                 ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field_directions' => [
