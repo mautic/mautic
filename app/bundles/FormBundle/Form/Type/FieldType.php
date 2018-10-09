@@ -499,6 +499,7 @@ class FieldType extends AbstractType
                 case 'number':
                 case 'text':
                 case 'url':
+                case 'tel':
                     $builder->add(
                         'properties',
                         'formfield_placeholder',
