@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -76,14 +75,16 @@ class SummaryRepository extends CommonRepository
     }
 
     /**
-     * @param      $campaignId
-     * @param null $dateRangeValues
+     * @param                $campaignId
+     * @param \DateTime|null $dateFrom
+     * @param \DateTime|null $dateTo
      *
      * @return array
      */
     public function getCampaignLogCounts(
         $campaignId,
-        $dateRangeValues = null
+        \DateTime $dateFrom = null,
+        \DateTime $dateTo = null
     ) {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select(
@@ -93,15 +94,10 @@ class SummaryRepository extends CommonRepository
             ->where('cs.campaign_id = '.(int) $campaignId)
             ->groupBy('cs.event_id');
 
-        if (!empty($dateRangeValues)) {
-            $dateFrom = new DateTimeHelper($dateRangeValues['date_from']);
-            $dateTo   = new DateTimeHelper($dateRangeValues['date_to']);
-            $q->andWhere(
-                $q->expr()->gte('cs.date_triggered', ':dateFrom'),
-                $q->expr()->lte('cs.date_triggered', ':dateTo')
-            );
-            $q->setParameter('dateFrom', $dateFrom->toUtcString());
-            $q->setParameter('dateTo', $dateTo->toUtcString());
+        if ($dateFrom && $dateTo) {
+            $q->andWhere('cs.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
 
         $results = $q->execute()->fetchAll();

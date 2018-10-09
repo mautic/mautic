@@ -218,6 +218,8 @@ class LeadEventLogRepository extends CommonRepository
      * @param \DateTime|null $dateTo
      *
      * @return array
+     *
+     * @throws \Doctrine\DBAL\Cache\CacheException
      */
     public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $all = false, \DateTime $dateFrom = null, \DateTime $dateTo = null)
     {
