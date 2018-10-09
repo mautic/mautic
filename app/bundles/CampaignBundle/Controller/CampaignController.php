@@ -697,15 +697,15 @@ class CampaignController extends AbstractStandardFormController
                 if ($this->coreParametersHelper->getParameter('mautic.campaign_use_summary')) {
                     /** @var SummaryRepository $summaryRepo */
                     $summaryRepo       = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:Summary');
-                    $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId());
+                    $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateTo);
                 } else {
                     /** @var LeadEventLogRepository $eventLogRepo */
                     $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true);
+                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateTo);
                     $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false); // @todo implement pending counts for summary as well.
                 }
-                $leadCount         = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateTo);
-                $sortedEvents      = [
+                $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateTo);
+                $sortedEvents = [
                     'decision'  => [],
                     'action'    => [],
                     'condition' => [],
