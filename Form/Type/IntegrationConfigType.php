@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -46,7 +48,7 @@ class IntegrationConfigType extends AbstractType
      *
      * @throws IntegrationNotFoundException
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObject = $this->integrationsHelper->getIntegration($options['integration']);
 
@@ -62,7 +64,14 @@ class IntegrationConfigType extends AbstractType
 
         // apiKeys
         if ($integrationObject instanceof ConfigFormAuthInterface) {
-            $builder->add('apiKeys', $integrationObject->getAuthConfigFormName(), ['label' => false]);
+            $builder->add(
+                'apiKeys',
+                $integrationObject->getAuthConfigFormName(),
+                [
+                    'label'       => false,
+                    'integration' => $integrationObject,
+                ]
+            );
         }
 
         // supportedFeatures
@@ -100,7 +109,7 @@ class IntegrationConfigType extends AbstractType
     /**
      * @param OptionsResolver $resolver
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(
             [
