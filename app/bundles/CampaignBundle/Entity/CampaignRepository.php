@@ -502,6 +502,12 @@ class CampaignRepository extends CommonRepository
                     )
                 );
 
+            if ($dateFrom && $dateTo) {
+                $sq->andWhere('cl.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                    ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                    ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+            }
+
             $q->andWhere(
                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
             );
