@@ -65,6 +65,9 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * @param Events\LeadEvent $event
+     *
+     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
@@ -84,37 +87,23 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $changes       = $lead->getChanges(true);
-        $toPersist     = [];
-        $changedFields = [];
+        $changes = $lead->getChanges(true);
 
-        if (!isset($changes['fields'])) {
-            return;
+        if (isset($changes['fields'])) {
+            $this->recordFieldChanges($changes['fields'], $lead->getId(), Lead::class);
         }
 
-        foreach ($changes['fields'] as $key => list($oldValue, $newValue)) {
-            $valueDAO          = $this->variableExpressor->encodeVariable($newValue);
-            $changedFields[]   = $key;
-            $fieldChangeEntity = (new FieldChange)
-                ->setObjectType(Lead::class)
-                ->setObjectId($lead->getId())
-                ->setModifiedAt(new \DateTime)
-                ->setColumnName($key)
-                ->setColumnType($valueDAO->getType())
-                ->setColumnValue($valueDAO->getValue());
+        if (isset($changes['dnc_channel_status'])) {
+            $dncChanges = [];
+            foreach ($changes['dnc_channel_status'] as $channel => $change) {
+                $oldValue = $change['old_reason'];
+                $newValue = $change['reason'];
 
-            foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
-                $integrationFieldChangeEntity = clone $fieldChangeEntity;
-                $integrationFieldChangeEntity->setIntegration($integrationName);
-
-                $toPersist[] = $integrationFieldChangeEntity;
+                $dncChanges['mautic_dnc_'.$channel] = [$oldValue, $newValue];
             }
+
+            $this->recordFieldChanges($dncChanges, $lead->getId(), Lead::class);
         }
-
-        $this->fieldChangeRepo->deleteEntitiesForObjectByColumnName($lead->getId(), Lead::class, $changedFields);
-        $this->fieldChangeRepo->saveEntities($toPersist);
-
-        $this->fieldChangeRepo->clear();
     }
 
     /**
@@ -127,6 +116,9 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * @param Events\CompanyEvent $event
+     *
+     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException
      */
     public function onCompanyPostSave(Events\CompanyEvent $event)
     {
@@ -140,21 +132,41 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $company       = $event->getCompany();
-        $changes       = $company->getChanges(true);
-        $toPersist     = [];
-        $changedFields = [];
+        $company = $event->getCompany();
+        $changes = $company->getChanges(true);
 
         if (!isset($changes['fields'])) {
             return;
         }
 
-        foreach ($changes['fields'] as $key => list($oldValue, $newValue)) {
+        $this->recordFieldChanges($changes['fields'], $company->getId(), Company::class);
+    }
+
+    /**
+     * @param Events\CompanyEvent $event
+     */
+    public function onCompanyPostDelete(Events\CompanyEvent $event)
+    {
+        $this->fieldChangeRepo->deleteEntitiesForObject($event->getCompany()->deletedId, Company::class);
+    }
+
+    /**
+     * @param array  $fieldChanges
+     * @param int    $objectId
+     * @param string $objectType
+     *
+     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
+     */
+    private function recordFieldChanges(array $fieldChanges, int $objectId, string $objectType)
+    {
+        $toPersist     = [];
+        $changedFields = [];
+        foreach ($fieldChanges as $key => list($oldValue, $newValue)) {
             $valueDAO          = $this->variableExpressor->encodeVariable($newValue);
             $changedFields[]   = $key;
             $fieldChangeEntity = (new FieldChange)
                 ->setObjectType(Lead::class)
-                ->setObjectId($company->getId())
+                ->setObjectId($objectId)
                 ->setModifiedAt(new \DateTime)
                 ->setColumnName($key)
                 ->setColumnType($valueDAO->getType())
@@ -168,16 +180,9 @@ class LeadSubscriber extends CommonSubscriber
             }
         }
 
-        $this->fieldChangeRepo->deleteEntitiesForObjectByColumnName($company->getId(), Company::class, $changedFields);
+        $this->fieldChangeRepo->deleteEntitiesForObjectByColumnName($objectId, $objectType, $changedFields);
         $this->fieldChangeRepo->saveEntities($toPersist);
-        $this->fieldChangeRepo->clear();
-    }
 
-    /**
-     * @param Events\CompanyEvent $event
-     */
-    public function onCompanyPostDelete(Events\CompanyEvent $event)
-    {
-        $this->fieldChangeRepo->deleteEntitiesForObject($event->getCompany()->deletedId, Company::class);
+        $this->fieldChangeRepo->clear();
     }
 }
