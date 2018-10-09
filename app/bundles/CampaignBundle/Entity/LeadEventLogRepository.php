@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -209,28 +210,27 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param      $campaignId
-     * @param bool $excludeScheduled
-     * @param bool $excludeNegative
-     * @param bool $all
+     * @param                $campaignId
+     * @param bool           $excludeScheduled
+     * @param bool           $excludeNegative
+     * @param bool           $all
+     * @param \DateTime|null $dateFrom
+     * @param \DateTime|null $dateTo
      *
      * @return array
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $all = false)
+    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $all = false, \DateTime $dateFrom = null, \DateTime $dateTo = null)
     {
-        $q = $this->getSlaveConnection()->createQueryBuilder()
-                      ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
+        $join = $all ? 'leftJoin' : 'innerJoin';
 
-        $join = 'innerJoin';
-        if (true === $all) {
-            $join = 'leftJoin';
-        }
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
         $q->$join(
-                    'o',
-                    MAUTIC_TABLE_PREFIX.'campaign_leads',
-                    'l',
-                    'l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0 and o.lead_id = l.lead_id and l.rotation = o.rotation'
-                );
+            'o',
+            MAUTIC_TABLE_PREFIX.'campaign_leads',
+            'l',
+            'l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0 and o.lead_id = l.lead_id and l.rotation = o.rotation'
+        );
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId)
@@ -263,6 +263,11 @@ class LeadEventLogRepository extends CommonRepository
             ->where(
                 $failedSq->expr()->eq('fe.log_id', 'o.id')
             );
+        if ($dateFrom && $dateTo) {
+            $failedSq->andWhere('fe.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+        }
         $expr->add(
             sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
         );
@@ -271,7 +276,24 @@ class LeadEventLogRepository extends CommonRepository
           ->setParameter('false', false, 'boolean')
           ->groupBy($groupBy);
 
+        if ($dateFrom && $dateTo) {
+            $q->andWhere('o.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+        }
+
         $results = $q->execute()->fetchAll();
+
+        if ($q->getConnection()->getConfiguration()->getResultCacheImpl()) {
+            $results = $q->getConnection()->executeCacheQuery(
+                $q->getSQL(),
+                $q->getParameters(),
+                $q->getParameterTypes(),
+                new QueryCacheProfile(600, __METHOD__)
+            )->fetchAll();
+        } else {
+            $results = $q->execute()->fetchAll();
+        }
 
         $return = [];
 

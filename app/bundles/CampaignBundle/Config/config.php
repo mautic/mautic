@@ -632,5 +632,6 @@ return [
     'parameters' => [
         'campaign_time_wait_on_event_false' => 'PT1H',
         'campaign_use_summary'              => 0,
+        'campaign_by_range'                 => 0,
     ],
 ];

@@ -120,13 +120,15 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param     $objectId
-     * @param int $page
-     * @param int $count
+     * @param                $objectId
+     * @param int            $page
+     * @param null           $count
+     * @param \DateTime|null $dateFrom
+     * @param \DateTime|null $dateTo
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function contactsAction($objectId, $page = 1, $count = null)
+    public function contactsAction($objectId, $page = 1, $count = null, \DateTime $dateFrom = null, \DateTime $dateTo = null)
     {
         return $this->generateContactsGrid(
             $objectId,
@@ -143,7 +145,9 @@ class CampaignController extends AbstractStandardFormController
             null,
             'entity.lead_id',
             'DESC',
-            $count
+            $count,
+            $dateFrom,
+            $dateTo
         );
     }
 
@@ -682,9 +686,14 @@ class CampaignController extends AbstractStandardFormController
                 $dateRangeValues = $this->request->get('daterange', []);
                 $action          = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
                 $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-
-                $events            = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
-                $leadCount         = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
+                $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
+                $dateFrom        = null;
+                $dateTo          = null;
+                if ($this->coreParametersHelper->getParameter('campaign_by_range')) {
+                    $dateFrom        = new \DateTime($dateRangeForm->get('date_from')->getData());
+                    $dateTo          = new \DateTime($dateRangeForm->get('date_to')->getData());
+                    $dateTo->modify('+1 day');
+                }
                 if ($this->coreParametersHelper->getParameter('mautic.campaign_use_summary')) {
                     /** @var SummaryRepository $summaryRepo */
                     $summaryRepo       = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:Summary');
@@ -692,9 +701,10 @@ class CampaignController extends AbstractStandardFormController
                 } else {
                     /** @var LeadEventLogRepository $eventLogRepo */
                     $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
+                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true);
                     $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false); // @todo implement pending counts for summary as well.
                 }
+                $leadCount         = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateTo);
                 $sortedEvents      = [
                     'decision'  => [],
                     'action'    => [],
@@ -772,6 +782,8 @@ class CampaignController extends AbstractStandardFormController
                                 'page'       => $this->get('session')->get('mautic.campaign.contact.page', 1),
                                 'ignoreAjax' => true,
                                 'count'      => $leadCount,
+                                'dateFrom'   => $dateFrom,
+                                'dateTo'     => $dateTo,
                             ]
                         )->getContent(),
                     ]

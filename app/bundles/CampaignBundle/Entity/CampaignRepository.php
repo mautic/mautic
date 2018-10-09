@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
@@ -454,13 +455,17 @@ class CampaignRepository extends CommonRepository
     /**
      * Get a count of leads that belong to the campaign.
      *
-     * @param int   $campaignId
-     * @param int   $leadId        Optional lead ID to check if lead is part of campaign
-     * @param array $pendingEvents List of specific events to rule out
+     * @param int            $campaignId
+     * @param int            $leadId        Optional lead ID to check if lead is part of campaign
+     * @param array          $pendingEvents List of specific events to rule out
+     * @param \DateTime|null $dateFrom
+     * @param \DateTime|null $dateTo
      *
      * @return int
+     *
+     * @throws \Doctrine\DBAL\Cache\CacheException
      */
-    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [])
+    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], \DateTime $dateFrom = null, \DateTime $dateTo = null)
     {
         $q = $this->getSlaveConnection()->createQueryBuilder();
 
@@ -480,6 +485,12 @@ class CampaignRepository extends CommonRepository
             );
         }
 
+        if ($dateFrom && $dateTo) {
+            $q->andWhere('cl.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+        }
+
         if (count($pendingEvents) > 0) {
             $sq = $this->getSlaveConnection()->createQueryBuilder();
             $sq->select('null')
@@ -496,7 +507,16 @@ class CampaignRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        if ($q->getConnection()->getConfiguration()->getResultCacheImpl()) {
+            $results = $q->getConnection()->executeCacheQuery(
+                $q->getSQL(),
+                $q->getParameters(),
+                $q->getParameterTypes(),
+                new QueryCacheProfile(600, __METHOD__)
+            )->fetchAll();
+        } else {
+            $results = $q->execute()->fetchAll();
+        }
 
         return (int) $results[0]['lead_count'];
     }
