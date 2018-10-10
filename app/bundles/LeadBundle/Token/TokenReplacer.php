@@ -18,14 +18,14 @@ use Mautic\CoreBundle\Token\Replacer;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class ContactFieldReplacer.
+ * Class TokenReplacer.
  */
-class ContactFieldReplacer extends Replacer
+class TokenReplacer extends Replacer
 {
     private $tokenList = [];
 
     /** @var array */
-    private $regex = ['{leadfield=(.*?)}', '{contactfield=(.*?)}'];
+    private $regex = ['/({|%7B)leadfield=(.*?)(}|%7D)/', '/({|%7B)contactfield=(.*?)(}|%7D)/'];
 
     /**
      * @var CoreParametersHelper
@@ -43,13 +43,13 @@ class ContactFieldReplacer extends Replacer
     }
 
     /**
-     * @param Lead $contact
+     * @param Lead|array $contact
      * @param      $content
      * @param bool $replace
      *
      * @return mixed
      */
-    public function findAndReplaceTokens(Lead $contact, $content, $replace = false)
+    public function findAndReplaceTokens($contact, $content, $replace = false)
     {
         /**
          * @var Match
@@ -59,7 +59,7 @@ class ContactFieldReplacer extends Replacer
                 continue;
             }
             $this->tokenList[$token] = $this->getContactTokenValue(
-                $contact->getProfileFields(),
+                $contact instanceof Lead ? $contact->getProfileFields() : $contact,
                 $match->getAlias(),
                 $match->getModifier()
             );
@@ -91,10 +91,10 @@ class ContactFieldReplacer extends Replacer
                 case 'time':
                     $dt   = new DateTimeHelper($value);
                     $date = $dt->getDateTime()->format(
-                        (new ParamsLoaderHelper())->getParameters()['date_format_dateonly']
+                        $this->coreParametersHelper->getParameter('date_format_dateonly')
                     );
                     $time = $dt->getDateTime()->format(
-                        (new ParamsLoaderHelper())->getParameters()['date_format_timeonly']
+                        $this->coreParametersHelper->getParameter('date_format_timeonly')
                     );
                     switch ($modifier) {
                         case 'datetime':

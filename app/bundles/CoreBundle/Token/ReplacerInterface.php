@@ -11,12 +11,10 @@
 
 namespace Mautic\CoreBundle\Token;
 
-use Mautic\LeadBundle\Entity\Lead;
-
 /**
  * Interface ReplacerInterface.
  */
 interface ReplacerInterface
 {
-    public function findAndReplaceTokens(Lead $contact, $content, $replace);
+    public function findAndReplaceTokens($contact, $content, $replace);
 }

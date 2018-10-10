@@ -34,7 +34,7 @@ abstract class Replacer implements ReplacerInterface
                     if (isset($this->tokenList[$token])) {
                         continue;
                     }
-                    $this->tokenList[$token] = new Token($match);
+                    $this->tokenList[$token] = new Match($match);
                 }
             }
         }
