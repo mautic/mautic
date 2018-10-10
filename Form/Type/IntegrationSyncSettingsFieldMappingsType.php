@@ -85,7 +85,6 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                     'requiredIntegrationFields' => $this->getRequiredFields(),
                     'integrationFields'         => $this->getFilteredFields(),
                     'mauticFields'              => $this->getMauticFields($integrationObject, $objectName),
-                    'oneWayFields'              => $integrationObject->getOneWayFields(),
                     'page'                      => 1,
                     'keyword'                   => null,
                     'totalFieldCount'           => $this->getTotalFieldCount(),
@@ -136,18 +135,23 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
             ]
         );
 
+        // Add ID as a read only field
+        $coreFields['mautic_internal_id'] = $this->translator->trans('mautic.core.id');
+
         if (MauticSyncDataExchange::OBJECT_CONTACT !== $mauticObject) {
+            uasort($coreFields, 'strnatcmp');
+
             return $coreFields;
         }
 
         // Mautic contacts have "pseudo" fields such as channel do not contact, timeline, etc.
         $channels = $this->channelListHelper->getFeatureChannels([LeadModel::CHANNEL_FEATURE], true);
         foreach ($channels as $label => $channel) {
-            $coreFields['mautic_dnc_'.$channel] = $this->translator->trans('mautic.integration.sync.channel_dnc', ['%channel%' => $label]);
+            $coreFields['mautic_internal_dnc_'.$channel] = $this->translator->trans('mautic.integration.sync.channel_dnc', ['%channel%' => $label]);
         }
 
         // Add the timeline link
-        $coreFields['mautic_contact_timeline'] = $this->translator->trans('mautic.integration.sync.contact_timeline');
+        $coreFields['mautic_internal_contact_timeline'] = $this->translator->trans('mautic.integration.sync.contact_timeline');
 
         uasort($coreFields, 'strnatcmp');
 

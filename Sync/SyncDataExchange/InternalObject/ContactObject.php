@@ -280,6 +280,38 @@ class ContactObject implements ObjectInterface
         return $results;
     }
 
+
+    /**
+     * @param int    $contactId
+     * @param string $channel
+     *
+     * @return int
+     */
+    public function getDoNotContactStatus(int $contactId, string $channel): int
+    {
+        $q = $this->connection->createQueryBuilder();
+
+        $q->select('dnc.reason')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('dnc.lead_id', ':contactId'),
+                    $q->expr()->eq('dnc.channel', ':channel')
+                )
+            )
+            ->setParameter('contactId', $contactId)
+            ->setParameter('channel', $channel)
+            ->setMaxResults(1);
+
+        $status = $q->execute()->fetchColumn();
+
+        if (false === $status) {
+            return DoNotContact::IS_CONTACTABLE;
+        }
+
+        return (int) $status;
+    }
+
     /**
      * @return array
      */
@@ -301,8 +333,8 @@ class ContactObject implements ObjectInterface
     private function processPseudoFields(Lead $contact, array $fields, string $integration)
     {
         foreach ($fields as $name => $field) {
-            if (strpos($name, 'mautic_dnc') === 0) {
-                $channel   = str_replace('mautic_dnc_', '', $name);
+            if (strpos($name, 'mautic_internal_dnc_') === 0) {
+                $channel   = str_replace('mautic_internal_dnc_', '', $name);
                 $dncReason = $this->getDoNotContactReason($field->getValue()->getNormalizedValue());
 
                 if (DoNotContact::IS_CONTACTABLE === $dncReason) {
@@ -322,7 +354,7 @@ class ContactObject implements ObjectInterface
                 );
             }
 
-            // Ignore all others for now
+            // Ignore all others as unrecognized
         }
     }
 

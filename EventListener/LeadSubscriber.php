@@ -99,7 +99,7 @@ class LeadSubscriber extends CommonSubscriber
                 $oldValue = $change['old_reason'];
                 $newValue = $change['reason'];
 
-                $dncChanges['mautic_dnc_'.$channel] = [$oldValue, $newValue];
+                $dncChanges['mautic_internal_dnc_'.$channel] = [$oldValue, $newValue];
             }
 
             $this->recordFieldChanges($dncChanges, $lead->getId(), Lead::class);
