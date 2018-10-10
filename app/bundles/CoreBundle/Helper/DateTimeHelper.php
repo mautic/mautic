@@ -288,7 +288,9 @@ class DateTimeHelper
      * @param int    $interval
      * @param string $unit
      *
-     * @return DateInterval
+     * @return \DateInterval
+     *
+     * @throws \Exception
      */
     public function buildInterval($interval, $unit)
     {
@@ -387,5 +389,20 @@ class DateTimeHelper
         }
 
         return $timezone;
+    }
+
+    /**
+     * @param string $unit
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function validateMysqlDateTimeUnit($unit)
+    {
+        $possibleUnits   = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
+
+        if (!in_array($unit, $possibleUnits, true)) {
+            $possibleUnitsString = implode(', ', $possibleUnits);
+            throw new \InvalidArgumentException("Unit '$unit' is not supported. Use one of these: $possibleUnitsString");
+        }
     }
 }

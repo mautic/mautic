@@ -662,8 +662,13 @@ class PageModel extends FormModel
 
                     // If this is a trackable, up the trackable counts as well
                     if (!empty($clickthrough['channel'])) {
-                        $channelId = reset($clickthrough['channel']);
-                        $channel   = key($clickthrough['channel']);
+                        if (count($clickthrough['channel']) === 1) {
+                            $channelId = reset($clickthrough['channel']);
+                            $channel   = key($clickthrough['channel']);
+                        } else {
+                            $channel   = $clickthrough['channel'][0];
+                            $channelId = (int) $clickthrough['channel'][1];
+                        }
 
                         $this->pageTrackableModel->getRepository()->upHitCount($page->getId(), $channel, $channelId, 1, $isUnique);
                     }
@@ -1171,25 +1176,23 @@ class PageModel extends FormModel
     private function setLeadManipulator($page, Hit $hit, Lead $lead)
     {
         // Only save the lead and dispatch events if needed
-        if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
-            $source   = 'hit';
-            $sourceId = $hit->getId();
-            if ($page) {
-                $source   = $page instanceof Page ? 'page' : 'redirect';
-                $sourceId = $page->getId();
-            }
-
-            $lead->setManipulator(
-                new LeadManipulator(
-                    'page',
-                    $source,
-                    $sourceId,
-                    $hit->getUrl()
-                )
-            );
-
-            $this->leadModel->saveEntity($lead);
+        $source   = 'hit';
+        $sourceId = $hit->getId();
+        if ($page) {
+            $source   = $page instanceof Page ? 'page' : 'redirect';
+            $sourceId = $page->getId();
         }
+
+        $lead->setManipulator(
+            new LeadManipulator(
+                'page',
+                $source,
+                $sourceId,
+                $hit->getUrl()
+            )
+        );
+
+        $this->leadModel->saveEntity($lead);
     }
 
     /**

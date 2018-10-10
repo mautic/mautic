@@ -16,8 +16,7 @@ MauticVars.activeRequests = 0;
 mQuery.ajaxSetup({
     beforeSend: function (request, settings) {
         if (settings.showLoadingBar) {
-            mQuery('.loading-bar').addClass('active');
-            MauticVars.activeRequests++;
+            Mautic.startPageLoadingBar();
         }
 
         if (typeof IdleTimer != 'undefined') {
@@ -47,6 +46,7 @@ mQuery.ajaxSetup({
 });
 
 mQuery( document ).ajaxComplete(function(event, xhr, settings) {
+    Mautic.stopPageLoadingBar();
     xhr.always(function(response) {
         if (response.flashes) Mautic.setFlashes(response.flashes);
     });

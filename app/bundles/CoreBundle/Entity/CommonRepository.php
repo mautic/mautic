@@ -175,10 +175,11 @@ class CommonRepository extends EntityRepository
     {
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
-        foreach ($entities as $k => $entity) {
+        $i         = 0;
+        foreach ($entities as $entity) {
             $this->deleteEntity($entity, false);
 
-            if ((($k + 1) % $batchSize) === 0) {
+            if (++$i % $batchSize === 0) {
                 $this->_em->flush();
             }
         }
@@ -201,6 +202,24 @@ class CommonRepository extends EntityRepository
         if ($flush) {
             $this->_em->flush();
         }
+    }
+
+    /**
+     * @param array $entities
+     */
+    public function detachEntities(array $entities)
+    {
+        foreach ($entities as $entity) {
+            $this->getEntityManager()->detach($entity);
+        }
+    }
+
+    /**
+     * @param mixed $entity
+     */
+    public function detachEntity($entity)
+    {
+        $this->getEntityManager()->detach($entity);
     }
 
     /**
@@ -308,7 +327,7 @@ class CommonRepository extends EntityRepository
      *
      * @param array $args
      *
-     * @return Paginator
+     * @return array|\Doctrine\ORM\Internal\Hydration\IterableResult|Paginator
      */
     public function getEntities(array $args = [])
     {
@@ -755,11 +774,10 @@ class CommonRepository extends EntityRepository
         $batchSize = 20;
         $i         = 0;
 
-        foreach ($entities as $k => $entity) {
-            ++$i;
+        foreach ($entities as $entity) {
             $this->saveEntity($entity, false);
 
-            if ($i % $batchSize === 0) {
+            if (++$i % $batchSize === 0) {
                 $this->getEntityManager()->flush();
             }
         }
