@@ -29,7 +29,7 @@ class Match
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getAlias()
     {
@@ -38,6 +38,9 @@ class Match
         return $fallbackCheck[0];
     }
 
+    /**
+     * @return string
+     */
     public function getModifier()
     {
         $fallbackCheck = explode('|', $this->match);

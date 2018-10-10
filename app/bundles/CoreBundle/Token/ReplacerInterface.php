@@ -17,4 +17,6 @@ namespace Mautic\CoreBundle\Token;
 interface ReplacerInterface
 {
     public function findAndReplaceTokens($contact, $content, $replace);
+
+    public function findTokens($content, $regex);
 }

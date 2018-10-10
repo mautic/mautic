@@ -16,29 +16,33 @@ namespace Mautic\CoreBundle\Token;
  */
 abstract class Replacer implements ReplacerInterface
 {
-    private $tokenList = [];
-
+    /**
+     * @param $content
+     * @param array|string $regex
+     *
+     * @return array
+     */
     public function findTokens($content, $regex)
     {
         // convert string to array
         if (!is_array($regex)) {
             $regex = [$regex];
         }
-
+        $tokens = [];
         foreach ($regex as $regx) {
             preg_match_all($regx, $content, $matches);
             if (isset($matches[2])) {
                 foreach ($matches[2] as $key => $match) {
                     $token = $matches[0][$key];
 
-                    if (isset($this->tokenList[$token])) {
+                    if (isset($tokens[$token])) {
                         continue;
                     }
-                    $this->tokenList[$token] = new Match($match);
+                    $tokens[$token] = new Match($match);
                 }
             }
         }
 
-        return $this->tokenList;
+        return $tokens;
     }
 }

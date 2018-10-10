@@ -44,14 +44,14 @@ class TokenReplacer extends Replacer
 
     /**
      * @param Lead|array $contact
-     * @param      $content
-     * @param bool $replace
+     * @param            $content
+     * @param bool       $replace
      *
      * @return mixed
      */
     public function findAndReplaceTokens($contact, $content, $replace = false)
     {
-        /**
+        /*
          * @var Match
          */
         foreach ($this->findTokens($content, $this->regex) as $token => $match) {
@@ -72,6 +72,13 @@ class TokenReplacer extends Replacer
         return str_replace(array_keys($this->tokenList), $this->tokenList, $content);
     }
 
+    /**
+     * @param array $fields
+     * @param       $alias
+     * @param       $modifier
+     *
+     * @return mixed|string
+     */
     public function getContactTokenValue(array $fields, $alias, $modifier)
     {
         $value = '';
