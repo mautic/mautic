@@ -20,6 +20,9 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -75,25 +78,38 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
         }
 
         foreach ($options['objects'] as $objectName => $objectLabel) {
-            $this->filterFields($integrationObject, $objectName, null, 1);
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($integrationObject, $objectName) {
+                $error = null;
+                try {
+                    $this->filterFields($integrationObject, $objectName, null, 1);
+                } catch (\Exception $exception) {
+                    $error = $exception->getMessage();
+                }
 
-            $builder->add(
-                $objectName,
-                IntegrationSyncSettingsObjectFieldMappingType::class,
-                [
-                    'label'                     => false,
-                    'requiredIntegrationFields' => $this->getRequiredFields(),
-                    'integrationFields'         => $this->getFilteredFields(),
-                    'mauticFields'              => $this->getMauticFields($integrationObject, $objectName),
-                    'page'                      => 1,
-                    'keyword'                   => null,
-                    'totalFieldCount'           => $this->getTotalFieldCount(),
-                    'object'                    => $objectName,
-                    'integration'               => $integrationObject->getName(),
-                    'error_bubbling'            => false,
-                    'allow_extra_fields'        => true,
-                ]
-            );
+                $form = $event->getForm();
+                $form->add(
+                    $objectName,
+                    IntegrationSyncSettingsObjectFieldMappingType::class,
+                    [
+                        'label'                     => false,
+                        'requiredIntegrationFields' => $this->getRequiredFields(),
+                        'integrationFields'         => $this->getFilteredFields(),
+                        'mauticFields'              => $this->getMauticFields($integrationObject, $objectName),
+                        'page'                      => 1,
+                        'keyword'                   => null,
+                        'totalFieldCount'           => $this->getTotalFieldCount(),
+                        'object'                    => $objectName,
+                        'integration'               => $integrationObject->getName(),
+                        'error_bubbling'            => false,
+                        'allow_extra_fields'        => true,
+                    ]
+                );
+
+
+                if ($error) {
+                    $form[$objectName]->addError(new FormError($error));
+                }
+            });
         }
     }
 

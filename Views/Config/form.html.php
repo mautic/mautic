@@ -9,9 +9,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use \MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
-use \MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use \MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthInterface;
 
 echo $view['assets']->includeScript('plugins/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad');
 
@@ -26,6 +27,7 @@ $showFeaturesTab =
 $hasFeatureErrors =
     ($integrationObject instanceof ConfigFormFeatureSettingsInterface && $view['form']->containsErrors($form['featureSettings']['integration'])) ||
     (isset($form['featureSettings']['sync']['integration']) && $view['form']->containsErrors($form['featureSettings']['sync']['integration']));
+$hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $view['form']->containsErrors($form['apiKeys']);
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -34,6 +36,9 @@ $hasFeatureErrors =
     <li class="<?php if ($activeTab == 'details-container'): echo 'active'; endif; ?> " id="details-tab">
         <a href="#details-container" role="tab" data-toggle="tab">
             <?php echo $view['translator']->trans('mautic.plugin.integration.tab.details'); ?>
+            <?php if ($hasAuthErrors): ?>
+                <i class="fa fa-fw fa-warning text-danger"></i>
+            <?php endif; ?>
         </a>
     </li>
     <!-- Enabled\Auth -->
@@ -115,6 +120,9 @@ $hasFeatureErrors =
     <?php if ($integrationObject instanceof ConfigFormSyncInterface): ?>
     <?php foreach ($form['featureSettings']['sync']['fieldMappings'] as $object => $objectFieldMapping): ?>
     <div class="tab-pane fade <?php if ($activeTab == "field-mapping-{$object}"): echo 'in active'; endif; ?> bdr-w-0" id="<?php echo "field-mappings-{$object}"; ?>-container">
+        <div class="has-error">
+            <?php echo $view['form']->errors($objectFieldMapping); ?>
+        </div>
         <?php echo $view['form']->row($objectFieldMapping['filter-keyword']); ?>
 
         <div id="<?php echo "field-mappings-{$object}"; ?>">
