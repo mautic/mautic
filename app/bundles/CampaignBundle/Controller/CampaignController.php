@@ -689,12 +689,13 @@ class CampaignController extends AbstractStandardFormController
                 $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
                 $dateFrom        = null;
                 $dateTo          = null;
+                $this->setCoreParametersHelper($this->get('mautic.config'));
                 if ($this->coreParametersHelper->getParameter('campaign_by_range')) {
                     $dateFrom        = new \DateTime($dateRangeForm->get('date_from')->getData());
                     $dateTo          = new \DateTime($dateRangeForm->get('date_to')->getData());
                     $dateTo->modify('+1 day');
                 }
-                if ($this->coreParametersHelper->getParameter('mautic.campaign_use_summary')) {
+                if ($this->coreParametersHelper->getParameter('campaign_use_summary')) {
                     /** @var SummaryRepository $summaryRepo */
                     $summaryRepo       = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:Summary');
                     $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateTo);
