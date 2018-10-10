@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
@@ -35,6 +34,8 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\Company
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\ContactObject;
 use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
 
 /**
  * Class MauticSyncDataExchange
@@ -91,6 +92,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     private $lastProcessedTrackedId = [];
 
     /**
+     * @var Router
+     */
+    private $router;
+
+    /**
      * MauticSyncDataExchange constructor.
      *
      * @param FieldChangeRepository            $fieldChangeRepository
@@ -99,6 +105,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @param CompanyObject                    $companyObjectHelper
      * @param ContactObject                    $contactObjectHelper
      * @param FieldModel                       $fieldModel
+     * @param Router                           $router
      */
     public function __construct(
         FieldChangeRepository $fieldChangeRepository,
@@ -106,7 +113,8 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         MappingHelper $mappingHelper,
         CompanyObject $companyObjectHelper,
         ContactObject $contactObjectHelper,
-        FieldModel $fieldModel
+        FieldModel $fieldModel,
+        Router $router
     ) {
         $this->fieldChangeRepository   = $fieldChangeRepository;
         $this->variableExpresserHelper = $variableExpresserHelper;
@@ -114,6 +122,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         $this->companyObjectHelper     = $companyObjectHelper;
         $this->contactObjectHelper     = $contactObjectHelper;
         $this->fieldModel              = $fieldModel;
+        $this->router                  = $router;
         $this->valueNormalizer         = new ValueNormalizer();
     }
 
@@ -234,7 +243,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
             return new ReportObjectDAO($internalObjectName, null);
         }
 
-        $fieldChanges = $this->fieldChangeRepository->findChangesForObject($mappingManualDAO->getIntegration(), $internalObjectName, $internalObjectDAO->getObjectId());
+        $fieldChanges = $this->fieldChangeRepository->findChangesForObject(
+            $mappingManualDAO->getIntegration(),
+            $internalObjectName,
+            $internalObjectDAO->getObjectId()
+        );
         foreach ($fieldChanges as $fieldChange) {
             $internalObjectDAO->addField(
                 $this->getFieldChangeObject($fieldChange)
@@ -310,8 +323,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                         throw new ObjectNotSupportedException(self::NAME, $objectDAO->getObject());
                 }
 
-                $mauticFields = $this->getFieldList($objectDAO->getObject());
-                $fields       = $objectDAO->getFields();
+                $fields = $objectDAO->getFields();
                 foreach ($foundObjects as $object) {
                     $modifiedDateTime = new \DateTime(
                         !empty($object['date_modified']) ? $object['date_modified'] : $object['date_added'],
@@ -321,18 +333,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                     $syncReport->addObject($objectDAO);
 
                     foreach ($fields as $field) {
-                        if (!isset($mauticFields[$field])) {
-                            // Field must have been deleted or something so let's skip
-                            continue;
-                        }
-
-                        $fieldType       = $this->getNormalizedFieldType($mauticFields[$field]['type']);
-                        $normalizedValue = new NormalizedValueDAO(
-                            $fieldType,
-                            $object[$field]
-                        );
-
-                        $objectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
+                        $this->generateObjectField($field, $object, $objectDAO, $syncReport->getIntegration());
                     }
                 }
             } catch (ObjectNotSupportedException $exception) {
@@ -523,7 +524,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     {
         $objectName               = $objectDAO->getObject();
         $fields                   = $objectDAO->getFields();
-        $requiredFields           = $objectDAO->getRequiredFields();
         $objectsWithMissingFields = [];
         $syncObjects              = $syncReport->getObjects($objectName);
 
@@ -556,22 +556,87 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         }
 
         if (count($mauticObjects)) {
-            $mauticFields = $this->getFieldList($objectName);
-
             foreach ($mauticObjects as $mauticObject) {
                 $missingFields = $objectsWithMissingFields[$mauticObject['id']];
                 $syncObject    = $syncReport->getObject($objectName, $mauticObject['id']);
 
                 foreach ($missingFields as $field) {
-                    $syncObject->addField(
-                        new ReportFieldDAO(
-                            $field,
-                            $this->valueNormalizer->normalizeForMautic($this->getNormalizedFieldType($mauticFields[$field]['type']), $mauticObject[$field]),
-                            (in_array($field, $requiredFields)) ? FieldDAO::FIELD_REQUIRED : FieldDAO::FIELD_UNCHANGED
-                        )
-                    );
+                    $this->generateObjectField($field, $mauticObject, $syncObject, $syncReport->getIntegration());
                 }
             }
         }
+    }
+
+    /**
+     * @param string           $field
+     * @param array            $mauticObject
+     * @param RequestObjectDAO $objectDAO
+     * @param string           $integration
+     */
+    private function generateObjectField(string $field, array $mauticObject, RequestObjectDAO $objectDAO, string $integration)
+    {
+        // Special handling of the ID field
+        if ('mautic_internal_id' === $field) {
+            $normalizedValue = new NormalizedValueDAO(
+                NormalizedValueDAO::INT_TYPE,
+                $mauticObject[$field]
+            );
+
+            $objectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
+
+            return;
+        }
+
+        // Special handling of DNC fields
+        if (strpos($field, 'mautic_internal_dnc_') === 0) {
+            $channel = str_replace('mautic_internal_dnc_', '', $field);
+
+            $normalizedValue = new NormalizedValueDAO(
+                NormalizedValueDAO::INT_TYPE,
+                $this->contactObjectHelper->getDoNotContactStatus((int) $mauticObject['id'], $channel)
+            );
+
+            $objectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
+
+            return;
+        }
+
+        // Special handling of timeline URL
+        if ('mautic_internal_contact_timeline' === $field) {
+            $normalizedValue = new NormalizedValueDAO(
+                NormalizedValueDAO::URL_TYPE,
+                $this->router->generate(
+                    'mautic_plugin_timeline_view',
+                    [
+                        'integration' => $integration,
+                        'leadId'      => $mauticObject['id']
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                )
+            );
+
+            $objectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
+
+            return;
+        }
+
+        // The rest should be Mautic custom fields and if not, just ignore
+        $mauticFields = $this->getFieldList($objectDAO->getObject());
+        if (!isset($mauticFields[$field])) {
+            // Field must have been deleted or something so let's skip
+            return;
+        }
+
+        $requiredFields  = $objectDAO->getRequiredFields();
+        $fieldType       = $this->getNormalizedFieldType($mauticFields[$field]['type']);
+        $normalizedValue = $this->valueNormalizer->normalizeForMautic($fieldType, $mauticObject[$field]);
+
+        $objectDAO->addField(
+            new ReportFieldDAO(
+                $field,
+                $normalizedValue,
+                (in_array($field, $requiredFields)) ? ReportFieldDAO::FIELD_REQUIRED : ReportFieldDAO::FIELD_UNCHANGED
+            )
+        );
     }
 }

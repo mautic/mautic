@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
 
-use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;

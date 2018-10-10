@@ -15,9 +15,13 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
 use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -40,17 +44,36 @@ class ContactObject implements ObjectInterface
     private $connection;
 
     /**
+     * @var FieldModel
+     */
+    private $fieldModel;
+
+    /**
+     * @var array
+     */
+    private $availableFields;
+
+    /**
+     * @var DoNotContactModel
+     */
+    private $dncModel;
+
+    /**
      * ContactObject constructor.
      *
      * @param LeadModel      $model
      * @param LeadRepository $repository
      * @param Connection     $connection
+     * @param FieldModel     $fieldModel
+     * @param DoNotContactModel   $dncModel
      */
-    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection)
+    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel)
     {
         $this->model      = $model;
         $this->repository = $repository;
         $this->connection = $connection;
+        $this->fieldModel = $fieldModel;
+        $this->dncModel    = $dncModel;
     }
 
     /**
@@ -60,16 +83,29 @@ class ContactObject implements ObjectInterface
      */
     public function create(array $objects): array
     {
+        $availableFields = $this->getAvailableFields();
         $objectMappings = [];
+
         foreach ($objects as $object) {
             $contact = new Lead();
             $fields  = $object->getFields();
 
+            $pseudoFields = [];
             foreach ($fields as $field) {
-                $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
+                if (in_array($availableFields[$field->getName()])) {
+                    $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
+                } else {
+                    $pseudoFields[$field->getName()] = $field;
+                }
             }
 
+            // Create the contact before processing pseudo fields
             $this->model->saveEntity($contact);
+
+            // Process the pseudo field
+            $this->processPseudoFields($contact, $pseudoFields,  $object->getIntegration());
+
+            // Detach to free RAM
             $this->repository->detachEntity($contact);
 
             DebugLogger::log(
@@ -114,18 +150,30 @@ class ContactObject implements ObjectInterface
             __CLASS__.':'.__FUNCTION__
         );
 
+        $availableFields = $this->getAvailableFields();
         $updatedMappedObjects = [];
+
         foreach ($contacts as $contact) {
             /** @var ObjectChangeDAO $changedObject */
             $changedObject = $objects[$contact->getId()];
 
             $fields = $changedObject->getFields();
 
+            $pseudoFields = [];
             foreach ($fields as $field) {
-                $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
+                if (in_array($availableFields[$field->getName()])) {
+                    $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
+                } else {
+                    $pseudoFields[$field->getName()] = $field;
+                }
             }
 
+            // Create the contact before processing pseudo fields
             $this->model->saveEntity($contact);
+
+            // Process the pseudo field
+            $this->processPseudoFields($contact, $pseudoFields, $changedObject->getIntegration());
+
             $this->repository->detachEntity($contact);
 
             DebugLogger::log(
@@ -154,8 +202,8 @@ class ContactObject implements ObjectInterface
      *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @param int       $start
-     * @param int       $limit
+     * @param int                $start
+     * @param int                $limit
      *
      * @return array
      */
@@ -230,5 +278,98 @@ class ContactObject implements ObjectInterface
         $results = $q->execute()->fetchAll();
 
         return $results;
+    }
+
+
+    /**
+     * @param int    $contactId
+     * @param string $channel
+     *
+     * @return int
+     */
+    public function getDoNotContactStatus(int $contactId, string $channel): int
+    {
+        $q = $this->connection->createQueryBuilder();
+
+        $q->select('dnc.reason')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('dnc.lead_id', ':contactId'),
+                    $q->expr()->eq('dnc.channel', ':channel')
+                )
+            )
+            ->setParameter('contactId', $contactId)
+            ->setParameter('channel', $channel)
+            ->setMaxResults(1);
+
+        $status = $q->execute()->fetchColumn();
+
+        if (false === $status) {
+            return DoNotContact::IS_CONTACTABLE;
+        }
+
+        return (int) $status;
+    }
+
+    /**
+     * @return array
+     */
+    private function getAvailableFields(): array
+    {
+        if (null === $this->availableFields) {
+            $availableFields = $this->fieldModel->getFieldList(false, false);
+
+            $this->availableFields = array_keys($availableFields);
+        }
+
+        return $this->availableFields;
+    }
+
+    /**
+     * @param Lead       $contact
+     * @param FieldDAO[] $fields
+     */
+    private function processPseudoFields(Lead $contact, array $fields, string $integration)
+    {
+        foreach ($fields as $name => $field) {
+            if (strpos($name, 'mautic_internal_dnc_') === 0) {
+                $channel   = str_replace('mautic_internal_dnc_', '', $name);
+                $dncReason = $this->getDoNotContactReason($field->getValue()->getNormalizedValue());
+
+                if (DoNotContact::IS_CONTACTABLE === $dncReason) {
+                    $this->dncModel->removeDncForContact($contact->getId(), $channel);
+
+                    continue;
+                }
+
+                $this->dncModel->addDncForContact(
+                    $contact->getId(),
+                    $channel,
+                    $dncReason,
+                    $integration,
+                    true,
+                    true,
+                    true
+                );
+            }
+
+            // Ignore all others as unrecognized
+        }
+    }
+
+    /**
+     * @param $value
+     *
+     * @return int
+     */
+    private function getDoNotContactReason($value)
+    {
+        if (in_array((int) $value, [DoNotContact::BOUNCED, DoNotContact::UNSUBSCRIBED, DoNotContact::MANUAL, DoNotContact::IS_CONTACTABLE])) {
+            return $value;
+        }
+
+        // Assume manually removed
+        return DoNotContact::MANUAL;
     }
 }

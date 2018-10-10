@@ -78,6 +78,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.field',
+                    'mautic.channel.helper.channel_list',
                 ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field_directions' => [
@@ -183,6 +184,8 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.lead',
                     'doctrine.dbal.default_connection',
+                    'mautic.lead.model.field',
+                    'mautic.lead.model.dnc'
                 ],
             ],
             'mautic.integrations.helper.company_object' => [
@@ -202,6 +205,7 @@ return [
                     'mautic.integrations.helper.company_object',
                     'mautic.integrations.helper.contact_object',
                     'mautic.lead.model.field',
+                    'router'
                 ],
             ],
             'mautic.integrations.helper.sync_process_factory' => [
