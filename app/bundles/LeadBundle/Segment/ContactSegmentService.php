@@ -194,15 +194,16 @@ class ContactSegmentService
     /**
      * @param LeadList $segment
      * @param array    $batchLimiters
+     * @param null     $limit
      *
      * @return array
      *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [])
+    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], $limit = null)
     {
-        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters);
+        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters, $limit);
 
         $this->logger->debug('Segment QB: Orphan Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
@@ -254,13 +255,14 @@ class ContactSegmentService
     /**
      * @param LeadList $segment
      * @param array    $batchLimiters
+     * @param null     $limit
      *
      * @return QueryBuilder
      *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\DBALException
      */
-    private function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [])
+    private function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null)
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
@@ -279,6 +281,10 @@ class ContactSegmentService
         $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));
         $qbO->setParameter(':orpsegid', $segment->getId());
         $this->addLeadLimiter($qbO, $batchLimiters, 'orp.lead_id');
+
+        if ($limit) {
+            $qbO->setMaxResults((int) $limit);
+        }
 
         return $qbO;
     }
