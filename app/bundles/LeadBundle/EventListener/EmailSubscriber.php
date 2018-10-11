@@ -96,7 +96,7 @@ class EmailSubscriber extends CommonSubscriber
         $content .= implode(' ', $event->getTextHeaders());
 
         $lead      = $event->getLead();
-        $tokenList = $this->tokenReplacer->findAndReplaceTokens($lead, $content);
+        $tokenList = $this->tokenReplacer->findTokens($content, $lead);
         if (count($tokenList)) {
             $event->addTokens($tokenList);
             unset($tokenList);

@@ -11,12 +11,40 @@
 
 namespace Mautic\CoreBundle\Token;
 
+use Mautic\LeadBundle\Entity\Lead;
+
 /**
  * Interface ReplacerInterface.
  */
 interface ReplacerInterface
 {
-    public function findAndReplaceTokens($contact, $content, $replace);
+    /**
+     * Return content replaced tokens.
+     *
+     * @param string          $content
+     * @param Lead|array|null $contact
+     *
+     * @return string
+     */
+    public function replaceTokens($content, $contact);
 
-    public function findTokens($content, $regex);
+    /**
+     * Return tokens array with replaced data.
+     *
+     * @param string          $content
+     * @param Lead|array|null $contact
+     *
+     * @return string
+     */
+    public function findTokens($content, $contact);
+
+    /**
+     * Return tokens array with raw not-replaced data     *.
+     *
+     * @param string       $content
+     * @param array|string $regex
+     *
+     * @return array
+     */
+    public function searchTokens($content, $regex);
 }

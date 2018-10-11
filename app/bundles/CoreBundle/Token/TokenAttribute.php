@@ -14,18 +14,18 @@ namespace Mautic\CoreBundle\Token;
 /**
  * CLass Match.
  */
-class Match
+class TokenAttribute
 {
-    private $match;
+    private $attribute;
 
     /**
      * Token constructor.
      *
-     * @param $match
+     * @param $attribute
      */
-    public function __construct($match)
+    public function __construct($attribute)
     {
-        $this->match = $match;
+        $this->attribute = $attribute;
     }
 
     /**
@@ -33,7 +33,7 @@ class Match
      */
     public function getAlias()
     {
-        $fallbackCheck = explode('|', $this->match);
+        $fallbackCheck = explode('|', $this->attribute);
 
         return $fallbackCheck[0];
     }
@@ -43,7 +43,7 @@ class Match
      */
     public function getModifier()
     {
-        $fallbackCheck = explode('|', $this->match);
+        $fallbackCheck = explode('|', $this->attribute);
         if (!isset($fallbackCheck[1])) {
             return '';
         }

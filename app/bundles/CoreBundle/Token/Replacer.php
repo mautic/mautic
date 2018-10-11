@@ -22,7 +22,7 @@ abstract class Replacer implements ReplacerInterface
      *
      * @return array
      */
-    public function findTokens($content, $regex)
+    public function searchTokens($content, $regex)
     {
         // convert string to array
         if (!is_array($regex)) {
@@ -38,7 +38,7 @@ abstract class Replacer implements ReplacerInterface
                     if (isset($tokens[$token])) {
                         continue;
                     }
-                    $tokens[$token] = new Match($match);
+                    $tokens[$token] = new TokenAttribute($match);
                 }
             }
         }

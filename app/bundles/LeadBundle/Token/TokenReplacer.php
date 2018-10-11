@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Token;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Token\Match;
 use Mautic\CoreBundle\Token\Replacer;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -43,18 +42,24 @@ class TokenReplacer extends Replacer
     }
 
     /**
-     * @param Lead|array $contact
-     * @param            $content
-     * @param bool       $replace
+     * @param string          $content
+     * @param array|Lead|null $contact
      *
-     * @return mixed
+     * @return string
      */
-    public function findAndReplaceTokens($contact, $content, $replace = false)
+    public function replaceTokens($content, $contact)
+    {
+        $tokenList = $this->findTokens($content, $contact);
+
+        return str_replace(array_keys($tokenList), $tokenList, $content);
+    }
+
+    public function findTokens($content, $contact = null)
     {
         /*
          * @var Match
          */
-        foreach ($this->findTokens($content, $this->regex) as $token => $match) {
+        foreach ($this->searchTokens($content, $this->regex) as $token => $match) {
             if (isset($this->tokenList[$token])) {
                 continue;
             }
@@ -65,11 +70,7 @@ class TokenReplacer extends Replacer
             );
         }
 
-        if ($replace === false) {
-            return $this->tokenList;
-        }
-
-        return str_replace(array_keys($this->tokenList), $this->tokenList, $content);
+        return $this->tokenList;
     }
 
     /**
