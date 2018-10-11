@@ -603,11 +603,11 @@ class PageModel extends FormModel
             $lead->setTimezone($this->dateTimeHelper->guessTimezoneFromOffset($timezone));
         }
 
-        // Set info from request
-        $query = InputHelper::cleanArray($query);
+        $query = $this->cleanQuery($query);
 
         $hit->setQuery($query);
         $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
+
         if (isset($query['page_referrer'])) {
             $hit->setReferer($query['page_referrer']);
         }
@@ -1219,5 +1219,25 @@ class PageModel extends FormModel
     public function getVariants(Page $entity)
     {
         return $entity->getVariants();
+    }
+
+    /*
+     * Cleans query params saving url values.
+     *
+     * @param $query array
+     *
+     * @return array
+     */
+    private function cleanQuery($query)
+    {
+        foreach ($query as $key => $value) {
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                $query[$key] = InputHelper::url($value);
+            } else {
+                $query[$key] = InputHelper::clean($value);
+            }
+        }
+
+        return $query;
     }
 }
