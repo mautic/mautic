@@ -25,6 +25,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\MauticSaelosBundle\Command\SyncIntegrations;
 
 class ContactObject implements ObjectInterface
 {
@@ -92,7 +93,7 @@ class ContactObject implements ObjectInterface
 
             $pseudoFields = [];
             foreach ($fields as $field) {
-                if (in_array($availableFields[$field->getName()])) {
+                if (in_array($field->getName(), $availableFields)) {
                     $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
                 } else {
                     $pseudoFields[$field->getName()] = $field;
@@ -161,7 +162,7 @@ class ContactObject implements ObjectInterface
 
             $pseudoFields = [];
             foreach ($fields as $field) {
-                if (in_array($availableFields[$field->getName()])) {
+                if (in_array($field->getName(), $availableFields)) {
                     $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
                 } else {
                     $pseudoFields[$field->getName()] = $field;
