@@ -60,6 +60,7 @@ Installing from source is only recommended if you are comfortable using the comm
 	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
 	- recommended for development: `xdebug`
 3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
+4. Disabling `ONLY_FULL_GROUP_BY` on the mySQL server.
 
 ## Installation
 

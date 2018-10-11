@@ -375,6 +375,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
                     'mautic.lead.model.list',
+                    'mautic.lead.model.company',
                     'mautic.campaign.model.campaign',
                 ],
             ],
@@ -549,6 +550,11 @@ return [
                 'arguments' => ['mautic.factory'],
                 'alias'     => 'updatelead_action',
             ],
+            'mautic.form.type.updatecompany_action' => [
+                'class'     => Mautic\LeadBundle\Form\Type\UpdateCompanyActionType::class,
+                'arguments' => ['mautic.lead.model.field'],
+                'alias'     => 'updatecompany_action',
+            ],
             'mautic.form.type.leadnote' => [
                 'class' => Mautic\LeadBundle\Form\Type\NoteType::class,
                 'alias' => 'leadnote',
@@ -721,6 +727,15 @@ return [
             ],
             \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
                 'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
+                'tag'       => 'validator.constraint_validator',
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'mautic.helper.field.alias',
+                    '@doctrine.orm.entity_manager',
+                ],
+            ],
+            \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class => [
+                'class'     => \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class,
                 'tag'       => 'validator.constraint_validator',
                 'arguments' => [
                     'mautic.lead.model.list',
@@ -1111,6 +1126,7 @@ return [
                     'request_stack',
                     'mautic.helper.core_parameters',
                     'event_dispatcher',
+                    'mautic.lead.model.field',
                 ],
             ],
             'mautic.tracker.device' => [

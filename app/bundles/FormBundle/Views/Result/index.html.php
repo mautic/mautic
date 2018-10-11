@@ -30,7 +30,6 @@ $buttons[] = [
 
 $buttons[] = [
     'attr' => [
-        'data-toggle' => 'download',
         'data-toggle' => '',
         'class'       => 'btn btn-default btn-nospin',
         'href'        => $view['router']->path('mautic_form_export', ['objectId' => $form->getId(), 'format' => 'csv']),
@@ -43,7 +42,6 @@ $buttons[] = [
 if (class_exists('PHPExcel')) {
     $buttons[] = [
         'attr' => [
-            'data-toggle' => 'download',
             'data-toggle' => '',
             'class'       => 'btn btn-default btn-nospin',
             'href'        => $view['router']->path('mautic_form_export', ['objectId' => $form->getId(), 'format' => 'xlsx']),

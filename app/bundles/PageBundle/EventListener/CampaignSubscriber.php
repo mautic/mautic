@@ -228,11 +228,11 @@ class CampaignSubscriber extends CommonSubscriber
 
         // Check Landing Pages URL or Tracing Pixel URL
         if (isset($config['url']) && $config['url']) {
-            $pageUrl     = $eventDetails->getUrl();
+            $pageUrl     = html_entity_decode($eventDetails->getUrl());
             $limitToUrls = explode(',', $config['url']);
 
             foreach ($limitToUrls as $url) {
-                $url              = trim($url);
+                $url              = html_entity_decode(trim($url));
                 $urlMatches[$url] = fnmatch($url, $pageUrl);
             }
         }
@@ -241,11 +241,11 @@ class CampaignSubscriber extends CommonSubscriber
 
         // Check Landing Pages URL or Tracing Pixel URL
         if (isset($config['referer']) && $config['referer']) {
-            $refererUrl      = $eventDetails->getReferer();
+            $refererUrl      = html_entity_decode($eventDetails->getReferer());
             $limitToReferers = explode(',', $config['referer']);
 
             foreach ($limitToReferers as $referer) {
-                $referer                  = trim($referer);
+                $referer                  = html_entity_decode(trim($referer));
                 $refererMatches[$referer] = fnmatch($referer, $refererUrl);
             }
         }

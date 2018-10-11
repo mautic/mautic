@@ -113,7 +113,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     {
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
-        foreach ($entities as $k => $entity) {
+        $i         = 0;
+        foreach ($entities as $entity) {
             $isNew = ($entity->getId()) ? false : true;
 
             //set some defaults
@@ -129,7 +130,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
 
-            if ((($k + 1) % $batchSize) === 0) {
+            if (++$i % $batchSize === 0) {
                 $this->em->flush();
             }
         }
@@ -323,6 +324,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         if ($sentCount) {
             $this->getRepository()->upCount($sms->getId(), 'sent', $sentCount);
             $this->getStatRepository()->saveEntities($stats);
+            // send statId to results
+            $stat = reset($stats);
+            if ($stat instanceof Stat) {
+                $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
+            }
             $this->em->clear(Stat::class);
         }
 
