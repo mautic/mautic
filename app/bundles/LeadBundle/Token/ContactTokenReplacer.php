@@ -21,7 +21,7 @@ class ContactTokenReplacer extends TokenReplacer
     private $tokenList = [];
 
     /** @var array */
-    private $regex = ['/({|%7B)leadfield=(.*?)(}|%7D)/', '/({|%7B)contactfield=(.*?)(}|%7D)/'];
+    private $regex = ['{contactfield=(.*?)}', '{leadfield=(.*?)}'];
 
     /**
      * @var CoreParametersHelper
@@ -105,5 +105,13 @@ class ContactTokenReplacer extends TokenReplacer
         } else {
             return $value ?: $modifier;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getRegex()
+    {
+        return $this->regex;
     }
 }

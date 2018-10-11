@@ -40,9 +40,9 @@ abstract class TokenReplacer implements TokenReplacerInterface
         }
         $tokens = [];
         foreach ($regex as $regx) {
-            preg_match_all($regx, $content, $matches);
-            if (isset($matches[2])) {
-                foreach ($matches[2] as $key => $match) {
+            preg_match_all('/'.$regx.'/', $content, $matches);
+            if (isset($matches[1])) {
+                foreach ($matches[1] as $key => $match) {
                     $token = $matches[0][$key];
 
                     if (isset($tokens[$token])) {

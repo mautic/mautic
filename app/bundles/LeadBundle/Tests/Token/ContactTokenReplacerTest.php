@@ -31,7 +31,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
 
     private $content = 'custom content with {contactfield=firstname} {leadfield=firstname}';
 
-    private $regex = ['/({|%7B)leadfield=(.*?)(}|%7D)/', '/({|%7B)contactfield=(.*?)(}|%7D)/'];
+    private $regex;
 
     private $contactTokenReplacer;
 
@@ -39,6 +39,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
     {
         $coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->contactTokenReplacer = new ContactTokenReplacer($coreParametersHelperMock);
+        $this->regex                = $this->contactTokenReplacer->getRegex();
         parent::setUp();
     }
 

@@ -27,6 +27,7 @@ use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -94,16 +95,16 @@ class DynamicContentSubscriber extends CommonSubscriber
     /**
      * DynamicContentSubscriber constructor.
      *
-     * @param TrackableModel         $trackableModel
-     * @param PageTokenHelper        $pageTokenHelper
-     * @param AssetTokenHelper       $assetTokenHelper
-     * @param FormTokenHelper        $formTokenHelper
-     * @param FocusTokenHelper       $focusTokenHelper
-     * @param AuditLogModel          $auditLogModel
-     * @param LeadModel              $leadModel
-     * @param DynamicContentHelper   $dynamicContentHelper
-     * @param DynamicContentModel    $dynamicContentModel
-     * @param TokenReplacerInterface $contactTokenReplacer
+     * @param TrackableModel       $trackableModel
+     * @param PageTokenHelper      $pageTokenHelper
+     * @param AssetTokenHelper     $assetTokenHelper
+     * @param FormTokenHelper      $formTokenHelper
+     * @param FocusTokenHelper     $focusTokenHelper
+     * @param AuditLogModel        $auditLogModel
+     * @param LeadModel            $leadModel
+     * @param DynamicContentHelper $dynamicContentHelper
+     * @param DynamicContentModel  $dynamicContentModel
+     * @param ContactTokenReplacer $contactTokenReplacer
      */
     public function __construct(
         TrackableModel $trackableModel,
