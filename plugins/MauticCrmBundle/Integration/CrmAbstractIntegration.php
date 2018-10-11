@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
 /**
@@ -312,18 +311,30 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         // Default to new company
         $company         = new Company();
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $this->companyModel);
-        if ($existingCompany[2]) {
+        if (!empty($existingCompany[2])) {
             $company = $existingCompany[2];
         }
 
         $companyFieldTypes = $this->fieldModel->getFieldListWithProperties('company');
         foreach ($matchedFields as $companyField => $value) {
-            if (isset($companyFieldTypes[$companyField]['type']) && $companyFieldTypes[$companyField]['type'] == 'text') {
-                $matchedFields[$companyField] = substr($value, 0, 255);
+            if (isset($companyFieldTypes[$companyField]['type'])) {
+                switch ($companyFieldTypes[$companyField]['type']) {
+                    case 'text':
+                        $matchedFields[$companyField] = substr($value, 0, 255);
+                        break;
+                    case 'date':
+                        $date                         = new \DateTime($value);
+                        $matchedFields[$companyField] = $date->format('Y-m-d');
+                        break;
+                    case 'datetime':
+                        $date                         = new \DateTime($value);
+                        $matchedFields[$companyField] = $date->format('Y-m-d H:i:s');
+                        break;
+                }
             }
         }
 
-        if (!$company->isNew()) {
+        if (!empty($existingCompany[2])) {
             $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
             $fieldsToUpdate = array_intersect_key($config['companyFields'], $fieldsToUpdate);
             $matchedFields  = array_intersect_key($matchedFields, array_flip($fieldsToUpdate));

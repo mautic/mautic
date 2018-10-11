@@ -18,10 +18,12 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
+use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 {
@@ -66,10 +68,6 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
     public function testNoContactsResultInEmptyResults()
     {
-        $this->kickoffContactFinder->expects($this->once())
-            ->method('getContactCount')
-            ->willReturn(0);
-
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
         $campaign->expects($this->once())
@@ -78,7 +76,7 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
-        $counter = $this->getExecutioner()->execute($campaign, $limiter);
+        $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -121,10 +119,22 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->scheduler->expects($this->exactly(2))
             ->method('schedule');
 
-        $this->executioner->expects($this->exactly(2))
-            ->method('executeForContacts');
+        $this->executioner->expects($this->exactly(1))
+            ->method('executeEventsForContacts')
+            ->withConsecutive(
+                [
+                    $this->countOf(2),
+                    $this->isInstanceOf(ArrayCollection::class),
+                    $this->isInstanceOf(Counter::class),
+                ],
+                [
+                    $this->countOf(1),
+                        $this->isInstanceOf(ArrayCollection::class),
+                        $this->isInstanceOf(Counter::class),
+                ]
+            );
 
-        $counter = $this->getExecutioner()->execute($campaign, $limiter);
+        $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
         $this->assertEquals(4, $counter->getTotalEvaluated());
         $this->assertEquals(2, $counter->getTotalScheduled());

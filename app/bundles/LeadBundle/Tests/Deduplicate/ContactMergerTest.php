@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -29,6 +30,11 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject|LeadModel
      */
     private $leadModel;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|MergeRecordRepository
+     */
+    private $leadRepo;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|MergeRecordRepository
@@ -51,6 +57,10 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->leadRepo = $this->getMockBuilder(LeadRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->mergeRecordRepo = $this->getMockBuilder(MergeRecordRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -62,6 +72,8 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $this->logger = $this->getMockBuilder(Logger::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->leadModel->method('getRepository')->willReturn($this->leadRepo);
     }
 
     public function testMergeTimestamps()
@@ -81,6 +93,22 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($latestDateTime, $winner->getLastActive());
         $this->assertEquals($oldestDateTime, $winner->getDateIdentified());
+
+        // Test with null date identified loser
+        $winner->setDateIdentified($latestDateTime);
+        $loser->setDateIdentified(null);
+
+        $this->getMerger()->mergeTimestamps($winner, $loser);
+
+        $this->assertEquals($latestDateTime, $winner->getDateIdentified());
+
+        // Test with null date identified winner
+        $winner->setDateIdentified(null);
+        $loser->setDateIdentified($latestDateTime);
+
+        $this->getMerger()->mergeTimestamps($winner, $loser);
+
+        $this->assertEquals($latestDateTime, $winner->getDateIdentified());
     }
 
     public function testMergeIpAddresses()
@@ -140,11 +168,11 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             ->with('email')
             ->willReturn('winner@test.com');
 
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(3))
             ->method('getId')
             ->willReturn(1);
 
-        $loser->expects($this->once())
+        $loser->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(2);
 
@@ -199,11 +227,11 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             ->method('getDateModified')
             ->willReturn($loserDateModified);
 
-        $winner->expects($this->exactly(3))
+        $winner->expects($this->exactly(4))
             ->method('getId')
             ->willReturn(1);
 
-        $loser->expects($this->never())
+        $loser->expects($this->once())
             ->method('getId');
 
         // Winner values are newest so should be kept
@@ -259,11 +287,11 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             ->method('getDateAdded')
             ->willReturn($loserDateModified);
 
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(3))
             ->method('getId')
             ->willReturn(1);
 
-        $loser->expects($this->once())
+        $loser->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(2);
 
@@ -321,11 +349,11 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             ->method('getDateModified')
             ->willReturn($loserDateModified);
 
-        $winner->expects($this->exactly(3))
+        $winner->expects($this->exactly(4))
             ->method('getId')
             ->willReturn(1);
 
-        $loser->expects($this->never())
+        $loser->expects($this->once())
             ->method('getId');
 
         // Winner values are newest so should be kept

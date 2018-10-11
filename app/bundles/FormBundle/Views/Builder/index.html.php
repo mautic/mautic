@@ -233,7 +233,7 @@ endif;
 
 $view['slots']->append(
     'modal',
-    $this->render(
+    $view->render(
         'MauticCoreBundle:Helper:modal.html.php',
         [
             'id'            => 'formComponentModal',

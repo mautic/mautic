@@ -114,7 +114,7 @@ if ($tmpl == 'index') {
                                 ['objectAction' => 'edit', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php if (isset($fields['core']['companyname'])) : ?>
-                                    <?php echo $fields['core']['companyname']['value']; ?>
+                                    <?php echo $view->escape($fields['core']['companyname']['value']); ?>
                                 <?php endif; ?>
                             </a>
                         </div>
@@ -123,7 +123,7 @@ if ($tmpl == 'index') {
                         <?php if (isset($fields['core']['companyemail'])): ?>
                         <div class="text-muted mt-4">
                             <small>
-                                <?php echo $fields['core']['companyemail']['value']; ?>
+                                <?php echo $view->escape($fields['core']['companyemail']['value']); ?>
                             </small>
                         </div>
                         <?php endif; ?>
@@ -131,7 +131,7 @@ if ($tmpl == 'index') {
 
                     <td class="visible-md visible-lg">
                         <?php if (isset($fields['core']['companywebsite'])) :?>
-                        <?php echo $fields['core']['companywebsite']['value']; ?>
+                        <?php echo \Mautic\CoreBundle\Helper\InputHelper::url($fields['core']['companywebsite']['value']); ?>
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg">
@@ -142,7 +142,7 @@ if ($tmpl == 'index') {
                             'mautic_contact_index',
                             [
                                 'search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company').':"'
-                                    .$fields['core']['companyname']['value'].'"',
+                                    .$view->escape($fields['core']['companyname']['value']).'"',
                             ]
                         ); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? 'disabled=disabled' : ''; ?>>
                             <?php echo $view['translator']->transChoice(
