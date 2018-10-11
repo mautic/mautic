@@ -115,7 +115,7 @@ class DynamicContentSubscriber extends CommonSubscriber
         LeadModel $leadModel,
         DynamicContentHelper $dynamicContentHelper,
         DynamicContentModel $dynamicContentModel,
-        ContactTokenReplacer  $contactTokenReplacer
+        ContactTokenReplacer $contactTokenReplacer
     ) {
         $this->trackableModel       = $trackableModel;
         $this->pageTokenHelper      = $pageTokenHelper;
