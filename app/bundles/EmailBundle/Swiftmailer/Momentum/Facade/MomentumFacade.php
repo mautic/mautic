@@ -76,15 +76,22 @@ final class MomentumFacade implements MomentumFacadeInterface
      *
      * @return mixed
      *
-     * @throws \Exception
+     * @throws \Swift_TransportException
      */
     public function send(\Swift_Mime_Message $message)
     {
         try {
             $this->swiftMessageValidator->validate($message);
             $transmission = $this->swiftMessageService->transformToTransmission($message);
-            $response     = $this->adapter->createTransmission($transmission);
-            $response     = $response->wait();
+            $attempt      = 0;
+            do {
+                if (0 !== $attempt) {
+                    sleep(5);
+                }
+                $attempt += 1;
+                $response = $this->adapter->createTransmission($transmission);
+                $response = $response->wait();
+            } while (500 === (int) $response->getStatusCode() && 3 > $attempt);
 
             if (200 === (int) $response->getStatusCode()) {
                 $results = $response->getBody();
@@ -95,8 +102,6 @@ final class MomentumFacade implements MomentumFacadeInterface
                 return $sendCount;
             }
 
-            $message = $this->getErrors($response->getBody());
-
             $this->logger->addError(
                 'Momentum send: '.$response->getStatusCode(),
                 [
@@ -104,7 +109,7 @@ final class MomentumFacade implements MomentumFacadeInterface
                 ]
             );
 
-            throw new MomentumSendException($message);
+            throw new MomentumSendException($this->getErrors($response->getBody()));
         } catch (\Exception $exception) {
             $this->logger->addError(
                 'Momentum send exception',
@@ -112,7 +117,7 @@ final class MomentumFacade implements MomentumFacadeInterface
                     'message' => $exception->getMessage(),
                 ]);
 
-            throw $exception;
+            throw new MomentumSendException($exception->getMessage());
         }
     }
 
