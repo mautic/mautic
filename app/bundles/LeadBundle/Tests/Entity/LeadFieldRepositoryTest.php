@@ -65,22 +65,4 @@ class LeadFieldRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->method('getConnection')
             ->willReturn($this->mockConnection);
     }
-
-    public function testGetPropertyByFieldForLead()
-    {
-        $leadFieldRepo    = $this->em->getRepository('MauticLeadBundle:LeadField');
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->expects($this->any())->method('join')->willReturn('');
-        $this->assertEquals('l.email', $this->repo->getPropertyByField('email', $queryBuilderMock));
-    }
-
-    public function testGetPropertyByFieldForCompany()
-    {
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->expects($this->any())->method('join')->willReturn('');
-        $this->assertEquals(
-            'company.companyemail',
-            $this->repo->getPropertyByField('company.companyemail', $queryBuilderMock)
-        );
-    }
 }

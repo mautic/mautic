@@ -91,24 +91,6 @@ class FieldModelTest extends MauticMysqlTestCase
         $this->assertCount(0, $this->getColumns('companies', $companyField2->getAlias()));
     }
 
-    public function testGetFieldListWithPrefix()
-    {
-        $fieldModel = $this->container->get('mautic.lead.model.field');
-        $fieldsList = $fieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company'], true);
-        $fieldsList = reset($fieldsList);
-        $fieldAlias = reset(array_keys($fieldsList));
-        $this->assertNotFalse(strpos($fieldAlias, 'company.'));
-    }
-
-    public function testGetFieldListWithoutPrefix()
-    {
-        $fieldModel = $this->container->get('mautic.lead.model.field');
-        $fieldsList = $fieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
-        $fieldsList = reset($fieldsList);
-        $fieldAlias = reset(array_keys($fieldsList));
-        $this->assertFalse(strpos($fieldAlias, 'company.'));
-    }
-
     /**
      * @param $table
      * @param $column
