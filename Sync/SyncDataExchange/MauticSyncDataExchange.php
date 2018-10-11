@@ -264,12 +264,16 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     {
         foreach ($objectChanges as $changedObjectDAO) {
             try {
-                $object   = $this->getFieldObjectName($changedObjectDAO->getObject());
-                $objectId = $changedObjectDAO->getObjectId();
+                $object   = $this->getFieldObjectName($changedObjectDAO->getMappedObject());
+                $objectId = $changedObjectDAO->getMappedObjectId();
 
                 $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object, $changedObjectDAO->getIntegration());
             } catch (ObjectNotSupportedException $exception) {
-                // Process the others
+                DebugLogger::log(
+                    self::NAME,
+                    $exception->getMessage(),
+                    __CLASS__.':'.__FUNCTION__
+                );
             }
         }
     }
