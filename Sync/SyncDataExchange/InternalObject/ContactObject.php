@@ -92,7 +92,7 @@ class ContactObject implements ObjectInterface
 
             $pseudoFields = [];
             foreach ($fields as $field) {
-                if (isset($availableFields[$field->getName()])) {
+                if (in_array($field->getName(), $availableFields)) {
                     $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
                 } else {
                     $pseudoFields[$field->getName()] = $field;
@@ -161,7 +161,7 @@ class ContactObject implements ObjectInterface
 
             $pseudoFields = [];
             foreach ($fields as $field) {
-                if (isset($availableFields[$field->getName()])) {
+                if (in_array($field->getName(), $availableFields)) {
                     $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
                 } else {
                     $pseudoFields[$field->getName()] = $field;
