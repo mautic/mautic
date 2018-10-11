@@ -366,7 +366,7 @@ class ContactObject implements ObjectInterface
     private function getDoNotContactReason($value)
     {
         if (in_array((int) $value, [DoNotContact::BOUNCED, DoNotContact::UNSUBSCRIBED, DoNotContact::MANUAL, DoNotContact::IS_CONTACTABLE])) {
-            return $value;
+            return (int) $value;
         }
 
         // Assume manually removed
