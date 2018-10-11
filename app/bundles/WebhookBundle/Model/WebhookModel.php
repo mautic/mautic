@@ -246,9 +246,9 @@ class WebhookModel extends FormModel
 
             $webhook->addQueue($this->queueWebhook($webhook, $event, $payload, $serializationGroups));
 
-            // add the queuelist and save everything if command process
-            if ($this->queueMode == self::COMMAND_PROCESS) {
-                $this->saveEntity($webhook);
+            if (self::COMMAND_PROCESS === $this->queueMode) {
+                // Queue to the database to process later
+                $this->getQueueRepository()->saveEntity($this->queuedPayloads[$webhook->getId()]);
             }
         }
 
