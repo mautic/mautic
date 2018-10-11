@@ -16,9 +16,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Token\TokenReplacer;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class ContactTokenReplacer.
- */
 class ContactTokenReplacer extends TokenReplacer
 {
     private $tokenList = [];
@@ -43,18 +40,18 @@ class ContactTokenReplacer extends TokenReplacer
 
     /**
      * @param string          $content
-     * @param array|Lead|null $contact
+     * @param array|Lead|null $options
      *
      * @return array
      */
-    public function getTokens($content, $contact = null)
+    public function getTokens($content, $options = null)
     {
         foreach ($this->searchTokens($content, $this->regex) as $token => $tokenAttribute) {
             if (isset($this->tokenList[$token])) {
                 continue;
             }
             $this->tokenList[$token] = $this->getContactTokenValue(
-                $contact instanceof Lead ? $contact->getProfileFields() : $contact,
+                $options,
                 $tokenAttribute->getAlias(),
                 $tokenAttribute->getModifier()
             );

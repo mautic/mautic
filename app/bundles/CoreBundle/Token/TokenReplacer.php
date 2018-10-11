@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,20 +11,17 @@
 
 namespace Mautic\CoreBundle\Token;
 
-/**
- * abstract TokenReplacer.
- */
 abstract class TokenReplacer implements TokenReplacerInterface
 {
     /**
      * @param string          $content
-     * @param array|Lead|null $contact
+     * @param array|Lead|null $options
      *
      * @return string
      */
-    public function replaceTokens($content, $contact)
+    public function replaceTokens($content, $options)
     {
-        $tokenList = $this->getTokens($content, $contact);
+        $tokenList = $this->getTokens($content, $options);
 
         return str_replace(array_keys($tokenList), $tokenList, $content);
     }

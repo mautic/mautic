@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,18 +11,11 @@
 
 namespace Mautic\CoreBundle\Token;
 
-/**
- * CLass Match.
- */
 class TokenAttribute
 {
+    /** @var string */
     private $attribute;
 
-    /**
-     * Token constructor.
-     *
-     * @param $attribute
-     */
     public function __construct($attribute)
     {
         $this->attribute = $attribute;

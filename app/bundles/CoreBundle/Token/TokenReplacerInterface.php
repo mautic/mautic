@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,32 +11,27 @@
 
 namespace Mautic\CoreBundle\Token;
 
-use Mautic\LeadBundle\Entity\Lead;
-
-/**
- * Interface ReplacerInterface.
- */
 interface TokenReplacerInterface
 {
     /**
      * Return content replaced tokens.
      *
-     * @param string          $content
-     * @param Lead|array|null $contact
+     * @param string     $content
+     * @param array|null $options
      *
      * @return string
      */
-    public function replaceTokens($content, $contact);
+    public function replaceTokens($content, $options);
 
     /**
      * Return tokens array with replaced data.
      *
-     * @param string          $content
-     * @param Lead|array|null $contact
+     * @param string     $content
+     * @param array|null $options
      *
      * @return string
      */
-    public function getTokens($content, $contact);
+    public function getTokens($content, $options);
 
     /**
      * Return tokens array with raw not-replaced data     *.
