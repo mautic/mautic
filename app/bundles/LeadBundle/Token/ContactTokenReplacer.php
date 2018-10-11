@@ -45,9 +45,6 @@ class ContactTokenReplacer extends TokenReplacer
     public function getTokens($content, $options = null)
     {
         foreach ($this->searchTokens($content, $this->regex) as $token => $tokenAttribute) {
-            if (isset($this->tokenList[$token])) {
-                continue;
-            }
             $this->tokenList[$token] = $this->getContactTokenValue(
                 $options,
                 $tokenAttribute->getAlias(),
