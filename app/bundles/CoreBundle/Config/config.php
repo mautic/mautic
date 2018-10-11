@@ -916,6 +916,10 @@ return [
     ],
 
     'ip_lookup_services' => [
+        'extreme-ip' => [
+            'display_name' => 'Extreme-IP',
+            'class'        => 'Mautic\CoreBundle\IpLookup\ExtremeIpLookup',
+        ],
         'freegeoip' => [
             'display_name' => 'Ipstack.com',
             'class'        => 'Mautic\CoreBundle\IpLookup\IpstackLookup',
