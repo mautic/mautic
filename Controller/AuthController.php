@@ -18,13 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AuthController extends CommonController
 {
-    public function authorizeAction(string $integration, Request $request)
+    public function callbackAction(string $integration, Request $request)
     {
-        // Check ACL
-        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
-        }
-
         // Find the integration
         $authIntegrationsHelper = $this->get('mautic.integrations.helper.auth_integrations');
         try {

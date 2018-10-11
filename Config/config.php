@@ -28,6 +28,12 @@ return [
                 'controller' => 'IntegrationsBundle:UpdateField:update',
             ],
         ],
+        'public' => [
+            'mautic_integration_public_callback' => [
+                'path'       => '/integration/{integration}/callback',
+                'controller' => 'IntegrationsBundle:Auth:callback',
+            ],
+        ],
         'api' => [
         ],
     ],
