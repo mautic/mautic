@@ -1,6 +1,6 @@
 /* PluginBundle */
 Mautic.matchedFields = function (index, object, integration) {
-    var compoundMauticFields = ['mauticContactTimelineLink'];
+    var compoundMauticFields = ['mauticContactId','mauticContactTimelineLink'];
 
     if (mQuery('#integration_details_featureSettings_updateDncByDate_0').is(':checked')) {
         compoundMauticFields.push('mauticContactIsContactableByEmail');

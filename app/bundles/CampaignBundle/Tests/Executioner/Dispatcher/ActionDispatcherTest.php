@@ -143,8 +143,16 @@ class ActionDispatcherTest extends \PHPUnit_Framework_TestCase
             ->with(CampaignEvents::ON_EVENT_FAILED, $this->isInstanceOf(FailedEvent::class));
 
         $this->scheduler->expects($this->once())
-            ->method('rescheduleFailure')
-            ->with($logs->get(2));
+            ->method('rescheduleFailures')
+            ->willReturnCallback(
+                function (ArrayCollection $logs) use ($log2) {
+                    if ($logs->count() > 1) {
+                        $this->fail('Only one log was supposed to fail');
+                    }
+
+                    $this->assertEquals($log2, $logs->first());
+                }
+            );
 
         $this->notificationHelper->expects($this->once())
             ->method('notifyOfFailure')

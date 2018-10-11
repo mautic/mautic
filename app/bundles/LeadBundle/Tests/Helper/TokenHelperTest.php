@@ -15,6 +15,18 @@ use Mautic\LeadBundle\Helper\TokenHelper;
 
 class TokenHelperTest extends \PHPUnit_Framework_TestCase
 {
+    private $lead = [
+        'firstname' => 'Bob',
+        'lastname'  => 'Smith',
+        'country'   => '',
+        'date'      => '2000-05-05 12:45:50',
+        'companies' => [
+            [
+                'companyzip' => '77008',
+            ],
+        ],
+    ];
+
     public function testContactTokensAreReplaced()
     {
         $lead = [
@@ -153,5 +165,36 @@ class TokenHelperTest extends \PHPUnit_Framework_TestCase
             '',
             TokenHelper::getValueFromTokens($tokens, $token)
         );
+    }
+
+    public function testDateTimeFormatValue()
+    {
+        $token     = '{contactfield=date|datetime}';
+        $tokenList = TokenHelper::findLeadTokens($token, $this->lead);
+        $this->assertNotSame($this->lead['date'], $tokenList[$token]);
+    }
+
+    public function testDateFormatValue()
+    {
+        $token     = '{contactfield=date|date}';
+        $tokenList = TokenHelper::findLeadTokens($token, $this->lead);
+        $this->assertNotSame($this->lead['date'], $tokenList[$token]);
+    }
+
+    public function testTimeFormatValue()
+    {
+        $token     = '{contactfield=date|time}';
+        $tokenList = TokenHelper::findLeadTokens($token, $this->lead);
+        $this->assertNotSame($this->lead['date'], $tokenList[$token]);
+    }
+
+    public function testDateFormatForEmptyValue()
+    {
+        $lead         = $this->lead;
+        $lead['date'] = '';
+
+        $token     = '{contactfield=date|time}';
+        $tokenList = TokenHelper::findLeadTokens($token, $lead);
+        $this->assertEmpty($tokenList[$token]);
     }
 }

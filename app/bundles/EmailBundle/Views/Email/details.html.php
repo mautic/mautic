@@ -269,10 +269,14 @@ if (!$isEmbedded) {
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0" id="clicks-container">
-                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', ['trackables' => $trackables]); ?>
+                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', [
+                    'trackables'  => $trackables,
+                    'entity'      => $email,
+                    'channel'     => 'email',
+                ]); ?>
             </div>
 
-            <div class="tab-pane bdr-w-0" id="contacts-container">
+            <div class="tab-pane bdr-w-0 page-list" id="contacts-container">
                 <?php echo $contacts; ?>
             </div>
 

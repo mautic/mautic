@@ -603,11 +603,11 @@ class PageModel extends FormModel
             $lead->setTimezone($this->dateTimeHelper->guessTimezoneFromOffset($timezone));
         }
 
-        // Set info from request
-        $query = InputHelper::cleanArray($query);
+        $query = $this->cleanQuery($query);
 
         $hit->setQuery($query);
         $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
+
         if (isset($query['page_referrer'])) {
             $hit->setReferer($query['page_referrer']);
         }
@@ -662,8 +662,13 @@ class PageModel extends FormModel
 
                     // If this is a trackable, up the trackable counts as well
                     if (!empty($clickthrough['channel'])) {
-                        $channelId = reset($clickthrough['channel']);
-                        $channel   = key($clickthrough['channel']);
+                        if (count($clickthrough['channel']) === 1) {
+                            $channelId = reset($clickthrough['channel']);
+                            $channel   = key($clickthrough['channel']);
+                        } else {
+                            $channel   = $clickthrough['channel'][0];
+                            $channelId = (int) $clickthrough['channel'][1];
+                        }
 
                         $this->pageTrackableModel->getRepository()->upHitCount($page->getId(), $channel, $channelId, 1, $isUnique);
                     }
@@ -815,7 +820,6 @@ class PageModel extends FormModel
                         $query   = $this->decodeArrayFromUrl($query['d'], false);
                         $decoded = true;
                     }
-
                     if (is_array($query) && !empty($query)) {
                         if (isset($query['page_url'])) {
                             $pageURL = $query['page_url'];
@@ -1171,25 +1175,23 @@ class PageModel extends FormModel
     private function setLeadManipulator($page, Hit $hit, Lead $lead)
     {
         // Only save the lead and dispatch events if needed
-        if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
-            $source   = 'hit';
-            $sourceId = $hit->getId();
-            if ($page) {
-                $source   = $page instanceof Page ? 'page' : 'redirect';
-                $sourceId = $page->getId();
-            }
-
-            $lead->setManipulator(
-                new LeadManipulator(
-                    'page',
-                    $source,
-                    $sourceId,
-                    $hit->getUrl()
-                )
-            );
-
-            $this->leadModel->saveEntity($lead);
+        $source   = 'hit';
+        $sourceId = $hit->getId();
+        if ($page) {
+            $source   = $page instanceof Page ? 'page' : 'redirect';
+            $sourceId = $page->getId();
         }
+
+        $lead->setManipulator(
+            new LeadManipulator(
+                'page',
+                $source,
+                $sourceId,
+                $hit->getUrl()
+            )
+        );
+
+        $this->leadModel->saveEntity($lead);
     }
 
     /**
@@ -1199,5 +1201,25 @@ class PageModel extends FormModel
      */
     public function setTrackByFingerprint($trackByFingerprint)
     {
+    }
+
+    /**
+     * Cleans query params saving url values.
+     *
+     * @param $query array
+     *
+     * @return array
+     */
+    private function cleanQuery($query)
+    {
+        foreach ($query as $key => $value) {
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                $query[$key] = InputHelper::url($value);
+            } else {
+                $query[$key] = InputHelper::clean($value);
+            }
+        }
+
+        return $query;
     }
 }

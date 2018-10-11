@@ -145,7 +145,7 @@ class NotificationRepository extends CommonRepository
         }
 
         $qb->where($expr)
-            ->orderBy('n.id');
+            ->orderBy('n.dateAdded', 'DESC');
 
         if ($limit) {
             $qb->setMaxResults($limit);
