@@ -435,7 +435,9 @@ class BuilderSubscriber extends CommonSubscriber
                 break;
             }
             $content         = $dom->saveHTML();
-            $content         = str_replace('<startform></startform>', $params['startform'], $content);
+            if (isset($params['startform'])) {
+                $content         = str_replace('<startform></startform>', $params['startform'], $content);
+            }
         }
         $clickThrough = ['source' => ['page', $page->getId()]];
         $tokens       = $this->tokenHelper->findPageTokens($content, $clickThrough);
