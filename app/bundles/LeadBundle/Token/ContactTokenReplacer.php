@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -29,8 +29,6 @@ class ContactTokenReplacer extends TokenReplacer
     private $coreParametersHelper;
 
     /**
-     * ContactFieldReplacer constructor.
-     *
      * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper)
@@ -61,9 +59,9 @@ class ContactTokenReplacer extends TokenReplacer
     }
 
     /**
-     * @param array $fields
-     * @param       $alias
-     * @param       $modifier
+     * @param array  $fields
+     * @param string $alias
+     * @param string $modifier
      *
      * @return mixed|string
      */
