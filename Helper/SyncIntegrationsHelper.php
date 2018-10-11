@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\SyncInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
@@ -113,10 +114,18 @@ class SyncIntegrationsHelper
         $enabledIntegrations = $this->getEnabledIntegrations();
 
         foreach ($enabledIntegrations as $integration) {
-            $syncIntegration     = $this->getIntegration($integration);
-            $featureSettings     = $syncIntegration->getIntegrationConfiguration()->getFeatureSettings();
+            $syncIntegration          = $this->getIntegration($integration);
+            $integrationConfiguration = $syncIntegration->getIntegrationConfiguration();
 
-            if (!isset($featureSettings['objects'])) {
+            // Sync is enabled
+            $enabledFeatures = $integrationConfiguration->getSupportedFeatures();
+            if (!in_array(ConfigFormFeaturesInterface::FEATURE_SYNC, $enabledFeatures)) {
+                continue;
+            }
+
+            // At least one object is enabled
+            $featureSettings = $integrationConfiguration->getFeatureSettings();
+            if (empty($featureSettings['sync']['objects'])) {
                 continue;
             }
 
@@ -124,7 +133,7 @@ class SyncIntegrationsHelper
             $mappingManual     = $syncIntegration->getMappingManual();
             $mappedObjectNames = $mappingManual->getMappedIntegrationObjectsNames($mauticObject);
             foreach ($mappedObjectNames as $mappedObjectName) {
-                if (in_array($mappedObjectName, $featureSettings['objects'])) {
+                if (in_array($mappedObjectName, $featureSettings['sync']['objects'])) {
                     return true;
                 }
             }
