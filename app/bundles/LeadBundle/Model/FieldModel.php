@@ -740,14 +740,13 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param bool|true  $byGroup
-     * @param bool|true  $alphabetical
-     * @param array      $filters
-     * @param bool|false $addPrefix    - add prefix to label and alias by object
+     * @param bool|true $byGroup
+     * @param bool|true $alphabetical
+     * @param array     $filters
      *
      * @return array
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'], $addPrefix = false)
+    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'])
     {
         $forceFilters = [];
         foreach ($filters as $col => $val) {
@@ -770,13 +769,6 @@ class FieldModel extends FormModel
 
         /** @var LeadField $f * */
         foreach ($fields as $f) {
-            if (!empty($addPrefix)) {
-                // set prefix to label, prevent duplicate for example Company Company E-mail
-                $label = $this->translator->trans('mautic.lead.'.$filters['object']);
-                $f->setLabel($label.' '.str_replace($label.' ', '', $f->getLabel()));
-                $f->setAlias($filters['object'].'.'.$f->getAlias());
-            }
-
             if ($byGroup) {
                 $fieldName                              = $this->translator->trans('mautic.lead.field.group.'.$f->getGroup());
                 $leadFields[$fieldName][$f->getAlias()] = $f->getLabel();

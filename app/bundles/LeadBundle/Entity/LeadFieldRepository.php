@@ -142,9 +142,9 @@ class LeadFieldRepository extends CommonRepository
     {
         $columnAlias = 'l.';
         // Join company tables If we're trying search by company fields
-        if (strpos($field, 'company.') !== false) {
+        if (in_array($field, array_column($this->getFieldAliases('company'), 'alias'))) {
             $this->addCompanyLeftJoin($q);
-            $columnAlias = '';
+            $columnAlias = 'company.';
         } elseif (in_array($field, ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term'])) {
             $q->join('l', MAUTIC_TABLE_PREFIX.'lead_utmtags', 'u', 'l.id = u.lead_id');
             $columnAlias = 'u.';
@@ -285,7 +285,7 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             }
-            if ($utmField) {
+            if (strpos($property, 'u.') === 0) {
                 // Match only against the latest UTM properties.
                 $q->orderBy('u.date_added', 'DESC');
                 $q->setMaxResults(1);

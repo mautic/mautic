@@ -43,9 +43,12 @@ class LeadFieldsType extends AbstractType
         $model = $this->fieldModel;
         $resolver->setDefaults([
             'choices' => function (Options $options) use ($model) {
-                $fieldList = array_merge_recursive($model->getFieldList(), $model->getFieldList(true, true, ['isPublished' => true, 'object' => 'company'], true));
+                $fieldList = $model->getFieldList();
                 if ($options['with_tags']) {
                     $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
+                }
+                if ($options['with_company_fields']) {
+                    $fieldList['Company'] = $model->getFieldList(false, true, ['isPublished' => true, 'object' => 'company']);
                 }
                 if ($options['with_utm']) {
                     $fieldList['UTM']['utm_campaign'] = 'mautic.lead.field.utmcampaign';
@@ -57,10 +60,11 @@ class LeadFieldsType extends AbstractType
 
                 return $fieldList;
             },
-            'global_only' => false,
-            'required'    => false,
-            'with_tags'   => false,
-            'with_utm'    => false,
+            'global_only'           => false,
+            'required'              => false,
+            'with_company_fields'   => false,
+            'with_tags'             => false,
+            'with_utm'              => false,
         ]);
     }
 
