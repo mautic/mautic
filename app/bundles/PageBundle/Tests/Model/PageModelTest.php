@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Tests\Model;
 
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Tests\PageTestAbstract;
+use ReflectionClass;
 
 class PageModelTest extends PageTestAbstract
 {
@@ -23,5 +24,25 @@ class PageModelTest extends PageTestAbstract
         $pageModel = $this->getPageModel();
         $url       = $pageModel->generateUrl($page);
         $this->assertContains('/this-is-a-test', $url);
+    }
+
+    public function testCleanQuery_WhenCalled_ReturnsSafeAndValidData()
+    {
+        $pageModel           = $this->getPageModel();
+        $pageModelReflection = new ReflectionClass(get_class($pageModel));
+        $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
+        $cleanQueryMethod->setAccessible(true);
+        $res = $cleanQueryMethod->invokeArgs($pageModel, [
+            [
+                'page_title'    => 'Mautic & PHP',
+                'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum',
+                'page_language' => 'en',
+            ],
+        ]);
+        $this->assertEquals($res, [
+            'page_title'    => 'Mautic &#38; PHP',
+            'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum',
+            'page_language' => 'en',
+        ]);
     }
 }
