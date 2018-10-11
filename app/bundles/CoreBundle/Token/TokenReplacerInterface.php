@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 /**
  * Interface ReplacerInterface.
  */
-interface ReplacerInterface
+interface TokenReplacerInterface
 {
     /**
      * Return content replaced tokens.

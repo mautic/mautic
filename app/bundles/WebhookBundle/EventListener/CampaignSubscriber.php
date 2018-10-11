@@ -17,7 +17,7 @@ use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
-use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Mautic\WebhookBundle\WebhookEvents;
 
 /**
@@ -31,13 +31,20 @@ class CampaignSubscriber extends CommonSubscriber
     protected $connector;
 
     /**
+     * @var ContactTokenReplacer
+     */
+    private $contactTokenReplacer;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param Http $connector
+     * @param Http                 $connector
+     * @param ContactTokenReplacer $contactTokenReplacer
      */
-    public function __construct(Http $connector)
+    public function __construct(Http $connector, ContactTokenReplacer $contactTokenReplacer)
     {
-        $this->connector = $connector;
+        $this->connector            = $connector;
+        $this->contactTokenReplacer = $contactTokenReplacer;
     }
 
     /**
@@ -70,12 +77,12 @@ class CampaignSubscriber extends CommonSubscriber
             $data   = array_flip(AbstractFormFieldHelper::parseList($data));
             // replace contacts tokens
             foreach ($data as $key => $value) {
-                $data[$key] = urldecode(TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true));
+                $data[$key] = urldecode($this->contactTokenReplacer->replaceTokens($value, $lead->getProfileFields()));
             }
             $headers = !empty($config['headers']['list']) ? $config['headers']['list'] : '';
             $headers = array_flip(AbstractFormFieldHelper::parseList($headers));
             foreach ($headers as $key => $value) {
-                $headers[$key] = urldecode(TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true));
+                $headers[$key] = urldecode($this->contactTokenReplacer->replaceTokens($value, $lead->getProfileFields()));
             }
             $timeout = $config['timeout'];
 

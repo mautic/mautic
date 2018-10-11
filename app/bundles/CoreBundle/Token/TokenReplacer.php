@@ -12,9 +12,9 @@
 namespace Mautic\CoreBundle\Token;
 
 /**
- * abstract Replacer.
+ * abstract TokenReplacer.
  */
-abstract class Replacer implements ReplacerInterface
+abstract class TokenReplacer implements TokenReplacerInterface
 {
     /**
      * @param string          $content

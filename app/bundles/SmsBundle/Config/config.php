@@ -27,6 +27,7 @@ return [
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
                     'mautic.helper.sms',
+                    'mautic.lead.token.replacer',
                 ],
             ],
             'mautic.sms.channel.subscriber' => [

@@ -16,6 +16,8 @@ use Mautic\FormBundle\Model\FormModel;
 
 /**
  * Class TokenHelper.
+ *
+ * @deprecated 2.14.2 to be removed in 3.0
  */
 class TokenHelper
 {

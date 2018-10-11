@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Model\FormModel;
-use Mautic\LeadBundle\Helper\TokenHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -459,10 +458,7 @@ class PublicController extends CommonFormController
             if ($lead = $submissionEvent->getLead()) {
                 $this->tokens = array_merge(
                     $submissionEvent->getTokens(),
-                    TokenHelper::findLeadTokens(
-                        $string,
-                        $lead->getProfileFields()
-                    )
+                    $this->get('mautic.lead.token.replacer')->findTokens($string, $lead->getProfileFields())
                 );
             }
         }

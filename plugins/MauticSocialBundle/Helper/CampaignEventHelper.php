@@ -13,7 +13,7 @@ namespace MauticPlugin\MauticSocialBundle\Helper;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -56,26 +56,34 @@ class CampaignEventHelper
     protected $clickthrough = [];
 
     /**
+     * @var ContactTokenReplacer
+     */
+    private $contactTokenReplacer;
+
+    /**
      * CampaignEventHelper constructor.
      *
-     * @param IntegrationHelper $integrationHelper
-     * @param TrackableModel    $trackableModel
-     * @param PageTokenHelper   $pageTokenHelper
-     * @param AssetTokenHelper  $assetTokenHelper
-     * @param TweetModel        $tweetModel
+     * @param IntegrationHelper    $integrationHelper
+     * @param TrackableModel       $trackableModel
+     * @param PageTokenHelper      $pageTokenHelper
+     * @param AssetTokenHelper     $assetTokenHelper
+     * @param TweetModel           $tweetModel
+     * @param ContactTokenReplacer $contactTokenReplacer
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper,
-        TweetModel $tweetModel
+        TweetModel $tweetModel,
+        ContactTokenReplacer $contactTokenReplacer
     ) {
-        $this->integrationHelper = $integrationHelper;
-        $this->trackableModel    = $trackableModel;
-        $this->pageTokenHelper   = $pageTokenHelper;
-        $this->assetTokenHelper  = $assetTokenHelper;
-        $this->tweetModel        = $tweetModel;
+        $this->integrationHelper    = $integrationHelper;
+        $this->trackableModel       = $trackableModel;
+        $this->pageTokenHelper      = $pageTokenHelper;
+        $this->assetTokenHelper     = $assetTokenHelper;
+        $this->tweetModel           = $tweetModel;
+        $this->contactTokenReplacer = $contactTokenReplacer;
     }
 
     /**
@@ -151,7 +159,7 @@ class CampaignEventHelper
 
         $tokens = array_merge(
             $tokens,
-            TokenHelper::findLeadTokens($text, $lead),
+            $this->contactTokenReplacer->findTokens($text, $lead),
             $this->pageTokenHelper->findPageTokens($text, $this->clickthrough),
             $this->assetTokenHelper->findAssetTokens($text, $this->clickthrough)
         );

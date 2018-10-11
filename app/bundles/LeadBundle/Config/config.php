@@ -779,7 +779,7 @@ return [
                 ],
             ],
             'mautic.lead.token.replacer' => [
-                'class'     => \Mautic\LeadBundle\Token\TokenReplacer::class,
+                'class'     => \Mautic\LeadBundle\Token\ContactTokenReplacer::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],

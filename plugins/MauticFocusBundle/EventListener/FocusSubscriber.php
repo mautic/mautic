@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -77,16 +77,22 @@ class FocusSubscriber extends CommonSubscriber
     protected $focusModel;
 
     /**
+     * @var ContactTokenReplacer
+     */
+    private $contactTokenReplacer;
+
+    /**
      * FocusSubscriber constructor.
      *
-     * @param RouterInterface  $router
-     * @param IpLookupHelper   $ipLookupHelper
-     * @param AuditLogModel    $auditLogModel
-     * @param TrackableModel   $trackableModel
-     * @param PageTokenHelper  $pageTokenHelper
-     * @param AssetTokenHelper $assetTokenHelper
-     * @param FormTokenHelper  $formTokenHelper
-     * @param FocusModel       $focusModel
+     * @param RouterInterface      $router
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param AuditLogModel        $auditLogModel
+     * @param TrackableModel       $trackableModel
+     * @param PageTokenHelper      $pageTokenHelper
+     * @param AssetTokenHelper     $assetTokenHelper
+     * @param FormTokenHelper      $formTokenHelper
+     * @param FocusModel           $focusModel
+     * @param ContactTokenReplacer $contactTokenReplacer
      */
     public function __construct(
         RouterInterface $router,
@@ -96,16 +102,18 @@ class FocusSubscriber extends CommonSubscriber
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper,
         FormTokenHelper $formTokenHelper,
-        FocusModel $focusModel
+        FocusModel $focusModel,
+        ContactTokenReplacer $contactTokenReplacer
     ) {
-        $this->router           = $router;
-        $this->ipHelper         = $ipLookupHelper;
-        $this->auditLogModel    = $auditLogModel;
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
-        $this->formTokenHelper  = $formTokenHelper;
-        $this->focusModel       = $focusModel;
+        $this->router               = $router;
+        $this->ipHelper             = $ipLookupHelper;
+        $this->auditLogModel        = $auditLogModel;
+        $this->trackableModel       = $trackableModel;
+        $this->pageTokenHelper      = $pageTokenHelper;
+        $this->assetTokenHelper     = $assetTokenHelper;
+        $this->formTokenHelper      = $formTokenHelper;
+        $this->focusModel           = $focusModel;
+        $this->contactTokenReplacer = $contactTokenReplacer;
     }
 
     /**
@@ -202,7 +210,7 @@ class FocusSubscriber extends CommonSubscriber
             );
 
             if ($lead && $lead->getId()) {
-                $tokens = array_merge($tokens, TokenHelper::findLeadTokens($content, $lead->getProfileFields()));
+                $tokens = array_merge($tokens, $this->contactTokenReplacer->findTokens($content, $lead->getProfileFields()));
             }
 
             list($content, $trackables) = $this->trackableModel->parseContentForTrackables(

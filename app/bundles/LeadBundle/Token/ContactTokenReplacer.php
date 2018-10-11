@@ -13,13 +13,13 @@ namespace Mautic\LeadBundle\Token;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Token\Replacer;
+use Mautic\CoreBundle\Token\TokenReplacer;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class TokenReplacer.
+ * Class ContactTokenReplacer.
  */
-class TokenReplacer extends Replacer
+class ContactTokenReplacer extends TokenReplacer
 {
     private $tokenList = [];
 

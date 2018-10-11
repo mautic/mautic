@@ -88,6 +88,7 @@ return [
                 'class'     => \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.http.connector',
+                    'mautic.lead.token.replacer',
                 ],
             ],
         ],

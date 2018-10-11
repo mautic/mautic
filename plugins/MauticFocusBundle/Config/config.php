@@ -83,6 +83,7 @@ return [
                     'mautic.asset.helper.token',
                     'mautic.form.helper.token',
                     'mautic.focus.model.focus',
+                    'mautic.lead.token.replacer',
                 ],
             ],
             'mautic.focus.stats.subscriber' => [

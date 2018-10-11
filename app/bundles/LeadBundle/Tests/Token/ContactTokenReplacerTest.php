@@ -12,7 +12,7 @@
 namespace Mautic\LeadBundle\Tests\Token;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\LeadBundle\Token\TokenReplacer;
+use Mautic\LeadBundle\Token\ContactTokenReplacer;
 
 class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,7 +38,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
-        $this->tokenReplacer      = new TokenReplacer($coreParametersHelperMock);
+        $this->tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
         parent::setUp();
     }
 
@@ -95,7 +95,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
             ->with('date_format_timeonly')
             ->willReturn('g:i a');
 
-        $tokenReplacer      = new TokenReplacer($coreParametersHelperMock);
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
         $token              = '{contactfield=date|datetime}';
         $tokenList          = $tokenReplacer->findTokens($token, $this->lead);
         $this->assertNotEmpty($tokenList[$token]);
@@ -116,7 +116,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
             ->with('date_format_timeonly')
             ->willReturn('g:i a');
 
-        $tokenReplacer      = new TokenReplacer($coreParametersHelperMock);
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
         $token              = '{contactfield=date|time}';
         $tokenList          = $tokenReplacer->findTokens($token, $this->lead);
         $this->assertNotEmpty($tokenList[$token]);
@@ -137,7 +137,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
             ->with('date_format_timeonly')
             ->willReturn('g:i a');
 
-        $tokenReplacer      = new TokenReplacer($coreParametersHelperMock);
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
         $token              = '{contactfield=date|time}';
         $tokenList          = $tokenReplacer->findTokens($token, $this->lead);
         $this->assertNotEmpty($tokenList[$token]);

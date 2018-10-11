@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Mautic\NotificationBundle\Event\NotificationEvent;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Entity\Trackable;
@@ -49,19 +49,26 @@ class NotificationSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
+     * @var ContactTokenReplacer
+     */
+    private $contactTokenReplacer;
+
+    /**
      * NotificationSubscriber constructor.
      *
-     * @param AuditLogModel    $auditLogModel
-     * @param TrackableModel   $trackableModel
-     * @param PageTokenHelper  $pageTokenHelper
-     * @param AssetTokenHelper $assetTokenHelper
+     * @param AuditLogModel        $auditLogModel
+     * @param TrackableModel       $trackableModel
+     * @param PageTokenHelper      $pageTokenHelper
+     * @param AssetTokenHelper     $assetTokenHelper
+     * @param ContactTokenReplacer $contactTokenReplacer
      */
-    public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
+    public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper, ContactTokenReplacer $contactTokenReplacer)
     {
-        $this->auditLogModel    = $auditLogModel;
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
+        $this->auditLogModel        = $auditLogModel;
+        $this->trackableModel       = $trackableModel;
+        $this->pageTokenHelper      = $pageTokenHelper;
+        $this->assetTokenHelper     = $assetTokenHelper;
+        $this->contactTokenReplacer = $contactTokenReplacer;
     }
 
     /**
@@ -126,7 +133,7 @@ class NotificationSubscriber extends CommonSubscriber
 
         if ($content) {
             $tokens = array_merge(
-                TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
+                $this->contactTokenReplacer->findTokens($content, $lead->getProfileFields()),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
             );

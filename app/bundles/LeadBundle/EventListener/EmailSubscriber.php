@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\LeadBundle\Token\TokenReplacer;
+use Mautic\LeadBundle\Token\ContactTokenReplacer;
 
 /**
  * Class EmailSubscriber.
@@ -24,30 +24,18 @@ use Mautic\LeadBundle\Token\TokenReplacer;
 class EmailSubscriber extends CommonSubscriber
 {
     /**
-     * @deprecated - to be removed in 3.0
-     *
-     * @var string
+     * @var ContactTokenReplacer
      */
-    private static $leadFieldRegex = '{leadfield=(.*?)}';
-
-    /**
-     * @var string
-     */
-    private static $contactFieldRegex = '{contactfield=(.*?)}';
-
-    /**
-     * @var TokenReplacer
-     */
-    private $tokenReplacer;
+    private $contactTokenReplacer;
 
     /**
      * EmailSubscriber constructor.
      *
-     * @param TokenReplacer $tokenReplacer
+     * @param ContactTokenReplacer $contactTokenReplacer
      */
-    public function __construct(TokenReplacer $tokenReplacer)
+    public function __construct(ContactTokenReplacer $contactTokenReplacer)
     {
-        $this->tokenReplacer = $tokenReplacer;
+        $this->contactTokenReplacer = $contactTokenReplacer;
     }
 
     /**
@@ -94,9 +82,7 @@ class EmailSubscriber extends CommonSubscriber
         $content .= $event->getContent();
         $content .= $event->getPlainText();
         $content .= implode(' ', $event->getTextHeaders());
-
-        $lead      = $event->getLead();
-        $tokenList = $this->tokenReplacer->findTokens($content, $lead);
+        $tokenList = $this->contactTokenReplacer->findTokens($content, $event->getLead());
         if (count($tokenList)) {
             $event->addTokens($tokenList);
             unset($tokenList);
