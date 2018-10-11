@@ -120,7 +120,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                         </div>
                         <div class="selected-filters" id="leadlist_filters">
                             <?php if ($filterErrors): ?>
-                                <div class="alert alert-danger">
+                                <div class="alert alert-danger has-error">
                                     <?php echo $view['form']->errors($form['filters']); ?>
                                 </div>
                             <?php endif ?>
