@@ -24,7 +24,7 @@ abstract class TokenReplacer implements TokenReplacerInterface
      */
     public function replaceTokens($content, $contact)
     {
-        $tokenList = $this->findTokens($content, $contact);
+        $tokenList = $this->getTokens($content, $contact);
 
         return str_replace(array_keys($tokenList), $tokenList, $content);
     }

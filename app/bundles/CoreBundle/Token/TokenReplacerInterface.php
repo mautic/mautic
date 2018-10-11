@@ -36,7 +36,7 @@ interface TokenReplacerInterface
      *
      * @return string
      */
-    public function findTokens($content, $contact);
+    public function getTokens($content, $contact);
 
     /**
      * Return tokens array with raw not-replaced data     *.

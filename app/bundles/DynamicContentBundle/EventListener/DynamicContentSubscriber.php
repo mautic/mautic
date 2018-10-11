@@ -192,7 +192,7 @@ class DynamicContentSubscriber extends CommonSubscriber
 
         if ($content) {
             $tokens = array_merge(
-                $this->contactTokenReplacer->findTokens($content, $lead->getProfileFields()),
+                $this->contactTokenReplacer->getTokens($content, $lead->getProfileFields()),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough),
                 $this->formTokenHelper->findFormTokens($content),

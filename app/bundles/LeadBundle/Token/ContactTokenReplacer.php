@@ -47,7 +47,7 @@ class ContactTokenReplacer extends TokenReplacer
      *
      * @return array
      */
-    public function findTokens($content, $contact = null)
+    public function getTokens($content, $contact = null)
     {
         foreach ($this->searchTokens($content, $this->regex) as $token => $tokenAttribute) {
             if (isset($this->tokenList[$token])) {

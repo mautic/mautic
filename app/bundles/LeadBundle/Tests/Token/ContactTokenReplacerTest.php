@@ -33,51 +33,51 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
 
     private $regex = ['/({|%7B)leadfield=(.*?)(}|%7D)/', '/({|%7B)contactfield=(.*?)(}|%7D)/'];
 
-    private $tokenReplacer;
+    private $contactTokenReplacer;
 
     public function setUp()
     {
-        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
-        $this->tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
+        $coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
+        $this->contactTokenReplacer = new ContactTokenReplacer($coreParametersHelperMock);
         parent::setUp();
     }
 
     public function testSearchTokens()
     {
-        $tokens = $this->tokenReplacer->searchTokens($this->content, $this->regex);
+        $tokens = $this->contactTokenReplacer->searchTokens($this->content, $this->regex);
         $this->assertCount(2, $tokens);
     }
 
-    public function testFindTokens()
+    public function testGetTokens()
     {
-        $tokens = $this->tokenReplacer->findTokens($this->content, $this->lead);
+        $tokens = $this->contactTokenReplacer->getTokens($this->content, $this->lead);
         $this->assertCount(2, $tokens);
     }
 
     public function testReplaceTokens()
     {
-        $content = $this->tokenReplacer->replaceTokens($this->content, $this->lead);
+        $content = $this->contactTokenReplacer->replaceTokens($this->content, $this->lead);
         $this->assertEquals('custom content with Bob Bob', $content);
     }
 
     public function testReplaceEmptyValueTokens()
     {
         $content = 'custom content with {contactfield=country}';
-        $content = $this->tokenReplacer->replaceTokens($content, $this->lead);
+        $content = $this->contactTokenReplacer->replaceTokens($content, $this->lead);
         $this->assertEquals('custom content with ', $content);
     }
 
     public function testReplaceDefaultValueTokens()
     {
         $content = 'custom content with {contactfield=country|somethingdefault}';
-        $content = $this->tokenReplacer->replaceTokens($content, $this->lead);
+        $content = $this->contactTokenReplacer->replaceTokens($content, $this->lead);
         $this->assertEquals('custom content with somethingdefault', $content);
     }
 
     public function testReplaceUrlEncodeValueTokens()
     {
         $content = 'custom content with {contactfield=web|true}';
-        $content = $this->tokenReplacer->replaceTokens($content, $this->lead);
+        $content = $this->contactTokenReplacer->replaceTokens($content, $this->lead);
         $this->assertEquals('custom content with https%3A%2F%2Fmautic.org', $content);
     }
 
@@ -97,7 +97,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
 
         $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
         $token              = '{contactfield=date|datetime}';
-        $tokenList          = $tokenReplacer->findTokens($token, $this->lead);
+        $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
         $this->assertNotEmpty($tokenList[$token]);
         $this->assertNotSame($this->lead['date'], $tokenList[$token]);
     }
@@ -118,7 +118,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
 
         $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
         $token              = '{contactfield=date|time}';
-        $tokenList          = $tokenReplacer->findTokens($token, $this->lead);
+        $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
         $this->assertNotEmpty($tokenList[$token]);
         $this->assertNotSame($this->lead['date'], $tokenList[$token]);
     }
@@ -139,7 +139,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
 
         $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
         $token              = '{contactfield=date|time}';
-        $tokenList          = $tokenReplacer->findTokens($token, $this->lead);
+        $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
         $this->assertNotEmpty($tokenList[$token]);
         $this->assertNotSame($this->lead['date'], $tokenList[$token]);
     }

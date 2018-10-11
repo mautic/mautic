@@ -159,7 +159,7 @@ class CampaignEventHelper
 
         $tokens = array_merge(
             $tokens,
-            $this->contactTokenReplacer->findTokens($text, $lead),
+            $this->contactTokenReplacer->getTokens($text, $lead),
             $this->pageTokenHelper->findPageTokens($text, $this->clickthrough),
             $this->assetTokenHelper->findAssetTokens($text, $this->clickthrough)
         );

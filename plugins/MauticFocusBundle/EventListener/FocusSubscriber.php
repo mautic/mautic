@@ -210,7 +210,7 @@ class FocusSubscriber extends CommonSubscriber
             );
 
             if ($lead && $lead->getId()) {
-                $tokens = array_merge($tokens, $this->contactTokenReplacer->findTokens($content, $lead->getProfileFields()));
+                $tokens = array_merge($tokens, $this->contactTokenReplacer->getTokens($content, $lead->getProfileFields()));
             }
 
             list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
