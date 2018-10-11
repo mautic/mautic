@@ -287,53 +287,53 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         $limit = 200;
         $start = $limit * ($requestDAO->getSyncIteration() - 1);
 
-        foreach ($requestedObjects as $objectDAO) {
+        foreach ($requestedObjects as $requestedObjectDAO) {
             try {
                 DebugLogger::log(
                     self::NAME,
                     sprintf(
                         "Searching for %s objects between %s and %s (%d,%d)",
-                        $objectDAO->getObject(),
-                        $objectDAO->getFromDateTime()->format('Y:m:d H:i:s'),
-                        $objectDAO->getToDateTime()->format('Y:m:d H:i:s'),
+                        $requestedObjectDAO->getObject(),
+                        $requestedObjectDAO->getFromDateTime()->format('Y:m:d H:i:s'),
+                        $requestedObjectDAO->getToDateTime()->format('Y:m:d H:i:s'),
                         $start,
                         $limit
                     ),
                     __CLASS__.':'.__FUNCTION__
                 );
 
-                switch ($objectDAO->getObject()) {
+                switch ($requestedObjectDAO->getObject()) {
                     case self::OBJECT_CONTACT:
                         $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates(
-                            $objectDAO->getFromDateTime(),
-                            $objectDAO->getToDateTime(),
+                            $requestedObjectDAO->getFromDateTime(),
+                            $requestedObjectDAO->getToDateTime(),
                             $start,
                             $limit
                         );
                         break;
                     case self::OBJECT_COMPANY:
                         $foundObjects = $this->companyObjectHelper->findObjectsBetweenDates(
-                            $objectDAO->getFromDateTime(),
-                            $objectDAO->getToDateTime(),
+                            $requestedObjectDAO->getFromDateTime(),
+                            $requestedObjectDAO->getToDateTime(),
                             $start,
                             $limit
                         );
                         break;
                     default:
-                        throw new ObjectNotSupportedException(self::NAME, $objectDAO->getObject());
+                        throw new ObjectNotSupportedException(self::NAME, $requestedObjectDAO->getObject());
                 }
 
-                $fields = $objectDAO->getFields();
+                $fields = $requestedObjectDAO->getFields();
                 foreach ($foundObjects as $object) {
                     $modifiedDateTime = new \DateTime(
                         !empty($object['date_modified']) ? $object['date_modified'] : $object['date_added'],
                         new \DateTimeZone('UTC')
                     );
-                    $objectDAO        = new ReportObjectDAO($objectDAO->getObject(), $object['id'], $modifiedDateTime);
-                    $syncReport->addObject($objectDAO);
+                    $reportObjectDAO  = new ReportObjectDAO($requestedObjectDAO->getObject(), $object['id'], $modifiedDateTime);
+                    $syncReport->addObject($reportObjectDAO);
 
                     foreach ($fields as $field) {
-                        $this->generateObjectField($field, $object, $objectDAO, $syncReport->getIntegration());
+                        $this->generateObjectField($field, $object, $requestedObjectDAO, $reportObjectDAO, $syncReport->getIntegration());
                     }
                 }
             } catch (ObjectNotSupportedException $exception) {
@@ -516,20 +516,18 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
     /**
      * @param ReportDAO        $syncReport
-     * @param RequestObjectDAO $objectDAO
+     * @param RequestObjectDAO $requestObjectDAO
      *
      * @throws ObjectNotFoundException
      */
-    private function fillInMissingFields(ReportDAO $syncReport, RequestObjectDAO $objectDAO)
+    private function fillInMissingFields(ReportDAO $syncReport, RequestObjectDAO $requestObjectDAO)
     {
-        $objectName               = $objectDAO->getObject();
-        $fields                   = $objectDAO->getFields();
+        $objectName               = $requestObjectDAO->getObject();
+        $fields                   = $requestObjectDAO->getFields();
         $objectsWithMissingFields = [];
         $syncObjects              = $syncReport->getObjects($objectName);
 
         foreach ($syncObjects as $syncObject) {
-            $syncObject->getObjectId();
-
             $missingFields = [];
             foreach ($fields as $field) {
                 try {
@@ -557,11 +555,11 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
         if (count($mauticObjects)) {
             foreach ($mauticObjects as $mauticObject) {
-                $missingFields = $objectsWithMissingFields[$mauticObject['id']];
-                $syncObject    = $syncReport->getObject($objectName, $mauticObject['id']);
+                $missingFields   = $objectsWithMissingFields[$mauticObject['id']];
+                $reportObjectDAO = $syncReport->getObject($objectName, $mauticObject['id']);
 
                 foreach ($missingFields as $field) {
-                    $this->generateObjectField($field, $mauticObject, $syncObject, $syncReport->getIntegration());
+                    $this->generateObjectField($field, $mauticObject, $requestObjectDAO, $reportObjectDAO, $syncReport->getIntegration());
                 }
             }
         }
@@ -570,11 +568,17 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     /**
      * @param string           $field
      * @param array            $mauticObject
-     * @param RequestObjectDAO $objectDAO
+     * @param RequestObjectDAO $requestObjectDAO
+     * @param ReportObjectDAO  $reportObjectDAO
      * @param string           $integration
      */
-    private function generateObjectField(string $field, array $mauticObject, RequestObjectDAO $objectDAO, string $integration)
-    {
+    private function generateObjectField(
+        string $field,
+        array $mauticObject,
+        RequestObjectDAO $requestObjectDAO,
+        ReportObjectDAO $reportObjectDAO,
+        string $integration
+    ) {
         // Special handling of the ID field
         if ('mautic_internal_id' === $field) {
             $normalizedValue = new NormalizedValueDAO(
@@ -582,7 +586,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 $mauticObject[$field]
             );
 
-            $objectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
+            $reportObjectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
 
             return;
         }
@@ -596,7 +600,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 $this->contactObjectHelper->getDoNotContactStatus((int) $mauticObject['id'], $channel)
             );
 
-            $objectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
+            $reportObjectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
 
             return;
         }
@@ -615,23 +619,23 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 )
             );
 
-            $objectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
+            $reportObjectDAO->addField(new ReportFieldDAO($field, $normalizedValue));
 
             return;
         }
 
         // The rest should be Mautic custom fields and if not, just ignore
-        $mauticFields = $this->getFieldList($objectDAO->getObject());
+        $mauticFields = $this->getFieldList($requestObjectDAO->getObject());
         if (!isset($mauticFields[$field])) {
             // Field must have been deleted or something so let's skip
             return;
         }
 
-        $requiredFields  = $objectDAO->getRequiredFields();
+        $requiredFields  = $requestObjectDAO->getRequiredFields();
         $fieldType       = $this->getNormalizedFieldType($mauticFields[$field]['type']);
         $normalizedValue = $this->valueNormalizer->normalizeForMautic($fieldType, $mauticObject[$field]);
 
-        $objectDAO->addField(
+        $reportObjectDAO->addField(
             new ReportFieldDAO(
                 $field,
                 $normalizedValue,
