@@ -116,7 +116,7 @@ class LeadFieldRepository extends CommonRepository
         return $qb->select('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                 ->where($qb->expr()->eq('object', ':object'))
-                ->setParameter('f.object', $object)
+                ->setParameter('object', $object)
                 ->orderBy('f.field_order', 'ASC')
                 ->execute()->fetchAll();
     }
