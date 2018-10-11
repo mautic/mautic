@@ -136,7 +136,8 @@ class FieldChangeRepository extends CommonRepository
                 )
             )
             ->setParameter('integration', $integration)
-            ->setParameter('objectType', $objectType);
+            ->setParameter('objectType', $objectType)
+            ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
         return $qb->execute()->fetchAll();
     }
@@ -164,32 +165,9 @@ class FieldChangeRepository extends CommonRepository
             )
             ->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
-            ->setParameter('objectId', (int) $objectId);
+            ->setParameter('objectId', (int) $objectId)
+            ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
         return $qb->execute()->fetchAll();
     }
-
-
-//    /**
-//     * @param $objectType
-//     * @param $fromTimestamp
-//     * @param $toTimestamp
-//     */
-//    public function deleteChangesBetween($objectType, $fromTimestamp, $toTimestamp)
-//    {
-//        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-//
-//        $qb
-//            ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
-//            ->where(
-//                $qb->expr()->andX(
-//                    $qb->expr()->eq('object_type', ':objectType'),
-//                    sprintf('modified_at BETWEEN :startDateTime and :endDateTime')
-//                )
-//            )
-//            ->setParameter('objectType', $objectType)
-//            ->setParameter('startDateTime', (new \DateTime($fromTimestamp, new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'))
-//            ->setParameter('endDateTime', (new \DateTime($toTimestamp, new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'))
-//            ->execute();
-//    }
 }
