@@ -17,6 +17,19 @@ namespace Mautic\CoreBundle\Token;
 abstract class Replacer implements ReplacerInterface
 {
     /**
+     * @param string          $content
+     * @param array|Lead|null $contact
+     *
+     * @return string
+     */
+    public function replaceTokens($content, $contact)
+    {
+        $tokenList = $this->findTokens($content, $contact);
+
+        return str_replace(array_keys($tokenList), $tokenList, $content);
+    }
+
+    /**
      * @param $content
      * @param array|string $regex
      *

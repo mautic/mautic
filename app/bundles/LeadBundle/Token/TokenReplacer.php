@@ -45,28 +45,18 @@ class TokenReplacer extends Replacer
      * @param string          $content
      * @param array|Lead|null $contact
      *
-     * @return string
+     * @return array
      */
-    public function replaceTokens($content, $contact)
-    {
-        $tokenList = $this->findTokens($content, $contact);
-
-        return str_replace(array_keys($tokenList), $tokenList, $content);
-    }
-
     public function findTokens($content, $contact = null)
     {
-        /*
-         * @var Match
-         */
-        foreach ($this->searchTokens($content, $this->regex) as $token => $match) {
+        foreach ($this->searchTokens($content, $this->regex) as $token => $tokenAttribute) {
             if (isset($this->tokenList[$token])) {
                 continue;
             }
             $this->tokenList[$token] = $this->getContactTokenValue(
                 $contact instanceof Lead ? $contact->getProfileFields() : $contact,
-                $match->getAlias(),
-                $match->getModifier()
+                $tokenAttribute->getAlias(),
+                $tokenAttribute->getModifier()
             );
         }
 
@@ -80,7 +70,7 @@ class TokenReplacer extends Replacer
      *
      * @return mixed|string
      */
-    public function getContactTokenValue(array $fields, $alias, $modifier)
+    private function getContactTokenValue(array $fields, $alias, $modifier)
     {
         $value = '';
         if (isset($fields[$alias])) {
