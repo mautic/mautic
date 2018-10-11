@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0cd57cd722d98713168ea8428332db47",
+    "content-hash": "10dadf00307b2db829fa7013b0c4ce73",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -807,7 +807,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2017-10-12T17:23:29+00:00"
+            "time": "2017-09-29T14:39:10+00:00"
         },
         {
             "name": "doctrine/doctrine-fixtures-bundle",
@@ -3125,7 +3125,7 @@
                 "geolocation",
                 "maxmind"
             ],
-            "time": "2017-10-27T19:15:33+00:00"
+            "time": "2017-01-19T23:49:38+00:00"
         },
         {
             "name": "maxmind/web-service-common",
@@ -4615,97 +4615,6 @@
                 "uuid"
             ],
             "time": "2018-01-20T00:28:24+00:00"
-        },
-        {
-            "name": "recombee/php-api-client",
-            "version": "v2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/recombee/php-api-client.git",
-                "reference": "1843fec6a70bd941434e99397ce4dae0e6bbbda2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/recombee/php-api-client/zipball/1843fec6a70bd941434e99397ce4dae0e6bbbda2",
-                "reference": "1843fec6a70bd941434e99397ce4dae0e6bbbda2",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0",
-                "rmccue/requests": "^1.7.0"
-            },
-            "require-dev": {
-                "phpdocumentor/phpdocumentor": "2.*",
-                "phpunit/phpunit": "^6.1.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Recombee\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ondřej Fiedler",
-                    "email": "ondrej.fiedler@recombee.com"
-                }
-            ],
-            "description": "PHP client for easy use of the Recombee recommendation API.",
-            "homepage": "https://recombee.com",
-            "time": "2018-09-10T16:31:19+00:00"
-        },
-        {
-            "name": "rmccue/requests",
-            "version": "v1.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/rmccue/Requests.git",
-                "reference": "87932f52ffad70504d93f04f15690cf16a089546"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rmccue/Requests/zipball/87932f52ffad70504d93f04f15690cf16a089546",
-                "reference": "87932f52ffad70504d93f04f15690cf16a089546",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2"
-            },
-            "require-dev": {
-                "requests/test-server": "dev-master"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Requests": "library/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "ISC"
-            ],
-            "authors": [
-                {
-                    "name": "Ryan McCue",
-                    "homepage": "http://ryanmccue.info"
-                }
-            ],
-            "description": "A HTTP library written in PHP, for human beings.",
-            "homepage": "http://github.com/rmccue/Requests",
-            "keywords": [
-                "curl",
-                "fsockopen",
-                "http",
-                "idna",
-                "ipv6",
-                "iri",
-                "sockets"
-            ],
-            "time": "2016-10-13T00:11:37+00:00"
         },
         {
             "name": "robrichards/xmlseclibs",
@@ -7656,7 +7565,7 @@
             ],
             "description": "Symfony SwiftmailerBundle",
             "homepage": "http://symfony.com",
-            "time": "2017-10-19T01:06:41+00:00"
+            "time": "2017-07-22T07:18:13+00:00"
         },
         {
             "name": "symfony/templating",
@@ -8910,7 +8819,7 @@
                 "object",
                 "object graph"
             ],
-            "time": "2017-10-19T19:58:43+00:00"
+            "time": "2017-04-12T18:52:22+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
