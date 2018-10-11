@@ -456,7 +456,7 @@ class ConfigType extends AbstractType
             'choice',
             [
                 'choices' => [
-                    ''          => 'mautic.core.daterange.0days',
+                    'midnight'  => 'mautic.core.daterange.0days',
                     '-24 hours' => 'mautic.core.daterange.1days',
                     '-48 hours' => 'mautic.core.daterange.2days',
                     '-72 hours' => 'mautic.core.daterange.3days',
