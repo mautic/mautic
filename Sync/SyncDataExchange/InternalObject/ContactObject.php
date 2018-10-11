@@ -25,7 +25,6 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
-use MauticPlugin\MauticSaelosBundle\Command\SyncIntegrations;
 
 class ContactObject implements ObjectInterface
 {
