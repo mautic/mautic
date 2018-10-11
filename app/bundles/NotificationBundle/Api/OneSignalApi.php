@@ -171,7 +171,15 @@ class OneSignalApi extends AbstractNotificationApi
                     $data['android_visibility'] = (int) $value;
                     break;
                 case 'additional_data':
-                    $data['data'] = $value['list'];
+                    if (is_array($value['list'])) {
+                        $additionalData = [];
+                        foreach ($value['list'] as $item) {
+                            $additionalData[$item['label']] = $item['value'];
+                        }
+                        $data['data'] = $additionalData;
+                    } else {
+                        $data['data'] = $value['list'];
+                    }
                     break;
             }
         }
