@@ -23,6 +23,7 @@ use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\NullLogger;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
 {
@@ -88,12 +89,76 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
-        $counter = $this->getExecutioner()->execute($campaign, $limiter);
+        $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
     public function testEventsAreExecuted()
+    {
+        $this->repository->expects($this->once())
+            ->method('getScheduledCounts')
+            ->willReturn([1 => 2, 2 => 2]);
+
+        $campaign = $this->getMockBuilder(Campaign::class)
+            ->getMock();
+
+        $event = new Event();
+        $event->setCampaign($campaign);
+
+        $log1 = new LeadEventLog();
+        $log1->setEvent($event);
+        $log1->setCampaign($campaign);
+
+        $log2 = new LeadEventLog();
+        $log2->setEvent($event);
+        $log2->setCampaign($campaign);
+
+        $event2 = new Event();
+        $event2->setCampaign($campaign);
+
+        $log3 = new LeadEventLog();
+        $log3->setEvent($event2);
+        $log3->setCampaign($campaign);
+
+        $log4 = new LeadEventLog();
+        $log4->setEvent($event2);
+        $log4->setCampaign($campaign);
+
+        $this->repository->expects($this->exactly(4))
+            ->method('getScheduled')
+            ->willReturnOnConsecutiveCalls(
+                new ArrayCollection(
+                    [
+                        $log1,
+                        $log2,
+                    ]
+                ),
+                new ArrayCollection(),
+                new ArrayCollection(
+                    [
+                        $log3,
+                        $log4,
+                    ]
+                ),
+                new ArrayCollection()
+            );
+
+        $this->executioner->expects($this->exactly(2))
+            ->method('executeLogs');
+
+        $this->scheduler->expects($this->exactly(4))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
+
+        $limiter = new ContactLimiter(0, 0, 0, 0);
+
+        $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+
+        $this->assertEquals(4, $counter->getTotalEvaluated());
+    }
+
+    public function testEventsAreExecutedInQuietMode()
     {
         $this->repository->expects($this->once())
             ->method('getScheduledCounts')

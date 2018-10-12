@@ -180,7 +180,7 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->exactly(2))
             ->method('getChannel')
             ->willReturn('email');
-        $event->expects($this->exactly(3))
+        $event->expects($this->exactly(4))
             ->method('getChannelId')
             ->willReturn(3);
         $event->method('getEventType')
@@ -215,7 +215,7 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->exactly(2))
             ->method('getChannel')
             ->willReturn('email');
-        $event->expects($this->exactly(2))
+        $event->expects($this->exactly(3))
             ->method('getChannelId')
             ->willReturn(3);
         $event->expects($this->once())
@@ -268,7 +268,7 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->exactly(2))
             ->method('getChannel')
             ->willReturn('email');
-        $event->expects($this->exactly(2))
+        $event->expects($this->exactly(3))
             ->method('getChannelId')
             ->willReturn(3);
         $event->method('getEventType')
@@ -304,7 +304,7 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
 
         $this->executioner->expects($this->once())
-            ->method('executeForContact');
+            ->method('executeEventsForContact');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
 

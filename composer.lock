@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "98fcd2dd14dd5ab388bb936ca21d6b88",
+    "content-hash": "10dadf00307b2db829fa7013b0c4ce73",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -6216,16 +6216,16 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v2.8.34",
+            "version": "v2.8.44",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "686464910bbe58a2b38eb1f898aa45dc6c4de0cb"
+                "reference": "10f660d43087b2198c3789bebbd587d20ec6e956"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/686464910bbe58a2b38eb1f898aa45dc6c4de0cb",
-                "reference": "686464910bbe58a2b38eb1f898aa45dc6c4de0cb",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/10f660d43087b2198c3789bebbd587d20ec6e956",
+                "reference": "10f660d43087b2198c3789bebbd587d20ec6e956",
                 "shasum": ""
             },
             "require": {
@@ -6267,7 +6267,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-29T08:54:45+00:00"
+            "time": "2018-08-01T13:47:49+00:00"
         },
         {
             "name": "symfony/http-kernel",
@@ -7245,16 +7245,16 @@
         },
         {
             "name": "symfony/security",
-            "version": "v2.8.34",
+            "version": "v2.8.45",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security.git",
-                "reference": "8f451ddc1c8c0985e130de1ed96a6dc35ae21097"
+                "reference": "2a1c4c71e944cfa94fc0f41d9a99837021060e1c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security/zipball/8f451ddc1c8c0985e130de1ed96a6dc35ae21097",
-                "reference": "8f451ddc1c8c0985e130de1ed96a6dc35ae21097",
+                "url": "https://api.github.com/repos/symfony/security/zipball/2a1c4c71e944cfa94fc0f41d9a99837021060e1c",
+                "reference": "2a1c4c71e944cfa94fc0f41d9a99837021060e1c",
                 "shasum": ""
             },
             "require": {
@@ -7270,7 +7270,7 @@
                 "symfony/security-acl": "~2.7|~3.0.0"
             },
             "conflict": {
-                "symfony/http-foundation": "~2.8,<2.8.31|~3.4,<3.4-beta5"
+                "symfony/http-foundation": "~2.8,<2.8.31"
             },
             "replace": {
                 "symfony/security-core": "self.version",
@@ -7324,7 +7324,7 @@
             ],
             "description": "Symfony Security Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-18T13:56:23+00:00"
+            "time": "2018-08-11T11:15:56+00:00"
         },
         {
             "name": "symfony/security-acl",
@@ -7389,16 +7389,16 @@
         },
         {
             "name": "symfony/security-bundle",
-            "version": "v2.8.34",
+            "version": "v2.8.45",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-bundle.git",
-                "reference": "8bdecbbab35b971363cb7a5093d0f8f0f08211e1"
+                "reference": "a34e30addf491a71bbf3d616626fbb0968d7dfc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security-bundle/zipball/8bdecbbab35b971363cb7a5093d0f8f0f08211e1",
-                "reference": "8bdecbbab35b971363cb7a5093d0f8f0f08211e1",
+                "url": "https://api.github.com/repos/symfony/security-bundle/zipball/a34e30addf491a71bbf3d616626fbb0968d7dfc3",
+                "reference": "a34e30addf491a71bbf3d616626fbb0968d7dfc3",
                 "shasum": ""
             },
             "require": {
@@ -7406,7 +7406,7 @@
                 "php": ">=5.3.9",
                 "symfony/http-kernel": "~2.7|~3.0.0",
                 "symfony/polyfill-php70": "~1.0",
-                "symfony/security": "^2.8.31|~3.3.13",
+                "symfony/security": "^2.8.45|^3.4.15",
                 "symfony/security-acl": "~2.7|~3.0.0"
             },
             "require-dev": {
@@ -7414,6 +7414,7 @@
                 "symfony/browser-kit": "~2.7|~3.0.0",
                 "symfony/console": "~2.7|~3.0.0",
                 "symfony/css-selector": "^2.7|~3.0.0",
+                "symfony/dependency-injection": "~2.8.41",
                 "symfony/dom-crawler": "^2.7|~3.0.0",
                 "symfony/expression-language": "~2.7|~3.0.0",
                 "symfony/form": "^2.8.18",
@@ -7456,7 +7457,7 @@
             ],
             "description": "Symfony SecurityBundle",
             "homepage": "https://symfony.com",
-            "time": "2018-01-23T20:17:18+00:00"
+            "time": "2018-08-01T18:49:49+00:00"
         },
         {
             "name": "symfony/stopwatch",
@@ -8200,7 +8201,7 @@
                 "oauth",
                 "server"
             ],
-            "time": "2017-05-10 00:39:21"
+            "time": "2017-05-10T00:39:21+00:00"
         }
     ],
     "packages-dev": [

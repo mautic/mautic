@@ -186,7 +186,6 @@ class ContactSegmentQueryBuilder
         $existsQueryBuilder
             ->select($tableAlias.'.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias)
-            ->where($tableAlias.'.lead_id = l.id')
             ->andWhere($queryBuilder->expr()->eq($tableAlias.'.leadlist_id', intval($leadListId)))
             ->andWhere(
                 $queryBuilder->expr()->orX(
@@ -196,7 +195,7 @@ class ContactSegmentQueryBuilder
             );
 
         $queryBuilder->orWhere(
-            $queryBuilder->expr()->exists($existsQueryBuilder->getSQL())
+            $queryBuilder->expr()->in('l.id', $existsQueryBuilder->getSQL())
         );
 
         return $queryBuilder;

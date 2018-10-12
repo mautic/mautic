@@ -14,10 +14,10 @@ if (empty($route)) {
 
 ?>
 <?php if (empty($update)): ?>
-<div id="CampaignEvent_<?php echo $event['id'] ?>" data-type="<?php echo $event['eventType']; ?>" class="draggable list-campaign-event list-campaign-<?php echo $event['eventType']; ?>" data-event="<?php echo $event['type']; ?>">
+<div id="CampaignEvent_<?php echo $event['id'] ?>" data-type="<?php echo $event['eventType']; ?>" class="draggable list-campaign-event list-campaign-<?php echo $event['eventType']; ?>" data-event="<?php echo $event['type']; ?>" data-event-id="<?php echo $event['id']; ?>">
 <?php endif; ?>
     <div class="campaign-event-content">
-        <div><span class="campaign-event-name ellipsis"><?php echo $event['name']; ?></span></div>
+        <div><span class="campaign-event-name ellipsis"><?php if ('dev' === MAUTIC_ENV):?><small><?php echo $event['id']; ?></small> <?php endif; ?><?php echo $event['name']; ?></span></div>
     </div>
 <?php if (empty($update)): ?>
     <div class="campaign-event-buttons hide">

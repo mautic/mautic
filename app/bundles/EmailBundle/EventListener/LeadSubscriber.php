@@ -152,8 +152,14 @@ class LeadSubscriber extends CommonSubscriber
     {
         $eventTypeKey  = 'email.replied';
         $eventTypeName = $this->translator->trans('mautic.email.replied');
-        $event->addSerializerGroup('emailList');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('emailList');
+
+        // Decide if those events are filtered
+        if (!$event->isApplicable($eventTypeKey)) {
+            return;
+        }
+
         $options          = $event->getQueryOptions();
         $replies          = $this->emailReplyRepository->getByLeadIdForTimeline($event->getLeadId(), $options);
         if (!$event->isEngagementCount()) {
