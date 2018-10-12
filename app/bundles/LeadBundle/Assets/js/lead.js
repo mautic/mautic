@@ -934,7 +934,7 @@ Mautic.togglePreferredChannel = function(channel) {
 
        // "select all" checked status
         mQuery('#channels input:checkbox').each(function(){ //iterate all listed checkbox items
-            if (this.checked != status) {
+            if (this.disabled === false && this.checked != status) {
                 this.checked = status;
                 Mautic.setPreferredChannel(this.value);
             }
