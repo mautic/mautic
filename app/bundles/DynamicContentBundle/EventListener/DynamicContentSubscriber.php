@@ -262,7 +262,7 @@ class DynamicContentSubscriber extends CommonSubscriber
             }
 
             $newnode = $dom->createDocumentFragment();
-            $newnode->appendXML('<![CDATA[' . mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8') . ']]>');
+            $newnode->appendXML('<![CDATA['.mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8').']]>');
             $slot->parentNode->replaceChild($newnode, $slot);
         }
 
