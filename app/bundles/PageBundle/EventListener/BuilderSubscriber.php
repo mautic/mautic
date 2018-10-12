@@ -434,9 +434,9 @@ class BuilderSubscriber extends CommonSubscriber
                 $slot->parentNode->insertBefore($newnode, $slot);
                 break;
             }
-            $content         = $dom->saveHTML();
+            $content= $dom->saveHTML();
             if (isset($params['startform'])) {
-                $content         = str_replace('<startform></startform>', $params['startform'], $content);
+                $content = str_replace('<startform></startform>', $params['startform'], $content);
             }
         }
         $clickThrough = ['source' => ['page', $page->getId()]];
