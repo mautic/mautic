@@ -250,7 +250,6 @@ class DynamicContentSubscriber extends CommonSubscriber
 
         $divContent = $xpath->query('//*[@data-slot="dwc"]');
         for ($i = 0; $i < $divContent->length; ++$i) {
-
             $slot = $divContent->item($i);
             if (!$slotName = $slot->getAttribute('data-param-slot-name')) {
                 continue;
@@ -258,7 +257,6 @@ class DynamicContentSubscriber extends CommonSubscriber
 
             if (!$slotContent = $this->dynamicContentHelper->getDynamicContentForLead($slotName, $lead)) {
                 continue;
-
             }
 
             $newnode = $dom->createDocumentFragment();
