@@ -242,7 +242,7 @@ class DynamicContentSubscriber extends CommonSubscriber
                 if ($lead && $this->matchFilterForLead($dwc->getFilters(), $leadArray)) {
                     $slotContent = $lead ? $this->dynamicContentHelper->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
                     $newnode     = $dom->createDocumentFragment();
-                    $newnode->appendXML(mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8'));
+                    $newnode->appendXML('<![CDATA[' . mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8') . ']]>');
                     // in case we want to just change the slot contents:
                     // $slot->appendChild($newnode);
                     $slot->parentNode->replaceChild($newnode, $slot);
