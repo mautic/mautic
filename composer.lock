@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "10dadf00307b2db829fa7013b0c4ce73",
+    "content-hash": "ec225eafbd68795e675382a89d2be61a",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -8161,11 +8161,11 @@
         },
         {
             "name": "willdurand/oauth-server-bundle",
-            "version": "dev-master",
+            "version": "0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/BazingaOAuthServerBundle.git",
-                "reference": "d4d2e94bb69c20ae4a5fc136c0fe40253368787e"
+                "reference": "f7685479cdc35114cc4e6219313f57f5c72a5ee6"
             },
             "require": {
                 "php": ">=5.3.3",
@@ -8201,7 +8201,7 @@
                 "oauth",
                 "server"
             ],
-            "time": "2017-05-10T00:39:21+00:00"
+            "time": "2018-10-12T15:31:56+00:00"
         }
     ],
     "packages-dev": [
@@ -10447,9 +10447,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "willdurand/oauth-server-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
