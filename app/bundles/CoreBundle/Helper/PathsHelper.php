@@ -162,10 +162,10 @@ class PathsHelper
 
         if ($fullPath) {
             $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
-            
-			if(strpos($path, $rootPath) === false){
-				return $rootPath.'/'.$path;
-			}
+
+            if (strpos($path, $rootPath) === false) {
+                return $rootPath.'/'.$path;
+            }
         }
 
         return $path;
