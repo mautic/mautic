@@ -34,6 +34,9 @@ class TrackingHelper
      */
     protected $contactTracker;
 
+    /** @var array */
+    private $localSession = [];
+
     /**
      * BuildJsSubscriber constructor.
      */
@@ -80,8 +83,9 @@ class TrackingHelper
      */
     public function updateSession($values)
     {
-        $sessionName = $this->getSessionName();
-        $this->session->set($sessionName, serialize(array_merge($values, $this->getSession())));
+        $sessionName                      = $this->getSessionName();
+        $this->localSession[$sessionName] = array_merge($values, $this->getSession());
+        $this->session->set($sessionName, serialize($this->localSession[$sessionName]));
 
         return (array) $values;
     }
@@ -92,8 +96,13 @@ class TrackingHelper
     public function getSession($remove = false)
     {
         $sessionName = $this->getSessionName();
-        $sesionValue = Serializer::decode($this->session->get($sessionName));
+        if (isset($this->localSession[$sessionName])) {
+            $sesionValue = $this->localSession[$sessionName];
+        } else {
+            $sesionValue = Serializer::decode($this->session->get($sessionName));
+        }
         if ($remove) {
+            unset($this->localSession[$sessionName]);
             $this->session->remove($sessionName);
         }
 
