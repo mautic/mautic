@@ -477,7 +477,7 @@ class BuilderSubscriber extends CommonSubscriber
     /**
      * @return string
      */
-    private function setAttributeForFirtSlot()
+    private function getAttributeForFirtSlot()
     {
         return 'data-prefs-center-first="1"';
     }
@@ -494,7 +494,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-segmentlist' ".$this->setAttributeForFirtSlot().">\n";
+            $content = "<div class='pref-segmentlist' ".$this->getAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
             $content .= "</div>\n";
         }
@@ -512,7 +512,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-categorylist ' ".$this->setAttributeForFirtSlot().">\n";
+            $content = "<div class='pref-categorylist ' ".$this->getAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
             $content .= "</div>\n";
         }
@@ -566,7 +566,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-saveprefs ' ".$this->setAttributeForFirtSlot().">\n";
+            $content = "<div class='pref-saveprefs ' ".$this->getAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
             $content .= "</div>\n";
         }
