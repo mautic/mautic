@@ -88,7 +88,7 @@ $container->loadFromExtension('monolog', [
             'formatter' => 'mautic.monolog.fulltrace.formatter',
             'type'      => 'rotating_file',
             'path'      => '%kernel.logs_dir%/%kernel.environment%.php',
-            'level'     => 'debug',
+            'level'     => getenv('MAUTIC_DEBUG_LEVEL') ?: 'error',
             'channels'  => [
                 '!mautic',
             ],
@@ -102,7 +102,7 @@ $container->loadFromExtension('monolog', [
             'formatter' => 'mautic.monolog.fulltrace.formatter',
             'type'      => 'rotating_file',
             'path'      => '%kernel.logs_dir%/mautic_%kernel.environment%.php',
-            'level'     => 'debug',
+            'level'     => getenv('MAUTIC_DEBUG_LEVEL') ?: 'error',
             'channels'  => [
                 'mautic',
             ],
@@ -114,6 +114,10 @@ $container->loadFromExtension('monolog', [
 $container->loadFromExtension('liip_functional_test', [
     'cache_sqlite_db' => true,
 ]);
+
+// Enable api by default
+$container->setParameter('mautic.api_enabled', true);
+$container->setParameter('mautic.api_enable_basic_auth', true);
 
 $loader->import('security_test.php');
 

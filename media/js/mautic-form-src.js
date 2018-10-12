@@ -635,7 +635,7 @@
             window.addEventListener('message', function(event) {
                 if (Core.debug()) console.log(event);
 
-                if (event.origin !== MauticDomain) return;
+                if (MauticDomain.indexOf(event.origin) !== 0) return;
 
                 try {
                     var response = JSON.parse(event.data);

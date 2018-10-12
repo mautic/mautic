@@ -409,6 +409,9 @@ class ReportSubscriber extends CommonSubscriber
 
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
+            $queryBuilder->resetQueryPart('join');
+            $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
+
             switch ($g) {
                 case 'mautic.lead.graph.pie.attribution_stages':
                 case 'mautic.lead.graph.pie.attribution_campaigns':
@@ -653,6 +656,10 @@ class ReportSubscriber extends CommonSubscriber
     private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters)
     {
         $pointColumns = [
+            'lp.id' => [
+                'label' => 'mautic.lead.report.points.id',
+                'type'  => 'int',
+            ],
             'lp.type' => [
                 'label' => 'mautic.lead.report.points.type',
                 'type'  => 'string',
@@ -678,7 +685,7 @@ class ReportSubscriber extends CommonSubscriber
         $data = [
             'display_name' => 'mautic.lead.report.points.table',
             'columns'      => array_merge($columns, $pointColumns, $event->getIpColumn()),
-            'filters'      => $filters,
+            'filters'      => array_merge($filters, $pointColumns),
         ];
         $event->addTable(self::CONTEXT_LEAD_POINT_LOG, $data, self::GROUP_CONTACTS);
 
@@ -733,7 +740,7 @@ class ReportSubscriber extends CommonSubscriber
         $data = [
             'display_name' => 'mautic.lead.report.frequency.messages',
             'columns'      => array_merge($columns, $frequencyColumns),
-            'filters'      => $filters,
+            'filters'      => array_merge($filters, $frequencyColumns),
         ];
         $event->addTable(self::CONTEXT_CONTACT_FREQUENCYRULES, $data, self::GROUP_CONTACTS);
     }

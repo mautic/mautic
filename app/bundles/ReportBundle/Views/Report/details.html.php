@@ -172,8 +172,10 @@ if ($tmpl == 'index') {
 <?php if (!empty($debug)): ?>
 <div class="well">
     <h4>Debug: <?php echo $debug['query_time']; ?></h4>
+    <div><?php echo $debug['count_query']; ?></div>
+    <br />
     <div><?php echo $debug['query']; ?></div>
 </div>
 <?php endif; ?>
 <!--/ end: box layout -->
-<input type="hidden" name="entityId" id="entityId" value="<?php echo $report->getId(); ?>"/>
+<input type="hidden" name="entityId" id="entityId" value="<?php echo $view->escape($report->getId()); ?>"/>

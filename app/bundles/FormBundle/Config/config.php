@@ -66,10 +66,6 @@ return [
                 'path'       => '/forms/results/{objectId}/{page}',
                 'controller' => 'MauticFormBundle:Result:index',
             ],
-            'mautic_form_file_download' => [
-                'path'       => '/forms/results/file/{submissionId}/{field}',
-                'controller' => 'MauticFormBundle:Result:downloadFile',
-            ],
             'mautic_form_export' => [
                 'path'       => '/forms/results/{objectId}/export/{format}',
                 'controller' => 'MauticFormBundle:Result:export',
@@ -120,6 +116,10 @@ return [
             ],
         ],
         'public' => [
+            'mautic_form_file_download' => [
+                'path'       => '/forms/results/file/{submissionId}/{field}',
+                'controller' => 'MauticFormBundle:Result:downloadFile',
+            ],
             'mautic_form_postresults' => [
                 'path'       => '/form/submit',
                 'controller' => 'MauticFormBundle:Public:submit',
@@ -282,7 +282,7 @@ return [
                 'class' => FormFieldCaptchaType::class,
                 'alias' => 'formfield_captcha',
             ],
-            'muatic.form.type.field_propertypagebreak' => [
+            'mautic.form.type.field_propertypagebreak' => [
                 'class'     => FormFieldPageBreakType::class,
                 'arguments' => [
                     'translator',
@@ -377,6 +377,8 @@ return [
                     'mautic.helper.form.field_helper',
                     'mautic.form.validator.upload_field_validator',
                     'mautic.form.helper.form_uploader',
+                    'mautic.lead.service.device_tracking_service',
+                    'mautic.form.service.field.value.transformer',
                 ],
             ],
             'mautic.form.model.submission_result_loader' => [
@@ -405,6 +407,13 @@ return [
                 'class'     => TokenHelper::class,
                 'arguments' => [
                     'mautic.form.model.form',
+                    'mautic.security',
+                ],
+            ],
+            'mautic.form.service.field.value.transformer' => [
+                'class'     => \Mautic\FormBundle\Event\Service\FieldValueTransformer::class,
+                'arguments' => [
+                    'router',
                 ],
             ],
         ],

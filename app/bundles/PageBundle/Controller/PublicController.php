@@ -13,9 +13,11 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
@@ -267,6 +269,9 @@ class PublicController extends CommonFormController
                 if (!empty($analytics)) {
                     $content = str_replace('</head>', $analytics."\n</head>", $content);
                 }
+                if ($entity->getNoIndex()) {
+                    $content = str_replace('</head>', "<meta name=\"robots\" content=\"noindex\">\n</head>", $content);
+                }
             }
 
             $this->get('templating.helper.assets')->addScript(
@@ -356,6 +361,8 @@ class PublicController extends CommonFormController
 
     /**
      * @return Response
+     *
+     * @throws \Exception
      */
     public function trackingImageAction()
     {
@@ -368,6 +375,8 @@ class PublicController extends CommonFormController
 
     /**
      * @return JsonResponse
+     *
+     * @throws \Exception
      */
     public function trackingAction()
     {
@@ -386,7 +395,10 @@ class PublicController extends CommonFormController
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
-        list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+        $lead = $leadModel->getCurrentLead();
+        /** @var DeviceTrackingServiceInterface $trackedDevice */
+        $trackedDevice = $this->get('mautic.lead.service.device_tracking_service')->getTrackedDevice();
+        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
 
         /** @var TrackingHelper $trackingHelper */
         $trackingHelper = $this->get('mautic.page.helper.tracking');
@@ -394,10 +406,11 @@ class PublicController extends CommonFormController
 
         return new JsonResponse(
             [
-                'success' => 1,
-                'id'      => ($lead) ? $lead->getId() : null,
-                'sid'     => $trackingId,
-                'events'  => $sessionValue,
+                'success'   => 1,
+                'id'        => ($lead) ? $lead->getId() : null,
+                'sid'       => $trackingId,
+                'device_id' => $trackingId,
+                'events'    => $sessionValue,
             ]
         );
     }
@@ -407,7 +420,7 @@ class PublicController extends CommonFormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Exception
      */
     public function redirectAction($redirectId)
     {
@@ -415,14 +428,13 @@ class PublicController extends CommonFormController
         $redirectModel = $this->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
-        if (empty($redirect) || !$redirect->isPublished(false)) {
-            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
-        }
-        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-        $pageModel = $this->getModel('page');
-        $pageModel->hitPage($redirect, $this->request);
+        $logger->debug('Executing Redirect: '.(string) $redirect);
 
         $url = $redirect->getUrl();
+
+        if (empty($redirect) || !$redirect->isPublished(false)) {
+            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
+        }
 
         // Ensure the URL does not have encoded ampersands
         $url = str_replace('&amp;', '&', $url);
@@ -430,7 +442,8 @@ class PublicController extends CommonFormController
         // Get query string
         $query = $this->request->query->all();
 
-        // Unset the clickthrough
+        // Unset the clickthrough from the URL query
+        $ct = $query['ct'];
         unset($query['ct']);
 
         // Tak on anything left to the URL
@@ -442,11 +455,66 @@ class PublicController extends CommonFormController
         // Search replace lead fields in the URL
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
-        $lead      = $leadModel->getCurrentLead();
-        $leadArray = ($lead) ? $lead->getProfileFields() : [];
-        $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
+        $lead      = $leadModel->getContactFromRequest(['ct' => $ct]);
+
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+        $pageModel = $this->getModel('page');
+        $pageModel->hitPage($redirect, $this->request, 200, $lead);
+
+        /** @var PrimaryCompanyHelper $primaryCompanyHelper */
+        $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
+        $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+
+        $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+        $url = UrlHelper::sanitizeAbsoluteUrl($url);
+
+        if (false === filter_var($url, FILTER_VALIDATE_URL)) {
+            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
+        }
 
         return $this->redirect($url);
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private function replaceAssetTokenUrl($url)
+    {
+        if ($this->urlIsToken($url)) {
+            $tokens = $this->get('mautic.asset.helper.token')->findAssetTokens($url);
+
+            return isset($tokens[$url]) ? $tokens[$url] : $url;
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private function replacePageTokenUrl($url)
+    {
+        if ($this->urlIsToken($url)) {
+            $tokens = $this->get('mautic.page.helper.token')->findPageTokens($url);
+
+            return isset($tokens[$url]) ? $tokens[$url] : $url;
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return bool
+     */
+    private function urlIsToken($url)
+    {
+        return substr($url, 0, 1) === '{';
     }
 
     /**
@@ -568,10 +636,14 @@ class PublicController extends CommonFormController
             /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
 
-            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
-            $data                                = [
-                'id'  => ($lead) ? $lead->getId() : null,
-                'sid' => $trackingId,
+            $lead = $leadModel->getCurrentLead();
+            /** @var DeviceTrackingServiceInterface $trackedDevice */
+            $trackedDevice = $this->get('mautic.lead.service.device_tracking_service')->getTrackedDevice();
+            $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+            $data          = [
+                'id'        => ($lead) ? $lead->getId() : null,
+                'sid'       => $trackingId,
+                'device_id' => $trackingId,
             ];
         }
 

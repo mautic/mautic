@@ -106,6 +106,11 @@ class ReportSubscriber extends CommonSubscriber
                 'type'  => 'int',
                 'alias' => $aliasPrefix.'channel_id',
             ],
+            $prefix.'rotation' => [
+                'label' => 'mautic.report.campaign.event.rotation',
+                'type'  => 'int',
+                'alias' => $eventAliasPrefix.'rotation',
+            ],
 
             // Event columns
             $eventPrefix.'name' => [
@@ -166,7 +171,6 @@ class ReportSubscriber extends CommonSubscriber
         $data = [
             'display_name' => 'mautic.campaign.events',
             'columns'      => $columns,
-            'filters'      => $companyColumns,
         ];
         $event->addTable(self::CONTEXT_CAMPAIGN_LEAD_EVENT_LOG, $data);
 
@@ -200,6 +204,8 @@ class ReportSubscriber extends CommonSubscriber
         if ($this->companyReportData->eventHasCompanyColumns($event)) {
             $event->addCompanyLeftJoin($qb);
         }
+
+        $event->applyDateFilters($qb, 'date_triggered', 'log');
 
         $event->setQueryBuilder($qb);
     }

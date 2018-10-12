@@ -15,6 +15,7 @@ use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Monolog\Logger;
@@ -55,16 +56,20 @@ class TwilioApi extends AbstractSmsApi
 
             $keys = $integration->getDecryptedApiKeys();
 
-            $this->client = new \Services_Twilio($keys['username'], $keys['password']);
+            if (isset($keys['username']) && isset($keys['password'])) {
+                $this->client = new \Services_Twilio($keys['username'], $keys['password']);
+            }
         }
 
         parent::__construct($pageTrackableModel);
     }
 
     /**
-     * @param string $number
+     * @param $number
      *
      * @return string
+     *
+     * @throws NumberParseException
      */
     protected function sanitizeNumber($number)
     {
@@ -75,13 +80,15 @@ class TwilioApi extends AbstractSmsApi
     }
 
     /**
-     * @param string $number
+     * @param Lead   $lead
      * @param string $content
      *
      * @return bool|string
      */
-    public function sendSms($number, $content)
+    public function sendSms(Lead $lead, $content)
     {
+        $number = $lead->getLeadPhoneNumber();
+
         if ($number === null) {
             return false;
         }

@@ -69,7 +69,7 @@ class CompanyReportData
      */
     public function eventHasCompanyColumns(ReportGeneratorEvent $event)
     {
-        $companyColumns = $this->getCompanyColumns();
+        $companyColumns = $this->getCompanyData();
         foreach ($companyColumns as $key => $column) {
             if ($event->hasColumn($key)) {
                 return true;
@@ -86,6 +86,7 @@ class CompanyReportData
     {
         return [
             'comp.id' => [
+                'alias' => 'comp_id',
                 'label' => 'mautic.lead.report.company.company_id',
                 'type'  => 'int',
                 'link'  => 'mautic_company_action',

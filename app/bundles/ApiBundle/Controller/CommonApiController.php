@@ -19,6 +19,7 @@ use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -168,6 +169,11 @@ class CommonApiController extends FOSRestController implements MauticController
      * @var User
      */
     protected $user;
+
+    /**
+     * @var array
+     */
+    protected $entityRequestParameters = [];
 
     /**
      * Delete a batch of entities.
@@ -372,7 +378,7 @@ class CommonApiController extends FOSRestController implements MauticController
         if ($this->security->checkPermissionExists($this->permissionBase.':viewother')
             && !$this->security->isGranted($this->permissionBase.':viewother')
         ) {
-            $this->listFilters = [
+            $this->listFilters[] = [
                 'column' => $tableAlias.'.createdBy',
                 'expr'   => 'eq',
                 'value'  => $this->user->getId(),
@@ -579,11 +585,25 @@ class CommonApiController extends FOSRestController implements MauticController
         $errors            = [];
         $statusCodes       = [];
         foreach ($parameters as $key => $params) {
-            $entity = $this->getNewEntity($params);
-            $this->processBatchForm($key, $entity, $params, 'POST', $errors, $entities);
+            // Can be new or an existing on based on params
+            $entity       = $this->getNewEntity($params);
+            $entityExists = false;
+            $method       = 'POST';
+            if ($entity->getId()) {
+                $entityExists = true;
+                $method       = 'PATCH';
+                if (!$this->checkEntityAccess($entity, 'edit')) {
+                    $this->setBatchError($key, 'mautic.core.error.accessdenied', Codes::HTTP_FORBIDDEN, $errors, $entities, $entity);
+                    $statusCodes[$key] = Codes::HTTP_FORBIDDEN;
+                    continue;
+                }
+            }
+            $this->processBatchForm($key, $entity, $params, $method, $errors, $entities);
 
             if (isset($errors[$key])) {
                 $statusCodes[$key] = $errors[$key]['code'];
+            } elseif ($entityExists) {
+                $statusCodes[$key] = Codes::HTTP_OK;
             } else {
                 $statusCodes[$key] = Codes::HTTP_CREATED;
             }
@@ -1058,7 +1078,7 @@ class CommonApiController extends FOSRestController implements MauticController
                     $entity
                 );
             }
-        } elseif ($formResponse === $entity) {
+        } elseif (get_class($formResponse) === get_class($entity)) {
             // Success
             $entities[$key] = $formResponse;
         } elseif (is_array($formResponse) && isset($formResponse['code'], $formResponse['message'])) {
@@ -1082,10 +1102,15 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function processForm($entity, $parameters = null, $method = 'PUT')
     {
+        $categoryId = null;
+
         if ($parameters === null) {
             //get from request
             $parameters = $this->request->request->all();
         }
+
+        // Store the original parameters from the request so that callbacks can have access to them as needed
+        $this->entityRequestParameters = $parameters;
 
         //unset the ID in the parameters if set as this will cause the form to fail
         if (isset($parameters['id'])) {
@@ -1132,11 +1157,18 @@ class CommonApiController extends FOSRestController implements MauticController
             return $submitParams;
         }
 
+        // Remove category from the payload because it will cause form validation error.
+        if (isset($submitParams['category'])) {
+            $categoryId = (int) $submitParams['category'];
+            unset($submitParams['category']);
+        }
+
         $this->prepareParametersFromRequest($form, $submitParams, $entity, $this->dataInputMasks);
 
         $form->submit($submitParams, 'PATCH' !== $method);
 
         if ($form->isValid()) {
+            $this->setCategory($entity, $categoryId);
             $preSaveError = $this->preSaveEntity($entity, $form, $submitParams, $action);
 
             if ($preSaveError instanceof Response) {
@@ -1237,6 +1269,25 @@ class CommonApiController extends FOSRestController implements MauticController
             } elseif (in_array($statement['expr'], ['andX', 'orX'])) {
                 $this->sanitizeWhereClauseArrayFromRequest($statement['val']);
             }
+        }
+    }
+
+    /**
+     * @param object $entity
+     * @param int    $categoryId
+     *
+     * @throws \UnexpectedValueException
+     */
+    protected function setCategory($entity, $categoryId)
+    {
+        if (!empty($categoryId) && method_exists($entity, 'setCategory')) {
+            $category = $this->getDoctrine()->getManager()->find(Category::class, $categoryId);
+
+            if (null === $category) {
+                throw new \UnexpectedValueException("Category $categoryId does not exist");
+            }
+
+            $entity->setCategory($category);
         }
     }
 

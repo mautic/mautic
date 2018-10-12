@@ -11,7 +11,6 @@
 
 namespace Mautic\PageBundle\Controller;
 
-use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
@@ -55,9 +54,7 @@ class PageController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         //set limits
         $limit = $this->get('session')->get('mautic.page.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
@@ -622,6 +619,7 @@ class PageController extends FormController
                 'sections'      => $this->buildSlotForms($sections),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                 'sectionForm'   => $sectionForm->createView(),
+                'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], true),
                 'permissions'   => $security->isGranted(
                     [
                         'page:preference_center:editown',
@@ -629,7 +627,7 @@ class PageController extends FormController
                     ],
                     'RETURN_ARRAY'
                 ),
-                'security' => $security,
+                'security'      => $security,
             ],
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => [
@@ -1092,7 +1090,6 @@ class PageController extends FormController
             }
         }
 
-        //add builder toolbar
         $slotsHelper->start('builder'); ?>
         <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
         <?php

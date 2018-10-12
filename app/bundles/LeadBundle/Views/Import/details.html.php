@@ -224,6 +224,6 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
-    <input name="entityId" id="entityId" type="hidden" value="<?php echo $item->getId(); ?>"/>
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $view->escape($item->getId()); ?>"/>
 </div>
 <!--/ end: box layout -->

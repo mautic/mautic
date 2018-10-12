@@ -35,7 +35,7 @@
                         ); ?>"
                         data-target="#CampaignEventModal"
                         title="<?php echo $view->escape($e['description']); ?>"
-                        value="<?php echo $k; ?>">
+                        value="<?php echo $view->escape($k); ?>">
                     <span><?php echo $e['label']; ?></span>
                 </option>
             <?php endforeach; ?>

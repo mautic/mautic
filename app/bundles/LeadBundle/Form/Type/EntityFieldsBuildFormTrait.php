@@ -24,8 +24,9 @@ trait EntityFieldsBuildFormTrait
 {
     private function getFormFields(FormBuilderInterface $builder, array $options, $object = 'lead')
     {
-        $fieldValues = [];
-        $isObject    = false;
+        $cleaningRules = [];
+        $fieldValues   = [];
+        $isObject      = false;
         if (!empty($options['data'])) {
             $isObject    = is_object($options['data']);
             $fieldValues = ($isObject) ? $options['data']->getFields() : $options['data'];
@@ -59,6 +60,9 @@ trait EntityFieldsBuildFormTrait
                 $constraints[] = new NotBlank(
                     ['message' => 'mautic.lead.customfield.notblank']
                 );
+            } elseif (!empty($options['ignore_required_constraints'])) {
+                $required            = false;
+                $field['isRequired'] = false;
             }
 
             switch ($type) {
@@ -178,9 +182,10 @@ trait EntityFieldsBuildFormTrait
                     $choiceType = 'choice';
                     $emptyValue = '';
                     if (in_array($type, ['select', 'multiselect']) && !empty($properties['list'])) {
-                        $typeProperties['choices']  = FormFieldHelper::parseList($properties['list']);
-                        $typeProperties['expanded'] = false;
-                        $typeProperties['multiple'] = ('multiselect' === $type);
+                        $typeProperties['choices']      = FormFieldHelper::parseList($properties['list']);
+                        $typeProperties['expanded']     = false;
+                        $typeProperties['multiple']     = ('multiselect' === $type);
+                        $cleaningRules[$field['alias']] = 'raw';
                     }
                     if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
                         $choiceType                  = 'yesno_button_group';
@@ -282,5 +287,7 @@ trait EntityFieldsBuildFormTrait
                     break;
             }
         }
+
+        return $cleaningRules;
     }
 }

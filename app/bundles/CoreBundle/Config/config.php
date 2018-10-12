@@ -190,6 +190,12 @@ return [
                     'doctrine.dbal.default_connection',
                 ],
             ],
+            'mautic.core.request.subscriber' => [
+                'class'     => \Mautic\CoreBundle\EventListener\RequestSubscriber::class,
+                'arguments' => [
+                    'security.csrf.token_manager',
+                ],
+            ],
             'mautic.core.stats.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
@@ -424,12 +430,10 @@ return [
                 'alias'     => 'gravatar',
             ],
             'mautic.helper.template.analytics' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\AnalyticsHelper',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\AnalyticsHelper::class,
                 'alias'     => 'analytics',
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.helper.cookie',
-                    'mautic.lead.model.lead',
                 ],
             ],
             'mautic.helper.template.mautibot' => [
@@ -477,11 +481,12 @@ return [
                 'alias' => 'version',
             ],
             'mautic.helper.template.security' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\SecurityHelper',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\SecurityHelper::class,
                 'arguments' => [
                     'mautic.security',
                     'request_stack',
                     'event_dispatcher',
+                    'security.csrf.token_manager',
                 ],
                 'alias' => 'security',
             ],
@@ -606,7 +611,8 @@ return [
                 'class' => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher::class,
             ],
             'mautic.cipher.openssl' => [
-                'class' => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
+                'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
+                'arguments' => ['%kernel.environment%'],
             ],
             'mautic.factory' => [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
@@ -755,6 +761,12 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
+            'mautic.helper.hash' => [
+                'class' => \Mautic\CoreBundle\Helper\HashHelper\HashHelper::class,
+            ],
+            'mautic.helper.random' => [
+                'class' => \Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
+            ],
             'mautic.menu_renderer' => [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
                 'arguments' => [
@@ -861,6 +873,14 @@ return [
                     'mautic.schema.helper.column',
                 ],
             ],
+            'mautic.form.list.validator.circular' => [
+                'class'     => Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'request_stack',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
         ],
         'models' => [
             'mautic.core.model.auditlog' => [
@@ -905,8 +925,8 @@ return [
 
     'ip_lookup_services' => [
         'freegeoip' => [
-            'display_name' => 'Freegeoip.net',
-            'class'        => 'Mautic\CoreBundle\IpLookup\FreegeoipLookup',
+            'display_name' => 'Ipstack.com',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IpstackLookup',
         ],
         'geobytes' => [
             'display_name' => 'Geobytes',
