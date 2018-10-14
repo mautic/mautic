@@ -419,26 +419,29 @@ class BuilderSubscriber extends CommonSubscriber
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
 
-            $dom = new DOMDocument('1.0', 'utf-8');
-            $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
-            $xpath      = new DOMXPath($dom);
-            // If use slots
-            $divContent = $xpath->query('//*[@data-prefs-center="1"]');
-            if (!$divContent->length) {
-                // If use tokens
-                $divContent = $xpath->query('//*[@data-prefs-center-first="1"]');
-            }
-            for ($i = 0; $i < $divContent->length; ++$i) {
-                $slot    = $divContent->item($i);
-                $newnode = $dom->createElement('startform');
-                $slot->parentNode->insertBefore($newnode, $slot);
-                break;
-            }
-            $content= $dom->saveHTML();
-            if (isset($params['startform'])) {
+            // add form before first block of prefs center
+            if (isset($params['startform']) && strpos('data-prefs-center', $content) !== false) {
+                $dom = new DOMDocument('1.0', 'utf-8');
+                $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+                $xpath      = new DOMXPath($dom);
+                // If use slots
+                $divContent = $xpath->query('//*[@data-prefs-center="1"]');
+                if (!$divContent->length) {
+                    // If use tokens
+                    $divContent = $xpath->query('//*[@data-prefs-center-first="1"]');
+                }
+
+                if ($divContent->length) {
+                    $slot    = $divContent->item(0);
+                    $newnode = $dom->createElement('startform');
+                    $slot->parentNode->insertBefore($newnode, $slot);
+                }
+
+                $content = $dom->saveHTML();
                 $content = str_replace('<startform></startform>', $params['startform'], $content);
             }
         }
+
         $clickThrough = ['source' => ['page', $page->getId()]];
         $tokens       = $this->tokenHelper->findPageTokens($content, $clickThrough);
 
