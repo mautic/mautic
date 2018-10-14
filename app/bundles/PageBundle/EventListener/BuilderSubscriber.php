@@ -435,10 +435,9 @@ class BuilderSubscriber extends CommonSubscriber
                     $slot    = $divContent->item(0);
                     $newnode = $dom->createElement('startform');
                     $slot->parentNode->insertBefore($newnode, $slot);
+                    $content = $dom->saveHTML();
+                    $content = str_replace('<startform></startform>', $params['startform'], $content);
                 }
-
-                $content = $dom->saveHTML();
-                $content = str_replace('<startform></startform>', $params['startform'], $content);
             }
         }
 
