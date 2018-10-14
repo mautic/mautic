@@ -23,7 +23,7 @@
         "symfony/intl": "~2.8",
         "symfony/options-resolver": "~2.8",
         "symfony/process": "~2.8",
-        "symfony/security": "~2.8",
+        "symfony/security": "^2.8.41",
         "symfony/security-acl": "~2.7",
         "symfony/translation": "2.8.11",
         "symfony/validator": "~2.8",
@@ -51,7 +51,7 @@
 
         "symfony/framework-bundle": "~2.8",
         "symfony/monolog-bundle": "~2.11",
-        "symfony/security-bundle": "~2.8",
+        "symfony/security-bundle": "^2.8.41",
         "symfony/swiftmailer-bundle": "~2.3",
 
         "symfony/doctrine-bridge": "~2.8",
@@ -80,7 +80,7 @@
         "knplabs/knp-menu-bundle":"^2.0",
         "friendsofsymfony/rest-bundle": "1.8.*",
         "friendsofsymfony/oauth-server-bundle": "1.5.2",
-        "willdurand/oauth-server-bundle": "dev-master",
+        "willdurand/oauth-server-bundle": "0.0.2",
         "jms/serializer-bundle": "~1.1",
         "oneup/uploader-bundle": "~1.3",
 

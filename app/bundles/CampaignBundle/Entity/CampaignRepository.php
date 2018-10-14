@@ -524,6 +524,27 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
+     * @param $contactId
+     * @param $campaignId
+     *
+     * @return mixed
+     */
+    public function getContactSingleSegmentByCampaign($contactId, $campaignId)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        return $q->select('ll.id, ll.name')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'll')
+            ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = ll.id and lll.lead_id = :contactId and lll.manually_removed = 0')
+            ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx', 'clx.leadlist_id = ll.id and clx.campaign_id = :campaignId')
+            ->setParameter('contactId', (int) $contactId)
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setMaxResults(1)
+            ->execute()
+            ->fetch();
+    }
+
+    /**
      * Get lead IDs of a campaign.
      *
      * @deprecated 2.13.0 to be removed in 3.0

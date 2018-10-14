@@ -293,7 +293,7 @@ Mautic.leadlistOnLoad = function(container) {
     if (mQuery('#' + prefix + '_filters').length) {
         mQuery('#available_filters').on('change', function() {
             if (mQuery(this).val()) {
-                Mautic.addLeadListFilter(mQuery(this).val());
+                Mautic.addLeadListFilter(mQuery(this).val(),mQuery('option:selected',this).data('field-object'));
                 mQuery(this).val('');
                 mQuery(this).trigger('chosen:updated');
             }
@@ -448,7 +448,7 @@ Mautic.convertLeadFilterInput = function(el) {
             mQuery(filterId).removeAttr('multiple');
 
             // Update the name
-            newName = filterEl.attr('name');
+            newName = mQuery(filterId).attr('name');
             lastPos = newName.lastIndexOf('[]');
             newName = newName.substring(0, lastPos);
 
@@ -497,8 +497,8 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
     Mautic.activateFieldTypeahead(displayId, filterId, [], 'lead:fieldList')
 };
 
-Mautic.addLeadListFilter = function (elId) {
-    var filterId = '#available_' + elId;
+Mautic.addLeadListFilter = function (elId, elObj) {
+    var filterId = '#available_' + elObj + '_' + elId;
     var label    = mQuery(filterId).text();
 
     //create a new filter
