@@ -16,8 +16,8 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\CompanyObject;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
@@ -28,20 +28,20 @@ class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
     private $mappingHelper;
 
     /**
-     * @var ContactObject|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $contactObjectHelper;
 
     /**
-     * @var CompanyObject|\PHPUnit_Framework_MockObject_MockObject
+     * @var CompanyObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $companyObjectHelper;
 
     protected function setup()
     {
         $this->mappingHelper = $this->createMock(MappingHelper::class);
-        $this->contactObjectHelper = $this->createMock(ContactObject::class);
-        $this->companyObjectHelper = $this->createMock(CompanyObject::class);
+        $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
+        $this->companyObjectHelper = $this->createMock(CompanyObjectHelper::class);
     }
 
     public function testContactsAreUpdatedAndCreated()

@@ -177,7 +177,7 @@ return [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudge::class,
             ],
             'mautic.integrations.helper.contact_object' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ContactObject::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.lead',
@@ -187,7 +187,7 @@ return [
                 ],
             ],
             'mautic.integrations.helper.company_object' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\CompanyObject::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper::class,
                 'arguments' => [
                     'mautic.lead.model.company',
                     'mautic.lead.repository.company',

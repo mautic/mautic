@@ -17,7 +17,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestOb
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
@@ -40,7 +40,7 @@ class FieldBuilder
     private $fieldHelper;
 
     /**
-     * @var ContactObject
+     * @var ContactObjectHelper
      */
     private $contactObjectHelper;
 
@@ -57,11 +57,11 @@ class FieldBuilder
     /**
      * FieldBuilder constructor.
      *
-     * @param Router        $router
-     * @param FieldHelper   $fieldHelper
-     * @param ContactObject $contactObjectHelper
+     * @param Router              $router
+     * @param FieldHelper         $fieldHelper
+     * @param ContactObjectHelper $contactObjectHelper
      */
-    public function __construct(Router $router, FieldHelper $fieldHelper, ContactObject $contactObjectHelper)
+    public function __construct(Router $router, FieldHelper $fieldHelper, ContactObjectHelper $contactObjectHelper)
     {
         $this->valueNormalizer = new ValueNormalizer();
 

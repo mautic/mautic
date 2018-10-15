@@ -22,8 +22,8 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\CompanyObject;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
@@ -41,12 +41,12 @@ class PartialObjectReportBuilder
     private $fieldHelper;
 
     /**
-     * @var ContactObject
+     * @var ContactObjectHelper
      */
     private $contactObjectHelper;
 
     /**
-     * @var CompanyObject
+     * @var CompanyObjectHelper
      */
     private $companyObjectHelper;
 
@@ -80,15 +80,15 @@ class PartialObjectReportBuilder
      *
      * @param FieldChangeRepository $fieldChangeRepository
      * @param FieldHelper           $fieldHelper
-     * @param ContactObject         $contactObjectHelper
-     * @param CompanyObject         $companyObjectHelper
+     * @param ContactObjectHelper   $contactObjectHelper
+     * @param CompanyObjectHelper   $companyObjectHelper
      * @param FieldBuilder          $fieldBuilder
      */
     public function __construct(
         FieldChangeRepository $fieldChangeRepository,
         FieldHelper $fieldHelper,
-        ContactObject $contactObjectHelper,
-        CompanyObject $companyObjectHelper,
+        ContactObjectHelper $contactObjectHelper,
+        CompanyObjectHelper $companyObjectHelper,
         FieldBuilder $fieldBuilder
     ) {
         $this->fieldChangeRepository = $fieldChangeRepository;

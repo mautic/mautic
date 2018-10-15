@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\Object;
+namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\ObjectHelper;
 
 
 use Doctrine\DBAL\Connection;
@@ -17,10 +17,10 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\CompanyObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
-class CompanyObjectTest extends \PHPUnit_Framework_TestCase
+class CompanyObjectHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var CompanyModel|\PHPUnit_Framework_MockObject_MockObject
@@ -103,10 +103,10 @@ class CompanyObjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return CompanyObject
+     * @return CompanyObjectHelper
      */
     private function getObjectHelper()
     {
-        return new CompanyObject($this->model, $this->repository, $this->connection);
+        return new CompanyObjectHelper($this->model, $this->repository, $this->connection);
     }
 }

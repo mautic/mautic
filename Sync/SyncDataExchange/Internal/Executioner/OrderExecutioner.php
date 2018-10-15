@@ -16,8 +16,8 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\CompanyObject;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class OrderExecutioner
@@ -28,12 +28,12 @@ class OrderExecutioner
     private $mappingHelper;
 
     /**
-     * @var ContactObject
+     * @var ContactObjectHelper
      */
     private $contactObjectHelper;
 
     /**
-     * @var CompanyObject
+     * @var CompanyObjectHelper
      */
     private $companyObjectHelper;
 
@@ -45,11 +45,11 @@ class OrderExecutioner
     /**
      * OrderExecutioner constructor.
      *
-     * @param MappingHelper $mappingHelper
-     * @param ContactObject $contactObjectHelper
-     * @param CompanyObject $companyObjectHelper
+     * @param MappingHelper       $mappingHelper
+     * @param ContactObjectHelper $contactObjectHelper
+     * @param CompanyObjectHelper $companyObjectHelper
      */
-    public function __construct(MappingHelper $mappingHelper, ContactObject $contactObjectHelper, CompanyObject $companyObjectHelper)
+    public function __construct(MappingHelper $mappingHelper, ContactObjectHelper $contactObjectHelper, CompanyObjectHelper $companyObjectHelper)
     {
         $this->mappingHelper       = $mappingHelper;
         $this->contactObjectHelper = $contactObjectHelper;

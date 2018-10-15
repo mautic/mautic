@@ -16,8 +16,8 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\CompanyObject;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -25,12 +25,12 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange
 class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ContactObject|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $contactObjectHelper;
 
     /**
-     * @var CompanyObject|\PHPUnit_Framework_MockObject_MockObject
+     * @var CompanyObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $companyObjectHelper;
 
@@ -41,8 +41,8 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contactObjectHelper = $this->createMock(ContactObject::class);
-        $this->companyObjectHelper = $this->createMock(CompanyObject::class);
+        $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
+        $this->companyObjectHelper = $this->createMock(CompanyObjectHelper::class);
         $this->fieldBuilder        = $this->createMock(FieldBuilder::class);
     }
 

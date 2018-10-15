@@ -19,19 +19,19 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\CompanyObject;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class FullObjectReportBuilder
 {
     /**
-     * @var ContactObject
+     * @var ContactObjectHelper
      */
     private $contactObjectHelper;
 
     /**
-     * @var CompanyObject
+     * @var CompanyObjectHelper
      */
     private $companyObjectHelper;
 
@@ -43,11 +43,11 @@ class FullObjectReportBuilder
     /**
      * FullObjectReportBuilder constructor.
      *
-     * @param ContactObject $contactObjectHelper
-     * @param CompanyObject $companyObjectHelper
-     * @param FieldBuilder  $fieldBuilder
+     * @param ContactObjectHelper $contactObjectHelper
+     * @param CompanyObjectHelper $companyObjectHelper
+     * @param FieldBuilder        $fieldBuilder
      */
-    public function __construct(ContactObject $contactObjectHelper, CompanyObject $companyObjectHelper, FieldBuilder $fieldBuilder)
+    public function __construct(ContactObjectHelper $contactObjectHelper, CompanyObjectHelper $companyObjectHelper, FieldBuilder $fieldBuilder)
     {
         $this->contactObjectHelper = $contactObjectHelper;
         $this->companyObjectHelper = $companyObjectHelper;

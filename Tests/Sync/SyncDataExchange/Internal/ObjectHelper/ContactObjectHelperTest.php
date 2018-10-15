@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\Object;
+namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\ObjectHelper;
 
 
 use Doctrine\DBAL\Connection;
@@ -21,10 +21,10 @@ use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
-class ContactObjectTest extends \PHPUnit_Framework_TestCase
+class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var LeadModel|\PHPUnit_Framework_MockObject_MockObject
@@ -195,10 +195,10 @@ class ContactObjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ContactObject
+     * @return ContactObjectHelper
      */
     private function getObjectHelper()
     {
-        return new ContactObject($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel);
+        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel);
     }
 }

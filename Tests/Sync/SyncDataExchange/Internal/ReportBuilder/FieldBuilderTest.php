@@ -15,7 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\Internal\R
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
@@ -33,7 +33,7 @@ class FieldBuilderTest extends \PHPUnit_Framework_TestCase
     private $fieldHelper;
 
     /**
-     * @var ContactObject|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $contactObjectHelper;
 
@@ -44,7 +44,7 @@ class FieldBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethodsExcept(['getNormalizedFieldType', 'getFieldObjectName',])
             ->getMock();
-        $this->contactObjectHelper = $this->createMock(ContactObject::class);
+        $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
     }
 
     public function testIdFieldIsAdded()

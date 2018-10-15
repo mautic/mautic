@@ -21,8 +21,8 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\CompanyObject;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -40,12 +40,12 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
     private $fieldHelper;
 
     /**
-     * @var ContactObject|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $contactObjectHelper;
 
     /**
-     * @var CompanyObject|\PHPUnit_Framework_MockObject_MockObject
+     * @var CompanyObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $companyObjectHelper;
 
@@ -61,8 +61,8 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethodsExcept(['getNormalizedFieldType', 'getFieldObjectName',])
             ->getMock();
-        $this->contactObjectHelper = $this->createMock(ContactObject::class);
-        $this->companyObjectHelper = $this->createMock(CompanyObject::class);
+        $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
+        $this->companyObjectHelper = $this->createMock(CompanyObjectHelper::class);
         $this->fieldBuilder        = $this->createMock(FieldBuilder::class);
     }
 
