@@ -418,9 +418,8 @@ class BuilderSubscriber extends CommonSubscriber
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
-
             // add form before first block of prefs center
-            if (isset($params['startform']) && strpos('data-prefs-center', $content) !== false) {
+            if (isset($params['startform']) && strpos($content, 'data-prefs-center') !== false) {
                 $dom = new DOMDocument('1.0', 'utf-8');
                 $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
                 $xpath      = new DOMXPath($dom);
