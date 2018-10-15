@@ -418,7 +418,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         case
         when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, " <small>", companycity,", ", companycountry, "</small>")
         when (comp.companycountry is not null) then concat(comp.companyname, " <small>", comp.companycountry, "</small>")
-        when (comp.companycity is not null) then concat(comp.companycity, " <small>", comp.companycity, "</small>")
+        when (comp.companycity is not null) then concat(comp.companyname, " <small>", comp.companycity, "</small>")
         else comp.companyname
         end
         as label')
