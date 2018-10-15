@@ -13,6 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\PluginBundle\Entity\Integration;
+use MauticPlugin\IntegrationsBundle\Event\FormLoadEvent;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Exception\RequiredFieldsMissingException;
 use MauticPlugin\IntegrationsBundle\Form\Type\IntegrationConfigType;
@@ -22,6 +23,7 @@ use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use MauticPlugin\IntegrationsBundle\SyncEvents;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -79,6 +81,10 @@ class ConfigController extends AbstractFormController
         } catch (IntegrationNotFoundException $exception) {
             return $this->notFound();
         }
+
+        $dispatcher = $this->get('event_dispatcher');
+        $event      = new FormLoadEvent($this->integrationConfiguration);
+        $dispatcher->dispatch(SyncEvents::INTEGRATION_CONFIG_FORM_LOAD, $event);
 
         // Set the request for private methods
         $this->request = $request;
