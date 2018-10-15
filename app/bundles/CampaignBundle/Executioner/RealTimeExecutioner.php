@@ -239,8 +239,8 @@ class RealTimeExecutioner
             throw new DecisionNotApplicableException("Event {$event->getId()} is not a decision.");
         }
 
-        // If channels do not match up, there's no need to go further
-        if ($channel && $event->getChannel() && $channel !== $event->getChannel()) {
+        // If channels do not match up at all (not even fuzzy logic i.e. page vs page.redirect), there's no need to go further
+        if ($channel && $event->getChannel() && $channel && strpos($channel, $event->getChannel()) === false) {
             throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");
         }
 

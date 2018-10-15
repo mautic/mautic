@@ -119,6 +119,11 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             <div class="clearfix"></div>
                         </div>
                         <div class="selected-filters" id="leadlist_filters">
+                            <?php if ($filterErrors): ?>
+                                <div class="alert alert-danger has-error">
+                                    <?php echo $view['form']->errors($form['filters']); ?>
+                                </div>
+                            <?php endif ?>
                             <?php echo $view['form']->widget($form['filters']); ?>
                         </div>
                     </div>

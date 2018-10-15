@@ -80,7 +80,7 @@
         "knplabs/knp-menu-bundle":"^2.0",
         "friendsofsymfony/rest-bundle": "1.8.*",
         "friendsofsymfony/oauth-server-bundle": "1.5.2",
-        "willdurand/oauth-server-bundle": "dev-master",
+        "willdurand/oauth-server-bundle": "0.0.2",
         "jms/serializer-bundle": "~1.1",
         "oneup/uploader-bundle": "~1.3",
 

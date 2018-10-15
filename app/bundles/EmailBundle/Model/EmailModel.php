@@ -597,6 +597,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 'company_name'  => (string) $stat['company_name'],
                 'campaign_id'   => (string) $stat['campaign_id'],
                 'campaign_name' => (string) $stat['campaign_name'],
+                'date_sent'     => $stat['date_sent'],
+                'date_read'     => $stat['date_read'],
             ];
 
             if ($item['click'] && $item['email_id'] && $item['contact_id']) {
