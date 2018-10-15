@@ -163,6 +163,65 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $responses->containsResponses());
     }
 
+    public function testChannelFuzzyMatchResultsInNonEmptyResponses()
+    {
+        $lead = $this->getMockBuilder(Lead::class)
+            ->getMock();
+        $lead->expects($this->exactly(5))
+            ->method('getId')
+            ->willReturn(10);
+
+        $this->contactTracker->expects($this->once())
+            ->method('getContact')
+            ->willReturn($lead);
+
+        $event = $this->getMockBuilder(Event::class)
+            ->getMock();
+        $event->expects($this->exactly(2))
+            ->method('getChannel')
+            ->willReturn('page');
+        $event->method('getEventType')
+            ->willReturn(Event::TYPE_DECISION);
+
+        $action1 = $this->getMockBuilder(Event::class)
+            ->getMock();
+        $action2 = $this->getMockBuilder(Event::class)
+            ->getMock();
+
+        $event->expects($this->once())
+            ->method('getPositiveChildren')
+            ->willReturn(new ArrayCollection([$action1, $action2]));
+
+        $this->eventRepository->expects($this->once())
+            ->method('getContactPendingEvents')
+            ->willReturn([$event]);
+
+        $this->eventCollector->expects($this->once())
+            ->method('getEventConfig')
+            ->willReturn(new DecisionAccessor([]));
+
+        $this->eventScheduler->expects($this->exactly(2))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
+
+        $this->eventScheduler->expects($this->at(1))
+            ->method('shouldSchedule')
+            ->willReturn(true);
+
+        $this->eventScheduler->expects($this->once())
+            ->method('scheduleForContact');
+
+        $this->eventScheduler->expects($this->at(3))
+            ->method('shouldSchedule')
+            ->willReturn(false);
+
+        // This is how we know if the test failed/passed
+        $this->executioner->expects($this->once())
+            ->method('executeEventsForContact');
+
+        $this->getExecutioner()->execute('something', null, 'page.redirect');
+    }
+
     public function testChannelIdMisMatchResultsInEmptyResponses()
     {
         $lead = $this->getMockBuilder(Lead::class)
