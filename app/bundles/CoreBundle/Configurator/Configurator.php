@@ -257,13 +257,13 @@ class Configurator
                 if ($counter === $count) {
                     $string .= str_repeat("\t", $level + 1);
                 }
-                $string .= "'".$key."' => ";
+                $string .= '\''.$key.'\' => ';
             }
 
             if (is_array($value)) {
                 $string .= $this->renderArray($value, $level + 1);
             } else {
-                $string .= "'".addcslashes($value, '\\\'')."'";
+                $string .= '\''.addcslashes($value, '\\\'').'\'';
             }
 
             --$counter;
