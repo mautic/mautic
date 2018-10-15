@@ -76,9 +76,7 @@ return [
             'mautic.integrations.form.config.sync_settings_field_mappings' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
                 'arguments' => [
-                    'translator',
-                    'mautic.lead.model.field',
-                    'mautic.channel.helper.channel_list',
+                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
                 ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field_directions' => [
@@ -209,6 +207,8 @@ return [
                 'arguments' => [
                     'mautic.lead.model.field',
                     'mautic.integrations.helper.variable_expresser',
+                    'mautic.channel.helper.channel_list',
+                    'translator',
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.field_builder' => [

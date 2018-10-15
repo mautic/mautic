@@ -12,15 +12,18 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper;
 
 
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldHelper
 {
@@ -35,20 +38,39 @@ class FieldHelper
     private $variableExpresserHelper;
 
     /**
+     * @var ChannelListHelper
+     */
+    private $channelListHelper;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @var array
      */
     private $fieldList = [];
+
+    /**
+     * @var array
+     */
+    private $syncFields = [];
 
     /**
      * FieldHelper constructor.
      *
      * @param FieldModel                       $fieldModel
      * @param VariableExpresserHelperInterface $variableExpresserHelper
+     * @param ChannelListHelper                $channelListHelper
+     * @param TranslatorInterface              $translator
      */
-    public function __construct(FieldModel $fieldModel, VariableExpresserHelperInterface $variableExpresserHelper)
+    public function __construct(FieldModel $fieldModel, VariableExpresserHelperInterface $variableExpresserHelper, ChannelListHelper $channelListHelper, TranslatorInterface $translator)
     {
         $this->fieldModel              = $fieldModel;
         $this->variableExpresserHelper = $variableExpresserHelper;
+        $this->channelListHelper       = $channelListHelper;
+        $this->translator              = $translator;
     }
 
     /**
@@ -121,5 +143,48 @@ class FieldHelper
         $reportFieldDAO->setChangeDateTime($changeTimestamp);
 
         return $reportFieldDAO;
+    }
+
+    /**
+     * @param string $objectName
+     *
+     * @return array
+     */
+    public function getSyncFields(string $objectName)
+    {
+        if (isset($this->syncFields[$objectName])) {
+            return $this->syncFields[$objectName];
+        }
+        
+        $this->syncFields[$objectName] = $this->fieldModel->getFieldList(
+            false,
+            true,
+            [
+                'isPublished' => true,
+                'object'      => $objectName
+            ]
+        );
+
+        // Add ID as a read only field
+        $this->syncFields[$objectName]['mautic_internal_id'] = $this->translator->trans('mautic.core.id');
+
+        if (MauticSyncDataExchange::OBJECT_CONTACT !== $objectName) {
+            uasort($this->syncFields[$objectName], 'strnatcmp');
+
+            return $this->syncFields[$objectName];
+        }
+
+        // Mautic contacts have "pseudo" fields such as channel do not contact, timeline, etc.
+        $channels = $this->channelListHelper->getFeatureChannels([LeadModel::CHANNEL_FEATURE], true);
+        foreach ($channels as $label => $channel) {
+            $this->syncFields[$objectName]['mautic_internal_dnc_'.$channel] = $this->translator->trans('mautic.integration.sync.channel_dnc', ['%channel%' => $label]);
+        }
+
+        // Add the timeline link
+        $this->syncFields[$objectName]['mautic_internal_contact_timeline'] = $this->translator->trans('mautic.integration.sync.contact_timeline');
+
+        uasort($this->syncFields[$objectName], 'strnatcmp');
+
+        return $this->syncFields[$objectName];
     }
 }
