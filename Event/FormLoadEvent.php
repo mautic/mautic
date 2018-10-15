@@ -21,23 +21,23 @@ class FormLoadEvent extends Event
     /**
      * @var Integration
      */
-    private $integration;
+    private $integrationConfiguration;
 
     public function __construct(Integration $integration)
     {
-        $this->integration = $integration;
+        $this->integrationConfiguration = $integration;
     }
 
     /**
      * @return Integration
      */
-    public function getIntegration(): Integration
+    public function getIntegrationConfiguration(): Integration
     {
-        return $this->integration;
+        return $this->integrationConfiguration;
     }
 
-    public function getIntegrationName()
+    public function getIntegration()
     {
-        return $this->integration->getName();
+        return $this->integrationConfiguration->getName();
     }
 }
