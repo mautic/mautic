@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
+namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 
 use Doctrine\DBAL\Connection;
@@ -26,7 +26,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
-class ContactObject implements ObjectInterface
+class ContactObjectHelper implements ObjectHelperInterface
 {
     /**
      * @var LeadModel
@@ -327,14 +327,17 @@ class ContactObject implements ObjectInterface
     }
 
     /**
-     * @param Lead       $contact
-     * @param FieldDAO[] $fields
+     * @param Lead   $contact
+     * @param FieldDAO[]  $fields
+     * @param string $integration
      */
     private function processPseudoFields(Lead $contact, array $fields, string $integration)
     {
+
         foreach ($fields as $name => $field) {
             if (strpos($name, 'mautic_internal_dnc_') === 0) {
                 $channel   = str_replace('mautic_internal_dnc_', '', $name);
+
                 $dncReason = $this->getDoNotContactReason($field->getValue()->getNormalizedValue());
 
                 if (DoNotContact::IS_CONTACTABLE === $dncReason) {
@@ -342,7 +345,6 @@ class ContactObject implements ObjectInterface
 
                     continue;
                 }
-
                 $this->dncModel->addDncForContact(
                     $contact->getId(),
                     $channel,

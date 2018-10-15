@@ -9,14 +9,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
+namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 
-interface ObjectInterface
+interface ObjectHelperInterface
 {
     /**
      * @param ObjectChangeDAO[] $objects

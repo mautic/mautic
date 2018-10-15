@@ -131,7 +131,7 @@ class MappingManualDAO
     /**
      * @return array
      */
-    public function getInternalObjectsNames(): array
+    public function getInternalObjectNames(): array
     {
         return array_keys($this->internalObjectsMapping);
     }
@@ -144,7 +144,7 @@ class MappingManualDAO
      * @return array
      * @throws ObjectNotFoundException
      */
-    public function getInternalObjectFieldNames(string $internalObjectName): array
+    public function getInternalObjectFieldsToSyncToIntegration(string $internalObjectName): array
     {
         if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
             throw new ObjectNotFoundException($internalObjectName);
@@ -204,7 +204,7 @@ class MappingManualDAO
     /**
      * @return array
      */
-    public function getIntegrationObjectsNames(): array
+    public function getIntegrationObjectNames(): array
     {
         return array_keys($this->integrationObjectsMapping);
     }
@@ -217,7 +217,7 @@ class MappingManualDAO
      * @return array
      * @throws ObjectNotFoundException
      */
-    public function getIntegrationObjectFieldNames(string $integrationObjectName): array
+    public function getIntegrationObjectFieldsToSyncToMautic(string $integrationObjectName): array
     {
         if (!array_key_exists($integrationObjectName, $this->integrationObjectsMapping)) {
             throw new ObjectNotFoundException($integrationObjectName);
@@ -277,15 +277,15 @@ class MappingManualDAO
     }
 
     /**
-     * @param string $internalObjectName
      * @param string $integrationObjectName
+     * @param string $internalObjectName
      * @param string $internalFieldName
      *
      * @return string
      * @throws FieldNotFoundException
      * @throws ObjectNotFoundException
      */
-    public function getIntegrationMappedField(string $internalObjectName, string $integrationObjectName, string $internalFieldName): string
+    public function getIntegrationMappedField(string $integrationObjectName, string $internalObjectName, string $internalFieldName): string
     {
         if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
             throw new ObjectNotFoundException($internalObjectName);
@@ -305,5 +305,36 @@ class MappingManualDAO
         }
 
         throw new FieldNotFoundException($internalFieldName, $internalObjectName);
+    }
+
+    /**
+     * @param string $internalObjectName
+     * @param string $integrationObjectName
+     * @param string $integrationFieldName
+     *
+     * @return string
+     * @throws FieldNotFoundException
+     * @throws ObjectNotFoundException
+     */
+    public function getInternalMappedField(string $internalObjectName, string $integrationObjectName, string $integrationFieldName): string
+    {
+        if (!array_key_exists($internalObjectName, $this->internalObjectsMapping)) {
+            throw new ObjectNotFoundException($internalObjectName);
+        }
+
+        if (!array_key_exists($integrationObjectName, $this->objectsMapping[$internalObjectName])) {
+            throw new ObjectNotFoundException($integrationObjectName);
+        }
+
+        /** @var ObjectMappingDAO $objectMappingDAO */
+        $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
+        $fieldMappings    = $objectMappingDAO->getFieldMappings();
+        foreach ($fieldMappings as $fieldMapping) {
+            if ($fieldMapping->getIntegrationField() === $integrationFieldName) {
+                return $fieldMapping->getInternalField();
+            }
+        }
+
+        throw new FieldNotFoundException($integrationFieldName, $integrationObjectName);
     }
 }

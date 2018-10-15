@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
+namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 
 use Doctrine\DBAL\Connection;
@@ -22,7 +22,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
-class CompanyObject implements ObjectInterface
+class CompanyObjectHelper implements ObjectHelperInterface
 {
     /**
      * @var CompanyModel

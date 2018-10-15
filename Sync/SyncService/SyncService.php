@@ -17,7 +17,8 @@ use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcessFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -27,19 +28,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class SyncService implements SyncServiceInterface
 {
     /**
-     * @var SyncJudgeInterface
-     */
-    private $syncJudge;
-
-    /**
      * @var SyncProcessFactoryInterface
      */
     private $integrationSyncProcessFactory;
-
-    /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
 
     /**
      * @var SyncDataExchangeInterface
@@ -47,9 +38,24 @@ final class SyncService implements SyncServiceInterface
     private $internalSyncDataExchange;
 
     /**
+     * @var SyncDateHelper
+     */
+    private $syncDateHelper;
+
+    /**
      * @var MappingHelper
      */
     private $mappingHelper;
+
+    /**
+     * @var IntegrationSyncProcess
+     */
+    private $integratinSyncProcess;
+
+    /**
+     * @var MauticSyncProcess
+     */
+    private $mauticSyncProcess;
 
     /**
      * @var SyncIntegrationsHelper
@@ -63,30 +69,33 @@ final class SyncService implements SyncServiceInterface
     /**
      * SyncService constructor.
      *
-     * @param SyncJudgeInterface          $syncJudge
      * @param SyncProcessFactoryInterface $integrationSyncProcessFactory
-     * @param SyncDateHelper              $syncDateHelper
      * @param MauticSyncDataExchange      $internalSyncDataExchange
+     * @param SyncDateHelper              $syncDateHelper
      * @param MappingHelper               $mappingHelper
      * @param SyncIntegrationsHelper      $syncIntegrationsHelper
      * @param EventDispatcherInterface    $eventDispatcher
+     * @param IntegrationSyncProcess      $integrationSyncProcess
+     * @param MauticSyncProcess           $mauticSyncProcess
      */
     public function __construct(
-        SyncJudgeInterface $syncJudge,
         SyncProcessFactoryInterface $integrationSyncProcessFactory,
-        SyncDateHelper $syncDateHelper,
         MauticSyncDataExchange $internalSyncDataExchange,
+        SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
         SyncIntegrationsHelper $syncIntegrationsHelper,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        IntegrationSyncProcess $integrationSyncProcess,
+        MauticSyncProcess $mauticSyncProcess
     ) {
-        $this->syncJudge                     = $syncJudge;
         $this->integrationSyncProcessFactory = $integrationSyncProcessFactory;
-        $this->syncDateHelper                = $syncDateHelper;
         $this->internalSyncDataExchange      = $internalSyncDataExchange;
+        $this->syncDateHelper                = $syncDateHelper;
         $this->mappingHelper                 = $mappingHelper;
         $this->syncIntegrationsHelper        = $syncIntegrationsHelper;
         $this->eventDispatcher               = $eventDispatcher;
+        $this->integratinSyncProcess         = $integrationSyncProcess;
+        $this->mauticSyncProcess             = $mauticSyncProcess;
     }
 
     /**
@@ -102,16 +111,18 @@ final class SyncService implements SyncServiceInterface
         $firstTimeSync,
         \DateTimeInterface $syncFromDateTime = null,
         \DateTimeInterface $syncToDateTime = null
-    ) {
+    )
+    {
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
-            $this->syncJudge,
-            $this->syncIntegrationsHelper->getMappingManual($integration),
-            $this->internalSyncDataExchange,
-            $this->syncIntegrationsHelper->getSyncDataExchange($integration),
             $this->syncDateHelper,
             $this->mappingHelper,
-            $firstTimeSync,
+            $this->integratinSyncProcess,
+            $this->mauticSyncProcess,
             $this->eventDispatcher,
+            $this->internalSyncDataExchange,
+            $this->syncIntegrationsHelper->getSyncDataExchange($integration),
+            $this->syncIntegrationsHelper->getMappingManual($integration),
+            $firstTimeSync,
             $syncFromDateTime,
             $syncToDateTime
         );
@@ -129,6 +140,9 @@ final class SyncService implements SyncServiceInterface
         $integrationSyncProcess->execute();
     }
 
+    /**
+     * @param DebugLogger $logger
+     */
     public function initiateDebugLogger(DebugLogger $logger)
     {
         // Yes it's a hack to prevent from having to pass the logger as a dependency into dozens of classes

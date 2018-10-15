@@ -57,27 +57,29 @@ class ObjectChangeDAO
      * @var FieldDAO[]
      */
     private $fieldsByState = [
-        ReportFieldDAO::FIELD_CHANGED => [],
+        ReportFieldDAO::FIELD_CHANGED   => [],
         ReportFieldDAO::FIELD_UNCHANGED => [],
-        ReportFieldDAO::FIELD_REQUIRED => [],
+        ReportFieldDAO::FIELD_REQUIRED  => [],
     ];
 
     /**
      * ObjectChangeDAO constructor.
      *
-     * @param string $integration
-     * @param string $object
-     * @param mixed  $objectId
-     * @param mixed  $mappedId     ID of the source object
-     * @param string $mappedObject Name of the source object type
+     * @param string             $integration
+     * @param string             $object
+     * @param mixed              $objectId
+     * @param string             $mappedObject   Name of the source object type
+     * @param mixed              $mappedId       ID of the source object
+     * @param \DateTimeInterface $changeDateTime Date\Time the object was last changed
      */
-    public function __construct($integration, $object, $objectId, $mappedObject, $mappedId)
+    public function __construct($integration, $object, $objectId, $mappedObject, $mappedId, \DateTimeInterface $changeDateTime = null)
     {
-        $this->integration  = $integration;
-        $this->object       = $object;
-        $this->objectId     = $objectId;
-        $this->mappedId     = $mappedId;
-        $this->mappedObject = $mappedObject;
+        $this->integration    = $integration;
+        $this->object         = $object;
+        $this->objectId       = $objectId;
+        $this->mappedObject   = $mappedObject;
+        $this->mappedId       = $mappedId;
+        $this->changeDateTime = $changeDateTime;
     }
 
     /**

@@ -74,7 +74,7 @@ class InformationChangeRequestDAO
     /**
      * @return string
      */
-    public function getIntegration()
+    public function getIntegration(): string
     {
         return $this->integration;
     }
@@ -90,7 +90,7 @@ class InformationChangeRequestDAO
     /**
      * @return string
      */
-    public function getObject()
+    public function getObject(): string
     {
         return $this->objectName;
     }
@@ -98,7 +98,7 @@ class InformationChangeRequestDAO
     /**
      * @return string
      */
-    public function getField()
+    public function getField(): string
     {
         return $this->field;
     }
@@ -106,7 +106,7 @@ class InformationChangeRequestDAO
     /**
      * @return NormalizedValueDAO
      */
-    public function getNewValue()
+    public function getNewValue(): NormalizedValueDAO
     {
         return $this->newValue;
     }
@@ -114,7 +114,7 @@ class InformationChangeRequestDAO
     /**
      * @return \DateTimeInterface|null
      */
-    public function getPossibleChangeDateTime()
+    public function getPossibleChangeDateTime(): ?\DateTimeInterface
     {
         return $this->possibleChangeDateTime;
     }
@@ -124,7 +124,7 @@ class InformationChangeRequestDAO
      *
      * @return InformationChangeRequestDAO
      */
-    public function setPossibleChangeDateTime(\DateTimeInterface $possibleChangeDateTime = null)
+    public function setPossibleChangeDateTime(\DateTimeInterface $possibleChangeDateTime = null): InformationChangeRequestDAO
     {
         $this->possibleChangeDateTime = $possibleChangeDateTime;
 
@@ -134,7 +134,7 @@ class InformationChangeRequestDAO
     /**
      * @return \DateTimeInterface|null
      */
-    public function getCertainChangeDateTime()
+    public function getCertainChangeDateTime(): ?\DateTimeInterface
     {
         return $this->certainChangeDateTime;
     }
@@ -144,7 +144,7 @@ class InformationChangeRequestDAO
      *
      * @return InformationChangeRequestDAO
      */
-    public function setCertainChangeDateTime(\DateTimeInterface $certainChangeDateTime = null)
+    public function setCertainChangeDateTime(\DateTimeInterface $certainChangeDateTime = null): InformationChangeRequestDAO
     {
         $this->certainChangeDateTime = $certainChangeDateTime;
 

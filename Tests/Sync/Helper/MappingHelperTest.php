@@ -18,9 +18,10 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\CompanyObject;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MappingHelperTest extends \PHPUnit_Framework_TestCase
@@ -31,12 +32,12 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
     private $fieldModel;
 
     /**
-     * @var ContactObject|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $contactObjectHelper;
 
     /**
-     * @var CompanyObject|\PHPUnit_Framework_MockObject_MockObject
+     * @var CompanyObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $companyObjectHelper;
 
@@ -48,8 +49,8 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->fieldModel              = $this->createMock(FieldModel::class);
-        $this->contactObjectHelper     = $this->createMock(ContactObject::class);
-        $this->companyObjectHelper     = $this->createMock(CompanyObject::class);
+        $this->contactObjectHelper     = $this->createMock(ContactObjectHelper::class);
+        $this->companyObjectHelper     = $this->createMock(CompanyObjectHelper::class);
         $this->objectMappingRepository = $this->createMock(ObjectMappingRepository::class);
     }
 
@@ -108,7 +109,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $mappingManual = $this->createMock(MappingManualDAO::class);
         $mappingManual->expects($this->once())
             ->method('getIntegrationMappedField')
-            ->with($internalObjectName, $integrationObjectDAO->getObject(), 'email')
+            ->with($integrationObjectDAO->getObject(), $internalObjectName, 'email')
             ->willReturn('integration_email');
 
         $this->contactObjectHelper->expects($this->once())
@@ -140,7 +141,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $mappingManual = $this->createMock(MappingManualDAO::class);
         $mappingManual->expects($this->once())
             ->method('getIntegrationMappedField')
-            ->with($internalObjectName, $integrationObjectDAO->getObject(), 'email')
+            ->with($integrationObjectDAO->getObject(), $internalObjectName, 'email')
             ->willReturn('integration_email');
         $mappingManual->expects($this->exactly(2))
             ->method('getIntegration')
@@ -183,7 +184,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $mappingManual = $this->createMock(MappingManualDAO::class);
         $mappingManual->expects($this->once())
             ->method('getIntegrationMappedField')
-            ->with($internalObjectName, $integrationObjectDAO->getObject(), 'email')
+            ->with($integrationObjectDAO->getObject(), $internalObjectName, 'email')
             ->willReturn('integration_email');
         $mappingManual->expects($this->exactly(2))
             ->method('getIntegration')
@@ -210,12 +211,60 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testIntegrationObjectReturnedIfMapped()
     {
-        //findIntegrationObject
+        $objectName     = 'Object';
+        $objectId       = 1;
+        $changeDateTime = '2018-10-08 00:00:00';
+
+        $this->objectMappingRepository->expects($this->once())
+            ->method('getIntegrationObject')
+            ->willReturn(
+                [
+                    'is_deleted'            => false,
+                    'integration_object_id' => $objectId,
+                    'last_sync_date'        => $changeDateTime,
+                ]
+            );
+
+        $foundIntegrationObject = $this->getMappingHelper()->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
+
+        $this->assertEquals($objectName, $foundIntegrationObject->getObject());
+        $this->assertEquals($objectId, $foundIntegrationObject->getObjectId());
+        $this->assertEquals($changeDateTime, $foundIntegrationObject->getChangeDateTime()->format('Y-m-d H:i:s'));
     }
 
     public function testEmptyIntegrationObjectReturnedIfNotMapped()
     {
-        //findIntegrationObject
+        $objectName     = 'Object';
+        $this->objectMappingRepository->expects($this->once())
+            ->method('getIntegrationObject')
+            ->willReturn([]);
+
+        $foundIntegrationObject = $this->getMappingHelper()->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
+
+        $this->assertEquals($objectName, $foundIntegrationObject->getObject());
+        $this->assertEquals(null, $foundIntegrationObject->getObjectId());
+        $this->assertEquals(null, $foundIntegrationObject->getChangeDateTime());
+    }
+
+    public function testDeletedExceptionThrownIfIntegrationObjectHasBeenNotedAsDeleted()
+    {
+        $this->expectException(ObjectDeletedException::class);
+
+        $objectName     = 'Object';
+        $objectId       = 1;
+        $changeDateTime = '2018-10-08 00:00:00';
+
+        $this->objectMappingRepository->expects($this->once())
+            ->method('getIntegrationObject')
+            ->willReturn(
+                [
+                    'is_deleted'            => true,
+                    'integration_object_id' => $objectId,
+                    'last_sync_date'        => $changeDateTime,
+                ]
+            );
+
+        $this->getMappingHelper()->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
     }
 
     /**

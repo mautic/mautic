@@ -23,8 +23,8 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\CompanyObject;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\ContactObject;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MappingHelper
@@ -35,12 +35,12 @@ class MappingHelper
     private $fieldModel;
 
     /**
-     * @var ContactObject
+     * @var ContactObjectHelper
      */
     private $contactObjectHelper;
 
     /**
-     * @var CompanyObject
+     * @var CompanyObjectHelper
      */
     private $companyObjectHelper;
 
@@ -54,10 +54,10 @@ class MappingHelper
      *
      * @param FieldModel              $fieldModel
      * @param ObjectMappingRepository $objectMappingRepository
-     * @param ContactObject           $contactObjectHelper
-     * @param CompanyObject           $companyObjectHelper
+     * @param ContactObjectHelper     $contactObjectHelper
+     * @param CompanyObjectHelper     $companyObjectHelper
      */
-    public function __construct(FieldModel $fieldModel, ObjectMappingRepository $objectMappingRepository, ContactObject $contactObjectHelper, CompanyObject $companyObjectHelper)
+    public function __construct(FieldModel $fieldModel, ObjectMappingRepository $objectMappingRepository, ContactObjectHelper $contactObjectHelper, CompanyObjectHelper $companyObjectHelper)
     {
         $this->fieldModel              = $fieldModel;
         $this->objectMappingRepository = $objectMappingRepository;
@@ -96,7 +96,7 @@ class MappingHelper
 
         foreach ($uniqueIdentifierFields as $field => $fieldLabel) {
             try {
-                $integrationField = $mappingManualDAO->getIntegrationMappedField($internalObjectName, $integrationObjectDAO->getObject(), $field);
+                $integrationField = $mappingManualDAO->getIntegrationMappedField($integrationObjectDAO->getObject(), $internalObjectName, $field);
                 if ($integrationValue = $integrationObjectDAO->getField($integrationField)) {
                     $identifiers[$field] = $integrationValue->getValue()->getNormalizedValue();
                 }

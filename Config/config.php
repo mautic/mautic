@@ -82,9 +82,7 @@ return [
             'mautic.integrations.form.config.sync_settings_field_mappings' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
                 'arguments' => [
-                    'translator',
-                    'mautic.lead.model.field',
-                    'mautic.channel.helper.channel_list',
+                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
                 ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field_directions' => [
@@ -185,7 +183,7 @@ return [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudge::class,
             ],
             'mautic.integrations.helper.contact_object' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\ContactObject::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.lead',
@@ -195,38 +193,105 @@ return [
                 ],
             ],
             'mautic.integrations.helper.company_object' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject\CompanyObject::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper::class,
                 'arguments' => [
                     'mautic.lead.model.company',
                     'mautic.lead.repository.company',
                     'doctrine.dbal.default_connection',
                 ],
             ],
+            'mautic.integrations.sync.data_exchange.mautic.order_executioner' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner::class,
+                'arguments' => [
+                    'mautic.integrations.helper.sync_mapping',
+                    'mautic.integrations.helper.contact_object',
+                    'mautic.integrations.helper.company_object',
+                ],
+            ],
+            'mautic.integrations.sync.data_exchange.mautic.field_helper' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.integrations.helper.variable_expresser',
+                    'mautic.channel.helper.channel_list',
+                    'translator',
+                ],
+            ],
+            'mautic.integrations.sync.data_exchange.mautic.field_builder' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder::class,
+                'arguments' => [
+                    'router',
+                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
+                    'mautic.integrations.helper.contact_object',
+                ],
+            ],
+            'mautic.integrations.sync.data_exchange.mautic.full_object_report_builder' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder::class,
+                'arguments' => [
+                    'mautic.integrations.helper.contact_object',
+                    'mautic.integrations.helper.company_object',
+                    'mautic.integrations.sync.data_exchange.mautic.field_builder'
+                ],
+            ],
+            'mautic.integrations.sync.data_exchange.mautic.partial_object_report_builder' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder::class,
+                'arguments' => [
+                    'mautic.integrations.repository.field_change',
+                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
+                    'mautic.integrations.helper.contact_object',
+                    'mautic.integrations.helper.company_object',
+                    'mautic.integrations.sync.data_exchange.mautic.field_builder',
+                ],
+            ],
             'mautic.integrations.sync.data_exchange.mautic' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
-                    'mautic.integrations.helper.variable_expresser',
+                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
                     'mautic.integrations.helper.sync_mapping',
-                    'mautic.integrations.helper.company_object',
-                    'mautic.integrations.helper.contact_object',
-                    'mautic.lead.model.field',
-                    'router'
+                    'mautic.integrations.sync.data_exchange.mautic.full_object_report_builder',
+                    'mautic.integrations.sync.data_exchange.mautic.partial_object_report_builder',
+                    'mautic.integrations.sync.data_exchange.mautic.order_executioner',
                 ],
             ],
-            'mautic.integrations.helper.sync_process_factory' => [
+            'mautic.integrations.sync.process_factory' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcessFactory::class,
+            ],
+            'mautic.integrations.sync.integration_process.object_change_generator' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator::class,
+            ],
+            'mautic.integrations.sync.integration_process' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess::class,
+                'arguments' => [
+                    'mautic.integrations.helper.sync_date',
+                    'mautic.integrations.helper.sync_mapping',
+                    'mautic.integrations.sync.integration_process.object_change_generator',
+                ],
+            ],
+            'mautic.integrations.sync.internal_process.object_change_generator' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator::class,
+                'arguments' => [
+                    'mautic.integrations.helper.sync_judge',
+                ],
+            ],
+            'mautic.integrations.sync.internal_process' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess::class,
+                'arguments' => [
+                    'mautic.integrations.helper.sync_date',
+                    'mautic.integrations.sync.internal_process.object_change_generator',
+                ],
             ],
             'mautic.integrations.sync.service' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService::class,
                 'arguments' => [
-                    'mautic.integrations.helper.sync_judge',
-                    'mautic.integrations.helper.sync_process_factory',
-                    'mautic.integrations.helper.sync_date',
+                    'mautic.integrations.sync.process_factory',
                     'mautic.integrations.sync.data_exchange.mautic',
+                    'mautic.integrations.helper.sync_date',
                     'mautic.integrations.helper.sync_mapping',
                     'mautic.integrations.helper.sync_integrations',
-                    'event_dispatcher'
+                    'event_dispatcher',
+                    'mautic.integrations.sync.integration_process',
+                    'mautic.integrations.sync.internal_process',
                 ],
                 'methodCalls' => [
                     'initiateDebugLogger' => ['mautic.sync.logger'],
