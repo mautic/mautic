@@ -17,9 +17,9 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Token\TokenReplacerInterface;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -77,22 +77,22 @@ class FocusSubscriber extends CommonSubscriber
     protected $focusModel;
 
     /**
-     * @var ContactTokenReplacer
+     * @var TokenReplacerInterface
      */
     private $contactTokenReplacer;
 
     /**
      * FocusSubscriber constructor.
      *
-     * @param RouterInterface      $router
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param AuditLogModel        $auditLogModel
-     * @param TrackableModel       $trackableModel
-     * @param PageTokenHelper      $pageTokenHelper
-     * @param AssetTokenHelper     $assetTokenHelper
-     * @param FormTokenHelper      $formTokenHelper
-     * @param FocusModel           $focusModel
-     * @param ContactTokenReplacer $contactTokenReplacer
+     * @param RouterInterface        $router
+     * @param IpLookupHelper         $ipLookupHelper
+     * @param AuditLogModel          $auditLogModel
+     * @param TrackableModel         $trackableModel
+     * @param PageTokenHelper        $pageTokenHelper
+     * @param AssetTokenHelper       $assetTokenHelper
+     * @param FormTokenHelper        $formTokenHelper
+     * @param FocusModel             $focusModel
+     * @param TokenReplacerInterface $contactTokenReplacer
      */
     public function __construct(
         RouterInterface $router,
@@ -103,7 +103,7 @@ class FocusSubscriber extends CommonSubscriber
         AssetTokenHelper $assetTokenHelper,
         FormTokenHelper $formTokenHelper,
         FocusModel $focusModel,
-        ContactTokenReplacer $contactTokenReplacer
+        TokenReplacerInterface $contactTokenReplacer
     ) {
         $this->router               = $router;
         $this->ipHelper             = $ipLookupHelper;

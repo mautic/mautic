@@ -17,7 +17,7 @@ use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
-use Mautic\LeadBundle\Token\ContactTokenReplacer;
+use Mautic\CoreBundle\Token\TokenReplacerInterface;
 use Mautic\WebhookBundle\WebhookEvents;
 
 /**
@@ -31,17 +31,17 @@ class CampaignSubscriber extends CommonSubscriber
     protected $connector;
 
     /**
-     * @var ContactTokenReplacer
+     * @var TokenReplacerInterface
      */
     private $contactTokenReplacer;
 
     /**
      * CampaignSubscriber constructor.
      *
-     * @param Http                 $connector
-     * @param ContactTokenReplacer $contactTokenReplacer
+     * @param Http                   $connector
+     * @param TokenReplacerInterface $contactTokenReplacer
      */
-    public function __construct(Http $connector, ContactTokenReplacer $contactTokenReplacer)
+    public function __construct(Http $connector, TokenReplacerInterface $contactTokenReplacer)
     {
         $this->connector            = $connector;
         $this->contactTokenReplacer = $contactTokenReplacer;

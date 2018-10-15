@@ -12,8 +12,8 @@
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\CoreBundle\Token\TokenReplacerInterface;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -56,19 +56,19 @@ class CampaignEventHelper
     protected $clickthrough = [];
 
     /**
-     * @var ContactTokenReplacer
+     * @var TokenReplacerInterface
      */
     private $contactTokenReplacer;
 
     /**
      * CampaignEventHelper constructor.
      *
-     * @param IntegrationHelper    $integrationHelper
-     * @param TrackableModel       $trackableModel
-     * @param PageTokenHelper      $pageTokenHelper
-     * @param AssetTokenHelper     $assetTokenHelper
-     * @param TweetModel           $tweetModel
-     * @param ContactTokenReplacer $contactTokenReplacer
+     * @param IntegrationHelper      $integrationHelper
+     * @param TrackableModel         $trackableModel
+     * @param PageTokenHelper        $pageTokenHelper
+     * @param AssetTokenHelper       $assetTokenHelper
+     * @param TweetModel             $tweetModel
+     * @param TokenReplacerInterface $contactTokenReplacer
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
@@ -76,7 +76,7 @@ class CampaignEventHelper
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper,
         TweetModel $tweetModel,
-        ContactTokenReplacer $contactTokenReplacer
+        TokenReplacerInterface $contactTokenReplacer
     ) {
         $this->integrationHelper    = $integrationHelper;
         $this->trackableModel       = $trackableModel;

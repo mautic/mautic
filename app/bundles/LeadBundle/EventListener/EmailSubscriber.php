@@ -13,10 +13,10 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Token\TokenReplacerInterface;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\LeadBundle\Token\ContactTokenReplacer;
 
 /**
  * Class EmailSubscriber.
@@ -24,16 +24,16 @@ use Mautic\LeadBundle\Token\ContactTokenReplacer;
 class EmailSubscriber extends CommonSubscriber
 {
     /**
-     * @var ContactTokenReplacer
+     * @var TokenReplacerInterface
      */
     private $contactTokenReplacer;
 
     /**
      * EmailSubscriber constructor.
      *
-     * @param ContactTokenReplacer $contactTokenReplacer
+     * @param TokenReplacerInterface $contactTokenReplacer
      */
-    public function __construct(ContactTokenReplacer $contactTokenReplacer)
+    public function __construct(TokenReplacerInterface $contactTokenReplacer)
     {
         $this->contactTokenReplacer = $contactTokenReplacer;
     }

@@ -15,8 +15,8 @@ use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Token\TokenReplacerInterface;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Mautic\NotificationBundle\Event\NotificationEvent;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Entity\Trackable;
@@ -49,20 +49,20 @@ class NotificationSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * @var ContactTokenReplacer
+     * @var TokenReplacerInterface
      */
     private $contactTokenReplacer;
 
     /**
      * NotificationSubscriber constructor.
      *
-     * @param AuditLogModel        $auditLogModel
-     * @param TrackableModel       $trackableModel
-     * @param PageTokenHelper      $pageTokenHelper
-     * @param AssetTokenHelper     $assetTokenHelper
-     * @param ContactTokenReplacer $contactTokenReplacer
+     * @param AuditLogModel          $auditLogModel
+     * @param TrackableModel         $trackableModel
+     * @param PageTokenHelper        $pageTokenHelper
+     * @param AssetTokenHelper       $assetTokenHelper
+     * @param TokenReplacerInterface $contactTokenReplacer
      */
-    public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper, ContactTokenReplacer $contactTokenReplacer)
+    public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper, TokenReplacerInterface $contactTokenReplacer)
     {
         $this->auditLogModel        = $auditLogModel;
         $this->trackableModel       = $trackableModel;
