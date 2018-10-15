@@ -24,8 +24,7 @@ use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 
 class ExampleSyncDataExchange implements SyncDataExchangeInterface
 {
-    const OBJECT_LEAD = 'lead';
-    const OBJECT_CONTACT = 'contact';
+    const OBJECT_LEAD = 'integration_lead';
 
     /**
      * @var array
@@ -81,7 +80,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      */
     public function executeSyncOrder(OrderDAO $syncOrderDAO)
     {
-        $byEmail = [self::OBJECT_CONTACT => [], self::OBJECT_LEAD => []];
+        $byEmail = [];
 
         $orderedObjects = $syncOrderDAO->getUnidentifiedObjects();
         foreach ($orderedObjects as $objectName => $unidentifiedObjects) {
@@ -99,7 +98,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 $emailAddress = $unidentifiedObject->getField('email')->getValue()->getNormalizedValue();
 
                 // Store by email address so they can be found again when we update the OrderDAO about mapping
-                $byEmail[$unidentifiedObject->getObject()][$emailAddress] = $unidentifiedObject;
+                $byEmail[$emailAddress] = $unidentifiedObject;
 
                 // Build the person's profile
                 $person = ['object' => $objectName];
@@ -124,7 +123,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
              */
             foreach ($identifiedObjects as $id => $identifiedObject) {
                 // Use getChangedFields in order to update only fields that have been modified since
-                $fields = $identifiedObject->getChangedFields();
+                $fields = $identifiedObject->getFields();
 
                 // Build the person's profile
                 $person = [
@@ -144,12 +143,12 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
 
         // Notify the order regarding the status of objects
         foreach ($response as $result) {
-            if (empty($byEmail[$result['object']][$result['email']])) {
+            if (empty($byEmail[$result['email']])) {
                 continue;
             }
 
             /** @var ObjectChangeDAO $changeObject */
-            $changeObject = $byEmail[$result['object']][$result['email']];
+            $changeObject = $byEmail[$result['email']];
 
             switch ($result['code']) {
                 case 200: // updated
@@ -174,7 +173,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                         $changeObject->getObject(),
                         $changeObject->getObjectId(),
                         $result['converted_id'],
-                        self::OBJECT_CONTACT
+                        self::OBJECT_LEAD
                     );
                 case 500: // there was some kind of temporary issue so just retry this later
                     $syncOrderDAO->retrySyncLater($changeObject);
@@ -258,41 +257,37 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         // applicable to the integration. I.e. Salesforce supports querying for specific fields in it's SOQL
 
         $payload = [
-            self::OBJECT_CONTACT => [
-                [
-                    'id'            => 1,
-                    'first_name'    => 'John',
-                    'last_name'     => 'Contact',
-                    'email'         => 'john.contact@test.com',
-                    'last_modified' => '2018-08-02T10:02:00+05:00',
-                ],
-                [
-                    'id'            => 2,
-                    'first_name'    => 'Jane',
-                    'last_name'     => 'Contact',
-                    'email'         => 'jane.contact@test.com',
-                    'last_modified' => '2018-08-02T10:07:00+05:00',
-                ],
+            [
+                'id'            => 1,
+                'first_name'    => 'John',
+                'last_name'     => 'Contact',
+                'email'         => 'john.contact@test.com',
+                'last_modified' => '2018-08-02T10:02:00+05:00',
             ],
-            self::OBJECT_LEAD    => [
-                [
-                    'id'            => 3,
-                    'first_name'    => 'Overwrite',
-                    'last_name'     => 'Me',
-                    'email'         => 'NellieABaird@armyspy.com',
-                    'last_modified' => '2018-08-02T10:02:00+05:00',
-                ],
-                [
-                    'id'            => 4,
-                    'first_name'    => 'Overwrite',
-                    'last_name'     => 'Me',
-                    'email'         => 'LewisTSyed@gustr.com',
-                    'last_modified' => '2018-08-02T10:07:00+05:00',
-                ],
+            [
+                'id'            => 2,
+                'first_name'    => 'Jane',
+                'last_name'     => 'Contact',
+                'email'         => 'jane.contact@test.com',
+                'last_modified' => '2018-08-02T10:07:00+05:00',
+            ],
+            [
+                'id'            => 3,
+                'first_name'    => 'Overwrite',
+                'last_name'     => 'Me',
+                'email'         => 'NellieABaird@armyspy.com',
+                'last_modified' => '2018-08-02T10:02:00+05:00',
+            ],
+            [
+                'id'            => 4,
+                'first_name'    => 'Overwrite',
+                'last_name'     => 'Me',
+                'email'         => 'LewisTSyed@gustr.com',
+                'last_modified' => '2018-08-02T10:07:00+05:00',
             ],
         ];
 
-        return $payload[$object];
+        return $payload;
     }
 
     /**

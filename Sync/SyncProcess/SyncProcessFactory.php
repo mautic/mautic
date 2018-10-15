@@ -14,7 +14,8 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -23,40 +24,43 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class SyncProcessFactory implements SyncProcessFactoryInterface
 {
     /**
-     * @param SyncJudgeInterface        $syncJudge
-     * @param MappingManualDAO          $integrationMappingManual
-     * @param SyncDataExchangeInterface $internalSyncDataExchange
-     * @param SyncDataExchangeInterface $integrationSyncDataExchange
      * @param SyncDateHelper            $syncDateHelper
      * @param MappingHelper             $mappingHelper
-     * @param \DateTimeInterface|null   $isFirstTimeSync
+     * @param IntegrationSyncProcess    $integrationSyncProcess
+     * @param MauticSyncProcess         $mauticSyncProcess
      * @param EventDispatcherInterface  $eventDispatcher
+     * @param SyncDataExchangeInterface $internalSyncDataExchange
+     * @param SyncDataExchangeInterface $integrationSyncDataExchange
+     * @param MappingManualDAO          $integrationMappingManual
+     * @param                           $isFirstTimeSync
      * @param \DateTimeInterface|null   $syncFromDateTime
      * @param \DateTimeInterface|null   $syncToDateTime
      *
      * @return SyncProcess
      */
     public function create(
-        SyncJudgeInterface $syncJudge,
-        MappingManualDAO $integrationMappingManual,
-        SyncDataExchangeInterface $internalSyncDataExchange,
-        SyncDataExchangeInterface $integrationSyncDataExchange,
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
-        $isFirstTimeSync,
+        IntegrationSyncProcess $integrationSyncProcess,
+        MauticSyncProcess $mauticSyncProcess,
         EventDispatcherInterface $eventDispatcher,
+        SyncDataExchangeInterface $internalSyncDataExchange,
+        SyncDataExchangeInterface $integrationSyncDataExchange,
+        MappingManualDAO $integrationMappingManual,
+        $isFirstTimeSync,
         \DateTimeInterface $syncFromDateTime = null,
         \DateTimeInterface $syncToDateTime = null
     ): SyncProcess {
         return new SyncProcess(
-            $syncJudge,
+            $syncDateHelper,
+            $mappingHelper,
+            $integrationSyncProcess,
+            $mauticSyncProcess,
+            $eventDispatcher,
             $integrationMappingManual,
             $internalSyncDataExchange,
             $integrationSyncDataExchange,
-            $syncDateHelper,
-            $mappingHelper,
             $isFirstTimeSync,
-            $eventDispatcher,
             $syncFromDateTime,
             $syncToDateTime
         );

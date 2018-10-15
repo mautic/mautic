@@ -96,13 +96,6 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
         );
         $mappingManual->addObjectMapping($leadObjectMapping);
 
-        // Then it is also mapping Mautic's Contact object to the Example's Contact object
-        $contactObjectMapping = new ObjectMappingDAO(
-            MauticSyncDataExchange::OBJECT_CONTACT,
-            ExampleSyncDataExchange::OBJECT_CONTACT
-        );
-        $mappingManual->addObjectMapping($contactObjectMapping);
-
         // Get field mapping as configured in Mautic's integration config
         $mappedFields = $this->getConfiguredFieldMapping();
 
@@ -110,11 +103,14 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
             // In this case, we're just adding each field to each of the objects
             // Of course, other integrations may need more logic
 
-            // The lead object will only sync from Mautic to the integration; it's also possible to set ObjectMappingDAO::SYNC_TO_MAUTIC
-            $leadObjectMapping->addFieldMapping($mauticField, $integrationField, ObjectMappingDAO::SYNC_TO_INTEGRATION);
+            // Sync bidirectionally by default but also can use ObjectMappingDAO::SYNC_TO_MAUTIC or ObjectMappingDAO::SYNC_TO_INTEGRATION
 
-            // The contact object will sync by default, bidirectionally
-            $contactObjectMapping->addFieldMapping($mauticField, $integrationField);
+            if ('email' === $mauticField) {
+                // Set email as a required field so that it maps a value regardless if changed
+                $leadObjectMapping->addFieldMapping($mauticField, $integrationField, ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
+            } else {
+                $leadObjectMapping->addFieldMapping($mauticField, $integrationField);
+            }
         }
 
         return $mappingManual;

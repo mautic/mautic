@@ -116,21 +116,6 @@ class ObjectMappingDAO
     }
 
     /**
-     * @param int $internalObjectId
-     * @param int $integrationObjectId
-     *
-     * @throws \LogicException
-     */
-    public function mapIds(int $internalObjectId, $integrationObjectId)
-    {
-        if (array_key_exists($internalObjectId, $this->internalIdMapping)) {
-            throw new \LogicException(); // TODO better exception
-        }
-        $this->internalIdMapping[$internalObjectId]       = $integrationObjectId;
-        $this->integrationIdMapping[$integrationObjectId] = $internalObjectId;
-    }
-
-    /**
      * @return string
      */
     public function getInternalObjectName(): string

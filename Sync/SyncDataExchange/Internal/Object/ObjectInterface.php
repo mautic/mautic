@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\InternalObject;
+namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object;
 
 
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;

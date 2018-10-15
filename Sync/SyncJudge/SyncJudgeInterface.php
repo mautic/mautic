@@ -19,32 +19,37 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
  */
 interface SyncJudgeInterface
 {
-    /**
-     * Winner is selected only if provided vindications don't leave open possibilities of different result.
-     */
-    const PRESUMPTION_OF_INNOCENCE_MODE = 'presumptionOfInnocence';
 
     /**
-     * Winner is selected based on certain information only.
+     * Winner is selected based on the field was updated after the loser
      */
-    const HARD_EVIDENCE_MODE            = 'hardEvidence';
+    const HARD_EVIDENCE_MODE = 'hard';
 
     /**
-     * Winner is selected based on best evidence available.
+     * Winner is selected based on hard evidence if available, otherwise if the object of the winner was updated after the object of the loser.
      */
-    const BEST_EVIDENCE_MODE            = 'bestEvidence';
+    const BEST_EVIDENCE_MODE = 'best';
 
     /**
-     * @param string $mode
-     * @param InformationChangeRequestDAO|null $changeRequest1
-     * @param InformationChangeRequestDAO|null $changeRequest2
+     * Winner is selected based on the probability that it was updated after the loser
+     */
+    const FUZZY_EVIDENCE_MODE = 'fuzzy';
+
+    const LEFT_WINNER = 'left';
+    const RIGHT_WINNER = 'right';
+    const NO_WINNER = 'no';
+
+    /**
+     * @param string                           $mode
+     * @param InformationChangeRequestDAO $leftChangeRequest
+     * @param InformationChangeRequestDAO $rightChangeRequest
      *
      * @return InformationChangeRequestDAO
      * @throws ConflictUnresolvedException
      */
     public function adjudicate(
-        $mode = self::PRESUMPTION_OF_INNOCENCE_MODE,
-        InformationChangeRequestDAO $changeRequest1 = null,
-        InformationChangeRequestDAO $changeRequest2 = null
+        $mode = self::FUZZY_EVIDENCE_MODE,
+        InformationChangeRequestDAO $leftChangeRequest,
+        InformationChangeRequestDAO $rightChangeRequest
     );
 }

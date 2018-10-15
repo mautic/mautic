@@ -53,9 +53,9 @@ class ObjectDAO
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return null|\DateTimeInterface
      */
-    public function getChangeDateTime(): \DateTimeInterface
+    public function getChangeDateTime(): ?\DateTimeInterface
     {
         return $this->changeDateTime;
     }
