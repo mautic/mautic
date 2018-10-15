@@ -98,7 +98,7 @@ $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $view[
             echo $view['form']->row($form['featureSettings']['sync']['objects']);
             // @todo echo $view['form']->row($form['featureSettings']['sync']['updateBlanks']);
 
-            if (isset($form['featureSettings']['sync']['custom'])):
+            if (isset($form['featureSettings']['sync']['integration'])):
                 echo $view['form']->row($form['featureSettings']['sync']['integration']);
             endif;
 
