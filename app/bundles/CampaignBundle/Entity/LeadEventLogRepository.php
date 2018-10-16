@@ -280,8 +280,6 @@ class LeadEventLogRepository extends CommonRepository
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
 
-        $results = $q->execute()->fetchAll();
-
         if ($q->getConnection()->getConfiguration()->getResultCacheImpl()) {
             $results = $q->getConnection()->executeCacheQuery(
                 $q->getSQL(),
