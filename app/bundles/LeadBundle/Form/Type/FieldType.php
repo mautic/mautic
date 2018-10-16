@@ -13,8 +13,8 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
@@ -48,7 +48,6 @@ class FieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('lead.field', $options));
 
         $builder->add(
@@ -217,15 +216,18 @@ class FieldType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($listChoices) {
-            $form = $event->getForm();
-            $data = $event->getData();
-            $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
+        $formModifier = function (FormEvent $event) use ($listChoices, $type) {
+            $cleaningRules = [];
+            $form          = $event->getForm();
+            $data          = $event->getData();
+            $type          = (is_array($data)) ? (isset($data['type']) ? $data['type'] : $type) : $data->getType();
 
             switch ($type) {
                 case 'multiselect':
                 case 'select':
                 case 'lookup':
+                    $cleaningRules['defaultValue'] = 'raw';
+
                     if (is_array($data)) {
                         $properties = isset($data['properties']) ? $data['properties'] : [];
                     } else {
@@ -236,10 +238,11 @@ class FieldType extends AbstractType
                         'properties',
                         'sortablelist',
                         [
-                            'required'    => false,
-                            'label'       => 'mautic.lead.field.form.properties.select',
-                            'data'        => $properties,
-                            'with_labels' => ('lookup' !== $type),
+                            'required'          => false,
+                            'label'             => 'mautic.lead.field.form.properties.select',
+                            'data'              => $properties,
+                            'with_labels'       => ('lookup' !== $type),
+                            'option_constraint' => [],
                         ]
                     );
 
@@ -391,6 +394,8 @@ class FieldType extends AbstractType
 
                 break;
             }
+
+            return $cleaningRules;
         };
 
         $builder->addEventListener(
@@ -403,7 +408,13 @@ class FieldType extends AbstractType
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($formModifier) {
-                $formModifier($event);
+                $data          = $event->getData();
+                $cleaningRules = $formModifier($event);
+                $masks         = !empty($cleaningRules) ? $cleaningRules : 'clean';
+                // clean the data
+                $data = InputHelper::_($data, $masks);
+
+                $event->setData($data);
             }
         );
 

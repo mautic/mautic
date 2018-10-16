@@ -11,20 +11,27 @@
 
 namespace Mautic\ChannelBundle\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Model\MessageModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CampaignSubscriber.
  */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var MessageModel
@@ -32,14 +39,39 @@ class CampaignSubscriber extends CommonSubscriber
     protected $messageModel;
 
     /**
-     * @var CampaignModel
+     * @var ActionDispatcher
      */
-    protected $campaignModel;
+    private $actionDispatcher;
 
     /**
-     * @var EventModel
+     * @var EventCollector
      */
-    protected $eventModel;
+    private $eventCollector;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var Event
+     */
+    private $pseudoEvent;
+
+    /**
+     * @var PendingEvent
+     */
+    private $pendingEvent;
+
+    /**
+     * @var ArrayCollection
+     */
+    private $mmLogs;
 
     /**
      * @var array
@@ -49,15 +81,24 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MessageModel  $messageModel
-     * @param CampaignModel $campaignModel
-     * @param EventModel    $eventModel
+     * @param MessageModel        $messageModel
+     * @param ActionDispatcher    $actionDispatcher
+     * @param EventCollector      $collector
+     * @param LoggerInterface     $logger
+     * @param TranslatorInterface $translator
      */
-    public function __construct(MessageModel $messageModel, CampaignModel $campaignModel, EventModel $eventModel)
-    {
-        $this->messageModel  = $messageModel;
-        $this->campaignModel = $campaignModel;
-        $this->eventModel    = $eventModel;
+    public function __construct(
+        MessageModel $messageModel,
+        ActionDispatcher $actionDispatcher,
+        EventCollector $collector,
+        LoggerInterface $logger,
+        TranslatorInterface $translator
+    ) {
+        $this->messageModel     = $messageModel;
+        $this->actionDispatcher = $actionDispatcher;
+        $this->eventCollector   = $collector;
+        $this->logger           = $logger;
+        $this->translator       = $translator;
     }
 
     /**
@@ -66,8 +107,8 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
-            ChannelEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
+            ChannelEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -88,6 +129,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'                  => 'mautic.channel.message.send.marketing.message',
             'description'            => 'mautic.channel.message.send.marketing.message.descr',
             'eventName'              => ChannelEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'batchEventName'         => ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
             'formType'               => 'message_send',
             'formTheme'              => 'MauticChannelBundle:FormTheme\MessageSend',
             'channel'                => 'channel.message',
@@ -97,8 +139,8 @@ class CampaignSubscriber extends CommonSubscriber
                     'decision' => $decisions,
                 ],
             ],
-            'timelineTemplate'     => 'MauticChannelBundle:SubscribedEvents\Timeline:index.html.php',
-            'timelineTemplateVars' => [
+            'timelineTemplate'       => 'MauticChannelBundle:SubscribedEvents\Timeline:index.html.php',
+            'timelineTemplateVars'   => [
                 'messageSettings' => $channels,
             ],
         ];
@@ -106,109 +148,162 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param CampaignExecutionEvent $event
+     * @param PendingEvent $pendingEvent
+     *
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \ReflectionException
      */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(PendingEvent $pendingEvent)
     {
+        $this->pendingEvent = $pendingEvent;
+        $this->pseudoEvent  = clone $pendingEvent->getEvent();
+        $this->pseudoEvent->setCampaign($pendingEvent->getEvent()->getCampaign());
+
+        $this->mmLogs    = $pendingEvent->getPending();
+        $campaignEvent   = $pendingEvent->getEvent();
+        $properties      = $campaignEvent->getProperties();
         $messageSettings = $this->messageModel->getChannels();
-        $id              = (int) $event->getConfig()['marketingMessage'];
+        $id              = (int) $properties['marketingMessage'];
+
+        // Set channel for the event logs
+        $pendingEvent->setChannel('channel.message', $id);
+
         if (!isset($this->messageChannels[$id])) {
             $this->messageChannels[$id] = $this->messageModel->getMessageChannels($id);
         }
-        $lead           = $event->getLead();
-        $channelRules   = $lead->getChannelRules();
-        $result         = false;
-        $channelResults = [];
 
-        // Use preferred channels first
-        $tryChannels = $this->messageChannels[$id];
-        foreach ($channelRules as $channel => $rule) {
-            if ($rule['dnc'] !== DoNotContact::IS_CONTACTABLE) {
-                unset($tryChannels[$channel]);
-                $channelResults[$channel] = [
-                    'failed' => 1,
-                    'dnc'    => $rule['dnc'],
-                ];
+        // organize into preferred channels
+        $preferenceBuilder = new PreferenceBuilder($this->mmLogs, $this->pseudoEvent, $this->messageChannels[$id], $this->logger);
 
-                continue;
-            }
+        // Loop until we have no more channels
+        $priority           = 1;
+        $channelPreferences = $preferenceBuilder->getChannelPreferences();
 
-            if (isset($tryChannels[$channel])) {
-                $messageChannel = $tryChannels[$channel];
-
-                // Remove this channel so that any non-preferred channels can be used as a last resort
-                unset($tryChannels[$channel]);
-
-                // Attempt to send the message
-                if (isset($messageSettings[$channel])) {
-                    $result = $this->sendChannelMessage($channel, $messageChannel, $messageSettings[$channel], $event, $channelResults);
+        while ($priority <= count($this->messageChannels[$id])) {
+            foreach ($channelPreferences as $channel => $preferences) {
+                if (!isset($messageSettings[$channel]['campaignAction'])) {
+                    continue;
                 }
+
+                $channelLogs = $preferences->getLogsByPriority($priority);
+                if (!$channelLogs->count()) {
+                    continue;
+                }
+
+                // Marketing messages mimick campaign actions so create a pseudo event
+                $this->pseudoEvent->setEventType(Event::TYPE_ACTION)
+                    ->setType($messageSettings[$channel]['campaignAction']);
+
+                $successfullyExecuted = $this->sendChannelMessage($channelLogs, $channel, $this->messageChannels[$id][$channel]);
+
+                $this->passExecutedLogs($successfullyExecuted, $preferenceBuilder);
             }
+            ++$priority;
         }
 
-        if (!$result && count($tryChannels)) {
-            // All preferred channels were a no go so try whatever is left
-            foreach ($tryChannels as $channel => $messageChannel) {
-                // Attempt to send the message through other channels
-                if (isset($messageSettings[$channel])) {
-                    if ($this->sendChannelMessage($channel, $messageChannel, $messageSettings[$channel], $event, $channelResults)) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $event->setResult($channelResults);
+        $pendingEvent->failRemaining($this->translator->trans('mautic.channel.message.failed'));
     }
 
     /**
-     * @param                        $channel
-     * @param                        $messageChannel
-     * @param                        $settings
-     * @param CampaignExecutionEvent $event
-     * @param                        $channelResults
+     * @param ArrayCollection $logs
+     * @param string          $channel
+     * @param array           $messageChannel
      *
-     * @return bool|mixed
+     * @return bool|ArrayCollection
+     *
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \ReflectionException
      */
-    protected function sendChannelMessage($channel, $messageChannel, $settings, CampaignExecutionEvent $event, &$channelResults)
+    protected function sendChannelMessage(ArrayCollection $logs, $channel, array $messageChannel)
     {
-        if (!isset($settings['campaignAction'])) {
-            return false;
+        /** @var ActionAccessor $config */
+        $config = $this->eventCollector->getEventConfig($this->pseudoEvent);
+
+        // Set the property set as the channel ID with the message ID
+        if ($channelIdField = $config->getChannelIdField()) {
+            $messageChannel['properties'][$channelIdField] = $messageChannel['channel_id'];
         }
 
-        $eventSettings  = $this->campaignModel->getEvents();
-        $campaignAction = $settings['campaignAction'];
+        $this->pseudoEvent->setProperties($messageChannel['properties']);
 
-        $result = false;
-        if (isset($eventSettings['action'][$campaignAction])) {
-            $campaignEventSettings      = $eventSettings['action'][$campaignAction];
-            $messageEvent               = $event->getEvent();
-            $messageEvent['type']       = $campaignAction;
-            $messageEvent['properties'] = $messageChannel['properties'];
+        // Dispatch the mimicked campaign action
+        $pendingEvent = new PendingEvent($config, $this->pseudoEvent, $logs);
+        $pendingEvent->setChannel('campaign.event', $messageChannel['channel_id']);
 
-            // Set the property set as the channel ID with the message ID
-            if (isset($campaignEventSettings['channelIdField'])) {
-                $messageEvent['properties'][$campaignEventSettings['channelIdField']] = $messageChannel['channel_id'];
+        $this->actionDispatcher->dispatchEvent(
+            $config,
+            $this->pseudoEvent,
+            $logs,
+            $pendingEvent
+        );
+
+        // Record the channel metadata mainly for debugging
+        $this->recordChannelMetadata($pendingEvent, $channel);
+
+        // Remove pseudo failures so we can try the next channel
+        $success = $pendingEvent->getSuccessful();
+        $this->removePsuedoFailures($success);
+
+        unset($pendingEvent);
+
+        return $success;
+    }
+
+    /**
+     * @param ArrayCollection   $logs
+     * @param PreferenceBuilder $channelPreferences
+     */
+    private function passExecutedLogs(ArrayCollection $logs, PreferenceBuilder $channelPreferences)
+    {
+        /** @var LeadEventLog $log */
+        foreach ($logs as $log) {
+            // Remove those successfully executed from being processed again for lower priorities
+            $channelPreferences->removeLogFromAllChannels($log);
+
+            // Find the Marketing Message log and pass it
+            $mmLog = $this->pendingEvent->findLogByContactId($log->getLead()->getId());
+
+            // Pass these for the MM campaign event
+            $this->pendingEvent->pass($mmLog);
+        }
+    }
+
+    /**
+     * @param ArrayCollection $success
+     */
+    private function removePsuedoFailures(ArrayCollection $success)
+    {
+        /**
+         * @var int
+         * @var LeadEventLog $log
+         */
+        foreach ($success as $key => $log) {
+            if (!empty($log->getMetadata()['failed'])) {
+                $success->remove($key);
             }
+        }
+    }
 
-            $result = $this->eventModel->invokeEventCallback(
-                $messageEvent,
-                $campaignEventSettings,
-                $event->getLead(),
-                null,
-                $event->getSystemTriggered()
-            );
+    /**
+     * @param PendingEvent    $pendingEvent
+     * @param ArrayCollection $mmLogs
+     * @param                 $channel
+     */
+    private function recordChannelMetadata(PendingEvent $pendingEvent, $channel)
+    {
+        /** @var LeadEventLog $log */
+        foreach ($this->mmLogs as $log) {
+            try {
+                $channelLog = $pendingEvent->findLogByContactId($log->getLead()->getId());
 
-            $channelResults[$channel] = $result;
-            if ($result) {
-                if (is_array($result) && !empty($result['failed'])) {
-                    $result = false;
-                } elseif (!$event->getChannel()) {
-                    $event->setChannel($channel, $messageChannel['channel_id']);
+                if ($metadata = $channelLog->getMetadata()) {
+                    $log->appendToMetadata([$channel => $metadata]);
                 }
+            } catch (NoContactsFoundException $exception) {
+                continue;
             }
         }
-
-        return $result;
     }
 }

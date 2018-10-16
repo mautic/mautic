@@ -145,7 +145,7 @@ class ContactRequestHelper
     {
         // Check for a lead requested through clickthrough query parameter
         if (isset($this->queryFields['ct'])) {
-            $clickthrough = $this->queryFields['ct'];
+            $clickthrough = (is_array($this->queryFields['ct'])) ? $this->queryFields['ct'] : ClickthroughHelper::decodeArrayFromUrl($this->queryFields['ct']);
         } elseif ($clickthrough = $this->request->get('ct', [])) {
             $clickthrough = ClickthroughHelper::decodeArrayFromUrl($clickthrough);
         }
@@ -202,7 +202,7 @@ class ContactRequestHelper
             throw new ContactNotFoundException();
         }
 
-        if ((int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
+        if ($stat->getEmail() && (int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
             // Email ID mismatch - fishy so use tracked lead
             throw new ContactNotFoundException();
         }
@@ -304,7 +304,7 @@ class ContactRequestHelper
      */
     private function mergeWithTrackedContact(Lead $foundContact)
     {
-        if ($this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
+        if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
             return $this->leadModel->mergeLeads($this->trackedContact, $foundContact, false);
         }
 

@@ -12,7 +12,9 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
@@ -169,8 +171,8 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param $campaign
-     * @param $oldCampaign
+     * @param Campaign $campaign
+     * @param Campaign $oldCampaign
      */
     protected function afterEntityClone($campaign, $oldCampaign)
     {
@@ -183,15 +185,25 @@ class CampaignController extends AbstractStandardFormController
         $campaign->setIsPublished(false);
 
         // Clone the campaign's events
+        /** @var Event $event */
         foreach ($events as $event) {
             $tempEventId = 'new'.$event->getId();
 
             $clone = clone $event;
+            $clone->nullId();
             $clone->setCampaign($campaign);
             $clone->setTempId($tempEventId);
 
             // Just wipe out the parent as it'll be generated when the cloned entity is saved
             $clone->setParent(null);
+
+            if (CampaignActionJumpToEventSubscriber::EVENT_NAME === $clone->getType()) {
+                // Update properties to point to the new temp ID
+                $properties                = $clone->getProperties();
+                $properties['jumpToEvent'] = 'new'.$properties['jumpToEvent'];
+
+                $clone->setProperties($properties);
+            }
 
             $campaign->addEvent($tempEventId, $clone);
         }

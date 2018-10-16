@@ -12,6 +12,7 @@
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -68,6 +69,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var string
      */
     private $content;
+
+    /**
+     * @var array
+     */
+    private $utmTags = [];
 
     /**
      * @var int
@@ -145,6 +151,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
         $builder->createField('content', 'text')
             ->columnName('content')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmTags', Type::JSON_ARRAY)
+            ->columnName('utm_tags')
             ->nullable()
             ->build();
 
@@ -243,6 +254,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'variantParent',
                 'variantChildren',
                 'content',
+                'utmTags',
                 'filters',
                 'isCampaignBased',
                 'slotName',
@@ -485,5 +497,26 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         if ($this->getIsCampaignBased()) {
             $this->setSlotName('');
         }
+    }
+
+    /**
+     * @param array $utmTags
+     *
+     * @return DynamicContent
+     */
+    public function setUtmTags(array $utmTags)
+    {
+        $this->isChanged('utmTags', $utmTags);
+        $this->utmTags = $utmTags;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTags()
+    {
+        return $this->utmTags;
     }
 }
