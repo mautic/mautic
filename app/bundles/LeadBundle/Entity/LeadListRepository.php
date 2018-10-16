@@ -1126,8 +1126,7 @@ class LeadListRepository extends CommonRepository
                     if ($details['field'] == 'lead_email_read_date') {
                         $column = 'date_read';
                         $table  = 'email_stats';
-                    }
-                    if ($details['field'] == 'lead_email_sent_date') {
+                    } elseif ($details['field'] == 'lead_email_sent_date') {
                         $column = 'date_sent';
                         $table  = 'email_stats';
                     }
