@@ -93,13 +93,13 @@ class SummaryModel extends AbstractCommonModel
      * Summarize all of history.
      *
      * @param OutputInterface $output
-     * @param int             $daysPerBatch
-     * @param null            $maxDays
+     * @param int             $hoursPerBatch
+     * @param null            $maxHours
      * @param bool            $rebuild
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function summarizeDays(OutputInterface $output, $daysPerBatch = 1, $maxDays = null, $rebuild = false)
+    public function summarize(OutputInterface $output, $hoursPerBatch = 1, $maxHours = null, $rebuild = false)
     {
         $start = null;
         if (!$rebuild) {
@@ -111,21 +111,22 @@ class SummaryModel extends AbstractCommonModel
         /** @var LeadEventLog $oldestTriggeredEventLog */
         $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
         if ($end && $end <= $start) {
-            if ($maxDays && $end->diff($start)->days > $maxDays) {
+            $hours = ($end->diff($start)->days * 24) + $end->diff($start)->h;
+            if ($maxHours && $hours > $maxHours) {
                 $end = clone $start;
-                $end = $end->sub(new \DateInterval('P'.intval($maxDays).'D'));
+                $end = $end->sub(new \DateInterval('PT'.intval($maxHours).'H'));
             }
-            $this->progressBar = ProgressBarHelper::init($output, $end->diff($start)->days);
+            $this->progressBar = ProgressBarHelper::init($output, $hours);
             $this->progressBar->start();
 
-            $interval = new \DateInterval('P'.$daysPerBatch.'D');
+            $interval = new \DateInterval('PT'.$hoursPerBatch.'H');
             $dateFrom = clone $start;
             $dateTo   = clone $start;
             do {
                 $dateFrom->sub($interval);
                 $output->write("\t".$dateFrom->format('Y-m-d'));
-                $this->getRepository()->summarizeByDate($dateFrom, $dateTo);
-                $this->progressBar->advance($daysPerBatch);
+                $this->getRepository()->summarize($dateFrom, $dateTo);
+                $this->progressBar->advance($hoursPerBatch);
                 $dateTo->sub($interval);
             } while ($end < $dateFrom);
             $this->progressBar->finish();
