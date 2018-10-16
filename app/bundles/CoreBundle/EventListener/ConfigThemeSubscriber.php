@@ -35,7 +35,10 @@ class ConfigThemeSubscriber extends CommonSubscriber
             'bundle'     => 'CoreBundle',
             'formAlias'  => 'themeconfig',
             'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
-            'parameters' => $event->getParametersFromConfig('MauticCoreBundle'),
+            'parameters' => [
+                    'theme'                           => $event->getParametersFromConfig('MauticCoreBundle')['theme'],
+                    'theme_import_allowed_extensions' => $event->getParametersFromConfig('MauticCoreBundle')['theme_import_allowed_extensions'],
+                ],
         ]);
     }
 }
