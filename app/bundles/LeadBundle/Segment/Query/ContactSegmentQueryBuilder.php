@@ -145,16 +145,7 @@ class ContactSegmentQueryBuilder
         $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias, $tableAlias.'.lead_id = l.id');
         $queryBuilder->addSelect($tableAlias.'.lead_id AS '.$tableAlias.'_lead_id');
 
-        // @todo evaluate if this was supposed to be here; it's causing contacts already in the segment to be added because the join is based on
-        // when the contact is created
-        if (false && isset($batchRestrictions['dateTime'])) {
-            $expression = $queryBuilder->expr()->andX(
-                $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId),
-                $queryBuilder->expr()->lte('l.date_added', "'".$batchRestrictions['dateTime']."'")
-            );
-        } else {
-            $expression = $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId);
-        }
+        $expression = $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId);
 
         $queryBuilder->addJoinCondition($tableAlias, $expression);
 
@@ -186,7 +177,6 @@ class ContactSegmentQueryBuilder
         $existsQueryBuilder
             ->select($tableAlias.'.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias)
-            ->where($tableAlias.'.lead_id = l.id')
             ->andWhere($queryBuilder->expr()->eq($tableAlias.'.leadlist_id', intval($leadListId)))
             ->andWhere(
                 $queryBuilder->expr()->orX(
@@ -196,7 +186,7 @@ class ContactSegmentQueryBuilder
             );
 
         $queryBuilder->orWhere(
-            $queryBuilder->expr()->exists($existsQueryBuilder->getSQL())
+            $queryBuilder->expr()->in('l.id', $existsQueryBuilder->getSQL())
         );
 
         return $queryBuilder;

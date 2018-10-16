@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -203,18 +204,24 @@ class ImportController extends FormController
                 $importFields  = $session->get('mautic.'.$object.'.import.importfields', []);
                 $companyFields = $fieldModel->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']);
 
-                $form = $this->get('form.factory')->create(
-                    'lead_field_import',
-                    [],
-                    [
-                        'object'           => $object,
-                        'action'           => $action,
-                        'lead_fields'      => $leadFields,
-                        'company_fields'   => $companyFields,
-                        'import_fields'    => $importFields,
-                        'line_count_limit' => $this->getLineCountLimit(),
-                    ]
-                );
+                try {
+                    $form = $this->get('form.factory')->create(
+                        'lead_field_import',
+                        [],
+                        [
+                            'object'           => $object,
+                            'action'           => $action,
+                            'lead_fields'      => $leadFields,
+                            'company_fields'   => $companyFields,
+                            'import_fields'    => $importFields,
+                            'line_count_limit' => $this->getLineCountLimit(),
+                        ]
+                    );
+                } catch (LogicException $e) {
+                    $this->resetImport($fullPath);
+
+                    return $this->newAction(0, true);
+                }
 
                 break;
             case self::STEP_PROGRESS_BAR:
