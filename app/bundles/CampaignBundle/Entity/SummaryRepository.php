@@ -167,11 +167,8 @@ class SummaryRepository extends CommonRepository
             ->getConnection()
             ->prepare($sql);
 
-        // To prevent inaccuracy we must floor to the hour in the same manner for special timezone cases.
-        $dateFromTimestamp = $dateFrom->getTimestamp() - ($dateFrom->getTimestamp() % 3600);
-        $dateToTimestamp   = $dateTo->getTimestamp() - ($dateTo->getTimestamp() % 3600);
-        $q->bindParam('dateFrom', $dateFromTimestamp, \PDO::PARAM_INT);
-        $q->bindParam('dateTo', $dateToTimestamp, \PDO::PARAM_INT);
+        $q->bindParam('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT);
+        $q->bindParam('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
 
         $q->execute();
     }
