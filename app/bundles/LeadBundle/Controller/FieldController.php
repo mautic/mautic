@@ -15,7 +15,6 @@ use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 
 class FieldController extends FormController
@@ -399,6 +398,7 @@ class FieldController extends FormController
         ];
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var FieldModel $model */
             $model = $this->getModel('lead.field');
             $field = $model->getEntity($objectId);
 
@@ -415,16 +415,28 @@ class FieldController extends FormController
                 return $this->accessDenied();
             }
 
-            $model->deleteEntity($field);
+            if ($model->isUsedField($field)) {
+                $flashMessage = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.core.notice.used.field',
+                    'msgVars' => [
+                        '%name%' => $field->getLabel(),
+                        '%id%'   => $objectId,
+                    ],
+                ];
+            } else {
+                $model->deleteEntity($field);
+                $flashMessage = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.core.notice.deleted',
+                    'msgVars' => [
+                        '%name%' => $field->getLabel(),
+                        '%id%'   => $objectId,
+                    ],
+                ];
+            }
 
-            $flashes[] = [
-                'type'    => 'notice',
-                'msg'     => 'mautic.core.notice.deleted',
-                'msgVars' => [
-                    '%name%' => $field->getLabel(),
-                    '%id%'   => $objectId,
-                ],
-            ];
+            $flashes[] = $flashMessage;
         } //else don't do anything
 
         return $this->postActionRedirect(
@@ -458,6 +470,7 @@ class FieldController extends FormController
         ];
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var FieldModel $model */
             $model     = $this->getModel('lead.field');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
@@ -483,15 +496,26 @@ class FieldController extends FormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+                $filteredDeleteIds = $model->filterUsedFieldIds($deleteIds);
 
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.lead.field.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
+                if ($filteredDeleteIds !== $deleteIds) {
+                    $flashes[] = [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.core.notice.used.fields',
+                    ];
+                }
+
+                if (count($filteredDeleteIds)) {
+                    $entities = $model->deleteEntities($deleteIds);
+
+                    $flashes[] = [
+                        'type'    => 'notice',
+                        'msg'     => 'mautic.lead.field.notice.batch_deleted',
+                        'msgVars' => [
+                            '%count%' => count($entities),
+                        ],
+                    ];
+                }
             }
         } //else don't do anything
 

@@ -72,4 +72,14 @@ final class FocusEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.focus.on_campaign_trigger_action';
+
+    /**
+     * The mautic.focus.on_open event is dispatched when an focus is opened.
+     *
+     * The event listener receives a
+     * MauticPlugin\MauticFocusBundle\Event\FocusOpenEvent instance.
+     *
+     * @var string
+     */
+    const FOCUS_ON_VIEW = 'mautic.focus.on_view';
 }
