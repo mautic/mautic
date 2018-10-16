@@ -71,19 +71,19 @@ class SummarizeCommand extends ModeratedCommand
                 '--batch-limit',
                 '-l',
                 InputOption::VALUE_OPTIONAL,
-                'Number of days to process per batch.',
+                'Number of hours to process per batch.',
                 1
             )
             ->addOption(
-                '--max-days',
+                '--max-hours',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Optionally specify how many days back in time you wish to summarize.'
+                'Optionally specify how many hours back in time you wish to summarize.'
             )
             ->addOption(
                 '--rebuild',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_NONE,
                 'Rebuild existing data. To be used only if database exceptions have been known to cause inaccuracies.'
             )
             ->setDescription('Builds historical campaign summary statistics if they do not already exist.');
@@ -106,14 +106,14 @@ class SummarizeCommand extends ModeratedCommand
         }
 
         $batchLimit = $input->getOption('batch-limit');
-        $maxDays    = $input->getOption('max-days');
+        $maxHours   = $input->getOption('max-hours');
         $rebuild    = $input->getOption('rebuild');
 
         $output->writeln(
             '<info>'.$this->translator->trans('mautic.campaign.summarizing', ['%batch%' => $batchLimit]).'</info>'
         );
 
-        $this->summaryModel->summarizeDays($output, $batchLimit, $maxDays, $rebuild);
+        $this->summaryModel->summarize($output, $batchLimit, $maxHours, $rebuild);
 
         $this->completeRun();
 
