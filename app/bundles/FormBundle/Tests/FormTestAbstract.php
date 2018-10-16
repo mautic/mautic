@@ -353,7 +353,7 @@ class FormTestAbstract extends WebTestCase
             $uploadFieldValidatorMock,
             $formUploaderMock,
             $deviceTrackingService,
-            new FieldValueTransformer($this->container->get('router'))
+            new FieldValueTransformer($this->container->get('router')),
             $dateHelper
         );
 
