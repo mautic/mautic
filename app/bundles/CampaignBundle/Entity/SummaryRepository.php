@@ -106,8 +106,8 @@ class SummaryRepository extends CommonRepository
         // Group by event id
         foreach ($results as $row) {
             $return[$row['event_id']] = [
-                0 => (int) $row['non_action_path_taken_count'],
-                1 => (int) $row['triggered_count'],
+                0 => intval($row['non_action_path_taken_count']),
+                1 => intval($row['triggered_count']) + intval($row['scheduled_count']),
             ];
         }
 
@@ -140,7 +140,7 @@ class SummaryRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function summarizeByDate(\DateTime $dateFrom, \DateTime $dateTo)
+    public function summarize(\DateTime $dateFrom, \DateTime $dateTo)
     {
         $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
             '(campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count) '.
@@ -148,10 +148,10 @@ class SummaryRepository extends CommonRepository
             '        t.campaign_id as campaign_id, '.
             '        t.event_id as event_id, '.
             '        FROM_UNIXTIME(UNIX_TIMESTAMP(t.date_triggered) - (UNIX_TIMESTAMP(t.date_triggered) % 3600)) AS date_triggered, '.
-            '        SUM((IF(t.is_scheduled = 1 AND t.trigger_date > NOW(), 1, 0))) as scheduled_count, '.
-            '        SUM((IF(t.is_scheduled = 1 AND t.trigger_date > NOW(), 0, t.non_action_path_taken))) as non_action_path_taken_count, '.
-            '        SUM((IF((t.is_scheduled = 1 AND t.trigger_date > NOW()) OR t.non_action_path_taken, 0, fe.log_id IS NOT NULL))) as failed_count, '.
-            '        SUM((IF((t.is_scheduled = 1 AND t.trigger_date > NOW()) OR t.non_action_path_taken OR fe.log_id IS NOT NULL, 0, 1))) as triggered_count '.
+            '        SUM(IF(t.is_scheduled = 1 AND t.trigger_date > NOW(), 1, 0)) as scheduled_count, '.
+            '        SUM(IF(t.is_scheduled = 1 AND t.trigger_date > NOW(), 0, t.non_action_path_taken)) as non_action_path_taken_count, '.
+            '        SUM(IF((t.is_scheduled = 1 AND t.trigger_date > NOW()) OR t.non_action_path_taken, 0, fe.log_id IS NOT NULL)) as failed_count, '.
+            '        SUM(IF((t.is_scheduled = 1 AND t.trigger_date > NOW()) OR t.non_action_path_taken OR fe.log_id IS NOT NULL, 0, 1)) as triggered_count '.
             '    FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log t '.
             '    LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log fe '.
             '        ON fe.log_id = t.id '.
