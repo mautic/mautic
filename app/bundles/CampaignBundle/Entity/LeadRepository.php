@@ -386,7 +386,7 @@ class LeadRepository extends CommonRepository
             return new CountResult(0, 0, 0);
         }
 
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
         $qb->select('min(ll.lead_id) as min_id, max(ll.lead_id) as max_id, count(distinct(ll.lead_id)) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
@@ -421,7 +421,7 @@ class LeadRepository extends CommonRepository
             return [];
         }
 
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
         $qb->select('distinct(ll.lead_id) as id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
@@ -458,7 +458,7 @@ class LeadRepository extends CommonRepository
     {
         $segments = $this->getCampaignSegments($campaignId);
 
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
         $qb->select('min(cl.lead_id) as min_id, max(cl.lead_id) as max_id, count(cl.lead_id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
@@ -487,7 +487,7 @@ class LeadRepository extends CommonRepository
     {
         $segments = $this->getCampaignSegments($campaignId);
 
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
         $qb->select('cl.lead_id as id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
