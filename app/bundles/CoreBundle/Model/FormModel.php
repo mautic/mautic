@@ -217,7 +217,7 @@ class FormModel extends AbstractCommonModel
         $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent('post_save', $entity, false, $event);
 
-        return true;
+        return false;
     }
 
     /**
