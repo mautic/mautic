@@ -168,7 +168,7 @@ class MauticSyncProcess
                 $objectMapping = $this->mappingManualDAO->getObjectMapping($mappedInternalObjectName, $integrationObjectName);
                 foreach ($integrationObjects as $integrationObject) {
                     $internalObject = $this->syncDataExchange->getConflictedInternalObject($this->mappingManualDAO, $mappedInternalObjectName, $integrationObject);
-                    $objectChange   = $this->objectChangeGenerator->getSyncObjectChange($syncReport, $this->mappingManualDAO, $objectMapping, $integrationObject, $internalObject);
+                    $objectChange   = $this->objectChangeGenerator->getSyncObjectChange($syncReport, $this->mappingManualDAO, $objectMapping, $internalObject, $integrationObject);
 
                     if ($objectChange->shouldSync()) {
                         $syncOrder->addObjectChange($objectChange);
