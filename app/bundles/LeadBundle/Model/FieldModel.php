@@ -36,32 +36,38 @@ class FieldModel extends FormModel
             'type'       => 'lookup',
             'properties' => ['list' => 'Mr|Mrs|Miss'],
             'fixed'      => true,
+            'listable'   => true,
             'object'     => 'lead',
         ],
         'firstname' => [
-            'fixed'  => true,
-            'short'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'short'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'lastname' => [
-            'fixed'  => true,
-            'short'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'short'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'company' => [
-            'fixed'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'position' => [
-            'fixed'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'email' => [
-            'type'   => 'email',
-            'unique' => true,
-            'fixed'  => true,
-            'short'  => true,
-            'object' => 'lead',
+            'type'     => 'email',
+            'unique'   => true,
+            'fixed'    => true,
+            'short'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'mobile' => [
             'type'     => 'tel',
@@ -76,9 +82,11 @@ class FieldModel extends FormModel
             'object'   => 'lead',
         ],
         'points' => [
-            'type'   => 'number',
-            'fixed'  => true,
-            'object' => 'lead',
+            'type'     => 'number',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+            'default'  => 0,
         ],
         'fax' => [
             'type'     => 'tel',
@@ -96,25 +104,35 @@ class FieldModel extends FormModel
             'object'   => 'lead',
         ],
         'city' => [
-            'fixed'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'state' => [
-            'type'   => 'region',
-            'fixed'  => true,
-            'object' => 'lead',
+            'type'     => 'region',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'zipcode' => [
-            'fixed'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'country' => [
-            'type'   => 'country',
-            'fixed'  => true,
-            'object' => 'lead',
+            'type'     => 'country',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'preferred_locale' => [
             'type'     => 'locale',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+        ],
+        'timezone' => [
+            'type'     => 'timezone',
             'fixed'    => true,
             'listable' => true,
             'object'   => 'lead',
@@ -187,10 +205,11 @@ class FieldModel extends FormModel
             'object'   => 'company',
         ],
         'companyemail' => [
-            'type'   => 'email',
-            'unique' => true,
-            'fixed'  => true,
-            'object' => 'company',
+            'type'     => 'email',
+            'unique'   => true,
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'company',
         ],
         'companyphone' => [
             'type'     => 'tel',
@@ -204,9 +223,10 @@ class FieldModel extends FormModel
             'object'   => 'company',
         ],
         'companystate' => [
-            'type'   => 'region',
-            'fixed'  => true,
-            'object' => 'company',
+            'type'     => 'region',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'company',
         ],
         'companyzipcode' => [
             'fixed'    => true,
@@ -214,13 +234,15 @@ class FieldModel extends FormModel
             'object'   => 'company',
         ],
         'companycountry' => [
-            'type'   => 'country',
-            'fixed'  => true,
-            'object' => 'company',
+            'type'     => 'country',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'company',
         ],
         'companyname' => [
             'fixed'    => true,
             'required' => true,
+            'listable' => true,
             'object'   => 'company',
         ],
         'companywebsite' => [
@@ -233,6 +255,7 @@ class FieldModel extends FormModel
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'precision' => 0],
             'group'      => 'professional',
+            'listable'   => true,
             'object'     => 'company',
         ],
         'companyfax' => [
@@ -253,12 +276,14 @@ class FieldModel extends FormModel
             'group'      => 'professional',
             'properties' => ['list' => 'Agriculture|Apparel|Banking|Biotechnology|Chemicals|Communications|Construction|Education|Electronics|Energy|Engineering|Entertainment|Environmental|Finance|Food & Beverage|Government|Healthcare|Hospitality|Insurance|Machinery|Manufacturing|Media|Not for Profit|Recreation|Retail|Shipping|Technology|Telecommunications|Transportation|Utilities|Other'],
             'fixed'      => true,
+            'listable'   => true,
             'object'     => 'company',
         ],
         'companydescription' => [
-            'fixed'  => true,
-            'group'  => 'professional',
-            'object' => 'company',
+            'fixed'    => true,
+            'group'    => 'professional',
+            'listable' => true,
+            'object'   => 'company',
         ],
     ];
 
@@ -278,15 +303,25 @@ class FieldModel extends FormModel
     protected $uniqueIdentifierFields = [];
 
     /**
+     * @var ListModel
+     */
+    private $leadListModel;
+
+    /**
      * FieldModel constructor.
      *
      * @param IndexSchemaHelper  $indexSchemaHelper
      * @param ColumnSchemaHelper $columnSchemaHelper
+     * @param ListModel          $leadListModel
      */
-    public function __construct(IndexSchemaHelper $indexSchemaHelper, ColumnSchemaHelper $columnSchemaHelper)
-    {
+    public function __construct(
+        IndexSchemaHelper $indexSchemaHelper,
+        ColumnSchemaHelper $columnSchemaHelper,
+        ListModel $leadListModel
+    ) {
         $this->indexSchemaHelper  = $indexSchemaHelper;
         $this->columnSchemaHelper = $columnSchemaHelper;
+        $this->leadListModel      = $leadListModel;
     }
 
     /**
@@ -546,6 +581,32 @@ class FieldModel extends FormModel
         }
 
         return $entities;
+    }
+
+    /**
+     * Is field used in segment filter?
+     *
+     * @param LeadField $field
+     *
+     * @return bool
+     */
+    public function isUsedField(LeadField $field)
+    {
+        return $this->leadListModel->isFieldUsed($field);
+    }
+
+    /**
+     * Filter used field ids.
+     *
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function filterUsedFieldIds(array $ids)
+    {
+        return array_filter($ids, function ($id) {
+            return $this->isUsedField($this->getEntity($id)) === false;
+        });
     }
 
     /**

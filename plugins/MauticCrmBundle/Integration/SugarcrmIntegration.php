@@ -13,10 +13,10 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -32,7 +32,25 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         'Contacts',
         'Accounts',
     ];
+
+    private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
     private $authorzationError;
+
+    /**
+     * @var DoNotContact
+     */
+    protected $doNotContactModel;
+
+    /**
+     * SugarcrmIntegration constructor.
+     *
+     * @param DoNotContact $doNotContactModel
+     */
+    public function __construct(DoNotContact $doNotContactModel)
+    {
+        $this->doNotContactModel = $doNotContactModel;
+        parent::__construct();
+    }
 
     /**
      * Returns the name of the social integration that must match the name of the file.
@@ -194,18 +212,45 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Get available fields for choices in the config UI.
+     *
      * @param array $settings
      *
-     * @return array|mixed
-     *
-     * @throws \Exception
+     * @return array
      */
     public function getFormLeadFields($settings = [])
     {
-        $leadFields    = $this->getFormFieldsByObject('Leads', $settings);
-        $contactFields = $this->getFormFieldsByObject('Contacts', $settings);
+        if (!$this->isAuthorized()) {
+            return [];
+        }
 
-        return array_merge($leadFields, $contactFields);
+        if (isset($settings['feature_settings']['objects'])) {
+            // combine keys with values
+            $settings['feature_settings']['objects'] = array_combine(
+                array_values($settings['feature_settings']['objects']),
+                $settings['feature_settings']['objects']
+            );
+        }
+
+        // unset company object
+        if (isset($settings['feature_settings']['objects']['company'])) {
+            unset($settings['feature_settings']['objects']['company']);
+        }
+
+        if (empty($settings['feature_settings']['objects'])) {
+            // BC force add Leads and Contacts from Integration
+            $settings['feature_settings']['objects']['Leads']    = 'Leads';
+            $settings['feature_settings']['objects']['Contacts'] = 'Contacts';
+        }
+
+        $fields = [];
+        // merge all arrays from level 1
+        $fieldsromObjects = $this->getAvailableLeadFields($settings);
+        foreach ($fieldsromObjects as $fieldsFromObject) {
+            $fields = array_merge($fields, $fieldsFromObject);
+        }
+
+        return $fields;
     }
 
     /**
@@ -221,10 +266,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         $sugarObjects      = [];
 
-        if (isset($settings['feature_settings']['objects'])) {
+        if (!empty($settings['feature_settings']['objects'])) {
             $sugarObjects = $settings['feature_settings']['objects'];
         } else {
-            $sugarObjects[] = 'Leads';
+            $sugarObjects['Leads']                   = 'Leads';
+            $sugarObjects['Contacts']                = 'Contacts';
+            $settings['feature_settings']['objects'] = $sugarObjects;
         }
 
         $isRequired = function (array $field, $object) {
@@ -265,12 +312,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                     //6.x/community
 
                                     foreach ($fields['module_fields'] as $fieldInfo) {
-                                        if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'bool', 'link', 'relate'])
-                                        ||
-                                        ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
-                                        )) {
+                                        if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'link', 'relate']) || ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
+                                            )
+                                        ) {
                                             $type      = 'string';
-                                            $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
+                                            $fieldName = (strpos($fieldInfo['name'],
+                                                    'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_',
+                                                '', $fieldInfo['name']);
                                             // make these congruent as some come in with colons and some do not
                                             $label = str_replace(':', '', $fieldInfo['label']);
                                             if ($sObject !== 'company') {
@@ -295,11 +343,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                     foreach ($fields['fields'] as $fieldInfo) {
                                         if (isset($fieldInfo['name']) && empty($fieldInfo['readonly'])
                                             && (!in_array(
-                                                $fieldInfo['type'],
-                                                ['id', 'team_list', 'bool', 'link', 'relate']
-                                            )
-                                            ||
-                                            ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
+                                                    $fieldInfo['type'],
+                                                    ['id', 'team_list', 'link', 'relate']
+                                                )
+                                                ||
+                                                ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
                                             )
                                         ) {
                                             if (!empty($fieldInfo['comment'])) {
@@ -396,7 +444,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 $executed += $this->amendLeadDataBeforeMauticPopulate($result, $sugarObject);
                 if (
                     (isset($result['total_count']) && $result['total_count'] > $params['offset'])   //Sugar 6
-                        || (!isset($result['total_count']) && $params['offset'] > -1)) {            //Sugar 7
+                    || (!isset($result['total_count']) && $params['offset'] > -1)) {            //Sugar 7
                     $result = null;
                     $executed += $this->getCompanies($params, null, $executed);
                 }
@@ -539,7 +587,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     $params['offset'] = $result['next_offset'];
                     $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
                     if (
-                    (isset($result['total_count']) && $result['total_count'] > $params['offset'])   //Sugar 6
+                        (isset($result['total_count']) && $result['total_count'] > $params['offset'])   //Sugar 6
                         || (!isset($result['total_count']) && $params['offset'] > -1)) {            //Sugar 7
                         $params['object'] = $object;
                         $executed += $this->getLeads($params, null, $executed, [], $object);
@@ -790,7 +838,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     $newName = '__'.$object;
                 }
                 if ($SUGAR_VERSION == '6') {
-                    foreach ($record['name_value_list'] as $item) {
+                    foreach ($record['name_value_list'] as $k=>$item) {
                         if ($object !== 'Activity') {
                             if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {
                                 $convertedMultiSelectString         = $this->convertSuiteCrmToMauticMultiSelect($item['value']);
@@ -820,7 +868,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     }
                 }
                 if ($object == 'Leads' && isset($dataObject['email1__Leads']) && $dataObject['email1__Leads'] != null
-                && $dataObject['email1__Leads'] != '' && in_array($dataObject['email1__Leads'], $sugarRejectedLeads)) {
+                    && $dataObject['email1__Leads'] != '' && in_array($dataObject['email1__Leads'], $sugarRejectedLeads)) {
                     continue; //Lead email is already in Sugar Contacts. Do not carry on
                 }
                 //$itemLastDate = $itemDateModified;
@@ -843,6 +891,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
                         $detachClass           = Lead::class;
                         $company               = null;
+                        $this->fetchDncToMautic($entity, $data);
                         if ($entity && isset($dataObject['account_id'.$newName]) && trim($dataObject['account_id'.$newName]) != '') {
                             $integrationCompanyEntity = $integrationEntityRepo->findOneBy(
                                 [
@@ -863,7 +912,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     } elseif ($object == 'Accounts') {
-                        $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $entity                = $this->getMauticCompany($dataObject, $object);
                         $detachClass           = Company::class;
                         $mauticObjectReference = 'company';
                     } else {
@@ -952,6 +1001,25 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'expanded'    => true,
                     'multiple'    => true,
                     'label'       => 'mautic.sugarcrm.form.updateOwner',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
+                    ],
+                ]
+            );
+
+            $builder->add(
+                'updateDnc',
+                'choice',
+                [
+                    'choices' => [
+                        'updateDnc' => 'mautic.sugarcrm.updateDnc',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.sugarcrm.form.updateDnc',
                     'label_attr'  => ['class' => 'control-label'],
                     'empty_value' => false,
                     'required'    => false,
@@ -1094,7 +1162,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'internalEntity'    => 'lead',
                     'internalEntityId'  => $lead->getId(),
                 ]
-                );
+            );
 
             $mappedData[$object]['id'] = $integrationEntity->getIntegrationEntityId();
         }
@@ -1296,6 +1364,84 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Update body to sync.
+     *
+     * @param array $lead
+     * @param array $body
+     */
+    private function pushDncToSugar(array $lead, array &$body)
+    {
+        $features = $this->settings->getFeatureSettings();
+        // update DNC sync disabled
+        if (empty($features['updateDnc'])) {
+            return;
+        }
+        $leadEntity = $this->leadModel->getEntity($lead['internal_entity_id']);
+        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $dncEntries */
+        $dncEntries   = $this->doNotContactModel->getDncRepo()->getEntriesByLeadAndChannel($leadEntity, 'email');
+        $sugarDncKeys = array_combine(array_values($this->sugarDncKeys), $this->sugarDncKeys);
+        foreach ($dncEntries as $dncEntry) {
+            if (empty($sugarDncKeys)) {
+                continue;
+            }
+            // If DNC exists set to 1
+            switch ($dncEntry->getReason()) {
+                case 1:
+                case 3:
+                    $body[] = ['name' => 'email_opt_out', 'value' => 1];
+                    unset($sugarDncKeys['email_opt_out']);
+                    break;
+                case 2:
+                    $body[] = ['name' => 'invalid_email', 'value' => 1];
+                    unset($sugarDncKeys['invalid_email']);
+                    break;
+            }
+        }
+
+        // uncheck
+        // If DNC doesn't exist set to 1
+        if (!empty($sugarDncKeys)) {
+            foreach ($sugarDncKeys as $sugarDncKey) {
+                $body[] = ['name' => $sugarDncKey, 'value' => 0];
+            }
+        }
+    }
+
+    /**
+     * @param Lead  $lead
+     * @param array $data
+     */
+    private function fetchDncToMautic(Lead $lead, array $data)
+    {
+        $features = $this->settings->getFeatureSettings();
+        if (empty($features['updateDnc'])) {
+            return;
+        }
+
+        // try find opt_out value for lead
+        $isContactable = true;
+        foreach ($data['relationship_list'] as $relationshipList) {
+            foreach ($relationshipList['link_list'] as $links) {
+                if ($links['name'] == 'email_addresses') {
+                    foreach ($links['records'] as $records) {
+                        if (!empty($records['link_value']['email_address']['value']) && $records['link_value']['email_address']['value'] == $lead->getEmail() && !empty($records['link_value']['opt_out']['value'])) {
+                            $isContactable = false;
+                            break 3;
+                        }
+                    }
+                }
+            }
+        }
+
+        $reason = \Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED;
+        if (!$isContactable) {
+            $this->doNotContactModel->addDncForContact($lead->getId(), 'email', $reason, $this->getName());
+        } else {
+            $this->doNotContactModel->removeDncForContact($lead->getId(), 'email', true, $reason);
+        }
+    }
+
+    /**
      * @param $checkEmailsInSugar
      * @param $mauticData
      * @param $availableFields
@@ -1353,8 +1499,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 foreach ($checkEmailsInSugar as $emailKey => $mauticRecord) {
                     if ($email == $emailKey) {
                         $isConverted = (isset($sugarLeadRecord['contact_id'])
-                                        && $sugarLeadRecord['contact_id'] != null
-                                        && $sugarLeadRecord['contact_id'] != '');
+                            && $sugarLeadRecord['contact_id'] != null
+                            && $sugarLeadRecord['contact_id'] != '');
 
                         $sugarIdMapping[$checkEmailsInSugar[$key]['internal_entity_id']] = ($isConverted) ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id'];
                         $lead['owner_email']                                             = $this->getOwnerEmail($mauticRecord);
@@ -1456,14 +1602,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    // Check to see if Mautic Field contains Multi Select Values
                     if (strpos($lead[$mauticField], '|') !== false) {
                         // Transform Mautic Multi Select into SugarCRM/SuiteCRM Multi Select format
-                        $sugarCrmMultiSelectString = $this->convertMauticToSuiteCrmMultiSelect($lead[$mauticField]);
-                        $body[]                    = ['name' => $sugarField, 'value' => $sugarCrmMultiSelectString];
+                        $value = $this->convertMauticToSuiteCrmMultiSelect($lead[$mauticField]);
                     } else {
-                        $body[]                    = ['name' => $sugarField, 'value' => $lead[$mauticField]];
+                        $value = $lead[$mauticField];
                     }
+                    $body[] = ['name' => $sugarField, 'value' =>  $value];
                 } elseif ($required) {
                     $value  = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
                     $body[] = ['name' => $sugarField, 'value' => $value];
@@ -1481,6 +1626,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 if (isset($onwerAssignedUserIdByEmail) && isset($lead['owner_email']) && isset($onwerAssignedUserIdByEmail[$lead['owner_email']])) {
                     $body[] = ['name' => 'assigned_user_id', 'value' => $onwerAssignedUserIdByEmail[$lead['owner_email']]];
                 }
+
+                // pushd DNC to Sugar CRM
+                $this->pushDncToSugar($lead, $body);
+
                 $mauticData[$object][] = $body;
             }
         }
@@ -1595,7 +1744,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         if (isset($fieldsToUpdate['leadFields'])) {
             // Pass in the whole config
-            $fields = $fieldsToUpdate['leadFields'];
+            $fields = $fieldsToUpdate;
         } else {
             $fields = array_flip($fieldsToUpdate);
         }
@@ -1603,6 +1752,51 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
 
         return $fieldsToUpdate;
+    }
+
+    /**
+     * @param array $fields
+     * @param array $keys
+     * @param mixed $object
+     *
+     * @return array
+     */
+    public function prepareFieldsForSync($fields, $keys, $object = null)
+    {
+        $leadFields = [];
+        if (null === $object) {
+            $object = 'Lead';
+        }
+
+        $objects = (!is_array($object)) ? [$object] : $object;
+        if (is_string($object) && 'Accounts' === $object) {
+            return isset($fields['companyFields']) ? $fields['companyFields'] : $fields;
+        }
+
+        if (isset($fields['leadFields'])) {
+            $fields = $fields['leadFields'];
+            $keys   = array_keys($fields);
+        }
+
+        foreach ($objects as $obj) {
+            if (!isset($leadFields[$obj])) {
+                $leadFields[$obj] = [];
+            }
+
+            foreach ($keys as $key) {
+                if (strpos($key, '__'.$obj)) {
+                    $newKey = str_replace('__'.$obj, '', $key);
+                    if ('Id' === $newKey) {
+                        // Don't map Id for push
+                        continue;
+                    }
+
+                    $leadFields[$obj][$newKey] = $fields[$key];
+                }
+            }
+        }
+
+        return (is_array($object)) ? $leadFields : $leadFields[$object];
     }
 
     /**
@@ -1614,12 +1808,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
     {
-        if ($object == 'company') {
-            $priority = parent::getPriorityFieldsForMautic($config, $object, 'mautic_company');
-            $fields   = array_intersect_key($config['companyFields'], $priority);
-        } else {
-            $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
-        }
+        $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
 
         return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
     }

@@ -154,6 +154,7 @@ class LeadDevice
 
         $builder->createField('trackingId', 'string')
             ->columnName('tracking_id')
+            ->unique()
             ->nullable()
             ->build();
     }

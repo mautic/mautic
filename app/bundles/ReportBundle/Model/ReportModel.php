@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -26,6 +27,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
@@ -172,7 +174,7 @@ class ReportModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Report();
         }
 
@@ -239,7 +241,7 @@ class ReportModel extends FormModel
                 $data[$context]['graphs'] = &$data['all']['graphs'][$context];
             } else {
                 //build them
-                $eventContext = ($context == 'all') ? '' : $context;
+                $eventContext = ('all' == $context) ? '' : $context;
 
                 $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper);
                 $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
@@ -247,7 +249,7 @@ class ReportModel extends FormModel
                 $tables = $event->getTables();
                 $graphs = $event->getGraphs();
 
-                if ($context == 'all') {
+                if ('all' == $context) {
                     $data[$context]['tables'] = $tables;
                     $data[$context]['graphs'] = $graphs;
                 } else {
@@ -310,7 +312,7 @@ class ReportModel extends FormModel
         $return->definitions = [];
 
         foreach ($columns as $column => $data) {
-            if ($isGroupBy && ($column == 'unsubscribed' || $column == 'unsubscribed_ratio' || $column == 'unique_ratio')) {
+            if ($isGroupBy && ('unsubscribed' == $column || 'unsubscribed_ratio' == $column || 'unique_ratio' == $column)) {
                 continue;
             }
             if (isset($data['label'])) {
@@ -541,7 +543,7 @@ class ReportModel extends FormModel
             'dynamicFilters' => (isset($options['dynamicFilters'])) ? $options['dynamicFilters'] : [],
         ];
 
-        /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
+        /** @var QueryBuilder $query */
         $query                 = $reportGenerator->getQuery($dataOptions);
         $options['translator'] = $this->translator;
 
@@ -591,41 +593,38 @@ class ReportModel extends FormModel
             }
         }
 
+        $query->add('orderBy', $order);
+
+        // Allow plugin to manipulate the query
+        $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
+        $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
+        $query = $event->getQuery();
+
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
-            if ($paginate && !$entity->getGroupBy()) {
+            if ($paginate) {
                 // Build the options array to pass into the query
                 $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
                 if (!empty($options['limit'])) {
                     $limit      = $options['limit'];
                     $reportPage = $options['page'];
                 }
-                $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
+                $start = (1 === $reportPage) ? 0 : (($reportPage - 1) * $limit);
                 if ($start < 0) {
                     $start = 0;
                 }
 
-                // Must make two queries here, one to get count and one to select data
-                $select = $parts['select'];
+                if (empty($options['totalResults'])) {
+                    $options['totalResults'] = $totalResults = $this->getTotalCount($query, $debugData);
+                } else {
+                    $totalResults = $options['totalResults'];
+                }
 
-                // Get the count
-                $query->select('COUNT(*) as count');
-                $countQuery = clone $query;
-                $countQuery->resetQueryPart('groupBy');
-
-                $result       = $countQuery->execute()->fetchAll();
-                $totalResults = (!empty($result[0]['count'])) ? $result[0]['count'] : 0;
-                unset($countQuery);
-
-                // Set the limit and get the results
                 if ($limit > 0) {
                     $query->setFirstResult($start)
                         ->setMaxResults($limit);
                 }
-
-                $query->select($select);
             }
 
-            $query->add('orderBy', $order);
             $queryTime = microtime(true);
             $data      = $query->execute()->fetchAll();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
@@ -638,7 +637,7 @@ class ReportModel extends FormModel
                 $queryTime .= 'ms';
             }
 
-            if (!$paginate || $entity->getGroupBy()) {
+            if (!$paginate) {
                 $totalResults = count($data);
             }
 
@@ -716,5 +715,26 @@ class ReportModel extends FormModel
         }
 
         return $options;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param array        $debugData
+     *
+     * @return int
+     */
+    private function getTotalCount(QueryBuilder $qb, array &$debugData)
+    {
+        $countQb = clone $qb;
+        $countQb->resetQueryParts();
+
+        $countQb->select('count(*)')
+            ->from('('.$qb->getSQL().')', 'c');
+
+        if (MAUTIC_ENV == 'dev') {
+            $debugData['count_query'] = $countQb->getSQL();
+        }
+
+        return (int) $countQb->execute()->fetchColumn();
     }
 }

@@ -11,6 +11,9 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
+
 /**
  * Class TokenHelper.
  */
@@ -63,6 +66,23 @@ class TokenHelper
     }
 
     /**
+     * Returns correct token value from provided list of tokens and the concrete token.
+     *
+     * @param array  $tokens like ['{contactfield=website}' => 'https://mautic.org']
+     * @param string $token  like '{contactfield=website|https://default.url}'
+     *
+     * @return string empty string if no match
+     */
+    public static function getValueFromTokens(array $tokens, $token)
+    {
+        $token   = str_replace(['{', '}'], '', $token);
+        $alias   = self::getFieldAlias($token);
+        $default = self::getTokenDefaultValue($token);
+
+        return empty($tokens["{{$alias}}"]) ? $default : $tokens["{{$alias}}"];
+    }
+
+    /**
      * @param array $lead
      * @param       $alias
      * @param       $defaultValue
@@ -78,11 +98,40 @@ class TokenHelper
             $value = $lead['companies'][0][$alias];
         }
 
-        if ('true' === $defaultValue) {
-            $value = urlencode($value);
+        if ($value) {
+            switch ($defaultValue) {
+                case 'true':
+                    $value = urlencode($value);
+                    break;
+                case 'datetime':
+                case 'date':
+                case 'time':
+                    $dt   = new DateTimeHelper($value);
+                    $date = $dt->getDateTime()->format(
+                        (new ParamsLoaderHelper())->getParameters()['date_format_dateonly']
+                    );
+                    $time = $dt->getDateTime()->format(
+                        (new ParamsLoaderHelper())->getParameters()['date_format_timeonly']
+                    );
+                    switch ($defaultValue) {
+                        case 'datetime':
+                            $value = $date.' '.$time;
+                            break;
+                        case 'date':
+                            $value = $date;
+                            break;
+                        case 'time':
+                            $value = $time;
+                            break;
+                    }
+                    break;
+            }
         }
-
-        return $value ?: $defaultValue;
+        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime'])) {
+            return $value;
+        } else {
+            return $value ?: $defaultValue;
+        }
     }
 
     /**

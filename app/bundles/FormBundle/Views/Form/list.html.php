@@ -35,7 +35,7 @@ if ($tmpl == 'index') {
                                     'confirmText'   => $view['translator']->trans('mautic.form.rebuild'),
                                     'confirmAction' => $view['router']->path(
                                         'mautic_form_action',
-                                        array_merge(['objectAction' => 'batchRebuildHtml'])
+                                        ['objectAction' => 'batchRebuildHtml']
                                     ),
                                     'iconClass'       => 'fa fa-fw fa-refresh',
                                     'btnText'         => $view['translator']->trans('mautic.form.rebuild'),

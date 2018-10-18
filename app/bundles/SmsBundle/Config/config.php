@@ -15,8 +15,8 @@ return [
             'mautic.sms.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.helper.integration',
                     'mautic.sms.model.sms',
+                    'mautic.sms.transport_chain',
                 ],
             ],
             'mautic.sms.smsbundle.subscriber' => [
@@ -26,12 +26,13 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
+                    'mautic.helper.sms',
                 ],
             ],
             'mautic.sms.channel.subscriber' => [
                 'class'     => \Mautic\SmsBundle\EventListener\ChannelSubscriber::class,
                 'arguments' => [
-                    'mautic.helper.integration',
+                    'mautic.sms.transport_chain',
                 ],
             ],
             'mautic.sms.message_queue.subscriber' => [
@@ -100,20 +101,24 @@ return [
                 'alias' => 'sms_api',
             ],
             'mautic.sms.transport_chain' => [
-                'class'     => '\Mautic\SmsBundle\Sms\TransportChain',
-                'arguments' => ['%mautic.sms_transport%', 'mautic.helper.integration', 'monolog.logger.mautic'],
+                'class'     => \Mautic\SmsBundle\Sms\TransportChain::class,
+                'arguments' => [
+                    '%mautic.sms_transport%',
+                    'mautic.helper.integration',
+                    'monolog.logger.mautic',
+                ],
             ],
             'mautic.sms.transport.twilio' => [
-                'class'     => 'Mautic\SmsBundle\Api\TwilioApi',
-                'arguments' => [
+                'class'        => \Mautic\SmsBundle\Api\TwilioApi::class,
+                'arguments'    => [
                     'mautic.page.model.trackable',
                     'mautic.helper.phone_number',
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
-                'alias' => 'mautic.sms.transport.twilio',
-                'tags'  => [
-                    'name' => 'mautic.sms_transport', 'Twilio',
+                'tag'          => 'mautic.sms_transport',
+                'tagArguments' => [
+                    'integrationAlias' => 'Twilio',
                 ],
             ],
         ],
