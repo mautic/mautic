@@ -252,7 +252,7 @@ class LeadRepository extends CommonRepository
             );
         }
 
-        if ($limiter->hasCampaignLimit()) {
+        if ($limiter->hasCampaignLimit() && $limiter->getCampaignLimitRemaining() < $limiter->getBatchLimit()) {
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
         }
 

@@ -410,7 +410,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $this->updateOrmQueryFromContactLimiter('o', $q, $limiter);
 
-        if ($limiter->hasCampaignLimit()) {
+        if ($limiter->hasCampaignLimit() && $limiter->getCampaignLimitRemaining() < $limiter->getBatchLimit()) {
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
         }
 

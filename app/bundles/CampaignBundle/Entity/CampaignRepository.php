@@ -430,7 +430,7 @@ class CampaignRepository extends CommonRepository
         )
             ->setParameter('campaignId', (int) $campaignId);
 
-        if ($limiter->hasCampaignLimit()) {
+        if ($limiter->hasCampaignLimit() && $limiter->getCampaignLimitRemaining() < $limiter->getBatchLimit()) {
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
         }
 
