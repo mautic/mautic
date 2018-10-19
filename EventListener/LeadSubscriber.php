@@ -1,5 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * @copyright   2018 Mautic Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://www.mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\IntegrationsBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -53,7 +64,7 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
@@ -69,7 +80,7 @@ class LeadSubscriber extends CommonSubscriber
      * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException
      */
-    public function onLeadPostSave(Events\LeadEvent $event)
+    public function onLeadPostSave(Events\LeadEvent $event): void
     {
         $lead = $event->getLead();
         if ($lead->isAnonymous()) {
@@ -110,7 +121,7 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @param Events\LeadEvent $event
      */
-    public function onLeadPostDelete(Events\LeadEvent $event)
+    public function onLeadPostDelete(Events\LeadEvent $event): void
     {
         $this->fieldChangeRepo->deleteEntitiesForObject($event->getLead()->deletedId, Lead::class);
     }
@@ -121,7 +132,7 @@ class LeadSubscriber extends CommonSubscriber
      * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException
      */
-    public function onCompanyPostSave(Events\CompanyEvent $event)
+    public function onCompanyPostSave(Events\CompanyEvent $event): void
     {
         if (defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS')) {
             // Don't track changes just made by an active sync
@@ -146,7 +157,7 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @param Events\CompanyEvent $event
      */
-    public function onCompanyPostDelete(Events\CompanyEvent $event)
+    public function onCompanyPostDelete(Events\CompanyEvent $event): void
     {
         $this->fieldChangeRepo->deleteEntitiesForObject($event->getCompany()->deletedId, Company::class);
     }
@@ -158,7 +169,7 @@ class LeadSubscriber extends CommonSubscriber
      *
      * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
      */
-    private function recordFieldChanges(array $fieldChanges, int $objectId, string $objectType)
+    private function recordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
     {
         $toPersist     = [];
         $changedFields = [];
@@ -166,7 +177,7 @@ class LeadSubscriber extends CommonSubscriber
             $valueDAO          = $this->variableExpressor->encodeVariable($newValue);
             $changedFields[]   = $key;
             $fieldChangeEntity = (new FieldChange)
-                ->setObjectType(Lead::class)
+                ->setObjectType($objectType)
                 ->setObjectId($objectId)
                 ->setModifiedAt(new \DateTime)
                 ->setColumnName($key)
