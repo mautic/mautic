@@ -113,6 +113,7 @@ return [
                 'arguments' => [
                     'mautic.plugin.integrations.repository.integration',
                     'mautic.integrations.service.encryption',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.integrations.helper.auth_integrations' => [

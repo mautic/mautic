@@ -4,11 +4,16 @@
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
 
+use Mautic\CampaignBundle\Membership\EventDispatcher;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
+use MauticPlugin\IntegrationsBundle\Event\KeysDecryptionEvent;
+use MauticPlugin\IntegrationsBundle\Event\KeysEncryptionEvent;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Facade\EncryptionService;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class IntegrationsHelper
 {
@@ -28,6 +33,11 @@ class IntegrationsHelper
     private $encryptionService;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * @var array
      */
     private $decryptedIntegrationConfigurations = [];
@@ -35,13 +45,18 @@ class IntegrationsHelper
     /**
      * IntegrationsHelper constructor.
      *
-     * @param IntegrationRepository $integrationRepository
-     * @param EncryptionService     $encryptionService
+     * @param IntegrationRepository    $integrationRepository
+     * @param EncryptionService        $encryptionService
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(IntegrationRepository $integrationRepository, EncryptionService $encryptionService)
-    {
+    public function __construct(
+        IntegrationRepository $integrationRepository,
+        EncryptionService $encryptionService,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->integrationRepository = $integrationRepository;
         $this->encryptionService     = $encryptionService;
+        $this->eventDispatcher       = $eventDispatcher;
     }
 
     /**
@@ -60,7 +75,7 @@ class IntegrationsHelper
      */
     public function getIntegration(string $integration)
     {
-        if (!isset($this->integrations[$integration])){
+        if (!isset($this->integrations[$integration])) {
             throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.basic_integration");
         }
 
@@ -77,7 +92,13 @@ class IntegrationsHelper
     {
         // Encrypt the keys before saving
         $decryptedApiKeys = $configuration->getApiKeys();
-        $encryptedApiKeys = $this->encryptionService->encrypt($decryptedApiKeys);
+
+        // Dispatch event before encryption
+        $encryptionEvent = new KeysEncryptionEvent($configuration, $decryptedApiKeys);
+        $this->eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_KEYS_BEFORE_ENCRYPTION, $encryptionEvent);
+
+        // Encrypt and store the keys
+        $encryptedApiKeys = $this->encryptionService->encrypt($encryptionEvent->getKeys());
         $configuration->setApiKeys($encryptedApiKeys);
 
         // Save
@@ -111,7 +132,12 @@ class IntegrationsHelper
             $configuration    = $integration->getIntegrationConfiguration();
             $encryptedApiKeys = $configuration->getApiKeys();
             $decryptedApiKeys = $this->encryptionService->decrypt($encryptedApiKeys);
-            $configuration->setApiKeys($decryptedApiKeys);
+
+            // Dispatch event after decryption
+            $decryptionEvent = new KeysDecryptionEvent($configuration, $decryptedApiKeys);
+            $this->eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_KEYS_AFTER_DECRYPTION, $decryptionEvent);
+
+            $configuration->setApiKeys($decryptionEvent->getKeys());
 
             $this->decryptedIntegrationConfigurations[$integration->getName()] = true;
         }

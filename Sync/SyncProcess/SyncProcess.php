@@ -21,7 +21,7 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
-use MauticPlugin\IntegrationsBundle\SyncEvents;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -149,7 +149,7 @@ class SyncProcess
 
         // Tell listeners sync is done
         $this->eventDispatcher->dispatch(
-            SyncEvents::INTEGRATION_POST_EXECUTE,
+            IntegrationEvents::INTEGRATION_POST_EXECUTE,
             new SyncEvent($this->mappingManualDAO->getIntegration(), $this->syncFromDateTime, $this->syncToDateTime)
         );
     }
