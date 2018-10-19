@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$formName = '_'.$form->generateFormName().(isset($suffix) ? $suffix : '');
+$formName = '_'.$form->generateFormName().(isset($suffix) ? $suffix : '').'_'.uniqid();
 if (!isset($fields)) {
     $fields = $form->getFields();
 }
