@@ -13,6 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\Logger;
 
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 class DebugLogger
 {
@@ -36,8 +37,9 @@ class DebugLogger
      * @param string $loggedFrom
      * @param string $message
      * @param array  $context
+     * @param string $urgency
      */
-    public static function log($integration, $message, $loggedFrom = null, array $context = [], $urgency = 'debug')
+    public static function log($integration, $message, $loggedFrom = null, array $context = [], $urgency = LogLevel::DEBUG)
     {
         if (!static::$logger) {
             return;
