@@ -153,7 +153,6 @@ class ScheduledExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 
@@ -210,20 +209,27 @@ class ScheduledExecutioner implements ExecutionerInterface
         $organized = $this->organizeByEvent($logs);
         $now       = new \DateTime();
         foreach ($organized as $organizedLogs) {
-            $this->progressBar->advance($organizedLogs->count());
-
+            /** @var Event $event */
             $event = $organizedLogs->first()->getEvent();
 
             // Validate that the schedule is still appropriate
-            $this->validateSchedule($event, $organizedLogs, $now, true);
+            $this->validateSchedule($organizedLogs, $now, true);
 
-            try {
-                // Hydrate contacts with custom field data
-                $this->scheduledContactFinder->hydrateContacts($organizedLogs);
+            // Check that the campaign is published with up/down dates
+            if ($event->getCampaign()->isPublished()) {
+                try {
+                    // Hydrate contacts with custom field data
+                    $this->scheduledContactFinder->hydrateContacts($organizedLogs);
 
-                $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
-            } catch (NoContactsFoundException $e) {
-                // All of the events were rescheduled
+                    $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
+                } catch (NoContactsFoundException $e) {
+                    // All of the events were rescheduled
+                }
+            } else {
+                $this->executioner->recordLogsWithError(
+                    $organizedLogs,
+                    $this->translator->trans('mautic.campaign.event.campaign_unpublished')
+                );
             }
 
             $this->progressBar->advance($organizedLogs->count());
@@ -311,7 +317,7 @@ class ScheduledExecutioner implements ExecutionerInterface
             $this->counter->advanceEvaluated($logs->count());
 
             // Validate that the schedule is still appropriate
-            $this->validateSchedule($event, $logs, $now);
+            $this->validateSchedule($logs, $now);
 
             // Execute if there are any that did not get rescheduled
             $this->executioner->executeLogs($event, $logs, $this->counter);
@@ -323,14 +329,13 @@ class ScheduledExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param Event           $event
      * @param ArrayCollection $logs
      * @param \DateTime       $now
      * @param bool            $scheduleTogether
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function validateSchedule(Event $event, ArrayCollection $logs, \DateTime $now, $scheduleTogether = false)
+    private function validateSchedule(ArrayCollection $logs, \DateTime $now, $scheduleTogether = false)
     {
         $toBeRescheduled     = new ArrayCollection();
         $latestExecutionDate = $now;
@@ -338,7 +343,7 @@ class ScheduledExecutioner implements ExecutionerInterface
         // Check if the event should be scheduled (let the schedulers do the debug logging)
         /** @var LeadEventLog $log */
         foreach ($logs as $key => $log) {
-            $executionDate = $this->scheduler->getExecutionDateTime($event, $now, $log->getDateTriggered());
+            $executionDate = $this->scheduler->validateExecutionDateTime($log, $now);
             $this->logger->debug(
                 'CAMPAIGN: Log ID #'.$log->getID().
                 ' to be executed on '.$executionDate->format('Y-m-d H:i:s').

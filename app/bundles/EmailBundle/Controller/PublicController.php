@@ -171,10 +171,11 @@ class PublicController extends CommonFormController
             if ($lead) {
                 // Set the lead as current lead
                 $leadModel->setCurrentLead($lead);
-            }
-            // Set lead lang
-            if ($lead->getPreferredLocale()) {
-                $translator->setLocale($lead->getPreferredLocale());
+
+                // Set lead lang
+                if ($lead->getPreferredLocale()) {
+                    $translator->setLocale($lead->getPreferredLocale());
+                }
             }
 
             if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {

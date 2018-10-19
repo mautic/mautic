@@ -11,6 +11,7 @@
 
 namespace Mautic\FormBundle\Model;
 
+use DOMDocument;
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
@@ -413,7 +414,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * Obtains the cached HTML of a form and generates it if missing.
+     * Obtains the content.
      *
      * @param Form      $form
      * @param bool|true $withScript
@@ -422,6 +423,27 @@ class FormModel extends CommonFormModel
      * @return string
      */
     public function getContent(Form $form, $withScript = true, $useCache = true)
+    {
+        $html = $this->getFormHtml($form, $useCache);
+
+        if ($withScript) {
+            $html = $this->getFormScript($form)."\n\n".$this->removeScriptTag($html);
+        } else {
+            $html = $this->removeScriptTag($html);
+        }
+
+        return $html;
+    }
+
+    /**
+     * Obtains the cached HTML of a form and generates it if missing.
+     *
+     * @param Form      $form
+     * @param bool|true $useCache
+     *
+     * @return string
+     */
+    public function getFormHtml(Form $form, $useCache = true)
     {
         if ($useCache && !$form->usesProgressiveProfiling()) {
             $cachedHtml = $form->getCachedHtml();
@@ -433,10 +455,6 @@ class FormModel extends CommonFormModel
 
         if (!$form->getInKioskMode()) {
             $this->populateValuesWithLead($form, $cachedHtml);
-        }
-
-        if ($withScript) {
-            $cachedHtml = $this->getFormScript($form)."\n\n".$cachedHtml;
         }
 
         return $cachedHtml;
@@ -724,21 +742,26 @@ class FormModel extends CommonFormModel
      */
     public function getAutomaticJavascript(Form $form)
     {
-        $html = $this->getContent($form);
+        $html       = $this->getContent($form, false);
+        $formScript = $this->getFormScript($form);
 
         //replace line breaks with literal symbol and escape quotations
-        $search  = ["\r\n", "\n", '"'];
-        $replace = ['', '', '\"'];
-        $html    = str_replace($search, $replace, $html);
+        $search        = ["\r\n", "\n", '"'];
+        $replace       = ['', '', '\"'];
+        $html          = str_replace($search, $replace, $html);
+        $oldFormScript = str_replace($search, $replace, $formScript);
+        $newFormScript = $this->generateJsScript($formScript);
 
         // Write html for all browser and fallback for IE
         $script = '
-            var scr = document.currentScript;
+            var scr  = document.currentScript;
+            var html = "'.$html.'";
             
             if (scr !== undefined) {
-                scr.insertAdjacentHTML("afterend" , "'.$html.'");
+                scr.insertAdjacentHTML("afterend", html);
+                '.$newFormScript.'
             } else {
-                document.write("'.$html.'");
+                document.write("'.$oldFormScript.'"+html);
             }
         ';
 
@@ -765,6 +788,13 @@ class FormModel extends CommonFormModel
                 'theme' => $theme,
             ]
         );
+
+        $html    = $this->getFormHtml($form);
+        $scripts = $this->extractScriptTag($html);
+
+        foreach ($scripts as $item) {
+            $script .= $item."\n";
+        }
 
         return $script;
     }
@@ -926,5 +956,95 @@ class FormModel extends CommonFormModel
         $results = $q->execute()->fetchAll();
 
         return $results;
+    }
+
+    /**
+     * Extract script from html.
+     *
+     * @param $html
+     *
+     * @return array
+     */
+    private function extractScriptTag($html)
+    {
+        libxml_use_internal_errors(true);
+        $dom = new DOMDocument();
+        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $items = $dom->getElementsByTagName('script');
+
+        $scripts = [];
+        foreach ($items as $script) {
+            $scripts[] = $dom->saveHTML($script);
+        }
+
+        return $scripts;
+    }
+
+    /**
+     * Remove script from html.
+     *
+     * @param $html
+     *
+     * @return string
+     */
+    private function removeScriptTag($html)
+    {
+        libxml_use_internal_errors(true);
+        $dom = new DOMDocument();
+        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $items = $dom->getElementsByTagName('script');
+
+        $remove = [];
+        foreach ($items as $item) {
+            $remove[] = $item;
+        }
+
+        foreach ($remove as $item) {
+            $item->parentNode->removeChild($item);
+        }
+
+        $root   = $dom->documentElement;
+        $result = '';
+        foreach ($root->childNodes as $childNode) {
+            $result .= $dom->saveHTML($childNode);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate dom manipulation javascript to include all script.
+     *
+     * @param $html
+     *
+     * @return string
+     */
+    private function generateJsScript($html)
+    {
+        libxml_use_internal_errors(true);
+        $dom = new DOMDocument();
+        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $items = $dom->getElementsByTagName('script');
+
+        $javascript = '';
+        foreach ($items as $key => $script) {
+            if ($script->hasAttribute('src')) {
+                $javascript .= "
+                var script$key = document.createElement('script');
+                script$key.src = '".$script->getAttribute('src')."';
+                document.getElementsByTagName('head')[0].appendChild(script$key);";
+            } else {
+                $scriptContent = $script->nodeValue;
+                $scriptContent = str_replace(["\r\n", "\n", '"'], ['', '', '\"'], $scriptContent);
+
+                $javascript .= "
+                var inlineScript$key = document.createTextNode(\"$scriptContent\");
+                var script$key       = document.createElement('script');
+                script$key.appendChild(inlineScript$key);
+                document.getElementsByTagName('head')[0].appendChild(script$key);";
+            }
+        }
+
+        return $javascript;
     }
 }
