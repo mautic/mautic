@@ -56,7 +56,24 @@ class UpdateLeadActionType extends AbstractType
 
         $options['fields']                      = $leadFields;
         $options['ignore_required_constraints'] = true;
-
+        $builder->add(
+            'mode',
+            'button_group',
+            [
+                'label'      => 'mautic.campaign.lead.updatelead',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.campaign.lead.updatelead.desc',
+                ],
+                'choices' => [
+                    'mautic.campaign.lead.update'   => 'update',
+                    'mautic.campaign.lead.remove'   => 'remove',
+                    'mautic.campaign.lead.reset'    => 'reset',
+                ],
+                'choices_as_values' => true,
+            ]
+        );
         $this->getFormFields($builder, $options);
     }
 
