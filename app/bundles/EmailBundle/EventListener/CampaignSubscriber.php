@@ -219,15 +219,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function isFromParent(Email $email, $emailId)
-    {
-        if ($email->getVariantParent()) {
-            return in_array($emailId, [$email->getId(), $email->getVariantParent()->getId()]);
-        } else {
-            return in_array($emailId, [$email->getId()]);
-        }
-    }
-
     /**
      * @param CampaignExecutionEvent $event
      */
