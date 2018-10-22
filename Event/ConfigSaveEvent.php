@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,19 +11,25 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Event;
 
+
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\EventDispatcher\Event;
 
-class FormLoadEvent extends Event
+class ConfigSaveEvent extends Event
 {
     /**
      * @var Integration
      */
     private $integrationConfiguration;
 
-    public function __construct(Integration $integration)
+    /**
+     * ConfigSaveEvent constructor.
+     *
+     * @param Integration $integrationConfiguration
+     */
+    public function __construct(Integration $integrationConfiguration)
     {
-        $this->integrationConfiguration = $integration;
+        $this->integrationConfiguration = $integrationConfiguration;
     }
 
     /**

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,19 +11,32 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Event;
 
+
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\EventDispatcher\Event;
 
-class FormLoadEvent extends Event
+class KeysDecryptionEvent extends Event
 {
     /**
      * @var Integration
      */
     private $integrationConfiguration;
 
-    public function __construct(Integration $integration)
+    /**
+     * @var array
+     */
+    private $keys;
+
+    /**
+     * KeysEncryptionEvent constructor.
+     *
+     * @param Integration $integrationConfiguration
+     * @param array       $keys
+     */
+    public function __construct(Integration $integrationConfiguration, array $keys)
     {
-        $this->integrationConfiguration = $integration;
+        $this->integrationConfiguration = $integrationConfiguration;
+        $this->keys = $keys;
     }
 
     /**
@@ -37,10 +48,18 @@ class FormLoadEvent extends Event
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getIntegration(): string
+    public function getKeys(): array
     {
-        return $this->integrationConfiguration->getName();
+        return $this->keys;
+    }
+
+    /**
+     * @param array $keys
+     */
+    public function setKeys(array $keys)
+    {
+        $this->keys = $keys;
     }
 }

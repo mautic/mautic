@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncService;
 
+use GuzzleHttp\Exception\ClientException;
 use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
@@ -20,6 +21,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcessFactoryInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -137,7 +139,12 @@ final class SyncService implements SyncServiceInterface
             __CLASS__.':'.__FUNCTION__
         );
 
-        $integrationSyncProcess->execute();
+        try {
+            $integrationSyncProcess->execute();
+        } catch (ClientException $exception) {
+            // The sync failed to communicate with the integration so log it
+            DebugLogger::log($integration, $exception->getMessage(), null, [], LogLevel::ERROR);
+        }
     }
 
     /**
