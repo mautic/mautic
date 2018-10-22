@@ -380,15 +380,27 @@ Mautic.reorderSegmentFilters = function() {
     mQuery('#' + prefix + '_filters .panel').each(function() {
         Mautic.updateFilterPositioning(mQuery(this).find('select.glue-select').first());
         mQuery(this).find('[id^="' + prefix + '_filters_"]').each(function() {
-            var id = mQuery(this).attr('id');
+            var id     = mQuery(this).attr('id');
+            var name   = mQuery(this).attr('name');
+            var suffix = id.split(/[_]+/).pop();
+
             if (prefix + '_filters___name___filter' === id) {
                 return true;
             }
 
-            var suffix = id.split(/[_]+/).pop();
+            var newName = prefix+'[filters]['+counter+']['+suffix+']';
+            if (name.slice(-2) === '[]') {
+                newName += '[]';
+            }
 
+            mQuery(this).attr('name', newName);
             mQuery(this).attr('id', prefix + '_filters_'+counter+'_'+suffix);
-            mQuery(this).attr('name', prefix + '[filters]['+counter+']['+suffix+']');
+
+            // Destroy the chosen and recreate
+            if (mQuery(this).is('select') && suffix == "filter") {
+                Mautic.destroyChosen(mQuery(this));
+                Mautic.activateChosenSelect(mQuery(this));
+            }
         });
 
         ++counter;
@@ -469,9 +481,7 @@ Mautic.convertLeadFilterInput = function(el) {
         }
 
         // Destroy the chosen and recreate
-        if (mQuery(filterId + '_chosen').length) {
-            mQuery(filterId).chosen('destroy');
-        }
+        Mautic.destroyChosen(mQuery(filterId));
 
         mQuery(filterId).attr('data-placeholder', placeholder);
 
@@ -766,7 +776,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
     if (defaultValueField.hasClass('calendar-activated')) {
         defaultValueField.datetimepicker('destroy').removeClass('calendar-activated');
     } else if (mQuery('#leadfield_defaultValue_chosen').length) {
-        mQuery('#leadfield_defaultValue').chosen('destroy');
+        Mautic.destroyChosen(defaultValueField);
     }
 
     var defaultFieldType = mQuery('input[name="leadfield[defaultValue]"]').attr('type');
@@ -1442,4 +1452,4 @@ Mautic.setAsPrimaryCompany = function (companyId,leadId){
 
         }
     });
-}
+};
