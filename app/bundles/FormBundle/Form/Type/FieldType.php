@@ -533,6 +533,14 @@ class FieldType extends AbstractType
                             'data'  => $propertiesData,
                         ]
                     );
+                    $builder->add(
+                        'properties',
+                        'formfield_placeholder',
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
                     break;
             }
         }

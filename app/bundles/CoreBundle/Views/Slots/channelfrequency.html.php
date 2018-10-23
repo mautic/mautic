@@ -21,11 +21,11 @@ $channelNumber = 0;
         <tr>
             <td>
                 <div class="text-left">
-                    <input type="checkbox" id="<?php echo $channel->value ?>"
+                    <input type="checkbox" id="<?php echo $channel->value; ?>"
                            name="lead_contact_frequency_rules[subscribed_channels][]"
                            onclick="togglePreferredChannel(this.value);"
-                           value="<?php echo $view->escape($channel->value) ?>" <?php echo $checked; ?>>
-                    <label for="<?php echo $channel->value ?>" id="is-contactable-<?php echo $channel->value ?>" data-channel="<?php echo $channelName; ?>">
+                           value="<?php echo $view->escape($channel->value); ?>" <?php echo $checked; ?>>
+                    <label for="<?php echo $channel->value; ?>" id="is-contactable-<?php echo $channel->value; ?>" data-channel="<?php echo $channelName; ?>">
                         <?php echo $view['translator']->trans('mautic.lead.contact.me.label', ['%channel%' => $channelName]); ?>
                     </label>
                 </div>
@@ -35,7 +35,7 @@ $channelNumber = 0;
             <td>
                 <div id="frequency_<?php echo $channel->value; ?>" class="text-left">
                     <?php
-                    if ($showContactFrequency):?>
+                    if ($showContactFrequency && isset($form['frequency_number_'.$channel->value]) && isset($form['frequency_time_'.$channel->value])):?>
                         <div class="col-md-6">
                             <label class="text-muted label1"><?php echo $view['translator']->trans($form['frequency_number_'.$channel->value]->vars['label']); ?></label>
                             <?php echo $view['form']->widget($form['frequency_number_'.$channel->value]); ?>
@@ -46,7 +46,7 @@ $channelNumber = 0;
                         unset($form['frequency_time_'.$channel->value]);
                         unset($form['frequency_number_'.$channel->value]);
                     endif; ?>
-                    <?php if ($showContactPauseDates):?>
+                    <?php if ($showContactPauseDates && isset($form['contact_pause_start_date_'.$channel->value]) && isset($form['contact_pause_end_date_'.$channel->value])):?>
                         <div class="col-md-6">
                             <label class="text-muted label3"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
                             <?php echo $view['form']->widget($form['contact_pause_start_date_'.$channel->value]); ?>

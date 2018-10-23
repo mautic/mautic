@@ -37,12 +37,11 @@ class AggregatorType extends AbstractType
         // function
         $builder->add('function', 'choice', [
             'choices' => [
-                'COUNT'          => $this->translator->trans('mautic.report.report.label.aggregators.count'),
-                'AVG'            => $this->translator->trans('mautic.report.report.label.aggregators.avg'),
-                'SUM'            => $this->translator->trans('mautic.report.report.label.aggregators.sum'),
-                'MIN'            => $this->translator->trans('mautic.report.report.label.aggregators.min'),
-                'MAX'            => $this->translator->trans('mautic.report.report.label.aggregators.max'),
-                'GROUP_CONCAT'   => $this->translator->trans('mautic.report.report.label.aggregators.group_concat'),
+                'COUNT' => $this->translator->trans('mautic.report.report.label.aggregators.count'),
+                'AVG'   => $this->translator->trans('mautic.report.report.label.aggregators.avg'),
+                'SUM'   => $this->translator->trans('mautic.report.report.label.aggregators.sum'),
+                'MIN'   => $this->translator->trans('mautic.report.report.label.aggregators.min'),
+                'MAX'   => $this->translator->trans('mautic.report.report.label.aggregators.max'),
             ],
             'expanded'    => false,
             'multiple'    => false,
