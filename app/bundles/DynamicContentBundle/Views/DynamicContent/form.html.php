@@ -121,7 +121,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                                             ) : '{}';
                                                             ?>
                                                             <option value="<?php echo $view->escape($value); ?>"
-                                                                    id="available_<?php echo $value; ?>"
+                                                                    id="available_<?php echo $object.'_'.$value; ?>"
                                                                     data-field-object="<?php echo $object; ?>"
                                                                     data-field-type="<?php echo $params['properties']['type']; ?>"
                                                                     data-field-list="<?php echo $view->escape($list); ?>"
