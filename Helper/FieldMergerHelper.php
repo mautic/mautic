@@ -53,25 +53,6 @@ class FieldMergerHelper
     }
 
     /**
-     * @param string $object
-     *
-     * @return array
-     */
-    public function findMissingRequiredFieldMappings(string $object)
-    {
-        $requiredFields = $this->integrationObject->getRequiredFieldsForMapping($object);
-
-        $missingFields = [];
-        foreach ($requiredFields as $field => $label) {
-            if (empty($this->currentFieldMappings[$object][$field]['mappedField'])) {
-                $missingFields[] = $field;
-            }
-        }
-
-        return $missingFields;
-    }
-
-    /**
      * @return array
      */
     public function getFieldMappings()

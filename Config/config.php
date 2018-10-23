@@ -134,6 +134,13 @@ return [
                     'mautic.integrations.helper',
                 ],
             ],
+            'mautic.integrations.helper.field_validator' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Helper\FieldValidationHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'translator',
+                ],
+            ],
         ],
         'other' => [
             'mautic.integrations.service.encryption' => [
