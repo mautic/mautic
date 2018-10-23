@@ -195,7 +195,12 @@ class PageSubscriber extends CommonSubscriber
         $page                   = $pageId ? $pageRepo->find((int) $pageId) : null;
         $lead                   = $leadId ? $leadRepo->find((int) $leadId) : null;
 
-        $this->pageModel->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated, false);
-        $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
+        if ($hit != null && $lead != null) {
+          $this->pageModel->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated, false);
+          $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
+        } else {
+          $this->factory->getLogger()->log('error', 'Error processing page hit ' . $pageId . ' for ' . $leadId);
+          $event->setResult(QueueConsumerResults::REJECT);
+        }
     }
 }
