@@ -109,20 +109,36 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
         $this->scheduler->expects($this->at(0))
-            ->method('validateAndScheduleEventForContacts')
-            ->willReturn(null);
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
 
         $this->scheduler->expects($this->at(1))
             ->method('validateAndScheduleEventForContacts')
             ->willReturn(null);
 
         $this->scheduler->expects($this->at(2))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
+
+        $this->scheduler->expects($this->at(3))
+            ->method('validateAndScheduleEventForContacts')
+            ->willReturn(null);
+
+        $this->scheduler->expects($this->at(4))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
+
+        $this->scheduler->expects($this->at(5))
             ->method('validateAndScheduleEventForContacts')
             ->willReturnCallback(function () {
                 throw new NotSchedulableException();
             });
 
-        $this->scheduler->expects($this->at(3))
+        $this->scheduler->expects($this->at(6))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
+
+        $this->scheduler->expects($this->at(7))
             ->method('validateAndScheduleEventForContacts')
             ->willReturnCallback(function () {
                 throw new NotSchedulableException();
