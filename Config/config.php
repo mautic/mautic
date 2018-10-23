@@ -65,6 +65,12 @@ return [
                     'controller_resolver',
                 ],
             ],
+            'mautic.integrations.subscriber.ui_contact_integrations_tab' => [
+                'class' => \MauticPlugin\IntegrationsBundle\EventListener\UIContactIntegrationsTabSubscriber::class,
+                'arguments' => [
+                    'mautic.integrations.repository.object_mapping',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.integrations.form.config.integration' => [

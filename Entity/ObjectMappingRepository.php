@@ -132,4 +132,26 @@ class ObjectMappingRepository  extends CommonRepository
             ->setParameter('objectName', $objectName)
             ->setParameter('objectId', $objectId);
     }
+
+    /**
+     * @param string $internalObject
+     * @param int    $internalObjectId
+     *
+     * @return ObjectMapping[]
+     */
+    public function getIntegrationMappingsForInternalObject(string $internalObject, int $internalObjectId)
+    {
+        $qb = $this->createQueryBuilder('m');
+        $qb->select('m')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('m.internalObjectName', ':internalObject'),
+                    $qb->expr()->eq('m.internalObjectId', ':internalObjectId')
+                )
+            )
+            ->setParameter('internalObject', $internalObject)
+            ->setParameter('internalObjectId', $internalObjectId);
+
+        return $qb->getQuery()->getResult();
+    }
 }
