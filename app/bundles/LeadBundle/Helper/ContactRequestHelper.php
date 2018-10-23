@@ -304,7 +304,7 @@ class ContactRequestHelper
      */
     private function mergeWithTrackedContact(Lead $foundContact)
     {
-        if ($this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
+        if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
             return $this->leadModel->mergeLeads($this->trackedContact, $foundContact, false);
         }
 

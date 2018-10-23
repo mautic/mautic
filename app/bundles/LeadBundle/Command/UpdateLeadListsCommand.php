@@ -58,6 +58,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             $list = $listModel->getEntity($id);
             if ($list !== null) {
                 $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $id]).'</info>');
+                $processed = 0;
                 try {
                     $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
                 } catch (QueryException $e) {

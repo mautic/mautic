@@ -118,34 +118,25 @@ class EventScheduler
         // Load the rotations for creating new log entries
         $this->eventLogger->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
-        foreach ($contacts as $contact) {
-            // Create the entry
-            $log = $this->eventLogger->buildLogEntry($event, $contact, $isInactiveEvent);
+        // If this is relative to a specific hour, process the contacts in batches by contacts' timezone
+        if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
+            $groupedExecutionDates = $this->intervalScheduler->groupContactsByDate($event, $contacts, $executionDate);
 
-            // Schedule it
-            $log->setTriggerDate($executionDate);
+            foreach ($groupedExecutionDates as $groupExecutionDateDAO) {
+                $this->scheduleEventForContacts(
+                    $event,
+                    $config,
+                    $groupExecutionDateDAO->getExecutionDate(),
+                    $groupExecutionDateDAO->getContacts(),
+                    $isInactiveEvent
+                );
+            }
 
-            // Add it to the queue to persist to the DB
-            $this->eventLogger->queueToPersist($log);
-
-            //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
-            $this->logger->debug(
-                'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
-                .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:m:i T')
-            );
-
-            $this->dispatchScheduledEvent($config, $log);
+            return;
         }
 
-        // Persist any pending in the queue
-        $logs = $this->eventLogger->persistQueuedLogs();
-
-        // Send out a batch event
-        $this->dispatchBatchScheduledEvent($config, $event, $logs);
-
-        // Update log entries and clear from memory
-        $this->eventLogger->persistCollection($logs)
-            ->clearCollection($logs);
+        // Otherwise just schedule as the default
+        $this->scheduleEventForContacts($event, $config, $executionDate, $contacts, $isInactiveEvent);
     }
 
     /**
@@ -274,6 +265,37 @@ class EventScheduler
     }
 
     /**
+     * @param LeadEventLog $log
+     * @param \DateTime    $currentDateTime
+     *
+     * @return \DateTime
+     *
+     * @throws NotSchedulableException
+     */
+    public function validateExecutionDateTime(LeadEventLog $log, \DateTime $currentDateTime)
+    {
+        if (!$scheduledDateTime = $log->getTriggerDate()) {
+            throw new NotSchedulableException();
+        }
+
+        $event = $log->getEvent();
+
+        switch ($event->getTriggerMode()) {
+            case Event::TRIGGER_MODE_IMMEDIATE:
+            case null: // decision
+                $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
+
+                return $currentDateTime;
+            case Event::TRIGGER_MODE_INTERVAL:
+                return $this->intervalScheduler->validateExecutionDateTime($log, $currentDateTime);
+            case Event::TRIGGER_MODE_DATE:
+                return $this->dateTimeScheduler->getExecutionDateTime($event, $currentDateTime, $scheduledDateTime);
+        }
+
+        throw new NotSchedulableException();
+    }
+
+    /**
      * @param ArrayCollection|Event[] $events
      * @param \DateTime               $lastActiveDate
      *
@@ -341,6 +363,53 @@ class EventScheduler
     }
 
     /**
+     * @param Event           $event
+     * @param \DateTime       $comparedFromDateTime
+     * @param ArrayCollection $contacts
+     *
+     * @throws NotSchedulableException
+     */
+    public function validateAndScheduleEventForContacts(Event $event, \DateTime $comparedFromDateTime, ArrayCollection $contacts)
+    {
+        if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
+            $this->logger->debug(
+                'CAMPAIGN: Event ID# '.$event->getId().
+                ' has to be scheduled based on contact specific parameters '.
+                ' compared to '.$comparedFromDateTime->format('Y-m-d H:i:s')
+            );
+
+            $groupedExecutionDates = $this->intervalScheduler->groupContactsByDate($event, $contacts, $comparedFromDateTime);
+            $config                = $this->collector->getEventConfig($event);
+
+            foreach ($groupedExecutionDates as $groupExecutionDateDAO) {
+                $this->scheduleEventForContacts(
+                    $event,
+                    $config,
+                    $groupExecutionDateDAO->getExecutionDate(),
+                    $groupExecutionDateDAO->getContacts()
+                );
+            }
+
+            return;
+        }
+
+        $executionDateTime = $this->getExecutionDateTime($event, $comparedFromDateTime);
+        $this->logger->debug(
+            'CAMPAIGN: Event ID# '.$event->getId().
+            ' to be executed on '.$executionDateTime->format('Y-m-d H:i:s').
+            ' compared to '.$comparedFromDateTime->format('Y-m-d H:i:s')
+        );
+
+        if ($this->shouldSchedule($executionDateTime, $comparedFromDateTime)) {
+            $this->schedule($event, $executionDateTime, $contacts);
+
+            return;
+        }
+
+        throw new NotSchedulableException();
+    }
+
+    /**
      * @param AbstractEventAccessor $config
      * @param LeadEventLog          $log
      * @param bool                  $isReschedule
@@ -369,5 +438,44 @@ class EventScheduler
             CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
             new ScheduledBatchEvent($config, $event, $logs, $isReschedule)
         );
+    }
+
+    /**
+     * @param Event                 $event
+     * @param AbstractEventAccessor $config
+     * @param \DateTime             $executionDate
+     * @param ArrayCollection       $contacts
+     * @param bool                  $isInactiveEvent
+     */
+    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTime $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    {
+        foreach ($contacts as $contact) {
+            // Create the entry
+            $log = $this->eventLogger->buildLogEntry($event, $contact, $isInactiveEvent);
+
+            // Schedule it
+            $log->setTriggerDate($executionDate);
+
+            // Add it to the queue to persist to the DB
+            $this->eventLogger->queueToPersist($log);
+
+            //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
+            $this->logger->debug(
+                'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
+                .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:m:i T')
+            );
+
+            $this->dispatchScheduledEvent($config, $log);
+        }
+
+        // Persist any pending in the queue
+        $logs = $this->eventLogger->persistQueuedLogs();
+
+        // Send out a batch event
+        $this->dispatchBatchScheduledEvent($config, $event, $logs);
+
+        // Update log entries and clear from memory
+        $this->eventLogger->persistCollection($logs)
+            ->clearCollection($logs);
     }
 }
