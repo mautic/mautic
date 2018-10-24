@@ -21,11 +21,14 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
@@ -38,6 +41,16 @@ class ObjectChangeGenerator
      * @var ReportDAO
      */
     private $syncReport;
+
+    /**
+     * @var ValueHelper
+     */
+    private $valueHelper;
+
+    /**
+     * @var FieldHelper
+     */
+    private $fieldHelper;
 
     /**
      * @var MappingManualDAO
@@ -72,10 +85,14 @@ class ObjectChangeGenerator
      * ObjectChangeGenerator constructor.
      *
      * @param SyncJudgeInterface $syncJudge
+     * @param ValueHelper        $valueHelper
+     * @param FieldHelper        $fieldHelper
      */
-    public function __construct(SyncJudgeInterface $syncJudge)
+    public function __construct(SyncJudgeInterface $syncJudge, ValueHelper $valueHelper, FieldHelper $fieldHelper)
     {
-        $this->syncJudge = $syncJudge;
+        $this->syncJudge   = $syncJudge;
+        $this->valueHelper = $valueHelper;
+        $this->fieldHelper = $fieldHelper;
     }
 
     /**
@@ -152,7 +169,12 @@ class ObjectChangeGenerator
     private function addFieldToObjectChange(FieldMappingDAO $fieldMappingDAO)
     {
         try {
-            $fieldState = $this->integrationObject->getField($fieldMappingDAO->getIntegrationField())->getState();
+            $integrationFieldState = $this->integrationObject->getField($fieldMappingDAO->getIntegrationField())->getState();
+            $internalFieldState    = $this->getFieldState(
+                $fieldMappingDAO->getInternalObject(),
+                $fieldMappingDAO->getInternalField(),
+                $integrationFieldState
+            );
 
             $integrationInformationChangeRequest = $this->syncReport->getInformationChangeRequest(
                 $this->integrationObject->getObject(),
@@ -165,15 +187,21 @@ class ObjectChangeGenerator
 
         // If syncing bidirectional, let the sync judge determine what value should be used for the field
         if (ObjectMappingDAO::SYNC_BIDIRECTIONALLY === $fieldMappingDAO->getSyncDirection()) {
-            $this->judgeThenAddFieldToObjectChange($fieldMappingDAO, $integrationInformationChangeRequest, $fieldState);
+            $this->judgeThenAddFieldToObjectChange($fieldMappingDAO, $integrationInformationChangeRequest, $internalFieldState);
 
             return;
         }
 
+        $newValue = $this->valueHelper->getValueForMautic(
+            $integrationInformationChangeRequest->getNewValue(),
+            $internalFieldState,
+            $fieldMappingDAO->getSyncDirection()
+        );
+
         // Add the value to the field based on the field state
         $this->objectChange->addField(
-            new FieldDAO($fieldMappingDAO->getInternalField(), $integrationInformationChangeRequest->getNewValue()),
-            $fieldState
+            new FieldDAO($fieldMappingDAO->getInternalField(), $newValue),
+            $internalFieldState
         );
 
         /**
@@ -186,9 +214,9 @@ class ObjectChangeGenerator
                 $this->mappingManual->getIntegration(),
                 sprintf(
                     "Integration to Mautic; syncing %s %s with a value of %s",
-                    $fieldState,
+                    $internalFieldState,
                     $fieldMappingDAO->getInternalField(),
-                    var_export($integrationInformationChangeRequest->getNewValue()->getOriginalValue(), true)
+                    var_export($newValue->getNormalizedValue(), true)
                 ),
                 __CLASS__.':'.__FUNCTION__
             );
@@ -202,7 +230,7 @@ class ObjectChangeGenerator
             sprintf(
                 "Integration to Mautic; the %s object's %s field %s was added to the list of required fields because it's configured to sync to the integration",
                 $this->internalObject->getObject(),
-                $fieldState,
+                $internalFieldState,
                 $fieldMappingDAO->getInternalField()
             ),
             __CLASS__.':'.__FUNCTION__
@@ -226,11 +254,14 @@ class ObjectChangeGenerator
         }
 
         if (!$internalField) {
+            $newValue = $this->valueHelper->getValueForMautic(
+                $integrationInformationChangeRequest->getNewValue(),
+                $fieldState,
+                $fieldMappingDAO->getSyncDirection()
+            );
+
             $this->objectChange->addField(
-                new FieldDAO(
-                    $fieldMappingDAO->getInternalField(),
-                    $integrationInformationChangeRequest->getNewValue()
-                ),
+                new FieldDAO($fieldMappingDAO->getInternalField(), $newValue),
                 $fieldState
             );
 
@@ -241,7 +272,7 @@ class ObjectChangeGenerator
                     $this->internalObject->getObject(),
                     $fieldState,
                     $fieldMappingDAO->getInternalField(),
-                    var_export($integrationInformationChangeRequest->getNewValue()->getOriginalValue(), true)
+                    var_export($newValue->getNormalizedValue(), true)
                 ),
                 __CLASS__.':'.__FUNCTION__
             );
@@ -308,8 +339,14 @@ class ObjectChangeGenerator
             $integrationInformationChangeRequest
         );
 
+        $newValue = $this->valueHelper->getValueForMautic(
+            $winningChangeRequest->getNewValue(),
+            $fieldState,
+            $fieldMappingDAO->getSyncDirection()
+        );
+
         $this->objectChange->addField(
-            new FieldDAO($fieldMappingDAO->getInternalField(), $winningChangeRequest->getNewValue()),
+            new FieldDAO($fieldMappingDAO->getInternalField(), $newValue),
             $fieldState
         );
 
@@ -321,10 +358,27 @@ class ObjectChangeGenerator
                 $winningChangeRequest->getObject(),
                 $fieldState,
                 $fieldMappingDAO->getInternalField(),
-                var_export($winningChangeRequest->getNewValue()->getOriginalValue(), true),
+                var_export($newValue->getNormalizedValue(), true),
                 $judgeMode
             ),
             __CLASS__.':'.__FUNCTION__
         );
+    }
+
+    /**
+     * @param string $object
+     * @param string $field
+     * @param string $integrationFieldState
+     *
+     * @return string
+     */
+    private function getFieldState(string $object, string $field, string $integrationFieldState)
+    {
+        // If this is a Mautic required field, return required
+        if (isset($this->fieldHelper->getRequiredFields($object)[$field])) {
+            return ReportFieldDAO::FIELD_REQUIRED;
+        }
+
+        return $integrationFieldState;
     }
 }

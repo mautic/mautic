@@ -137,7 +137,7 @@ return [
             'mautic.integrations.helper.field_validator' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Helper\FieldValidationHelper::class,
                 'arguments' => [
-                    'mautic.lead.model.field',
+                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
                     'translator',
                 ],
             ],
@@ -225,6 +225,12 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.integrations.sync.sync_process.value_helper' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             'mautic.integrations.sync.data_exchange.mautic.field_builder' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder::class,
                 'arguments' => [
@@ -267,6 +273,9 @@ return [
             ],
             'mautic.integrations.sync.integration_process.object_change_generator' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator::class,
+                'arguments' => [
+                    'mautic.integrations.sync.sync_process.value_helper'
+                ],
             ],
             'mautic.integrations.sync.integration_process' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess::class,
@@ -280,6 +289,8 @@ return [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_judge',
+                    'mautic.integrations.sync.sync_process.value_helper',
+                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
                 ],
             ],
             'mautic.integrations.sync.internal_process' => [

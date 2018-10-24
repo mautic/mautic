@@ -12,11 +12,11 @@
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
 
-use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -24,9 +24,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FieldValidationHelper
 {
     /**
-     * @var FieldModel
+     * @var FieldHelper
      */
-    private $fieldModel;
+    private $fieldHelper;
 
     /**
      * @var TranslatorInterface
@@ -46,12 +46,12 @@ class FieldValidationHelper
     /**
      * FieldValidationHelper constructor.
      *
-     * @param FieldModel          $fieldModel
+     * @param FieldHelper         $fieldHelper
      * @param TranslatorInterface $translator
      */
-    public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
+    public function __construct(FieldHelper $fieldHelper, TranslatorInterface $translator)
     {
-        $this->fieldModel = $fieldModel;
+        $this->fieldHelper = $fieldHelper;
         $this->translator = $translator;
     }
 
@@ -194,25 +194,6 @@ class FieldValidationHelper
             throw new ObjectNotFoundException($object);
         }
 
-        $requiredFields = $this->fieldModel->getFieldList(
-            false,
-            false,
-            [
-                'isPublished' => true,
-                'isRequired'  => true,
-                'object'      => $mappedObjects[$object]
-            ]
-        );
-
-        $uniqueIdentifierFields = $this->fieldModel->getUniqueIdentifierFields(
-            [
-                'isPublished' => true,
-                'object'      => $mappedObjects[$object]
-            ]
-        );
-
-        $requiredFields = array_merge($requiredFields, $uniqueIdentifierFields);
-
         // Get Mautic mapped fields
         $mauticMappedFields = [];
         foreach ($objectFieldMappings as $field => $mapping) {
@@ -222,6 +203,9 @@ class FieldValidationHelper
 
             $mauticMappedFields[$mapping['mappedField']] = true;
         }
+
+        $requiredFields = $this->fieldHelper->getRequiredFields($mappedObjects[$object]);
+
         return array_diff_key($requiredFields, $mauticMappedFields);
     }
 }

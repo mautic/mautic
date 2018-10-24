@@ -17,13 +17,20 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
+    /**
+     * @var ValueHelper
+     */
+    private $valueHelper;
+
     /**
      * @var ReportDAO
      */
@@ -48,6 +55,16 @@ class ObjectChangeGenerator
      * @var ObjectChangeDAO
      */
     private $objectChange;
+
+    /**
+     * ObjectChangeGenerator constructor.
+     *
+     * @param ValueHelper $valueHelper
+     */
+    public function __construct(ValueHelper $valueHelper)
+    {
+        $this->valueHelper = $valueHelper;
+    }
 
     /**
      * @param ReportDAO        $syncReport
@@ -134,9 +151,15 @@ class ObjectChangeGenerator
             return;
         }
 
-        // Note: bidirectional conflicts were handled by IntegrationHelper::getSyncObjectChange
+        $newValue = $this->valueHelper->getValueForIntegration(
+            $internalInformationChangeRequest->getNewValue(),
+            $fieldState,
+            $fieldMappingDAO->getSyncDirection()
+        );
+
+        // Note: bidirectional conflicts were handled by Internal\ObjectChangeGenerator
         $this->objectChange->addField(
-            new FieldDAO($fieldMappingDAO->getIntegrationField(), $internalInformationChangeRequest->getNewValue()),
+            new FieldDAO($fieldMappingDAO->getIntegrationField(), $newValue),
             $fieldState
         );
 
@@ -170,7 +193,7 @@ class ObjectChangeGenerator
                 $this->integrationObject->getObject(),
                 $fieldState,
                 $fieldMappingDAO->getIntegrationField(),
-                var_export($internalInformationChangeRequest->getNewValue()->getOriginalValue(), true)
+                var_export($newValue->getNormalizedValue(), true)
             ),
             __CLASS__.':'.__FUNCTION__
         );

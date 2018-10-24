@@ -138,6 +138,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
             $internalObjectName,
             $internalObjectDAO->getObjectId()
         );
+
         foreach ($fieldChanges as $fieldChange) {
             $internalObjectDAO->addField(
                 $this->fieldHelper->getFieldChangeObject($fieldChange)
