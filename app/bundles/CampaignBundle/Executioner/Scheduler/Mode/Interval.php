@@ -206,7 +206,8 @@ class Interval implements ScheduleModeInterface
         } elseif ($startTime && $endTime) {
             $groupDateTime = $this->getExecutionDateTimeBetweenHours($contact, $startTime, $endTime, $diff, $eventId, $compareFromDateTime);
         } else {
-            $groupDateTime = $compareFromDateTime;
+            $groupDateTime = clone $compareFromDateTime;
+            $groupDateTime->add($diff);
         }
 
         if ($daysOfWeek) {
