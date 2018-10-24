@@ -111,7 +111,6 @@ class ReportDAO
             $reportField->getValue()
         );
 
-
         $informationChangeRequest->setPossibleChangeDateTime($reportObject->getChangeDateTime())
             ->setCertainChangeDateTime($reportField->getChangeDateTime());
 

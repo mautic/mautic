@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncProcess;
+namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncProcess\Direction\Integration;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
@@ -18,12 +18,30 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
 
 class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var ValueHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $valueHelper;
+
+    protected function setUp()
+    {
+        $this->valueHelper = $this->createMock(ValueHelper::class);
+    }
+
     public function testFieldIsAddedToObjectChange()
     {
+        $this->valueHelper->method('getValueForIntegration')
+            ->willReturnCallback(
+                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
+                    return $normalizedValueDAO;
+                }
+            );
+
         $integration = 'Test';
         $objectName  = 'Contact';
 
@@ -34,7 +52,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $integrationReportObject->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));
         $integrationReportObject->addField(new ReportFieldDAO('first_name', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
 
-        $objectChangeGenerator = new ObjectChangeGenerator();
+        $objectChangeGenerator = $this->getObjectChangeGenerator();
         $objectChangeDAO       = $objectChangeGenerator->getSyncObjectChange(
             $syncReport,
             $mappingManual,
@@ -68,6 +86,13 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
 
     public function testFieldIsNotAddedToObjectChangeIfNotFound()
     {
+        $this->valueHelper->method('getValueForIntegration')
+            ->willReturnCallback(
+                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
+                    return $normalizedValueDAO;
+                }
+            );
+
         $integration = 'Test';
         $objectName  = 'Contact';
 
@@ -78,7 +103,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $integrationReportObject->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));
         $integrationReportObject->addField(new ReportFieldDAO('first_name', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
 
-        $objectChangeGenerator = new ObjectChangeGenerator();
+        $objectChangeGenerator = $this->getObjectChangeGenerator();
         $objectChangeDAO       = $objectChangeGenerator->getSyncObjectChange(
             $syncReport,
             $mappingManual,
@@ -132,7 +157,9 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $syncReport = new ReportDAO(MauticSyncDataExchange::NAME);
         $internalReportObject = new ReportObjectDAO(MauticSyncDataExchange::OBJECT_CONTACT, 1);
-        $internalReportObject->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'), ReportFieldDAO::FIELD_REQUIRED));
+        $internalReportObject->addField(
+            new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'), ReportFieldDAO::FIELD_REQUIRED)
+        );
 
         if ($includeFirstNameField) {
             $internalReportObject->addField(new ReportFieldDAO('firstname', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
@@ -141,5 +168,13 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $syncReport->addObject($internalReportObject);
 
         return $syncReport;
+    }
+
+    /**
+     * @return ObjectChangeGenerator
+     */
+    private function getObjectChangeGenerator()
+    {
+        return new ObjectChangeGenerator($this->valueHelper);
     }
 }

@@ -19,6 +19,7 @@ use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Form\Type\IntegrationConfigType;
 use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Helper\FieldMergerHelper;
+use MauticPlugin\IntegrationsBundle\Helper\FieldValidationHelper;
 use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
@@ -126,7 +127,6 @@ class ConfigController extends AbstractFormController
 
         // Submit the form
         $this->form->handleRequest($this->request);
-
         if ($this->integrationObject instanceof ConfigFormSyncInterface) {
             $integration   = $this->integrationObject->getName();
             $settings      = $this->integrationConfiguration->getFeatureSettings();
@@ -139,9 +139,11 @@ class ConfigController extends AbstractFormController
                 $fieldMerger->mergeSyncFieldMapping($object, $fields);
             }
 
-            $this->validateRequiredFields($fieldMerger, $settings['sync']['objects']);
-
             $settings['sync']['fieldMappings'] = $fieldMerger->getFieldMappings();
+
+            /** @var FieldValidationHelper $fieldValidator */
+            $fieldValidator = $this->get('mautic.integrations.helper.field_validator');
+            $fieldValidator->validateRequiredFields($this->form, $this->integrationObject, $settings['sync']['fieldMappings']);
 
             $this->integrationConfiguration->setFeatureSettings($settings);
         }
@@ -227,62 +229,5 @@ class ConfigController extends AbstractFormController
         );
     }
 
-    /**
-     * @param FieldMergerHelper $fieldMergerHelper
-     * @param array             $objects
-     */
-    private function validateRequiredFields(FieldMergerHelper $fieldMergerHelper, array $objects)
-    {
-        if (!$this->integrationConfiguration->getIsPublished()) {
-            // Don't bind form errors if the integration is not published
-            return;
-        }
 
-        $features = $this->integrationConfiguration->getSupportedFeatures();
-        if (!in_array(ConfigFormFeaturesInterface::FEATURE_SYNC, $features)) {
-            // Don't bind form errors if sync is not enabled
-            return;
-        }
-
-        foreach ($objects as $object) {
-            $hasMissingFields  = false;
-            $errorsOnGivenPage = false;
-
-            try {
-                $missingFields = $fieldMergerHelper->findMissingRequiredFieldMappings($object);
-                if (!$hasMissingFields && !empty($missingFields)) {
-                    $hasMissingFields = true;
-                }
-
-                foreach ($missingFields as $field) {
-                    if (!isset($this->form['featureSettings']['sync']['fieldMappings'][$object][$field])) {
-                        continue;
-                    }
-
-                    $errorsOnGivenPage = true;
-
-                    /** @var Form $formField */
-                    $formField = $this->form['featureSettings']['sync']['fieldMappings'][$object][$field]['mappedField'];
-                    $formField->addError(
-                        new FormError(
-                            $this->get('translator')->trans('mautic.core.value.required', [], 'validators')
-                        )
-                    );
-                }
-
-                if (!$errorsOnGivenPage && $hasMissingFields) {
-                    // A hidden page has required fields that are missing so we have to tell the form there is an error
-                    /** @var Form $formField */
-                    $formField = $this->form['featureSettings']['sync']['fieldMappings'][$object];
-                    $formField->addError(
-                        new FormError(
-                            $this->get('translator')->trans('mautic.core.value.required', [], 'validators')
-                        )
-                    );
-                }
-            } catch (\Exception $exception) {
-                $this->form['featureSettings']['sync']['fieldMappings'][$object]->addError(new FormError($exception->getMessage()));
-            }
-        }
-    }
 }

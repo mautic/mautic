@@ -58,6 +58,11 @@ class FieldHelper
     private $syncFields = [];
 
     /**
+     * @var
+     */
+    private $requiredFields;
+
+    /**
      * FieldHelper constructor.
      *
      * @param FieldModel                       $fieldModel
@@ -186,5 +191,38 @@ class FieldHelper
         uasort($this->syncFields[$objectName], 'strnatcmp');
 
         return $this->syncFields[$objectName];
+    }
+
+    /**
+     * @param string $object
+     *
+     * @return array
+     */
+    public function getRequiredFields(string $object): array
+    {
+        if (null !== $this->requiredFields) {
+            return $this->requiredFields;
+        }
+
+        $requiredFields = $this->fieldModel->getFieldList(
+            false,
+            false,
+            [
+                'isPublished' => true,
+                'isRequired'  => true,
+                'object'      => $object
+            ]
+        );
+
+        $uniqueIdentifierFields = $this->fieldModel->getUniqueIdentifierFields(
+            [
+                'isPublished' => true,
+                'object'      => $object
+            ]
+        );
+
+        $this->requiredFields = array_merge($requiredFields, $uniqueIdentifierFields);
+
+        return $this->requiredFields;
     }
 }

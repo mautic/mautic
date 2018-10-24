@@ -239,12 +239,12 @@ class PartialObjectReportBuilder
     }
 
     /**
-     * @param array            $completeObjects
+     * @param array            $incompleteObjects
      * @param RequestObjectDAO $requestObjectDAO
      */
-    private function completeObjectsWithMissingFields(array $completeObjects, RequestObjectDAO $requestObjectDAO)
+    private function completeObjectsWithMissingFields(array $incompleteObjects, RequestObjectDAO $requestObjectDAO)
     {
-        foreach ($completeObjects as $incompleteObject) {
+        foreach ($incompleteObjects as $incompleteObject) {
             $missingFields   = $this->objectsWithMissingFields[$incompleteObject['id']];
             $reportObjectDAO = $this->syncReport->getObject($requestObjectDAO->getObject(), $incompleteObject['id']);
 

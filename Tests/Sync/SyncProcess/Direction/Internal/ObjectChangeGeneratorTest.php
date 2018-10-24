@@ -9,18 +9,20 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncProcess\Internal;
+namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncProcess\Direction\Internal;
 
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator;
 
 class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
@@ -30,13 +32,32 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     private $syncJudge;
 
+    /**
+     * @var ValueHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $valueHelper;
+
+    /**
+     * @var FieldHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $fieldHelper;
+
     protected function setUp()
     {
-        $this->syncJudge = $this->createMock(SyncJudgeInterface::class);
+        $this->syncJudge   = $this->createMock(SyncJudgeInterface::class);
+        $this->valueHelper = $this->createMock(ValueHelper::class);
+        $this->fieldHelper = $this->createMock(FieldHelper::class);
     }
 
     public function testFieldsAreAddedToObjectChangeAndIntegrationFirstNameWins()
     {
+        $this->valueHelper->method('getValueForMautic')
+            ->willReturnCallback(
+                function(NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
+                    return $normalizedValueDAO;
+                }
+            );
+
         $integration = 'Test';
         $objectName  = 'Contact';
 
@@ -91,6 +112,13 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
 
     public function testFieldsAreAddedToObjectChangeAndInternalFirstNameWins()
     {
+        $this->valueHelper->method('getValueForMautic')
+            ->willReturnCallback(
+                function(NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
+                    return $normalizedValueDAO;
+                }
+            );
+
         $integration = 'Test';
         $objectName  = 'Contact';
 
@@ -183,6 +211,6 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     private function getObjectGenerator()
     {
-        return new ObjectChangeGenerator($this->syncJudge);
+        return new ObjectChangeGenerator($this->syncJudge, $this->valueHelper, $this->fieldHelper);
     }
 }
