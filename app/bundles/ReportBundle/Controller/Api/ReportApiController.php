@@ -11,25 +11,32 @@
 
 namespace Mautic\ReportBundle\Controller\Api;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ReportBundle\Entity\Report;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class ReportApiController.
- */
 class ReportApiController extends CommonApiController
 {
+    /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
     /**
      * {@inheritdoc}
      */
     public function initialize(FilterControllerEvent $event)
     {
         $this->model            = $this->getModel('report');
-        $this->entityClass      = 'Mautic\ReportBundle\Entity\Report';
+        $this->entityClass      = Report::class;
         $this->entityNameOne    = 'report';
         $this->entityNameMulti  = 'reports';
         $this->serializerGroups = ['reportList', 'reportDetails'];
+        $this->formFactory      = $this->container->get('form.factory');
 
         parent::initialize($event);
     }
@@ -49,10 +56,19 @@ class ReportApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $reportData = $this->model->getReportData($entity, $this->container->get('form.factory'), ['paginate' => false, 'ignoreGraphData' => true]);
+        $options = [
+            'paginate'        => true,
+            'ignoreGraphData' => true,
+            'dateFrom'        => new DateTimeImmutable($this->request->query->get('dateFrom', '-30 days'), new DateTimeZone('UTC')),
+            'dateTo'          => new DateTimeImmutable($this->request->query->get('dateTo', null), new DateTimeZone('UTC')),
+            'page'            => $this->request->query->getInt('page', 1),
+            'limit'           => $this->request->query->getInt('limit', 10),
+        ];
+
+        $reportData = $this->model->getReportData($entity, $this->formFactory, $options);
 
         // Unset keys that we don't need to send back
-        foreach (['graphs', 'contentTemplate', 'columns', 'limit'] as $key) {
+        foreach (['graphs', 'contentTemplate', 'columns'] as $key) {
             unset($reportData[$key]);
         }
 
