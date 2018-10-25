@@ -178,7 +178,13 @@ class FormModel extends CommonFormModel
             return new Form();
         }
 
-        return parent::getEntity($id);
+        $entity = parent::getEntity($id);
+
+        foreach ($entity->getFields() as $field) {
+            $this->addLeadFieldOptions($field);
+        }
+
+        return $entity;
     }
 
     /**
@@ -1046,5 +1052,26 @@ class FormModel extends CommonFormModel
         }
 
         return $javascript;
+    }
+
+    /**
+     * Finds out whether the.
+     *
+     * @param Field $field
+     */
+    private function addLeadFieldOptions(Field $field)
+    {
+        $properties = $field->getProperties();
+
+        if (empty($properties['syncList']) || empty($field->getLeadField())) {
+            return;
+        }
+
+        $leadField = $this->leadFieldModel->getEntityByAlias($field->getLeadField());
+
+        if ($leadField && !empty($leadField->getProperties()['list'])) {
+            $properties['list'] = ['list' => $leadField->getProperties()['list']];
+            $field->setProperties($properties);
+        }
     }
 }
