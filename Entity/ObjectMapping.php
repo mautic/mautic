@@ -287,7 +287,7 @@ class ObjectMapping
      *
      * @return ObjectMapping
      */
-    public function setLastSyncDate(\DateTimeInterface $lastSyncDate)
+    public function setLastSyncDate(?\DateTimeInterface $lastSyncDate)
     {
         $this->lastSyncDate = $lastSyncDate;
 

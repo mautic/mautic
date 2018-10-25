@@ -71,6 +71,7 @@ class MappingHelper
      * @param ObjectDAO        $integrationObjectDAO
      *
      * @return ObjectDAO
+     * @throws ObjectDeletedException
      * @throws ObjectNotFoundException
      * @throws ObjectNotSupportedException
      */
@@ -83,6 +84,9 @@ class MappingHelper
             $integrationObjectDAO->getObjectId(),
             $internalObjectName
         )) {
+            if ($internalObject['is_deleted']) {
+                throw new ObjectDeletedException();
+            }
             return new ObjectDAO(
                 $internalObjectName,
                 $internalObject['internal_object_id'],
