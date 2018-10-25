@@ -348,13 +348,12 @@ $container->loadFromExtension('doctrine_cache', [
   'providers' => [
     'api_rate_limiter_cache' => [
       'type'      => '%mautic.api_rate_limiter_cache_type%',
-      'directory' => '%mautic.tmp_path%',
     ],
   ],
 ]);
-
+$api_rate_limiter_limit = $container->getParameter('mautic.api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
-  'enabled'           => '%mautic.api_rate_limiter_limit%' == 0 ? false : true,
+  'enabled'           => $api_rate_limiter_limit == 0 ? false : true,
   'storage_engine'    => 'doctrine',
   'doctrine_provider' => 'api_rate_limiter_cache',
   'path_limits'       => [
@@ -364,7 +363,7 @@ $container->loadFromExtension('noxlogic_rate_limit', [
       'period' => 3600,
     ],
   ],
-  'fos_oauth_key_listener' => false,
+  'fos_oauth_key_listener' => true,
   'display_headers'        => true,
   'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of %mautic.api_rate_limiter_limit% API calls by hour.", "details": [] } ]}',
 ]);
