@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ec225eafbd68795e675382a89d2be61a",
+    "content-hash": "7ff538da80dce74cd0cdd520120b8e32",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -3412,6 +3412,63 @@
             "time": "2017-02-24T16:06:33+00:00"
         },
         {
+            "name": "noxlogic/ratelimit-bundle",
+            "version": "1.11.1",
+            "target-dir": "Noxlogic/RateLimitBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jaytaph/RateLimitBundle.git",
+                "reference": "df677add8b0e155cc47e90814b80e34ae2d47415"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jaytaph/RateLimitBundle/zipball/df677add8b0e155cc47e90814b80e34ae2d47415",
+                "reference": "df677add8b0e155cc47e90814b80e34ae2d47415",
+                "shasum": ""
+            },
+            "require": {
+                "sensio/framework-extra-bundle": "^2.3|^3.0|^4.0|^5.0",
+                "symfony/framework-bundle": "^2.3|^3.0|^4.0"
+            },
+            "require-dev": {
+                "doctrine/cache": "^1.5",
+                "friendsofsymfony/oauth-server-bundle": "^1.5",
+                "phpunit/phpunit": "^4.8|^5.0",
+                "predis/predis": "^0.8|^1.1",
+                "psr/cache": "^1.0",
+                "psr/simple-cache": "^1.0"
+            },
+            "suggest": {
+                "doctrine/doctrine-cache-bundle": "Use Doctrine Cache as a storage engine.",
+                "friendsofsymfony/oauth-server-bundle": "Throttle using OAuth access tokens.",
+                "leaseweb/memcache-bundle": "Use Memcache as a storage engine.",
+                "snc/redis-bundle": "Use Redis as a storage engine."
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-0": {
+                    "Noxlogic\\RateLimitBundle": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joshua Thijssen",
+                    "email": "jthijssen@noxlogic.nl"
+                }
+            ],
+            "description": "This bundle provides functionality to limit calls to actions based on rate limits",
+            "keywords": [
+                "api",
+                "rest",
+                "x-rate-limit"
+            ],
+            "time": "2018-07-02T12:33:43+00:00"
+        },
+        {
             "name": "oneup/uploader-bundle",
             "version": "1.9.2",
             "target-dir": "Oneup/UploaderBundle",
@@ -4805,6 +4862,61 @@
                 "distribution"
             ],
             "time": "2017-08-25T16:55:44+00:00"
+        },
+        {
+            "name": "sensio/framework-extra-bundle",
+            "version": "v3.0.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sensiolabs/SensioFrameworkExtraBundle.git",
+                "reference": "3e8936fe13aa4086644977d334d8fcd275f50357"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sensiolabs/SensioFrameworkExtraBundle/zipball/3e8936fe13aa4086644977d334d8fcd275f50357",
+                "reference": "3e8936fe13aa4086644977d334d8fcd275f50357",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/common": "~2.2",
+                "symfony/framework-bundle": "~2.3|~3.0"
+            },
+            "require-dev": {
+                "symfony/expression-language": "~2.4|~3.0",
+                "symfony/security-bundle": "~2.4|~3.0"
+            },
+            "suggest": {
+                "symfony/expression-language": "",
+                "symfony/psr-http-message-bridge": "To use the PSR-7 converters",
+                "symfony/security-bundle": ""
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sensio\\Bundle\\FrameworkExtraBundle\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "This bundle provides a way to configure your controllers with annotations",
+            "keywords": [
+                "annotations",
+                "controllers"
+            ],
+            "time": "2015-12-18T17:39:27+00:00"
         },
         {
             "name": "sensiolabs/security-checker",

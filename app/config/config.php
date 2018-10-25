@@ -344,6 +344,31 @@ $container->loadFromExtension('jms_serializer', [
     ],
 ]);
 
+$container->loadFromExtension('doctrine_cache', [
+  'providers' => [
+    'api_rate_limiter_cache' => [
+      'type'      => '%mautic.api_rate_limiter_cache_type%',
+      'directory' => '%mautic.tmp_path%',
+    ],
+  ],
+]);
+
+$container->loadFromExtension('noxlogic_rate_limit', [
+  'enabled'           => '%mautic.api_rate_limiter_limit%' == 0 ? false : true,
+  'storage_engine'    => 'doctrine',
+  'doctrine_provider' => 'api_rate_limiter_cache',
+  'path_limits'       => [
+    [
+      'path'   => '/api',
+      'limit'  => '%mautic.api_rate_limiter_limit%',
+      'period' => 3600,
+    ],
+  ],
+  'fos_oauth_key_listener' => false,
+  'display_headers'        => true,
+  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of %mautic.api_rate_limiter_limit% API calls by hour.", "details": [] } ]}',
+]);
+
 $container->setParameter(
     'jms_serializer.camel_case_naming_strategy.class',
     'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'

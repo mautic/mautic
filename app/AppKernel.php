@@ -184,6 +184,7 @@ class AppKernel extends Kernel
             new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
             new LightSaml\SpBundle\LightSamlSpBundle(),
             new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
+            new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
             // These two bundles do DI based on config, so they need to be loaded after config is declared in MauticQueueBundle
             new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
             new Leezy\PheanstalkBundle\LeezyPheanstalkBundle(),

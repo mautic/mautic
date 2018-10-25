@@ -89,6 +89,26 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+
+        $builder->add(
+          'api_rate_limiter_limit',
+          'number',
+          [
+            'label' => 'mautic.api.config.form.api.rate_limiter_limit',
+            'attr'  => [
+              'tooltip'      => 'mautic.api.config.form.api.rate_limiter_limit.tooltip',
+              'class'        => 'form-control',
+              'data-show-on' => '{"config_apiconfig_api_enabled_1":"checked"}',
+            ],
+            'constraints' => [
+              new NotBlank(
+                [
+                  'message' => 'mautic.core.value.required',
+                ]
+              ),
+            ],
+          ]
+        );
     }
 
     /**
