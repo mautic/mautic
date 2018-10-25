@@ -241,7 +241,9 @@ class BuildJsSubscriber extends CommonSubscriber
 
     // Process pageviews after new are added
     document.addEventListener('eventAddedToMauticQueue', function(e) {
-        m.sendPageview(e.detail);
+      if(e.detail[0] == 'send' && e.detail[1] == 'pageview'){
+         m.sendPageview(e.detail);
+      }
     });
 })(MauticJS, location, navigator, document);
 JS;
