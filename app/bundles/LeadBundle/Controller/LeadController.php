@@ -966,7 +966,10 @@ class LeadController extends FormController
         if (true === $form) {
             return $this->postActionRedirect(
                 [
-                    'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
+                    'returnUrl'       => $this->generateUrl('mautic_contact_action', [
+                        'objectId' => $lead->getId(),
+                        'objectAction' => 'view'
+                    ]),
                     'viewParameters'  => $viewParameters,
                     'contentTemplate' => 'MauticLeadBundle:Lead:view',
                     'passthroughVars' => [
