@@ -138,10 +138,10 @@ class ScheduledExecutioner implements ExecutionerInterface
      */
     public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null)
     {
-        $this->campaign = $campaign;
-        $this->limiter  = $limiter;
-        $this->output   = ($output) ? $output : new NullOutput();
-        $this->counter  = new Counter();
+        $this->campaign   = $campaign;
+        $this->limiter    = $limiter;
+        $this->output     = ($output) ? $output : new NullOutput();
+        $this->counter    = new Counter();
 
         $this->logger->debug('CAMPAIGN: Triggering scheduled events');
 
