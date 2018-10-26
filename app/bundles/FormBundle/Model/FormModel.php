@@ -959,6 +959,37 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * Load HTML consider Libxml < 2.7.8
+     *
+     * @param $html
+     */
+    private function loadHTML(&$dom, $html)
+    {
+        if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
+            $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        } else {
+            $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        }
+    }
+
+    /**
+     * Save HTML consider Libxml < 2.7.8
+     *
+     * @param $html
+     *
+     * @return string
+     */
+    private function saveHTML($dom, $html)
+    {
+        if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
+            return $dom->saveHTML($html);
+        } else {
+            // remove DOCTYPE, <html>, and <body> tags for old libxml
+            return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace( array('<html>', '</html>', '<body>', '</body>'), array('', '', '', ''), $dom->saveHTML($html)));
+        }
+    }
+
+    /**
      * Extract script from html.
      *
      * @param $html
@@ -969,12 +1000,12 @@ class FormModel extends CommonFormModel
     {
         libxml_use_internal_errors(true);
         $dom = new DOMDocument();
-        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $this->loadHTML($dom, $html);
         $items = $dom->getElementsByTagName('script');
 
         $scripts = [];
         foreach ($items as $script) {
-            $scripts[] = $dom->saveHTML($script);
+            $scripts[] = $this->saveHTML($dom, $script);
         }
 
         return $scripts;
@@ -991,7 +1022,7 @@ class FormModel extends CommonFormModel
     {
         libxml_use_internal_errors(true);
         $dom = new DOMDocument();
-        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $this->loadHTML($dom, '<div>'.$html.'</div>');
         $items = $dom->getElementsByTagName('script');
 
         $remove = [];
@@ -1006,7 +1037,7 @@ class FormModel extends CommonFormModel
         $root   = $dom->documentElement;
         $result = '';
         foreach ($root->childNodes as $childNode) {
-            $result .= $dom->saveHTML($childNode);
+            $result .= $this->saveHTML($dom, $childNode);
         }
 
         return $result;
@@ -1023,7 +1054,7 @@ class FormModel extends CommonFormModel
     {
         libxml_use_internal_errors(true);
         $dom = new DOMDocument();
-        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $this->loadHTML($dom, '<div>'.$html.'</div>');
         $items = $dom->getElementsByTagName('script');
 
         $javascript = '';
