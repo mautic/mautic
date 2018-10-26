@@ -959,7 +959,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * Load HTML consider Libxml < 2.7.8
+     * Load HTML consider Libxml < 2.7.8.
      *
      * @param $html
      */
@@ -973,7 +973,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * Save HTML consider Libxml < 2.7.8
+     * Save HTML consider Libxml < 2.7.8.
      *
      * @param $html
      *
@@ -985,7 +985,7 @@ class FormModel extends CommonFormModel
             return $dom->saveHTML($html);
         } else {
             // remove DOCTYPE, <html>, and <body> tags for old libxml
-            return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace( array('<html>', '</html>', '<body>', '</body>'), array('', '', '', ''), $dom->saveHTML($html)));
+            return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
         }
     }
 
