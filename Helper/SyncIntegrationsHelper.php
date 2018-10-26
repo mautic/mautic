@@ -129,13 +129,17 @@ class SyncIntegrationsHelper
                 continue;
             }
 
-            // Find what object is mapped to Mautic's object
-            $mappingManual     = $syncIntegration->getMappingManual();
-            $mappedObjectNames = $mappingManual->getMappedIntegrationObjectsNames($mauticObject);
-            foreach ($mappedObjectNames as $mappedObjectName) {
-                if (in_array($mappedObjectName, $featureSettings['sync']['objects'])) {
-                    return true;
+            try {
+                // Find what object is mapped to Mautic's object
+                $mappingManual     = $syncIntegration->getMappingManual();
+                $mappedObjectNames = $mappingManual->getMappedIntegrationObjectsNames($mauticObject);
+                foreach ($mappedObjectNames as $mappedObjectName) {
+                    if (in_array($mappedObjectName, $featureSettings['sync']['objects'])) {
+                        return true;
+                    }
                 }
+            } catch (ObjectNotFoundException $exception) {
+                // Object is not supported so just continue
             }
         }
 
