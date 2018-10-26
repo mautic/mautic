@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
@@ -121,8 +122,9 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @param ReportObjectDAO  $integrationObjectDAO
      *
      * @return ReportObjectDAO
-     * @throws ObjectNotSupportedException
      * @throws ObjectNotFoundException
+     * @throws ObjectNotSupportedException
+     * @throws ObjectDeletedException
      */
     public function getConflictedInternalObject(MappingManualDAO $mappingManualDAO, string $internalObjectName, ReportObjectDAO $integrationObjectDAO)
     {

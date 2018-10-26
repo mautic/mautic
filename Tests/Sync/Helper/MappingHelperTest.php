@@ -56,19 +56,20 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testObjectReturnedIfKnwonMappingExists()
     {
-        $mappingManual = new MappingManualDAO('test');
+        $mappingManual        = new MappingManualDAO('test');
         $integrationObjectDAO = new ObjectDAO('Object', 1);
 
         $internalObjectDAO = [
             'internal_object_id' => 1,
-            'last_sync_date' => '2018-10-01 00:00:00'
+            'last_sync_date'     => '2018-10-01 00:00:00',
+            'is_deleted'         => 0,
         ];
 
         $this->objectMappingRepository->expects($this->once())
             ->method('getInternalObject')
             ->willReturn($internalObjectDAO);
 
-        $internalObjectName = 'Contact';
+        $internalObjectName  = 'Contact';
         $foundInternalObject = $this->getMappingHelper()->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
 
         $this->assertEquals($internalObjectName, $foundInternalObject->getObject());

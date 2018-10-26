@@ -111,26 +111,30 @@ class ObjectMappingRepository  extends CommonRepository
     }
 
     /**
-     * @param string $integration
-     * @param string $objectName
-     * @param mixed  $objectId
+     * @param $integration
+     * @param $objectName
+     * @param $objectId
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|int
      */
     public function markAsDeleted($integration, $objectName, $objectId)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping')
+        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping','m')
             ->set('is_deleted', 1)
             ->where(
                 $qb->expr()->andX(
-                    $qb->expr()->eq('i.integration', ':integration'),
-                    $qb->expr()->eq('i.integration_object_name', ':objectName'),
-                    $qb->expr()->eq('i.integration_object_id', ':objectId')
+                    $qb->expr()->eq('m.integration', ':integration'),
+                    $qb->expr()->eq('m.integration_object_name', ':objectName'),
+                    $qb->expr()->eq('m.integration_object_id', ':objectId')
                 )
             )
             ->setParameter('integration', $integration)
             ->setParameter('objectName', $objectName)
             ->setParameter('objectId', $objectId);
+
+        return $qb->execute();
     }
 
     /**
