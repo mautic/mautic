@@ -74,8 +74,7 @@ class LeadEventLogRepository extends CommonRepository
         $query = $this->getEntityManager()
             ->getConnection()
             ->createQueryBuilder()
-            ->select(
-                'll.id as log_id,
+            ->select('ll.id as log_id,
                     ll.event_id,
                     ll.campaign_id,
                     ll.date_triggered as dateTriggered,
@@ -135,14 +134,7 @@ class LeadEventLogRepository extends CommonRepository
             );
         }
 
-        return $this->getTimelineResults(
-            $query,
-            $options,
-            'e.name',
-            'll.date_triggered',
-            ['metadata'],
-            ['dateTriggered', 'triggerDate']
-        );
+        return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate']);
     }
 
     /**
@@ -158,8 +150,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $query = $this->_em->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
-            ->select(
-                'll.event_id,
+            ->select('ll.event_id,
                     ll.campaign_id,
                     ll.trigger_date,
                     ll.lead_id,
@@ -168,8 +159,7 @@ class LeadEventLogRepository extends CommonRepository
                     c.name AS campaign_name,
                     c.description AS campaign_description,
                     ll.metadata,
-                    CONCAT(CONCAT(l.firstname, \' \'), l.lastname) AS lead_name'
-            )
+                    CONCAT(CONCAT(l.firstname, \' \'), l.lastname) AS lead_name')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = e.campaign_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = ll.lead_id')
@@ -316,7 +306,7 @@ class LeadEventLogRepository extends CommonRepository
             ->where('cl.lead_id = '.$toLeadId)
             ->execute()
             ->fetchAll();
-        $exists  = [];
+        $exists = [];
         foreach ($results as $r) {
             $exists[] = $r['event_id'];
         }
@@ -348,11 +338,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getChartQuery($options)
     {
-        $chartQuery = new ChartQuery(
-            $this->getEntityManager()->getConnection(),
-            $options['dateFrom'],
-            $options['dateTo']
-        );
+        $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $options['dateFrom'], $options['dateTo']);
 
         // Load points for selected period
         $query = $this->_em->getConnection()->createQueryBuilder();
@@ -493,79 +479,6 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
-     *
-     * @return array
-     */
-    public function getPublishedEventIds($campaignId)
-    {
-        if (!$campaignId) {
-            return [];
-        }
-
-        $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $expr = $q->expr()->andX(
-        // requires PR 6247 (https://github.com/mautic/mautic/pull/6247) where e.is_published is created
-            $q->expr()->eq('e.is_published', 1),
-            $q->expr()->eq('c.is_published', 1),
-            $q->expr()->eq('e.campaign_id', ':campaignId')
-        );
-        $q->select('e.id')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'e')
-            ->join('e', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'e.campaign_id = c.id')
-            ->where($expr)
-            ->setParameter('campaignId', $campaignId);
-
-        $results = $q->execute()
-            ->fetchAll(\PDO::FETCH_COLUMN);
-
-        return $results;
-    }
-
-    /**
-     * @param array          $eventIds2 ) private funded
-     * @param \DateTime      $date
-     * @param ContactLimiter $limiter
-     *
-     * @return array
-     */
-    public function getScheduledEvents($eventIds, \DateTime $date, ContactLimiter $limiter, $withCounts = false)
-    {
-        $now = clone $date;
-        $now->setTimezone(new \DateTimeZone('UTC'));
-
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $expr = $q->expr()->andX(
-            $q->expr()->lte('l.trigger_date', ':now'),
-            $q->expr()->in('l.event_id', ':ids'),
-            $q->expr()->eq('l.is_scheduled', ':true')
-        );
-        $q->setParameter('ids', $ids, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
-
-        $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
-
-        $results = $q->select('COUNT(*) as event_count, l.event_id')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
-            ->where($expr)
-            ->setParameter('ids', $eventIds)
-            ->setParameter('true', true)
-            ->setParameter('now', $now->format('Y-m-d H:i:s'))
-            ->groupBy('l.event_id')
-            ->execute()
-            ->fetchAll();
-
-        $events = [];
-
-        foreach ($results as $result) {
-            $value                       = $withCounts ? (int) $result['event_count'] : 0;
-            $events[$result['event_id']] = $value;
-        }
-
-        return $events;
-    }
-
-    /**
      * @param       $eventId
      * @param array $contactIds
      *
@@ -666,9 +579,9 @@ SQL;
             )
             ->setParameters(
                 [
-                    'contactId'  => (int) $contactId,
-                    'campaignId' => (int) $campaignId,
-                    'rotation'   => (int) $rotation,
+                    'contactId'     => (int) $contactId,
+                    'campaignId'    => (int) $campaignId,
+                    'rotation'      => (int) $rotation,
                 ]
             )
             ->execute();
@@ -683,13 +596,83 @@ SQL;
     public function removeScheduledEvents($campaignId, $leadId)
     {
         $conn = $this->_em->getConnection();
-        $conn->delete(
-            MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
-            [
-                'lead_id'      => (int) $leadId,
-                'campaign_id'  => (int) $campaignId,
-                'is_scheduled' => 1,
-            ]
+        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
+            'lead_id'      => (int) $leadId,
+            'campaign_id'  => (int) $campaignId,
+            'is_scheduled' => 1,
+        ]);
+    }
+
+    /**
+     * @param $campaignId
+     *
+     * @return array
+     */
+    public function getPublishedEventIds($campaignId)
+    {
+        if (!$campaignId) {
+            return [];
+        }
+
+        $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $expr = $q->expr()->andX(
+        // requires PR 6247 (https://github.com/mautic/mautic/pull/6247) where e.is_published is created
+            $q->expr()->eq('e.is_published', 1),
+            $q->expr()->eq('c.is_published', 1),
+            $q->expr()->eq('e.campaign_id', ':campaignId')
         );
+        $q->select('e.id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'e')
+            ->join('e', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'e.campaign_id = c.id')
+            ->where($expr)
+            ->setParameter('campaignId', $campaignId);
+
+        $results = $q->execute()
+            ->fetchAll(\PDO::FETCH_COLUMN);
+
+        return $results;
+    }
+
+    /**
+     * @param array          $eventIds2 ) private funded
+     * @param \DateTime      $date
+     * @param ContactLimiter $limiter
+     *
+     * @return array
+     */
+    public function getScheduledEvents($eventIds, \DateTime $date, ContactLimiter $limiter, $withCounts = false)
+    {
+        $now = clone $date;
+        $now->setTimezone(new \DateTimeZone('UTC'));
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $expr = $q->expr()->andX(
+            $q->expr()->lte('l.trigger_date', ':now'),
+            $q->expr()->in('l.event_id', ':ids'),
+            $q->expr()->eq('l.is_scheduled', ':true')
+        );
+        $q->setParameter('ids', $ids, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+
+        $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
+
+        $results = $q->select('COUNT(*) as event_count, l.event_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
+            ->where($expr)
+            ->setParameter('ids', $eventIds)
+            ->setParameter('true', true)
+            ->setParameter('now', $now->format('Y-m-d H:i:s'))
+            ->groupBy('l.event_id')
+            ->execute()
+            ->fetchAll();
+
+        $events = [];
+
+        foreach ($results as $result) {
+            $value                       = $withCounts ? (int) $result['event_count'] : 0;
+            $events[$result['event_id']] = $value;
+        }
+
+        return $events;
     }
 }
