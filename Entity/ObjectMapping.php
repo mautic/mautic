@@ -53,7 +53,7 @@ class ObjectMapping
     private $integrationObjectId;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var \DateTimeInterface
      */
     private $lastSyncDate;
 
@@ -143,7 +143,8 @@ class ObjectMapping
             $dateCreated = new \DateTime();
         }
 
-        $this->dateCreated = $dateCreated;
+        $this->dateCreated  = $dateCreated;
+        $this->lastSyncDate = $dateCreated;
     }
 
     /**
@@ -275,9 +276,9 @@ class ObjectMapping
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return \DateTimeInterface
      */
-    public function getLastSyncDate(): ?\DateTimeInterface
+    public function getLastSyncDate(): \DateTimeInterface
     {
         return $this->lastSyncDate;
     }
@@ -289,6 +290,10 @@ class ObjectMapping
      */
     public function setLastSyncDate(?\DateTimeInterface $lastSyncDate)
     {
+        if (null === $lastSyncDate) {
+            $lastSyncDate = new \DateTime();
+        }
+
         $this->lastSyncDate = $lastSyncDate;
 
         return $this;
