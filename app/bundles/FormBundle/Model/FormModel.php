@@ -26,6 +26,7 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\Event;
@@ -1059,19 +1060,51 @@ class FormModel extends CommonFormModel
      *
      * @param Field $field
      */
-    private function addLeadFieldOptions(Field $field)
+    private function addLeadFieldOptions(Field $formField)
     {
-        $properties = $field->getProperties();
+        $formFieldProps    = $formField->getProperties();
+        $contactFieldAlias = $formField->getLeadField();
 
-        if (empty($properties['syncList']) || empty($field->getLeadField())) {
+        if (empty($formFieldProps['syncList']) || empty($contactFieldAlias)) {
             return;
         }
 
-        $leadField = $this->leadFieldModel->getEntityByAlias($field->getLeadField());
+        $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);
 
-        if ($leadField && !empty($leadField->getProperties()['list'])) {
-            $properties['list'] = ['list' => $leadField->getProperties()['list']];
-            $field->setProperties($properties);
+        if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
+            return;
+        }
+
+        $contactFieldProps = $contactField->getProperties();
+
+        switch ($contactField->getType()) {
+            case 'select':
+            case 'multiselect':
+            case 'lookup':
+                $list = isset($contactFieldProps['list']) ? $contactFieldProps['list'] : [];
+                break;
+            case 'boolean':
+                $list = [$contactFieldProps['no'], $contactFieldProps['yes']];
+                break;
+            case 'country':
+                $list = ContactFieldHelper::getCountryChoices();
+                break;
+            case 'region':
+                $list = ContactFieldHelper::getRegionChoices();
+                break;
+            case 'timezone':
+                $list = ContactFieldHelper::getTimezonesChoices();
+                break;
+            case 'locale':
+                $list = ContactFieldHelper::getLocaleChoices();
+                break;
+            default:
+                return;
+        }
+
+        if (!empty($list)) {
+            $formFieldProps['list'] = ['list' => $list];
+            $formField->setProperties($formFieldProps);
         }
     }
 }
