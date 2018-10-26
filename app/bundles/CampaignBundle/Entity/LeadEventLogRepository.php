@@ -72,9 +72,9 @@ class LeadEventLogRepository extends CommonRepository
     public function getLeadLogs($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()
-            ->getConnection()
-            ->createQueryBuilder()
-            ->select('ll.id as log_id,
+                      ->getConnection()
+                      ->createQueryBuilder()
+                      ->select('ll.id as log_id,
                     ll.event_id,
                     ll.campaign_id,
                     ll.date_triggered as dateTriggered,
@@ -91,13 +91,13 @@ class LeadEventLogRepository extends CommonRepository
                     ll.lead_id,
                     fl.reason as fail_reason
                     '
-            )
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
-            ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
-            ->join('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
-            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fl', 'fl.log_id = ll.id')
-            ->andWhere('e.event_type != :eventType')
-            ->setParameter('eventType', 'decision');
+                      )
+                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+                        ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
+                        ->join('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
+                        ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fl', 'fl.log_id = ll.id')
+                        ->andWhere('e.event_type != :eventType')
+                        ->setParameter('eventType', 'decision');
 
         if ($leadId) {
             $query->where('ll.lead_id = '.(int) $leadId);
@@ -177,7 +177,7 @@ class LeadEventLogRepository extends CommonRepository
 
         if (isset($options['type'])) {
             $query->andwhere('e.type = :type')
-                ->setParameter('type', $options['type']);
+                  ->setParameter('type', $options['type']);
         }
 
         if (isset($options['eventType'])) {
@@ -220,13 +220,13 @@ class LeadEventLogRepository extends CommonRepository
     public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
-            ->innerJoin(
-                'o',
-                MAUTIC_TABLE_PREFIX.'campaign_leads',
-                'l',
-                'l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0 and o.lead_id = l.lead_id and l.rotation = o.rotation'
-            );
+                       ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
+                       ->innerJoin(
+                           'o',
+                           MAUTIC_TABLE_PREFIX.'campaign_leads',
+                           'l',
+                           'l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0 and o.lead_id = l.lead_id and l.rotation = o.rotation'
+                       );
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId)
@@ -264,8 +264,8 @@ class LeadEventLogRepository extends CommonRepository
         );
 
         $q->where($expr)
-            ->setParameter('false', false, 'boolean')
-            ->groupBy($groupBy);
+          ->setParameter('false', false, 'boolean')
+          ->groupBy($groupBy);
 
         $results = $q->execute()->fetchAll();
 
