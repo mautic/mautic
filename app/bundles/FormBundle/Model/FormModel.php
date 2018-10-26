@@ -959,6 +959,31 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * Consider Libxml < 2.7.8
+     *
+     * @param $html
+     *
+     * @return array
+     */
+    private function cleanHTML($html)
+    {
+      $dom = new DOMDocument();
+      if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')){
+          $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+          $html = $dom->saveHTML();
+        } else {
+          $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+          // remove DOCTYPE, <html>, and <body> tags.
+          // use preg_replace to clean up DOCTYPE.
+          $html = $dom->saveHTML();
+          $html_start = strpos($html, '<html><body>') + 12;
+          $html_length = strpos($html, '</body></html>') - $html_start;
+          $html = substr($html, $html_start, $html_length);
+
+        }
+        return $html;
+    }
+    /**
      * Extract script from html.
      *
      * @param $html
@@ -968,8 +993,9 @@ class FormModel extends CommonFormModel
     private function extractScriptTag($html)
     {
         libxml_use_internal_errors(true);
+        $html = $this->cleanHTML($html);
         $dom = new DOMDocument();
-        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         $items = $dom->getElementsByTagName('script');
 
         $scripts = [];
@@ -990,8 +1016,9 @@ class FormModel extends CommonFormModel
     private function removeScriptTag($html)
     {
         libxml_use_internal_errors(true);
+        $html = $this->cleanHTML($html);
         $dom = new DOMDocument();
-        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>');
         $items = $dom->getElementsByTagName('script');
 
         $remove = [];
@@ -1022,8 +1049,9 @@ class FormModel extends CommonFormModel
     private function generateJsScript($html)
     {
         libxml_use_internal_errors(true);
+        $html = $this->cleanHTML($html);
         $dom = new DOMDocument();
-        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>');
         $items = $dom->getElementsByTagName('script');
 
         $javascript = '';
