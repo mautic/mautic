@@ -56,24 +56,46 @@ class ReportApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $options = [
-            'paginate'        => true,
-            'ignoreGraphData' => true,
-            'dateFrom'        => new DateTimeImmutable($this->request->query->get('dateFrom', '-30 days'), new DateTimeZone('UTC')),
-            'dateTo'          => new DateTimeImmutable($this->request->query->get('dateTo', null), new DateTimeZone('UTC')),
-            'page'            => $this->request->query->getInt('page', 1),
-            'limit'           => $this->request->query->getInt('limit', 10),
-        ];
-
-        $reportData = $this->model->getReportData($entity, $this->formFactory, $options);
+        $reportData = $this->model->getReportData($entity, $this->formFactory, $this->getOptionsFromRequest());
 
         // Unset keys that we don't need to send back
         foreach (['graphs', 'contentTemplate', 'columns'] as $key) {
             unset($reportData[$key]);
         }
 
-        $view = $this->view($reportData, Codes::HTTP_OK);
+        return $this->handleView(
+            $this->view($reportData, Codes::HTTP_OK)
+        );
+    }
 
-        return $this->handleView($view);
+    /**
+     * This method is careful to add new options from the request to keep BC.
+     * It originally loaded all rows without any filter or pagination applied.
+     *
+     * @return array
+     */
+    private function getOptionsFromRequest()
+    {
+        $options = ['paginate'=> false, 'ignoreGraphData' => true];
+
+        if ($this->request->query->has('dateFrom')) {
+            $options['dateFrom'] = new DateTimeImmutable($this->request->query->get('dateFrom'), new DateTimeZone('UTC'));
+        }
+
+        if ($this->request->query->has('dateTo')) {
+            $options['dateTo']   = new DateTimeImmutable($this->request->query->get('dateTo'), new DateTimeZone('UTC'));
+        }
+
+        if ($this->request->query->has('page')) {
+            $options['page']     = $this->request->query->getInt('page');
+            $options['paginate'] = true;
+        }
+
+        if ($this->request->query->has('limit')) {
+            $options['limit']    = $this->request->query->getInt('limit');
+            $options['paginate'] = true;
+        }
+
+        return $options;
     }
 }
