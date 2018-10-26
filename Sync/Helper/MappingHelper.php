@@ -87,6 +87,7 @@ class MappingHelper
             if ($internalObject['is_deleted']) {
                 throw new ObjectDeletedException();
             }
+
             return new ObjectDAO(
                 $internalObjectName,
                 $internalObject['internal_object_id'],
