@@ -651,6 +651,7 @@ SQL;
             $q->expr()->lte('l.trigger_date', ':now'),
             $q->expr()->in('l.event_id', ':ids'),
             $q->expr()->eq('l.is_scheduled', ':true')
+
         );
         $q->setParameter('ids', $ids, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
 
