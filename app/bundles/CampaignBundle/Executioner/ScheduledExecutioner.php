@@ -144,7 +144,6 @@ class ScheduledExecutioner implements ExecutionerInterface
         $this->counter    = new Counter();
 
         $this->logger->debug('CAMPAIGN: Triggering scheduled events');
-
         try {
             $this->prepareForExecution();
             $this->executeOrRecheduleEvent();
@@ -249,32 +248,32 @@ class ScheduledExecutioner implements ExecutionerInterface
         $this->now         = new \Datetime();
         $withCounts        = $this->output instanceof NullOutput ? false : true;
 
+        // replaces call to getScheduledCounts
         $eventIds        = $this->repo->getPublishedEventIds($this->campaign->getId());
-        $scheduledEvents = $this->repo->getScheduledEvents($eventIds, $this->now, $this->limiter, $withCounts);
+        $scheduledEvents = $this->repo->getScheduledEvents($eventIds, $this->now, $this->limiter);
 
-        if (!count($scheduledEvents)) {
+        $totalScheduledCount   = $scheduledEvents ? array_sum($scheduledEvents) : 0;
+        $this->scheduledEvents = $scheduledEvents ? array_keys($scheduledEvents) : [];
+        if (!$totalScheduledCount) {
             throw new NoEventsFoundException();
+        } else {
+            if ($withCounts) {
+                $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
+
+                $this->output->writeln(
+                    $this->translator->trans(
+                        'mautic.campaign.trigger.event_count',
+                        [
+                            '%events%' => $totalScheduledCount,
+                            '%batch%'  => $this->limiter->getBatchLimit(),
+                        ]
+                    )
+                );
+            }
+
+            $this->progressBar = ProgressBarHelper::init($this->output, $totalScheduledCount);
+            $this->progressBar->start();
         }
-
-        $this->scheduledEvents = array_keys($scheduledEvents);
-        $totalScheduledCount   = array_sum($scheduledEvents);
-
-        if ($withCounts) {
-            $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
-
-            $this->output->writeln(
-                $this->translator->trans(
-                    'mautic.campaign.trigger.event_count',
-                    [
-                        '%events%' => $totalScheduledCount,
-                        '%batch%'  => $this->limiter->getBatchLimit(),
-                    ]
-                )
-            );
-        }
-
-        $this->progressBar = ProgressBarHelper::init($this->output, $totalScheduledCount);
-        $this->progressBar->start();
     }
 
     /**
@@ -291,7 +290,6 @@ class ScheduledExecutioner implements ExecutionerInterface
 
         foreach ($this->scheduledEvents as $eventId) {
             $this->counter->advanceEventCount();
-
             // Loop over contacts until the entire campaign is executed
             $this->executeScheduled($eventId, $now);
         }

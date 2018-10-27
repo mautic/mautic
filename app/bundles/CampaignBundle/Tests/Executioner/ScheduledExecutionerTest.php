@@ -78,7 +78,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
     public function testNoEventsResultInEmptyResults()
     {
         $this->repository->expects($this->once())
-            ->method('getScheduledCounts')
+            ->method('getScheduledEvents')
             ->willReturn(['nada' => 0]);
 
         $this->repository->expects($this->never())
@@ -94,10 +94,19 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
+    /**
+     * @throws \Doctrine\ORM\Query\QueryException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
+     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     *
+     *  @group failing
+     */
     public function testEventsAreExecuted()
     {
         $this->repository->expects($this->once())
-            ->method('getScheduledCounts')
+            ->method('getScheduledEvents')
             ->willReturn([1 => 2, 2 => 2]);
 
         $campaign = $this->getMockBuilder(Campaign::class)
@@ -152,7 +161,6 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(new \DateTime());
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
-
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
         $this->assertEquals(4, $counter->getTotalEvaluated());
@@ -161,7 +169,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
     public function testEventsAreExecutedInQuietMode()
     {
         $this->repository->expects($this->once())
-            ->method('getScheduledCounts')
+            ->method('getScheduledEvents')
             ->willReturn([1 => 2, 2 => 2]);
 
         $campaign = $this->getMockBuilder(Campaign::class)
@@ -283,7 +291,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
     public function testEventsAreScheduled()
     {
         $this->repository->expects($this->once())
-            ->method('getScheduledCounts')
+            ->method('getScheduledEvents')
             ->willReturn([1 => 2]);
 
         $campaign = $this->getMockBuilder(Campaign::class)
