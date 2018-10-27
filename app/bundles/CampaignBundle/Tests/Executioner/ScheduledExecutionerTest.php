@@ -100,8 +100,6 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
-     *
-     *  @group failing
      */
     public function testEventsAreExecuted()
     {
