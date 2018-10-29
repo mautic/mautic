@@ -503,32 +503,21 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->em->persist($email);
         }
 
+        $this->em->persist($stat);
+
+        // Flush the email stat entity in different transactions than the device stat entity to avoid deadlocks.
+        $this->flushAndCatch();
+
         if ($lead) {
+            $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
             $emailOpenStat = new StatDevice();
             $emailOpenStat->setIpAddress($ipAddress);
-            $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
             $emailOpenStat->setDevice($trackedDevice);
             $emailOpenStat->setDateOpened($readDateTime->toUtcString());
             $emailOpenStat->setStat($stat);
-        }
 
-        $this->em->persist($stat);
-
-        if ($lead) {
             $this->em->persist($emailOpenStat);
-        }
-
-        try {
-            $this->em->flush();
-        } catch (\Exception $ex) {
-            if (MAUTIC_ENV === 'dev') {
-                throw $ex;
-            } else {
-                $this->logger->addError(
-                    $ex->getMessage(),
-                    ['exception' => $ex]
-                );
-            }
+            $this->flushAndCatch();
         }
     }
 
