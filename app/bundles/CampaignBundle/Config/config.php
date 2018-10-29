@@ -229,7 +229,7 @@ return [
                 'alias'     => 'campaignconfig',
             ],
             'mautic.form.type.campaign_tags' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\TagListType',
+                'class'     => Mautic\LeadBundle\Form\Type\TagListType::class,
                 'alias'     => 'lead_tags',
                 'arguments' => ['translator'],
             ],
@@ -239,7 +239,7 @@ return [
                 'arguments' => ['doctrine.orm.entity_manager'],
             ],
             'mautic.form.type.modify_campaign_tags' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\ModifyLeadTagsType',
+                'class'     => Mautic\LeadBundle\Form\Type\ModifyLeadTagsType::class,
                 'alias'     => 'modify_lead_tags',
                 'arguments' => ['translator'],
             ],

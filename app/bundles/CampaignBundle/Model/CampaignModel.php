@@ -26,10 +26,12 @@ use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -981,6 +983,101 @@ class CampaignModel extends CommonFormModel
         if ($batchProcess) {
             $this->leadModel->getRepository()->detachEntities($leads);
         }
+    }
+
+    /**
+     * Modify tags with support to remove via a prefixed minus sign.
+     *
+     * @param Campaign $campaign
+     * @param          $tags
+     * @param          $removeTags
+     * @param          $persist    True if tags modified
+     *
+     * @return bool
+     */
+    public function modifyTags(Campaign $campaign, $tags, array $removeTags = null, $persist = true)
+    {
+        $tagsModified = false;
+        $campaignTags = $campaign->getTags();
+
+        if (!$campaignTags->isEmpty()) {
+            $this->logger->debug('CAMPAIGN: Campaign currently has tags '.implode(', ', $campaignTags->getKeys()));
+        } else {
+            $this->logger->debug('CAMPAIGN: Campaign currently does not have any tags');
+        }
+
+        if (!is_array($tags)) {
+            $tags = explode(',', $tags);
+        }
+
+        if (empty($tags) && empty($removeTags)) {
+            return false;
+        }
+
+        $this->logger->debug('CAMPAIGN: Adding '.implode(', ', $tags).' to campaign ID# '.$campaign->getId());
+
+        array_walk($tags, function (&$val) {
+            $val = trim($val);
+            InputHelper::clean($val);
+        });
+
+        // See which tags already exist
+        $foundTags = $this->getTagRepository()->getTagsByName($tags);
+        foreach ($tags as $tag) {
+            if (strpos($tag, '-') === 0) {
+                // Tag to be removed
+                $tag = substr($tag, 1);
+
+                if (array_key_exists($tag, $foundTags) && $campaignTags->contains($foundTags[$tag])) {
+                    $tagsModified = true;
+                    $lead->removeTag($foundTags[$tag]);
+
+                    $this->logger->debug('CAMPIAGN: Removed '.$tag);
+                }
+            } else {
+                $tagToBeAdded = null;
+
+                if (!array_key_exists($tag, $foundTags)) {
+                    $tagToBeAdded = new Tag($tag);
+                } elseif (!$campaignTags->contains($foundTags[$tag])) {
+                    $tagToBeAdded = $foundTags[$tag];
+                }
+
+                if ($tagToBeAdded) {
+                    $campaign->addTag($tagToBeAdded);
+                    $tagsModified = true;
+                    $this->logger->debug('CAMPAIGN: Added '.$tag);
+                }
+            }
+        }
+
+        if (!empty($removeTags)) {
+            $this->logger->debug('CAMPAIGN: Removing '.implode(', ', $removeTags).' for campaign ID# '.$campaign->getId());
+
+            array_walk($removeTags, function (&$val) {
+                $val = trim($val);
+                InputHelper::clean($val);
+            });
+
+            // See which tags really exist
+            $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
+
+            foreach ($removeTags as $tag) {
+                // Tag to be removed
+                if (array_key_exists($tag, $foundRemoveTags) && $campaignTags->contains($foundRemoveTags[$tag])) {
+                    $campaign->removeTag($foundRemoveTags[$tag]);
+                    $tagsModified = true;
+
+                    $this->logger->debug('CAMPAIGN: Removed '.$tag);
+                }
+            }
+        }
+
+        if ($persist) {
+            $this->saveEntity($campaign);
+        }
+
+        return $tagsModified;
     }
 
     /**

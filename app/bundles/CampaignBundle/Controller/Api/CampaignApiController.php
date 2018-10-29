@@ -31,7 +31,7 @@ class CampaignApiController extends CommonApiController
         $this->entityClass      = 'Mautic\CampaignBundle\Entity\Campaign';
         $this->entityNameOne    = 'campaign';
         $this->entityNameMulti  = 'campaigns';
-        $this->serializerGroups = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
+        $this->serializerGroups = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList', 'tagList'];
 
         parent::initialize($event);
     }
@@ -187,6 +187,10 @@ class CampaignApiController extends CommonApiController
             $this->model->setEvents($entity, $parameters['events'], $parameters['canvasSettings'], $deletedEvents);
         }
 
+        if (isset($this->entityRequestParameters['tags'])) {
+            $this->model->modifyTags($entity, $this->entityRequestParameters['tags'], null, false);
+        }
+
         // Persist to the database before building connection so that IDs are available
         $this->model->saveEntity($entity);
 
@@ -269,5 +273,24 @@ class CampaignApiController extends CommonApiController
                 'limit'     => $limit,
             ]
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function prepareParametersForBinding($parameters, $entity, $action)
+    {
+        // Unset the tags from params to avoid a validation error
+        if (isset($parameters['tags'])) {
+            unset($parameters['tags']);
+        }
+
+        if (count($entity->getTags()) > 0) {
+            foreach ($entity->getTags() as $tag) {
+                $parameters['tags'][] = $tag->getId();
+            }
+        }
+
+        return $parameters;
     }
 }

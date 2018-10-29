@@ -204,7 +204,8 @@ class Campaign extends FormEntity
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('campaign')
+        $metadata
+            ->setGroupPrefix('campaign')
             ->addListProperties(
                 [
                     'id',
@@ -261,6 +262,12 @@ class Campaign extends FormEntity
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
+            }
+        } elseif ($prop == 'tags') {
+            if ($val instanceof Tag) {
+                $this->changes['tags']['added'][] = $val->getTag();
+            } else {
+                $this->changes['tags']['removed'][] = $val;
             }
         } else {
             parent::isChanged($prop, $val);
@@ -693,7 +700,7 @@ class Campaign extends FormEntity
      *
      * @param Tag $tag
      *
-     * @return Campaign
+     * @return $this
      */
     public function addTag(Tag $tag)
     {
@@ -715,7 +722,7 @@ class Campaign extends FormEntity
     }
 
     /**
-     * @return ArrayCollection
+     * @return mixed
      */
     public function getTags()
     {
@@ -723,11 +730,11 @@ class Campaign extends FormEntity
     }
 
     /**
-     * @param ArrayCollection $tags
+     * @param $tags
      *
-     * @return Campaign
+     * @return $this
      */
-    public function setTags(ArrayCollection $tags)
+    public function setTags($tags)
     {
         $this->tags = $tags;
 

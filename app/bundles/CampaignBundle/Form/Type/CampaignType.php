@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\LeadBundle\Form\Type\TagType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -87,14 +88,14 @@ class CampaignType extends AbstractType
 
         $builder->add(
             'tags',
-            'lead_tag',
+            TagType::class,
             [
                 'by_reference' => false,
                 'attr'         => [
                     'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
                     'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'       => 'true',
-                    'onchange'             => 'Mautic.createLeadTag(this)',
+                    'onchange'             => 'Mautic.createCampaignTag(this)',
                 ],
             ]
         );
