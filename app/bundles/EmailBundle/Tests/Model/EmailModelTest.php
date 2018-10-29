@@ -14,6 +14,8 @@ namespace Mautic\EmailBundle\Tests;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -22,6 +24,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -31,6 +34,7 @@ use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -40,6 +44,7 @@ use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Request;
 
 class EmailModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,6 +72,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
     private $deviceTrackerMock;
     private $redirectRepositoryMock;
     private $cacheStorageHelperMock;
+    private $emailModel;
 
     protected function setUp()
     {
@@ -632,5 +638,53 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ['email_type' => 'marketing']
         );
         $this->assertTrue(count($result) === 0, print_r($result, true));
+    }
+
+    public function testHitEmailSavesEmailStatAndDeviceStatInTwoTransactions()
+    {
+        $contact       = new Lead();
+        $stat          = new Stat();
+        $request       = new Request();
+        $contactDevice = new LeadDevice();
+        $ipAddress     = new IpAddress();
+
+        $stat->setLead($contact);
+
+        $this->ipLookupHelper->expects($this->once())
+            ->method('getIpAddress')
+            ->willReturn($ipAddress);
+
+        $this->deviceTrackerMock->expects($this->once())
+            ->method('createDeviceFromUserAgent')
+            ->with($contact)
+            ->willReturn($contactDevice);
+
+        $this->entityManager->expects($this->at(0))
+            ->method('persist')
+            ->with($this->callback(function ($statDevice) use ($stat, $ipAddress) {
+                $this->assertInstanceOf(Stat::class, $statDevice);
+
+                return true;
+            }));
+
+        $this->entityManager->expects($this->at(1))
+            ->method('flush');
+
+        $this->entityManager->expects($this->at(2))
+            ->method('persist')
+            ->with($this->callback(function ($statDevice) use ($stat, $ipAddress) {
+                $this->assertInstanceOf(StatDevice::class, $statDevice);
+                $this->assertSame($stat, $statDevice->getStat());
+                $this->assertSame($ipAddress, $statDevice->getIpAddress());
+
+                return true;
+            }));
+
+        $this->entityManager->expects($this->at(3))
+            ->method('flush');
+
+        $this->emailModel->setDispatcher($this->createMock(EventDispatcher::class));
+
+        $this->emailModel->hitEmail($stat, $request);
     }
 }
