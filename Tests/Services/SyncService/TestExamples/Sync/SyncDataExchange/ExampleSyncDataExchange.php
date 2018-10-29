@@ -175,6 +175,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                         $result['converted_id'],
                         self::OBJECT_LEAD
                     );
+                    break;
                 case 500: // there was some kind of temporary issue so just retry this later
                     $syncOrderDAO->retrySyncLater($changeObject);
                     break;
