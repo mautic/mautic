@@ -14,8 +14,6 @@ namespace MauticPlugin\IntegrationsBundle;
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\AuthenticationIntegrationPass;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\ConfigIntegrationPass;
-use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\DispatcherIntegrationPass;
-use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\EncryptionIntegrationPass;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\IntegrationsPass;
 use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\SyncIntegrationsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

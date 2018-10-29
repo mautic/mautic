@@ -31,11 +31,6 @@ class MauticSyncProcess
     private $syncDateHelper;
 
     /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
-
-    /**
      * @var ObjectChangeGenerator
      */
     private $objectChangeGenerator;

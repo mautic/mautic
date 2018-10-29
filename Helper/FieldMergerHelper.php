@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
-use MauticPlugin\IntegrationsBundle\Exception\RequiredFieldsMissingException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 
