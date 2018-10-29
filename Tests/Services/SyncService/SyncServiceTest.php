@@ -11,15 +11,11 @@
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Services\SyncService;
 
-
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
-use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService;
-use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\EventListener\IntegrationSubscriber;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 

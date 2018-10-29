@@ -3,8 +3,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
-
-use Mautic\CampaignBundle\Membership\EventDispatcher;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use MauticPlugin\IntegrationsBundle\Event\KeysDecryptionEvent;

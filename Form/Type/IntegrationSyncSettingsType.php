@@ -11,8 +11,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
-
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
