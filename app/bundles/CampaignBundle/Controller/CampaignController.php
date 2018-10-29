@@ -76,8 +76,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfon+6
-     *                   -y\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function batchDeleteAction()
     {
