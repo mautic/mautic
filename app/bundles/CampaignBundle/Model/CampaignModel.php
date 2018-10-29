@@ -1030,7 +1030,7 @@ class CampaignModel extends CommonFormModel
 
                 if (array_key_exists($tag, $foundTags) && $campaignTags->contains($foundTags[$tag])) {
                     $tagsModified = true;
-                    $lead->removeTag($foundTags[$tag]);
+                    $campaign->removeTag($foundTags[$tag]);
 
                     $this->logger->debug('CAMPIAGN: Removed '.$tag);
                 }
