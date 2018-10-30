@@ -92,10 +92,10 @@ class MomentumSubscriber extends CommonSubscriber
      */
     public function onMomentumWebhookRequest(TransportWebhookEvent $event)
     {
-        if ($this->queueService->isQueueEnabled()) {
+        $transport = MomentumTransport::class;
+        if ($this->queueService->isQueueEnabled() && $event->transportIsInstanceOf($transport)) {
             // Beanstalk jobs are limited to 65,535 kB. Momentum can send up to 10.000 items per request.
             // One item has about 1,6 kB. Lets store the request to the cache storage instead of the job itself.
-            $transport = MomentumTransport::class;
             $key       = $this->requestStorageHelper->storeRequest($transport, $event->getRequest());
             $this->queueService->publishToQueue(QueueName::TRANSPORT_WEBHOOK, ['transport' => $transport, 'key' => $key]);
             $event->stopPropagation();

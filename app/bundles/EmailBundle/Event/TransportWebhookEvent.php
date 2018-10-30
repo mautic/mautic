@@ -55,4 +55,16 @@ class TransportWebhookEvent extends Event
     {
         $this->request = $request;
     }
+
+    /**
+     * Checks if the event is for specific transport.
+     *
+     * @param string $transportClassName
+     *
+     * @return bool
+     */
+    public function transportIsInstanceOf($transportClassName)
+    {
+        return $this->transport instanceof $transportClassName;
+    }
 }
