@@ -123,6 +123,10 @@ class MomentumSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getRequest')
             ->willReturn($request);
 
+        $transportWebhookEvent->expects($this->once())
+            ->method('transportIsInstanceOf')
+            ->willReturn(true);
+
         $this->requestStorageHelperMock->expects($this->once())
             ->method('storeRequest')
             ->with(MomentumTransport::class, $request)
