@@ -84,6 +84,13 @@ class FieldMergerHelper
     {
         // Merge updated fields into current fields
         foreach ($updatedFieldMappings as $fieldName => $fieldMapping) {
+            if (isset($this->currentFieldMappings[$object][$fieldName]) && !$fieldMapping) {
+                // Mapping was deleted
+                unset($this->currentFieldMappings[$object][$fieldName]);
+
+                continue;
+            }
+
             if (isset($this->currentFieldMappings[$object][$fieldName])) {
                 // Merge
                 $this->currentFieldMappings[$object][$fieldName] = array_merge($this->currentFieldMappings[$object][$fieldName], $fieldMapping);
