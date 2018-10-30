@@ -166,7 +166,7 @@ class WidgetDetailEvent extends CommonEvent
         // Store the template data to the cache
         if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
             $cache = new CacheStorageHelper($this->cacheDir, $this->uniqueCacheDir);
-            $cache->set($this->getUniqueWidgetId(), $templateData);
+            $cache->set($this->getUniqueWidgetId(), $templateData, $this->widget->getCacheTimeout());
         }
     }
 
