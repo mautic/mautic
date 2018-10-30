@@ -31,7 +31,7 @@ final class SyncJudge implements SyncJudgeInterface
      * @throws ConflictUnresolvedException
      */
     public function adjudicate(
-        $mode = self::PRESUMPTION_OF_INNOCENCE_MODE,
+        $mode,
         InformationChangeRequestDAO $leftChangeRequest,
         InformationChangeRequestDAO $rightChangeRequest
     ) {

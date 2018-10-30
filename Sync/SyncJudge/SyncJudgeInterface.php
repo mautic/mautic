@@ -19,25 +19,24 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
  */
 interface SyncJudgeInterface
 {
-
     /**
      * Winner is selected based on the field was updated after the loser
      */
-    const HARD_EVIDENCE_MODE = 'hard';
+    public const HARD_EVIDENCE_MODE = 'hard';
 
     /**
      * Winner is selected based on hard evidence if available, otherwise if the object of the winner was updated after the object of the loser.
      */
-    const BEST_EVIDENCE_MODE = 'best';
+    public const BEST_EVIDENCE_MODE = 'best';
 
     /**
      * Winner is selected based on the probability that it was updated after the loser
      */
-    const FUZZY_EVIDENCE_MODE = 'fuzzy';
+    public const FUZZY_EVIDENCE_MODE = 'fuzzy';
 
-    const LEFT_WINNER = 'left';
-    const RIGHT_WINNER = 'right';
-    const NO_WINNER = 'no';
+    public const LEFT_WINNER = 'left';
+    public const RIGHT_WINNER = 'right';
+    public const NO_WINNER = 'no';
 
     /**
      * @param string                           $mode
@@ -48,7 +47,7 @@ interface SyncJudgeInterface
      * @throws ConflictUnresolvedException
      */
     public function adjudicate(
-        $mode = self::FUZZY_EVIDENCE_MODE,
+        $mode,
         InformationChangeRequestDAO $leftChangeRequest,
         InformationChangeRequestDAO $rightChangeRequest
     );
