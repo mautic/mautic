@@ -14,6 +14,7 @@ namespace MauticPlugin\IntegrationsBundle\Helper;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\AuthenticationInterface;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 
 class AuthIntegrationsHelper
 {
@@ -48,7 +49,7 @@ class AuthIntegrationsHelper
     /**
      * @param string $integration
      *
-     * @return AuthenticationInterface
+     * @return IntegrationInterface
      * @throws IntegrationNotFoundException
      */
     public function getIntegration(string $integration)

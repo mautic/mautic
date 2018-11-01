@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Integration\Auth\Provider\Oauth2ThreeLegged;
+namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
 
 interface CredentialsInterface
 {
@@ -21,14 +21,9 @@ interface CredentialsInterface
     public function getAuthorizationUrl(): string;
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getRequestTokenUrl(): string;
-
-    /**
-     * @return string
-     */
-    public function getAccessTokenUrl(): string;
+    public function getClientId(): string;
 
     /**
      * @return null|string
@@ -38,25 +33,20 @@ interface CredentialsInterface
     /**
      * @return null|string
      */
-    public function getClientId(): ?string;
+    public function getConsumerKey(): ?string;
 
     /**
      * @return null|string
      */
-    public function getClientSecret(): ?string;
+    public function getConsumerSecret(): ?string;
 
     /**
      * @return null|string
      */
-    public function getBearerToken(): ?string;
+    public function getToken(): ?string;
 
     /**
      * @return null|string
      */
-    public function getAccessToken(): ?string;
-
-    /**
-     * @return null|string
-     */
-    public function getRequestToken(): ?string;
+    public function getTokenSecret(): ?string;
 }
