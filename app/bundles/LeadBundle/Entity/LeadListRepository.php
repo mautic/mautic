@@ -2036,9 +2036,7 @@ class LeadListRepository extends CommonRepository
     {
         $commands = [
             'mautic.lead.list.searchcommand.isglobal',
-            'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.ispublished',
-            'mautic.core.searchcommand.isinactive',
             'mautic.core.searchcommand.name',
         ];
 
