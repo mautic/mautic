@@ -790,12 +790,10 @@ class PageModel extends FormModel
      */
     public function getHitQuery(Request $request, $page = null)
     {
-        if (!isset($query)) {
-            if ($request->getMethod() === 'POST') {
-                $query = $request->request->all();
-            } else {
-                $query = $request->query->all();
-            }
+        if ($request->getMethod() === 'GET') {
+            $query = $request->query->all();
+        } else {
+            $query = $request->request->all();
         }
 
         // Set generated page url
