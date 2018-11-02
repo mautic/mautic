@@ -332,9 +332,18 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         return $contacts;
     }
 
+    /**
+     * Because the test is comparing hour differences, there is the chance that a future date is after the US changes time for daylights savings time.
+     * This causes the expected hour to be off by one hour depending on if the date is during the "fall back" or "spring forward" DST change.
+     *
+     * @param \DateTime $leftDateTime
+     * @param \DateTime $rightDateTime
+     */
     private function adjustForDST(\DateTime $leftDateTime, \DateTime $rightDateTime)
     {
         // DST hack
+
+        // DST goes into effect causing there to be an extra hour that must be accounted for
         $springForward = new \DateTime('Second Sunday March');
         if ($leftDateTime < $springForward && $rightDateTime >= $springForward) {
             $rightDateTime->modify('+1 hour');
@@ -342,6 +351,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             return;
         }
 
+        // DST is reverted causing there to be an less that must be accounted for
         $fallBack = new \DateTime('First Sunday November');
         if ($leftDateTime < $fallBack && $rightDateTime >= $fallBack) {
             $rightDateTime->modify('-1 hour');
