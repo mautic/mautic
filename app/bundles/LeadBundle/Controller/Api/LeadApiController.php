@@ -427,7 +427,7 @@ class LeadApiController extends CommonApiController
 
         $channelId = (int) $this->request->request->get('channelId');
         if ($channelId) {
-            $channel = [$channel, $channelId];
+            $channel = [$channel => $channelId];
         }
         $reason   = (int) $this->request->request->get('reason');
         $comments = InputHelper::clean($this->request->request->get('comments'));
