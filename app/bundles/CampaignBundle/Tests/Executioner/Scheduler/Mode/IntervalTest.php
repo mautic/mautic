@@ -96,6 +96,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
                     $this->assertCount(4, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([1, 2, 5, 6], $groupExecutionDateDAO->getContacts()->getKeys());
                     $this->assertEquals('13:00', $executionDate->format('H:i'));
+                    $this->adjustForDST($scheduledExecutionDate, $executionDate);
                     $diff = $scheduledExecutionDate->diff($executionDate);
 
                     // This was within the time range for all contacts so should be 0
@@ -241,8 +242,8 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
                     $this->assertCount(4, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([1, 2, 5, 6], $groupExecutionDateDAO->getContacts()->getKeys());
                     $this->assertEquals('13:00', $executionDate->format('H:i'));
+                    $this->adjustForDST($scheduledExecutionDate, $executionDate);
                     $diff = $scheduledExecutionDate->diff($executionDate);
-
                     // This was within the time range for all contacts so should be 0
                     $this->assertEquals(0, $diff->h);
                     $this->assertEquals(2, $diff->d);
@@ -329,5 +330,21 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         ]);
 
         return $contacts;
+    }
+
+    private function adjustForDST(\DateTime $leftDateTime, \DateTime $rightDateTime)
+    {
+        // DST hack
+        $springForward = new \DateTime('Second Sunday March');
+        if ($leftDateTime < $springForward && $rightDateTime >= $springForward) {
+            $rightDateTime->modify('+1 hour');
+
+            return;
+        }
+
+        $fallBack = new \DateTime('First Sunday November');
+        if ($leftDateTime < $fallBack && $rightDateTime >= $fallBack) {
+            $rightDateTime->modify('-1 hour');
+        }
     }
 }
