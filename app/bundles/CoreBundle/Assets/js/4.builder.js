@@ -561,7 +561,8 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
 };
 
 /**
- * Clones full HTML document by creating a virtual iframe, putting the HTML into it and reading it back. This is async process.
+ * Clones full HTML document by creating a virtual iframe, putting the HTML into it and
+ * reading it back. This is async process.
  *
  * @param  object   content
  * @param  Function callback(clonedContent)
