@@ -163,8 +163,7 @@ Mautic.isInViewport = function(el) {
 };
 
 /**
- * Adds a hidded field which adds inBuilder=1 param to the request and will be
- * returned in the response
+ * Adds a hidded field which adds inBuilder=1 param to the request and will be returned in the response
  *
  * @param jQuery object of form
  */
@@ -483,8 +482,7 @@ Mautic.closeBuilder = function(model) {
 };
 
 /**
- * Copies the HTML from the builder to the textarea and sanitizes it along the
- * way.
+ * Copies the HTML from the builder to the textarea and sanitizes it along the way.
  *
  * @param Function callback
  * @param bool keepBuilderContent
@@ -543,8 +541,7 @@ Mautic.domToString = function(dom) {
 };
 
 /**
- * Removes stuff the Builder needs for it's magic but cannot be in the HTML
- * result
+ * Removes stuff the Builder needs for it's magic but cannot be in the HTML result
  *
  * @param  object htmlContent
  */
@@ -564,8 +561,7 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
 };
 
 /**
- * Clones full HTML document by creating a virtual iframe, putting the HTML
- * into it and reading it back. This is async process.
+ * Clones full HTML document by creating a virtual iframe, putting the HTML into it and reading it back. This is async process.
  *
  * @param  object   content
  * @param  Function callback(clonedContent)
