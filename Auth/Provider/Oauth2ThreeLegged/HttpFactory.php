@@ -80,8 +80,13 @@ class HttpFactory implements AuthProviderInterface
     {
         $stack = HandlerStack::create();
         $grantType = new NullGrantType();
+
         $oAuth2 = new OAuth2Middleware($grantType);
         $oAuth2->setAccessTokenSigner(new BearerAuth());
+        $oAuth2->setAccessToken([
+            'access_token' => $credentials->getAccessToken(),
+        ]);
+
         $stack->push($oAuth2);
 
         return new Client([
