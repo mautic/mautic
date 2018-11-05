@@ -163,7 +163,7 @@ class FieldController extends FormController
                         } catch (AbortColumnCreateException $e) {
                             $flashMessage = $this->get('translator')->trans('mautic.lead.field.pushed_to_background');
                         } catch (SchemaException $e) {
-                            $flashMessage = '';
+                            $flashMessage = $e->getMessage();
                             $form['alias']->addError(new FormError($e->getMessage()));
                             $valid = false;
                         } catch (\Exception $e) {

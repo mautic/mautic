@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Monolog\Logger;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldColumn
 {
@@ -60,7 +61,8 @@ class CustomFieldColumn
         Logger $logger,
         LeadFieldSaver $leadFieldSaver,
         CustomFieldIndex $customFieldIndex,
-        FieldColumnDispatcher $fieldColumnDispatcher
+        FieldColumnDispatcher $fieldColumnDispatcher,
+        TranslatorInterface $translator
     ) {
         $this->columnSchemaHelper    = $columnSchemaHelper;
         $this->schemaDefinition      = $schemaDefinition;
@@ -68,6 +70,7 @@ class CustomFieldColumn
         $this->leadFieldSaver        = $leadFieldSaver;
         $this->customFieldIndex      = $customFieldIndex;
         $this->fieldColumnDispatcher = $fieldColumnDispatcher;
+        $this->translator            = $translator;
     }
 
     /**
@@ -91,7 +94,7 @@ class CustomFieldColumn
             }
         } catch (SchemaException $e) {
             // We use slightly different error message if the column already exists in this case.
-            throw new SchemaException(sprintf('There was an error creating the custom field "%s" because it already exists.', $leadField->getName()));
+            throw new SchemaException($this->translator->trans('mautic.lead.field.column.already.exists', ['%field%' => $leadField->getName()], 'validators'));
         }
 
         try {

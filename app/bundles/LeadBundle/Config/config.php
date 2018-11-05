@@ -1284,6 +1284,7 @@ return [
                     'mautic.lead.field.lead_field_saver',
                     'mautic.lead.field.custom_field_index',
                     'mautic.lead.field.dispatcher.field_column_dispatcher',
+                    'translator',
                 ],
             ],
             'mautic.lead.field.custom_field_index' => [
