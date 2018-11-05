@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Field;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
@@ -82,8 +83,15 @@ class CustomFieldColumn
         $leadsSchema = $this->columnSchemaHelper->setName($leadField->getCustomFieldObject());
 
         // We do not need to do anything if the column already exists
-        if ($leadsSchema->checkColumnExists($leadField->getAlias())) {
-            return;
+        // But we have to check if the LeadField entity is new.
+        // In such case we must throw an exception to warn users that the column already exists.
+        try {
+            if ($leadsSchema->checkColumnExists($leadField->getAlias(), $leadField->isNew())) {
+                return;
+            }
+        } catch (SchemaException $e) {
+            // We use slightly different error message if the column already exists in this case.
+            throw new SchemaException(sprintf('There was an error creating the custom field "%s" because it already exists.', $leadField->getName()));
         }
 
         try {
