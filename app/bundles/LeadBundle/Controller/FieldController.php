@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
@@ -158,6 +159,10 @@ class FieldController extends FormController
                             $model->saveEntity($field);
                         } catch (DBALException $ee) {
                             $flashMessage = $ee->getMessage();
+                        } catch (SchemaException $e) {
+                            $flashMessage = $e->getMessage();
+                            $form['alias']->addError(new FormError($e->getMessage()));
+                            $valid = false;
                         } catch (\Exception $e) {
                             $form['alias']->addError(
                                     new FormError(
