@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -47,7 +49,7 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
      *
      * @throws InvalidFormOptionException
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!is_array($options['objects'])) {
             throw new InvalidFormOptionException('objects must be an array');
@@ -72,20 +74,18 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                     $objectName,
                     IntegrationSyncSettingsObjectFieldMappingType::class,
                     [
-                        'label'                     => false,
-                        'requiredIntegrationFields' => $this->getRequiredFields(),
-                        'integrationFields'         => $this->getFilteredFields(),
-                        'mauticFields'              => $this->getMauticFields($integrationObject, $objectName),
-                        'page'                      => 1,
-                        'keyword'                   => null,
-                        'totalFieldCount'           => $this->getTotalFieldCount(),
-                        'object'                    => $objectName,
-                        'integration'               => $integrationObject->getName(),
-                        'error_bubbling'            => false,
-                        'allow_extra_fields'        => true,
+                        'label'              => false,
+                        'integrationFields'  => $this->getFilteredFields(),
+                        'mauticFields'       => $this->getMauticFields($integrationObject, $objectName),
+                        'page'               => 1,
+                        'keyword'            => null,
+                        'totalFieldCount'    => $this->getTotalFieldCount(),
+                        'object'             => $objectName,
+                        'integration'        => $integrationObject->getName(),
+                        'error_bubbling'     => false,
+                        'allow_extra_fields' => true,
                     ]
                 );
-
 
                 if ($error) {
                     $form[$objectName]->addError(new FormError($error));
@@ -97,7 +97,7 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
     /**
      * @param OptionsResolver $resolver
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(
             [
@@ -114,7 +114,7 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
      * @return array
      * @throws ObjectNotFoundException
      */
-    private function getMauticFields(ConfigFormSyncInterface $integrationObject, string $objectName)
+    private function getMauticFields(ConfigFormSyncInterface $integrationObject, string $objectName): array
     {
         $mappedObjects = $integrationObject->getSyncMappedObjects();
         if (!isset($mappedObjects[$objectName])) {

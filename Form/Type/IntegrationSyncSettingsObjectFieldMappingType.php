@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,7 +13,8 @@
 
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
-
+use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
+use MauticPlugin\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -39,21 +42,29 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
+     *
+     * @throws InvalidFormOptionException
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        foreach ($options['integrationFields'] as $field => $label) {
+        $integrationFields = $options['integrationFields'];
+
+        foreach ($integrationFields as $fieldName => $fieldInfo) {
+            if (!$fieldInfo instanceof MappedFieldInfoInterface) {
+                throw new InvalidFormOptionException('integrationFields must contain an instance of MappedFieldInfoInterface');
+            }
+
             $builder->add(
-                $field,
+                $fieldName,
                 IntegrationSyncSettingsObjectFieldType::class,
                 [
-                    'label'        => $label,
+                    'label'        => $fieldInfo->getLabel(),
                     'mauticFields' => $options['mauticFields'],
-                    'required'     => isset($options['requiredIntegrationFields'][$field]),
+                    'required'     => $fieldInfo->isMandatory(),
                     'placeholder'  => $this->translator->trans('mautic.integration.sync_mautic_field'),
                     'object'       => $options['object'],
                     'integration'  => $options['integration'],
-                    'field'        => $field,
+                    'field'        => $fieldInfo,
                 ]
             );
         }
@@ -88,11 +99,10 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
     /**
      * @param OptionsResolver $resolver
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(
             [
-                'requiredIntegrationFields',
                 'integrationFields',
                 'mauticFields',
                 'page',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,21 +14,17 @@
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use MauticPlugin\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 
 trait FilteredFieldsTrait
 {
-    /**
-     * @var array
-     */
-    private $requiredFields = [];
-
     /**
      * @var int
      */
     private $totalFieldCount = 0;
 
     /**
-     * @var array
+     * @var array|MappedFieldInfoInterface[]
      */
     private $filteredFields = [];
 
@@ -36,15 +34,15 @@ trait FilteredFieldsTrait
      * @param string|null             $keyword
      * @param int                     $page
      */
-    private function filterFields(ConfigFormSyncInterface $integrationObject, string $objectName, string $keyword = null, int $page = 1)
+    private function filterFields(ConfigFormSyncInterface $integrationObject, string $objectName, string $keyword = null, int $page = 1): void
     {
-        $this->requiredFields = $integrationObject->getRequiredFieldsForMapping($objectName);
-        asort($this->requiredFields);
+        $requiredFields = $integrationObject->getRequiredFieldsForMapping($objectName);
+        asort($requiredFields);
 
         $optionalFields = $integrationObject->getOptionalFieldsForMapping($objectName);
         asort($optionalFields);
 
-        $allFields = array_merge($this->requiredFields, $optionalFields);
+        $allFields = array_merge($requiredFields, $optionalFields);
 
         if ($keyword) {
             $this->filteredFields = $this->getFieldsByKeyword($allFields, $keyword);
@@ -63,9 +61,9 @@ trait FilteredFieldsTrait
      * @param int   $page
      * @param int   $limit
      *
-     * @return array
+     * @return array|MappedFieldInfoInterface[]
      */
-    private function getPageOfFields(array $fields, int $page, int $limit = 15)
+    private function getPageOfFields(array $fields, int $page, int $limit = 15): array
     {
         $offset = ($page - 1) * $limit;
 
@@ -73,46 +71,38 @@ trait FilteredFieldsTrait
     }
 
     /**
-     * @param array  $fields
-     * @param string $keyword
+     * @param array|MappedFieldInfoInterface[] $fields
+     * @param string                           $keyword
      *
-     * @return array
+     * @return array|MappedFieldInfoInterface[]
      */
-    private function getFieldsByKeyword(array $fields, string $keyword)
+    private function getFieldsByKeyword(array $fields, string $keyword): array
     {
         $found = [];
 
-        foreach ($fields as $name => $label) {
-            if (!stristr($label, $keyword)) {
+        foreach ($fields as $name => $field) {
+            if (!stristr($field->getName(), $keyword)) {
                 continue;
             }
 
-            $found[$name] = $label;
+            $found[$name] = $field;
         }
 
         return $found;
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    private function getRequiredFields()
-    {
-        return $this->requiredFields;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getTotalFieldCount()
+    private function getTotalFieldCount(): int
     {
         return $this->totalFieldCount;
     }
 
     /**
-     * @return mixed
+     * @return array|MappedFieldInfoInterface[]
      */
-    private function getFilteredFields()
+    private function getFilteredFields(): array
     {
         return $this->filteredFields;
     }

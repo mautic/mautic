@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Controller;
-
 
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -64,15 +65,14 @@ class FieldPaginationController extends CommonController
             IntegrationSyncSettingsObjectFieldMappingType::class,
             $currentFields,
             [
-                'requiredIntegrationFields' => $this->getRequiredFields(),
-                'integrationFields'         => $this->getFilteredFields(),
-                'mauticFields'              => $fieldModel->getFieldList(false),
-                'page'                      => $page,
-                'keyword'                   => $keyword,
-                'totalFieldCount'           => $this->getTotalFieldCount(),
-                'object'                    => $object,
-                'integration'               => $integration,
-                'csrf_protection'           => false,
+                'integrationFields' => $this->getFilteredFields(),
+                'mauticFields'      => $fieldModel->getFieldList(false),
+                'page'              => $page,
+                'keyword'           => $keyword,
+                'totalFieldCount'   => $this->getTotalFieldCount(),
+                'object'            => $object,
+                'integration'       => $integration,
+                'csrf_protection'   => false,
             ]
         );
 

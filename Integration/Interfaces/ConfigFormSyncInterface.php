@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,6 +12,8 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
+
+use MauticPlugin\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 
 interface ConfigFormSyncInterface extends IntegrationInterface
 {
@@ -34,7 +38,7 @@ interface ConfigFormSyncInterface extends IntegrationInterface
      *
      * @param string $object
      *
-     * @return array
+     * @return array|MappedFieldInfoInterface[]
      */
     public function getRequiredFieldsForMapping(string $object): array;
 
@@ -43,7 +47,7 @@ interface ConfigFormSyncInterface extends IntegrationInterface
      *
      * @param string $object
      *
-     * @return array
+     * @return array|MappedFieldInfoInterface[]
      */
     public function getOptionalFieldsForMapping(string $object): array;
 
