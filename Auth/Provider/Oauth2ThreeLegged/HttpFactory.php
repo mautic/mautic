@@ -18,6 +18,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
 use kamermans\OAuth2\GrantType\NullGrantType;
 use kamermans\OAuth2\OAuth2Middleware;
+use kamermans\OAuth2\Signer\AccessToken\BearerAuth;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\OAuth2\Persistence\FileTokenPersistence;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
@@ -80,6 +81,7 @@ class HttpFactory implements AuthProviderInterface
         $stack = HandlerStack::create();
         $grantType = new NullGrantType();
         $oAuth2 = new OAuth2Middleware($grantType);
+        $oAuth2->setAccessTokenSigner(new BearerAuth());
         $stack->push($oAuth2);
 
         return new Client([
