@@ -16,9 +16,10 @@ namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
-use kamermans\OAuth2\GrantType\ClientCredentials;
+use kamermans\OAuth2\GrantType\NullGrantType;
 use kamermans\OAuth2\OAuth2Middleware;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\OAuth2\Persistence\FileTokenPersistence;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
@@ -77,35 +78,16 @@ class HttpFactory implements AuthProviderInterface
     private function buildClient(CredentialsInterface $credentials)
     {
         $stack = HandlerStack::create();
-        $stack->push($this->createOAuth2($credentials));
+        $grantType = new NullGrantType();
+        $oAuth2 = new OAuth2Middleware($grantType);
+        $stack->push($oAuth2);
 
         return new Client([
+            'base_uri' => $credentials->getBaseUri(),
+            'timeout'  => 0,
             'handler'  => $stack,
             'auth'     => 'oauth'
         ]);
-    }
-
-    /**
-     * @param CredentialsInterface $credentials
-     *
-     * @return OAuth2Middleware
-     */
-    private function createOAuth2(CredentialsInterface $credentials)
-    {
-        // Authorization client - this is used to request OAuth access tokens
-        $authClient = new Client([
-            // URL for access_token request
-            'base_uri' => $credentials->getAuthorizationUrl(),
-        ]);
-
-        $config = [
-            "client_id" => $credentials->getClientId(),
-        ];
-
-        $grantType = new ClientCredentials($authClient, $config);
-        $oAuth2 = new OAuth2Middleware($grantType);
-
-        return $oAuth2;
     }
 
     /**
@@ -115,6 +97,6 @@ class HttpFactory implements AuthProviderInterface
      */
     private function credentialsAreConfigured(CredentialsInterface $credentials)
     {
-        return !empty($credentials->getAuthorizationUrl()) && !empty($credentials->getClientId());
+        return $credentials->getAuthorizationUrl() && $credentials->getClientId() && $credentials->getAccessToken() && $credentials->getBaseUri();
     }
 }

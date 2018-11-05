@@ -21,32 +21,22 @@ interface CredentialsInterface
     public function getAuthorizationUrl(): string;
 
     /**
-     * @return null|string
+     * @return string
+     */
+    public function getAuthCallbackUrl(): string;
+
+    /**
+     * @return string
      */
     public function getClientId(): string;
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getAuthCallbackUrl(): ?string;
+    public function getAccessToken(): string;
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getConsumerKey(): ?string;
-
-    /**
-     * @return null|string
-     */
-    public function getConsumerSecret(): ?string;
-
-    /**
-     * @return null|string
-     */
-    public function getToken(): ?string;
-
-    /**
-     * @return null|string
-     */
-    public function getTokenSecret(): ?string;
+    public function getBaseUri(): string;
 }
