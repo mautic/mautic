@@ -554,7 +554,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $firstGroup    = reset($grouped);
         $executionDate = $firstGroup->getExecutionDate();
 
-        $this->assertEquals('2018-10-18 10:00', $executionDate->format('Y-m-d H:i'));
+        $this->assertEquals('2018-10-19 10:00', $executionDate->format('Y-m-d H:i'));
     }
 
     public function testContactsAreGrouped()
