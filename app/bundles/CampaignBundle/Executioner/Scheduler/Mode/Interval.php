@@ -331,7 +331,13 @@ class Interval implements ScheduleModeInterface
         $testStopDateTime = clone $groupExecutionDate;
         $testStopDateTime->setTime($endTime->format('H'), $endTime->format('i'));
 
-        if ($groupExecutionDate < $testStartDateTime || $groupExecutionDate > $testStopDateTime) {
+        if ($groupExecutionDate < $testStartDateTime) {
+            // Too early so set it to the start date
+            return $testStartDateTime;
+        }
+
+        if ($groupExecutionDate > $testStopDateTime) {
+            // Too late so try again tomorrow
             $groupExecutionDate->modify('+1 day')->setTime($startTime->format('H'), $startTime->format('i'));
         }
 
