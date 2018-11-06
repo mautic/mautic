@@ -128,6 +128,11 @@ class Stat
      */
     private $replies;
 
+    /**
+     * @var string
+     */
+    private $generatedSentDate;
+
     public function __construct()
     {
         $this->replies = new ArrayCollection();
@@ -146,7 +151,8 @@ class Stat
             ->addIndex(['tracking_hash'], 'stat_email_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_email_source_search')
             ->addIndex(['date_sent'], 'email_date_sent')
-            ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead');
+            ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead')
+            ->addIndex(['email_id', 'generated_sent_date'], 'email_id_date_string');
 
         $builder->addBigIntIdField();
 
@@ -226,6 +232,8 @@ class Stat
             ->fetchExtraLazy()
             ->cascadeAll()
             ->build();
+
+        $builder->addGeneratedField('generatedSentDate', 'CHAR(10)', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))', 'generated_sent_date');
     }
 
     /**
