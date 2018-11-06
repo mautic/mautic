@@ -29,4 +29,19 @@ interface MappedFieldInfoInterface
      * @return bool
      */
     public function isMandatory(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isBidirectionalSyncEnabled(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isToIntegrationSyncEnabled(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isToMauticSyncEnabled(): bool;
 }
