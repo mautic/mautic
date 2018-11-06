@@ -161,9 +161,6 @@ return [
             'mautic.integrations.auth_provider.oauth1atwolegged' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory::class,
             ],
-            'mautic.integrations.auth_provider.oauth2threelegged.factory.http' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory::class,
-            ],
         ],
         'repositories' => [
             'mautic.integrations.repository.field_change' => [
