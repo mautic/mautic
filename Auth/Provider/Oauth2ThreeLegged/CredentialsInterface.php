@@ -29,9 +29,4 @@ interface CredentialsInterface
      * @return string
      */
     public function getAccessToken(): string;
-
-    /**
-     * @return string
-     */
-    public function getBaseUri(): string;
 }
