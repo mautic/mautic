@@ -18,11 +18,6 @@ interface CredentialsInterface
     /**
      * @return string
      */
-    public function getAuthorizationUrl(): string;
-
-    /**
-     * @return string
-     */
     public function getAuthCallbackUrl(): string;
 
     /**
