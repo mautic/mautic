@@ -184,6 +184,8 @@ return [
         'api_oauth2_refresh_token_lifetime' => 14,
         'api_batch_max_limit'               => 200,
         'api_rate_limiter_limit'            => 0,
-        'api_rate_limiter_cache_type'       => 'file_system',
+        'api_rate_limiter_cache'            => [
+          'type'      => 'file_system',
+        ],
     ],
 ];

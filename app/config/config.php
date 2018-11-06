@@ -346,11 +346,10 @@ $container->loadFromExtension('jms_serializer', [
 
 $container->loadFromExtension('doctrine_cache', [
   'providers' => [
-    'api_rate_limiter_cache' => [
-      'type'      => '%mautic.api_rate_limiter_cache_type%',
-    ],
+    'api_rate_limiter_cache' => '%mautic.api_rate_limiter_cache%',
   ],
 ]);
+
 $api_rate_limiter_limit = $container->getParameter('mautic.api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
   'enabled'           => $api_rate_limiter_limit == 0 ? false : true,
