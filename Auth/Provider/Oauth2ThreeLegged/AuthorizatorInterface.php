@@ -21,6 +21,13 @@ interface AuthorizatorInterface
     public function isAuthorized(): bool;
 
     /**
+     * @return string
+     *
+     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
+     */
+    public function getAccessToken(): string;
+
+    /**
      * @param CredentialsInterface $credentials
      *
      * @return string
