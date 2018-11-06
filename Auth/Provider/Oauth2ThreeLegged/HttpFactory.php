@@ -20,7 +20,6 @@ use kamermans\OAuth2\GrantType\NullGrantType;
 use kamermans\OAuth2\OAuth2Middleware;
 use kamermans\OAuth2\Signer\AccessToken\BearerAuth;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\OAuth2\Persistence\FileTokenPersistence;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
@@ -30,7 +29,7 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
  */
 class HttpFactory implements AuthProviderInterface
 {
-    const NAME = 'oauth3a_three_legged';
+    const NAME = 'oauth2_three_legged';
 
     /**
      * Cache of initialized clients.
