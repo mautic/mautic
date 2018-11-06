@@ -15,8 +15,18 @@ namespace MauticPlugin\IntegrationsBundle\Mapping;
 
 interface MappedFieldInfoInterface
 {
+    /**
+     * @return string
+     */
     public function getName(): string;
-    public function getFormType() :string;
+
+    /**
+     * @return string
+     */
     public function getLabel(): string;
+
+    /**
+     * @return bool
+     */
     public function isMandatory(): bool;
 }
