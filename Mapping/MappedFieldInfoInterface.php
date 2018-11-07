@@ -28,7 +28,7 @@ interface MappedFieldInfoInterface
     /**
      * @return bool
      */
-    public function isMandatory(): bool;
+    public function isRequired(): bool;
 
     /**
      * @return bool
