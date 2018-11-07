@@ -115,6 +115,12 @@ return [
                     'mautic.api.model.client',
                 ],
             ],
+            'mautic.api.rate_limit_generate_key.subscriber' => [
+              'class'     => 'Mautic\ApiBundle\EventListener\RateLimitGenerateKeySubscriber',
+              'arguments' => [
+                'mautic.helper.core_parameters',
+              ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.apiclients' => [
