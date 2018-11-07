@@ -60,7 +60,7 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
                 [
                     'label'        => $fieldInfo->getLabel(),
                     'mauticFields' => $options['mauticFields'],
-                    'required'     => $fieldInfo->isRequired(),
+                    'required'     => $fieldInfo->showAsRequired(),
                     'placeholder'  => $this->translator->trans('mautic.integration.sync_mautic_field'),
                     'object'       => $options['object'],
                     'integration'  => $options['integration'],
