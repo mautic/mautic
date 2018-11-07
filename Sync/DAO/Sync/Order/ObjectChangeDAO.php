@@ -127,7 +127,7 @@ class ObjectChangeDAO
     }
 
     /**
-     * @return int
+     * @return mixed
      */
     public function getObjectId()
     {
@@ -147,7 +147,7 @@ class ObjectChangeDAO
     /**
      * Returns the ID for the object in this system that is being synced to the other
      *
-     * @return mixed|null
+     * @return mixed
      */
     public function getMappedObjectId()
     {

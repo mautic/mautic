@@ -84,6 +84,11 @@ class OrderDAO
     private $objectCounter = 0;
 
     /**
+     * @var NotificationDAO[]
+     */
+    private $notifications = [];
+
+    /**
      * OrderDAO constructor.
      *
      * @param \DateTimeInterface $syncDateTime
@@ -250,6 +255,15 @@ class OrderDAO
     }
 
     /**
+     * @param ObjectChangeDAO $objectChangeDAO
+     * @param string          $message
+     */
+    public function noteObjectSyncIssue(ObjectChangeDAO $objectChangeDAO, string $message)
+    {
+        $this->notifications[] = new NotificationDAO($objectChangeDAO, $message);
+    }
+
+    /**
      * @return ObjectMapping[]
      */
     public function getObjectMappings(): array
@@ -279,6 +293,14 @@ class OrderDAO
     public function getRemappedObjects(): array
     {
         return $this->remappedObjects;
+    }
+
+    /**
+     * @return NotificationDAO[]
+     */
+    public function getNotifications()
+    {
+        return $this->notifications;
     }
 
     /**
