@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
@@ -237,6 +238,8 @@ class FormTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $dateHelper = $this->createMock(DateHelper::class);
+
         $leadModel->expects($this
             ->any())
             ->method('getCurrentLead')
@@ -350,7 +353,8 @@ class FormTestAbstract extends WebTestCase
             $uploadFieldValidatorMock,
             $formUploaderMock,
             $deviceTrackingService,
-            new FieldValueTransformer($this->container->get('router'))
+            new FieldValueTransformer($this->container->get('router')),
+            $dateHelper
         );
 
         $submissionModel->setDispatcher($dispatcher);
