@@ -33,6 +33,16 @@ interface MappedFieldInfoInterface
     /**
      * @return bool
      */
+    public function hasTooltip(): bool;
+
+    /**
+     * @return string
+     */
+    public function getTooltip(): string;
+
+    /**
+     * @return bool
+     */
     public function isBidirectionalSyncEnabled(): bool;
 
     /**
