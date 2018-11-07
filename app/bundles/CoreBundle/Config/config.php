@@ -873,6 +873,14 @@ return [
                     'mautic.schema.helper.column',
                 ],
             ],
+            'mautic.form.list.validator.circular' => [
+                'class'     => Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'request_stack',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
         ],
         'models' => [
             'mautic.core.model.auditlog' => [
@@ -917,8 +925,8 @@ return [
 
     'ip_lookup_services' => [
         'freegeoip' => [
-            'display_name' => 'Freegeoip.net',
-            'class'        => 'Mautic\CoreBundle\IpLookup\FreegeoipLookup',
+            'display_name' => 'Ipstack.com',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IpstackLookup',
         ],
         'geobytes' => [
             'display_name' => 'Geobytes',

@@ -131,6 +131,12 @@ class FieldModel extends FormModel
             'listable' => true,
             'object'   => 'lead',
         ],
+        'timezone' => [
+            'type'     => 'timezone',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+        ],
         'attribution_date' => [
             'type'     => 'datetime',
             'fixed'    => true,
@@ -297,15 +303,25 @@ class FieldModel extends FormModel
     protected $uniqueIdentifierFields = [];
 
     /**
+     * @var ListModel
+     */
+    private $leadListModel;
+
+    /**
      * FieldModel constructor.
      *
      * @param IndexSchemaHelper  $indexSchemaHelper
      * @param ColumnSchemaHelper $columnSchemaHelper
+     * @param ListModel          $leadListModel
      */
-    public function __construct(IndexSchemaHelper $indexSchemaHelper, ColumnSchemaHelper $columnSchemaHelper)
-    {
+    public function __construct(
+        IndexSchemaHelper $indexSchemaHelper,
+        ColumnSchemaHelper $columnSchemaHelper,
+        ListModel $leadListModel
+    ) {
         $this->indexSchemaHelper  = $indexSchemaHelper;
         $this->columnSchemaHelper = $columnSchemaHelper;
+        $this->leadListModel      = $leadListModel;
     }
 
     /**
@@ -565,6 +581,32 @@ class FieldModel extends FormModel
         }
 
         return $entities;
+    }
+
+    /**
+     * Is field used in segment filter?
+     *
+     * @param LeadField $field
+     *
+     * @return bool
+     */
+    public function isUsedField(LeadField $field)
+    {
+        return $this->leadListModel->isFieldUsed($field);
+    }
+
+    /**
+     * Filter used field ids.
+     *
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function filterUsedFieldIds(array $ids)
+    {
+        return array_filter($ids, function ($id) {
+            return $this->isUsedField($this->getEntity($id)) === false;
+        });
     }
 
     /**

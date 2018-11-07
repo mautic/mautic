@@ -14,6 +14,7 @@ namespace Mautic\FormBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -258,7 +259,7 @@ class FormApiController extends CommonApiController
      *
      * @param $entity
      *
-     * @return Form
+     * @return FormInterface
      */
     protected function createActionEntityForm($entity)
     {
@@ -278,7 +279,7 @@ class FormApiController extends CommonApiController
      *
      * @param $entity
      *
-     * @return Form
+     * @return FormInterface
      */
     protected function createFieldEntityForm($entity)
     {

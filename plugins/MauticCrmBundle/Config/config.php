@@ -76,6 +76,7 @@ return [
             'mautic.integration.sugarcrm' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration::class,
                 'arguments' => [
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.integration.vtiger' => [

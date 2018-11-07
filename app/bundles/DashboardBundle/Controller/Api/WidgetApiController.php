@@ -102,7 +102,7 @@ class WidgetApiController extends CommonApiController
         $widget->setType($type);
         $widget->setHeight($widgetHeight);
 
-        if ($cacheTimeout === null) {
+        if ($cacheTimeout !== null) {
             $widget->setCacheTimeout($cacheTimeout);
         }
 

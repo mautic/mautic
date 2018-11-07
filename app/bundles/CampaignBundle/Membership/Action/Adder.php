@@ -50,8 +50,6 @@ class Adder
      * @param          $isManualAction
      *
      * @return CampaignMember
-     *
-     * @throws ContactCannotBeAddedToCampaignException
      */
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction)
     {
@@ -60,11 +58,6 @@ class Adder
         // Start the new rotation at 2
         $rotation = 1;
         if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
-            if (!$campaign->allowRestart()) {
-                // This contact has already been in the campaign at some point
-                throw new ContactCannotBeAddedToCampaignException();
-            }
-
             $rotation = 2;
         }
 

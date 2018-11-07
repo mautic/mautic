@@ -53,6 +53,11 @@ class IpLookupHelper
     protected $doNotTrackInternalIps;
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * IpLookupHelper constructor.
      *
      * @param RequestStack         $requestStack
@@ -73,6 +78,7 @@ class IpLookupHelper
         $this->doNotTrackBots        = $coreParametersHelper->getParameter('mautic.do_not_track_bots');
         $this->doNotTrackInternalIps = $coreParametersHelper->getParameter('mautic.do_not_track_internal_ips');
         $this->trackPrivateIPRanges  = $coreParametersHelper->getParameter('mautic.track_private_ip_ranges');
+        $this->coreParametersHelper  = $coreParametersHelper;
     }
 
     /**
@@ -140,6 +146,9 @@ class IpLookupHelper
 
             if ($ipAddress === null) {
                 $ipAddress = new IpAddress();
+                if ($this->coreParametersHelper->getParameter('anonymize_ip')) {
+                    $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
+                }
                 $ipAddress->setIpAddress($ip);
             }
 
