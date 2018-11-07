@@ -45,10 +45,17 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $entity = null;
         }
 
-        if ($entity != null) {
-            $fieldValues = $this->getFieldValues($id, true, 'company');
-            $entity->setFields($fieldValues);
+        if (null === $entity) {
+            return $entity;
         }
+
+        if ($entity->getFields()) {
+            // Pulled from Doctrine memory so don't make unnecessary queries as this has already happened
+            return $entity;
+        }
+
+        $fieldValues = $this->getFieldValues($id, true, 'company');
+        $entity->setFields($fieldValues);
 
         return $entity;
     }
@@ -411,7 +418,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         case
         when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, " <small>", companycity,", ", companycountry, "</small>")
         when (comp.companycountry is not null) then concat(comp.companyname, " <small>", comp.companycountry, "</small>")
-        when (comp.companycity is not null) then concat(comp.companycity, " <small>", comp.companycity, "</small>")
+        when (comp.companycity is not null) then concat(comp.companyname, " <small>", comp.companycity, "</small>")
         else comp.companyname
         end
         as label')

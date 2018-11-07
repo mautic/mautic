@@ -58,6 +58,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     protected $emailValidator;
 
     /**
+     * @var array
+     */
+    private $fields = [];
+
+    /**
      * CompanyModel constructor.
      *
      * @param FieldModel     $leadFieldModel
@@ -244,17 +249,16 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         if (empty($fieldValues)) {
             // Lead is new or they haven't been populated so let's build the fields now
-            static $fields;
-            if (empty($fields)) {
-                $fields = $this->leadFieldModel->getEntities(
+            if (empty($this->fields)) {
+                $this->fields = $this->leadFieldModel->getEntities(
                     [
                         'filter'         => ['object' => 'company'],
                         'hydration_mode' => 'HYDRATE_ARRAY',
                     ]
                 );
-                $fields = $this->organizeFieldsByGroup($fields);
+                $this->fields = $this->organizeFieldsByGroup($this->fields);
             }
-            $fieldValues = $fields;
+            $fieldValues = $this->fields;
         }
 
         //update existing values
@@ -833,7 +837,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
                 // Skip if the value is in the CSV row
                 continue;
-            } elseif ($entityField['defaultValue']) {
+            } elseif ($company->isNew() && $entityField['defaultValue']) {
                 // Fill in the default value if any
                 $fieldData[$entityField['alias']] = ('multiselect' === $entityField['type']) ? [$entityField['defaultValue']] : $entityField['defaultValue'];
             }

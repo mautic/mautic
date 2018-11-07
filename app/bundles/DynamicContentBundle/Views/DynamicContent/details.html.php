@@ -170,6 +170,8 @@ if (!$isEmbedded) {
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">
@@ -190,7 +192,12 @@ if (!$isEmbedded) {
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active active bdr-w-0" id="clicks-container">
-                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', ['trackables' => $trackables]); ?>
+                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', [
+                    'trackables' => $trackables,
+                    'entity'     => $entity,
+                    'channel'    => 'dynamicContent',
+                ]); ?>
+
             </div>
             <!-- #translation-container -->
             <?php if ($showTranslations): ?>
