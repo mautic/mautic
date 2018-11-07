@@ -735,9 +735,7 @@ Mautic.convertDynamicContentFilterInput = function(el, jQueryVariant) {
         }
 
         // Destroy the chosen and recreate
-        if (mQuery(filterId + '_chosen').length) {
-            filterEl.chosen('destroy');
-        }
+        Mautic.destroyChosen(filterEl);
 
         filterEl.attr('data-placeholder', placeholder);
 
