@@ -790,7 +790,7 @@ class PageModel extends FormModel
      */
     public function getHitQuery(Request $request, $page = null)
     {
-        $get = $request->query->all();
+        $get  = $request->query->all();
         $post = $request->request->all();
 
         $query = \array_merge($get, $post);
