@@ -42,7 +42,7 @@ class CleanupMaintenanceCommand extends ContainerAwareCommand
                         365
                     ),
                     new InputOption('dry-run', 'r', InputOption::VALUE_NONE, 'Do a dry run without actually deleting anything.'),
-                    new InputOption('gdpr', 'g', InputOption::VALUE_NONE, 'Delete data to fullfil GDPR requiement.'),
+                    new InputOption('gdpr', 'g', InputOption::VALUE_NONE, 'Delete data to fullfil GDPR requirement.'),
                 ]
             )
             ->setHelp(
