@@ -181,8 +181,10 @@ class FormModel extends CommonFormModel
 
         $entity = parent::getEntity($id);
 
-        foreach ($entity->getFields() as $field) {
-            $this->addLeadFieldOptions($field);
+        if ($entity && $entity->getFields()) {
+            foreach ($entity->getFields() as $field) {
+                $this->addLeadFieldOptions($field);
+            }
         }
 
         return $entity;
