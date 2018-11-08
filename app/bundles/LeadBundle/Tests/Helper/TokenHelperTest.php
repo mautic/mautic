@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\TokenHelper;
-use ReflectionProperty;
 
 class TokenHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,18 +26,6 @@ class TokenHelperTest extends \PHPUnit_Framework_TestCase
             ],
         ],
     ];
-
-    public function setUp()
-    {
-        $reflectionProperty = new ReflectionProperty(TokenHelper::class, 'parameters');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue([
-            'date_format_dateonly' => 'F j, Y',
-            'date_format_timeonly' => 'g:i a',
-        ]);
-
-        parent::setUp();
-    }
 
     public function testContactTokensAreReplaced()
     {

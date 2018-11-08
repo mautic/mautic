@@ -18,14 +18,7 @@ class OwnerTest extends PipedriveTest
 
     public function testAddPipedriveOwner()
     {
-        $this->installPipedriveIntegration(
-            true,
-            $this->features,
-            [
-                'url'   => '',
-                'token' => 'token',
-            ]
-        );
+        $this->installPipedriveIntegration(true, $this->features);
 
         $data = $this->getData('user.added');
 
@@ -44,14 +37,7 @@ class OwnerTest extends PipedriveTest
 
     public function testAddPipedriveOwnerViaUpdate()
     {
-        $this->installPipedriveIntegration(
-            true,
-            $this->features,
-            [
-                'url'   => '',
-                'token' => 'token',
-            ]
-        );
+        $this->installPipedriveIntegration(true, $this->features);
         $json = $this->getData('user.updated');
 
         $this->makeRequest('POST', $json);
@@ -69,14 +55,7 @@ class OwnerTest extends PipedriveTest
 
     public function testUpdatePipedriveOwner()
     {
-        $this->installPipedriveIntegration(
-            true,
-            $this->features,
-            [
-                'url'   => '',
-                'token' => 'token',
-            ]
-        );
+        $this->installPipedriveIntegration(true, $this->features);
         $json = $this->getData('user.updated');
         $data = json_decode($json, true);
 
