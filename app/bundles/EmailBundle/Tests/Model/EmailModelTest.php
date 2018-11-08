@@ -1083,7 +1083,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
                     'lastname'  => 'someone',
                 ],
             ],
-            ['email_type' => 'marketing']
+            ['email_type' => 'transactional']
         );
         $this->assertTrue(count($result) === 0, print_r($result, true));
     }
