@@ -125,6 +125,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $publishDown;
 
     /**
+     * @var bool
+     */
+    private $publicPreview = 1;
+
+    /**
      * @var int
      */
     private $readCount = 0;
@@ -214,10 +219,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function __construct()
     {
-        $this->lists            = new ArrayCollection();
-        $this->stats            = new ArrayCollection();
-        $this->variantChildren  = new ArrayCollection();
-        $this->assetAttachments = new ArrayCollection();
+        $this->lists               = new ArrayCollection();
+        $this->stats               = new ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
+        $this->variantChildren     = new ArrayCollection();
+        $this->assetAttachments    = new ArrayCollection();
     }
 
     /**
@@ -295,6 +301,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->build();
 
         $builder->addField('headers', 'json_array');
+
+        $builder->addNullableField('publicPreview', Type::BOOLEAN, 'public_preview');
     }
 
     /**
@@ -1113,5 +1121,34 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         } else {
             return 0;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPublicPreview()
+    {
+        return $this->publicPreview;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPublicPreview()
+    {
+        return $this->publicPreview;
+    }
+
+    /**
+     * @param bool $publicPreview
+     *
+     * @return $this
+     */
+    public function setPublicPreview($publicPreview)
+    {
+        $this->isChanged('publicPreview', $publicPreview);
+        $this->publicPreview = $publicPreview;
+
+        return $this;
     }
 }

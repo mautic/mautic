@@ -24,6 +24,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Class AjaxController.
@@ -241,10 +242,11 @@ class AjaxController extends CommonController
      */
     protected function togglePublishStatusAction(Request $request)
     {
-        $dataArray = ['success' => 0];
-        $name      = InputHelper::clean($request->request->get('model'));
-        $id        = InputHelper::int($request->request->get('id'));
-        $model     = $this->getModel($name);
+        $dataArray      = ['success' => 0];
+        $name           = InputHelper::clean($request->request->get('model'));
+        $id             = InputHelper::int($request->request->get('id'));
+        $customToggle   = InputHelper::clean($request->request->get('customToggle'));
+        $model          = $this->getModel($name);
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
@@ -279,9 +281,14 @@ class AjaxController extends CommonController
             if ($hasPermission) {
                 $dataArray['success'] = 1;
                 //toggle permission state
-                $refresh = $model->togglePublishStatus($entity);
-
-                if ($refresh) {
+                if ($customToggle) {
+                    $accessor = PropertyAccess::createPropertyAccessor();
+                    $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
+                    $model->getRepository()->saveEntity($entity);
+                } else {
+                    $refresh = $model->togglePublishStatus($entity);
+                }
+                if (!empty($refresh)) {
                     $dataArray['reload'] = 1;
                 } else {
                     //get updated icon HTML

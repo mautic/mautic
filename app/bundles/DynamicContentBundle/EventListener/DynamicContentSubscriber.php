@@ -228,7 +228,11 @@ class DynamicContentSubscriber extends CommonSubscriber
             return;
         }
 
-        $content   = $event->getContent();
+        $content = $event->getContent();
+        if (empty($content)) {
+            return;
+        }
+
         $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
         $leadArray = [];
         if ($lead instanceof Lead) {

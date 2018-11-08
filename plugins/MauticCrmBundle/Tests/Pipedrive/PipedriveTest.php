@@ -34,7 +34,12 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     public static function getData($type)
     {
-        return file_get_contents(dirname(__FILE__).sprintf('/Data/%s.json', $type));
+        $filename = dirname(__FILE__).sprintf('/Data/%s.json', $type);
+        if (file_exists($filename)) {
+            return file_get_contents($filename);
+        }
+
+        return null;
     }
 
     protected function makeRequest($method, $json, $addCredential = true)
