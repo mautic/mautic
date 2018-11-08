@@ -867,8 +867,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $mockCompanyModel->method('getEntity')
             ->willReturn(new Company());
-        $mockCompanyModel->method('getEntities')
-            ->willReturn([]);
         $mockFieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
             ->getMock();
