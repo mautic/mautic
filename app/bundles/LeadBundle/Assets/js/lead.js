@@ -939,11 +939,10 @@ Mautic.toggleLeadList = function(toggleId, leadId, listId) {
 };
 
 Mautic.togglePreferredChannel = function(channel) {
-    if (channel == 'all') {
-        var status = mQuery('#lead_contact_frequency_rules_subscribed_channels_0')[0].checked;  //"select all" change
-
-       // "select all" checked status
-        mQuery('#channels input:checkbox').each(function(){ //iterate all listed checkbox items
+    if (channel === 'all') {
+        var channelsForm = mQuery('form[name="contact_channels"]');
+        var status = channelsForm.find('#contact_channels_subscribed_channels_0:checked').length;
+        channelsForm.find('tbody input:checkbox').each(function() {
             if (this.checked != status) {
                 this.checked = status;
                 Mautic.setPreferredChannel(this.value);
@@ -1299,7 +1298,8 @@ Mautic.createLeadUtmTag = function (el) {
 
 Mautic.leadBatchSubmit = function() {
     if (Mautic.batchActionPrecheck()) {
-        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length || mQuery('#lead_batch_owner_addowner').length) {
+
+        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length || mQuery('#lead_batch_owner_addowner').length || mQuery('#contact_channels_ids').length) {
             var ids = Mautic.getCheckedListIds(false, true);
 
             if (mQuery('#lead_batch_ids').length) {
@@ -1308,8 +1308,10 @@ Mautic.leadBatchSubmit = function() {
                 mQuery('#lead_batch_dnc_ids').val(ids);
             } else if (mQuery('#lead_batch_stage_addstage').length) {
                 mQuery('#lead_batch_stage_ids').val(ids);
-            }else if (mQuery('#lead_batch_owner_addowner').length) {
+            } else if (mQuery('#lead_batch_owner_addowner').length) {
                 mQuery('#lead_batch_owner_ids').val(ids);
+            } else if (mQuery('#contact_channels_ids').length) {
+                mQuery('#contact_channels_ids').val(ids);
             }
 
             return true;

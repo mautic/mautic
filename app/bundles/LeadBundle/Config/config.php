@@ -27,6 +27,14 @@ return [
                     'leadId'      => '\d+',
                 ],
             ],
+            'mautic_segment_batch_contact_set' => [
+                'path'       => '/segments/batch/contact/set',
+                'controller' => 'MauticLeadBundle:BatchSegment:set',
+            ],
+            'mautic_segment_batch_contact_view' => [
+                'path'       => '/segments/batch/contact/view',
+                'controller' => 'MauticLeadBundle:BatchSegment:index',
+            ],
             'mautic_segment_index' => [
                 'path'       => '/segments/{page}',
                 'controller' => 'MauticLeadBundle:List:index',
@@ -623,6 +631,12 @@ return [
                 ],
                 'alias' => 'lead_contact_frequency_rules',
             ],
+            'mautic.form.type.contact_channels' => [
+                'class'     => \Mautic\LeadBundle\Form\Type\ContactChannelsType::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'mautic.form.type.campaignevent_lead_field_value' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
                 'arguments' => [
@@ -803,6 +817,13 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\Lead::class,
+                ],
+            ],
+            'mautic.lead.repository.frequency_rule' => [
+                'class'     => \Mautic\LeadBundle\Entity\FrequencyRuleRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\FrequencyRule::class,
                 ],
             ],
             'mautic.lead.repository.lead_event_log' => [
@@ -1084,6 +1105,12 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.dnc',
+                ],
+            ],
+            'mautic.lead.model.segment.action' => [
+                'class'     => \Mautic\LeadBundle\Model\SegmentActionModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
                 ],
             ],
             'mautic.lead.factory.device_detector_factory' => [
