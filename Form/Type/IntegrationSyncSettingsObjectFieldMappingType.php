@@ -54,18 +54,27 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
                 throw new InvalidFormOptionException('integrationFields must contain an instance of MappedFieldInfoInterface');
             }
 
+            $attr = [
+                'label'        => $fieldInfo->getLabel(),
+                'mauticFields' => $options['mauticFields'],
+                'required'     => $fieldInfo->showAsRequired(),
+                'placeholder'  => $this->translator->trans('mautic.integration.sync_mautic_field'),
+                'object'       => $options['object'],
+                'integration'  => $options['integration'],
+                'field'        => $fieldInfo,
+            ];
+
+            if ($fieldInfo->hasTooltip()) {
+                $attr['attr'] = [
+                    'tooltip' => $fieldInfo->getTooltip(),
+                    'class'   => 'form-control',
+                ];
+            }
+
             $builder->add(
                 $fieldName,
                 IntegrationSyncSettingsObjectFieldType::class,
-                [
-                    'label'        => $fieldInfo->getLabel(),
-                    'mauticFields' => $options['mauticFields'],
-                    'required'     => $fieldInfo->showAsRequired(),
-                    'placeholder'  => $this->translator->trans('mautic.integration.sync_mautic_field'),
-                    'object'       => $options['object'],
-                    'integration'  => $options['integration'],
-                    'field'        => $fieldInfo,
-                ]
+                $attr
             );
         }
 
