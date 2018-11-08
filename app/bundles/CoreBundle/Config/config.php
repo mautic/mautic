@@ -813,7 +813,6 @@ return [
             ],
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
-            'monolog.handler.stream.class'    => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
 
             // Form extensions
             'mautic.form.extension.custom' => [
