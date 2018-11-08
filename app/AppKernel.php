@@ -92,12 +92,12 @@ class AppKernel extends Kernel
                 $base   = $request->getBaseUrl();
                 $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
-                if ((strpos(strtolower($_SERVER['SERVER_SOFTWARE']), 'apache') === false
+                if (stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache') === false
                     || !file_exists(__DIR__.'../.htaccess')
                     && strpos(
                         $base,
                         'index'
-                    ) === false)
+                    ) === false
                 ) {
                     $prefix .= '/index.php';
                 }
@@ -374,7 +374,7 @@ class AppKernel extends Kernel
     {
         $parameters = $this->getLocalParams();
         if (isset($parameters['cache_path'])) {
-            $envFolder = (strpos($parameters['cache_path'], -1) != '/') ? '/'.$this->environment : $this->environment;
+            $envFolder = (substr($parameters['cache_path'], -1) != '/') ? '/'.$this->environment : $this->environment;
 
             return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['cache_path'].$envFolder);
         } else {
