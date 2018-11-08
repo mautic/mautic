@@ -62,7 +62,7 @@ class FormModelTest extends FormTestAbstract
 
         $fields->add($formField);
 
-        $formEntity->expects($this->once())
+        $formEntity->expects($this->exactly(2))
             ->method('getFields')
             ->willReturn($fields);
 
@@ -91,7 +91,7 @@ class FormModelTest extends FormTestAbstract
 
         $fields->add($formField);
 
-        $formEntity->expects($this->once())
+        $formEntity->expects($this->exactly(2))
             ->method('getFields')
             ->willReturn($fields);
 
@@ -118,7 +118,7 @@ class FormModelTest extends FormTestAbstract
 
         $fields->add($formField);
 
-        $formEntity->expects($this->once())
+        $formEntity->expects($this->exactly(2))
             ->method('getFields')
             ->willReturn($fields);
 
@@ -150,7 +150,7 @@ class FormModelTest extends FormTestAbstract
         $contactField->setType('boolean');
         $contactField->setProperties($options);
 
-        $formEntity->expects($this->once())
+        $formEntity->expects($this->exactly(2))
             ->method('getFields')
             ->willReturn($fields);
 
@@ -224,7 +224,7 @@ class FormModelTest extends FormTestAbstract
 
         $fields->add($formField);
 
-        $formEntity->expects($this->once())
+        $formEntity->expects($this->exactly(2))
             ->method('getFields')
             ->willReturn($fields);
 
@@ -258,7 +258,7 @@ class FormModelTest extends FormTestAbstract
         $contactField = new LeadField();
         $contactField->setType($type);
 
-        $formEntity->expects($this->once())
+        $formEntity->expects($this->exactly(2))
             ->method('getFields')
             ->willReturn($fields);
 
