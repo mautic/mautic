@@ -171,10 +171,11 @@ class PublicController extends CommonFormController
             if ($lead) {
                 // Set the lead as current lead
                 $leadModel->setCurrentLead($lead);
-            }
-            // Set lead lang
-            if ($lead->getPreferredLocale()) {
-                $translator->setLocale($lead->getPreferredLocale());
+
+                // Set lead lang
+                if ($lead->getPreferredLocale()) {
+                    $translator->setLocale($lead->getPreferredLocale());
+                }
             }
 
             if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {
@@ -428,7 +429,7 @@ class PublicController extends CommonFormController
         }
 
         if (
-            ($this->get('mautic.security')->isAnonymous() && !$emailEntity->isPublished())
+            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->isPublished() || !$emailEntity->isPublicPreview()))
             || (!$this->get('mautic.security')->isAnonymous()
                 && !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',

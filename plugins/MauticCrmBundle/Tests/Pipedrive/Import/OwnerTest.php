@@ -16,9 +16,42 @@ class OwnerTest extends PipedriveTest
         ],
     ];
 
+    public function testAddPipedriveOwner()
+    {
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => '',
+                'token' => 'token',
+            ]
+        );
+
+        $data = $this->getData('user.added');
+
+        $this->makeRequest('POST', $data);
+
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+        $po           = $this->em->getRepository(PipedriveOwner::class)->find(1);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertEquals($responseData['status'], 'ok');
+        $this->assertEquals($po->getEmail(), 'test_user@test.com');
+        $this->assertEquals($po->getOwnerId(), 2540581);
+        $this->assertEquals(count($this->em->getRepository(PipedriveOwner::class)->findAll()), 1);
+    }
+
     public function testAddPipedriveOwnerViaUpdate()
     {
-        $this->installPipedriveIntegration(true, $this->features);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => '',
+                'token' => 'token',
+            ]
+        );
         $json = $this->getData('user.updated');
 
         $this->makeRequest('POST', $json);
@@ -36,7 +69,14 @@ class OwnerTest extends PipedriveTest
 
     public function testUpdatePipedriveOwner()
     {
-        $this->installPipedriveIntegration(true, $this->features);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => '',
+                'token' => 'token',
+            ]
+        );
         $json = $this->getData('user.updated');
         $data = json_decode($json, true);
 

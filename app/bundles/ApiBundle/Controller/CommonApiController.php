@@ -19,6 +19,7 @@ use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -1101,6 +1102,8 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function processForm($entity, $parameters = null, $method = 'PUT')
     {
+        $categoryId = null;
+
         if ($parameters === null) {
             //get from request
             $parameters = $this->request->request->all();
@@ -1154,11 +1157,18 @@ class CommonApiController extends FOSRestController implements MauticController
             return $submitParams;
         }
 
+        // Remove category from the payload because it will cause form validation error.
+        if (isset($submitParams['category'])) {
+            $categoryId = (int) $submitParams['category'];
+            unset($submitParams['category']);
+        }
+
         $this->prepareParametersFromRequest($form, $submitParams, $entity, $this->dataInputMasks);
 
         $form->submit($submitParams, 'PATCH' !== $method);
 
         if ($form->isValid()) {
+            $this->setCategory($entity, $categoryId);
             $preSaveError = $this->preSaveEntity($entity, $form, $submitParams, $action);
 
             if ($preSaveError instanceof Response) {
@@ -1259,6 +1269,25 @@ class CommonApiController extends FOSRestController implements MauticController
             } elseif (in_array($statement['expr'], ['andX', 'orX'])) {
                 $this->sanitizeWhereClauseArrayFromRequest($statement['val']);
             }
+        }
+    }
+
+    /**
+     * @param object $entity
+     * @param int    $categoryId
+     *
+     * @throws \UnexpectedValueException
+     */
+    protected function setCategory($entity, $categoryId)
+    {
+        if (!empty($categoryId) && method_exists($entity, 'setCategory')) {
+            $category = $this->getDoctrine()->getManager()->find(Category::class, $categoryId);
+
+            if (null === $category) {
+                throw new \UnexpectedValueException("Category $categoryId does not exist");
+            }
+
+            $entity->setCategory($category);
         }
     }
 

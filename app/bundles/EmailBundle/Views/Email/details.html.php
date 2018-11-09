@@ -276,7 +276,7 @@ if (!$isEmbedded) {
                 ]); ?>
             </div>
 
-            <div class="tab-pane bdr-w-0" id="contacts-container">
+            <div class="tab-pane bdr-w-0 page-list" id="contacts-container">
                 <?php echo $contacts; ?>
             </div>
 
@@ -304,10 +304,11 @@ if (!$isEmbedded) {
         <!-- preview URL -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
-                <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.urlvariant'); ?></div>
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.preview.url'); ?></div>
             </div>
             <div class="panel-body pt-xs">
                 <div class="input-group">
+                    <div class="input-group-addon"><?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $email, 'model' => 'email', 'query' => 'customToggle=publicPreview']); ?></div>
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly
                            value="<?php echo $view->escape($previewUrl); ?>"/>
