@@ -64,9 +64,7 @@ if (!empty($fields['core']['email']['value'])) {
         'primary'   => true,
     ];
 }
-
 //View Contact Frequency button
-
 if ($edit) {
     $buttons[] = [
         'attr' => [
@@ -130,6 +128,7 @@ if (($view['security']->hasEntityAccess(
         'iconClass' => 'fa fa-user',
     ];
 }
+//Download button
 if ($view['security']->hasEntityAccess(
     $permissions['lead:leads:viewown'],
     $permissions['lead:leads:viewother'],
@@ -146,7 +145,6 @@ if ($view['security']->hasEntityAccess(
         ],
         'btnText'   => $view['translator']->trans('mautic.core.export'),
         'iconClass' => 'fa fa-download',
-        'priority'  => -1,
     ];
 }
 
