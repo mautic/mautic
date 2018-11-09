@@ -15,8 +15,6 @@ namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
 use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -27,21 +25,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class IntegrationSyncSettingsFieldMappingsType extends AbstractType
 {
     use FilteredFieldsTrait;
-
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
-
-    /**
-     * IntegrationSyncSettingsFieldMappingsType constructor.
-     *
-     * @param FieldHelper $fieldHelper
-     */
-    public function __construct(FieldHelper $fieldHelper)
-    {
-        $this->fieldHelper = $fieldHelper;
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -55,6 +38,7 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
             throw new InvalidFormOptionException('objects must be an array');
         }
 
+        /** @var ConfigFormSyncInterface $integrationObject */
         $integrationObject = $options['integrationObject'];
         if (!$integrationObject instanceof ConfigFormSyncInterface) {
             throw new InvalidFormOptionException('integrationObject must be an instance of ConfigFormSyncInterface');
@@ -76,12 +60,11 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                     [
                         'label'              => false,
                         'integrationFields'  => $this->getFilteredFields(),
-                        'mauticFields'       => $this->getMauticFields($integrationObject, $objectName),
                         'page'               => 1,
                         'keyword'            => null,
                         'totalFieldCount'    => $this->getTotalFieldCount(),
                         'object'             => $objectName,
-                        'integration'        => $integrationObject->getName(),
+                        'integrationObject'  => $integrationObject,
                         'error_bubbling'     => false,
                         'allow_extra_fields' => true,
                     ]
@@ -105,24 +88,5 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                 'objects',
             ]
         );
-    }
-
-    /**
-     * @param ConfigFormSyncInterface $integrationObject
-     * @param string                  $objectName
-     *
-     * @return array
-     * @throws ObjectNotFoundException
-     */
-    private function getMauticFields(ConfigFormSyncInterface $integrationObject, string $objectName): array
-    {
-        $mappedObjects = $integrationObject->getSyncMappedObjects();
-        if (!isset($mappedObjects[$objectName])) {
-            throw new ObjectNotFoundException($objectName);
-        }
-
-        $mauticObject = $mappedObjects[$objectName];
-
-        return $this->fieldHelper->getSyncFields($mauticObject);
     }
 }

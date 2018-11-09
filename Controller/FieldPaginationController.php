@@ -52,8 +52,6 @@ class FieldPaginationController extends CommonController
             return $this->notFound();
         }
 
-        $fieldModel = $this->get('mautic.lead.model.field');
-
         $keyword         = $request->get('keyword');
         $featureSettings = $integrationConfiguration->getFeatureSettings();
         $currentFields   = $this->getFields($featureSettings, $integration, $object);
@@ -66,12 +64,11 @@ class FieldPaginationController extends CommonController
             $currentFields,
             [
                 'integrationFields' => $this->getFilteredFields(),
-                'mauticFields'      => $fieldModel->getFieldList(false),
                 'page'              => $page,
                 'keyword'           => $keyword,
                 'totalFieldCount'   => $this->getTotalFieldCount(),
                 'object'            => $object,
-                'integration'       => $integration,
+                'integrationObject' => $integrationObject,
                 'csrf_protection'   => false,
             ]
         );
