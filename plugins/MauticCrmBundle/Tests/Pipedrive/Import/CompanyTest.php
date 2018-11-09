@@ -23,9 +23,6 @@ class CompanyTest extends PipedriveTest
             'companyFields' => [
                 'name'    => 'companyname',
                 'address' => 'companyaddress1',
-            ], [
-                'url'   => '',
-                'token' => 'token',
             ],
         ]);
 
@@ -43,14 +40,7 @@ class CompanyTest extends PipedriveTest
 
     public function testCreateCompany()
     {
-        $this->installPipedriveIntegration(
-            true,
-            $this->features,
-            [
-                'url'   => '',
-                'token' => 'token',
-            ]
-        );
+        $this->installPipedriveIntegration(true, $this->features);
         $data = $this->getData('organization.added');
 
         $this->makeRequest('POST', $data);
@@ -68,14 +58,7 @@ class CompanyTest extends PipedriveTest
 
     public function testCreateSameCompanyMultipleTimes()
     {
-        $this->installPipedriveIntegration(
-            true,
-            $this->features,
-            [
-                'url'   => '',
-                'token' => 'token',
-            ]
-        );
+        $this->installPipedriveIntegration(true, $this->features);
 
         $data = $this->getData('organization.added');
         $this->makeRequest('POST', $data);
@@ -87,14 +70,7 @@ class CompanyTest extends PipedriveTest
 
     public function testCreateCompanyViaUpdate()
     {
-        $this->installPipedriveIntegration(
-            true,
-            $this->features,
-            [
-                'url'   => '',
-                'token' => 'token',
-            ]
-        );
+        $this->installPipedriveIntegration(true, $this->features);
         $data = $this->getData('organization.updated');
 
         $this->makeRequest('POST', $data);
@@ -112,14 +88,7 @@ class CompanyTest extends PipedriveTest
 
     public function testCreateCompanyWithOwner()
     {
-        $this->installPipedriveIntegration(
-            true,
-            $this->features,
-            [
-                'url'   => '',
-                'token' => 'token',
-            ]
-        );
+        $this->installPipedriveIntegration(true, $this->features);
 
         $json = $this->getData('organization.added');
         $data = json_decode($json, true);
@@ -145,14 +114,7 @@ class CompanyTest extends PipedriveTest
 
     public function testUpdateCompanyOwner()
     {
-        $this->installPipedriveIntegration(
-            true,
-            $this->features,
-            [
-                'url'   => '',
-                'token' => 'token',
-            ]
-        );
+        $this->installPipedriveIntegration(true, $this->features);
 
         $json = $this->getData('organization.updated');
         $data = json_decode($json, true);
@@ -184,14 +146,7 @@ class CompanyTest extends PipedriveTest
 
     public function testUpdateCompany()
     {
-        $this->installPipedriveIntegration(
-            true,
-            $this->features,
-            [
-                'url'   => '',
-                'token' => 'token',
-            ]
-        );
+        $this->installPipedriveIntegration(true, $this->features);
         $company = $this->createCompany();
         $json    = $this->getData('organization.updated');
         $data    = json_decode($json, true);
@@ -212,14 +167,7 @@ class CompanyTest extends PipedriveTest
 
     public function testDeleteCompany()
     {
-        $this->installPipedriveIntegration(
-            true,
-            $this->features,
-            [
-                'url'   => '',
-                'token' => 'token',
-            ]
-        );
+        $this->installPipedriveIntegration(true, $this->features);
         $company = $this->createCompany();
         $json    = $this->getData('organization.deleted');
         $data    = json_decode($json, true);
