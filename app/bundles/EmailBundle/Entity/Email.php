@@ -219,11 +219,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function __construct()
     {
-        $this->lists               = new ArrayCollection();
-        $this->stats               = new ArrayCollection();
-        $this->translationChildren = new ArrayCollection();
-        $this->variantChildren     = new ArrayCollection();
-        $this->assetAttachments    = new ArrayCollection();
+        $this->lists            = new ArrayCollection();
+        $this->stats            = new ArrayCollection();
+        $this->variantChildren  = new ArrayCollection();
+        $this->assetAttachments = new ArrayCollection();
     }
 
     /**

@@ -235,7 +235,7 @@ class CheckStep implements StepInterface
         if (extension_loaded('xdebug')) {
             $cfgValue = ini_get('xdebug.max_nesting_level');
 
-            if ($cfgValue <= 100) {
+            if (!call_user_func(create_function('$cfgValue', 'return $cfgValue > 100;'), $cfgValue)) {
                 $messages[] = 'mautic.install.xdebug.nesting';
             }
         }
