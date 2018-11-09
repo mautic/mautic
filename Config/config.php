@@ -71,6 +71,13 @@ return [
                     'mautic.integrations.repository.object_mapping',
                 ],
             ],
+            'mautic.integrations.subscriber.contact_timeline_events' => [
+                'class' => \MauticPlugin\IntegrationsBundle\EventListener\TimelineSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_event_log',
+                    'translator',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.integrations.form.config.integration' => [

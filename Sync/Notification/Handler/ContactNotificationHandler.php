@@ -50,6 +50,16 @@ class ContactNotificationHandler implements HandlerInterface
     private $userNotificationHelper;
 
     /**
+     * @var string
+     */
+    private $integrationDisplayName;
+
+    /**
+     * @var string
+     */
+    private $objectDisplayName;
+
+    /**
      * ContactNotificationHandler constructor.
      *
      * @param Writer                        $writer
@@ -97,6 +107,9 @@ class ContactNotificationHandler implements HandlerInterface
      */
     public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName)
     {
+        $this->integrationDisplayName = $integrationDisplayName;
+        $this->objectDisplayName      = $objectDisplayName;
+
         $this->writer->writeAuditLogEntry(
             $notificationDAO->getIntegration(),
             $notificationDAO->getMauticObject(),
@@ -140,13 +153,9 @@ class ContactNotificationHandler implements HandlerInterface
             ->setAction('sync')
             ->setProperties(
                 [
-                    'object_description' => $this->translator->trans(
-                        'mautic.integration.sync.event',
-                        [
-                            '%integration%' => $integration,
-                            '%message%'     => $message,
-                        ]
-                    ),
+                    'message'     => $message,
+                    'integration' => $this->integrationDisplayName,
+                    'object'      => $this->objectDisplayName
                 ]
             );
 
