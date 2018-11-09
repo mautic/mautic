@@ -315,6 +315,7 @@ return [
                     'mautic.integrations.helper.sync_mapping',
                     'mautic.integrations.helper.sync_integrations',
                     'event_dispatcher',
+                    'mautic.integrations.sync.notifier',
                     'mautic.integrations.sync.integration_process',
                     'mautic.integrations.sync.internal_process',
                 ],
@@ -335,6 +336,81 @@ return [
                     'mautic.integrations.repository.object_mapping',
                     'mautic.integrations.helper.contact_object',
                     'mautic.integrations.helper.company_object',
+                ],
+            ],
+            'mautic.integrations.sync.notifier' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier::class,
+                'arguments' => [
+                    'mautic.integrations.sync.notification.handler_container',
+                    'mautic.integrations.helper.sync_integrations',
+                    'mautic.integrations.helper.config_integrations',
+                ],
+            ],
+            'mautic.integrations.sync.notification.writer' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Writer::class,
+                'arguments' => [
+                    'mautic.core.model.notification',
+                    'mautic.core.model.auditlog',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.integrations.sync.notification.handler_container' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer::class,
+            ],
+            'mautic.integrations.sync.notification.handler_company' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\CompanyNotificationHandler::class,
+                'arguments' => [
+                    'mautic.integrations.sync.notification.writer',
+                    'mautic.integrations.sync.notification.helper_user_notification',
+                    'mautic.integrations.sync.notification.helper_company',
+                ],
+                'tag' => 'mautic.sync.notification_handler',
+            ],
+            'mautic.integrations.sync.notification.handler_contact' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\ContactNotificationHandler::class,
+                'arguments' => [
+                    'mautic.integrations.sync.notification.writer',
+                    'mautic.lead.repository.lead_event_log',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'mautic.integrations.sync.notification.helper_user_summary_notification',
+                ],
+                'tag' => 'mautic.sync.notification_handler',
+            ],
+            'mautic.integrations.sync.notification.helper_company' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\CompanyHelper::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.integrations.sync.notification.helper_user' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserHelper::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.integrations.sync.notification.helper_route' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper::class,
+                'arguments' => [
+                    'router',
+                ],
+            ],
+            'mautic.integrations.sync.notification.helper_user_notification' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper::class,
+                'arguments' => [
+                    'mautic.integrations.sync.notification.writer',
+                    'mautic.integrations.sync.notification.helper_user',
+                    'mautic.integrations.sync.notification.helper_route',
+                    'translator',
+                ],
+            ],
+            'mautic.integrations.sync.notification.helper_user_summary_notification' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper::class,
+                'arguments' => [
+                    'mautic.integrations.sync.notification.writer',
+                    'mautic.integrations.sync.notification.helper_user',
+                    'mautic.integrations.sync.notification.helper_route',
+                    'translator',
                 ],
             ],
         ],

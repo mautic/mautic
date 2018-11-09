@@ -12,6 +12,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
+use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
@@ -29,6 +30,7 @@ interface SyncProcessFactoryInterface
      * @param IntegrationSyncProcess    $integrationSyncProcess
      * @param MauticSyncProcess         $mauticSyncProcess
      * @param EventDispatcherInterface  $eventDispatcher
+     * @param Notifier                  $notifier
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
      * @param MappingManualDAO          $integrationMappingManual
@@ -44,6 +46,7 @@ interface SyncProcessFactoryInterface
         IntegrationSyncProcess $integrationSyncProcess,
         MauticSyncProcess $mauticSyncProcess,
         EventDispatcherInterface $eventDispatcher,
+        Notifier $notifier,
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
         MappingManualDAO $integrationMappingManual,

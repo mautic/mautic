@@ -12,11 +12,14 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess;
 
 use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
+use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
+use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
@@ -71,6 +74,11 @@ class SyncProcess
     private $eventDispatcher;
 
     /**
+     * @var Notifier
+     */
+    private $notifier;
+
+    /**
      * @var bool
      */
     private $isFirstTimeSync = false;
@@ -98,6 +106,7 @@ class SyncProcess
      * @param IntegrationSyncProcess    $integrationSyncProcess
      * @param MauticSyncProcess         $mauticSyncProcess
      * @param EventDispatcherInterface  $eventDispatcher
+     * @param Notifier                  $notifier
      * @param MappingManualDAO          $mappingManualDAO
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
@@ -111,6 +120,7 @@ class SyncProcess
         IntegrationSyncProcess $integrationSyncProcess,
         MauticSyncProcess $mauticSyncProcess,
         EventDispatcherInterface $eventDispatcher,
+        Notifier $notifier,
         MappingManualDAO $mappingManualDAO,
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
@@ -123,6 +133,7 @@ class SyncProcess
         $this->integrationSyncProcess      = $integrationSyncProcess;
         $this->mauticSyncProcess           = $mauticSyncProcess;
         $this->eventDispatcher             = $eventDispatcher;
+        $this->notifier = $notifier;
         $this->mappingManualDAO            = $mappingManualDAO;
         $this->internalSyncDataExchange    = $internalSyncDataExchange;
         $this->integrationSyncDataExchange = $integrationSyncDataExchange;
@@ -237,6 +248,9 @@ class SyncProcess
                     __CLASS__.':'.__FUNCTION__
                 );
 
+                // Finalize notifications such as injecting user notifications
+                $this->notifier->finalizeNotifications();
+
                 break;
             }
 
@@ -262,6 +276,9 @@ class SyncProcess
 
     /**
      * @param OrderDAO $syncOrder
+     *
+     * @throws IntegrationNotFoundException
+     * @throws HandlerNotSupportedException
      */
     private function finalizeSync(OrderDAO $syncOrder)
     {
@@ -276,6 +293,9 @@ class SyncProcess
 
         // Tell sync that these objects have been deleted and not to continue re-syncing them
         $this->mappingHelper->markAsDeleted($syncOrder->getDeletedObjects());
+
+        // Inject notifications
+        $this->notifier->noteMauticSyncIssue($syncOrder->getNotifications());
 
         // Cleanup field tracking for successfully synced objects
         $this->internalSyncDataExchange->cleanupProcessedObjects($syncOrder->getSuccessfullySyncedObjects());
