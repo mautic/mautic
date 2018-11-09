@@ -58,7 +58,7 @@ class FormValidationSubsriber extends CommonSubscriber
             if (!empty($field->getValidation()['international_validationmsg'])) {
                 $event->failedValidation($field->getValidation()['international_validationmsg']);
             } else {
-                $event->failedValidation('mautic.form.submission.phone.invalid');
+                $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid'));
             }
         }
     }
