@@ -813,7 +813,6 @@ return [
             ],
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
-            'monolog.handler.stream.class'    => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
 
             // Form extensions
             'mautic.form.extension.custom' => [
@@ -872,6 +871,14 @@ return [
                     '%mautic.db_table_prefix%',
                     'mautic.schema.helper.column',
                 ],
+            ],
+            'mautic.form.list.validator.circular' => [
+                'class'     => Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'request_stack',
+                ],
+                'tag' => 'validator.constraint_validator',
             ],
         ],
         'models' => [
@@ -1046,6 +1053,7 @@ return [
             'facebookexternalhit',
         ],
         'do_not_track_internal_ips' => [],
+        'track_private_ip_ranges'   => false,
         'link_shortener_url'        => null,
         'cached_data_timeout'       => 10,
         'batch_sleep_time'          => 1,

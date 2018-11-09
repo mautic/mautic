@@ -15,7 +15,7 @@
         ]
     },
     "require": {
-        "php": ">=5.6.19 <7.2",
+        "php": ">=5.6.19 <7.3",
 
         "symfony/console": "~2.8",
         "symfony/debug": "~2.8",
@@ -50,7 +50,7 @@
         "symfony/templating": "~2.1",
 
         "symfony/framework-bundle": "~2.8",
-        "symfony/monolog-bundle": "~2.11",
+        "symfony/monolog-bundle": "^3.3",
         "symfony/security-bundle": "^2.8.41",
         "symfony/swiftmailer-bundle": "~2.3",
 
@@ -80,7 +80,7 @@
         "knplabs/knp-menu-bundle":"^2.0",
         "friendsofsymfony/rest-bundle": "1.8.*",
         "friendsofsymfony/oauth-server-bundle": "1.5.2",
-        "willdurand/oauth-server-bundle": "dev-master",
+        "willdurand/oauth-server-bundle": "0.0.2",
         "jms/serializer-bundle": "~1.1",
         "oneup/uploader-bundle": "~1.3",
 

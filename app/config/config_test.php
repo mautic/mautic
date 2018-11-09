@@ -130,3 +130,4 @@ if (file_exists(__DIR__.'/config_override.php')) {
 $container->setParameter('mautic.secret_key', '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0');
 $container->setParameter('mautic.security.disableUpdates', true);
 $container->setParameter('mautic.rss_notification_url', null);
+$container->setParameter('mautic.batch_sleep_time', 0);

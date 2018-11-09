@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 
 /**
- * Class CustomMappedDecorator.
+ * Class CompanyDecorator.
  */
 class CompanyDecorator extends BaseDecorator
 {
