@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -42,11 +44,9 @@ class FieldMergerHelper
      * @param string $object
      * @param array  $updatedFieldMappings
      */
-    public function mergeSyncFieldMapping(string $object, array $updatedFieldMappings)
+    public function mergeSyncFieldMapping(string $object, array $updatedFieldMappings): void
     {
-        $requiredFields = $this->integrationObject->getRequiredFieldsForMapping($object);
-
-        $this->removeNonExistentFieldMappings($object, $requiredFields);
+        $this->removeNonExistentFieldMappings($object);
 
         $this->bindUpdatedFieldMappings($object, $updatedFieldMappings);
     }
@@ -54,19 +54,17 @@ class FieldMergerHelper
     /**
      * @return array
      */
-    public function getFieldMappings()
+    public function getFieldMappings(): array
     {
         return $this->currentFieldMappings;
     }
 
     /**
      * @param string $object
-     * @param array  $requiredFields
      */
-    private function removeNonExistentFieldMappings(string $object, array $requiredFields)
+    private function removeNonExistentFieldMappings(string $object): void
     {
-        $optionalFields = $this->integrationObject->getOptionalFieldsForMapping($object);
-        $allFields      = array_merge($requiredFields, $optionalFields);
+        $allFields = $this->integrationObject->getAllFieldsForMapping($object);
 
         if (!isset($this->currentFieldMappings[$object])) {
             $this->currentFieldMappings[$object] = [];
@@ -80,7 +78,7 @@ class FieldMergerHelper
      * @param string $object
      * @param array  $updatedFieldMappings
      */
-    private function bindUpdatedFieldMappings(string $object, array $updatedFieldMappings)
+    private function bindUpdatedFieldMappings(string $object, array $updatedFieldMappings): void
     {
         // Merge updated fields into current fields
         foreach ($updatedFieldMappings as $fieldName => $fieldMapping) {

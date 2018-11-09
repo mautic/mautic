@@ -36,13 +36,7 @@ trait FilteredFieldsTrait
      */
     private function filterFields(ConfigFormSyncInterface $integrationObject, string $objectName, string $keyword = null, int $page = 1): void
     {
-        $requiredFields = $integrationObject->getRequiredFieldsForMapping($objectName);
-        asort($requiredFields);
-
-        $optionalFields = $integrationObject->getOptionalFieldsForMapping($objectName);
-        asort($optionalFields);
-
-        $allFields = array_merge($requiredFields, $optionalFields);
+        $allFields = $integrationObject->getAllFieldsForMapping($objectName);
 
         if ($keyword) {
             $this->filteredFields = $this->getFieldsByKeyword($allFields, $keyword);

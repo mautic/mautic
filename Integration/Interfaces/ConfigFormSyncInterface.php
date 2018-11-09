@@ -34,7 +34,7 @@ interface ConfigFormSyncInterface extends IntegrationInterface
     public function getSyncMappedObjects(): array;
 
     /**
-     * Return an array of required fields in the format of [$key => $label]
+     * Return an array of required fields
      *
      * @param string $object
      *
@@ -43,13 +43,22 @@ interface ConfigFormSyncInterface extends IntegrationInterface
     public function getRequiredFieldsForMapping(string $object): array;
 
     /**
-     * Return an array of optional fields in the format of [$key => $label]
+     * Return an array of optional fields
      *
      * @param string $object
      *
      * @return array|MappedFieldInfoInterface[]
      */
     public function getOptionalFieldsForMapping(string $object): array;
+
+    /**
+     * Return an array of all fields
+     *
+     * @param string $object
+     *
+     * @return array|MappedFieldInfoInterface[]
+     */
+    public function getAllFieldsForMapping(string $object): array;
 
     /**
      * Return a custom form field name to be included in the features array specific to sync
