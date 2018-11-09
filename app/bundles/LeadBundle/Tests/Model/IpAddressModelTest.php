@@ -50,13 +50,32 @@ class IpAddressModelTest extends \PHPUnit_Framework_TestCase
         $this->ipAddressModel->saveIpAddressesReferencesForContact(new Lead());
     }
 
-    public function testSaveIpAddressReferencesForContactWhenSomeIps()
+    public function testSaveIpAddressReferencesForContactThatHasIpsButNoChanges()
     {
         $contact      = $this->createMock(Lead::class);
         $ipAddress    = $this->createMock(IpAddress::class);
         $ipAddresses  = new ArrayCollection(['1.2.3.4' => $ipAddress]);
         $connection   = $this->createMock(Connection::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $contact->expects($this->exactly(1))
+            ->method('getIpAddresses')
+            ->willReturn($ipAddresses);
+
+        $this->entityManager->expects($this->never())
+            ->method('getConnection');
+
+        $this->ipAddressModel->saveIpAddressesReferencesForContact($contact);
+    }
+
+    public function testSaveIpAddressReferencesForContactThatHasIpsWithSomeAdded()
+    {
+        $contact        = $this->createMock(Lead::class);
+        $ipAddressAdded = $this->createMock(IpAddress::class);
+        $ipAddressOld   = $this->createMock(IpAddress::class);
+        $ipAddresses    = new ArrayCollection(['1.2.3.999' => $ipAddressOld, '1.2.3.4' => $ipAddressAdded]);
+        $connection     = $this->createMock(Connection::class);
+        $queryBuilder   = $this->createMock(QueryBuilder::class);
 
         $contact->expects($this->exactly(2))
             ->method('getIpAddresses')
@@ -66,9 +85,24 @@ class IpAddressModelTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->willReturn(55);
 
-        $ipAddress->expects($this->exactly(2))
+        $contact->expects($this->exactly(2))
+            ->method('getChanges')
+            ->willReturn(['ipAddress' => ['1.2.3.4' => $ipAddressAdded]]);
+
+        $ipAddressAdded->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(44);
+
+        $ipAddressAdded->expects($this->once())
+            ->method('getIpAddress')
+            ->willReturn('1.2.3.4');
+
+        $ipAddressOld->expects($this->never())
+            ->method('getId');
+
+        $ipAddressOld->expects($this->once())
+            ->method('getIpAddress')
+            ->willReturn('1.2.3.999');
 
         $queryBuilder->expects($this->once())
             ->method('execute');
@@ -83,7 +117,7 @@ class IpAddressModelTest extends \PHPUnit_Framework_TestCase
 
         $this->ipAddressModel->saveIpAddressesReferencesForContact($contact);
 
-        $this->assertCount(1, $contact->getIpAddresses());
+        $this->assertCount(2, $contact->getIpAddresses());
     }
 
     public function testSaveIpAddressReferencesForContactWhenSomeIpsIfTheReferenceExistsAlready()
@@ -102,9 +136,17 @@ class IpAddressModelTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->willReturn(55);
 
+        $contact->expects($this->once())
+            ->method('getChanges')
+            ->willReturn(['ipAddress' => ['1.2.3.4' => $ipAddress]]);
+
         $ipAddress->expects($this->exactly(3))
             ->method('getId')
             ->willReturn(44);
+
+        $ipAddress->expects($this->once())
+            ->method('getIpAddress')
+            ->willReturn('1.2.3.4');
 
         $queryBuilder->expects($this->once())
             ->method('execute')
