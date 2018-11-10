@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -14,26 +14,23 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\LeadBundle\Event as Events;
+use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\LeadEvents;
 
-/**
- * Class CompanySubscriber.
- */
-class CompanySubscriber extends CommonSubscriber
+class SegmentSubscriber extends CommonSubscriber
 {
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
-     * LeadSubscriber constructor.
+     * @var AuditLogModel
+     */
+    private $auditLogModel;
+
+    /**
+     * SegmentSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
@@ -50,24 +47,24 @@ class CompanySubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
-            LeadEvents::COMPANY_POST_DELETE => ['onCompanyDelete', 0],
+            LeadEvents::LIST_POST_SAVE   => ['onSegmentPostSave', 0],
+            LeadEvents::LIST_POST_DELETE => ['onSegmentDelete', 0],
         ];
     }
 
     /**
-     * Add a company entry to the audit log.
+     * Add a segment entry to the audit log.
      *
-     * @param Events\CompanyEvent $event
+     * @param SegmentEvent $event
      */
-    public function onCompanyPostSave(Events\CompanyEvent $event)
+    public function onSegmentPostSave(SegmentEvent $event)
     {
-        $company = $event->getCompany();
+        $segment = $event->getList();
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'lead',
-                'object'    => 'company',
-                'objectId'  => $company->getId(),
+                'object'    => 'segment',
+                'objectId'  => $segment->getId(),
                 'action'    => ($event->isNew()) ? 'create' : 'update',
                 'details'   => $details,
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
@@ -77,19 +74,19 @@ class CompanySubscriber extends CommonSubscriber
     }
 
     /**
-     * Add a company delete entry to the audit log.
+     * Add a segment delete entry to the audit log.
      *
-     * @param Events\CompanyEvent $event
+     * @param SegmentEvent $event
      */
-    public function onCompanyDelete(Events\CompanyEvent $event)
+    public function onSegmentDelete(SegmentEvent $event)
     {
-        $company = $event->getCompany();
+        $segment = $event->getList();
         $log     = [
             'bundle'    => 'lead',
-            'object'    => 'company',
-            'objectId'  => $company->deletedId,
+            'object'    => 'segment',
+            'objectId'  => $segment->deletedId,
             'action'    => 'delete',
-            'details'   => ['name', $company->getPrimaryIdentifier()],
+            'details'   => ['name', $segment->getName()],
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
