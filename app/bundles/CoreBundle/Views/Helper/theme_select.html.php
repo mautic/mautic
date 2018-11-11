@@ -16,7 +16,7 @@ $isCodeMode = ($active == $codeMode);
     <div class="col-md-3 theme-list">
         <div class="panel panel-default <?php echo $isCodeMode ? 'theme-selected' : ''; ?>">
             <div class="panel-body text-center">
-                <h3><?php echo $view['translator']->trans('mautic.core.code.mode'); ?></h3>
+                <h3 class="ellipsis" title="<?php echo $view['translator']->trans('mautic.core.code.mode'); ?>"><?php echo $view['translator']->trans('mautic.core.code.mode'); ?></h3>
                 <div class="panel-body text-center" style="height: 250px">
                     <i class="fa fa-code fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4;"></i>
                 </div>
