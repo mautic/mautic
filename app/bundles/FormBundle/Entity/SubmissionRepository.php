@@ -470,21 +470,15 @@ class SubmissionRepository extends CommonRepository
      */
     public function getSubmissionCounts($form)
     {
-        $q = <<<EOQ
-SELECT
-        COUNT(s.id) AS total,
-        COUNT(DISTINCT (s.lead_id)) AS `unique`
-    FROM
-        form_submissions AS s
-    WHERE
-        s.form_id = :id
-EOQ;
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select('COUNT(fs.id) AS `total`, COUNT(DISTINCT (fs.lead_id)) AS `unique`')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs');
+        $query->where($query->expr()->eq('fs.form_id', ':id'))
+                ->setParameter('id', $form->getId());
 
-        $stmt = $this->_em->getConnection()->prepare($q);
-        $stmt->bindValue('id', $form->getId());
-        $stmt->execute();
+        $result = $query->execute()->fetch();
 
-        return $stmt->fetch();
+        return $result;
     }
 
     /**
