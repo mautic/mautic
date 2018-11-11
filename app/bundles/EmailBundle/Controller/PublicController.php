@@ -429,7 +429,7 @@ class PublicController extends CommonFormController
         }
 
         if (
-            ($this->get('mautic.security')->isAnonymous() && !$emailEntity->isPublished())
+            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->isPublished() || !$emailEntity->isPublicPreview()))
             || (!$this->get('mautic.security')->isAnonymous()
                 && !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
