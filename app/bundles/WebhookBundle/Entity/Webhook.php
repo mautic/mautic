@@ -49,6 +49,11 @@ class Webhook extends FormEntity
     private $webhookUrl;
 
     /**
+     * @var string
+     */
+    private $secret;
+
+    /**
      * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
@@ -147,6 +152,11 @@ class Webhook extends FormEntity
             ->length(255)
             ->build();
 
+        $builder->createField('secret', Type::STRING)
+            ->columnName('secret')
+            ->length(255)
+            ->build();
+
         $builder->addNullableField('eventsOrderbyDir', Type::STRING, 'events_orderby_dir');
     }
 
@@ -164,6 +174,7 @@ class Webhook extends FormEntity
                     'name',
                     'description',
                     'webhookUrl',
+                    'secret',
                     'eventsOrderbyDir',
                     'category',
                     'triggers',
@@ -299,6 +310,31 @@ class Webhook extends FormEntity
     public function getWebhookUrl()
     {
         return $this->webhookUrl;
+    }
+
+    /**
+     * Set secret.
+     *
+     * @param string $secret
+     *
+     * @return Webhook
+     */
+    public function setSecret($secret)
+    {
+        $this->isChanged('secret', $secret);
+        $this->secret = $secret;
+
+        return $this;
+    }
+
+    /**
+     * Get secret.
+     *
+     * @return string
+     */
+    public function getSecret()
+    {
+        return $this->secret;
     }
 
     /**

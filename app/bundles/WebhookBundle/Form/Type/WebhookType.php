@@ -13,6 +13,7 @@ namespace Mautic\WebhookBundle\Form\Type;
 
 use Doctrine\Common\Collections\Criteria;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\WebhookBundle\Form\DataTransformer\EventsToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -79,6 +80,18 @@ class WebhookType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => true,
+            ]
+        );
+
+        $builder->add(
+            'secret',
+            'text',
+            [
+                'label'            => 'mautic.webhook.form.secret',
+                'label_attr'       => ['class' => 'control-label'],
+                'attr'             => ['class' => 'form-control'],
+                'empty_data'       => EncryptionHelper::generateKey(),
+                'required'         => false,
             ]
         );
 
