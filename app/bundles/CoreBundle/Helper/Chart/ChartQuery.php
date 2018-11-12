@@ -83,6 +83,14 @@ class ChartQuery extends AbstractChart
         $this->connection = $connection;
     }
 
+    /**
+     * Adds a generated column definition. Chart query will use $generatedColumn
+     * for select, group by and order instead of $originalColumn if the $unit is used.
+     *
+     * @param string $generatedColumn
+     * @param string $originalColumn
+     * @param string $unit
+     */
     public function addGeneratedColumn($generatedColumn, $originalColumn, $unit)
     {
         if (!isset($this->generatedColumns[$originalColumn])) {
@@ -218,6 +226,8 @@ class ChartQuery extends AbstractChart
         $this->modifyTimeDataQuery($query, $column, 't', $countColumn, $isEnumerable);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
+        dump($query->getSql());
+        die;
 
         return $query;
     }
@@ -233,7 +243,7 @@ class ChartQuery extends AbstractChart
      */
     public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
     {
-        // Convert time unitst to the right form for current database platform
+        // Convert time units to the right form for current database platform
         $limit   = $this->countAmountFromDateRange($this->unit);
         $groupBy = '';
 
@@ -242,7 +252,8 @@ class ChartQuery extends AbstractChart
             unset($filters['groupBy']);
         }
 
-        $dateConstruct = $this->getDateConstruct($column);
+        $dateConstruct = $this->getDateConstruct($tablePrefix, $column);
+        $count         = ($isEnumerable === true) ? 'COUNT('.$countColumn.') AS count' : $countColumn.' AS count';
 
         if ($isEnumerable === true) {
             $count = 'COUNT('.$countColumn.') AS count';
@@ -251,21 +262,10 @@ class ChartQuery extends AbstractChart
         } else {
             $count = $countColumn.' AS count';
         }
-        $query->select($dateConstruct.' AS date, '.$count)
-            ->groupBy($dateConstruct.$groupBy);
-
-        $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
-    }
-
-    private function getDateConstruct($column)
-    {
-        if (isset($this->generatedColumns[$column][$this->unit])) {
-            return $this->generatedColumns[$column][$this->unit];
-        }
-
-        $dbUnit = $this->translateTimeUnit($this->unit);
-
-        return 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
+        $query->select($dateConstruct.' AS date, '.$count);
+        $query->groupBy($dateConstruct.$groupBy);
+        $query->orderBy($dateConstruct, 'ASC');
+        $query->setMaxResults($limit);
     }
 
     /**
@@ -602,5 +602,20 @@ class ChartQuery extends AbstractChart
         }
 
         return MAUTIC_TABLE_PREFIX.$table;
+    }
+
+    /**
+     * @param string $tablePrefix
+     * @param string $column
+     */
+    private function getDateConstruct($tablePrefix, $column)
+    {
+        if (isset($this->generatedColumns[$column][$this->unit])) {
+            return $tablePrefix.'.'.$this->generatedColumns[$column][$this->unit];
+        }
+
+        $dbUnit = $this->translateTimeUnit($this->unit);
+
+        return 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
     }
 }
