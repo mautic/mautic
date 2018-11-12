@@ -1893,6 +1893,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
         $chart      = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
+        $query->addGeneratedColumn('generated_sent_date', 'date_sent', 'd');
 
         if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'sent_and_opened' || !$flag || in_array('sent', $datasets)) {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
