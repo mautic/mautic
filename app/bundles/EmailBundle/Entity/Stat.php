@@ -233,7 +233,7 @@ class Stat
             ->cascadeAll()
             ->build();
 
-        $builder->addGeneratedField('generatedSentDate', 'CHAR(10)', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))', 'generated_sent_date');
+        $builder->addGeneratedField('generatedSentDate', 'DATE', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))', 'generated_sent_date');
     }
 
     /**
