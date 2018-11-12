@@ -227,8 +227,6 @@ class ChartQuery extends AbstractChart
         $this->modifyTimeDataQuery($query, $column, 't', $countColumn, $isEnumerable);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
-        dump($query->getSql());
-        die;
 
         return $query;
     }
