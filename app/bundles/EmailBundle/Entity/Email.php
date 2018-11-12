@@ -1163,10 +1163,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param int $count
+     *
+     * @return $this
      */
     public function setQueuedCount($count)
     {
         $this->queuedCount = $count;
+
+        return $this;
     }
 
     /**
@@ -1179,10 +1183,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param int $count
+     *
+     * @return $this
      */
     public function setPendingCount($count)
     {
         $this->pendingCount = $count;
+
+        return $this;
     }
 
     /**
