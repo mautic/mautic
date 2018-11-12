@@ -9,9 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\FormBundle\Test;
-
-namespace Symfony\Component\HttpFoundation\File;
+namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\SubmissionEvent;

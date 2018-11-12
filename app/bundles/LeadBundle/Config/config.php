@@ -27,6 +27,14 @@ return [
                     'leadId'      => '\d+',
                 ],
             ],
+            'mautic_segment_batch_contact_set' => [
+                'path'       => '/segments/batch/contact/set',
+                'controller' => 'MauticLeadBundle:BatchSegment:set',
+            ],
+            'mautic_segment_batch_contact_view' => [
+                'path'       => '/segments/batch/contact/view',
+                'controller' => 'MauticLeadBundle:BatchSegment:index',
+            ],
             'mautic_segment_index' => [
                 'path'       => '/segments/{page}',
                 'controller' => 'MauticLeadBundle:List:index',
@@ -90,6 +98,13 @@ return [
                 'controller'   => 'MauticLeadBundle:Auditlog:batchExport',
                 'requirements' => [
                     'leadId' => '\d+',
+                ],
+            ],
+            'mautic_contact_export_action' => [
+                'path'         => '/contacts/contact/export/{contactId}',
+                'controller'   => 'MauticLeadBundle:Lead:contactExport',
+                'requirements' => [
+                    'contactId' => '\d+',
                 ],
             ],
             // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_index instead.
@@ -468,6 +483,13 @@ return [
                     'mautic.lead.repository.lead_event_log',
                 ],
             ],
+            'mautic.lead.subscriber.segment' => [
+                'class'     => 'Mautic\LeadBundle\EventListener\SegmentSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
@@ -622,6 +644,12 @@ return [
                     'mautic.helper.core_parameters',
                 ],
                 'alias' => 'lead_contact_frequency_rules',
+            ],
+            'mautic.form.type.contact_channels' => [
+                'class'     => \Mautic\LeadBundle\Form\Type\ContactChannelsType::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
             'mautic.form.type.campaignevent_lead_field_value' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
@@ -805,6 +833,13 @@ return [
                     \Mautic\LeadBundle\Entity\Lead::class,
                 ],
             ],
+            'mautic.lead.repository.frequency_rule' => [
+                'class'     => \Mautic\LeadBundle\Entity\FrequencyRuleRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\FrequencyRule::class,
+                ],
+            ],
             'mautic.lead.repository.lead_event_log' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
@@ -925,6 +960,7 @@ return [
                 'arguments' => [
                     'mautic.schema.helper.index',
                     'mautic.schema.helper.column',
+                    'mautic.lead.model.list',
                 ],
             ],
             'mautic.lead.model.list' => [
@@ -1083,6 +1119,12 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.dnc',
+                ],
+            ],
+            'mautic.lead.model.segment.action' => [
+                'class'     => \Mautic\LeadBundle\Model\SegmentActionModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
                 ],
             ],
             'mautic.lead.factory.device_detector_factory' => [

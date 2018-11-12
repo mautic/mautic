@@ -837,7 +837,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
                 // Skip if the value is in the CSV row
                 continue;
-            } elseif ($entityField['defaultValue']) {
+            } elseif ($company->isNew() && $entityField['defaultValue']) {
                 // Fill in the default value if any
                 $fieldData[$entityField['alias']] = ('multiselect' === $entityField['type']) ? [$entityField['defaultValue']] : $entityField['defaultValue'];
             }

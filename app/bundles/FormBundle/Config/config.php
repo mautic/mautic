@@ -379,6 +379,7 @@ return [
                     'mautic.form.helper.form_uploader',
                     'mautic.lead.service.device_tracking_service',
                     'mautic.form.service.field.value.transformer',
+                    'mautic.helper.template.date',
                 ],
             ],
             'mautic.form.model.submission_result_loader' => [
@@ -407,6 +408,7 @@ return [
                 'class'     => TokenHelper::class,
                 'arguments' => [
                     'mautic.form.model.form',
+                    'mautic.security',
                 ],
             ],
             'mautic.form.service.field.value.transformer' => [

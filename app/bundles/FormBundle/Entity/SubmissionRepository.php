@@ -11,6 +11,7 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -479,6 +480,22 @@ class SubmissionRepository extends CommonRepository
         $result = $q->execute()->fetch();
 
         return !empty($result['id']);
+    }
+
+    /**
+     * @param Form $form
+     */
+    public function getSubmissionCounts($form)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select('COUNT(fs.id) AS `total`, COUNT(DISTINCT (fs.lead_id)) AS `unique`')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs');
+        $query->where($query->expr()->eq('fs.form_id', ':id'))
+                ->setParameter('id', $form->getId());
+
+        $result = $query->execute()->fetch();
+
+        return $result;
     }
 
     /**

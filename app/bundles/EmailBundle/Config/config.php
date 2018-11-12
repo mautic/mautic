@@ -21,7 +21,7 @@ return [
                 'controller' => 'MauticEmailBundle:Email:execute',
             ],
             'mautic_email_contacts' => [
-                'path'       => '/emails/contacts/{objectId}',
+                'path'       => '/emails/view/{objectId}/contact/{page}',
                 'controller' => 'MauticEmailBundle:Email:contacts',
             ],
         ],

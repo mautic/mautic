@@ -60,10 +60,8 @@ trait FilterTrait
 
         $field = [];
 
-        if (isset($options['fields']['lead'][$fieldName])) {
-            $field = $options['fields']['lead'][$fieldName];
-        } elseif (isset($options['fields']['company'][$fieldName])) {
-            $field = $options['fields']['company'][$fieldName];
+        if (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
+            $field = $options['fields'][$data['object']][$fieldName];
         }
 
         $customOptions = [];

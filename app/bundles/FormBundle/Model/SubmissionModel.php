@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Model;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -20,6 +21,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\FormBundle\Crate\UploadFileCrate;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
@@ -125,6 +127,11 @@ class SubmissionModel extends CommonFormModel
     private $fieldValueTransformer;
 
     /**
+     * @var DateHelper
+     */
+    private $dateHelper;
+
+    /**
      * @param IpLookupHelper                 $ipLookupHelper
      * @param TemplatingHelper               $templatingHelper
      * @param FormModel                      $formModel
@@ -138,6 +145,7 @@ class SubmissionModel extends CommonFormModel
      * @param FormUploader                   $formUploader
      * @param DeviceTrackingServiceInterface $deviceTrackingService
      * @param FieldValueTransformer          $fieldValueTransformer
+     * @param DateHelper                     $dateHelper
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -152,7 +160,8 @@ class SubmissionModel extends CommonFormModel
         UploadFieldValidator $uploadFieldValidator,
         FormUploader $formUploader,
         DeviceTrackingServiceInterface $deviceTrackingService,
-        FieldValueTransformer $fieldValueTransformer
+        FieldValueTransformer $fieldValueTransformer,
+        DateHelper $dateHelper
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->templatingHelper       = $templatingHelper;
@@ -167,6 +176,7 @@ class SubmissionModel extends CommonFormModel
         $this->formUploader           = $formUploader;
         $this->deviceTrackingService  = $deviceTrackingService;
         $this->fieldValueTransformer  = $fieldValueTransformer;
+        $this->dateHelper             = $dateHelper;
     }
 
     /**
@@ -535,7 +545,7 @@ class SubmissionModel extends CommonFormModel
                         foreach ($results as $k => $s) {
                             $row = [
                                 $s['id'],
-                                $s['dateSubmitted'],
+                                $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
                                 $s['ipAddress'],
                                 $s['referer'],
                             ];
@@ -612,7 +622,7 @@ class SubmissionModel extends CommonFormModel
                             foreach ($results as $k => $s) {
                                 $row = [
                                     $s['id'],
-                                    $s['dateSubmitted'],
+                                    $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
                                     $s['ipAddress'],
                                     $s['referer'],
                                 ];
@@ -658,7 +668,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -1077,7 +1087,7 @@ class SubmissionModel extends CommonFormModel
      */
     protected function validateFieldValue(Field $field, $value)
     {
-        $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value);
+        $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value, $field);
         if (!empty($standardValidation)) {
             return $standardValidation;
         }
