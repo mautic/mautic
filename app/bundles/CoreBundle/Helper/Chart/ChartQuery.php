@@ -63,6 +63,8 @@ class ChartQuery extends AbstractChart
         'Y' => '%Y',
     ];
 
+    private $generatedColumns = [];
+
     /**
      * Construct a new ChartQuery object.
      *
@@ -76,6 +78,15 @@ class ChartQuery extends AbstractChart
         $this->isTimeUnit = (in_array($this->unit, ['H', 'i', 's']));
         $this->setDateRange($dateFrom, $dateTo);
         $this->connection = $connection;
+    }
+
+    public function addGeneratedColumn($generatedColumn, $originalColumn, $unit)
+    {
+        if (!isset($this->generatedColumns[$originalColumn])) {
+            $this->generatedColumns[$originalColumn] = [];
+        }
+
+        $this->generatedColumns[$originalColumn][$unit] = $generatedColumn;
     }
 
     /**
@@ -221,12 +232,11 @@ class ChartQuery extends AbstractChart
      * @param string       $countColumn
      * @param bool|string  $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
+    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
     {
         // Convert time unitst to the right form for current database platform
-        $dbUnit        = $this->translateTimeUnit($this->unit);
         $limit         = $this->countAmountFromDateRange();
-        $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
+        $dateConstruct = $this->getDateConstruct($column);
 
         if (true === $isEnumerable) {
             $count = 'COUNT('.$countColumn.') AS count';
@@ -239,6 +249,17 @@ class ChartQuery extends AbstractChart
             ->groupBy($dateConstruct);
 
         $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
+    }
+
+    private function getDateConstruct($column)
+    {
+        if (isset($this->generatedColumns[$column][$this->unit])) {
+            return $this->generatedColumns[$column][$this->unit];
+        }
+
+        $dbUnit = $this->translateTimeUnit($this->unit);
+
+        return 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
     }
 
     /**
