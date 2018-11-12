@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2015 Mautic Contributors. All rights reserved
+ * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -17,10 +17,29 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 class ChartQueryTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|Connection
+     */
     private $connection;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|QueryBuilder
+     */
     private $queryBuilder;
+
+    /**
+     * @var string
+     */
     private $dateColumn;
+
+    /**
+     * @var string
+     */
     private $unit;
+
+    /**
+     * @var ChartQuery
+     */
     private $chartQuery;
 
     protected function setUp()

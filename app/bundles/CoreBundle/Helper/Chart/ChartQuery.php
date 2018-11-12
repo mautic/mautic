@@ -65,6 +65,17 @@ class ChartQuery extends AbstractChart
         'Y' => '%Y',
     ];
 
+    /**
+     * Holds generated columns in format:.
+     *
+     * [
+     *      $originalColumn => [
+     *          $unit => $generatedColumn
+     *      ]
+     * ]
+     *
+     * @var array
+     */
     private $generatedColumns = [];
 
     /**
