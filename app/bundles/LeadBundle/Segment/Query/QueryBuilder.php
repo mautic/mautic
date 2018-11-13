@@ -1713,4 +1713,12 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
         return $this;
     }
+
+    /**
+     * @return array|bool|string
+     */
+    public function getLeadsTableAlias()
+    {
+        return $this->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+    }
 }
