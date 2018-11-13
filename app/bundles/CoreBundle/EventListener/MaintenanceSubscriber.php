@@ -14,7 +14,7 @@ namespace Mautic\CoreBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Mautic\UserBundle\Entity\UserTokenRepository;
+use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 
 /**
  * Class MaintenanceSubscriber.
@@ -27,17 +27,17 @@ class MaintenanceSubscriber extends CommonSubscriber
     protected $db;
 
     /**
-     * @var UserTokenRepository
+     * @var UserTokenRepositoryInterface
      */
     private $userTokenRepository;
 
     /**
      * MaintenanceSubscriber constructor.
      *
-     * @param Connection          $db
-     * @param UserTokenRepository $userTokenRepository
+     * @param Connection                   $db
+     * @param UserTokenRepositoryInterface $userTokenRepository
      */
-    public function __construct(Connection $db, UserTokenRepository $userTokenRepository)
+    public function __construct(Connection $db, UserTokenRepositoryInterface $userTokenRepository)
     {
         $this->db                  = $db;
         $this->userTokenRepository = $userTokenRepository;

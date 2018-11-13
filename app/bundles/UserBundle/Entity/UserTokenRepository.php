@@ -63,11 +63,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
     }
 
     /**
-     * Delete expired user tokens.
-     *
-     * @param bool $isDryRun
-     *
-     * @return int Number of selected or deleted rows
+     * {@inheritdoc}
      */
     public function deleteExpired($isDryRun = false)
     {
