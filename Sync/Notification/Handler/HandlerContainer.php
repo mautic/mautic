@@ -62,13 +62,4 @@ class HandlerContainer
             return array_merge($accumulator, $integrationHandlers);    
         }, []);
     }
-    {
-        $flattened = [];
-
-        foreach ($this->handlers as $integrationHandlers) {
-            $flattened = array_merge($flattened, $integrationHandlers);
-        }
-
-        return $flattened;
-    }
 }
