@@ -103,7 +103,13 @@ class BackgroundService
 
         try {
             $this->customFieldColumn->processCreateLeadColumn($leadField, false);
-        } catch (DriverException | SchemaException | \Mautic\CoreBundle\Exception\SchemaException $e) {
+        } catch (DriverException $e) {
+            $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
+            throw $e;
+        } catch (SchemaException $e) {
+            $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
+            throw $e;
+        } catch (\Mautic\CoreBundle\Exception\SchemaException $e) {
             $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
             throw $e;
         } catch (CustomFieldLimitException $e) {
