@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
+use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
 
 class BackgroundService
@@ -44,20 +45,28 @@ class BackgroundService
      */
     private $fieldColumnBackgroundJobDispatcher;
 
+    /**
+     * @var CustomFieldNotification
+     */
+    private $customFieldNotification;
+
     public function __construct(
         FieldModel $fieldModel,
         CustomFieldColumn $customFieldColumn,
         LeadFieldSaver $leadFieldSaver,
-        FieldColumnBackgroundJobDispatcher $fieldColumnBackgroundJobDispatcher
+        FieldColumnBackgroundJobDispatcher $fieldColumnBackgroundJobDispatcher,
+        CustomFieldNotification $customFieldNotification
     ) {
         $this->fieldModel                         = $fieldModel;
         $this->customFieldColumn                  = $customFieldColumn;
         $this->leadFieldSaver                     = $leadFieldSaver;
         $this->fieldColumnBackgroundJobDispatcher = $fieldColumnBackgroundJobDispatcher;
+        $this->customFieldNotification            = $customFieldNotification;
     }
 
     /**
      * @param int $leadFieldId
+     * @param int $userId
      *
      * @throws AbortColumnCreateException
      * @throws ColumnAlreadyCreatedException
@@ -68,7 +77,7 @@ class BackgroundService
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function addColumn($leadFieldId)
+    public function addColumn($leadFieldId, $userId)
     {
         $leadField = $this->fieldModel->getEntity($leadFieldId);
         if (null === $leadField) {
@@ -76,6 +85,7 @@ class BackgroundService
         }
 
         if (!$leadField->getColumnIsNotCreated()) {
+            $this->customFieldNotification->customFieldWasCreated($leadField, $userId);
             throw new ColumnAlreadyCreatedException('Column was already created');
         }
 
@@ -84,9 +94,25 @@ class BackgroundService
         } catch (NoListenerException $e) {
         }
 
-        $this->customFieldColumn->processCreateLeadColumn($leadField, false);
+        try {
+            $this->customFieldColumn->processCreateLeadColumn($leadField, false);
+        } catch (DriverException $e) {
+            $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
+            throw $e;
+        } catch (SchemaException $e) {
+            $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
+            throw $e;
+        } catch (\Mautic\CoreBundle\Exception\SchemaException $e) {
+            $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
+            throw $e;
+        } catch (CustomFieldLimitException $e) {
+            $this->customFieldNotification->customFieldLimitWasHit($leadField, $userId);
+            throw $e;
+        }
 
         $leadField->setColumnWasCreated();
         $this->leadFieldSaver->saveLeadFieldEntity($leadField, false);
+
+        $this->customFieldNotification->customFieldWasCreated($leadField, $userId);
     }
 }
