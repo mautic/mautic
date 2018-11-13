@@ -58,6 +58,11 @@ class HandlerContainer
      */
     public function getHandlers()
     {
+        return array_reduce($this->handlers, function($accumulator, $integrationHandlers) {
+            return array_merge($accumulator, $integrationHandlers);    
+        }, []);
+    }
+    {
         $flattened = [];
 
         foreach ($this->handlers as $integrationHandlers) {
