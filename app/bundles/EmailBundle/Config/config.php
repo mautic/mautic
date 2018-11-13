@@ -356,6 +356,14 @@ return [
             ],
         ],
         'other' => [
+            'mautic.email.doctrine.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\DoctrineSubscriber::class,
+                'tag'       => 'doctrine.event_subscriber',
+                'arguments' => [
+                    'monolog.logger.mautic',
+                ],
+            ],
+
             // Mailers
             'mautic.transport.amazon' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',

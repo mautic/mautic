@@ -32,7 +32,9 @@ class GeneratedType extends Type
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
-        return "{$fieldDeclaration['columnType']} AS ({$fieldDeclaration['as']}) /*";
+        //return "{$fieldDeclaration['columnType']} AS ({$fieldDeclaration['as']})";
+
+        // Must be defined in `columnDefinition` option when adding the column in the subscriber
     }
 
     /**
