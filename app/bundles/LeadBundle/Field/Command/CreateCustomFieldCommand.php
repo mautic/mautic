@@ -84,7 +84,19 @@ EOT
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
             return 1;
-        } catch (DriverException | SchemaException | DBALException | \Mautic\CoreBundle\Exception\SchemaException $e) {
+        } catch (DriverException $e) {
+            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
+
+            return 1;
+        } catch (SchemaException $e) {
+            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
+
+            return 1;
+        } catch (DBALException $e) {
+            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
+
+            return 1;
+        } catch (\Mautic\CoreBundle\Exception\SchemaException $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
             return 1;
