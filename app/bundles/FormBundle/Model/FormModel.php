@@ -827,20 +827,23 @@ class FormModel extends CommonFormModel
      */
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
-        $formName = $form->generateFormName();
-        $fields   = $form->getFields();
+        $formName       = $form->generateFormName();
+        $fields         = $form->getFields();
+        $autoFillFields = [];
+
         /** @var \Mautic\FormBundle\Entity\Field $field */
         foreach ($fields as $key => $field) {
             $leadField  = $field->getLeadField();
             $isAutoFill = $field->getIsAutoFill();
 
             // we want work just with matched autofill fields
-            if (!isset($leadField) || !$isAutoFill) {
-                unset($fields[$key]);
+            if (isset($leadField) && $isAutoFill) {
+                $autoFillFields[$key] = $field;
             }
         }
+
         // no fields for populate
-        if (!count($fields)) {
+        if (!count($autoFillFields)) {
             return;
         }
 
@@ -849,7 +852,7 @@ class FormModel extends CommonFormModel
             return;
         }
 
-        foreach ($fields as $field) {
+        foreach ($autoFillFields as $field) {
             $value = $lead->getFieldValue($field->getLeadField());
 
             if (!empty($value)) {
