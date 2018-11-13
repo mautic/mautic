@@ -128,11 +128,6 @@ class Stat
      */
     private $replies;
 
-    /**
-     * @var string
-     */
-    private $generatedSentDate;
-
     public function __construct()
     {
         $this->replies = new ArrayCollection();
@@ -232,8 +227,6 @@ class Stat
             ->fetchExtraLazy()
             ->cascadeAll()
             ->build();
-
-        $builder->addGeneratedField('generatedSentDate', 'DATE', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))', 'generated_sent_date');
     }
 
     /**

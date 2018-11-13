@@ -368,6 +368,13 @@ return [
                     'swiftmailer.transport.real',
                 ],
             ],
+            'mautic.email.doctrine.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\DoctrineSubscriber::class,
+                'tag'       => 'doctrine.event_subscriber',
+                'arguments' => [
+                    'monolog.logger.mautic',
+                ],
+            ],
 
             // Mailers
             'mautic.transport.spool' => [
