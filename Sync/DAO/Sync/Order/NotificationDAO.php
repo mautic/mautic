@@ -17,7 +17,7 @@ class NotificationDAO
     /**
      * @var ObjectChangeDAO
      */
-    private $objectChangeDOO;
+    private $objectChangeDAO;
 
     /**
      * @var string
@@ -27,12 +27,12 @@ class NotificationDAO
     /**
      * NotificationDAO constructor.
      *
-     * @param ObjectChangeDAO $objectChangeDOO
+     * @param ObjectChangeDAO $objectChangeDAO
      * @param string          $message
      */
-    public function __construct(ObjectChangeDAO $objectChangeDOO, string $message)
+    public function __construct(ObjectChangeDAO $objectChangeDAO, string $message)
     {
-        $this->objectChangeDOO = $objectChangeDOO;
+        $this->objectChangeDAO = $objectChangeDAO;
         $this->message         = $message;
     }
 
@@ -41,7 +41,7 @@ class NotificationDAO
      */
     public function getMauticObject(): string
     {
-        return $this->objectChangeDOO->getMappedObject();
+        return $this->objectChangeDAO->getMappedObject();
     }
 
     /**
@@ -49,7 +49,7 @@ class NotificationDAO
      */
     public function getMauticObjectId(): int
     {
-        return $this->objectChangeDOO->getMappedObjectId();
+        return $this->objectChangeDAO->getMappedObjectId();
     }
 
     /**
@@ -57,7 +57,7 @@ class NotificationDAO
      */
     public function getIntegration(): string
     {
-        return $this->objectChangeDOO->getIntegration();
+        return $this->objectChangeDAO->getIntegration();
     }
 
     /**
@@ -65,7 +65,7 @@ class NotificationDAO
      */
     public function getIntegrationObject(): string
     {
-        return $this->objectChangeDOO->getObject();
+        return $this->objectChangeDAO->getObject();
     }
 
     /**
@@ -73,7 +73,7 @@ class NotificationDAO
      */
     public function getIntegrationObjectId()
     {
-        return $this->objectChangeDOO->getObjectId();
+        return $this->objectChangeDAO->getObjectId();
     }
 
     /**
