@@ -25,74 +25,97 @@ use Mautic\LeadBundle\Model\FieldModel;
 
 class BackgroundServiceTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|BackgroundService
+     */
+    private $backgroundService;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FieldModel
+     */
+    private $fieldModel;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|CustomFieldColumn
+     */
+    private $customFieldColumn;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|LeadFieldSaver
+     */
+    private $leadFieldSaver;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FieldColumnBackgroundJobDispatcher
+     */
+    private $fieldColumnBackgroundJobDispatcher;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|CustomFieldNotification
+     */
+    private $customFieldNotification;
+
+    public function setUp()
+    {
+        $this->fieldModel                         = $this->createMock(FieldModel::class);
+        $this->customFieldColumn                  = $this->createMock(CustomFieldColumn::class);
+        $this->leadFieldSaver                     = $this->createMock(LeadFieldSaver::class);
+        $this->fieldColumnBackgroundJobDispatcher = $this->createMock(FieldColumnBackgroundJobDispatcher::class);
+        $this->customFieldNotification            = $this->createMock(CustomFieldNotification::class);
+
+        $this->backgroundService = new BackgroundService(
+            $this->fieldModel,
+            $this->customFieldColumn,
+            $this->leadFieldSaver,
+            $this->fieldColumnBackgroundJobDispatcher,
+            $this->customFieldNotification
+        );
+    }
+
     public function testNoLeadField()
     {
-        $fieldModel                         = $this->createMock(FieldModel::class);
-        $customFieldColumn                  = $this->createMock(CustomFieldColumn::class);
-        $leadFieldSaver                     = $this->createMock(LeadFieldSaver::class);
-        $fieldColumnBackgroundJobDispatcher = $this->createMock(FieldColumnBackgroundJobDispatcher::class);
-        $customFieldNotification            = $this->createMock(CustomFieldNotification::class);
-
-        $backgroundService = new BackgroundService($fieldModel, $customFieldColumn, $leadFieldSaver, $fieldColumnBackgroundJobDispatcher, $customFieldNotification);
-
-        $fieldModel->expects($this->once())
+        $this->fieldModel->expects($this->once())
             ->method('getEntity')
             ->willReturn(null);
 
         $this->expectException(LeadFieldWasNotFoundException::class);
         $this->expectExceptionMessage('LeadField entity was not found');
 
-        $backgroundService->addColumn(1, 3);
+        $this->backgroundService->addColumn(1, 3);
     }
 
     public function testColumnAlreadyCreated()
     {
-        $fieldModel                         = $this->createMock(FieldModel::class);
-        $customFieldColumn                  = $this->createMock(CustomFieldColumn::class);
-        $leadFieldSaver                     = $this->createMock(LeadFieldSaver::class);
-        $fieldColumnBackgroundJobDispatcher = $this->createMock(FieldColumnBackgroundJobDispatcher::class);
-        $customFieldNotification            = $this->createMock(CustomFieldNotification::class);
-
-        $backgroundService = new BackgroundService($fieldModel, $customFieldColumn, $leadFieldSaver, $fieldColumnBackgroundJobDispatcher, $customFieldNotification);
-
         $leadField = new LeadField();
         $leadField->setColumnWasCreated();
 
-        $fieldModel->expects($this->once())
+        $this->fieldModel->expects($this->once())
             ->method('getEntity')
             ->willReturn($leadField);
 
         $userId = 3;
-        $customFieldNotification->expects($this->once())
+        $this->customFieldNotification->expects($this->once())
             ->method('customFieldWasCreated')
             ->with($leadField, $userId);
 
         $this->expectException(ColumnAlreadyCreatedException::class);
         $this->expectExceptionMessage('Column was already created');
 
-        $backgroundService->addColumn(1, $userId);
+        $this->backgroundService->addColumn(1, $userId);
     }
 
     public function testAbortColumnCreate()
     {
-        $fieldModel                         = $this->createMock(FieldModel::class);
-        $customFieldColumn                  = $this->createMock(CustomFieldColumn::class);
-        $leadFieldSaver                     = $this->createMock(LeadFieldSaver::class);
-        $fieldColumnBackgroundJobDispatcher = $this->createMock(FieldColumnBackgroundJobDispatcher::class);
-        $customFieldNotification            = $this->createMock(CustomFieldNotification::class);
-
-        $backgroundService = new BackgroundService($fieldModel, $customFieldColumn, $leadFieldSaver, $fieldColumnBackgroundJobDispatcher, $customFieldNotification);
-
         $leadField = new LeadField();
         $leadField->setColumnIsNotCreated();
 
-        $fieldModel->expects($this->once())
+        $this->fieldModel->expects($this->once())
             ->method('getEntity')
             ->willReturn($leadField);
 
         $userId = 3;
 
-        $fieldColumnBackgroundJobDispatcher->expects($this->once())
+        $this->fieldColumnBackgroundJobDispatcher->expects($this->once())
             ->method('dispatchPreAddColumnEvent')
             ->with($leadField)
             ->willThrowException(new AbortColumnCreateException('Message'));
@@ -100,81 +123,65 @@ class BackgroundServiceTest extends \PHPUnit_Framework_TestCase
         $this->expectException(AbortColumnCreateException::class);
         $this->expectExceptionMessage('Message');
 
-        $backgroundService->addColumn(1, $userId);
+        $this->backgroundService->addColumn(1, $userId);
     }
 
     public function testCustomFieldLimit()
     {
-        $fieldModel                         = $this->createMock(FieldModel::class);
-        $customFieldColumn                  = $this->createMock(CustomFieldColumn::class);
-        $leadFieldSaver                     = $this->createMock(LeadFieldSaver::class);
-        $fieldColumnBackgroundJobDispatcher = $this->createMock(FieldColumnBackgroundJobDispatcher::class);
-        $customFieldNotification            = $this->createMock(CustomFieldNotification::class);
-
-        $backgroundService = new BackgroundService($fieldModel, $customFieldColumn, $leadFieldSaver, $fieldColumnBackgroundJobDispatcher, $customFieldNotification);
-
         $leadField = new LeadField();
         $leadField->setColumnIsNotCreated();
 
-        $fieldModel->expects($this->once())
+        $this->fieldModel->expects($this->once())
             ->method('getEntity')
             ->willReturn($leadField);
 
-        $fieldColumnBackgroundJobDispatcher->expects($this->once())
+        $this->fieldColumnBackgroundJobDispatcher->expects($this->once())
             ->method('dispatchPreAddColumnEvent')
             ->with($leadField);
 
-        $customFieldColumn->expects($this->once())
+        $this->customFieldColumn->expects($this->once())
             ->method('processCreateLeadColumn')
             ->with($leadField, false)
             ->willThrowException(new CustomFieldLimitException('Limit'));
 
         $userId = 3;
-        $customFieldNotification->expects($this->once())
+        $this->customFieldNotification->expects($this->once())
             ->method('customFieldLimitWasHit')
             ->with($leadField, $userId);
 
         $this->expectException(CustomFieldLimitException::class);
         $this->expectExceptionMessage('Limit');
 
-        $backgroundService->addColumn(1, $userId);
+        $this->backgroundService->addColumn(1, $userId);
     }
 
     public function testCreateColumnWithNoError()
     {
-        $fieldModel                         = $this->createMock(FieldModel::class);
-        $customFieldColumn                  = $this->createMock(CustomFieldColumn::class);
-        $leadFieldSaver                     = $this->createMock(LeadFieldSaver::class);
-        $fieldColumnBackgroundJobDispatcher = $this->createMock(FieldColumnBackgroundJobDispatcher::class);
-        $customFieldNotification            = $this->createMock(CustomFieldNotification::class);
-
-        $backgroundService = new BackgroundService($fieldModel, $customFieldColumn, $leadFieldSaver, $fieldColumnBackgroundJobDispatcher, $customFieldNotification);
-
         $leadField = new LeadField();
         $leadField->setColumnIsNotCreated();
 
-        $fieldModel->expects($this->once())
+        $this->fieldModel->expects($this->once())
             ->method('getEntity')
             ->willReturn($leadField);
 
-        $fieldColumnBackgroundJobDispatcher->expects($this->once())
+        $this->fieldColumnBackgroundJobDispatcher->expects($this->once())
             ->method('dispatchPreAddColumnEvent')
             ->with($leadField);
 
-        $customFieldColumn->expects($this->once())
+        $this->customFieldColumn->expects($this->once())
             ->method('processCreateLeadColumn')
             ->with($leadField, false);
 
-        $leadFieldSaver->expects($this->once())
+        $this->leadFieldSaver->expects($this->once())
             ->method('saveLeadFieldEntity')
             ->with($leadField, false);
 
         $userId = 3;
-        $customFieldNotification->expects($this->once())
+        $this->customFieldNotification->expects($this->once())
             ->method('customFieldWasCreated')
             ->with($leadField, $userId);
 
-        $backgroundService->addColumn(1, $userId);
+        $this->backgroundService->addColumn(1, $userId);
 
         $this->assertFalse($leadField->getColumnIsNotCreated());
     }
