@@ -144,7 +144,7 @@ class FieldValidationHelper
         $requiredFields = $this->integrationObject->getRequiredFieldsForMapping($object);
 
         $missingFields = [];
-        foreach ($requiredFields as $field => $fieldObjest) {
+        foreach ($requiredFields as $field => $fieldObject) {
             if (empty($mappedFields[$field]['mappedField'])) {
                 $missingFields[] = $field;
             }
