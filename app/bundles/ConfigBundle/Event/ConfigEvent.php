@@ -46,6 +46,20 @@ class ConfigEvent extends CommonEvent
     private $fieldErrors = [];
 
     /**
+     * Data got from build form before update.
+     *
+     * @var array
+     */
+    private $originalNormData;
+
+    /**
+     * Data got from build form after update.
+     *
+     * @var array
+     */
+    private $normData;
+
+    /**
      * @param array        $config
      * @param ParameterBag $post
      */
@@ -90,6 +104,8 @@ class ConfigEvent extends CommonEvent
      * Returns the POST.
      *
      * @return \Symfony\Component\HttpFoundation\ParameterBag
+     *
+     * @deprecated 2.14.1; to be removed in 3.0 as unused
      */
     public function getPost()
     {
@@ -125,8 +141,12 @@ class ConfigEvent extends CommonEvent
     /**
      * Set error message.
      *
-     * @param string $message     (untranslated)
-     * @param array  $messageVars for translation
+     * @param string      $message     (untranslated)
+     * @param array       $messageVars for translation
+     * @param string|null $key
+     * @param string|null $field
+     *
+     * @return ConfigEvent
      */
     public function setError($message, $messageVars = [], $key = null, $field = null)
     {
@@ -188,5 +208,41 @@ class ConfigEvent extends CommonEvent
     public function encodeFileContents($content)
     {
         return base64_encode($content);
+    }
+
+    /**
+     * @return array
+     */
+    public function getOriginalNormData()
+    {
+        return $this->originalNormData;
+    }
+
+    /**
+     * @param array $normData
+     *
+     * @return ConfigEvent
+     */
+    public function setOriginalNormData(array $normData)
+    {
+        $this->originalNormData = $normData;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNormData()
+    {
+        return $this->normData;
+    }
+
+    /**
+     * @param array $normData
+     */
+    public function setNormData($normData)
+    {
+        $this->normData = $normData;
     }
 }

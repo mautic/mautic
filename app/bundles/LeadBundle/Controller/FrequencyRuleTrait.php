@@ -131,19 +131,19 @@ trait FrequencyRuleTrait
 
         foreach ($allChannels as $channel) {
             if (isset($frequencyRules[$channel])) {
-                $frequencyRule                      = $frequencyRules[$channel];
-                $data['frequency_number_'.$channel] = $frequencyRule['frequency_number'];
-                $data['frequency_time_'.$channel]   = $frequencyRule['frequency_time'];
+                $frequencyRule                                       = $frequencyRules[$channel];
+                $data['lead_channels']['frequency_number_'.$channel] = $frequencyRule['frequency_number'];
+                $data['lead_channels']['frequency_time_'.$channel]   = $frequencyRule['frequency_time'];
                 if ($frequencyRule['pause_from_date']) {
-                    $data['contact_pause_start_date_'.$channel] = new \DateTime($frequencyRule['pause_from_date']);
+                    $data['lead_channels']['contact_pause_start_date_'.$channel] = new \DateTime($frequencyRule['pause_from_date']);
                 }
 
                 if ($frequencyRule['pause_to_date']) {
-                    $data['contact_pause_end_date_'.$channel] = new \DateTime($frequencyRule['pause_to_date']);
+                    $data['lead_channels']['contact_pause_end_date_'.$channel] = new \DateTime($frequencyRule['pause_to_date']);
                 }
 
                 if (!empty($frequencyRule['preferred_channel'])) {
-                    $data['preferred_channel'] = $channel;
+                    $data['lead_channels']['preferred_channel'] = $channel;
                 }
             }
         }
@@ -159,8 +159,8 @@ trait FrequencyRuleTrait
             $data['lead_lists'][] = $leadList->getId();
         }
 
-        $data['subscribed_channels'] = $leadChannels;
-        $this->isPublicView          = $isPublic;
+        $data['lead_channels']['subscribed_channels'] = $leadChannels;
+        $this->isPublicView                           = $isPublic;
 
         return $data;
     }
@@ -177,7 +177,7 @@ trait FrequencyRuleTrait
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
 
-        foreach ($formData['subscribed_channels'] as $contactChannel) {
+        foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {
             if (!isset($leadChannels[$contactChannel])) {
                 $contactable = $model->isContactable($lead, $contactChannel);
                 if ($contactable == DoNotContact::UNSUBSCRIBED) {
@@ -187,7 +187,7 @@ trait FrequencyRuleTrait
             }
         }
 
-        $dncChannels = array_diff($allChannels, $formData['subscribed_channels']);
+        $dncChannels = array_diff($allChannels, $formData['lead_channels']['subscribed_channels']);
         if (!empty($dncChannels)) {
             foreach ($dncChannels as $channel) {
                 if ($currentChannelId) {

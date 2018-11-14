@@ -103,4 +103,37 @@ class UrlHelperTest extends \PHPUnit_Framework_TestCase
             UrlHelper::getUrlsFromPlaintext('Hello there, http://mautic.org is the correct URL. Not http://mucktick.org.')
         );
     }
+
+    public function testGetUrlsFromPlaintextWithSymbols()
+    {
+        $this->assertEquals(
+            ['https://example.org/with/square/brackets',
+                'https://example.org/square/brackets/with/slash/and/comma/',
+                'https://example.org/with/parentheses',
+                'https://example.org/with/braces',
+                'https://example.org/with/greater-than-symbol',
+                'https://example.org/with/comma',
+                'https://example.org/with/dot',
+                'https://example.org/with/colon',
+                'https://example.org/with/semi-colon',
+                'https://example.org/with/simple-quotes',
+                'https://example.org/with/double-quotes',
+                'https://example.org/with/exclamation',
+                'https://example.org/with/quotation',
+                ],
+            UrlHelper::getUrlsFromPlaintext('This text contains URL with the square brackets [https://example.org/with/square/brackets]
+                also the square brackets with a slash and a comma [https://example.org/square/brackets/with/slash/and/comma/],
+                or parentheses (https://example.org/with/parentheses),
+                or braces {https://example.org/with/braces}
+                or greater than symbol <https://example.org/with/greater-than-symbol>
+                even with just a comma: https://example.org/with/comma,
+                or with a dot: https://example.org/with/dot.
+                https://example.org/with/colon: It is cool!
+                This website https://example.org/with/semi-colon; Very awesome!
+                A single example \'https://example.org/with/simple-quotes\'
+                A double example "https://example.org/with/double-quotes"
+                Thanks for this https://example.org/with/exclamation!
+                Someone said “https://example.org/with/quotation”')
+        );
+    }
 }

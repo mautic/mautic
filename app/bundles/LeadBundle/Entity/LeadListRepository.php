@@ -1148,12 +1148,16 @@ class LeadListRepository extends CommonRepository
                     break;
                 case 'hit_url_date':
                 case 'lead_email_read_date':
+                case 'lead_email_sent_date':
                     $operand = (in_array($func, ['eq', 'gt', 'lt', 'gte', 'lte', 'between'])) ? 'EXISTS' : 'NOT EXISTS';
                     $table   = 'page_hits';
                     $column  = 'date_hit';
 
                     if ($details['field'] == 'lead_email_read_date') {
                         $column = 'date_read';
+                        $table  = 'email_stats';
+                    } elseif ($details['field'] == 'lead_email_sent_date') {
+                        $column = 'date_sent';
                         $table  = 'email_stats';
                     }
 
@@ -1766,7 +1770,7 @@ class LeadListRepository extends CommonRepository
                         case 'notIn':
                             foreach ($details['filter'] as &$value) {
                                 $value = $q->expr()->literal(
-                                    InputHelper::clean($value)
+                                    InputHelper::string($value)
                                 );
                             }
                             if ($details['type'] == 'multiselect') {

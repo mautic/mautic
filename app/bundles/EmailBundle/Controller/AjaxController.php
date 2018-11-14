@@ -310,14 +310,22 @@ class AjaxController extends CommonAjaxController
         /** @var EmailModel $model */
         $model = $this->getModel('email');
 
+        $id  = $request->get('id');
+        $ids = $request->get('ids');
+
+        // Support for legacy calls
+        if (!$ids && $id) {
+            $ids = [$id];
+        }
+
         $data = [];
-        if ($id = $request->get('id')) {
+        foreach ($ids as $id) {
             if ($email = $model->getEntity($id)) {
                 $pending = $model->getPendingLeads($email, null, true);
                 $queued  = $model->getQueuedCounts($email);
 
-                $data = [
-                    'success'     => 1,
+                $data[] = [
+                    'id'          => $id,
                     'pending'     => 'list' === $email->getEmailType() && $pending ? $this->translator->trans(
                         'mautic.email.stat.leadcount',
                         ['%count%' => $pending]
@@ -328,6 +336,16 @@ class AjaxController extends CommonAjaxController
                     'readPercent' => $this->translator->trans('mautic.email.stat.readpercent', ['%count%' => $email->getReadPercentage(true)]),
                 ];
             }
+        }
+
+        // Support for legacy calls
+        if ($request->get('id')) {
+            $data = $data[0];
+        } else {
+            $data = [
+                'success' => 1,
+                'stats'   => $data,
+            ];
         }
 
         return new JsonResponse($data);

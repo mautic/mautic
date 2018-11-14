@@ -337,7 +337,7 @@ class WebhookModel extends FormModel
             $this->addLog($webhook, $response->code, (microtime(true) - $start), $response->body);
 
             // throw an error exception if we don't get a 200 back
-            if ($response->code >= 300 && $response->code < 200) {
+            if ($response->code >= 300 || $response->code < 200) {
                 // The reciever of the webhook is telling us to stop bothering him with our requests by code 410
                 if ($response->code == 410) {
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');

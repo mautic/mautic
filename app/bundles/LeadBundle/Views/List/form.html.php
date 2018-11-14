@@ -102,7 +102,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                             $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
                                             ?>
                                             <option value="<?php echo $view->escape($value); ?>"
-                                                    id="available_<?php echo $value; ?>"
+                                                    id="available_<?php echo $object.'_'.$value; ?>"
                                                     data-field-object="<?php echo $object; ?>"
                                                     data-field-type="<?php echo $params['properties']['type']; ?>"
                                                     data-field-list="<?php echo $view->escape($list); ?>"
@@ -119,6 +119,11 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             <div class="clearfix"></div>
                         </div>
                         <div class="selected-filters" id="leadlist_filters">
+                            <?php if ($filterErrors): ?>
+                                <div class="alert alert-danger has-error">
+                                    <?php echo $view['form']->errors($form['filters']); ?>
+                                </div>
+                            <?php endif ?>
                             <?php echo $view['form']->widget($form['filters']); ?>
                         </div>
                     </div>

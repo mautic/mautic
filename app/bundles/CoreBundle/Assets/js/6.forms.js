@@ -582,7 +582,7 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
 
             if (mQuery('#'+fieldPrefix+'value_chosen').length) {
                 valueFieldAttrs['value'] = '';
-                valueField.chosen('destroy');
+                Mautic.destroyChosen(valueField);
             }
 
             if (!mQuery.isEmptyObject(response.options) && response.fieldType !== 'number') {
@@ -658,9 +658,7 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
             if (!mQuery.isEmptyObject(response.operators)) {
                 var operatorField = mQuery('#'+fieldPrefix+'operator');
 
-                if (mQuery('#'+fieldPrefix+'operator_chosen').length) {
-                    operatorField.chosen('destroy');
-                }
+                Mautic.destroyChosen(operatorField);
 
                 var operatorFieldAttrs = {
                     'class': operatorField.attr('class'),
