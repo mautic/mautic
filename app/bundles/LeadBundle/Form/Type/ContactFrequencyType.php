@@ -123,7 +123,8 @@ class ContactFrequencyType extends AbstractType
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(
             [
-                'public_view' => false,
+                'public_view'            => false,
+                'preference_center_only' => false,
             ]
         );
     }
