@@ -56,9 +56,14 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
 
                 foreach ($rows as $col => $val) {
                     if ($val != 'NULL') {
-                        $setter = 'set'.ucfirst($col);
-                        if (in_array($col, ['form', 'page', 'ipAddress'])) {
-                            $entity = $fixture->getReference($col.'-'.$val);
+                        $setter = 'set'.\ucfirst($col);
+                        if (\in_array($col, ['form', 'page', 'ipAddress', 'lead'])) {
+                            if ($col === 'lead') {
+                                // For some reason the lead must be linked with id - 1
+                                $entity = $fixture->getReference($col.'-'.($val - 1));
+                            } else {
+                                $entity = $fixture->getReference($col.'-'.$val);
+                            }
                             if ($col == 'page') {
                                 $submission->setReferer($pageModel->generateUrl($entity));
                             }
@@ -79,7 +84,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
         $results = CsvHelper::csv_to_array(__DIR__.'/fakeresultdata.csv');
         $importResults($results);
 
-        sleep(2);
+        \sleep(2);
 
         $results2 = CsvHelper::csv_to_array(__DIR__.'/fakeresult2data.csv');
         $importResults($results2);
