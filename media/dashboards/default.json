@@ -4,29 +4,29 @@
     "widgets":
     [
         {
-            "name": "Page Visits",
-            "width": 100,
-            "height": 330,
-            "ordering": 0,
-            "type": "page.hits.in.time",
-            "params": {
-                "flag": "unique"
-            }
-        },
-        {
             "name": "Contacts Created",
             "width": 100,
             "height": 330,
-            "ordering": 1,
+            "ordering": 0,
             "type": "created.leads.in.time",
             "params": {
                 "lists": "identifiedVsAnonymous"
             }
         },
         {
+            "name": "Page Visits",
+            "width": 50,
+            "height": 330,
+            "ordering": 1,
+            "type": "page.hits.in.time",
+            "params": {
+                "flag": "unique"
+            }
+        },
+        {
             "name": "Form Submissions",
-            "width": 100,
-            "height": 215,
+            "width": 50,
+            "height": 330,
             "ordering": 2,
             "type": "submissions.in.time"
         },
