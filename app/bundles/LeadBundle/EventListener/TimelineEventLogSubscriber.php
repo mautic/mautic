@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -21,16 +20,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 class TimelineEventLogSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
-
-    /**
-     * @var TranslatorInterface|Translator
-     */
-    private $translator;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $eventLogRepository;
 
     /**
      * TimelineEventLogSubscriber constructor.
