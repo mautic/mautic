@@ -93,7 +93,7 @@ class MigrationCommandSubscriber extends CommonSubscriber
 
             $output->writeln('');
             $output->writeln("<info>++</info> adding generated column <comment>{$generatedColumn->getColumnName()}</comment>");
-            $output->writeln("<comment>-></comment>{$generatedColumn->getAlterTableSql()}");
+            $output->writeln("<comment>-></comment> {$generatedColumn->getAlterTableSql()}");
 
             $this->connection->query($generatedColumn->getAlterTableSql());
 

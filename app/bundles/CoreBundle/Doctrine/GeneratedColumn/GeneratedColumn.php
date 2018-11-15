@@ -128,7 +128,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
     {
         return "ALTER TABLE {$this->tablePrefix}email_stats 
             ADD {$this->columnName} {$this->getColumnDefinition()},
-            ADD index `{$this->tablePrefix}{$this->getIndexName()}`({$this->indexColumnsToString()})";
+            ADD index `{$this->getIndexName()}`({$this->indexColumnsToString()})";
     }
 
     /**
