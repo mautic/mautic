@@ -28,19 +28,9 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
     use TimelineEventLogTrait;
 
     /**
-     * @var LeadEventLogRepository
-     */
-    private $eventLogRepository;
-
-    /**
      * @var UserHelper
      */
     private $userHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
 
     /**
      * TimelineEventLogCampaignSubscriber constructor.
