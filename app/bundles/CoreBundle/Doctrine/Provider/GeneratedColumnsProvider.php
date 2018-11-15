@@ -81,7 +81,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
     /**
      * @return bool
      */
-    private function generatedColumnsAreSupported()
+    public function generatedColumnsAreSupported()
     {
         return 1 !== version_compare($this->getMinimalSupportedVersion(), $this->versionProvider->fetchVersion());
     }
@@ -89,7 +89,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
     /**
      * @return string
      */
-    private function getMinimalSupportedVersion()
+    public function getMinimalSupportedVersion()
     {
         if ($this->versionProvider->isMariaDb()) {
             return self::MARIADB_MINIMUM_VERSION;

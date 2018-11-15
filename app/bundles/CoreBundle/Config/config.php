@@ -173,6 +173,14 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.core.migration.command.subscriber' => [
+                'class'     => \Mautic\CoreBundle\EventListener\MigrationCommandSubscriber::class,
+                'arguments' => [
+                    'mautic.database.version.provider',
+                    'mautic.generated.columns.provider',
+                    'database_connection',
+                ],
+            ],
             'mautic.core.configbundle.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
