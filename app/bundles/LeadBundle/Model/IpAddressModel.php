@@ -61,7 +61,7 @@ class IpAddressModel
      */
     private function insertIpAddressReference(Lead $contact, IpAddress $ipAddress)
     {
-        $ipAddressAdded = isset($contact->getChanges()['ipAddress'][$ipAddress->getIpAddress()]);
+        $ipAddressAdded = isset($contact->getChanges()['ipAddressList'][$ipAddress->getIpAddress()]);
         if (!$ipAddressAdded || !$ipAddress->getId() || !$contact->getId()) {
             return;
         }

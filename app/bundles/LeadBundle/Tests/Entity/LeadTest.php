@@ -293,11 +293,11 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $contact->addIpAddress($ip1);
         $changes = $contact->getChanges();
 
-        $this->assertSame(['1.2.3.4' => $ip1], $contact->getChanges()['ipAddress']);
+        $this->assertSame(['1.2.3.4' => $ip1], $contact->getChanges()['ipAddressList']);
 
         $contact->addIpAddress($ip2);
 
-        $this->assertSame(['1.2.3.4' => $ip1, '1.2.3.5' => $ip2], $contact->getChanges()['ipAddress']);
+        $this->assertSame(['1.2.3.4' => $ip1, '1.2.3.5' => $ip2], $contact->getChanges()['ipAddressList']);
     }
 
     /**

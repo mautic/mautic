@@ -87,7 +87,7 @@ class IpAddressModelTest extends \PHPUnit_Framework_TestCase
 
         $contact->expects($this->exactly(2))
             ->method('getChanges')
-            ->willReturn(['ipAddress' => ['1.2.3.4' => $ipAddressAdded]]);
+            ->willReturn(['ipAddressList' => ['1.2.3.4' => $ipAddressAdded]]);
 
         $ipAddressAdded->expects($this->exactly(2))
             ->method('getId')
@@ -138,7 +138,7 @@ class IpAddressModelTest extends \PHPUnit_Framework_TestCase
 
         $contact->expects($this->once())
             ->method('getChanges')
-            ->willReturn(['ipAddress' => ['1.2.3.4' => $ipAddress]]);
+            ->willReturn(['ipAddressList' => ['1.2.3.4' => $ipAddress]]);
 
         $ipAddress->expects($this->exactly(3))
             ->method('getId')

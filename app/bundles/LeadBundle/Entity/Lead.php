@@ -535,11 +535,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         } elseif ($prop == 'ipAddresses') {
             $this->changes['ipAddresses'] = ['', $val->getIpAddress()]; // Kept for BC. Not a good way to track changes on a collection
 
-            if (empty($this->changes['ipAddress'])) {
-                $this->changes['ipAddress'] = [];
+            if (empty($this->changes['ipAddressList'])) {
+                $this->changes['ipAddressList'] = [];
             }
 
-            $this->changes['ipAddress'][$val->getIpAddress()] = $val;
+            $this->changes['ipAddressList'][$val->getIpAddress()] = $val;
         } elseif ($prop == 'tags') {
             if ($val instanceof Tag) {
                 $this->changes['tags']['added'][] = $val->getTag();
