@@ -120,7 +120,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->redirectRepositoryMock,
             $this->cacheStorageHelperMock,
             $this->contactTracker,
-            $this->doNotContact
+            $this->doNotContact,
             $this->generatedColumnsProvider
         );
 
@@ -500,7 +500,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->redirectRepositoryMock,
             $this->cacheStorageHelperMock,
             $this->contactTracker,
-            $this->doNotContact
+            $this->doNotContact,
             $this->generatedColumnsProvider
         );
 
