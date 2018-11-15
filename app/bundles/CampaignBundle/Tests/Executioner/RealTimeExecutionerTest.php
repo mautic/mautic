@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\NullLogger;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 
 class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
 {
@@ -62,6 +63,11 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
      */
     private $contactTracker;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|LeadRepository
+     */
+    private $leadRepository;
+
     protected function setUp()
     {
         $this->leadModel = $this->getMockBuilder(LeadModel::class)
@@ -89,6 +95,10 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->contactTracker = $this->getMockBuilder(ContactTracker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -415,7 +425,8 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
             $this->decisionExecutioner,
             $this->eventCollector,
             $this->eventScheduler,
-            $this->contactTracker
+            $this->contactTracker,
+            $this->leadRepository
         );
     }
 }

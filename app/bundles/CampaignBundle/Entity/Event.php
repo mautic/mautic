@@ -636,6 +636,31 @@ class Event implements ChannelInterface
     }
 
     /**
+     * Get path taken from log.
+     *
+     * @param Contact $contact
+     * @param $rotation
+     * @return int|null
+     */
+    public function getPathTaken(Contact $contact, $rotation)
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('lead', $contact))
+            ->andWhere(Criteria::expr()->eq('rotation', $rotation))
+            ->orderBy(['id' => 'DESC'])
+            ->setMaxResults(1);
+        ;
+
+        $log = $this->getLog()->matching($criteria);
+
+        if (count($log)) {
+            return (int)$log->first()->getNonActionPathTaken();
+        }
+
+        return null;
+    }
+
+    /**
      * Add children.
      *
      * @param \Mautic\CampaignBundle\Entity\Event $children
