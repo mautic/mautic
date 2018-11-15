@@ -90,7 +90,7 @@ class LeadSubscriber extends CommonSubscriber
 
         if ($details = $event->getChanges()) {
             // Unset dateLastActive and dateModified and ipAddress to prevent un-necessary audit log entries
-            unset($details['dateLastActive'], $details['dateModified'], $details['ipAddress']);
+            unset($details['dateLastActive'], $details['dateModified'], $details['ipAddressList']);
             if (empty($details)) {
                 return;
             }
