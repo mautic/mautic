@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -102,6 +103,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
         $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->doNotContact           = $this->createMock(DoNotContact::class);
+        $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -119,6 +121,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact
+            $this->generatedColumnsProvider
         );
 
         $this->emailModel->setTranslator($this->translator);
@@ -498,6 +501,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact
+            $this->generatedColumnsProvider
         );
 
         $emailModel->setTranslator($this->translator);

@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -41,15 +42,25 @@ class ReportSubscriber implements EventSubscriberInterface
     private $companyReportData;
 
     /**
+     * @var GeneratedColumnsProviderInterface
+     */
+    private $generatedColumnsProvider;
+
+    /**
      * @var StatRepository
      */
     private $statRepository;
 
-    public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
-    {
-        $this->db                = $db;
-        $this->companyReportData = $companyReportData;
-        $this->statRepository    = $statRepository;
+    public function __construct(
+        Connection $db,
+        CompanyReportData $companyReportData,
+        StatRepository $statRepository,
+        GeneratedColumnsProviderInterface $generatedColumnsProvider
+    ) {
+        $this->db                       = $db;
+        $this->companyReportData        = $companyReportData;
+        $this->statRepository           = $statRepository;
+        $this->generatedColumnsProvider = $generatedColumnsProvider;
     }
 
     /**
@@ -426,7 +437,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
             switch ($g) {
                 case 'mautic.email.graph.line.stats':
-                    $chartQuery->addGeneratedColumn('generated_sent_date', 'date_sent', 'd');
+                    $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
                     $chart     = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $sendQuery = clone $queryBuilder;
                     $readQuery = clone $origQuery;

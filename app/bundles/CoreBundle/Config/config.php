@@ -674,6 +674,26 @@ return [
                 'tag'       => 'doctrine.event_subscriber',
                 'arguments' => '%mautic.db_table_prefix%',
             ],
+            'mautic.database.version.provider' => [
+                'class'     => \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class,
+                'arguments' => ['database_connection'],
+            ],
+            'mautic.generated.columns.provider' => [
+                'class'     => \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class,
+                'arguments' => ['mautic.database.version.provider', 'event_dispatcher'],
+            ],
+            'mautic.generated.columns.doctrine.listener' => [
+                'class'        => \Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class,
+                'tag'          => 'doctrine.event_listener',
+                'tagArguments' => [
+                    'event' => 'postGenerateSchema',
+                    'lazy'  => true,
+                ],
+                'arguments' => [
+                    'mautic.generated.columns.provider',
+                    'monolog.logger.mautic',
+                ],
+            ],
             'mautic.exception.listener' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
                 'arguments' => [

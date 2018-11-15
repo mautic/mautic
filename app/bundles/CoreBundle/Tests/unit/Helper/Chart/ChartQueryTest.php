@@ -13,6 +13,9 @@ namespace Mautic\CoreBundle\Tests\Helper\Chart;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
+use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 class ChartQueryTest extends \PHPUnit_Framework_TestCase
@@ -82,7 +85,19 @@ class ChartQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGeneratedDateColumn()
     {
-        $this->chartQuery->addGeneratedColumn('generated_sent_date', $this->dateColumn, $this->unit);
+        $generatedColumn          = new GeneratedColumn('email_stats', 'generated_sent_date', 'DATE', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))');
+        $generatedColumns         = new GeneratedColumns();
+        $generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
+
+        $generatedColumn->addIndexColumn('email_id');
+        $generatedColumn->setOriginalDateColumn($this->dateColumn, $this->unit);
+        $generatedColumns->add($generatedColumn);
+
+        $generatedColumnsProvider->expects($this->once())
+            ->method('getGeneratedColumns')
+            ->willReturn($generatedColumns);
+
+        $this->chartQuery->setGeneratedColumnProvider($generatedColumnsProvider);
 
         $this->queryBuilder->expects($this->once())
             ->method('select')

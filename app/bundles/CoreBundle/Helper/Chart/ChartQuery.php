@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Helper\Chart;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 
 /**
  * Methods to get the chart data as native queries to get better performance and work with date/time native SQL queries.
@@ -25,6 +26,11 @@ class ChartQuery extends AbstractChart
      * @var Connection
      */
     protected $connection;
+
+    /**
+     * @var GeneratedColumnsProviderInterface
+     */
+    private $generatedColumnProvider;
 
     /**
      * Match date/time unit to a SQL datetime format
@@ -64,48 +70,22 @@ class ChartQuery extends AbstractChart
     ];
 
     /**
-     * Holds generated columns in format:.
-     *
-     * [
-     *      $originalColumn => [
-     *          $unit => $generatedColumn
-     *      ]
-     * ]
-     *
-     * @var array
-     */
-    private $generatedColumns = [];
-
-    /**
-     * Construct a new ChartQuery object.
-     *
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $unit
+     * @param string|null $unit
      */
     public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
     {
         $this->unit       = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
         $this->isTimeUnit = (in_array($this->unit, ['H', 'i', 's']));
-        $this->setDateRange($dateFrom, $dateTo);
         $this->connection = $connection;
+        $this->setDateRange($dateFrom, $dateTo);
     }
 
     /**
-     * Adds a generated column definition. Chart query will use $generatedColumn
-     * for select, group by and order instead of $originalColumn if the $unit is used.
-     *
-     * @param string $generatedColumn
-     * @param string $originalColumn
-     * @param string $unit
+     * @param GeneratedColumnsProviderInterface $generatedColumnProvider
      */
-    public function addGeneratedColumn($generatedColumn, $originalColumn, $unit)
+    public function setGeneratedColumnProvider(GeneratedColumnsProviderInterface $generatedColumnProvider)
     {
-        if (!isset($this->generatedColumns[$originalColumn])) {
-            $this->generatedColumns[$originalColumn] = [];
-        }
-
-        $this->generatedColumns[$originalColumn][$unit] = $generatedColumn;
+        $this->generatedColumnProvider = $generatedColumnProvider;
     }
 
     /**
@@ -605,8 +585,16 @@ class ChartQuery extends AbstractChart
      */
     private function getDateConstruct($tablePrefix, $column)
     {
-        if (isset($this->generatedColumns[$column][$this->unit])) {
-            return $tablePrefix.'.'.$this->generatedColumns[$column][$this->unit];
+        if ($this->generatedColumnProvider) {
+            $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();
+
+            try {
+                $generatedColumn = $generatedColumns->getForOriginalDateColumnAndUnit($column, $this->unit);
+
+                return $tablePrefix.'.'.$generatedColumn->getColumnName();
+            } catch (\UnexpectedValueException $e) {
+                // Alright. Use the original column then.
+            }
         }
 
         $dbUnit = $this->translateTimeUnit($this->unit);
