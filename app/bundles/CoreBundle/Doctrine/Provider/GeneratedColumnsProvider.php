@@ -68,8 +68,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
             && null === $this->generatedColumns
             && $this->dispatcher->hasListeners(CoreEvents::ON_GENERATED_COLUMNS_BUILD)
         ) {
-            $event = new GeneratedColumnsEvent();
-            $this->dispatcher->dispatch(CoreEvents::ON_GENERATED_COLUMNS_BUILD, $event);
+            $event                  = $this->dispatcher->dispatch(CoreEvents::ON_GENERATED_COLUMNS_BUILD, new GeneratedColumnsEvent());
             $this->generatedColumns = $event->getGeneratedColumns();
         } else {
             $this->generatedColumns = new GeneratedColumns();

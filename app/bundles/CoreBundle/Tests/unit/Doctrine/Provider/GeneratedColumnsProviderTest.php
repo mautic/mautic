@@ -11,9 +11,11 @@
 
 namespace Mautic\CoreBundle\Tests\Doctrine\Provider;
 
+use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnsInterface;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
+use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class GeneratedColumnsProviderTest extends \PHPUnit_Framework_TestCase
@@ -26,9 +28,13 @@ class GeneratedColumnsProviderTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
+
         $this->versionProvider = $this->createMock(VersionProviderInterface::class);
         $this->dispatcher      = $this->createMock(EventDispatcherInterface::class);
         $this->provider        = new GeneratedColumnsProvider($this->versionProvider, $this->dispatcher);
+
+        $this->dispatcher->method('hasListeners')->willReturn(true);
     }
 
     public function testGetGeneratedColumnsIfNotSupported()
@@ -46,5 +52,29 @@ class GeneratedColumnsProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
         $this->assertCount(0, $generatedColumns);
+    }
+
+    public function testGetGeneratedColumnsIfSupported()
+    {
+        $supportedMySqlVersion = '8.0.0';
+
+        $event = new GeneratedColumnsEvent();
+        $event->addGeneratedColumn(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
+
+        $this->versionProvider->expects($this->exactly(2))
+            ->method('fetchVersion')
+            ->willReturn($supportedMySqlVersion);
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->willReturn($event);
+
+        $generatedColumns = $this->provider->getGeneratedColumns();
+
+        $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
+        $this->assertCount(1, $generatedColumns);
+
+        // Ensure that the cache works and dispatcher is called only once
+        $generatedColumns = $this->provider->getGeneratedColumns();
     }
 }
