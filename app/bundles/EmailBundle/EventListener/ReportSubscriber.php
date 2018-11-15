@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -25,9 +26,6 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 
-/**
- * Class ReportSubscriber.
- */
 class ReportSubscriber extends CommonSubscriber
 {
     const CONTEXT_EMAILS      = 'emails';
@@ -44,15 +42,23 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * ReportSubscriber constructor.
-     *
-     * @param Connection        $db
-     * @param CompanyReportData $companyReportData
+     * @var GeneratedColumnsProviderInterface
      */
-    public function __construct(Connection $db, CompanyReportData $companyReportData)
-    {
-        $this->db                = $db;
-        $this->companyReportData = $companyReportData;
+    private $generatedColumnsProvider;
+
+    /**
+     * @param Connection                        $db
+     * @param CompanyReportData                 $companyReportData
+     * @param GeneratedColumnsProviderInterface $generatedColumnsProvider
+     */
+    public function __construct(
+        Connection $db,
+        CompanyReportData $companyReportData,
+        GeneratedColumnsProviderInterface $generatedColumnsProvider
+    ) {
+        $this->db                       = $db;
+        $this->companyReportData        = $companyReportData;
+        $this->generatedColumnsProvider = $generatedColumnsProvider;
     }
 
     /**
@@ -436,7 +442,7 @@ class ReportSubscriber extends CommonSubscriber
 
             switch ($g) {
                 case 'mautic.email.graph.line.stats':
-                    $chartQuery->addGeneratedColumn('generated_sent_date', 'date_sent', 'd');
+                    $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
                     $chart     = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $sendQuery = clone $queryBuilder;
                     $readQuery = clone $origQuery;
