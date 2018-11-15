@@ -17,4 +17,14 @@ interface GeneratedColumnsProviderInterface
      * @return GeneratedColumns
      */
     public function getGeneratedColumns();
+
+    /**
+     * @return bool
+     */
+    public function generatedColumnsAreSupported();
+
+    /**
+     * @return string
+     */
+    public function getMinimalSupportedVersion();
 }
