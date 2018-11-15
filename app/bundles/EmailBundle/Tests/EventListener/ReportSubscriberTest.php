@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -26,6 +27,7 @@ class ReportSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $connectionMock;
     private $companyReportDataMock;
+    private $generatedColumnsProvider;
     private $emMock;
 
     /**
@@ -37,10 +39,11 @@ class ReportSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->connectionMock        = $this->createMock(Connection::class);
-        $this->companyReportDataMock = $this->createMock(CompanyReportData::class);
-        $this->emMock                = $this->createMock(EntityManager::class);
-        $this->subscriber            = new ReportSubscriber($this->connectionMock, $this->companyReportDataMock);
+        $this->connectionMock           = $this->createMock(Connection::class);
+        $this->companyReportDataMock    = $this->createMock(CompanyReportData::class);
+        $this->emMock                   = $this->createMock(EntityManager::class);
+        $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
+        $this->subscriber               = new ReportSubscriber($this->connectionMock, $this->companyReportDataMock, $this->generatedColumnsProvider);
         $this->subscriber->setEntityManager($this->emMock);
     }
 
