@@ -15,6 +15,7 @@ use GuzzleHttp\Exception\ClientException;
 use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
+use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
@@ -69,6 +70,11 @@ final class SyncService implements SyncServiceInterface
     private $eventDispatcher;
 
     /**
+     * @var Notifier
+     */
+    private $notifier;
+
+    /**
      * SyncService constructor.
      *
      * @param SyncProcessFactoryInterface $integrationSyncProcessFactory
@@ -77,6 +83,7 @@ final class SyncService implements SyncServiceInterface
      * @param MappingHelper               $mappingHelper
      * @param SyncIntegrationsHelper      $syncIntegrationsHelper
      * @param EventDispatcherInterface    $eventDispatcher
+     * @param Notifier                    $notifier
      * @param IntegrationSyncProcess      $integrationSyncProcess
      * @param MauticSyncProcess           $mauticSyncProcess
      */
@@ -87,15 +94,18 @@ final class SyncService implements SyncServiceInterface
         MappingHelper $mappingHelper,
         SyncIntegrationsHelper $syncIntegrationsHelper,
         EventDispatcherInterface $eventDispatcher,
+        Notifier $notifier,
         IntegrationSyncProcess $integrationSyncProcess,
         MauticSyncProcess $mauticSyncProcess
-    ) {
+    )
+    {
         $this->integrationSyncProcessFactory = $integrationSyncProcessFactory;
         $this->internalSyncDataExchange      = $internalSyncDataExchange;
         $this->syncDateHelper                = $syncDateHelper;
         $this->mappingHelper                 = $mappingHelper;
         $this->syncIntegrationsHelper        = $syncIntegrationsHelper;
         $this->eventDispatcher               = $eventDispatcher;
+        $this->notifier                      = $notifier;
         $this->integratinSyncProcess         = $integrationSyncProcess;
         $this->mauticSyncProcess             = $mauticSyncProcess;
     }
@@ -121,6 +131,7 @@ final class SyncService implements SyncServiceInterface
             $this->integratinSyncProcess,
             $this->mauticSyncProcess,
             $this->eventDispatcher,
+            $this->notifier,
             $this->internalSyncDataExchange,
             $this->syncIntegrationsHelper->getSyncDataExchange($integration),
             $this->syncIntegrationsHelper->getMappingManual($integration),

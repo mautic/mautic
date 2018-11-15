@@ -28,5 +28,12 @@ class SyncIntegrationsPass implements CompilerPassInterface
         foreach ($taggedServices as $id => $tags) {
             $syncIntegrationsHelper->addMethodCall('addIntegration', [new Reference($id)]);
         }
+
+        $taggedServices   = $container->findTaggedServiceIds('mautic.sync.notification_handler');
+        $handlerContainer = $container->findDefinition('mautic.integrations.sync.notification.handler_container');
+
+        foreach ($taggedServices as $id => $tags) {
+            $handlerContainer->addMethodCall('registerHandler', [new Reference($id)]);
+        }
     }
 }
