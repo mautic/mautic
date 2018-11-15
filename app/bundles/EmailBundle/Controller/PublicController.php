@@ -192,7 +192,7 @@ class PublicController extends CommonFormController
                     'showContactSegments'          => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_segments'),
                 ];
 
-                $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action);
+                $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
                 if (true === $form) {
                     return $this->postActionRedirect(
                         [

@@ -152,7 +152,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false)
+    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
         if (is_array($lead)) {
             $q = $this->getEntityManager()->createQueryBuilder()
@@ -175,12 +175,16 @@ class LeadListRepository extends CommonRepository
             )
                 ->setParameter('leads', $lead)
                 ->setParameter('false', false, 'boolean');
+
             if ($isPublic) {
                 $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
                     ->setParameter('isPublic', true, 'boolean');
             }
+            if ($isPreferenceCenter) {
+                $q->andWhere($q->expr()->eq('l.isPreferenceCenter', ':isPreferenceCenter'))
+                    ->setParameter('isPreferenceCenter', true, 'boolean');
+            }
             $result = $q->getQuery()->getArrayResult();
-
             $return = [];
             foreach ($result as $r) {
                 foreach ($r['leads'] as $l) {
@@ -212,6 +216,11 @@ class LeadListRepository extends CommonRepository
             if ($isPublic) {
                 $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
                     ->setParameter('isPublic', true, 'boolean');
+            }
+
+            if ($isPreferenceCenter) {
+                $q->andWhere($q->expr()->eq('l.isPreferenceCenter', ':isPreferenceCenter'))
+                    ->setParameter('isPreferenceCenter', true, 'boolean');
             }
 
             return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
@@ -261,6 +270,27 @@ class LeadListRepository extends CommonRepository
             ->where($q->expr()->eq('l.isPublished', 'true'))
             ->setParameter(':true', true, 'boolean')
             ->andWhere($q->expr()->eq('l.isGlobal', ':true'))
+            ->orderBy('l.name');
+
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
+    }
+
+    /**
+     * Return a list of global lists.
+     *
+     * @return array
+     */
+    public function getPreferenceCenterList()
+    {
+        $q = $this->getEntityManager()->createQueryBuilder()
+            ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+
+        $q->select('partial l.{id, name, alias}')
+            ->where($q->expr()->eq('l.isPublished', 'true'))
+            ->setParameter(':true', true, 'boolean')
+            ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':true'))
             ->orderBy('l.name');
 
         $results = $q->getQuery()->getArrayResult();
