@@ -87,9 +87,6 @@ return [
             ],
             'mautic.integrations.form.config.sync_settings_field_mappings' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
-                'arguments' => [
-                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
-                ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field_directions' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
@@ -98,6 +95,7 @@ return [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType::class,
                 'arguments' => [
                     'translator',
+                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
                 ]
             ],
             'mautic.integrations.form.config.sync_settings_object_field' => [

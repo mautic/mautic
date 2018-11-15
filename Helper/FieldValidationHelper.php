@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Helper;
-
 
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
@@ -60,7 +61,7 @@ class FieldValidationHelper
      * @param ConfigFormSyncInterface $integrationObject
      * @param array                   $fieldMappings
      */
-    public function validateRequiredFields(Form $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings)
+    public function validateRequiredFields(Form $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings): void
     {
         $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
         if (!$integrationConfiguration->getIsPublished()) {
@@ -79,7 +80,7 @@ class FieldValidationHelper
 
         $settings = $integrationConfiguration->getFeatureSettings();
         foreach ($settings['sync']['objects'] as $object) {
-            $objectFieldMappings = (isset($fieldMappings[$object])) ? $fieldMappings[$object] : [];
+            $objectFieldMappings = $fieldMappings[$object] ?? [];
             $fieldMappingForm    = $form['featureSettings']['sync']['fieldMappings'][$object];
 
             try {
@@ -97,7 +98,7 @@ class FieldValidationHelper
      * @param Form  $fieldMappingsForm
      * @param array $missingFields
      */
-    private function validateIntegrationRequiredFields(Form $fieldMappingsForm, array $missingFields)
+    private function validateIntegrationRequiredFields(Form $fieldMappingsForm, array $missingFields): void
     {
         $hasMissingFields  = false;
         $errorsOnGivenPage = false;
@@ -138,12 +139,12 @@ class FieldValidationHelper
      *
      * @return array
      */
-    private function findMissingIntegrationRequiredFieldMappings(string $object, array $mappedFields)
+    private function findMissingIntegrationRequiredFieldMappings(string $object, array $mappedFields): array
     {
         $requiredFields = $this->integrationObject->getRequiredFieldsForMapping($object);
 
         $missingFields = [];
-        foreach ($requiredFields as $field => $label) {
+        foreach ($requiredFields as $field => $fieldObject) {
             if (empty($mappedFields[$field]['mappedField'])) {
                 $missingFields[] = $field;
             }
@@ -159,7 +160,7 @@ class FieldValidationHelper
      *
      * @throws ObjectNotFoundException
      */
-    private function validateMauticRequiredFields(Form $fieldMappingsForm, string $object, array $objectFieldMappings)
+    private function validateMauticRequiredFields(Form $fieldMappingsForm, string $object, array $objectFieldMappings): void
     {
         $missingFields = $this->findMissingInternalRequiredFieldMappings($object, $objectFieldMappings);
         if (empty($missingFields)) {
@@ -186,7 +187,7 @@ class FieldValidationHelper
      * @return array
      * @throws ObjectNotFoundException
      */
-    private function findMissingInternalRequiredFieldMappings(string $object, array $objectFieldMappings)
+    private function findMissingInternalRequiredFieldMappings(string $object, array $objectFieldMappings): array
     {
         $mappedObjects = $this->integrationObject->getSyncMappedObjects();
 
