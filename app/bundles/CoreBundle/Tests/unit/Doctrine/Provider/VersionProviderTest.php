@@ -14,10 +14,12 @@ namespace Mautic\CoreBundle\Tests\Doctrine\Provider;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class VersionProviderTest extends \PHPUnit_Framework_TestCase
 {
     private $connection;
+    private $coreParametersHelper;
     private $statement;
     private $provider;
 
@@ -25,13 +27,40 @@ class VersionProviderTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->connection = $this->createMock(Connection::class);
-        $this->statement  = $this->createMock(Statement::class);
-        $this->provider   = new VersionProvider($this->connection);
+        $this->connection           = $this->createMock(Connection::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->statement            = $this->createMock(Statement::class);
+        $this->provider             = new VersionProvider($this->connection, $this->coreParametersHelper);
     }
 
-    public function testFetchVersionForMySql()
+    public function testGetVersionFromConfig()
     {
+        $this->coreParametersHelper->expects($this->once())
+            ->method('hasParameter')
+            ->with('db_server_version')
+            ->willReturn(true);
+
+        $this->coreParametersHelper->expects($this->once())
+            ->method('getParameter')
+            ->willReturn('5.7.23-0ubuntu0.18.04.1');
+
+        $version = $this->provider->getVersion();
+
+        $this->assertSame('5.7.23-0ubuntu0.18.04.1', $version);
+        $this->assertFalse($this->provider->isMariaDb());
+        $this->assertTrue($this->provider->isMySql());
+    }
+
+    public function testGetVersionForMySql()
+    {
+        $this->coreParametersHelper->expects($this->once())
+            ->method('hasParameter')
+            ->with('db_server_version')
+            ->willReturn(false);
+
+        $this->coreParametersHelper->expects($this->never())
+            ->method('getParameter');
+
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with('SELECT VERSION()')
@@ -41,15 +70,23 @@ class VersionProviderTest extends \PHPUnit_Framework_TestCase
             ->method('fetchColumn')
             ->willReturn('5.7.23-23-log');
 
-        $version = $this->provider->fetchVersion();
+        $version = $this->provider->getVersion();
 
         $this->assertSame('5.7.23-23-log', $version);
         $this->assertFalse($this->provider->isMariaDb());
         $this->assertTrue($this->provider->isMySql());
     }
 
-    public function testFetchVersionForMariaDb()
+    public function testGetVersionForMariaDb()
     {
+        $this->coreParametersHelper->expects($this->once())
+            ->method('hasParameter')
+            ->with('db_server_version')
+            ->willReturn(false);
+
+        $this->coreParametersHelper->expects($this->never())
+            ->method('getParameter');
+
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with('SELECT VERSION()')
@@ -59,7 +96,7 @@ class VersionProviderTest extends \PHPUnit_Framework_TestCase
             ->method('fetchColumn')
             ->willReturn('10.3.9-MariaDB');
 
-        $version = $this->provider->fetchVersion();
+        $version = $this->provider->getVersion();
 
         $this->assertSame('10.3.9-MariaDB', $version);
         $this->assertTrue($this->provider->isMariaDb());

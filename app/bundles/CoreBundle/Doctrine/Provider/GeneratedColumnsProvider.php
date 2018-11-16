@@ -82,7 +82,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
      */
     public function generatedColumnsAreSupported()
     {
-        return 1 !== version_compare($this->getMinimalSupportedVersion(), $this->versionProvider->fetchVersion());
+        return 1 !== version_compare($this->getMinimalSupportedVersion(), $this->versionProvider->getVersion());
     }
 
     /**

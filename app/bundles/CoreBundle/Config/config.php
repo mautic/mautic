@@ -684,7 +684,7 @@ return [
             ],
             'mautic.database.version.provider' => [
                 'class'     => \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class,
-                'arguments' => ['database_connection'],
+                'arguments' => ['database_connection', 'mautic.helper.core_parameters'],
             ],
             'mautic.generated.columns.provider' => [
                 'class'     => \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class,

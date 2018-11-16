@@ -75,7 +75,7 @@ class MigrationCommandSubscriber extends CommonSubscriber
 
         if (!$this->generatedColumnsProvider->generatedColumnsAreSupported()) {
             $output->writeln('');
-            $output->writeln("<comment>Your database version ({$this->versionProvider->fetchVersion()}) does not support generated columns. Upgrade at least to {$this->generatedColumnsProvider->getMinimalSupportedVersion()} to get the speed improvements.</comment>");
+            $output->writeln("<comment>Your database version ({$this->versionProvider->getVersion()}) does not support generated columns. Upgrade at least to {$this->generatedColumnsProvider->getMinimalSupportedVersion()} and update `db_server_version` accordingly to get the speed improvements.</comment>");
             $output->writeln('');
 
             return;
