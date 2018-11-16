@@ -672,6 +672,7 @@ class ReportModel extends FormModel
             'contentTemplate' => $contentTemplate,
             'columns'         => $tableDetails['columns'],
             'limit'           => ($paginate) ? $limit : 0,
+            'page'            => ($paginate) ? $reportPage : 1,
             'dateFrom'        => $dataOptions['dateFrom'],
             'dateTo'          => $dataOptions['dateTo'],
             'debug'           => $debugData,

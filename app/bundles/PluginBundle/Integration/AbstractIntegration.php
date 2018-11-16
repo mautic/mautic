@@ -1838,7 +1838,7 @@ abstract class AbstractIntegration
         }
 
         if ($lead instanceof Lead) {
-            $fields = $lead->getFields(true);
+            $fields = $lead->getProfileFields();
             $leadId = $lead->getId();
         } else {
             $fields = $lead;
@@ -1882,9 +1882,9 @@ abstract class AbstractIntegration
                     continue;
                 }
                 $mauticKey = $leadFields[$integrationKey];
-                if (isset($fields[$mauticKey]) && $fields[$mauticKey]['value'] !== '' && $fields[$mauticKey]['value'] !== null) {
+                if (isset($fields[$mauticKey]) && $fields[$mauticKey] !== '' && $fields[$mauticKey] !== null) {
                     $matched[$matchIntegrationKey] = $this->cleanPushData(
-                        $fields[$mauticKey]['value'],
+                        $fields[$mauticKey],
                         (isset($field['type'])) ? $field['type'] : 'string'
                     );
                 }

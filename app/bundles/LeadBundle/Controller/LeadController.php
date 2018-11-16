@@ -1937,4 +1937,45 @@ class LeadController extends FormController
 
         return $this->exportResultsAs($iterator, $dataType, 'contacts');
     }
+
+    /**
+     * @param $contactId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function contactExportAction($contactId)
+    {
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        }
+
+        /** @var LeadModel $leadModel */
+        $leadModel  = $this->getModel('lead.lead');
+        $lead       = $leadModel->getEntity($contactId);
+        $dataType   = $this->request->get('filetype', 'csv');
+
+        if (empty($lead)) {
+            return $this->notFound();
+        }
+
+        $contactFields = $lead->getProfileFields();
+        $export        = [];
+        foreach ($contactFields as $alias=>$contactField) {
+            $export[] = [
+                'alias' => $alias,
+                'value' => $contactField,
+            ];
+        }
+
+        return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']));
+    }
 }

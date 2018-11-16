@@ -100,6 +100,13 @@ return [
                     'leadId' => '\d+',
                 ],
             ],
+            'mautic_contact_export_action' => [
+                'path'         => '/contacts/contact/export/{contactId}',
+                'controller'   => 'MauticLeadBundle:Lead:contactExport',
+                'requirements' => [
+                    'contactId' => '\d+',
+                ],
+            ],
             // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_index instead.
             'mautic_contact_import_index' => [
                 'path'       => '/{object}/import/{page}',
@@ -474,6 +481,13 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.repository.lead_event_log',
+                ],
+            ],
+            'mautic.lead.subscriber.segment' => [
+                'class'     => 'Mautic\LeadBundle\EventListener\SegmentSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
                 ],
             ],
         ],
