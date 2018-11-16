@@ -97,15 +97,7 @@ class FormApiController extends CommonApiController
             return $this->badRequest('The actions attribute must be array.');
         }
 
-        $currentActions = $entity->getActions();
-
-        foreach ($currentActions as $currentAction) {
-            if (in_array($currentAction->getId(), $actionsToDelete)) {
-                $entity->removeAction($currentAction);
-            }
-        }
-
-        $this->model->saveEntity($entity);
+        $this->model->deleteActions($entity, $actionsToDelete);
 
         $view = $this->view([$this->entityNameOne => $entity]);
 
