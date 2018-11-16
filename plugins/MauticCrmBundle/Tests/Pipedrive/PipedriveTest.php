@@ -33,11 +33,21 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         parent::tearDown();
     }
 
+    /**
+     * @param $type
+     *
+     * @return string
+     */
     public static function getData($type)
     {
         return @file_get_contents(dirname(__FILE__).sprintf('/Data/%s.json', $type));
     }
 
+    /**
+     * @param string $method
+     * @param string $json
+     * @param bool   $addCredential
+     */
     protected function makeRequest($method, $json, $addCredential = true)
     {
         $headers = !$addCredential ? [] : [
