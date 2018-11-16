@@ -40,7 +40,8 @@ class PipedriveApi extends CrmApi
     {
         $params   = $this->getRequestParameters($data);
         $url      = sprintf('%s/%s', $this->integration->getApiUrl(), self::ORGANIZATIONS_API_ENDPOINT);
-        $response = $this->transport->post($url, $params);
+
+        $response = $this->transportation('post', $url, $params);
 
         return $this->getResponseData($response);
     }
@@ -55,7 +56,7 @@ class PipedriveApi extends CrmApi
     {
         $params   = $this->getRequestParameters($data);
         $url      = sprintf('%s/%s/%s', $this->integration->getApiUrl(), self::ORGANIZATIONS_API_ENDPOINT, $id);
-        $response = $this->transport->put($url, $params);
+        $response = $this->transportation('put', $url, $params);
 
         return $this->getResponseData($response);
     }
@@ -70,7 +71,7 @@ class PipedriveApi extends CrmApi
     {
         $params   = $this->getRequestParameters();
         $url      = sprintf('%s/%s/%s', $this->integration->getApiUrl(), self::ORGANIZATIONS_API_ENDPOINT, $id);
-        $response = $this->transport->delete($url, $params);
+        $response = $this->transportation('delete', $url, $params);
 
         return $this->getResponseData($response);
     }
@@ -82,7 +83,7 @@ class PipedriveApi extends CrmApi
     {
         $params   = $this->getRequestParameters($data);
         $url      = sprintf('%s/%s', $this->integration->getApiUrl(), self::PERSONS_API_ENDPOINT);
-        $response = $this->transport->post($url, $params);
+        $response = $this->transportation('post', $url, $params);
 
         return $this->getResponseData($response);
     }
@@ -94,7 +95,7 @@ class PipedriveApi extends CrmApi
     {
         $params   = $this->getRequestParameters($data);
         $url      = sprintf('%s/%s/%s', $this->integration->getApiUrl(), self::PERSONS_API_ENDPOINT, $id);
-        $response = $this->transport->put($url, $params);
+        $response = $this->transportation('put', $url, $params);
 
         return $this->getResponseData($response);
     }
@@ -106,7 +107,7 @@ class PipedriveApi extends CrmApi
     {
         $params   = $this->getRequestParameters();
         $url      = sprintf('%s/%s/%s', $this->integration->getApiUrl(), self::PERSONS_API_ENDPOINT, $id);
-        $response = $this->transport->delete($url, $params);
+        $response = $this->transportation('delete', $url, $params);
 
         return $this->getResponseData($response);
     }
@@ -127,7 +128,7 @@ class PipedriveApi extends CrmApi
             ]),
         ];
 
-        $response = $this->transport->get($url, $params);
+        $response = $this->transportation('get', $url, $params);
 
         return $this->getResponseData($response);
     }
@@ -151,7 +152,7 @@ class PipedriveApi extends CrmApi
             ]),
         ];
 
-        $response = $this->transport->get($url, $params);
+        $response = $this->transportation('get', $url, $params);
 
         return $this->getResponseData($response);
     }
@@ -170,8 +171,8 @@ class PipedriveApi extends CrmApi
 
         $url = sprintf('%s/%s', $this->integration->getApiUrl(), $endpoint);
 
-        $response = $this->transport->get($url, $params);
-
+        $response = $this->transportation('get', $url, $params);
+        // todo
         return json_decode($response->getBody(), true);
     }
 
@@ -192,23 +193,23 @@ class PipedriveApi extends CrmApi
 
         $url = sprintf('%s/%sFields', $this->integration->getApiUrl(), $object);
 
-        $response = $this->transport->get($url, $params);
-
+        $response                 = $this->transportation('get', $url, $params);
         $this->apiFields[$object] = $response;
-
-        $data = $this->getResponseData($response);
+        $data                     = $this->getResponseData($response);
 
         return !empty($data) ? $data : [];
     }
 
     /**
-     * @param ResponseInterface $response
+     * @param ResponseInterface|null $response
      *
      * @return array
      */
-    private function getResponseData(ResponseInterface $response)
+    private function getResponseData(ResponseInterface $response = null)
     {
-        $body = json_decode($response->getBody(), true);
+        if ($response !== null) {
+            $body = json_decode($response->getBody(), true);
+        }
 
         return isset($body['data']) ? $body['data'] : [];
     }
@@ -240,5 +241,20 @@ class PipedriveApi extends CrmApi
         return [
             'api_token' => $tokenData[$this->integration->getAuthTokenKey()],
         ];
+    }
+
+    /**
+     * @param string $action
+     * @param string $url
+     * @param array  $params
+     *
+     * @return mixed
+     */
+    private function transportation($action, $url, $params)
+    {
+        try {
+            return $this->transport->$action($url, $params);
+        } catch (\Exception $exception) {
+        }
     }
 }
