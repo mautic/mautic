@@ -22,6 +22,7 @@ use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Fetcher;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Exception\NoObjectsToFetchException;
+use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper\StateValidationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\ResultsPaginator;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -1828,6 +1829,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             }
 
+            $this->amendLeadDataBeforePush($body);
+
             if (!empty($body)) {
                 $url = '/services/data/v38.0/sobjects/'.$object;
                 if ($objectId) {
@@ -2557,6 +2560,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $mappedData;
+    }
+
+    /**
+     * @param $mappedData
+     */
+    public function amendLeadDataBeforePush(&$mappedData)
+    {
+        $mappedData = StateValidationHelper::validate($mappedData);
     }
 
     /**
