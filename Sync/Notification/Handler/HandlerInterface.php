@@ -31,10 +31,10 @@ interface HandlerInterface
      * @param string          $integrationDisplayName
      * @param string          $objectDisplayName
      */
-    public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName);
+    public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void;
 
     /**
      * Finalize notifications such as pushing summary entries to the user notifications tray
      */
-    public function finalize();
+    public function finalize(): void;
 }
