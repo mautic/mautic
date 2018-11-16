@@ -28,19 +28,9 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
     use TimelineEventLogTrait;
 
     /**
-     * @var LeadEventLogRepository
-     */
-    private $eventLogRepository;
-
-    /**
      * @var UserHelper
      */
     private $userHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
 
     /**
      * @var EntityManagerInterface
