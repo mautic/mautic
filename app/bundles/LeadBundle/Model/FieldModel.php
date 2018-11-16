@@ -1031,4 +1031,12 @@ class FieldModel extends FormModel
             'options' => ['notnull' => false],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
+    {
+        return $this->getRepository()->findOneByAlias($alias);
+    }
 }

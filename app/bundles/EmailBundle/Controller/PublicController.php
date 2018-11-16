@@ -167,8 +167,7 @@ class PublicController extends CommonFormController
         $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
 
         if (!empty($stat)) {
-            $lead = $stat->getLead();
-            if ($lead) {
+            if ($lead = $stat->getLead()) {
                 // Set the lead as current lead
                 $leadModel->setCurrentLead($lead);
 
@@ -193,7 +192,7 @@ class PublicController extends CommonFormController
                     'showContactSegments'          => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_segments'),
                 ];
 
-                $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action);
+                $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
                 if (true === $form) {
                     return $this->postActionRedirect(
                         [
