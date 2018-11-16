@@ -673,6 +673,7 @@ return [
                     'mautic.email.model.send_email_to_contacts',
                     'mautic.tracker.device',
                     'mautic.page.repository.redirect',
+                    'mautic.helper.cache_storage',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
