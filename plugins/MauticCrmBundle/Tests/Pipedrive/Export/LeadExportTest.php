@@ -9,7 +9,7 @@ use Mautic\PointBundle\Entity\TriggerEvent;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
 
-class LeadTest extends PipedriveTest
+class LeadExportTest extends PipedriveTest
 {
     private $features = [
         'leadFields' => [

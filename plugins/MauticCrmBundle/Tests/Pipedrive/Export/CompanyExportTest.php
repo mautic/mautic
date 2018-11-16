@@ -7,7 +7,7 @@ use Mautic\PluginBundle\Entity\IntegrationEntity;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
 
-class CompanyTest extends PipedriveTest
+class CompanyExportTest extends PipedriveTest
 {
     private $features = [
         'objects'       => [
