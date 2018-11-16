@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class CampaignRepository extends CommonRepository
 {
     use ContactLimiterTrait;
+    use SlaveConnectionTrait;
 
     /**
      * {@inheritdoc}
@@ -348,7 +349,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCountsForPendingContacts($campaignId, array $pendingEvents, ContactLimiter $limiter)
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
 
         $q->select('min(cl.lead_id) as min_id, max(cl.lead_id) as max_id, count(cl.lead_id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
@@ -394,7 +395,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getPendingContactIds($campaignId, ContactLimiter $limiter)
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
 
         $q->select('cl.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
@@ -410,7 +411,7 @@ class CampaignRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $q, $limiter);
 
         // Only leads that have not started the campaign
-        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $sq = $this->getSlaveConnection($limiter)->createQueryBuilder();
         $sq->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
             ->where(
@@ -449,7 +450,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [])
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q = $this->getSlaveConnection()->createQueryBuilder();
 
         $q->select('count(cl.lead_id) as lead_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
@@ -468,7 +469,7 @@ class CampaignRepository extends CommonRepository
         }
 
         if (count($pendingEvents) > 0) {
-            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $sq = $this->getSlaveConnection()->createQueryBuilder();
             $sq->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
                 ->where(
@@ -500,7 +501,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = ['cl.lead_id'])
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q = $this->getSlaveConnection()->createQueryBuilder();
 
         $q->select($select)
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
@@ -521,6 +522,27 @@ class CampaignRepository extends CommonRepository
         $results = $q->execute()->fetchAll();
 
         return $results;
+    }
+
+    /**
+     * @param $contactId
+     * @param $campaignId
+     *
+     * @return mixed
+     */
+    public function getContactSingleSegmentByCampaign($contactId, $campaignId)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        return $q->select('ll.id, ll.name')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'll')
+            ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = ll.id and lll.lead_id = :contactId and lll.manually_removed = 0')
+            ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx', 'clx.leadlist_id = ll.id and clx.campaign_id = :campaignId')
+            ->setParameter('contactId', (int) $contactId)
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setMaxResults(1)
+            ->execute()
+            ->fetch();
     }
 
     /**
