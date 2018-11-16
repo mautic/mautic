@@ -119,6 +119,11 @@ class Form extends FormEntity
     private $formType;
 
     /**
+     * @var bool
+     */
+    private $noIndex;
+
+    /**
      * This var is used to cache the result once gained from the loop.
      *
      * @var bool
@@ -211,6 +216,11 @@ class Form extends FormEntity
             ->build();
 
         $builder->addNullableField('formType', 'string', 'form_type');
+
+        $builder->createField('noIndex', 'boolean')
+            ->columnName('no_index')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -294,6 +304,7 @@ class Form extends FormEntity
                     'formType',
                     'postAction',
                     'postActionProperty',
+                    'noIndex',
                 ]
             )
             ->build();
@@ -769,6 +780,27 @@ class Form extends FormEntity
         $this->formType = $formType;
 
         return $this;
+    }
+
+    /**
+     * Set noIndex.
+     *
+     * @param bool $noIndex
+     */
+    public function setNoIndex($noIndex)
+    {
+        $this->isChanged('noIndex', $noIndex);
+        $this->noIndex = $noIndex;
+    }
+
+    /**
+     * Get noIndex.
+     *
+     * @return bool
+     */
+    public function getNoIndex()
+    {
+        return $this->noIndex;
     }
 
     /**

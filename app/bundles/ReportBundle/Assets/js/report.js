@@ -209,9 +209,7 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
     }
 
     // Replace the value field appropriately
-    if (mQuery('#' + valueId + '_chosen').length) {
-        mQuery('#' + valueId).chosen('destroy');
-    }
+    Mautic.destroyChosen(mQuery('#' + valueId));
 
     if (filterType == 'bool' || filterType == 'boolean') {
         if (mQuery(valueEl).attr('type') != 'radio') {
