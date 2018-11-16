@@ -36,7 +36,7 @@ class LeadExport extends AbstractPipedrive
     public function create(Lead $lead)
     {
         // stop for anynomouse
-        if ($lead->isAnonymous()) {
+        if ($lead->isAnonymous() || empty($lead->getEmail())) {
             return false;
         }
 
@@ -45,18 +45,18 @@ class LeadExport extends AbstractPipedrive
 
         /** @var IntegrationEntity $integrationEntity */
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
-        if ($integrationEntity) {
-            return false;
-        } elseif (!empty($lead->getEmail())) {
-            // try find Pipedrive contact, create new entity but not new pipedrive contact, then update
-            $personData = $this->getIntegration()->getApiHelper()->findByEmail($lead->getEmail());
-            if (!empty($personData)) {
-                $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $personData[0]['id'], $leadId);
-                $this->em->persist($integrationEntity);
-                $this->em->flush();
+        $personData        = $this->getIntegration()->getApiHelper()->findByEmail($lead->getEmail());
 
-                return $this->update($lead);
-            }
+        // integration and Pipedrive contact already exist, try update it
+        if ($integrationEntity && !empty($personData)) {
+            return $this->update($lead);
+        } elseif (!$integrationEntity && !empty($personData)) {
+            // integration not exist and Pipedrive contact already exist, try create integration and update Pipedrive contact
+            $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $personData[0]['id'], $leadId);
+            $this->em->persist($integrationEntity);
+            $this->em->flush();
+
+            return $this->update($lead);
         }
 
         try {
