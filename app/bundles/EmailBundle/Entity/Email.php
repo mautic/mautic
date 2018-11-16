@@ -196,6 +196,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $headers = [];
 
+    /**
+     * @var int
+     */
+    private $pendingCount = 0;
+
+    /**
+     * @var int
+     */
+    private $queuedCount = 0;
+
     public function __clone()
     {
         $this->id               = null;
@@ -1149,5 +1159,45 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->publicPreview = $publicPreview;
 
         return $this;
+    }
+
+    /**
+     * @param int $count
+     *
+     * @return $this
+     */
+    public function setQueuedCount($count)
+    {
+        $this->queuedCount = $count;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQueuedCount()
+    {
+        return $this->queuedCount;
+    }
+
+    /**
+     * @param int $count
+     *
+     * @return $this
+     */
+    public function setPendingCount($count)
+    {
+        $this->pendingCount = $count;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPendingCount()
+    {
+        return $this->pendingCount;
     }
 }

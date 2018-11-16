@@ -44,9 +44,8 @@ $query = $event['extra']['hit']['query'];
         </dd>
     <?php endif; ?>
 
-    <dt><?php echo $view['translator']->trans('mautic.core.timeline.device.os'); ?></dt>
-
     <?php if (!empty($event['extra']['hit']['deviceOsName'])): ?>
+        <dt><?php echo $view['translator']->trans('mautic.core.timeline.device.os'); ?></dt>
         <dd class="ellipsis">
             <?php echo InputHelper::clean($event['extra']['hit']['deviceOsName']); ?>
         </dd>

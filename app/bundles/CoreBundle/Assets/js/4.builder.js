@@ -1391,12 +1391,6 @@ Mautic.initSlotListeners = function() {
 
                 var builderEl = parent.mQuery('.builder');
 
-                if (builderEl.length && builderEl.hasClass('email-builder')) {
-                    buttons = parent.mQuery.grep(buttons, function (value) {
-                        return value != 'insertGatedVideo';
-                    });
-                }
-
                 var froalaOptions = {
                     toolbarButtons: buttons,
                     toolbarButtonsMD: buttons,
@@ -1406,6 +1400,13 @@ Mautic.initSlotListeners = function() {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 };
+
+                if (builderEl.length && builderEl.hasClass('email-builder')) {
+                    buttons = parent.mQuery.grep(buttons, function (value) {
+                        return value != 'insertGatedVideo';
+                    });
+                    froalaOptions.imageOutputSize = true;
+                }
 
                 // prevent overriding variant content in editor
                 if (focusType !== 'dynamicContent') {
