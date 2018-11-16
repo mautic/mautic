@@ -16,7 +16,7 @@ interface VersionProviderInterface
     /**
      * @return string
      */
-    public function fetchVersion();
+    public function getVersion();
 
     /**
      * @return bool

@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Doctrine\Provider;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 final class VersionProvider implements VersionProviderInterface
 {
@@ -21,27 +22,36 @@ final class VersionProvider implements VersionProviderInterface
     private $connection;
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * @var string
      */
     private $version;
 
     /**
-     * @param Connection $db
+     * @param Connection           $connection
+     * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, CoreParametersHelper $coreParametersHelper)
     {
-        $this->connection = $connection;
+        $this->connection           = $connection;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
-     * Loads the version from the database and stores it to a property if not set yet.
-     *
      * @return string
      */
-    public function fetchVersion()
+    public function getVersion()
     {
-        if (!$this->version) {
-            $this->version = $this->connection->executeQuery('SELECT VERSION()')->fetchColumn();
+        if (null === $this->version) {
+            try {
+                $this->version = $this->getVersionFromConfig();
+            } catch (\UnexpectedValueException $e) {
+                $this->version = $this->fetchVersionFromDb();
+            }
         }
 
         return $this->version;
@@ -52,7 +62,7 @@ final class VersionProvider implements VersionProviderInterface
      */
     public function isMariaDb()
     {
-        return strpos($this->fetchVersion(), 'MariaDB') !== false;
+        return strpos($this->getVersion(), 'MariaDB') !== false;
     }
 
     /**
@@ -61,5 +71,27 @@ final class VersionProvider implements VersionProviderInterface
     public function isMySql()
     {
         return !$this->isMariaDb();
+    }
+
+    /**
+     * @return string
+     *
+     * @throws \UnexpectedValueException
+     */
+    private function getVersionFromConfig()
+    {
+        if ($this->coreParametersHelper->hasParameter('db_server_version')) {
+            return $this->coreParametersHelper->getParameter('db_server_version');
+        }
+
+        throw new \UnexpectedValueException('db_server_version is not set in the config file.');
+    }
+
+    /**
+     * @return string
+     */
+    private function fetchVersionFromDb()
+    {
+        return $this->connection->executeQuery('SELECT VERSION()')->fetchColumn();
     }
 }

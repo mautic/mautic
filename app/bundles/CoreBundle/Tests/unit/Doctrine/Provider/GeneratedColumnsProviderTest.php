@@ -42,7 +42,7 @@ class GeneratedColumnsProviderTest extends \PHPUnit_Framework_TestCase
         $notSupportedMySqlVersion = '5.6.0';
 
         $this->versionProvider->expects($this->once())
-            ->method('fetchVersion')
+            ->method('getVersion')
             ->willReturn($notSupportedMySqlVersion);
 
         $this->dispatcher->expects($this->never())
@@ -62,7 +62,7 @@ class GeneratedColumnsProviderTest extends \PHPUnit_Framework_TestCase
         $event->addGeneratedColumn(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
 
         $this->versionProvider->expects($this->exactly(2))
-            ->method('fetchVersion')
+            ->method('getVersion')
             ->willReturn($supportedMySqlVersion);
 
         $this->dispatcher->expects($this->once())
