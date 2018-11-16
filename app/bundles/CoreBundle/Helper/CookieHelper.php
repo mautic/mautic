@@ -22,6 +22,7 @@ class CookieHelper
     private $domain   = null;
     private $secure   = false;
     private $httponly = false;
+    private $request  = null;
 
     /**
      * CookieHelper constructor.
@@ -46,6 +47,21 @@ class CookieHelper
     }
 
     /**
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getCookie($key, $default = null)
+    {
+        if ($this->request === null) {
+            return $default;
+        }
+
+        return $this->request->cookies->get($key, $default);
+    }
+
+    /**
      * @param      $name
      * @param      $value
      * @param int  $expire
@@ -63,7 +79,7 @@ class CookieHelper
         setcookie(
             $name,
             $value,
-            ($expire) ? time() + $expire : null,
+            ($expire) ? (int) (time() + $expire) : null,
             ($path == null) ? $this->path : $path,
             ($domain == null) ? $this->domain : $domain,
             ($secure == null) ? $this->secure : $secure,

@@ -254,3 +254,26 @@ div[data-slot].ui-sortable-helper {
 [data-slot="dynamicContent"] {
     z-index:50;
 }
+
+.chosen-container .chosen-results li {
+    font-family: "Open Sans",Helvetica,Arial,sans-serif;
+    &:before {
+        font: normal normal normal 14px/1 FontAwesome;
+    }
+}
+.codemodeHtmlContainer {
+    background:#eee;
+    padding:1em 0 0 0;
+    display:block;
+    position:relative;
+    margin-bottom:2px;
+}
+.codemodeHtmlContainer:before {
+    content: "\f121";
+    font: normal normal normal 14px/1 FontAwesome;
+    position:absolute;
+    right: 2px;
+    top: 2px;
+    color:gray;
+    font-size:small;
+}

@@ -19,8 +19,10 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\ActionModel;
@@ -33,11 +35,13 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class FormTestAbstract extends WebTestCase
@@ -234,9 +238,7 @@ class FormTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $leadModel->expects($this
-            ->any())->method('getTrackingCookie')
-            ->willReturn([$this->mockTrackingId, true]);
+        $dateHelper = $this->createMock(DateHelper::class);
 
         $leadModel->expects($this
             ->any())
@@ -315,17 +317,30 @@ class FormTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $file1Mock = $this->getMockBuilder(UploadedFile::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $file1Mock->expects($this->any())
+            ->method('getClientOriginalName')
+            ->willReturn('test.jpg');
+
         $uploadFieldValidatorMock = $this
             ->getMockBuilder(UploadFieldValidator::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $uploadFieldValidatorMock->expects($this->any())
+            ->method('processFileValidation')
+            ->willReturn($file1Mock);
 
         $formUploaderMock = $this
             ->getMockBuilder(FormUploader::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $submissionModel = new SubmissionModel(
+        $deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
+        $submissionModel       = new SubmissionModel(
             $ipLookupHelper,
             $templatingHelperMock,
             $formModel,
@@ -336,7 +351,10 @@ class FormTestAbstract extends WebTestCase
             $companyModel,
             $fieldHelper,
             $uploadFieldValidatorMock,
-            $formUploaderMock
+            $formUploaderMock,
+            $deviceTrackingService,
+            new FieldValueTransformer($this->container->get('router')),
+            $dateHelper
         );
 
         $submissionModel->setDispatcher($dispatcher);
@@ -361,6 +379,19 @@ class FormTestAbstract extends WebTestCase
                 'type'         => 'email',
                 'leadField'    => 'email',
                 'id'           => $fieldSession,
+            ];
+
+        $fields['file'] =
+            [
+                'label'                   => 'File',
+                'showLabel'               => 1,
+                'saveResult'              => 1,
+                'defaultValue'            => false,
+                'alias'                   => 'file',
+                'type'                    => 'file',
+                'id'                      => 'file',
+                'allowed_file_size'       => 1,
+                'allowed_file_extensions' => ['jpg', 'gif'],
             ];
 
         return $fields;

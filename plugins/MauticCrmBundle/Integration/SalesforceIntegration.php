@@ -22,6 +22,7 @@ use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Fetcher;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Exception\NoObjectsToFetchException;
+use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper\StateValidationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\ResultsPaginator;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -725,8 +726,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $fieldsToUpdate = $mappedData[$object]['update'];
                         $fieldsToUpdate = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPersons[$object], $mappedData, $config);
                         $personFound    = true;
-                        if (!empty($fieldsToUpdate)) {
-                            foreach ($existingPersons[$object] as $person) {
+                        foreach ($existingPersons[$object] as $person) {
+                            if (!empty($fieldsToUpdate)) {
                                 if (isset($fieldsToUpdate['AccountId'])) {
                                     $accountId = $this->getCompanyName($fieldsToUpdate['AccountId'], 'Id', 'Name');
                                     if (!$accountId) {
@@ -744,9 +745,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     }
                                 }
 
-                                $personData                     = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $person['Id']);
-                                $people[$object][$person['Id']] = $person['Id'];
+                                $personData = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $person['Id']);
                             }
+
+                            $people[$object][$person['Id']] = $person['Id'];
                         }
                     }
 
@@ -908,7 +910,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         break;
                     }
 
-                    $params['nextUrl']  = $nextUrl;
+                    $query['nextUrl']  = $nextUrl;
                 }
 
                 if ($progress) {
@@ -1827,6 +1829,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             }
 
+            $this->amendLeadDataBeforePush($body);
+
             if (!empty($body)) {
                 $url = '/services/data/v38.0/sobjects/'.$object;
                 if ($objectId) {
@@ -2529,9 +2533,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'update' => !empty($fieldsToUpdateInSf) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
                 'create' => $fieldsToCreate,
             ];
-            $entity['primaryCompany'] = $company->getFields();
-
-            $entity['primaryCompany'] = $this->leadModel->flattenFields($entity['primaryCompany']);
+            $entity['primaryCompany'] = $company->getProfileFields();
 
             // Create an update and
             $mappedData[$object]['create'] = $this->populateCompanyData(
@@ -2556,6 +2558,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $mappedData;
+    }
+
+    /**
+     * @param $mappedData
+     */
+    public function amendLeadDataBeforePush(&$mappedData)
+    {
+        $mappedData = StateValidationHelper::validate($mappedData);
     }
 
     /**
@@ -2715,6 +2725,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $config                  = $this->mergeConfigToFeatureSettings($params);
         $integrationEntityRepo   = $this->getIntegrationEntityRepository();
 
+        if (!isset($config['companyFields'])) {
+            return [0, 0, 0, 0];
+        }
+
         $totalUpdated = 0;
         $totalCreated = 0;
         $totalErrors  = 0;
@@ -2830,7 +2844,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             if ($checkCompaniesInSF) {
-                $sfEntityRecords = $this->getSalesforceAccountsByName($sfObject, $checkCompaniesInSF, implode(',', array_keys($config['companyFields'])));
+                $sfEntityRecords = $this->getSalesforceAccountsByName($checkCompaniesInSF, implode(',', array_keys($config['companyFields'])));
 
                 if (!isset($sfEntityRecords['records'])) {
                     // Something is wrong so throw an exception to prevent creating a bunch of new companies
@@ -3122,62 +3136,54 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $sfObject
      * @param $checkIdsInSF
      * @param $requiredFieldString
      *
      * @return array
+     *
+     * @throws ApiErrorException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
      */
-    protected function getSalesforceAccountsByName($sfObject, &$checkIdsInSF, $requiredFieldString)
+    protected function getSalesforceAccountsByName(&$checkIdsInSF, $requiredFieldString)
     {
-        $field     = [];
-        $fieldId   = [];
-        $queryById = [];
+        $searchForIds   = [];
+        $searchForNames = [];
 
-        foreach ($checkIdsInSF as $items) {
-            if (!isset($items['integration_entity_id'])) {
-                foreach ($items as $key => $item) {
-                    if ($key == 'companyname') {
-                        $field[] = str_replace("'", "\'", $this->cleanPushData($item));
-                    }
-                }
-            } else {
-                foreach ($items as $key => $item) {
-                    if ($key == 'integration_entity_id') {
-                        $fieldId[$item] = $item;
-                    }
-                }
+        foreach ($checkIdsInSF as $key => $company) {
+            if (!empty($company['integration_entity_id'])) {
+                $searchForIds[$key] = $company['integration_entity_id'];
+
+                continue;
+            }
+
+            if (!empty($company['companyname'])) {
+                $searchForNames[$key] = $company['companyname'];
             }
         }
 
-        $fieldString = "'".implode("','", $field)."'";
-
-        $queryUrl    = $this->getQueryUrl();
-        $findQuery   = 'select Id, '.$requiredFieldString.' from '.$sfObject.' where isDeleted = false and Name in ('.$fieldString.')';
-        $queryByName = $this->getApiHelper()->request('query', ['q' => $findQuery], 'GET', false, null, $queryUrl);
-
-        if (!empty($fieldId)) {
-            $idString  = "'".implode("','", $fieldId)."'";
-            $findQuery = 'select isDeleted, Id, '.$requiredFieldString.' from '.$sfObject.' where  Id in ('.$idString.')';
-            $queryById = $this->getApiHelper()->request('queryAll', ['q' => $findQuery], 'GET', false, null, $queryUrl);
+        $resultsByName = $this->getApiHelper()->getCompaniesByName($searchForNames, $requiredFieldString);
+        $resultsById   = [];
+        if (!empty($searchForIds)) {
+            $resultsById = $this->getApiHelper()->getCompaniesById($searchForIds, $requiredFieldString);
 
             //mark as deleleted
-            foreach ($queryById['records'] as $sfId => $record) {
+            foreach ($resultsById['records'] as $sfId => $record) {
                 if (isset($record['IsDeleted']) && $record['IsDeleted'] == 1) {
-                    $foundKey = array_search($record['Id'], $fieldId);
-                    if ($foundKey) {
+                    if ($foundKey = array_search($record['Id'], $searchForIds)) {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $checkIdsInSF[$foundKey]['id']);
                         $integrationEntity->setInternalEntity('company-deleted');
                         $this->persistIntegrationEntities[] = $integrationEntity;
                         unset($checkIdsInSF[$foundKey]);
                     }
-                    unset($queryById['records'][$sfId]);
+
+                    unset($resultsById['records'][$sfId]);
                 }
             }
         }
 
         $this->cleanupFromSync();
-        $result = array_merge($queryByName, $queryById);
+        $result = array_merge($resultsByName, $resultsById);
 
         return $result;
     }

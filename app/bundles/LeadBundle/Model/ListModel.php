@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -29,6 +30,9 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\ContactSegmentService;
+use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
+use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -47,13 +51,19 @@ class ListModel extends FormModel
     protected $coreParametersHelper;
 
     /**
+     * @var ContactSegmentService
+     */
+    private $leadSegmentService;
+
+    /**
      * ListModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment)
     {
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->leadSegmentService   = $leadSegment;
     }
 
     /**
@@ -180,7 +190,7 @@ class ListModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new LeadList();
         }
 
@@ -316,6 +326,23 @@ class ListModel extends FormModel
                         'include' => [
                             'in',
                             '!in',
+                        ],
+                    ]
+                ),
+                'object' => 'lead',
+            ],
+            'lead_email_sent_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            '!=',
+                            'gt',
+                            'lt',
+                            'gte',
+                            'lte',
                         ],
                     ]
                 ),
@@ -668,6 +695,46 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
+            'utm_campaign' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.utmcampaign'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object'    => 'lead',
+            ],
+            'utm_content' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.utmcontent'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object'    => 'lead',
+            ],
+            'utm_medium' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.utmmedium'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object'    => 'lead',
+            ],
+            'utm_source' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.utmsource'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object'    => 'lead',
+            ],
+            'utm_term' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.utmterm'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object'    => 'lead',
+            ],
         ];
 
         // Add custom choices
@@ -681,8 +748,18 @@ class ListModel extends FormModel
         $fields = $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities(
             [
                 'filter' => [
-                    'isListable'  => true,
-                    'isPublished' => true,
+                    'where'         => [
+                        [
+                            'expr' => 'eq',
+                            'col'  => 'f.isListable',
+                            'val'  => true,
+                        ],
+                        [
+                            'expr' => 'eq',
+                            'col'  => 'f.isPublished',
+                            'val'  => true,
+                        ],
+                    ],
                 ],
                 'orderBy' => 'f.object',
             ]
@@ -692,7 +769,7 @@ class ListModel extends FormModel
             $properties         = $field->getProperties();
             $properties['type'] = $type;
             if (in_array($type, ['lookup', 'multiselect', 'boolean'])) {
-                if ($type == 'boolean') {
+                if ('boolean' == $type) {
                     //create a lookup list with ID
                     $properties['list'] = [
                         0 => $properties['no'],
@@ -701,7 +778,7 @@ class ListModel extends FormModel
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
                     $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
-                        FormFieldHelper::FORMAT_BAR,
+                        FormFieldHelper::FORMAT_ARRAY,
                         FormFieldHelper::parseList($properties['list'])
                     ) : '';
                 }
@@ -753,19 +830,26 @@ class ListModel extends FormModel
     }
 
     /**
-     * Rebuild lead lists.
+     * Get a list of preference center lead lists.
      *
-     * @param LeadList        $entity
-     * @param int             $limit
-     * @param bool            $maxLeads
-     * @param OutputInterface $output
-     *
-     * @return int
+     * @return mixed
      */
-    public function rebuildListLeads(LeadList $entity, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
+    public function getPreferenceCenterLists()
     {
-        defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getPreferenceCenterList();
 
+        return $lists;
+    }
+
+    /**
+     * @param LeadList $entity
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function getVersionNew(LeadList $entity)
+    {
         $id       = $entity->getId();
         $list     = ['id' => $id, 'filters' => $entity->getFilters()];
         $dtHelper = new DateTimeHelper();
@@ -774,14 +858,24 @@ class ListModel extends FormModel
             'dateTime' => $dtHelper->toUtcString(),
         ];
 
-        $localDateTime = $dtHelper->getLocalDateTime();
+        return $this->leadSegmentService->getNewLeadListLeadsCount($entity, $batchLimiters);
+    }
 
-        $this->dispatcher->dispatch(
-            LeadEvents::LIST_PRE_PROCESS_LIST,
-            new ListPreProcessListEvent($list, false)
-        );
+    /**
+     * @param LeadList $entity
+     *
+     * @return mixed
+     */
+    public function getVersionOld(LeadList $entity)
+    {
+        $id       = $entity->getId();
+        $list     = ['id' => $id, 'filters' => $entity->getFilters()];
+        $dtHelper = new DateTimeHelper();
 
-        // Get a count of leads to add
+        $batchLimiters = [
+            'dateTime' => $dtHelper->toUtcString(),
+        ];
+
         $newLeadsCount = $this->getLeadsByList(
             $list,
             true,
@@ -792,11 +886,53 @@ class ListModel extends FormModel
             ]
         );
 
-        // Ensure the same list is used each batch
-        $batchLimiters['maxId'] = (int) $newLeadsCount[$id]['maxId'];
+        $return = array_shift($newLeadsCount);
+
+        return $return;
+    }
+
+    /**
+     * @param LeadList             $leadList
+     * @param int                  $limit
+     * @param bool                 $maxLeads
+     * @param OutputInterface|null $output
+     *
+     * @return int
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
+     */
+    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null)
+    {
+        defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
+
+        $dtHelper = new DateTimeHelper();
+
+        $batchLimiters = ['dateTime' => $dtHelper->toUtcString()];
+        $list          = ['id' => $leadList->getId(), 'filters' => $leadList->getFilters()];
+
+        $this->dispatcher->dispatch(
+            LeadEvents::LIST_PRE_PROCESS_LIST, new ListPreProcessListEvent($list, false)
+        );
+
+        try {
+            // Get a count of leads to add
+            $newLeadsCount = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
+        } catch (FieldNotFoundException $e) {
+            // A field from filter does not exist anymore. Do not rebuild.
+            return 0;
+        } catch (SegmentNotFoundException $e) {
+            // A segment from filter does not exist anymore. Do not rebuild.
+            return 0;
+        }
+
+        // Ensure the same list is used each batch <- would love to know how
+        $batchLimiters['maxId'] = (int) $newLeadsCount[$leadList->getId()]['maxId'];
 
         // Number of total leads to process
-        $leadCount = (int) $newLeadsCount[$id]['count'];
+        $leadCount = (int) $newLeadsCount[$leadList->getId()]['count'];
+
+        $this->logger->info('Segment QB - No new leads for segment found');
 
         if ($output) {
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', ['%leads%' => $leadCount, '%batch%' => $limit]));
@@ -821,27 +957,19 @@ class ListModel extends FormModel
                 // Keep CPU down for large lists; sleep per $limit batch
                 $this->batchSleep();
 
-                $newLeadList = $this->getLeadsByList(
-                    $list,
-                    true,
-                    [
-                        'newOnly' => true,
-                        // No start set because of newOnly thus always at 0
-                        'limit'         => $limit,
-                        'batchLimiters' => $batchLimiters,
-                    ]
-                );
+                $this->logger->debug(sprintf('Segment QB - Fetching new leads for segment [%d] %s', $leadList->getId(), $leadList->getName()));
+                $newLeadList = $this->leadSegmentService->getNewLeadListLeads($leadList, $batchLimiters, $limit);
 
-                if (empty($newLeadList[$id])) {
+                if (empty($newLeadList[$leadList->getId()])) {
                     // Somehow ran out of leads so break out
                     break;
                 }
 
-                $processedLeads = [];
-                foreach ($newLeadList[$id] as $l) {
-                    $this->addLead($l, $entity, false, true, -1, $localDateTime);
-                    $processedLeads[] = $l;
-                    unset($l);
+                $this->logger->debug(sprintf('Segment QB - Adding %d new leads to segment [%d] %s', count($newLeadList[$leadList->getId()]), $leadList->getId(), $leadList->getName()));
+                foreach ($newLeadList[$leadList->getId()] as $l) {
+                    $this->logger->debug(sprintf('Segment QB - Adding lead #%s to segment [%d] %s', $l['id'], $leadList->getId(), $leadList->getName()));
+
+                    $this->addLead($l, $leadList, false, true, -1, $dtHelper->getLocalDateTime());
 
                     ++$leadsProcessed;
                     if ($output && $leadsProcessed < $maxCount) {
@@ -853,13 +981,15 @@ class ListModel extends FormModel
                     }
                 }
 
+                $this->logger->info(sprintf('Segment QB - Added %d new leads to segment [%d] %s', count($newLeadList[$leadList->getId()]), $leadList->getId(), $leadList->getName()));
+
                 $start += $limit;
 
                 // Dispatch batch event
-                if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                if (count($newLeadList[$leadList->getId()]) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
                         LeadEvents::LEAD_LIST_BATCH_CHANGE,
-                        new ListChangeEvent($processedLeads, $entity, true)
+                        new ListChangeEvent($newLeadList[$leadList->getId()], $leadList, true)
                     );
                 }
 
@@ -887,23 +1017,14 @@ class ListModel extends FormModel
         // Unset max ID to prevent capping at newly added max ID
         unset($batchLimiters['maxId']);
 
-        // Get a count of leads to be removed
-        $removeLeadCount = $this->getLeadsByList(
-            $list,
-            true,
-            [
-                'countOnly'      => true,
-                'nonMembersOnly' => true,
-                'batchLimiters'  => $batchLimiters,
-            ]
-        );
+        $orphanLeadsCount = $this->leadSegmentService->getOrphanedLeadListLeadsCount($leadList);
 
         // Ensure the same list is used each batch
-        $batchLimiters['maxId'] = (int) $removeLeadCount[$id]['maxId'];
+        $batchLimiters['maxId'] = (int) $orphanLeadsCount[$leadList->getId()]['maxId'];
 
         // Restart batching
         $start     = $lastRoundPercentage     = 0;
-        $leadCount = $removeLeadCount[$id]['count'];
+        $leadCount = $orphanLeadsCount[$leadList->getId()]['count'];
 
         if ($output) {
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', ['%leads%' => $leadCount, '%batch%' => $limit]));
@@ -922,25 +1043,16 @@ class ListModel extends FormModel
                 // Keep CPU down for large lists; sleep per $limit batch
                 $this->batchSleep();
 
-                $removeLeadList = $this->getLeadsByList(
-                    $list,
-                    true,
-                    [
-                        // No start because the items are deleted so always 0
-                        'limit'          => $limit,
-                        'nonMembersOnly' => true,
-                        'batchLimiters'  => $batchLimiters,
-                    ]
-                );
+                $removeLeadList = $this->leadSegmentService->getOrphanedLeadListLeads($leadList);
 
-                if (empty($removeLeadList[$id])) {
+                if (empty($removeLeadList[$leadList->getId()])) {
                     // Somehow ran out of leads so break out
                     break;
                 }
 
                 $processedLeads = [];
-                foreach ($removeLeadList[$id] as $l) {
-                    $this->removeLead($l, $entity, false, true, true);
+                foreach ($removeLeadList[$leadList->getId()] as $l) {
+                    $this->removeLead($l, $leadList, false, true, true);
                     $processedLeads[] = $l;
                     ++$leadsProcessed;
                     if ($output && $leadsProcessed < $maxCount) {
@@ -956,7 +1068,7 @@ class ListModel extends FormModel
                 if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
                         LeadEvents::LEAD_LIST_BATCH_CHANGE,
-                        new ListChangeEvent($processedLeads, $entity, false)
+                        new ListChangeEvent($processedLeads, $leadList, false)
                     );
                 }
 
@@ -1000,7 +1112,7 @@ class ListModel extends FormModel
      */
     public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1, $dateManipulated = null)
     {
-        if ($dateManipulated == null) {
+        if (null == $dateManipulated) {
             $dateManipulated = new \DateTime();
         }
 
@@ -1077,7 +1189,7 @@ class ListModel extends FormModel
                 );
             }
 
-            if ($listLead != null) {
+            if (null != $listLead) {
                 if ($manuallyAdded && $listLead->wasManuallyRemoved()) {
                     $listLead->setManuallyRemoved(false);
                     $listLead->setManuallyAdded($manuallyAdded);
@@ -1203,7 +1315,7 @@ class ListModel extends FormModel
                     'list' => $listId,
                 ]);
 
-            if ($listLead == null) {
+            if (null == $listLead) {
                 // Lead is not part of this list
                 continue;
             }
@@ -1249,17 +1361,19 @@ class ListModel extends FormModel
     }
 
     /**
+     * @deprecated in 2.14, to be removed in Mautic 3 - Use methods in the ContactSegmentService class
+     *
      * @param       $lists
      * @param bool  $idOnly
      * @param array $args
      *
-     * @return mixed
+     * @return array
      */
-    public function getLeadsByList($lists, $idOnly = false, $args = [])
+    public function getLeadsByList($lists, $idOnly = false, array $args = [])
     {
         $args['idOnly'] = $idOnly;
 
-        return $this->getRepository()->getLeadsByList($lists, $args);
+        return $this->getRepository()->getLeadsByList($lists, $args, $this->logger);
     }
 
     /**
@@ -1268,7 +1382,7 @@ class ListModel extends FormModel
     protected function batchSleep()
     {
         $leadSleepTime = $this->coreParametersHelper->getParameter('batch_lead_sleep_time', false);
-        if ($leadSleepTime === false) {
+        if (false === $leadSleepTime) {
             $leadSleepTime = $this->coreParametersHelper->getParameter('batch_sleep_time', 1);
         }
 
@@ -1590,5 +1704,27 @@ class ListModel extends FormModel
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts'), $contacts);
 
         return $chart->render();
+    }
+
+    /**
+     * Is custom field used in at least one defined segment?
+     *
+     * @param LeadField $field
+     *
+     * @return bool
+     */
+    public function isFieldUsed(LeadField $field)
+    {
+        $alias       = $field->getAlias();
+        $aliasLength = mb_strlen($alias);
+        $likeContent = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+
+        $filter = [
+            'force'  => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=> $likeContent],
+            ],
+        ];
+
+        return $this->getEntities(['filter' => $filter])->count() !== 0;
     }
 }

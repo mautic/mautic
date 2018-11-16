@@ -64,9 +64,7 @@ if (!empty($fields['core']['email']['value'])) {
         'primary'   => true,
     ];
 }
-
 //View Contact Frequency button
-
 if ($edit) {
     $buttons[] = [
         'attr' => [
@@ -128,6 +126,25 @@ if (($view['security']->hasEntityAccess(
         ],
         'btnText'   => $view['translator']->trans('mautic.lead.merge'),
         'iconClass' => 'fa fa-user',
+    ];
+}
+//Download button
+if ($view['security']->hasEntityAccess(
+    $permissions['lead:leads:viewown'],
+    $permissions['lead:leads:viewother'],
+    $lead->getPermissionUser()
+)
+) {
+    $buttons[] = [
+        'attr' => [
+            'data-toggle'=> 'download',
+            'href'       => $view['router']->path(
+                'mautic_contact_export_action',
+                ['contactId' => $lead->getId()]
+            ),
+        ],
+        'btnText'   => $view['translator']->trans('mautic.core.export'),
+        'iconClass' => 'fa fa-download',
     ];
 }
 
@@ -204,6 +221,10 @@ $view['slots']->set(
                                                     <?php else: ?>
                                                         <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
                                                             <?php echo implode(', ', $field['value']); ?>
+                                                        <?php elseif (is_string($field['value']) && 'url' === $field['type']): ?>
+                                                            <a href="<?php echo $field['value']; ?>" target="_blank">
+                                                                <?php echo $field['value']; ?>
+                                                            </a>
                                                         <?php else: ?>
                                                             <?php echo $field['value']; ?>
                                                         <?php endif; ?>
@@ -434,31 +455,31 @@ $view['slots']->set(
                 <?php endif; ?>
             </div>
             <?php if ($doNotContact) : ?>
-                <div id="bounceLabel<?php echo $doNotContact['id']; ?>">
+                <div id="bounceLabel<?php echo $doNotContact->getId(); ?>">
                     <div class="panel-heading text-center">
                         <h4 class="fw-sb">
-                            <?php if ($doNotContact['unsubscribed']): ?>
-                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
+                            <?php if (\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED == $doNotContact->getReason()): ?>
+                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact->getId(); ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
                             </span>
 
-                            <?php elseif ($doNotContact['manual']): ?>
-                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
+                            <?php elseif (\Mautic\LeadBundle\Entity\DoNotContact::MANUAL == $doNotContact->getReason()): ?>
+                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact->getId(); ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
                                     <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans(
                                         'mautic.lead.remove_dnc_status'
                                     ); ?>">
-                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i>
+                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact->getId(); ?>);"></i>
                                 </span>
                             </span>
 
-                            <?php elseif ($doNotContact['bounced']): ?>
-                                <span class="label label-warning" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
+                            <?php elseif (\Mautic\LeadBundle\Entity\DoNotContact::BOUNCED == $doNotContact->getReason()): ?>
+                                <span class="label label-warning" data-toggle="tooltip" title="<?php echo $doNotContact->getComments(); ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact_bounced'); ?>
                                     <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans(
                                         'mautic.lead.remove_dnc_status'
                                     ); ?>">
-                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i>
+                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact->getId(); ?>);"></i>
                                 </span>
                             </span>
                             <?php endif; ?>

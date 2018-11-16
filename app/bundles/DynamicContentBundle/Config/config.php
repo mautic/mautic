@@ -80,6 +80,7 @@ return [
                     'mautic.core.model.auditlog',
                     'mautic.lead.model.lead',
                     'mautic.helper.dynamicContent',
+                    'mautic.dynamicContent.model.dynamicContent',
                 ],
             ],
             'mautic.dynamicContent.subscriber.channel' => [

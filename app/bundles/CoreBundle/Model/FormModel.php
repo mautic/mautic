@@ -140,7 +140,8 @@ class FormModel extends AbstractCommonModel
     {
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
-        foreach ($entities as $k => $entity) {
+        $i         = 0;
+        foreach ($entities as $entity) {
             $isNew = $this->isNewEntity($entity);
 
             //set some defaults
@@ -148,8 +149,7 @@ class FormModel extends AbstractCommonModel
 
             $event = $this->dispatchEvent('pre_save', $entity, $isNew);
             $this->getRepository()->saveEntity($entity, false);
-
-            if ((($k + 1) % $batchSize) === 0) {
+            if (++$i % $batchSize === 0) {
                 $this->em->flush();
             }
         }

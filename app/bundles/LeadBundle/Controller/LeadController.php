@@ -14,10 +14,12 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -54,9 +56,7 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model   = $this->getModel('lead');
@@ -347,9 +347,8 @@ class LeadController extends FormController
             }
         }
 
-        // We need the EmailRepository to check if a lead is flagged as do not contact
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo       = $this->getModel('email')->getRepository();
+        // We need the DoNotContact repository to check if a lead is flagged as do not contact
+        $dnc             = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
         $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
         return $this->delegateView(
@@ -369,7 +368,7 @@ class LeadController extends FormController
                     'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'auditlog'          => $this->getAuditlogs($lead),
-                    'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
+                    'doNotContact'      => end($dnc),
                     'leadNotes'         => $this->forward(
                         'MauticLeadBundle:Note:index',
                         [
@@ -441,6 +440,12 @@ class LeadController extends FormController
                     $model->setFieldValues($lead, $data, true);
 
                     //form is valid so process the data
+                    $lead->setManipulator(new LeadManipulator(
+                        'lead',
+                        'lead',
+                        null,
+                        $this->get('mautic.helper.user')->getUser()->getName()
+                    ));
                     $model->saveEntity($lead);
 
                     if (!empty($companies)) {
@@ -622,6 +627,12 @@ class LeadController extends FormController
                     $model->setFieldValues($lead, $data, true);
 
                     //form is valid so process the data
+                    $lead->setManipulator(new LeadManipulator(
+                        'lead',
+                        'lead',
+                        $objectId,
+                        $this->get('mautic.helper.user')->getUser()->getName()
+                    ));
                     $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
                     $model->modifyCompanies($lead, $companies);
 
@@ -860,7 +871,12 @@ class LeadController extends FormController
                     }
 
                     //Both leads are good so now we merge them
-                    $mainLead = $model->mergeLeads($mainLead, $secLead, false);
+                    /** @var ContactMerger $contactMerger */
+                    $contactMerger = $this->container->get('mautic.lead.merger');
+                    try {
+                        $mainLead = $contactMerger->merge($mainLead, $secLead);
+                    } catch (SameContactException $exception) {
+                    }
                 }
             }
 
@@ -1291,10 +1307,7 @@ class LeadController extends FormController
         $leadFields['owner_id'] = $this->get('mautic.helper.user')->getUser()->getId();
 
         // Check if lead has a bounce status
-        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-        $emailModel = $this->getModel('email');
-        $dnc        = $emailModel->getRepository()->checkDoNotEmail($leadEmail);
-
+        $dnc    = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
         $inList = ($this->request->getMethod() == 'GET')
             ? $this->request->get('list', 0)
             : $this->request->request->get(
@@ -1417,7 +1430,7 @@ class LeadController extends FormController
                 'contentTemplate' => 'MauticLeadBundle:Lead:email.html.php',
                 'viewParameters'  => [
                     'form' => $form->createView(),
-                    'dnc'  => $dnc,
+                    'dnc'  => end($dnc),
                 ],
                 'passthroughVars' => [
                     'mauticContent' => 'leadEmail',
@@ -1425,108 +1438,6 @@ class LeadController extends FormController
                 ],
             ]
         );
-    }
-
-    /**
-     * Bulk edit lead lists.
-     *
-     * @param int $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function batchListsAction($objectId = 0)
-    {
-        if ($this->request->getMethod() == 'POST') {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model = $this->getModel('lead');
-            $data  = $this->request->request->get('lead_batch', [], true);
-            $ids   = json_decode($data['ids'], true);
-
-            $entities = [];
-            if (is_array($ids)) {
-                $entities = $model->getEntities(
-                    [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
-                                ],
-                            ],
-                        ],
-                        'ignore_paginator' => true,
-                    ]
-                );
-            }
-
-            $count = 0;
-            foreach ($entities as $lead) {
-                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                    ++$count;
-
-                    if (!empty($data['add'])) {
-                        $model->addToLists($lead, $data['add']);
-                    }
-
-                    if (!empty($data['remove'])) {
-                        $model->removeFromLists($lead, $data['remove']);
-                    }
-                }
-            }
-
-            $this->addFlash(
-                'mautic.lead.batch_leads_affected',
-                [
-                    'pluralCount' => $count,
-                    '%count%'     => $count,
-                ]
-            );
-
-            return new JsonResponse(
-                [
-                    'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
-                ]
-            );
-        } else {
-            // Get a list of lists
-            /** @var \Mautic\LeadBundle\Model\ListModel $model */
-            $model = $this->getModel('lead.list');
-            $lists = $model->getUserLists();
-            $items = [];
-            foreach ($lists as $list) {
-                $items[$list['id']] = $list['name'];
-            }
-
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchLists',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            'lead_batch',
-                            [],
-                            [
-                                'items'  => $items,
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
-        }
     }
 
     /**
@@ -2025,5 +1936,46 @@ class LeadController extends FormController
         $iterator = new IteratorExportDataModel($model, $args, $resultsCallback);
 
         return $this->exportResultsAs($iterator, $dataType, 'contacts');
+    }
+
+    /**
+     * @param $contactId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function contactExportAction($contactId)
+    {
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        }
+
+        /** @var LeadModel $leadModel */
+        $leadModel  = $this->getModel('lead.lead');
+        $lead       = $leadModel->getEntity($contactId);
+        $dataType   = $this->request->get('filetype', 'csv');
+
+        if (empty($lead)) {
+            return $this->notFound();
+        }
+
+        $contactFields = $lead->getProfileFields();
+        $export        = [];
+        foreach ($contactFields as $alias=>$contactField) {
+            $export[] = [
+                'alias' => $alias,
+                'value' => $contactField,
+            ];
+        }
+
+        return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']));
     }
 }

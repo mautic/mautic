@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Model;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -20,11 +21,13 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\FormBundle\Crate\UploadFileCrate;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\Exception\FileValidationException;
@@ -34,6 +37,7 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
@@ -41,6 +45,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,18 +118,34 @@ class SubmissionModel extends CommonFormModel
      */
     private $formUploader;
 
+    /** @var DeviceTrackingServiceInterface */
+    private $deviceTrackingService;
+
     /**
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param FormModel            $formModel
-     * @param PageModel            $pageModel
-     * @param LeadModel            $leadModel
-     * @param CampaignModel        $campaignModel
-     * @param LeadFieldModel       $leadFieldModel
-     * @param CompanyModel         $companyModel
-     * @param FormFieldHelper      $fieldHelper
-     * @param UploadFieldValidator $uploadFieldValidator
-     * @param FormUploader         $formUploader
+     * @var FieldValueTransformer
+     */
+    private $fieldValueTransformer;
+
+    /**
+     * @var DateHelper
+     */
+    private $dateHelper;
+
+    /**
+     * @param IpLookupHelper                 $ipLookupHelper
+     * @param TemplatingHelper               $templatingHelper
+     * @param FormModel                      $formModel
+     * @param PageModel                      $pageModel
+     * @param LeadModel                      $leadModel
+     * @param CampaignModel                  $campaignModel
+     * @param LeadFieldModel                 $leadFieldModel
+     * @param CompanyModel                   $companyModel
+     * @param FormFieldHelper                $fieldHelper
+     * @param UploadFieldValidator           $uploadFieldValidator
+     * @param FormUploader                   $formUploader
+     * @param DeviceTrackingServiceInterface $deviceTrackingService
+     * @param FieldValueTransformer          $fieldValueTransformer
+     * @param DateHelper                     $dateHelper
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -137,19 +158,25 @@ class SubmissionModel extends CommonFormModel
         CompanyModel $companyModel,
         FormFieldHelper $fieldHelper,
         UploadFieldValidator $uploadFieldValidator,
-        FormUploader $formUploader
+        FormUploader $formUploader,
+        DeviceTrackingServiceInterface $deviceTrackingService,
+        FieldValueTransformer $fieldValueTransformer,
+        DateHelper $dateHelper
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->templatingHelper     = $templatingHelper;
-        $this->formModel            = $formModel;
-        $this->pageModel            = $pageModel;
-        $this->leadModel            = $leadModel;
-        $this->campaignModel        = $campaignModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->companyModel         = $companyModel;
-        $this->fieldHelper          = $fieldHelper;
-        $this->uploadFieldValidator = $uploadFieldValidator;
-        $this->formUploader         = $formUploader;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->templatingHelper       = $templatingHelper;
+        $this->formModel              = $formModel;
+        $this->pageModel              = $pageModel;
+        $this->leadModel              = $leadModel;
+        $this->campaignModel          = $campaignModel;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->companyModel           = $companyModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->uploadFieldValidator   = $uploadFieldValidator;
+        $this->formUploader           = $formUploader;
+        $this->deviceTrackingService  = $deviceTrackingService;
+        $this->fieldValueTransformer  = $fieldValueTransformer;
+        $this->dateHelper             = $dateHelper;
     }
 
     /**
@@ -359,9 +386,9 @@ class SubmissionModel extends CommonFormModel
             $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
         }
 
-        // Get updated lead if applicable with tracking ID
-        /** @var Lead $lead */
-        list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
+        $lead          = $this->leadModel->getCurrentLead();
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
 
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
@@ -401,7 +428,7 @@ class SubmissionModel extends CommonFormModel
 
         // Save the submission
         $this->saveEntity($submission);
-
+        $this->fieldValueTransformer->transformValuesAfterSubmit($submissionEvent);
         // Now handle post submission actions
         try {
             $this->executeFormActions($submissionEvent);
@@ -414,6 +441,12 @@ class SubmissionModel extends CommonFormModel
             }
 
             return ['errors' => [$exception->getMessage()]];
+        }
+
+        // update contact fields with transform values
+        if (!empty($this->fieldValueTransformer->getContactFieldsToUpdate())) {
+            $this->leadModel->setFieldValues($lead, $this->fieldValueTransformer->getContactFieldsToUpdate());
+            $this->leadModel->saveEntity($lead, false);
         }
 
         if (!$form->isStandalone()) {
@@ -475,6 +508,7 @@ class SubmissionModel extends CommonFormModel
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
+        $queryArgs['simpleResults']  = true;
         $results                     = $this->getEntities($queryArgs);
         $translator                  = $this->translator;
 
@@ -511,8 +545,8 @@ class SubmissionModel extends CommonFormModel
                         foreach ($results as $k => $s) {
                             $row = [
                                 $s['id'],
-                                $s['dateSubmitted']->format('Y-m-d H:i:s'),
-                                $s['ipAddress']['ipAddress'],
+                                $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
+                                $s['ipAddress'],
                                 $s['referer'],
                             ];
                             foreach ($s['results'] as $k2 => $r) {
@@ -588,8 +622,8 @@ class SubmissionModel extends CommonFormModel
                             foreach ($results as $k => $s) {
                                 $row = [
                                     $s['id'],
-                                    $s['dateSubmitted']->format('Y-m-d H:i:s'),
-                                    $s['ipAddress']['ipAddress'],
+                                    $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
+                                    $s['ipAddress'],
                                     $s['referer'],
                                 ];
                                 foreach ($s['results'] as $k2 => $r) {
@@ -634,7 +668,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -875,6 +909,8 @@ class SubmissionModel extends CommonFormModel
         // Closure to get data and unique fields
         $getCompanyData = function ($currentFields) use ($companyFields) {
             $companyData = [];
+            // force add company contact field to company fields check
+            $companyFields = array_merge($companyFields, ['company'=> 'company']);
             foreach ($companyFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {
                     $value               = $currentFields[$alias];
@@ -1004,6 +1040,12 @@ class SubmissionModel extends CommonFormModel
         $lead->setLastActive(new \DateTime());
 
         //create a new lead
+        $lead->setManipulator(new LeadManipulator(
+            'form',
+            'submission',
+            $form->getId(),
+            $form->getName()
+        ));
         $this->leadModel->saveEntity($lead, false);
 
         if (!$inKioskMode) {
@@ -1019,6 +1061,9 @@ class SubmissionModel extends CommonFormModel
             list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+            } elseif ($companyEntity instanceof Company) {
+                $this->companyModel->setFieldValues($companyEntity, $companyFieldMatches);
+                $this->companyModel->saveEntity($companyEntity);
             }
 
             if (!empty($company) and $companyEntity instanceof Company) {
@@ -1042,7 +1087,7 @@ class SubmissionModel extends CommonFormModel
      */
     protected function validateFieldValue(Field $field, $value)
     {
-        $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value);
+        $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value, $field);
         if (!empty($standardValidation)) {
             return $standardValidation;
         }
