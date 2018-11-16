@@ -52,6 +52,7 @@ return [
                 'class'     => 'Mautic\ConfigBundle\EventListener\ConfigSubscriber',
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'mautic.config.config_change_logger',
                 ],
             ],
         ],
@@ -92,6 +93,13 @@ return [
                     'translator',
                     '%mautic.security.restrictedConfigFields%',
                     '%mautic.security.restrictedConfigFields.displayMode%',
+                ],
+            ],
+            'mautic.config.config_change_logger' => [
+                'class'     => \Mautic\ConfigBundle\Service\ConfigChangeLogger::class,
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
                 ],
             ],
         ],
