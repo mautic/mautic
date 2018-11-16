@@ -572,7 +572,9 @@ class FormController extends CommonFormController
                         $model->setFields($entity, $fields);
                         $model->deleteFields($entity, $deletedFields);
 
-                        if (!$alias = $entity->getAlias()) {
+                        $alias = $entity->getAlias();
+
+                        if (empty($alias)) {
                             $alias = $model->cleanAlias($entity->getName(), '', 10);
                             $entity->setAlias($alias);
                         }
