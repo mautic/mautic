@@ -14,7 +14,7 @@ namespace Mautic\CoreBundle\EventListener;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Type\GeneratedType;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 class DoctrineGeneratedColumnsListener
 {
@@ -24,15 +24,15 @@ class DoctrineGeneratedColumnsListener
     protected $generatedColumnsProvider;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
     /**
      * @param GeneratedColumnsProviderInterface $generatedColumnsProvider
-     * @param Logger                            $logger
+     * @param LoggerInterface                   $logger
      */
-    public function __construct(GeneratedColumnsProviderInterface $generatedColumnsProvider, Logger $logger)
+    public function __construct(GeneratedColumnsProviderInterface $generatedColumnsProvider, LoggerInterface $logger)
     {
         $this->generatedColumnsProvider = $generatedColumnsProvider;
         $this->logger                   = $logger;
@@ -60,7 +60,7 @@ class DoctrineGeneratedColumnsListener
 
                 $table->addColumn(
                     $generatedColumn->getColumnName(),
-                    GeneratedType::NAME,
+                    GeneratedType::GENERATED,
                     [
                         'columnDefinition' => $generatedColumn->getColumnDefinition(),
                         'notNull'          => false,
@@ -70,7 +70,7 @@ class DoctrineGeneratedColumnsListener
                 $table->addIndex($generatedColumn->getIndexColumns(), $generatedColumn->getIndexName());
             } catch (\Exception $e) {
                 //table doesn't exist or something bad happened so oh well
-                $this->logger->addError('SCHEMA ERROR: '.$e->getMessage());
+                $this->logger->error('SCHEMA ERROR: '.$e->getMessage());
             }
         }
     }

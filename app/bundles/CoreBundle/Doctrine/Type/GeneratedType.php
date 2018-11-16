@@ -22,7 +22,7 @@ class GeneratedType extends Type
     /**
      * @var string
      */
-    public const NAME = 'generated';
+    public const GENERATED = 'generated';
 
     /**
      * @param array            $fieldDeclaration
@@ -32,8 +32,6 @@ class GeneratedType extends Type
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
-        //return "{$fieldDeclaration['columnType']} AS ({$fieldDeclaration['as']})";
-
         // Must be defined in `columnDefinition` option when adding the column in the subscriber
     }
 
@@ -62,6 +60,6 @@ class GeneratedType extends Type
      */
     public function getName()
     {
-        return self::NAME;
+        return self::GENERATED;
     }
 }
