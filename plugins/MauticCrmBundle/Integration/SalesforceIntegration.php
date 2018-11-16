@@ -2533,9 +2533,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'update' => !empty($fieldsToUpdateInSf) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
                 'create' => $fieldsToCreate,
             ];
-            $entity['primaryCompany'] = $company->getFields();
-
-            $entity['primaryCompany'] = $this->leadModel->flattenFields($entity['primaryCompany']);
+            $entity['primaryCompany'] = $company->getProfileFields();
 
             // Create an update and
             $mappedData[$object]['create'] = $this->populateCompanyData(
@@ -2726,6 +2724,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
         $config                  = $this->mergeConfigToFeatureSettings($params);
         $integrationEntityRepo   = $this->getIntegrationEntityRepository();
+
+        if (!isset($config['companyFields'])) {
+            return [0, 0, 0, 0];
+        }
 
         $totalUpdated = 0;
         $totalCreated = 0;
