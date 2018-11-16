@@ -51,9 +51,7 @@ class FormController extends CommonFormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         $session = $this->get('session');
 
@@ -236,14 +234,17 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
+        $submissionCounts = $this->getModel('form.submission')->getRepository()->getSubmissionCounts($activeForm);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'activeForm'  => $activeForm,
-                    'page'        => $page,
-                    'logs'        => $logs,
-                    'permissions' => $permissions,
-                    'stats'       => [
+                    'activeForm'       => $activeForm,
+                    'submissionCounts' => $submissionCounts,
+                    'page'             => $page,
+                    'logs'             => $logs,
+                    'permissions'      => $permissions,
+                    'stats'            => [
                         'submissionsInTime' => $timeStats,
                     ],
                     'dateRangeForm'     => $dateRangeForm->createView(),
@@ -929,7 +930,12 @@ class FormController extends CommonFormController
             'content'     => $html,
             'stylesheets' => [],
             'name'        => $form->getName(),
+            'metaRobots'  => '<meta name="robots" content="index">',
         ];
+
+        if ($form->getNoIndex()) {
+            $viewParams['metaRobots'] = '<meta name="robots" content="noindex">';
+        }
 
         $template = $form->getTemplate();
         if (!empty($template)) {
@@ -964,6 +970,9 @@ class FormController extends CommonFormController
 
             if (!empty($analytics)) {
                 $assetsHelper->addCustomDeclaration($analytics);
+            }
+            if ($form->getNoIndex()) {
+                $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
             }
 
             return $this->render($logicalName, $viewParams);

@@ -65,7 +65,9 @@ class ExceptionController extends CommonController
                     $dataArray['trace'] = $exception->getTrace();
                 }
 
-                return new JsonResponse($dataArray, 200);
+                // Normal behavior in Symfony dev mode is to send 200 with error message,
+                // but this is used in prod mode for all "/api" requests too. (#224)
+                return new JsonResponse($dataArray, $code);
             }
 
             if ($request->get('prod')) {

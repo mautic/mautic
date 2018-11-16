@@ -1111,6 +1111,79 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param Lead|array $lead
+     * @param array      $config
+     *
+     * @return array|bool
+     */
+    public function pushLead($lead, $config = [])
+    {
+        $config  = $this->mergeConfigToFeatureSettings($config);
+        $zObject = 'Leads';
+
+        $fieldsToUpdateInZoho       = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
+        $availableFields            = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
+        $fieldsToUpdate['Leads']    = array_values(array_intersect(array_keys($availableFields['Leads']), $fieldsToUpdateInZoho));
+        $fieldsToUpdate['Contacts'] = array_values(array_intersect(array_keys($availableFields['Contacts']), $fieldsToUpdateInZoho));
+        $fieldsToUpdate['Leads']    = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Leads']));
+        $fieldsToUpdate['Contacts'] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Contacts']));
+        $objectFields               = $this->prepareFieldsForPush($availableFields[$zObject]);
+        $existingPerson             = $this->getExistingRecord('email', $lead->getEmail(), $zObject);
+        $fieldsToUpdate[$zObject]   = $this->getBlankFieldsToUpdate($fieldsToUpdate[$zObject], $existingPerson, $objectFields, $config);
+
+        if (empty($config['leadFields'])) {
+            return [];
+        }
+
+        $mappedData = $this->populateLeadData($lead, $config);
+
+        $this->amendLeadDataBeforePush($mappedData);
+
+        if (empty($mappedData)) {
+            return false;
+        }
+        $mapper    = new Mapper($availableFields);
+        $mapper->setObject($zObject);
+
+        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Zoho', $zObject, 'lead', $lead->getId());
+
+        $counter      = 0;
+        $errorCounter = 0;
+        try {
+            if ($this->isAuthorized()) {
+                if (!empty($existingPerson) && empty($integrationId)) {
+                    /** @var IntegrationEntity $integrationEntity */
+                    $integrationEntity = $this->createIntegrationEntity($zObject, $existingPerson['LEADID'], 'lead', $lead->getId());
+                    $mapper
+                        ->setMappedFields($fieldsToUpdate[$zObject])
+                        ->setContact($lead->getProfileFields())
+                        ->map($lead->getId(), $integrationEntity->getIntegrationEntityId());
+                    $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
+                } elseif (!empty($existingPerson) && !empty($integrationId)) { // contact exists, then update
+                    $mapper
+                        ->setMappedFields($fieldsToUpdate[$zObject])
+                        ->setContact($lead->getProfileFields())
+                        ->map($lead->getId(), $integrationId[0]['integration_entity_id']);
+                    $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
+                } else {
+                    $mapper
+                        ->setMappedFields($config['leadFields'])
+                        ->setContact($lead->getProfileFields())
+                        ->map($lead->getId());
+                    $this->createContactInZoho($mapper, $zObject, $counter, $errorCounter);
+                }
+
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return false;
+    }
+
+    /**
      * @param $fields
      * @param $sfRecord
      * @param $config
@@ -1212,7 +1285,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
         $selectColumns   = implode(',', array_keys($availableFields[$object]));
         $records         = $this->getApiHelper()->getSearchRecords($selectColumns, $seachColumn, $searchValue, $object);
-        $parsedRecords   = $this->parseZohoRecord($records, $availableFields[$object]);
+        $parsedRecords   = $this->parseZohoRecord($records, array_merge($availableFields[$object], ['LEADID' => ['dv'=>'LEADID']]));
 
         return $parsedRecords;
     }

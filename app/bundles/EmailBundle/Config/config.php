@@ -21,7 +21,7 @@ return [
                 'controller' => 'MauticEmailBundle:Email:execute',
             ],
             'mautic_email_contacts' => [
-                'path'       => '/emails/contacts/{objectId}',
+                'path'       => '/emails/view/{objectId}/contact/{page}',
                 'controller' => 'MauticEmailBundle:Email:contacts',
             ],
         ],
@@ -676,6 +676,7 @@ return [
                     'mautic.email.model.send_email_to_contacts',
                     'mautic.tracker.device',
                     'mautic.page.repository.redirect',
+                    'mautic.helper.cache_storage',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
