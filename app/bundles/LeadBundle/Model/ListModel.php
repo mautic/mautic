@@ -1715,6 +1715,28 @@ class ListModel extends FormModel
     }
 
     /**
+     * Is custom field used in at least one defined segment?
+     *
+     * @param LeadField $field
+     *
+     * @return bool
+     */
+    public function isFieldUsed(LeadField $field)
+    {
+        $alias       = $field->getAlias();
+        $aliasLength = mb_strlen($alias);
+        $likeContent = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+
+        $filter = [
+            'force'  => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=> $likeContent],
+            ],
+        ];
+
+        return $this->getEntities(['filter' => $filter])->count() !== 0;
+    }
+
+    /**
      * Get segments which are dependent on given segment.
      *
      * @param int $segmentId
