@@ -246,10 +246,16 @@ class FormApiController extends CommonApiController
 
         // Remove actions which weren't in the PUT request
         if (!$isNew && $method === 'PUT') {
+            $actionsToDelete = [];
+
             foreach ($currentActions as $currentAction) {
                 if (!in_array($currentAction->getId(), $requestActionIds)) {
-                    $entity->removeAction($currentAction);
+                    $actionsToDelete[] = $currentAction->getId();
                 }
+            }
+
+            if ($actionsToDelete) {
+                $this->model->deleteActions($entity, $actionsToDelete);
             }
         }
     }
