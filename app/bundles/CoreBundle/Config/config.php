@@ -304,6 +304,13 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.form.type.slot.successmessage' => [
+                'class'     => Mautic\CoreBundle\Form\Type\SlotSuccessMessageType::class,
+                'alias'     => 'slot_successmessage',
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             'mautic.form.type.slot.image' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
                 'alias' => 'slot_image',
