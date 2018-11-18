@@ -118,6 +118,7 @@ class WebhookSubscriber extends CommonSubscriber
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'tagList',
             ]
         );
     }
