@@ -36,11 +36,6 @@ class VersionProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetVersionFromConfig()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('hasParameter')
-            ->with('db_server_version')
-            ->willReturn(true);
-
-        $this->coreParametersHelper->expects($this->once())
             ->method('getParameter')
             ->willReturn('5.7.23-0ubuntu0.18.04.1');
 
@@ -54,12 +49,8 @@ class VersionProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetVersionForMySql()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('hasParameter')
-            ->with('db_server_version')
-            ->willReturn(false);
-
-        $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('getParameter')
+            ->willReturn(null);
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -80,12 +71,8 @@ class VersionProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetVersionForMariaDb()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('hasParameter')
-            ->with('db_server_version')
-            ->willReturn(false);
-
-        $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('getParameter')
+            ->willReturn('5.5');
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
