@@ -437,14 +437,14 @@ class FieldType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier, $disableDefaultValue) {
                 $data          = $event->getData();
                 $cleaningRules = $formModifier($event);
                 $masks         = !empty($cleaningRules) ? $cleaningRules : 'clean';
                 // clean the data
                 $data = InputHelper::_($data, $masks);
 
-                if ('social' === $data['group'] || !empty($data['isUniqueIdentifer'])) {
+                if ('social' === $data['group'] || !empty($data['isUniqueIdentifer']) || $disableDefaultValue) {
                     // Don't allow a default for social or unique identifiers
                     $data['defaultValue'] = null;
                 }
