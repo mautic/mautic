@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper;
-
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -58,11 +59,6 @@ class FieldHelper
     private $syncFields = [];
 
     /**
-     * @var
-     */
-    private $requiredFields;
-
-    /**
      * FieldHelper constructor.
      *
      * @param FieldModel                       $fieldModel
@@ -83,7 +79,7 @@ class FieldHelper
      *
      * @return array
      */
-    public function getFieldList(string $object)
+    public function getFieldList(string $object): array
     {
         if (!isset($this->fieldList[$object])) {
             $this->fieldList[$object] = $this->fieldModel->getFieldListWithProperties($object);
@@ -97,7 +93,7 @@ class FieldHelper
      *
      * @return string
      */
-    public function getNormalizedFieldType(string $type)
+    public function getNormalizedFieldType(string $type): string
     {
         switch ($type) {
             case 'boolean':
@@ -120,7 +116,7 @@ class FieldHelper
      * @return string
      * @throws ObjectNotSupportedException
      */
-    public function getFieldObjectName(string $objectName)
+    public function getFieldObjectName(string $objectName): string
     {
         switch ($objectName) {
             case MauticSyncDataExchange::OBJECT_CONTACT:
@@ -137,7 +133,7 @@ class FieldHelper
      *
      * @return FieldDAO
      */
-    public function getFieldChangeObject(array $fieldChange)
+    public function getFieldChangeObject(array $fieldChange): FieldDAO
     {
         $changeTimestamp = new \DateTimeImmutable($fieldChange['modified_at'], new \DateTimeZone('UTC'));
         $columnType      = $fieldChange['column_type'];
@@ -155,7 +151,7 @@ class FieldHelper
      *
      * @return array
      */
-    public function getSyncFields(string $objectName)
+    public function getSyncFields(string $objectName): array
     {
         if (isset($this->syncFields[$objectName])) {
             return $this->syncFields[$objectName];
@@ -200,10 +196,6 @@ class FieldHelper
      */
     public function getRequiredFields(string $object): array
     {
-        if (null !== $this->requiredFields) {
-            return $this->requiredFields;
-        }
-
         $requiredFields = $this->fieldModel->getFieldList(
             false,
             false,
@@ -221,8 +213,6 @@ class FieldHelper
             ]
         );
 
-        $this->requiredFields = array_merge($requiredFields, $uniqueIdentifierFields);
-
-        return $this->requiredFields;
+        return array_merge($requiredFields, $uniqueIdentifierFields);
     }
 }
