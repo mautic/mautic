@@ -34,6 +34,7 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
     const NAME = 'mautic';
+    const OBJECT_ACCOUNT = 'account';
     const OBJECT_CONTACT = 'lead'; // kept as lead for BC
     const OBJECT_COMPANY = 'company';
 
