@@ -191,7 +191,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                                 false,
                                 0,
                                 0,
-                                "'".$recordId."'"
+                                [$recordId]
                             );
                             if (count($integrationId)) { // company exists, then update local fields
                                 /** @var Company $entity */
@@ -240,6 +240,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                             $mauticObjectReference = 'company';
                         } elseif ('Leads' === $object) {
                             $recordId = $entityData['LEADID'];
+
                             // first try to find integration entity
                             $integrationId = $integrationEntityRepo->getIntegrationsEntityId(
                                 'Zoho',
@@ -251,8 +252,9 @@ class ZohoIntegration extends CrmAbstractIntegration
                                 false,
                                 0,
                                 0,
-                                "'".$recordId."'"
+                                [$recordId]
                             );
+
                             if (count($integrationId)) { // lead exists, then update
                                 /** @var Lead $entity */
                                 $entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
@@ -327,7 +329,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                                 false,
                                 0,
                                 0,
-                                "'".$recordId."'"
+                                [$recordId]
                             );
                             if (count($integrationId)) { // contact exists, then update
                                 /** @var Lead $entity */
@@ -1254,7 +1256,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                         false,
                         0,
                         0,
-                        "'".$fl[0]."'"
+                        [$fl[0]]
                     );
 
                     if (0 === count($integrationId)) {
