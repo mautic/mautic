@@ -873,6 +873,14 @@ return [
                     'mautic.schema.helper.column',
                 ],
             ],
+            'mautic.form.list.validator.circular' => [
+                'class'     => Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'request_stack',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
         ],
         'models' => [
             'mautic.core.model.auditlog' => [
