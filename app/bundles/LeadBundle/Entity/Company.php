@@ -12,7 +12,7 @@ use Mautic\UserBundle\Entity\User;
 /**
  * Class Company.
  */
-class Company extends FormEntity implements CustomFieldEntityInterface
+class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
@@ -169,6 +169,21 @@ class Company extends FormEntity implements CustomFieldEntityInterface
                 ]
             )
             ->build();
+    }
+
+    /**
+     * @return array
+     */
+    public static function getDefaultIdentifierFields()
+    {
+        return [
+            'companyname',
+            'companyemail',
+            'companywebsite',
+            'city',
+            'state',
+            'country',
+        ];
     }
 
     /**

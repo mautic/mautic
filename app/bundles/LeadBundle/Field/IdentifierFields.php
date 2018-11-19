@@ -1,15 +1,19 @@
 <?php
 
 /*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic
  *
- * @link        https://www.mautic.com
+ * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Field;
+
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\IdentifierFieldEntityInterface;
+use Mautic\LeadBundle\Entity\Lead;
 
 class IdentifierFields
 {
@@ -29,28 +33,6 @@ class IdentifierFields
     private $object;
 
     /**
-     * Fields that are used to identify as not anonymous or unique identifiers (company).
-     *
-     * @var array
-     */
-    private $defaultFields = [
-        'lead' => [
-            'firstname',
-            'lastname',
-            'company',
-            'email',
-        ],
-        'company' => [
-            'companyname',
-            'companyemail',
-            'companywebsite',
-            'city',
-            'state',
-            'country',
-        ],
-    ];
-
-    /**
      * IdentifierFields constructor.
      *
      * @param FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
@@ -64,18 +46,47 @@ class IdentifierFields
 
     /**
      * @param $object
+     * @param $entityClass
      *
      * @return array
      */
-    public function getFieldList($object)
+    public function getFieldList($object, $entityClass = null)
     {
         $this->object = $object;
 
         return array_merge(
-            isset($this->defaultFields[$object]) ? $this->defaultFields[$object] : [],
+            $this->getDefaultFields($entityClass),
             $this->getUniqueIdentifierFields(),
             $this->getSocialFields()
         );
+    }
+
+    /**
+     * @param $entityClass
+     *
+     * @return array
+     */
+    public function getDefaultFields($entityClass)
+    {
+        if (null === $entityClass) {
+            switch ($this->object) {
+                case 'lead':
+                    $entityClass = Lead::class;
+                    break;
+                case 'company':
+                    $entityClass = Company::class;
+                    break;
+                default:
+                    return [];
+            }
+        }
+
+        if (is_subclass_of($entityClass, IdentifierFieldEntityInterface::class)) {
+            return $entityClass::getDefaultIdentifierFields();
+        }
+
+        // The class wasn't recognized or doesn't implement the interface
+        return [];
     }
 
     /**
