@@ -97,6 +97,9 @@ class DateRangeType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+
+        $session->set('mautic.daterange.form.from', $dateFrom->format($humanFormat));
+        $session->set('mautic.daterange.form.to', $dateTo->format($humanFormat));
     }
 
     /**
