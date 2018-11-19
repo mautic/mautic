@@ -34,22 +34,23 @@ trait FrequencyRuleTrait
     protected $isPublicView = false;
 
     /**
-     * @param      $lead
-     * @param      $viewParameters
-     * @param null $data
-     * @param bool $isPublic
-     * @param null $action
+     * @param       $lead
+     * @param array $viewParameters
+     * @param null  $data
+     * @param bool  $isPublic
+     * @param null  $action
+     * @param bool  $isPreferenceCenter
      *
      * @return bool|Form
      */
-    protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null)
+    protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
 
         $leadChannels = $model->getContactChannels($lead);
         $allChannels  = $model->getPreferenceChannels();
-        $leadLists    = $model->getLists($lead, true, true, $isPublic);
+        $leadLists    = $model->getLists($lead, true, true, $isPublic, $isPreferenceCenter);
 
         $viewParameters = array_merge(
             $viewParameters,
@@ -72,18 +73,18 @@ trait FrequencyRuleTrait
         }
 
         if (null == $data) {
-            $data = $this->getFrequencyRuleFormData($lead, $allChannels, $leadChannels, $isPublic);
+            $data = $this->getFrequencyRuleFormData($lead, $allChannels, $leadChannels, $isPublic, null, $isPreferenceCenter);
         }
-
         /** @var Form $form */
         $form = $this->get('form.factory')->create(
             'lead_contact_frequency_rules',
             $data,
             [
-                'action'             => $action,
-                'channels'           => $allChannels,
-                'public_view'        => $isPublic,
-                'allow_extra_fields' => true,
+                'action'                 => $action,
+                'channels'               => $allChannels,
+                'public_view'            => $isPublic,
+                'preference_center_only' => $isPreferenceCenter,
+                'allow_extra_fields'     => true,
             ]
         );
 
@@ -110,7 +111,7 @@ trait FrequencyRuleTrait
      *
      * @return array
      */
-    protected function getFrequencyRuleFormData(Lead $lead, array $allChannels = null, $leadChannels = null, $isPublic = false, $frequencyRules = null)
+    protected function getFrequencyRuleFormData(Lead $lead, array $allChannels = null, $leadChannels = null, $isPublic = false, $frequencyRules = null, $isPreferenceCenter = false)
     {
         $data = [];
 
@@ -152,7 +153,7 @@ trait FrequencyRuleTrait
             : $model->getLeadCategories(
                 $lead
             );
-        $this->leadLists    = $model->getLists($lead, false, false, $isPublic);
+        $this->leadLists    = $model->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
         foreach ($this->leadLists as $leadList) {
             $data['lead_lists'][] = $leadList->getId();

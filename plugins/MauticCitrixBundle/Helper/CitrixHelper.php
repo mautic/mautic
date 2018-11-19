@@ -504,7 +504,7 @@ class CitrixHelper
 
             case CitrixProducts::GOTOTRAINING:
                 $reports  = self::getG2tApi()->request($product.'s/'.$productId, [], 'GET', 'rest/reports');
-                $sessions = array_column($reports, 'sessionKey');
+                $sessions = array_map(create_function('$o', 'return $o["sessionKey"];'), $reports);
                 foreach ($sessions as $session) {
                     $result = self::getG2tApi()->request(
                         'sessions/'.$session.'/attendees',
@@ -512,7 +512,7 @@ class CitrixHelper
                         'GET',
                         'rest/reports'
                     );
-                    $arr    = array_column($result, 'email');
+                    $arr    = array_map(create_function('$o', 'return $o["email"];'), $result);
                     $result = array_merge($result, $arr);
                 }
 

@@ -100,6 +100,13 @@ return [
                     'leadId' => '\d+',
                 ],
             ],
+            'mautic_contact_export_action' => [
+                'path'         => '/contacts/contact/export/{contactId}',
+                'controller'   => 'MauticLeadBundle:Lead:contactExport',
+                'requirements' => [
+                    'contactId' => '\d+',
+                ],
+            ],
             // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_index instead.
             'mautic_contact_import_index' => [
                 'path'       => '/{object}/import/{page}',
@@ -220,6 +227,11 @@ return [
             'mautic_api_segmentaddcontact' => [
                 'path'       => '/segments/{id}/contact/{leadId}/add',
                 'controller' => 'MauticLeadBundle:Api\ListApi:addLead',
+                'method'     => 'POST',
+            ],
+            'mautic_api_segmentaddcontacts' => [
+                'path'       => '/segments/{id}/contacts/add',
+                'controller' => 'MauticLeadBundle:Api\ListApi:addLeads',
                 'method'     => 'POST',
             ],
             'mautic_api_segmentremovecontact' => [
@@ -476,6 +488,30 @@ return [
                     'mautic.lead.repository.lead_event_log',
                 ],
             ],
+            'mautic.lead.timeline_events.campaign.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\TimelineEventLogCampaignSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_event_log',
+                    'mautic.helper.user',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.timeline_events.segment.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\TimelineEventLogSegmentSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_event_log',
+                    'mautic.helper.user',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.lead.subscriber.segment' => [
+                'class'     => 'Mautic\LeadBundle\EventListener\SegmentSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
@@ -670,7 +706,9 @@ return [
             ],
             'mautic.form.type.lead_fields' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadFieldsType',
-                'arguments' => ['mautic.factory'],
+                'arguments' => [
+                    'mautic.lead.model.field',
+                ],
                 'alias'     => 'leadfields_choices',
             ],
             'mautic.form.type.lead_dashboard_leads_in_time_widget' => [

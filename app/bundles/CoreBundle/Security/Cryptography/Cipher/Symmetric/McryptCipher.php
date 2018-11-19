@@ -20,26 +20,11 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
  */
 class McryptCipher implements SymmetricCipherInterface
 {
-    /**
-     * @var string
-     */
-    private $cipher;
+    /** @var string */
+    private $cipher = MCRYPT_RIJNDAEL_256;
 
-    /**
-     * @var string
-     */
-    private $mode;
-
-    public function __construct()
-    {
-        // Do not use Mcrypt constants if the extension is not installed
-        if (!$this->isSupported()) {
-            return;
-        }
-
-        $this->cipher = MCRYPT_RIJNDAEL_256;
-        $this->mode   = MCRYPT_MODE_CBC;
-    }
+    /** @var string */
+    private $mode = MCRYPT_MODE_CBC;
 
     /**
      * @param string $secretMessage
@@ -50,8 +35,6 @@ class McryptCipher implements SymmetricCipherInterface
      */
     public function encrypt($secretMessage, $key, $randomInitVector)
     {
-        $this->checkSupport();
-
         $key  = pack('H*', $key);
         $data = $secretMessage.$this->getHash($secretMessage, $this->getHashKey($key));
 
@@ -69,8 +52,6 @@ class McryptCipher implements SymmetricCipherInterface
      */
     public function decrypt($encryptedMessage, $key, $originalInitVector)
     {
-        $this->checkSupport();
-
         if (strlen($originalInitVector) !== $this->getInitVectorSize()) {
             throw new InvalidDecryptionException();
         }
@@ -93,8 +74,6 @@ class McryptCipher implements SymmetricCipherInterface
      */
     public function getRandomInitVector()
     {
-        $this->checkSupport();
-
         return mcrypt_create_iv($this->getInitVectorSize(), MCRYPT_DEV_URANDOM);
     }
 
@@ -135,17 +114,5 @@ class McryptCipher implements SymmetricCipherInterface
         $hexKey = bin2hex($binaryKey);
         // Get second half of hexKey version (stable but different than original key)
         return substr($hexKey, -32);
-    }
-
-    /**
-     * Throws an exception if Mcrypt is not supported.
-     *
-     * @throws \BadMethodCallException
-     */
-    private function checkSupport()
-    {
-        if (!$this->isSupported()) {
-            throw new \BadMethodCallException('Mcrypt PHP extension is not installed. Use OpenSSL.');
-        }
     }
 }
