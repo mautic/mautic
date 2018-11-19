@@ -74,11 +74,15 @@ class RouterSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::REQUEST => ['setRouterRequestContext', 0],
+            KernelEvents::REQUEST => ['setRouterRequestContext', 1],
         ];
     }
 
     /**
+     * This forces generated routes to be the same as what is configured as Mautic's site_url
+     * in order to prevent mismatches between cached URLs generated during web requests and URLs generated
+     * via CLI/cron jobs.
+     *
      * @param GetResponseEvent $event
      */
     public function setRouterRequestContext(GetResponseEvent $event)
