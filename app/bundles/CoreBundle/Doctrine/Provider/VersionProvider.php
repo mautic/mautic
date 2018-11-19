@@ -17,6 +17,13 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 final class VersionProvider implements VersionProviderInterface
 {
     /**
+     * @var string
+     *
+     * @see app/bundles/CoreBundle/Config/config.php and look for 'db_server_version'.
+     */
+    private const DEFAULT_CONFIG_VERSION = '5.5';
+
+    /**
      * @var Connection
      */
     private $connection;
@@ -80,11 +87,17 @@ final class VersionProvider implements VersionProviderInterface
      */
     private function getVersionFromConfig()
     {
-        if ($this->coreParametersHelper->hasParameter('db_server_version')) {
-            return $this->coreParametersHelper->getParameter('db_server_version');
+        $version = $this->coreParametersHelper->getParameter('db_server_version');
+
+        if (empty($version)) {
+            throw new \UnexpectedValueException('db_server_version has empty value. Set it in app/config/local.php.');
         }
 
-        throw new \UnexpectedValueException('db_server_version is not set in the config file.');
+        if (self::DEFAULT_CONFIG_VERSION === $version) {
+            throw new \UnexpectedValueException('db_server_version has default value of '.self::DEFAULT_CONFIG_VERSION.'. That is suspicious and the version is not probably set in app/config/local.php.');
+        }
+
+        return $version;
     }
 
     /**
