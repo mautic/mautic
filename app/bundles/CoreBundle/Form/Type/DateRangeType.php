@@ -36,10 +36,18 @@ class DateRangeType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $humanFormat      = 'M j, Y';
-        $dateRangeDefault = $this->factory->getParameter('default_daterange_filter', '-1 month');
-
-        $defaultFrom = new \DateTime($dateRangeDefault);
+        $humanFormat     = 'M j, Y';
+        $session         = $this->factory->get('session');
+        $sessionDateFrom = $session->get('mautic.daterange.form.from');
+        $sessionDateTo   = $session->get('mautic.daterange.form.to');
+        if (!empty($sessionDateFrom) && !empty($sessionDateTo)) {
+            $defaultFrom = new \DateTime($sessionDateFrom);
+            $defaultTo   = new \DateTime($sessionDateTo);
+        } else {
+            $dateRangeDefault = $this->factory->getParameter('default_daterange_filter', '-1 month');
+            $defaultFrom      = new \DateTime($dateRangeDefault);
+            $defaultTo        = new \DateTime();
+        }
 
         $dateFrom = (empty($options['data']['date_from']))
             ?
@@ -61,7 +69,7 @@ class DateRangeType extends AbstractType
 
         $dateTo = (empty($options['data']['date_to']))
             ?
-            new \DateTime()
+            $defaultTo
             :
             new \DateTime($options['data']['date_to']);
 

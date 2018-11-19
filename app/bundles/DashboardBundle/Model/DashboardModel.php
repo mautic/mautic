@@ -332,8 +332,8 @@ class DashboardModel extends FormModel
         $dateRangeStart->modify($dateRangeDefault);
 
         $today    = new \DateTime();
-        $dateFrom = new \DateTime($this->session->get('mautic.dashboard.date.from', $dateRangeStart->format('Y-m-d 00:00:00')));
-        $dateTo   = new \DateTime($this->session->get('mautic.dashboard.date.to', $today->format('Y-m-d 23:59:59')));
+        $dateFrom = new \DateTime($this->session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
+        $dateTo   = new \DateTime($this->session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
 
         return [
             'dateFrom' => $dateFrom,
