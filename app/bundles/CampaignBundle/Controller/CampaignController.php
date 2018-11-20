@@ -654,36 +654,48 @@ class CampaignController extends AbstractStandardFormController
                 $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
 
                 /** @var LeadEventLogRepository $eventLogRepo */
-                $eventLogRepo      = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-                $events            = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
-                $leadCount         = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
-                $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true);
-                $sortedEvents      = [
+                $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+                $events                   = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
+                $leadCount                = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
+                $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true);
+                $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
+                $sortedEvents             = [
                     'decision'  => [],
                     'action'    => [],
                     'condition' => [],
                 ];
 
                 foreach ($events as $event) {
-                    $event['logCount']   =
-                    $event['percent']    =
-                    $event['yesPercent'] =
-                    $event['noPercent']  = 0;
-                    $event['leadCount']  = $leadCount;
+                    $event['logCount']             =
+                    $event['logCountForPending']   =
+                    $event['percent']              =
+                    $event['yesPercent']           =
+                    $event['noPercent']            = 0;
+                    $event['leadCount']            = $leadCount;
 
                     if (isset($campaignLogCounts[$event['id']])) {
-                        $event['logCount'] = array_sum($campaignLogCounts[$event['id']]);
+                        $event['logCount']           = array_sum($campaignLogCounts[$event['id']]);
+                        $event['logCountForPending'] = array_sum($pendingCampaignLogCounts[$event['id']]);
 
+                        $pending  = $event['leadCount'] - $event['logCountForPending'];
+                        $total    = $event['logCount'] + $pending;
+                        $totalYes = $campaignLogCounts[$event['id']][1] + round($pending / 2);
+                        $totalNo  = $campaignLogCounts[$event['id']][0] + round($pending / 2);
+                        echo $total;
+                        echo '-';
+                        echo $totalYes;
+                        echo '-';
+                        echo $totalNo;
+                        echo '----';
                         if ($leadCount) {
-                            $event['percent']    = round(($event['logCount'] / $leadCount) * 100, 1);
-                            $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / $leadCount) * 100, 1);
-                            $event['noPercent']  = round(($campaignLogCounts[$event['id']][0] / $leadCount) * 100, 1);
+                            $event['percent']    = round(($event['logCount'] / $total) * 100, 1);
+                            $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / ($totalYes + $totalNo)) * 100, 1);
+                            $event['noPercent']  = $totalNo ? round(($campaignLogCounts[$event['id']][0] / ($totalYes + $totalNo)) * 100, 1) : 0;
                         }
                     }
 
                     $sortedEvents[$event['eventType']][] = $event;
                 }
-
                 $stats = $this->getCampaignModel()->getCampaignMetricsLineChartData(
                     null,
                     new \DateTime($dateRangeForm->get('date_from')->getData()),
