@@ -16,7 +16,6 @@
         <?php $typeClass    = ('action' === $event['eventType'] && 'no' === $event['decisionPath']) ? 'danger' : 'success'; ?>
         <?php $percentLabel = ($typeClass === 'danger') ? 'mautic.report.campaign.no.percent' : 'mautic.report.campaign.yes.percent'; ?>
         <?php $percentProp  = ($typeClass === 'danger') ? 'noPercent' : 'yesPercent'; ?>
-        <?php $percentProp  = ('no' === $event['decisionPath']) ? 'percent' : $percentProp; ?>
         <li class="list-group-item bg-auto bg-light-xs">
             <div class="progress-bar progress-bar-<?php echo $typeClass; ?>" style="width:<?php echo $event['yesPercent']; ?>%; left: 0;"></div>
             <div class="progress-bar progress-bar-danger" style="width:<?php echo $event['noPercent']; ?>%; left: <?php echo $event['yesPercent']; ?>%"></div>

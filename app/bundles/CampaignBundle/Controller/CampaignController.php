@@ -664,8 +664,7 @@ class CampaignController extends AbstractStandardFormController
                     'action'    => [],
                     'condition' => [],
                 ];
-
-                foreach ($events as $event) {
+                foreach ($events as &$event) {
                     $event['logCount']             =
                     $event['logCountForPending']   =
                     $event['percent']              =
@@ -675,22 +674,38 @@ class CampaignController extends AbstractStandardFormController
 
                     if (isset($campaignLogCounts[$event['id']])) {
                         $event['logCount']           = array_sum($campaignLogCounts[$event['id']]);
-                        $event['logCountForPending'] = array_sum($pendingCampaignLogCounts[$event['id']]);
+                        $event['logCountForPending'] = isset($pendingCampaignLogCounts[$event['id']]) ? array_sum($pendingCampaignLogCounts[$event['id']]) : 0;
 
                         $pending  = $event['leadCount'] - $event['logCountForPending'];
                         $totalYes = $campaignLogCounts[$event['id']][1];
                         $totalNo  = $campaignLogCounts[$event['id']][0];
                         $total    = $totalYes + $totalNo + $pending;
-
                         if ($leadCount) {
                             $event['percent']    = round(($event['logCount'] / $total) * 100, 1);
                             $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / $total) * 100, 1);
-                            $event['noPercent']  = $totalNo ? round(($campaignLogCounts[$event['id']][0] / $total) * 100, 1) : 0;
+                            $event['noPercent']  = $total ? round(($campaignLogCounts[$event['id']][0] / $total) * 100, 1) : 0;
                         }
                     }
+                }
 
+                // rewrite stats data from parent condition if exist
+                foreach ($events as &$event) {
+                    if (!empty($event['decisionPath']) && !empty($event['parent_id']) && isset($events[$event['parent_id']])) {
+                        $parentEvent                 = $events[$event['parent_id']];
+                        $event['logCount']           = $parentEvent['logCount'];
+                        $event['logCountForPending'] = $parentEvent['logCountForPending'];
+                        $event['percent']            = $parentEvent['percent'];
+                        $event['yesPercent']         = $parentEvent['yesPercent'];
+                        $event['noPercent']          = $parentEvent['noPercent'];
+                        if ($event['decisionPath'] == 'yes') {
+                            $event['noPercent'] = 0;
+                        } else {
+                            $event['yesPercent'] = 0;
+                        }
+                    }
                     $sortedEvents[$event['eventType']][] = $event;
                 }
+
                 $stats = $this->getCampaignModel()->getCampaignMetricsLineChartData(
                     null,
                     new \DateTime($dateRangeForm->get('date_from')->getData()),
