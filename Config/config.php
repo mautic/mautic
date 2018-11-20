@@ -427,9 +427,6 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.integrations.sync.notification.notification_dao_factory' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAOFactory::class,
-            ],
         ],
     ],
 ];
