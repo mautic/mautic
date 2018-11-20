@@ -12,11 +12,19 @@
 return [
     'services' => [
         'events' => [
-            'mautic.sms.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
+            'mautic.sms.campaignbundle.subscriber.send' => [
+                'class'     => \Mautic\SmsBundle\EventListener\CampaignSendSubscriber::class,
                 'arguments' => [
                     'mautic.sms.model.sms',
                     'mautic.sms.transport_chain',
+                ],
+                'alias' => 'mautic.sms.campaignbundle.subscriber',
+            ],
+            'mautic.sms.campaignbundle.subscriber.reply' => [
+                'class'     => \Mautic\SmsBundle\EventListener\CampaignReplySubscriber::class,
+                'arguments' => [
+                    'mautic.sms.transport_chain',
+                    'mautic.campaign.executioner.realtime',
                 ],
             ],
             'mautic.sms.smsbundle.subscriber' => [
@@ -107,11 +115,25 @@ return [
             'mautic.sms.callback_handler_container' => [
                 'class' => \Mautic\SmsBundle\Callback\HandlerContainer::class,
             ],
+            'mautic.sms.helper.contact' => [
+                'class'     => \Mautic\SmsBundle\Helper\ContactHelper::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead',
+                    'doctrine.dbal.default_connection',
+                    'mautic.sms.repository.stat',
+                    'mautic.helper.phone_number',
+                ],
+            ],
+            'mautic.sms.helper.reply' => [
+                'class'     => \Mautic\SmsBundle\Helper\ReplyHelper::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
             'mautic.sms.transport.twilio' => [
                 'class'        => \Mautic\SmsBundle\Api\TwilioApi::class,
                 'arguments'    => [
                     'mautic.page.model.trackable',
-                    'mautic.helper.phone_number',
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
@@ -151,7 +173,7 @@ return [
             ],
         ],
         'controllers' => [
-            'mautic.sms.callback_handler_container' => [
+            'mautic.sms.controller.reply' => [
                 'class'     => \Mautic\SmsBundle\Controller\ReplyController::class,
                 'arguments' => [
                     'mautic.sms.callback_handler_container',
