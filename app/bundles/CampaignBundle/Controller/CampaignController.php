@@ -678,19 +678,14 @@ class CampaignController extends AbstractStandardFormController
                         $event['logCountForPending'] = array_sum($pendingCampaignLogCounts[$event['id']]);
 
                         $pending  = $event['leadCount'] - $event['logCountForPending'];
-                        $total    = $event['logCount'] + $pending;
-                        $totalYes = $campaignLogCounts[$event['id']][1] + round($pending / 2);
-                        $totalNo  = $campaignLogCounts[$event['id']][0] + round($pending / 2);
-                        echo $total;
-                        echo '-';
-                        echo $totalYes;
-                        echo '-';
-                        echo $totalNo;
-                        echo '----';
+                        $totalYes = $campaignLogCounts[$event['id']][1];
+                        $totalNo  = $campaignLogCounts[$event['id']][0];
+                        $total    = $totalYes + $totalNo + $pending;
+
                         if ($leadCount) {
                             $event['percent']    = round(($event['logCount'] / $total) * 100, 1);
-                            $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / ($totalYes + $totalNo)) * 100, 1);
-                            $event['noPercent']  = $totalNo ? round(($campaignLogCounts[$event['id']][0] / ($totalYes + $totalNo)) * 100, 1) : 0;
+                            $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / $total) * 100, 1);
+                            $event['noPercent']  = $totalNo ? round(($campaignLogCounts[$event['id']][0] / $total) * 100, 1) : 0;
                         }
                     }
 
@@ -703,7 +698,6 @@ class CampaignController extends AbstractStandardFormController
                     null,
                     ['campaign_id' => $objectId]
                 );
-
                 $session = $this->get('session');
 
                 $campaignSources = $this->getCampaignModel()->getSourceLists();
