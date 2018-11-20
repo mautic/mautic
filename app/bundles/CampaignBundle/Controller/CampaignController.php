@@ -657,7 +657,7 @@ class CampaignController extends AbstractStandardFormController
                 $eventLogRepo      = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
                 $events            = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
                 $leadCount         = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
-                $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
+                $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true);
                 $sortedEvents      = [
                     'decision'  => [],
                     'action'    => [],
@@ -691,7 +691,6 @@ class CampaignController extends AbstractStandardFormController
                     null,
                     ['campaign_id' => $objectId]
                 );
-
                 $session = $this->get('session');
 
                 $campaignSources = $this->getCampaignModel()->getSourceLists();
