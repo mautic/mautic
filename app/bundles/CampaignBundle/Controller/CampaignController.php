@@ -683,7 +683,7 @@ class CampaignController extends AbstractStandardFormController
                         if ($leadCount) {
                             $event['percent']    = round(($event['logCount'] / $total) * 100, 1);
                             $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / $total) * 100, 1);
-                            $event['noPercent']  = $total ? round(($campaignLogCounts[$event['id']][0] / $total) * 100, 1) : 0;
+                            $event['noPercent']  = round(($campaignLogCounts[$event['id']][0] / $total) * 100, 1);
                         }
                     }
                 }
@@ -713,6 +713,7 @@ class CampaignController extends AbstractStandardFormController
                     null,
                     ['campaign_id' => $objectId]
                 );
+
                 $session = $this->get('session');
 
                 $campaignSources = $this->getCampaignModel()->getSourceLists();
