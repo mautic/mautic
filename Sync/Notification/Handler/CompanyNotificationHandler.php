@@ -64,7 +64,15 @@ class CompanyNotificationHandler implements HandlerInterface
         return MauticSyncDataExchange::OBJECT_COMPANY;
     }
 
-    public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName)
+    /**
+     * @param NotificationDAO $notificationDAO
+     * @param string $integrationDisplayName
+     * @param string $objectDisplayName
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
+     */
+    public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void
     {
         $this->writer->writeAuditLogEntry(
             $notificationDAO->getIntegration(),
@@ -88,7 +96,7 @@ class CompanyNotificationHandler implements HandlerInterface
         );
     }
 
-    public function finalize()
+    public function finalize(): void
     {
         // Nothing to do
     }

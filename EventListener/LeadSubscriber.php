@@ -159,7 +159,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onCompanyPostDelete(Events\CompanyEvent $event): void
     {
-        $this->fieldChangeRepo->deleteEntitiesForObject($event->getCompany()->deletedId, Company::class);
+        $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getCompany()->deletedId, Company::class);
     }
 
     /**

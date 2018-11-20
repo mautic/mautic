@@ -105,7 +105,7 @@ class ContactNotificationHandler implements HandlerInterface
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName)
+    public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void
     {
         $this->integrationDisplayName = $integrationDisplayName;
         $this->objectDisplayName      = $objectDisplayName;
@@ -128,7 +128,7 @@ class ContactNotificationHandler implements HandlerInterface
         $this->userNotificationHelper->storeSummaryNotification($integrationDisplayName, $objectDisplayName, $notificationDAO->getMauticObjectId());
     }
 
-    public function finalize()
+    public function finalize(): void
     {
         $this->userNotificationHelper->writeNotifications(
             MauticSyncDataExchange::OBJECT_CONTACT,
@@ -143,7 +143,7 @@ class ContactNotificationHandler implements HandlerInterface
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    private function writeEventLogEntry(string $integration, int $contactId, string $message)
+    private function writeEventLogEntry(string $integration, int $contactId, string $message): void
     {
         $eventLog = new LeadEventLog();
         $eventLog
