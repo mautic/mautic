@@ -115,7 +115,7 @@ return [
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
-                'tag'         => 'mautic.sms_transport',
+                'tag'          => 'mautic.sms_transport',
                 'tagArguments' => [
                     'integrationAlias' => 'Twilio',
                 ],
@@ -151,16 +151,16 @@ return [
             ],
         ],
         'controllers' => [
-            'mautic.sms.controller.reply' => [
-                'class' => \Mautic\SmsBundle\Controller\ReplyController::class,
+            'mautic.sms.callback_handler_container' => [
+                'class'     => \Mautic\SmsBundle\Controller\ReplyController::class,
                 'arguments' => [
-                    'mautic.helper.integration',
+                    'mautic.sms.callback_handler_container',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container'
-                    ]
-                ]
+                        '@service_container',
+                    ],
+                ],
             ],
         ],
     ],
@@ -183,6 +183,10 @@ return [
             'mautic_receive_sms' => [
                 'path'       => '/sms/receive',
                 'controller' => 'MauticSmsBundle:Api\SmsApi:receive',
+            ],
+            'mautic_sms_callback' => [
+                'path'       => '/sms/{transport}/callback',
+                'controller' => 'MauticSmsBundle:Reply:callback',
             ],
         ],
         'api' => [

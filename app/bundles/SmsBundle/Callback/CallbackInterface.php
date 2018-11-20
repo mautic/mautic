@@ -11,7 +11,6 @@
 
 namespace Mautic\SmsBundle\Callback;
 
-
 use Symfony\Component\HttpFoundation\Request;
 
 interface CallbackInterface
@@ -24,7 +23,7 @@ interface CallbackInterface
     public function getCallbackPath();
 
     /**
-     * Processes the response.
+     * Processes the callback from Request.
      *
      * @param Request $request
      */
