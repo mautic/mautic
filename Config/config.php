@@ -362,15 +362,6 @@ return [
             'mautic.integrations.sync.notification.handler_container' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer::class,
             ],
-            'mautic.integrations.sync.notification.handler_account' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\AccountNotificationHandler::class,
-                'arguments' => [
-                    'mautic.integrations.sync.notification.writer',
-                    'mautic.integrations.sync.notification.helper_user_notification',
-                    'mautic.user.repository',
-                ],
-                'tag' => 'mautic.sync.notification_handler',
-            ],
             'mautic.integrations.sync.notification.handler_company' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\CompanyNotificationHandler::class,
                 'arguments' => [
