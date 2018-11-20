@@ -237,8 +237,6 @@ class FrequencyRuleRepository extends CommonRepository
             $results[$key]['frequency_number'] = $defaultFrequencyNumber;
             $results[$key]['frequency_time']   = $defaultFrequencyTime;
         }
-        var_export($q->getParameters());
-        die(var_export($q->getSQL(), true));
 
         return $results;
     }
