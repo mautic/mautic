@@ -692,7 +692,6 @@ class CampaignController extends AbstractStandardFormController
                 foreach ($events as &$event) {
                     if (!empty($event['decisionPath']) && !empty($event['parent_id']) && isset($events[$event['parent_id']])) {
                         $parentEvent                 = $events[$event['parent_id']];
-                        $event['logCount']           = $parentEvent['logCount'];
                         $event['logCountForPending'] = $parentEvent['logCountForPending'];
                         $event['percent']            = $parentEvent['percent'];
                         $event['yesPercent']         = $parentEvent['yesPercent'];
