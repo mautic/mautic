@@ -683,7 +683,6 @@ class CampaignController extends AbstractStandardFormController
 
                     $sortedEvents[$event['eventType']][] = $event;
                 }
-
                 $stats = $this->getCampaignModel()->getCampaignMetricsLineChartData(
                     null,
                     new \DateTime($dateRangeForm->get('date_from')->getData()),
