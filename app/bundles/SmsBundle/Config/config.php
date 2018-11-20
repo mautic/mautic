@@ -89,6 +89,9 @@ return [
                 'alias'     => 'smsconfig',
                 'arguments' => ['mautic.sms.transport_chain', 'translator'],
             ],
+            'mautic.form.type.sms.campaign_reply_type' => [
+                'class' => \Mautic\SmsBundle\Form\Type\CampaignReplyType::class,
+            ],
         ],
         'helpers' => [
             'mautic.helper.sms' => [

@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\SmsBundle\Event\ReplyEvent;
+use Mautic\SmsBundle\Form\Type\CampaignReplyType;
 use Mautic\SmsBundle\Helper\ReplyHelper;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
@@ -74,9 +75,10 @@ class CampaignReplySubscriber implements EventSubscriberInterface
         $event->addDecision(
             self::TYPE,
             [
-                'label'            => 'mautic.campaign.sms.reply',
-                'description'      => 'mautic.campaign.sms.reply.tooltip',
-                'eventName'        => SmsEvents::ON_CAMPAIGN_REPLY,
+                'label'       => 'mautic.campaign.sms.reply',
+                'description' => 'mautic.campaign.sms.reply.tooltip',
+                'eventName'   => SmsEvents::ON_CAMPAIGN_REPLY,
+                'formType'    => CampaignReplyType::class,
             ]
         );
     }
