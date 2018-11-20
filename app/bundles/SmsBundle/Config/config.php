@@ -96,16 +96,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.sms.api' => [
-                'class'     => 'Mautic\SmsBundle\Api\TwilioApi',
-                'arguments' => [
-                    'mautic.page.model.trackable',
-                    'mautic.helper.phone_number',
-                    'mautic.helper.integration',
-                    'monolog.logger.mautic',
-                ],
-                'alias' => 'sms_api',
-            ],
             'mautic.sms.transport_chain' => [
                 'class'     => \Mautic\SmsBundle\Sms\TransportChain::class,
                 'arguments' => [
@@ -113,6 +103,9 @@ return [
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
+            ],
+            'mautic.sms.callback_handler_container' => [
+                'class' => \Mautic\SmsBundle\Callback\HandlerContainer::class,
             ],
             'mautic.sms.transport.twilio' => [
                 'class'        => \Mautic\SmsBundle\Api\TwilioApi::class,
@@ -122,9 +115,13 @@ return [
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
-                'tag'          => 'mautic.sms_transport',
+                'tag'         => 'mautic.sms_transport',
                 'tagArguments' => [
                     'integrationAlias' => 'Twilio',
+                ],
+                'serviceAliases' => [
+                    'sms_api',
+                    'mautic.sms.api',
                 ],
             ],
         ],
@@ -151,6 +148,19 @@ return [
                 'arguments' => [
                     \Mautic\SmsBundle\Entity\Stat::class,
                 ],
+            ],
+        ],
+        'controllers' => [
+            'mautic.sms.controller.reply' => [
+                'class' => \Mautic\SmsBundle\Controller\ReplyController::class,
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ]
+                ]
             ],
         ],
     ],
