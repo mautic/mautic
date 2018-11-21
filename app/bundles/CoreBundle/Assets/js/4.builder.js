@@ -1560,7 +1560,7 @@ Mautic.initSlotListeners = function() {
                 params.slot.find('img').closest('div').css('text-align', values[params.field.val()]);
             }
         } else if (fieldParam === 'border-radius') {
-            params.slot.find('a.button').css(fieldParam, params.field.val() + 'px');
+            params.slot.find('.button:first').css(fieldParam, params.field.val() + 'px');
         } else if (fieldParam === 'button-size') {
             var bg_clr = params.slot.attr('data-param-background-color');
             var values = [
@@ -1568,7 +1568,7 @@ Mautic.initSlotListeners = function() {
                 {borderWidth: '20px 23px', padding: '0', fontSize: '20px', borderColor : bg_clr, borderStyle: 'solid'},
                 {borderWidth: '25px 40px', padding: '0', fontSize: '30px', borderColor : bg_clr, borderStyle: 'solid'}
             ];
-            params.slot.find('a.button').css(values[params.field.val()]);
+            params.slot.find('.button:first').css(values[params.field.val()]);
         } else if (fieldParam === 'caption-color') {
             params.slot.find('.imagecard-caption').css('background-color', '#' + params.field.val());
         } else if (fieldParam === 'background-color' || fieldParam === 'color') {
@@ -1581,9 +1581,9 @@ Mautic.initSlotListeners = function() {
                     if ('imagecard' === type) {
                         params.slot.find('.imagecard').css(fieldParam, '#' + color);
                     } else {
-                        params.slot.find('a.button').css(fieldParam, '#' + color);
-                        params.slot.find('a.button').attr('background', '#' + color);
-                        params.slot.find('a.button').css('border-color', '#' + color);
+                        params.slot.find('.button:first').css(fieldParam, '#' + color);
+                        params.slot.find('.button:first').attr('background', '#' + color);
+                        params.slot.find('.button:first').css('border-color', '#' + color);
                     }
                 } else if (fieldParam === 'color') {
                     if ('imagecard' === type) {
