@@ -12,10 +12,17 @@
 namespace Mautic\SmsBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\SmsBundle\Entity\Stat;
+use Mautic\SmsBundle\Callback\CallbackInterface;
+use Mautic\SmsBundle\Callback\ResponseInterface;
 use Mautic\SmsBundle\Event\ReplyEvent;
+use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\SmsEvents;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class ReplyHelper.
@@ -28,6 +35,11 @@ class ReplyHelper
     private $eventDispatcher;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * ReplyHelper constructor.
      *
      * @param EventDispatcher $eventDispatcher
@@ -38,8 +50,8 @@ class ReplyHelper
     }
 
     /**
-     * @param string $pattern
-     * @param string $replyBody
+     * @param $pattern
+     * @param $replyBody
      *
      * @return bool
      */
@@ -49,14 +61,82 @@ class ReplyHelper
     }
 
     /**
-     * @param Lead      $contact
-     * @param string    $message
-     * @param Stat|null $stat
+     * @param CallbackInterface $handler
+     * @param Request           $request
+     *
+     * @return Response
+     *
+     * @throws \Exception
      */
-    public function dispatchReplyEvent(Lead $contact, $message, Stat $stat = null)
+    public function handleRequest(CallbackInterface $handler, Request $request)
     {
-        $replyEvent = new ReplyEvent($contact, $message, $stat);
+        // Set the default response
+        $response = $this->getDefaultResponse($handler);
+
+        try {
+            $message  = $handler->getMessage($request);
+            $contacts = $handler->getContacts($request);
+
+            foreach ($contacts as $contact) {
+                $eventResponse = $this->dispatchReplyEvent($contact, $message);
+
+                if ($eventResponse instanceof Response) {
+                    // Last one wins
+                    $response = $eventResponse;
+                }
+            }
+        } catch (BadRequestHttpException $exception) {
+            return new Response('invalid request', 400);
+        } catch (NotFoundHttpException $exception) {
+            return new Response('', 404);
+        } catch (NumberNotFoundException $exception) {
+            $this->logger->debug(
+                sprintf(
+                    '%s: %s was not found. The message sent was "%s"',
+                    $handler->getTransportName(),
+                    $exception->getNumber(),
+                    isset($message) ? $message : 'unknown'
+                )
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * @param Lead $contact
+     * @param      $message
+     *
+     * @return null|\Symfony\Component\HttpFoundation\Response
+     */
+    private function dispatchReplyEvent(Lead $contact, $message)
+    {
+        $replyEvent = new ReplyEvent($contact, trim($message));
 
         $this->eventDispatcher->dispatch(SmsEvents::ON_REPLY, $replyEvent);
+
+        return $replyEvent->getResponse();
+    }
+
+    /**
+     * @param CallbackInterface $handler
+     *
+     * @return Response
+     *
+     * @throws \Exception
+     */
+    private function getDefaultResponse(CallbackInterface $handler)
+    {
+        if ($handler instanceof ResponseInterface) {
+            $response = $handler->getResponse();
+
+            if (!$response instanceof Response) {
+                throw new \Exception('getResponse must return a Symfony\Component\HttpFoundation\Response object');
+            }
+
+            return $response;
+        }
+
+        return new Response();
     }
 }

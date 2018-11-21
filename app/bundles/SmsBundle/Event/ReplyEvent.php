@@ -12,8 +12,8 @@
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\SmsBundle\Entity\Stat;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\Response;
 
 class ReplyEvent extends Event
 {
@@ -28,24 +28,20 @@ class ReplyEvent extends Event
     private $message;
 
     /**
-     * This may not be known depending on if the SMS transport service supports identifying the message the contact replied to.
-     *
-     * @var Stat|null
+     * @var Response|null
      */
-    private $stat;
+    private $response;
 
     /**
      * ReplyEvent constructor.
      *
-     * @param Lead      $contact
-     * @param           $message
-     * @param Stat|null $stat
+     * @param Lead $contact
+     * @param      $message
      */
-    public function __construct(Lead $contact, $message, Stat $stat = null)
+    public function __construct(Lead $contact, $message)
     {
         $this->contact = $contact;
         $this->message = $message;
-        $this->stat    = $stat;
     }
 
     /**
@@ -65,10 +61,18 @@ class ReplyEvent extends Event
     }
 
     /**
-     * @return Stat|null
+     * @param Response $response
      */
-    public function getStat()
+    public function setResponse(Response $response)
     {
-        return $this->stat;
+        $this->response = $response;
+    }
+
+    /**
+     * @return null|Response
+     */
+    public function getResponse()
+    {
+        return $this->response;
     }
 }
