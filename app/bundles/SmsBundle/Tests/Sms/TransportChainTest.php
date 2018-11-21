@@ -64,7 +64,7 @@ class TransportChainTest extends AbstractMauticTestCase
     {
         $count = count($this->transportChain->getTransports());
 
-        $this->transportChain->addTransport('mautic.transport.test', $this->container->get('mautic.sms.transport.twilio'), 'mautic.transport.test', 'Twilio');
+        $this->transportChain->addTransport('mautic.transport.test', $this->container->get('mautic.sms.twilio.transport'), 'mautic.transport.test', 'Twilio');
 
         $this->assertCount($count + 1, $this->transportChain->getTransports());
     }

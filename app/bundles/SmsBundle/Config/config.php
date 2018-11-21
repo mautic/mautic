@@ -64,6 +64,12 @@ return [
                     'mautic.sms.repository.stat',
                 ],
             ],
+            'mautic.sms.subscriber.stop' => [
+                'class'     => \Mautic\SmsBundle\EventListener\StopSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.dnc',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.sms' => [
@@ -123,7 +129,6 @@ return [
                 'arguments' => [
                     'mautic.lead.repository.lead',
                     'doctrine.dbal.default_connection',
-                    'mautic.sms.repository.stat',
                     'mautic.helper.phone_number',
                 ],
             ],
@@ -133,12 +138,17 @@ return [
                     'event_dispatcher',
                 ],
             ],
-            'mautic.sms.transport.twilio' => [
-                'class'        => \Mautic\SmsBundle\Api\TwilioApi::class,
+            'mautic.sms.twilio.configuration' => [
+                'class'        => \Mautic\SmsBundle\Integration\Twilio\Configuration::class,
                 'arguments'    => [
-                    'mautic.page.model.trackable',
                     'mautic.helper.integration',
+                ],
+            ],
+            'mautic.sms.twilio.transport' => [
+                'class'        => \Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
+                'arguments'    => [
                     'monolog.logger.mautic',
+                    'mautic.sms.twilio.configuration',
                 ],
                 'tag'          => 'mautic.sms_transport',
                 'tagArguments' => [
@@ -147,6 +157,7 @@ return [
                 'serviceAliases' => [
                     'sms_api',
                     'mautic.sms.api',
+                    'mautic.sms.transport.twilio',
                 ],
             ],
         ],
@@ -180,6 +191,7 @@ return [
                 'class'     => \Mautic\SmsBundle\Controller\ReplyController::class,
                 'arguments' => [
                     'mautic.sms.callback_handler_container',
+                    'mautic.sms.helper.reply',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -205,13 +217,17 @@ return [
             ],
         ],
         'public' => [
-            'mautic_receive_sms' => [
-                'path'       => '/sms/receive',
-                'controller' => 'MauticSmsBundle:Api\SmsApi:receive',
-            ],
             'mautic_sms_callback' => [
                 'path'       => '/sms/{transport}/callback',
                 'controller' => 'MauticSmsBundle:Reply:callback',
+            ],
+            /* @deprecated as this was Twilio specific */
+            'mautic_receive_sms' => [
+                'path'       => '/sms/receive',
+                'controller' => 'MauticSmsBundle:Reply:callback',
+                'defaults'   => [
+                    'transport' => 'twilio',
+                ],
             ],
         ],
         'api' => [
@@ -253,6 +269,6 @@ return [
         'sms_sending_phone_number' => null,
         'sms_frequency_number'     => null,
         'sms_frequency_time'       => null,
-        'sms_transport'            => 'mautic.sms.transport.twilio',
+        'sms_transport'            => 'mautic.sms.twilio.transport',
     ],
 ];
