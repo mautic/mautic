@@ -16,8 +16,6 @@ use Doctrine\DBAL\Connection;
 use libphonenumber\PhoneNumberFormat;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\SmsBundle\Entity\Stat;
-use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 
 class ContactHelper
@@ -33,11 +31,6 @@ class ContactHelper
     private $connection;
 
     /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
      * @var PhoneNumberHelper
      */
     private $phoneNumberHelper;
@@ -47,18 +40,15 @@ class ContactHelper
      *
      * @param LeadRepository    $leadRepository
      * @param Connection        $connection
-     * @param StatRepository    $statRepository
      * @param PhoneNumberHelper $phoneNumberHelper
      */
     public function __construct(
         LeadRepository $leadRepository,
         Connection $connection,
-        StatRepository $statRepository,
         PhoneNumberHelper $phoneNumberHelper
     ) {
         $this->leadRepository    = $leadRepository;
         $this->connection        = $connection;
-        $this->statRepository    = $statRepository;
         $this->phoneNumberHelper = $phoneNumberHelper;
     }
 
@@ -72,15 +62,7 @@ class ContactHelper
     public function findContactsByNumber($number)
     {
         // Who knows what the number was originally formatted as so let's try a few
-        $searchForNumbers = array_unique(
-            [
-                $number,
-                $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164),
-                $this->phoneNumberHelper->format($number, PhoneNumberFormat::NATIONAL),
-                $this->phoneNumberHelper->format($number, PhoneNumberFormat::INTERNATIONAL),
-                $this->phoneNumberHelper->format($number, PhoneNumberFormat::RFC3966),
-            ]
-        );
+        $searchForNumbers = $this->getNumberList($number);
 
         $qb = $this->connection->createQueryBuilder();
 
@@ -98,7 +80,7 @@ class ContactHelper
 
         $ids = array_column($foundContacts);
         if (count($ids) === 0) {
-            throw new NumberNotFoundException();
+            throw new NumberNotFoundException($number);
         }
 
         $collection = new ArrayCollection();
@@ -112,12 +94,20 @@ class ContactHelper
     }
 
     /**
-     * @param $id
+     * @param $number
      *
-     * @return null|Stat
+     * @return array
      */
-    public function findStatByTrackingId($id)
+    private function getNumberList($number)
     {
-        return $this->statRepository->findOneBy(['trackingHash' => $id]);
+        return array_unique(
+            [
+                $number,
+                $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164),
+                $this->phoneNumberHelper->format($number, PhoneNumberFormat::NATIONAL),
+                $this->phoneNumberHelper->format($number, PhoneNumberFormat::INTERNATIONAL),
+                $this->phoneNumberHelper->format($number, PhoneNumberFormat::RFC3966),
+            ]
+        );
     }
 }
