@@ -13,7 +13,6 @@ namespace Mautic\SmsBundle\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
-use libphonenumber\PhoneNumberFormat;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
@@ -62,7 +61,7 @@ class ContactHelper
     public function findContactsByNumber($number)
     {
         // Who knows what the number was originally formatted as so let's try a few
-        $searchForNumbers = $this->getNumberList($number);
+        $searchForNumbers = $this->phoneNumberHelper->getFormattedNumberList($number);
 
         $qb = $this->connection->createQueryBuilder();
 
@@ -78,7 +77,7 @@ class ContactHelper
             ->execute()
             ->fetchAll();
 
-        $ids = array_column($foundContacts);
+        $ids = array_column($foundContacts, 'id');
         if (count($ids) === 0) {
             throw new NumberNotFoundException($number);
         }
@@ -91,23 +90,5 @@ class ContactHelper
         }
 
         return $collection;
-    }
-
-    /**
-     * @param $number
-     *
-     * @return array
-     */
-    private function getNumberList($number)
-    {
-        return array_unique(
-            [
-                $number,
-                $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164),
-                $this->phoneNumberHelper->format($number, PhoneNumberFormat::NATIONAL),
-                $this->phoneNumberHelper->format($number, PhoneNumberFormat::INTERNATIONAL),
-                $this->phoneNumberHelper->format($number, PhoneNumberFormat::RFC3966),
-            ]
-        );
     }
 }

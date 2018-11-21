@@ -11,6 +11,34 @@
 
 namespace Mautic\SmsBundle\Exception;
 
+use Throwable;
+
 class NumberNotFoundException extends \Exception
 {
+    /***
+     * @var string
+     */
+    private $number;
+
+    /**
+     * NumberNotFoundException constructor.
+     *
+     * @param                $number
+     * @param string         $message
+     * @param int            $code
+     * @param Throwable|null $previous
+     */
+    public function __construct($number, $message = '', $code = 0, Throwable $previous = null)
+    {
+        $this->number = $number;
+        parent::__construct($message, $code, $previous);
+    }
+
+    /**
+     * @return string
+     */
+    public function getNumber()
+    {
+        return $this->number;
+    }
 }
