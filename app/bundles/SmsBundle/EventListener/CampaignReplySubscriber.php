@@ -105,11 +105,7 @@ class CampaignReplySubscriber implements EventSubscriberInterface
             return;
         }
 
-        // Set the channel and channel ID if known
-        $stat      = $replyEvent->getStat();
-        $channelId = ($stat) ? $stat->getSms()->getId() : null;
-        $decisionEvent->setChannel('sms', $channelId);
-
+        $decisionEvent->setChannel('sms');
         $decisionEvent->setAsApplicable();
     }
 
