@@ -53,6 +53,8 @@ class ReplyController extends Controller
      */
     public function callbackAction(Request $request, $transport)
     {
+        define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
+
         try {
             $handler = $this->callbackHandler->getHandler($transport);
         } catch (CallbackHandlerNotFound $exception) {

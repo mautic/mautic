@@ -12,6 +12,7 @@
 namespace Mautic\SmsBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
 use Mautic\SmsBundle\Callback\ResponseInterface;
 use Mautic\SmsBundle\Event\ReplyEvent;
@@ -40,13 +41,22 @@ class ReplyHelper
     private $logger;
 
     /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * ReplyHelper constructor.
      *
      * @param EventDispatcher $eventDispatcher
+     * @param LoggerInterface $logger
+     * @param ContactTracker  $contactTracker
      */
-    public function __construct(EventDispatcher $eventDispatcher)
+    public function __construct(EventDispatcher $eventDispatcher, LoggerInterface $logger, ContactTracker $contactTracker)
     {
         $this->eventDispatcher = $eventDispatcher;
+        $this->logger          = $logger;
+        $this->contactTracker  = $contactTracker;
     }
 
     /**
@@ -57,7 +67,7 @@ class ReplyHelper
      */
     public static function matches($pattern, $replyBody)
     {
-        return fnmatch($pattern, $replyBody);
+        return fnmatch($pattern, $replyBody, FNM_CASEFOLD);
     }
 
     /**
@@ -77,7 +87,13 @@ class ReplyHelper
             $message  = $handler->getMessage($request);
             $contacts = $handler->getContacts($request);
 
+            $this->logger->debug(sprintf('SMS REPLY: Processing message "%s"', $message));
+            $this->logger->debug(sprintf('SMS REPLY: Found IDs %s', implode(',', $contacts->getKeys())));
+
             foreach ($contacts as $contact) {
+                // Set the contact for campaign decisions
+                $this->contactTracker->setSystemContact($contact);
+
                 $eventResponse = $this->dispatchReplyEvent($contact, $message);
 
                 if ($eventResponse instanceof Response) {

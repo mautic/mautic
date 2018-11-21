@@ -136,6 +136,8 @@ return [
                 'class'     => \Mautic\SmsBundle\Helper\ReplyHelper::class,
                 'arguments' => [
                     'event_dispatcher',
+                    'monolog.logger.mautic',
+                    'mautic.tracker.contact',
                 ],
             ],
             'mautic.sms.twilio.configuration' => [
@@ -147,8 +149,8 @@ return [
             'mautic.sms.twilio.transport' => [
                 'class'        => \Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
                 'arguments'    => [
-                    'monolog.logger.mautic',
                     'mautic.sms.twilio.configuration',
+                    'monolog.logger.mautic',
                 ],
                 'tag'          => 'mautic.sms_transport',
                 'tagArguments' => [
@@ -159,6 +161,14 @@ return [
                     'mautic.sms.api',
                     'mautic.sms.transport.twilio',
                 ],
+            ],
+            'mautic.sms.twilio.callback' => [
+                'class'     => \Mautic\SmsBundle\Integration\Twilio\TwilioCallback::class,
+                'arguments' => [
+                    'mautic.sms.helper.contact',
+                    'mautic.sms.twilio.configuration',
+                ],
+                'tag'   => 'mautic.sms_callback_handler',
             ],
         ],
         'models' => [
