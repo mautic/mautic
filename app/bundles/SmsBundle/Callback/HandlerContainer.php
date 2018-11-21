@@ -11,7 +11,6 @@
 
 namespace Mautic\SmsBundle\Callback;
 
-
 use Mautic\SmsBundle\Exception\CallbackHandlerNotFound;
 
 class HandlerContainer
@@ -26,21 +25,22 @@ class HandlerContainer
      */
     public function registerHandler(CallbackInterface $handler)
     {
-        $this->handlers[$handler->getCallbackPath()] = $handler;
+        $this->handlers[$handler->getTransportName()] = $handler;
     }
 
     /**
-     * @param $callbackPath
+     * @param $transportName
      *
      * @return CallbackInterface
+     *
      * @throws CallbackHandlerNotFound
      */
-    public function getHandler($callbackPath)
+    public function getHandler($transportName)
     {
-        if (!isset($this->handlers[$callbackPath])) {
-            throw new CallbackHandlerNotFound("$callbackPath has not been registered");
+        if (!isset($this->handlers[$transportName])) {
+            throw new CallbackHandlerNotFound("$transportName has not been registered");
         }
 
-        return $this->handlers[$callbackPath];
+        return $this->handlers[$transportName];
     }
 }
