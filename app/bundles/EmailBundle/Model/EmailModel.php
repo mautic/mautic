@@ -944,6 +944,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param int   $minContactId    Filter by min contact ID
      * @param int   $maxContactId    Filter by max contact ID
      * @param bool  $countWithMaxMin Add min_id and max_id info to the count result
+     * @param bool  $storeToCache    Whether to store the result to the cache
      *
      * @return int|array
      */
@@ -955,7 +956,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $includeVariants = true,
         $minContactId = null,
         $maxContactId = null,
-        $countWithMaxMin = false
+        $countWithMaxMin = false,
+        $storeToCache = true
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
         $total      = $this->getRepository()->getEmailPendingLeads(
@@ -969,7 +971,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $countWithMaxMin
         );
 
-        if (!empty($total)) {
+        if ($storeToCache && !empty($total)) {
             if ($countOnly && $countWithMaxMin) {
                 $toStore = $total['count'];
             } elseif ($countOnly) {
@@ -1059,7 +1061,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $progress = false;
         if ($batch && $output) {
             $progressCounter = 0;
-            $totalLeadCount  = $this->getPendingLeads($email, null, true, null, true, $minContactId, $maxContactId);
+            $totalLeadCount  = $this->getPendingLeads($email, null, true, null, true, $minContactId, $maxContactId, false, false);
             if (!$totalLeadCount) {
                 return [0, 0, []];
             }
@@ -1076,7 +1078,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
 
             $options['listId'] = $list->getId();
-            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId);
+            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false);
             $leadCount         = count($leads);
 
             while ($leadCount) {
@@ -1105,7 +1107,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     }
 
                     // Get the next batch of leads
-                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId);
+                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false);
                     $leadCount = count($leads);
                 } else {
                     $leadCount = 0;
