@@ -32,6 +32,18 @@ class TwilioCallback implements CallbackInterface
     private $configuration;
 
     /**
+     * TwilioCallback constructor.
+     *
+     * @param ContactHelper $contactHelper
+     * @param Configuration $configuration
+     */
+    public function __construct(ContactHelper $contactHelper, Configuration $configuration)
+    {
+        $this->contactHelper = $contactHelper;
+        $this->configuration = $configuration;
+    }
+
+    /**
      * @return string
      */
     public function getTransportName()
