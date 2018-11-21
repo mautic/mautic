@@ -155,6 +155,10 @@ class FrequencyRuleRepository extends CommonRepository
                 ->setParameter('channel', $channel);
         }
 
+        // Preferred channel is stored in this table so they may not have a frequency rule defined but just a preference so exclude them
+        $q->andWhere('fr.frequency_time IS NOT NULL AND fr.frequency_number IS NOT NULL');
+
+        // Calculate the rule timeframe
         $q->andWhere(
             '(ch.'.$statSentColumn.' >= case fr.frequency_time
                  when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH)
@@ -222,7 +226,8 @@ class FrequencyRuleRepository extends CommonRepository
         $subQuery = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subQuery->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr')
-            ->where("fr.lead_id = ch.{$statContactColumn}");
+            ->where("fr.lead_id = ch.{$statContactColumn}")
+            ->andWhere('fr.frequency_time IS NOT NULL AND fr.frequency_number IS NOT NULL');
         $q->andWhere(
             sprintf('NOT EXISTS (%s)', $subQuery->getSQL())
         );
