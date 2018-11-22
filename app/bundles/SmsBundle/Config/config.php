@@ -70,6 +70,13 @@ return [
                     'mautic.lead.model.dnc',
                 ],
             ],
+            'mautic.sms.subscriber.reply' => [
+                'class'     => \Mautic\SmsBundle\EventListener\ReplySubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.repository.lead_event_log',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.sms' => [
