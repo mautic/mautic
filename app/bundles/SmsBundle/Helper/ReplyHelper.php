@@ -19,7 +19,7 @@ use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\SmsEvents;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -31,7 +31,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ReplyHelper
 {
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     private $eventDispatcher;
 
@@ -48,11 +48,11 @@ class ReplyHelper
     /**
      * ReplyHelper constructor.
      *
-     * @param EventDispatcher $eventDispatcher
-     * @param LoggerInterface $logger
-     * @param ContactTracker  $contactTracker
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param LoggerInterface          $logger
+     * @param ContactTracker           $contactTracker
      */
-    public function __construct(EventDispatcher $eventDispatcher, LoggerInterface $logger, ContactTracker $contactTracker)
+    public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, ContactTracker $contactTracker)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->logger          = $logger;
