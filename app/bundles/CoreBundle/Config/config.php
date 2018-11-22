@@ -187,10 +187,12 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+
             'mautic.core.maintenance.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\MaintenanceSubscriber',
+                'class'     => Mautic\CoreBundle\EventListener\MaintenanceSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                    'mautic.user.token.repository',
                 ],
             ],
             'mautic.core.request.subscriber' => [
