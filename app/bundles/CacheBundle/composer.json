@@ -1,0 +1,24 @@
+{
+  "name": "mautic/mautic-cache-plugin",
+  "version": "1.0",
+  "description": "Provides PSR-6 and PSR-16 interfaces to caching, provides FS caching adapter",
+  "type": "library",
+  "require": {
+    "mautic/mautic": "^2.14.3",
+    "symfony/cache": "^3.4.10",
+    "php": ">=7.1"
+  },
+  "provide": {
+    "mautic/mautic-cache-plugin": "1.0"
+  },
+  "license": "GNU/GPLv3",
+  "authors": [
+    {
+      "name": "Jan Kozak",
+      "email": "galvani78@gmail.com",
+      "homepage": "https://www.mautic.com",
+      "role": "Developer"
+    }
+  ],
+  "minimum-stability": "dev"
+}

@@ -15,6 +15,11 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
+/**
+ * Class CacheStorageHelper.
+ *
+ * @deprecated to be removed soon. use mautic.cache.provider instead
+ */
 class CacheStorageHelper
 {
     const ADAPTOR_DATABASE = 'db';
@@ -62,7 +67,7 @@ class CacheStorageHelper
      * @param null $cacheDir
      * @param int  $defaultExpiration
      */
-    public function __construct($adaptor, $namespace = null, Connection $connection = null, $cacheDir = null, $defaultExpiration = 0)
+    public function __construct($adaptor, $namespace = null, Connection $connection = null, $cacheDir = null, $defaultExpiration = 0, $cacheProvider = null)
     {
         $this->cacheDir          = $cacheDir.'/data';
         $this->adaptor           = $adaptor;
@@ -70,22 +75,37 @@ class CacheStorageHelper
         $this->connection        = $connection;
         $this->defaultExpiration = $defaultExpiration;
 
-        $this->setCacheAdaptor();
+        // @deprecated BC support for pre 2.6.0 to be removed in 3.0
+        if (!in_array($adaptor, [self::ADAPTOR_DATABASE, self::ADAPTOR_FILESYSTEM])) {
+            if (file_exists($adaptor)) {
+                $this->cacheDir = $adaptor.'/data';
+            } else {
+                throw new \InvalidArgumentException('cache directory either not set or does not exist; use the container\'s mautic.helper.cache_storage service.');
+            }
+
+            $this->adaptor = self::ADAPTOR_FILESYSTEM;
+        }
+
+        if (is_null($cacheProvider)) {
+            if (!is_null($namespace) && 'mautic_' != $namespace) {
+                trigger_error('Service is deprecated. Use mautic.cache.provider service and tags instead. Your namespace is '.$namespace, E_USER_DEPRECATED);
+            }
+            $this->setCacheAdaptor();
+        } else {
+            $this->adaptor = $cacheProvider;
+        }
     }
 
     /**
-     * @return string|false
-     */
-    public function getAdaptorClassName()
-    {
-        return get_class($this->cacheAdaptor);
-    }
-
-    /**
-     * @param $name
-     * @param $data
+     * @param      $name
+     * @param      $data
+     * @param null $expiration
+     *
+     * @deprecated
      *
      * @return bool
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function set($name, $data, $expiration = null)
     {
@@ -105,10 +125,14 @@ class CacheStorageHelper
     }
 
     /**
-     * @param     $name
-     * @param int $maxAge @deprecated 2.6.0 to be removed in 3.0; set expiration when using set()
+     * @param      $name
+     * @param null $maxAge
+     *
+     * @deprecated
      *
      * @return bool|mixed
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function get($name, $maxAge = null)
     {
@@ -126,6 +150,8 @@ class CacheStorageHelper
     }
 
     /**
+     * @deprecated
+     *
      * @param $name
      */
     public function delete($name)
@@ -155,6 +181,8 @@ class CacheStorageHelper
      * @param null $namespace
      * @param null $defaultExpiration
      *
+     * @deprecated
+     *
      * @return CacheStorageHelper;
      */
     public function getCache($namespace = null, $defaultExpiration = 0)
@@ -174,6 +202,12 @@ class CacheStorageHelper
         return $this->cache[$namespace];
     }
 
+    /**
+     * @deprecated
+     *
+     * @param $namespace
+     * @param $defaultExpiration
+     */
     protected function setCacheAdaptor()
     {
         switch ($this->adaptor) {

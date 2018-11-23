@@ -787,6 +787,7 @@ return [
                     '%mautic.db_table_prefix%',
                     'doctrine.dbal.default_connection',
                     '%kernel.cache_dir%',
+                    'mautic.cache.provider',
                 ],
             ],
             'mautic.helper.update' => [

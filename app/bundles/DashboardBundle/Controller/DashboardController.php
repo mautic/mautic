@@ -32,6 +32,37 @@ class DashboardController extends AbstractFormController
      */
     public function indexAction()
     {
+        /** @var CacheProvider $cache */
+        $cache = $this->get('mautic.cache.provider');
+
+        /** @var CacheItemInterface $item */
+        $item = $cache->getItem('test_tagged_Item');
+        $item->set('yesa!!!');
+        $item->tag(['firstTag', 'secondTag']);
+        $item->expiresAfter(20000);
+
+        $cache->save($item);
+
+        $item = $cache->getItem('test_nottagged_Item2');
+        $item->tag(['firstTag']);
+        $cache->save($item);
+
+        $item = $cache->getItem('test_nottagged_Item3');
+        $item->tag(['secondTag']);
+        $cache->save($item);
+
+        $cache->commit();
+
+        var_dump($cache->getItem('test_nottagged_Item2')->isHit());
+        var_dump($cache->getItem('test_nottagged_Item3')->isHit());
+
+        $cache->invalidateTags(['firstTag']);
+
+        var_dump($cache->getItem('test_nottagged_Item2')->isHit());
+        var_dump($cache->getItem('test_nottagged_Item3')->isHit());
+
+        $cache->commit();
+        die();
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
         $model   = $this->getModel('dashboard');
         $widgets = $model->getWidgets();
