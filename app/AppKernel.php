@@ -110,6 +110,14 @@ class AppKernel extends Kernel
             $this->boot();
         }
 
+        /*
+         * If we've already sent the response headers, and we have a session
+         * set in the request, set that as the session in the container.
+         */
+        if (headers_sent() && $request->getSession()) {
+            $this->getContainer()->set('session', $request->getSession());
+        }
+
         // Check for an an active db connection and die with error if unable to connect
         if (!defined('MAUTIC_INSTALLER')) {
             $db = $this->getContainer()->get('database_connection');
