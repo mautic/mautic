@@ -35,6 +35,7 @@ class CompanyController extends FormController
                 'lead:leads:viewother',
                 'lead:leads:create',
                 'lead:leads:editother',
+                'lead:leads:editown',
                 'lead:leads:deleteother',
             ],
             'RETURN_ARRAY'
