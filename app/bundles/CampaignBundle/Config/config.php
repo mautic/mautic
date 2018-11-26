@@ -88,6 +88,11 @@ return [
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
                 'method'     => 'POST',
             ],
+            'mautic_api_contact_clone_campaign' => [
+                'path'       => '/campaigns/clone/{campaignId}',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:cloneCampaign',
+                'method'     => 'POST',
+            ],
 
             // @deprecated 2.6.0 to be removed 3.0
             'bc_mautic_api_campaignaddcontact'        => [

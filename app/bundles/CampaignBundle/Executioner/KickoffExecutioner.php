@@ -213,7 +213,16 @@ class KickoffExecutioner implements ExecutionerInterface
                 $this->counter->advanceEvaluated($contacts->count());
 
                 try {
-                    $this->scheduler->validateAndScheduleEventForContacts($event, $now, $contacts);
+                    // Get the date the event would be executed on as if it was based on days only
+                    $executionDate = $this->scheduler->getExecutionDateTime($event, $now);
+                    $this->logger->debug(
+                        'CAMPAIGN: Event ID# '.$event->getId().
+                        ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
+                        ' compared to '.$now->format('Y-m-d H:i:s')
+                    );
+
+                    // Adjust the hour based on contact timezone if applicable
+                    $this->scheduler->validateAndScheduleEventForContacts($event, $executionDate, $contacts, $now);
 
                     $this->counter->advanceTotalScheduled($contacts->count());
                     $rootEvents->remove($key);

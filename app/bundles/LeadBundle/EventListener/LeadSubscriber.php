@@ -620,7 +620,14 @@ class LeadSubscriber extends CommonSubscriber
     protected function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $eventLogRepo = $this->em->getRepository('MauticLeadBundle:LeadEventLog');
-        $imports      = $eventLogRepo->getEventsByLead('lead', 'import', $event->getLead(), $event->getQueryOptions());
+        $imports      = $eventLogRepo->getEvents(
+            $event->getLead(),
+            'lead',
+            'import',
+            ['failed', 'inserted', 'updated'],
+            $event->getQueryOptions()
+        );
+
         // Add to counter
         $event->addToCounter($eventTypeKey, $imports);
 

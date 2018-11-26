@@ -364,21 +364,22 @@ class EventScheduler
 
     /**
      * @param Event           $event
-     * @param \DateTime       $comparedFromDateTime
+     * @param \DateTime       $executionDateTime
      * @param ArrayCollection $contacts
+     * @param \DateTime       $comparedFromDateTime
      *
      * @throws NotSchedulableException
      */
-    public function validateAndScheduleEventForContacts(Event $event, \DateTime $comparedFromDateTime, ArrayCollection $contacts)
+    public function validateAndScheduleEventForContacts(Event $event, \DateTime $executionDateTime, ArrayCollection $contacts, \DateTime $comparedFromDateTime)
     {
         if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$event->getId().
                 ' has to be scheduled based on contact specific parameters '.
-                ' compared to '.$comparedFromDateTime->format('Y-m-d H:i:s')
+                ' compared to '.$executionDateTime->format('Y-m-d H:i:s')
             );
 
-            $groupedExecutionDates = $this->intervalScheduler->groupContactsByDate($event, $contacts, $comparedFromDateTime);
+            $groupedExecutionDates = $this->intervalScheduler->groupContactsByDate($event, $contacts, $executionDateTime);
             $config                = $this->collector->getEventConfig($event);
 
             foreach ($groupedExecutionDates as $groupExecutionDateDAO) {
@@ -392,13 +393,6 @@ class EventScheduler
 
             return;
         }
-
-        $executionDateTime = $this->getExecutionDateTime($event, $comparedFromDateTime);
-        $this->logger->debug(
-            'CAMPAIGN: Event ID# '.$event->getId().
-            ' to be executed on '.$executionDateTime->format('Y-m-d H:i:s').
-            ' compared to '.$comparedFromDateTime->format('Y-m-d H:i:s')
-        );
 
         if ($this->shouldSchedule($executionDateTime, $comparedFromDateTime)) {
             $this->schedule($event, $executionDateTime, $contacts);

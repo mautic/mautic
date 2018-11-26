@@ -14,6 +14,8 @@ namespace Mautic\PageBundle\Model;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Event\RedirectGenerationEvent;
+use Mautic\PageBundle\PageEvents;
 
 /**
  * Class RedirectModel.
@@ -67,6 +69,13 @@ class RedirectModel extends FormModel
      */
     public function generateRedirectUrl(Redirect $redirect, $clickthrough = [], $shortenUrl = false, $utmTags = [])
     {
+        if ($this->dispatcher->hasListeners(PageEvents::ON_REDIRECT_GENERATE)) {
+            $event = new RedirectGenerationEvent($redirect, $clickthrough);
+            $this->dispatcher->dispatch(PageEvents::ON_REDIRECT_GENERATE, $event);
+
+            $clickthrough = $event->getClickthrough();
+        }
+
         $url = $this->buildUrl(
             'mautic_url_redirect',
             ['redirectId' => $redirect->getRedirectId()],

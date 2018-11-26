@@ -64,13 +64,14 @@ class CampaignEventLeadFieldValueType extends AbstractType
             'field',
             'leadfields_choices',
             [
-                'label'       => 'mautic.lead.campaign.event.field',
-                'label_attr'  => ['class' => 'control-label'],
-                'multiple'    => false,
-                'with_tags'   => true,
-                'with_utm'    => true,
-                'empty_value' => 'mautic.core.select',
-                'attr'        => [
+                'label'                 => 'mautic.lead.campaign.event.field',
+                'label_attr'            => ['class' => 'control-label'],
+                'multiple'              => false,
+                'with_company_fields'   => true,
+                'with_tags'             => true,
+                'with_utm'              => true,
+                'empty_value'           => 'mautic.core.select',
+                'attr'                  => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.lead.campaign.event.field_descr',
                     'onchange' => 'Mautic.updateLeadFieldValues(this)',
