@@ -1,10 +1,53 @@
 # mautic-cache-plugin
 
-Enables PSR-6 and PSR-16 caching
+Enables PSR-6 and PSR-16 caching. Check: [Symfony Cache Component](https://symfony.com/doc/3.4/components/cache.html)
 
 ## Installation
 
 Install this plugin as submodule into plugins directory.
+
+## Namespace versus tag
+
+This bundle introduces tags to cache. All its adapters are fully tag
+aware which makes the use of namespace obsolete for daily use.
+
+Previously if you wanted to keep control on cache section and did not want to hold
+the index of all keys to clear you would have to use namespace.
+
+Disadvantage of this approach is a new adapter being created for each namespace.
+
+[Symfony 3.4 Cache](https://symfony.com/doc/3.4/components/cache.html) uses tag-aware adapters. If you want to clear all records related to your bundle
+or component you just need to tag them.
+
+```php
+    /** @var CacheProvider $cache */
+    $cache = $this->get('mautic.cache.provider');
+
+    /** @var CacheItemInterface $item */
+    $item = $cache->getItem('test_tagged_Item');
+    $item->set('yesa!!!');
+    $item->tag(['firstTag', 'secondTag']);
+    $item->expiresAfter(20000);
+```
+
+All you need to do now is to clear all tagged items:
+
+```
+$cache->invalidateTags(['firstTag']);
+```
+
+### Pools clearing
+
+Removing Cache Items¶
+
+Cache Pools include methods to delete a cache item, some of them or all of them.
+The most common is `Psr\\Cache\\CacheItemPoolInterface::deleteItem`, which deletes the cache item identified by the given key.
+
+```
+$isDeleted = $cache->deleteItem('user_'.$userId);
+```
+
+Use the Psr\\Cache\\CacheItemPoolInterface::deleteItems method to delete several cache items simultaneously (it returns true only if all the items have been deleted, even when any or some of them don't exist):
 
 ## Configuration
 
@@ -117,3 +160,4 @@ app/console  mautic:cache:clear
 
         var_dump($test);
 ```
+
