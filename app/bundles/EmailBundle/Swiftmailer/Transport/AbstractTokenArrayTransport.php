@@ -13,7 +13,7 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\EmailBundle\Helper\PlainTextMassageHelper;
+use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 
 /**
@@ -35,6 +35,23 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
      * @var bool
      */
     protected $started = false;
+
+    /**
+     * @var array
+     */
+    protected $standardHeaderKeys = [
+        'MIME-Version',
+        'received',
+        'dkim-signature',
+        'Content-Type',
+        'Content-Transfer-Encoding',
+        'To',
+        'From',
+        'Subject',
+        'Reply-To',
+        'CC',
+        'BCC',
+    ];
 
     /**
      * @var MauticFactory
@@ -140,7 +157,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
 
         $message = [
             'html'    => $this->message->getBody(),
-            'text'    => PlainTextMassageHelper::getPlainTextFromMessage($this->message),
+            'text'    => PlainTextMessageHelper::getPlainTextFromMessage($this->message),
             'subject' => $this->message->getSubject(),
             'from'    => [
                 'name'  => $fromName,
@@ -254,7 +271,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
         $headers            = $this->message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
-            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT) {
+            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT && !in_array($header->getFieldName(), $this->standardHeaderKeys)) {
                 $message['headers'][$header->getFieldName()] = $header->getFieldBodyModel();
             }
         }

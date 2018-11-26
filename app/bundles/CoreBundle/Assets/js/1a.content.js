@@ -546,7 +546,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
                     // Set custom buttons with separator between them.
                     toolbarButtons: maxButtons,
                     toolbarButtonsMD: maxButtons,
-                    heightMin: 300
+                    heightMin: 300,
+                    useClasses: false
                 };
 
                 if (textarea.hasClass('editor-basic-fullpage')) {
@@ -569,7 +570,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
                     toolbarButtonsMD: minButtons,
                     toolbarButtonsSM: minButtons,
                     toolbarButtonsXS: minButtons,
-                    heightMin: 100
+                    heightMin: 100,
+                    useClasses: false
                 }));
             }
         });
@@ -968,6 +970,21 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
 };
 
 /**
+ * Check and destroy chosen select
+ *
+ * @param el
+ */
+Mautic.destroyChosen = function(el) {
+    var eventObject = mQuery._data(el.get(0), 'events');
+
+    // Check if object has chosen event
+    if (eventObject !== undefined && eventObject['chosen:activate'] !== undefined) {
+        el.chosen('destroy');
+        el.off('chosen:activate chosen:close chosen:open chosen:updated'); //Clear chosen events because chosen('destroy') doesn't
+    }
+};
+
+/**
  * Activate a typeahead lookup
  *
  * @param field
@@ -1200,7 +1217,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
     var format = mQuery(el).data('format');
     if (type == 'datetime') {
         mQuery(el).datetimepicker({
-            format: (format) ? format : 'Y-m-d H:i:s',
+            format: (format) ? format : 'Y-m-d H:i',
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
@@ -1219,7 +1236,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
     } else if (type == 'time') {
         mQuery(el).datetimepicker({
             datepicker: false,
-            format: (format) ? format : 'H:i:s',
+            format: (format) ? format : 'H:i',
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,

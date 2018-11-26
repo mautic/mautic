@@ -25,6 +25,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -151,7 +152,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false)
+    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
         if (is_array($lead)) {
             $q = $this->getEntityManager()->createQueryBuilder()
@@ -174,12 +175,16 @@ class LeadListRepository extends CommonRepository
             )
                 ->setParameter('leads', $lead)
                 ->setParameter('false', false, 'boolean');
+
             if ($isPublic) {
                 $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
                     ->setParameter('isPublic', true, 'boolean');
             }
+            if ($isPreferenceCenter) {
+                $q->andWhere($q->expr()->eq('l.isPreferenceCenter', ':isPreferenceCenter'))
+                    ->setParameter('isPreferenceCenter', true, 'boolean');
+            }
             $result = $q->getQuery()->getArrayResult();
-
             $return = [];
             foreach ($result as $r) {
                 foreach ($r['leads'] as $l) {
@@ -211,6 +216,11 @@ class LeadListRepository extends CommonRepository
             if ($isPublic) {
                 $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
                     ->setParameter('isPublic', true, 'boolean');
+            }
+
+            if ($isPreferenceCenter) {
+                $q->andWhere($q->expr()->eq('l.isPreferenceCenter', ':isPreferenceCenter'))
+                    ->setParameter('isPreferenceCenter', true, 'boolean');
             }
 
             return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
@@ -268,6 +278,27 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * Return a list of global lists.
+     *
+     * @return array
+     */
+    public function getPreferenceCenterList()
+    {
+        $q = $this->getEntityManager()->createQueryBuilder()
+            ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+
+        $q->select('partial l.{id, name, alias}')
+            ->where($q->expr()->eq('l.isPublished', 'true'))
+            ->setParameter(':true', true, 'boolean')
+            ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':true'))
+            ->orderBy('l.name');
+
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
+    }
+
+    /**
      * Get a count of leads that belong to the list.
      *
      * @param $listIds
@@ -311,16 +342,26 @@ class LeadListRepository extends CommonRepository
         return ($returnArray) ? $return : $return[$listIds[0]];
     }
 
+    private function format_period($inputSeconds)
+    {
+        $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
+
+        return $now->format('H:i:s.u');
+    }
+
     /**
-     * @param       $lists
-     * @param array $args
+     * @deprecated in 2.14, to be removed in Mautic 3 - Use methods in the ContactSegmentService class
+     *
+     * @param        $lists
+     * @param array  $args
+     * @param Logger $logger
      *
      * @return array
      */
-    public function getLeadsByList($lists, $args = [])
+    public function getLeadsByList($lists, $args = [], Logger $logger = null)
     {
         // Return only IDs
-        $idOnly = (!array_key_exists('idOnly', $args)) ? false : $args['idOnly'];
+        $idOnly = (!array_key_exists('idOnly', $args)) ? false : $args['idOnly']; //Always TRUE
         // Return counts
         $countOnly = (!array_key_exists('countOnly', $args)) ? false : $args['countOnly'];
         // Return only leads that have not been added or manually manipulated to the lists yet
@@ -328,7 +369,7 @@ class LeadListRepository extends CommonRepository
         // Return leads that do not belong to a list based on filters
         $nonMembersOnly = (!array_key_exists('nonMembersOnly', $args)) ? false : $args['nonMembersOnly'];
         // Use filters to dynamically generate the list
-        $dynamic = ($newOnly || $nonMembersOnly || (!$newOnly && !$nonMembersOnly && $countOnly));
+        $dynamic = ($newOnly || $nonMembersOnly || (!$newOnly && !$nonMembersOnly && $countOnly)); ///This is always true - we can ommit conditions
         // Limiters
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
         $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
@@ -359,7 +400,7 @@ class LeadListRepository extends CommonRepository
             if ($dynamic && count($filters)) {
                 $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 if ($countOnly) {
-                    $count  = ($this->hasCompanyFilter) ? 'count(distinct(l.id))' : 'count(l.id)';
+                    $count  = 'count(distinct(l.id))';
                     $select = $count.' as lead_count, max(l.id) as max_id';
                     if ($withMinId) {
                         $select .= ', min(l.id) as min_id';
@@ -389,7 +430,6 @@ class LeadListRepository extends CommonRepository
 
                 if ($newOnly || !$nonMembersOnly) { // !$nonMembersOnly is mainly used for tests as we just want a live count
                     $expr = $this->generateSegmentExpression($filters, $parameters, $q, null, $id);
-
                     if (!$this->hasCompanyFilter && !$expr->count()) {
                         // Treat this as if it has no filters since all the filters are now invalid (fields were deleted)
                         $return[$id] = [];
@@ -418,7 +458,7 @@ class LeadListRepository extends CommonRepository
                         // Only leads in the list at the time of count
                         $listOnExpr->add(
                             $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
-                        );
+                         );
                     }
 
                     $q->leftJoin(
@@ -508,7 +548,27 @@ class LeadListRepository extends CommonRepository
                     $q->resetQueryPart('groupBy');
                 }
 
+                $params  = $q->getParameters();
+                $sqlT    = $q->getSQL();
+                foreach ($params as $key=>$val) {
+                    if (!is_int($val) and !is_float($val) and !is_array($val)) {
+                        $val = "'$val'";
+                    }
+                    if (is_array($val)) {
+                        $val = join(',', $val);
+                    }
+                    $sqlT                    = str_replace(":{$key}", $val, $sqlT);
+                }
+
+                if (null !== $logger) {
+                    $logger->debug(sprintf('Old version SQL: %s', $sqlT));
+                }
+                $timer   = microtime(true);
                 $results = $q->execute()->fetchAll();
+                $timer   = microtime(true) - $timer;
+                if (null !== $logger) {
+                    $logger->debug(sprintf('Old version SQL took: %s', $this->format_period($timer)));
+                }
 
                 foreach ($results as $r) {
                     if ($countOnly) {
@@ -1088,12 +1148,16 @@ class LeadListRepository extends CommonRepository
                     break;
                 case 'hit_url_date':
                 case 'lead_email_read_date':
+                case 'lead_email_sent_date':
                     $operand = (in_array($func, ['eq', 'gt', 'lt', 'gte', 'lte', 'between'])) ? 'EXISTS' : 'NOT EXISTS';
                     $table   = 'page_hits';
                     $column  = 'date_hit';
 
                     if ($details['field'] == 'lead_email_read_date') {
                         $column = 'date_read';
+                        $table  = 'email_stats';
+                    } elseif ($details['field'] == 'lead_email_sent_date') {
+                        $column = 'date_sent';
                         $table  = 'email_stats';
                     }
 
@@ -1706,7 +1770,7 @@ class LeadListRepository extends CommonRepository
                         case 'notIn':
                             foreach ($details['filter'] as &$value) {
                                 $value = $q->expr()->literal(
-                                    InputHelper::clean($value)
+                                    InputHelper::string($value)
                                 );
                             }
                             if ($details['type'] == 'multiselect') {
@@ -1720,7 +1784,7 @@ class LeadListRepository extends CommonRepository
                                     }
 
                                     $groupExpr->add(
-                                        $field." $operator '\\\\|?$filter\\\\|?'"
+                                        $field." $operator '(([|]|^)$filter([|]|$))'"
                                     );
                                 }
                             } else {
@@ -1960,10 +2024,6 @@ class LeadListRepository extends CommonRepository
         $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.ismine'):
-            case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
-                $expr = $q->expr()->eq('l.createdBy', $this->currentUser->getId());
-                break;
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isGlobal', ":$unique");
@@ -2006,9 +2066,8 @@ class LeadListRepository extends CommonRepository
     {
         $commands = [
             'mautic.lead.list.searchcommand.isglobal',
-            'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.ispublished',
-            'mautic.core.searchcommand.isinactive',
+            'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.name',
         ];
 

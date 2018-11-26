@@ -15,8 +15,8 @@ return [
             'mautic.sms.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.helper.integration',
                     'mautic.sms.model.sms',
+                    'mautic.sms.transport_chain',
                 ],
             ],
             'mautic.sms.smsbundle.subscriber' => [
@@ -26,12 +26,13 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
+                    'mautic.helper.sms',
                 ],
             ],
             'mautic.sms.channel.subscriber' => [
                 'class'     => \Mautic\SmsBundle\EventListener\ChannelSubscriber::class,
                 'arguments' => [
-                    'mautic.helper.integration',
+                    'mautic.sms.transport_chain',
                 ],
             ],
             'mautic.sms.message_queue.subscriber' => [
@@ -48,6 +49,12 @@ return [
             ],
             'mautic.sms.configbundle.subscriber' => [
                 'class' => Mautic\SmsBundle\EventListener\ConfigSubscriber::class,
+            ],
+            'mautic.sms.subscriber.contact_tracker' => [
+                'class'     => \Mautic\SmsBundle\EventListener\TrackingSubscriber::class,
+                'arguments' => [
+                    'mautic.sms.repository.stat',
+                ],
             ],
         ],
         'forms' => [
@@ -135,6 +142,15 @@ return [
         'integrations' => [
             'mautic.integration.twilio' => [
                 'class' => \Mautic\SmsBundle\Integration\TwilioIntegration::class,
+            ],
+        ],
+        'repositories' => [
+            'mautic.sms.repository.stat' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\SmsBundle\Entity\Stat::class,
+                ],
             ],
         ],
     ],

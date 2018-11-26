@@ -20,50 +20,49 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 
 class EmailRepositoryTest extends \PHPUnit_Framework_TestCase
 {
+    private $mockConnection;
+    private $em;
+    private $cm;
+
+    /**
+     * @var EmailRepository
+     */
+    private $repo;
+
     protected function setUp()
     {
         parent::setUp();
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
-        $mockConnection = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockConnection = $this->createMock(Connection::class);
+        $this->em             = $this->createMock(EntityManager::class);
+        $this->cm             = $this->createMock(ClassMetadata::class);
+        $this->repo           = new EmailRepository($this->em, $this->cm);
 
-        $mockConnection->method('createQueryBuilder')
+        $this->mockConnection->method('createQueryBuilder')
             ->willReturnCallback(
-                function () use ($mockConnection) {
-                    return new QueryBuilder($mockConnection);
+                function () {
+                    return new QueryBuilder($this->mockConnection);
                 }
             );
 
-        $mockConnection->method('getExpressionBuilder')
+        $this->mockConnection->method('getExpressionBuilder')
             ->willReturnCallback(
-                function () use ($mockConnection) {
-                    return new ExpressionBuilder($mockConnection);
+                function () {
+                    return new ExpressionBuilder($this->mockConnection);
                 }
             );
 
-        $mockConnection->method('quote')
+        $this->mockConnection->method('quote')
             ->willReturnCallback(
                 function ($value) {
                     return "'$value'";
                 }
             );
 
-        $this->em = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->cm = $this->getMockBuilder(ClassMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->em->method('getConnection')
-            ->willReturn($mockConnection);
-
-        $this->repo = new EmailRepository($this->em, $this->cm);
+            ->willReturn($this->mockConnection);
     }
 
     public function testGetEmailPendingQueryForSimpleCount()
@@ -88,7 +87,7 @@ class EmailRepositoryTest extends \PHPUnit_Framework_TestCase
             $countWithMaxMin
         );
 
-        $expectedQuery = "SELECT count(distinct(l.id)) as count FROM leads l INNER JOIN lead_lists_leads ll ON (ll.leadlist_id IN (22, 33)) AND (ll.lead_id = l.id) AND (ll.manually_removed = :false) WHERE (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE (stat.email_id = 5) AND (stat.lead_id IS NOT NULL))) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.channel = 'email') AND (mq.status <> 'sent') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
+        $expectedQuery = "SELECT count(*) as count FROM leads l WHERE (EXISTS (SELECT null FROM lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id = 5))) AND (NOT EXISTS (SELECT null FROM message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
         $this->assertEquals($expectedQuery, $query->getSql());
         $this->assertEquals(['false' => false], $query->getParameters());
     }
@@ -115,7 +114,7 @@ class EmailRepositoryTest extends \PHPUnit_Framework_TestCase
             $countWithMaxMin
         );
 
-        $expectedQuery = "SELECT count(distinct(l.id)) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM leads l INNER JOIN lead_lists_leads ll ON (ll.leadlist_id IN (22, 33)) AND (ll.lead_id = l.id) AND (ll.manually_removed = :false) WHERE (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE (stat.email_id = 5) AND (stat.lead_id IS NOT NULL))) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.channel = 'email') AND (mq.status <> 'sent') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
+        $expectedQuery = "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM leads l WHERE (EXISTS (SELECT null FROM lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id = 5))) AND (NOT EXISTS (SELECT null FROM message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
         $this->assertEquals($expectedQuery, $query->getSql());
         $this->assertEquals(['false' => false], $query->getParameters());
     }
@@ -142,7 +141,7 @@ class EmailRepositoryTest extends \PHPUnit_Framework_TestCase
             $countWithMaxMin
         );
 
-        $expectedQuery = "SELECT count(distinct(l.id)) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM leads l INNER JOIN lead_lists_leads ll ON (ll.leadlist_id IN (22, 33)) AND (ll.lead_id = l.id) AND (ll.manually_removed = :false) WHERE (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE (dnc.channel = 'email') AND (dnc.lead_id >= :minContactId) AND (dnc.lead_id <= :maxContactId))) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE (stat.email_id = 5) AND (stat.lead_id IS NOT NULL) AND (stat.lead_id >= :minContactId) AND (stat.lead_id <= :maxContactId))) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.channel = 'email') AND (mq.status <> 'sent') AND (mq.channel_id = 5) AND (mq.lead_id >= :minContactId) AND (mq.lead_id <= :maxContactId))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
+        $expectedQuery = "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM leads l WHERE (EXISTS (SELECT null FROM lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id = 5))) AND (NOT EXISTS (SELECT null FROM message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
 
         $expectedParams = [
             'false'        => false,
