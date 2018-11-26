@@ -36,7 +36,7 @@ class PageModelTest extends PageTestAbstract
 
         $pageModel->processPageHit($hit, $page, $request, $contact, false);
 
-        $this->assertSame($expected, $hit->getUrlTitle());
+        $this->assertSame($expectedTitle, $hit->getUrlTitle());
     }
 
     public function testGenerateUrl_WhenCalled_ReturnsValidUrl()
