@@ -124,7 +124,6 @@ class ContactRequestHelper
     {
         $this->trackedContact = $this->contactTracker->getContact();
         $this->queryFields    = $queryFields;
-
         try {
             $foundContact         = $this->getContactFromUrl();
             $this->trackedContact = $foundContact;
@@ -164,16 +163,18 @@ class ContactRequestHelper
 
         $this->setEmailFromClickthroughIdentification($clickthrough);
 
-        /** @var Lead $foundContact */
-        list($foundContact, $this->publiclyUpdatableFieldValues) = $this->leadModel->checkForDuplicateContact(
-            $this->queryFields,
-            $this->trackedContact,
-            true,
-            true
-        );
-        if ($foundContact->getId() !== $this->trackedContact->getId()) {
-            // A contact was found by a publicly updatable field
-            return $foundContact;
+        /* @var Lead $foundContact */
+        if (!empty($this->queryFields)) {
+            list($foundContact, $this->publiclyUpdatableFieldValues) = $this->leadModel->checkForDuplicateContact(
+                $this->queryFields,
+                $this->trackedContact,
+                true,
+                true
+            );
+            if ($foundContact->getId() !== $this->trackedContact->getId()) {
+                // A contact was found by a publicly updatable field
+                return $foundContact;
+            }
         }
 
         return $this->getContactByFingerprint();
@@ -263,13 +264,15 @@ class ContactRequestHelper
             $this->trackedContact->addIpAddress($ipAddress);
         }
 
-        $this->leadModel->setFieldValues(
-            $this->trackedContact,
-            $this->publiclyUpdatableFieldValues,
-            false,
-            true,
-            true
-        );
+        if (!empty($this->publiclyUpdatableFieldValues)) {
+            $this->leadModel->setFieldValues(
+                $this->trackedContact,
+                $this->publiclyUpdatableFieldValues,
+                false,
+                true,
+                true
+            );
+        }
 
         // Assume a web request as this is likely a tracking request from DWC or tracking code
         $this->trackedContact->setManipulator(
