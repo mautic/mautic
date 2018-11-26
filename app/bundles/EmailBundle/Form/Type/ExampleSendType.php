@@ -107,12 +107,4 @@ class ExampleSendType extends AbstractType
     {
         $resolver->setOptional(['filter']);
     }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'email_example_send';
-    }
 }
