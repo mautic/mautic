@@ -59,6 +59,7 @@ class BuilderSubscriber extends CommonSubscriber
     const channelfrequency  = '{channelfrequency}';
     const preferredchannel  = '{preferredchannel}';
     const saveprefsRegex    = '{saveprefsbutton}';
+    const successmessage    = '{successmessage}';
     const identifierToken   = '{leadidentifier}';
 
     /**
@@ -119,12 +120,8 @@ class BuilderSubscriber extends CommonSubscriber
             $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
 
             // add only filter based dwc tokens
-            $dwcTokenHelper = new BuilderTokenHelper(
-                $this->factory, 'dynamicContent', 'dynamiccontent:dynamiccontents'
-            );
-            $expr           = $this->factory->getDatabase()->getExpressionBuilder()->andX(
-                'e.is_campaign_based <> 1 and e.slot_name is not null'
-            );
+            $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent', 'dynamiccontent:dynamiccontents');
+            $expr           = $this->factory->getDatabase()->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,
                 '',
@@ -146,6 +143,7 @@ class BuilderSubscriber extends CommonSubscriber
                         self::preferredchannel   => $this->translator->trans('mautic.page.form.preferredchannel'),
                         self::channelfrequency   => $this->translator->trans('mautic.page.form.channelfrequency'),
                         self::saveprefsRegex     => $this->translator->trans('mautic.page.form.saveprefs'),
+                        self::successmessage     => $this->translator->trans('mautic.page.form.successmessage'),
                         self::identifierToken    => $this->translator->trans('mautic.page.form.leadidentifier'),
                     ]
                 )
@@ -209,11 +207,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot_socialfollow',
                 600
             );
-            if ($this->security->isGranted(
-                ['page:preference_center:editown', 'page:preference_center:editother'],
-                'MATCH_ONE'
-            )
-            ) {
+            if ($this->security->isGranted(['page:preference_center:editown', 'page:preference_center:editother'], 'MATCH_ONE')) {
                 $event->addSlotType(
                     'segmentlist',
                     $this->translator->trans('mautic.core.slot.label.segmentlist'),
@@ -252,6 +246,15 @@ class BuilderSubscriber extends CommonSubscriber
                     'floppy-o',
                     'MauticCoreBundle:Slots:saveprefsbutton.html.php',
                     'slot_saveprefsbutton',
+                    540
+                );
+
+                $event->addSlotType(
+                    'successmessage',
+                    $this->translator->trans('mautic.core.slot.label.successmessage'),
+                    'check',
+                    'MauticCoreBundle:Slots:successmessage.html.php',
+                    'slot_successmessage',
                     540
                 );
             }
@@ -438,6 +441,11 @@ class BuilderSubscriber extends CommonSubscriber
                     $content = str_replace('<startform></startform>', $params['startform'], $content);
                 }
             }
+
+            if (false !== strpos($content, self::successmessage)) {
+                $successMessage = $this->renderSuccessMessage($params);
+                $content        = str_ireplace(self::successmessage, $successMessage, $content);
+            }
         }
 
         $clickThrough = ['source' => ['page', $page->getId()]];
@@ -576,6 +584,24 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
+     * @param array $params
+     *
+     * @return string
+     */
+    protected function renderSuccessMessage(array $params = [])
+    {
+        static $content = '';
+
+        if (empty($content)) {
+            $content = "<div class=\"pref-successmessage\">\n";
+            $content .= $this->templating->render('MauticCoreBundle:Slots:successmessage.html.php', $params);
+            $content .= "</div>\n";
+        }
+
+        return $content;
+    }
+
+    /**
      * Renders the HTML for the language bar for a given page.
      *
      * @param $page
@@ -641,10 +667,7 @@ class BuilderSubscriber extends CommonSubscriber
                 return;
             }
 
-            $langbar = $this->templating->render(
-                'MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php',
-                ['pages' => $related]
-            );
+            $langbar = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
         }
 
         return $langbar;

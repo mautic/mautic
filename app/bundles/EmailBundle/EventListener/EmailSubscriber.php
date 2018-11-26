@@ -17,10 +17,8 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
+use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\QueueBundle\Event\QueueConsumerEvent;
-use Mautic\QueueBundle\Queue\QueueConsumerResults;
-use Mautic\QueueBundle\QueueEvents;
 
 /**
  * Class EmailSubscriber.
@@ -62,11 +60,11 @@ class EmailSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            EmailEvents::EMAIL_POST_SAVE   => ['onEmailPostSave', 0],
-            EmailEvents::EMAIL_POST_DELETE => ['onEmailDelete', 0],
-            EmailEvents::EMAIL_FAILED      => ['onEmailFailed', 0],
-            EmailEvents::EMAIL_RESEND      => ['onEmailResend', 0],
-            QueueEvents::EMAIL_HIT         => ['onEmailHit', 0],
+            EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
+            EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
+            EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
+            EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
+            EmailEvents::ON_TRANSPORT_WEBHOOK => ['onTransportWebhook', -255],
         ];
     }
 
@@ -164,14 +162,13 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param QueueConsumerEvent $event
+     * This is default handling of email transport webhook requests.
+     * For custom handling (queues) for specific transport use the same listener with priority higher than -255.
+     *
+     * @param TransportWebhookEvent $event
      */
-    public function onEmailHit(QueueConsumerEvent $event)
+    public function onTransportWebhook(TransportWebhookEvent $event)
     {
-        $payload = $event->getPayload();
-        $request = $payload['request'];
-        $idHash  = $payload['idHash'];
-        $this->emailModel->hitEmail($idHash, $request, false, false);
-        $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
+        $event->getTransport()->processCallbackRequest($event->getRequest());
     }
 }

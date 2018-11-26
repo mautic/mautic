@@ -11,8 +11,10 @@
 namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use UnexpectedValueException;
 
 /**
  * Throws an exception if the field alias is equal some segment filter keyword.
@@ -23,17 +25,25 @@ class CircularDependencyValidator extends ConstraintValidator
     /**
      * @var ListModel
      */
-    protected $model;
-    protected $currentSegmentId;
+    private $model;
 
-    public function __construct(ListModel $model, $request)
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @param ListModel    $model
+     * @param RequestStack $requestStack
+     */
+    public function __construct(ListModel $model, RequestStack $requestStack)
     {
-        $this->model            = $model;
-        $this->currentSegmentId = (int) $request->getCurrentRequest()->get('_route_params')['objectId'];
+        $this->model        = $model;
+        $this->requestStack = $requestStack;
     }
 
     /**
-     * @param LeadField  $field
+     * @param array      $filters
      * @param Constraint $constraint
      */
     public function validate($filters, Constraint $constraint)
@@ -42,12 +52,39 @@ class CircularDependencyValidator extends ConstraintValidator
             return $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters());
         }, $this->reduceToSegmentIds($filters)));
 
-        if (in_array($this->currentSegmentId, $dependentSegmentIds)) {
-            $this->context->addViolation($constraint->message);
+        try {
+            $segmentId = $this->getSegmentIdFromRequest();
+            if (in_array($segmentId, $dependentSegmentIds)) {
+                $this->context->addViolation($constraint->message);
+            }
+        } catch (UnexpectedValueException $e) {
+            // Segment ID is not in the request. May be new segment.
         }
     }
 
-    private function reduceToSegmentIds($filters)
+    /**
+     * @return int
+     *
+     * @throws UnexpectedValueException
+     */
+    private function getSegmentIdFromRequest()
+    {
+        $request     = $this->requestStack->getCurrentRequest();
+        $routeParams = $request->get('_route_params');
+
+        if (empty($routeParams['objectId'])) {
+            throw new UnexpectedValueException('Segment ID is missing in the request');
+        }
+
+        return (int) $routeParams['objectId'];
+    }
+
+    /**
+     * @param array $filters
+     *
+     * @return array
+     */
+    private function reduceToSegmentIds(array $filters)
     {
         $segmentFilters = array_filter($filters, function ($v) {
             return $v['type'] == 'leadlist';
@@ -58,7 +95,12 @@ class CircularDependencyValidator extends ConstraintValidator
         return $this->flatten($segentIdsInFilter);
     }
 
-    private function flatten($array)
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    private function flatten(array $array)
     {
         return array_unique(array_reduce($array, 'array_merge', []));
     }

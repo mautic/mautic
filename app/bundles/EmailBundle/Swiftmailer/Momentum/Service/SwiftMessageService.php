@@ -62,10 +62,11 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         if (!empty($messageFrom[$messageFromEmail])) {
             $from->setName($messageFrom[$messageFromEmail]);
         }
-        $content = new TransmissionDTO\ContentDTO($message->getSubject(), $from);
 
+        // Process metadata before consuming subject, body, etc
         $metadataProcessor = new MetadataProcessor($message);
 
+        $content = new TransmissionDTO\ContentDTO($message->getSubject(), $from);
         if ($body = $message->getBody()) {
             $content->setHtml($body);
         }
@@ -112,6 +113,7 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
                 }
             }
         }
+
         $cssHeader = $message->getHeaders()->get('X-MC-InlineCSS');
         if ($cssHeader !== null) {
             $content->setInlineCss($cssHeader);
