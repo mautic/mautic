@@ -615,7 +615,7 @@ class PageModel extends FormModel
             $hit->setPageLanguage($query['page_language']);
         }
         if (isset($query['page_title'])) {
-            $hit->setUrlTitle($query['page_title']);
+            $hit->setUrlTitle(InputHelper::transliterate($query['page_title']));
         }
 
         // Add entry to contact log table
