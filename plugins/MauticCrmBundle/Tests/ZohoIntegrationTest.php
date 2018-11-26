@@ -145,12 +145,13 @@ class ZohoIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testPopulateLeadData()
     {
         $fields = [
-            'id'       => '0',
-            'lastname' => [
-                'value' => 'user',
-            ],
-            'company' => [
-                'value' => 'company',
+            'core' => [
+                'lastname' => [
+                    'value' => 'user',
+                ],
+                'company' => [
+                    'value' => 'company',
+                ],
             ],
         ];
         $lead = new Lead();

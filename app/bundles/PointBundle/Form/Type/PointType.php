@@ -117,6 +117,15 @@ class PointType extends AbstractType
             'data'      => $data,
         ]);
 
+        $builder->add(
+            'repeatable',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.point.form.repeat',
+                'data'  => $options['data']->getRepeatable() ?: false,
+            ]
+        );
+
         $builder->add('publishUp', 'datetime', [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',

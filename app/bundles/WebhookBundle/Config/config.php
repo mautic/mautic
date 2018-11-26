@@ -87,8 +87,7 @@ return [
             'mautic.webhook.campaign.subscriber' => [
                 'class'     => \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
-                    'mautic.http.connector',
-                    'mautic.lead.token.replacer',
+                    'mautic.webhook.campaign.helper',
                 ],
             ],
         ],
@@ -99,6 +98,15 @@ return [
                     'mautic.helper.core_parameters',
                     'jms_serializer',
                     'mautic.core.model.notification',
+                ],
+            ],
+        ],
+        'others' => [
+            'mautic.webhook.campaign.helper' => [
+                'class'     => \Mautic\WebhookBundle\Helper\CampaignHelper::class,
+                'arguments' => [
+                    'mautic.http.connector',
+                    'mautic.lead.token.replacer',
                 ],
             ],
         ],

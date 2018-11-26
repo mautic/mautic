@@ -56,7 +56,7 @@ if (!isset($isAjax)) {
                     echo "\n          <div class=\"mauticform-page-wrapper mauticform-page-$pageCount\" data-mautic-form-page=\"$pageCount\"$lastFieldAttribute>\n";
                 endif;
 
-                if (!isset($submissions) || $f->showForContact($submissions, $lead, $form)):
+                if ($f->showForContact($submissions, $lead, $form)):
                     if ($f->isCustom()):
                         if (!isset($fieldSettings[$f->getType()])):
                             continue;
