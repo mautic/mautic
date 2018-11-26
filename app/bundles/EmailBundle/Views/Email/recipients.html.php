@@ -30,8 +30,8 @@
     </div>
 
 
-<?php echo $view['form']->end($form); ?>
 <?php echo $view['form']->row($form['emails']); ?>
+<?php echo $view['form']->end($form); ?>
 
 <?php if ($tmpl == 'index'): ?>
     </div>
