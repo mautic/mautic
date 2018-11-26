@@ -39,12 +39,11 @@
                         ];
                     }
 
-                    if (!empty($fields['core']['email']['value'])) {
+                    if (!empty($fields['core']['email']['value']) && $permissions['email:emails:create']) {
                         $custom[] = [
                             'attr' => [
                                 'data-toggle' => 'ajaxmodal',
                                 'data-target' => '#MauticSharedModal',
-                                'data-header' => $view['translator']->trans('mautic.lead.email.send_email.header', ['%email%' => $fields['core']['email']['value']]),
                                 'href'        => $view['router']->path('mautic_contact_action', ['objectId' => $item->getId(), 'objectAction' => 'email', 'list' => 1]),
                             ],
                             'btnText'   => 'mautic.lead.email.send_email',

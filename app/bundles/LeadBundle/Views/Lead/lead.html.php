@@ -44,7 +44,7 @@ $edit   = $view['security']->hasEntityAccess(
 
 $buttons = [];
 //Send email button
-if (!empty($fields['core']['email']['value'])) {
+if (!empty($fields['core']['email']['value']) && $permissions['email:emails:create']) {
     $buttons[] = [
         'attr' => [
             'id'          => 'sendEmailButton',

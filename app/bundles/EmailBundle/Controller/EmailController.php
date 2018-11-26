@@ -1128,6 +1128,10 @@ class EmailController extends FormController
         $session = $this->container->get('session');
         $page    = $session->get('mautic.email.page', 1);
 
+        if (!$this->get('mautic.security')->isGranted('email:emails:create')) {
+            return $this->accessDenied();
+        }
+
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
 

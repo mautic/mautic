@@ -44,34 +44,36 @@ if (empty($emailType)) {
 }
 
 $customButtons = [];
-if (!$isEmbedded) {
-    if ($emailType == 'list') {
+if ($permissions['email:emails:create']) {
+    if (!$isEmbedded) {
+        if ($emailType == 'list') {
+            $customButtons[] = [
+                'attr' => [
+                    'data-toggle' => 'ajax',
+                    'href'        => $view['router']->path(
+                        'mautic_email_action',
+                        ['objectAction' => 'send', 'objectId' => $email->getId()]
+                    ),
+                ],
+                'iconClass' => 'fa fa-send-o',
+                'btnText'   => 'mautic.email.send',
+                'primary'   => true,
+            ];
+        }
+
         $customButtons[] = [
             'attr' => [
-                'data-toggle' => 'ajax',
-                'href'        => $view['router']->path(
-                    'mautic_email_action',
-                    ['objectAction' => 'send', 'objectId' => $email->getId()]
-                ),
+                'class'       => 'btn btn-default btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_email_action', ['objectAction' => 'sendExample', 'objectId' => $email->getId()]),
+                'data-header' => $view['translator']->trans('mautic.email.send.example'),
             ],
-            'iconClass' => 'fa fa-send-o',
-            'btnText'   => 'mautic.email.send',
+            'iconClass' => 'fa fa-send',
+            'btnText'   => 'mautic.email.send.example',
             'primary'   => true,
         ];
     }
-
-    $customButtons[] = [
-        'attr' => [
-            'class'       => 'btn btn-default btn-nospin',
-            'data-toggle' => 'ajaxmodal',
-            'data-target' => '#MauticSharedModal',
-            'href'        => $view['router']->path('mautic_email_action', ['objectAction' => 'sendExample', 'objectId' => $email->getId()]),
-            'data-header' => $view['translator']->trans('mautic.email.send.example'),
-        ],
-        'iconClass' => 'fa fa-send',
-        'btnText'   => 'mautic.email.send.example',
-        'primary'   => true,
-    ];
 }
 // Only show A/B test button if not already a translation of an a/b test
 $allowAbTest = $email->isTranslation(true) && $translations['parent']->isVariant(true) ? false : true;

@@ -83,19 +83,22 @@ if ($tmpl == 'index') {
                             $permissions['email:emails:editother'],
                             $item->getCreatedBy()
                         );
-                        $customButtons = ($type == 'list') ? [
-                            [
-                                'attr' => [
-                                    'data-toggle' => 'ajax',
-                                    'href'        => $view['router']->path(
-                                        'mautic_email_action',
-                                        ['objectAction' => 'send', 'objectId' => $item->getId()]
-                                    ),
+                        $customButtons = [];
+                        if ($permissions['email:emails:create']) {
+                            $customButtons = ($type == 'list') ? [
+                                [
+                                    'attr' => [
+                                        'data-toggle' => 'ajax',
+                                        'href'        => $view['router']->path(
+                                            'mautic_email_action',
+                                            ['objectAction' => 'send', 'objectId' => $item->getId()]
+                                        ),
+                                    ],
+                                    'iconClass' => 'fa fa-send-o',
+                                    'btnText'   => 'mautic.email.send',
                                 ],
-                                'iconClass' => 'fa fa-send-o',
-                                'btnText'   => 'mautic.email.send',
-                            ],
-                        ] : [];
+                            ] : [];
+                        }
                         echo $view->render(
                             'MauticCoreBundle:Helper:list_actions.html.php',
                             [
