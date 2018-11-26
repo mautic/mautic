@@ -139,7 +139,7 @@ class CampaignHelper
         $contactValues = $this->getContactValues($contact);
 
         foreach ($rawTokens as $key => $value) {
-            $values[$key] = urldecode($this->contactTokenReplacer->replaceTokens($value, $contact->getProfileFields()));
+            $values[$key] = urldecode($this->contactTokenReplacer->replaceTokens($value, $contactValues));
         }
 
         return $values;

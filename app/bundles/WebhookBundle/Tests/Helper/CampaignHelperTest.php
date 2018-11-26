@@ -15,10 +15,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 
 class CampaignHelperTest extends \PHPUnit_Framework_TestCase
 {
+    protected $contactTokenReplacer;
+
     private $contact;
     private $connector;
 
@@ -36,15 +39,28 @@ class CampaignHelperTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->contact        = $this->createMock(Lead::class);
-        $this->connector      = $this->createMock(Http::class);
-        $this->ipCollection   = new ArrayCollection();
-        $this->campaignHelper = new CampaignHelper($this->connector);
+        $this->contact                   = $this->createMock(Lead::class);
+        $this->connector                 = $this->createMock(Http::class);
+        $this->contactTokenReplacer      = $this->createMock(ContactTokenReplacer::class);
+        $this->ipCollection              = new ArrayCollection();
+        $this->campaignHelper            = new CampaignHelper($this->connector, $this->contactTokenReplacer);
 
         $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
         $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
 
-        $this->contact->expects($this->once())
+        $this->contactTokenReplacer->expects($this->any())->method('replaceTokens')
+            ->willReturnCallback(
+                function ($value, $contactValues) {
+                    $alias = str_replace(['{contactfield=', '}'], '', $value);
+                    if (isset($contactValues[$alias])) {
+                        return $contactValues[$alias];
+                    }
+
+                    return $value;
+                }
+            );
+
+        $this->contact->expects($this->any())
             ->method('getProfileFields')
             ->willReturn(['email' => 'john@doe.email', 'company' => 'Mautic']);
 
