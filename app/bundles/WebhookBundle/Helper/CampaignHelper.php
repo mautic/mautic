@@ -34,15 +34,15 @@ class CampaignHelper
     /**
      * @var TokenReplacerInterface
      */
-    private $tokenReplacer;
+    private $contactTokenReplacer;
 
     /**
      * @param Http $connector
      */
-    public function __construct(Http $connector, TokenReplacerInterface $tokenReplacer)
+    public function __construct(Http $connector, TokenReplacerInterface $contactTokenReplacer)
     {
-        $this->connector     = $connector;
-        $this->tokenReplacer = $tokenReplacer;
+        $this->connector            = $connector;
+        $this->contactTokenReplacer = $contactTokenReplacer;
     }
 
     /**
