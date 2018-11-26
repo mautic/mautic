@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
@@ -431,7 +432,8 @@ class PublicController extends CommonFormController
                     $model->processMailerCallback($response);
                 }
             } elseif ($currentTransport instanceof CallbackTransportInterface) {
-                $currentTransport->processCallbackRequest($this->request);
+                $event = new TransportWebhookEvent($currentTransport, $this->request);
+                $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
             }
 
             return new Response('success');
