@@ -33,7 +33,11 @@ class MonitoringController extends FormController
         $this->setListFilters();
 
         /** @var \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $model */
-        $model = $this->getModel('social.monitoring');
+        $model       = $this->getModel('social.monitoring');
+        $permissions = $this->get('mautic.security')->isGranted(
+            ['plugin:mauticSocial:monitoring:publish'],
+            'RETURN_ARRAY'
+        );
 
         //set limits
         $limit = $session->get('mautic.social.monitoring.limit', $this->container->getParameter('mautic.default_pagelimit'));
@@ -74,7 +78,7 @@ class MonitoringController extends FormController
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
-                    'viewParameters'  => ['page' => $lastPage],
+                    'viewParameters'  => ['page' => $lastPage, 'permissions' => $permissions],
                     'contentTemplate' => 'MauticSocialBundle:Monitoring:index',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_social_index',
@@ -98,6 +102,7 @@ class MonitoringController extends FormController
                     'model'       => $model,
                     'tmpl'        => $tmpl,
                     'page'        => $page,
+                    'permissions' => $permissions,
                 ],
                 'contentTemplate' => 'MauticSocialBundle:Monitoring:list.html.php',
                 'passthroughVars' => [

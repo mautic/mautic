@@ -102,10 +102,12 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                ['item' => $item, 'model' => 'point.trigger']
-                            ); ?>
+                            <?php if ($permissions['point:triggers:publish']) {
+                            echo $view->render(
+                                        'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                        ['item' => $item, 'model' => 'point.trigger']
+                                    );
+                        } ?>
                             <?php if ($permissions['point:triggers:edit']): ?>
                                 <a href="<?php echo $view['router']->path(
                                     'mautic_pointtrigger_action',

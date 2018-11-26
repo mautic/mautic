@@ -119,13 +119,23 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                [
-                                    'item'  => $item,
-                                    'model' => 'asset.asset',
-                                ]
-                            ); ?>
+                            <?php
+                            if ($security->hasEntityAccess(
+                                    $permissions['asset:assets:publishown'],
+                                    $permissions['asset:assets:publishother'],
+                                    $item->getCreatedBy()
+                                )
+                            ) {
+                                echo $view->render(
+                                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                    [
+                                        'item'  => $item,
+                                        'model' => 'asset.asset',
+                                    ]
+                                );
+                            }
+
+                            ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_asset_action',
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]

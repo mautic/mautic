@@ -98,10 +98,12 @@ if ($tmpl == 'index') {
                     <td>
                         <div>
 
-                            <?php echo $view->render(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                ['item' => $item, 'model' => 'point']
-                            ); ?>
+                            <?php if ($permissions['point:points:publish']) {
+                            echo $view->render(
+                                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                    ['item' => $item, 'model' => 'point']
+                                );
+                        } ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_point_action',
                                 ['objectAction' => 'edit', 'objectId' => $item->getId()]

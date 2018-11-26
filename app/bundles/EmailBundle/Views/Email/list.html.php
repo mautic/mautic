@@ -118,7 +118,15 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'email']); ?>
+                            <?php
+                            if ($view['security']->hasEntityAccess(
+                                $permissions['email:emails:publishown'],
+                                $permissions['email:emails:publishother'],
+                                $item->getCreatedBy()
+                                )
+                            ) {
+                                echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'email']);
+                            } ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_email_action',
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]

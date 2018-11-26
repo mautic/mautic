@@ -113,7 +113,9 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'focus']); ?>
+                            <?php if ($permissions['plugin:focus:items:publish']) {
+                            echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'focus']);
+                        } ?>
                             <a data-toggle="ajax" href="<?php echo $view['router']->path(
                                 'mautic_focus_action',
                                 ['objectId' => $item->getId(), 'objectAction' => 'view']

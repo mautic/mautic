@@ -140,7 +140,7 @@ if (count($items)):
                         </td>
                         <td>
                             <div>
-                                <?php if (method_exists($item, 'isPublished')): ?>
+                                <?php if (method_exists($item, 'isPublished' && $permissions[$permissionBase.':publish'])): ?>
                                     <?php echo $view->render(
                                         'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                         ['item' => $item, 'model' => $modelName]

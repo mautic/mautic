@@ -68,6 +68,7 @@ class CategoryController extends FormController
                 $permissionBase.':create',
                 $permissionBase.':edit',
                 $permissionBase.':delete',
+                $permissionBase.':publish',
             ],
             'RETURN_ARRAY'
         );

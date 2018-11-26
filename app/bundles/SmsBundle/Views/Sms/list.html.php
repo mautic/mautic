@@ -124,10 +124,18 @@ if (count($items)):
                     <td>
                         <div>
                             <?php if ($type == 'template'): ?>
-                                <?php echo $view->render(
-                                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                    ['item' => $item, 'model' => 'sms']
-                                ); ?>
+                                <?php
+                                if ($security->hasEntityAccess(
+                                    $permissions['sms:smses:publishown'],
+                                    $permissions['sms:smses:publishother'],
+                                    $item->getCreatedBy()
+                                    )
+                                ) {
+                                    echo $view->render(
+                                        'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                        ['item' => $item, 'model' => 'sms']
+                                    );
+                                } ?>
                             <?php else: ?>
                                 <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
                             <?php endif; ?>

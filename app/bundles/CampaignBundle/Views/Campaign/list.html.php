@@ -88,13 +88,16 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                [
-                                    'item'  => $item,
-                                    'model' => 'campaign',
-                                ]
-                            ); ?>
+                            <?php
+                            if ($permissions['campaign:campaigns:publish']) {
+                                echo $view->render(
+                                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                    [
+                                        'item'  => $item,
+                                        'model' => 'campaign',
+                                    ]
+                                );
+                            } ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_campaign_action',
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]

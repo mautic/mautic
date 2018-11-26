@@ -113,10 +113,13 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                ['item' => $item, 'model' => 'category', 'query' => 'bundle='.$bundle]
-                            ); ?>
+                            <?php
+                            if ($permissions[$permissionBase.'publish']) {
+                                echo $view->render(
+                                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                    ['item' => $item, 'model' => 'category', 'query' => 'bundle='.$bundle]
+                                );
+                            } ?>
                             <?php if ($permissions[$permissionBase.':edit']): ?>
                                 <a href="<?php echo $view['router']->path(
                                     'mautic_category_action',

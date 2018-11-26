@@ -103,7 +103,15 @@ if ($tmpl == 'index') {
                         ?>
                     </td>
                     <td>
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'page.page']); ?>
+                        <?php
+                        if ($view['security']->hasEntityAccess(
+                            $permissions['page:pages:publishown'],
+                            $permissions['page:pages:publishother'],
+                            $item->getCreatedBy()
+                            )
+                        ) {
+                            echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'page.page']);
+                        } ?>
                         <a href="<?php echo $view['router']->path(
                             'mautic_page_action',
                             ['objectAction' => 'view', 'objectId' => $item->getId()]
