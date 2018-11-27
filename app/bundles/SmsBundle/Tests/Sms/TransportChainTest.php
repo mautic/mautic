@@ -12,7 +12,7 @@ namespace Mautic\SmsBundle\Tests\Sms;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\SmsBundle\Api\TwilioApi;
+use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
 use Mautic\SmsBundle\Sms\TransportChain;
 
 class TransportChainTest extends AbstractMauticTestCase
@@ -52,7 +52,7 @@ class TransportChainTest extends AbstractMauticTestCase
             'mautic.test.twilio.mock', $this->container->get('mautic.helper.integration'), $this->container->get('logger')
         );
 
-        $this->twilioTransport = $this->getMockBuilder(TwilioApi::class)
+        $this->twilioTransport = $this->getMockBuilder(TwilioTransport::class)
                                       ->disableOriginalConstructor()->getMock();
 
         $this->twilioTransport
