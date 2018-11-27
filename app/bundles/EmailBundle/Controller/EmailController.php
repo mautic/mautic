@@ -1394,7 +1394,8 @@ class EmailController extends FormController
             3600 * 24 * 31
         );
 
-        $filter = [];
+        $filter            = [];
+        $filter['force'][] = ['column' => 'l.email', 'expr' => 'neq', 'value' => ''];
         if (!empty($search)) {
             $filter = [
                 'string' => $search,
