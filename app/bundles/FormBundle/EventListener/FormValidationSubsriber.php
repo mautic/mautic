@@ -11,6 +11,8 @@
 
 namespace Mautic\FormBundle\EventListener;
 
+use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberUtil;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
@@ -55,10 +57,16 @@ class FormValidationSubsriber extends CommonSubscriber
     {
         $field = $event->getField();
         if ($field->getType() === 'tel' && !empty($field->getValidation()['international'])) {
-            if (!empty($field->getValidation()['international_validationmsg'])) {
-                $event->failedValidation($field->getValidation()['international_validationmsg']);
-            } else {
-                $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid'));
+            $value     = $event->getValue();
+            $phoneUtil = PhoneNumberUtil::getInstance();
+            try {
+                $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
+            } catch (NumberParseException $e) {
+                if (!empty($field->getValidation()['international_validationmsg'])) {
+                    $event->failedValidation($field->getValidation()['international_validationmsg']);
+                } else {
+                    $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid'));
+                }
             }
         }
     }
