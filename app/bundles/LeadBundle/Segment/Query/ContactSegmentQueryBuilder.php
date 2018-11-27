@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
@@ -63,8 +65,15 @@ class ContactSegmentQueryBuilder
      */
     public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters)
     {
+        /** @var Connection $connection */
+        $connection = $this->entityManager->getConnection();
+        if ($connection instanceof MasterSlaveConnection) {
+            // Prefer a slave connection if available.
+            $connection->connect('slave');
+        }
+
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
+        $queryBuilder = new QueryBuilder($connection);
 
         $queryBuilder->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
@@ -100,8 +109,15 @@ class ContactSegmentQueryBuilder
      */
     public function wrapInCount(QueryBuilder $qb)
     {
+        /** @var Connection $connection */
+        $connection = $this->entityManager->getConnection();
+        if ($connection instanceof MasterSlaveConnection) {
+            // Prefer a slave connection if available.
+            $connection->connect('slave');
+        }
+
         // Add count functions to the query
-        $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
+        $queryBuilder = new QueryBuilder($connection);
 
         //  If there is any right join in the query we need to select its it
         $primary = $qb->guessPrimaryLeadContactIdColumn();

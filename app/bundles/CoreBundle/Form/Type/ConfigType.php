@@ -198,18 +198,6 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'theme',
-            'theme_list',
-            [
-                'label' => 'mautic.core.config.form.theme',
-                'attr'  => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.form.template.help',
-                ],
-            ]
-        );
-
         // Get the list of available languages
         $languages   = $this->langHelper->fetchLanguages(false, false);
         $langChoices = [];

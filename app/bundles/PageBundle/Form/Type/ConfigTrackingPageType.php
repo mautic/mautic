@@ -25,18 +25,6 @@ class ConfigTrackingPageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'track_contact_by_ip',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.page.config.form.track_contact_by_ip',
-                'data'  => isset($options['data']['track_contact_by_ip']) ? (bool) $options['data']['track_contact_by_ip'] : false,
-                'attr'  => [
-                    'tooltip' => 'mautic.page.config.form.track_contact_by_ip.tooltip',
-                ],
-            ]
-        );
-
         $builder->add('track_by_tracking_url', 'yesno_button_group', [
             'label' => 'mautic.page.config.form.track.by.tracking.url',
             'data'  => isset($options['data']['track_by_tracking_url']) ? (bool) $options['data']['track_by_tracking_url'] : true,
@@ -52,6 +40,31 @@ class ConfigTrackingPageType extends AbstractType
                 'tooltip' => 'mautic.page.config.form.track.by.fingerprint.tooltip',
             ],
         ]);
+
+        $builder->add(
+            'anonymize_ip',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.page.config.form.anonymize_ip',
+                'data'  => (bool) $options['data']['anonymize_ip'],
+                'attr'  => [
+                    'tooltip' => 'mautic.page.config.form.anonymize_ip.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'track_contact_by_ip',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.page.config.form.track_contact_by_ip',
+                'data'  => (bool) $options['data']['track_contact_by_ip'],
+                'attr'  => [
+                    'tooltip'      => 'mautic.page.config.form.track_contact_by_ip.tooltip',
+                    'data-show-on' => '{"config_trackingconfig_anonymize_ip_1":"checked"}',
+                ],
+            ]
+        );
 
         $builder->add(
             'facebook_pixel_id',

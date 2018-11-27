@@ -458,20 +458,26 @@ class PublicController extends CommonFormController
             $url .= http_build_query($query);
         }
 
-        // Search replace lead fields in the URL
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->getModel('lead');
-        $lead      = $leadModel->getContactFromRequest(['ct' => $ct]);
+        // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
+        // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
+        $ipAddress = $this->container->get('mautic.helper.ip_lookup')->getIpAddress();
+        if ($ipAddress->isTrackable()) {
+            // Search replace lead fields in the URL
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+            $leadModel = $this->getModel('lead');
+            $lead      = $leadModel->getContactFromRequest(['ct' => $ct]);
 
-        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-        $pageModel = $this->getModel('page');
-        $pageModel->hitPage($redirect, $this->request, 200, $lead);
+            /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+            $pageModel = $this->getModel('page');
+            $pageModel->hitPage($redirect, $this->request, 200, $lead);
 
-        /** @var PrimaryCompanyHelper $primaryCompanyHelper */
-        $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
-        $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+            /** @var PrimaryCompanyHelper $primaryCompanyHelper */
+            $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
+            $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
 
-        $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+            $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+        }
+
         $url = UrlHelper::sanitizeAbsoluteUrl($url);
 
         if (false === filter_var($url, FILTER_VALIDATE_URL)) {

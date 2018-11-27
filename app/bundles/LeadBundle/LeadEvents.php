@@ -573,6 +573,16 @@ final class LeadEvents
     const FORM_SUBMIT_REMOVE_DO_NO_CONTACT = 'mautic.form_submit_remove_do_no_contact';
 
     /**
+     * The mautic.clickthrough_contact_identification event is dispatched when a clickthrough array is parsed from a tracking
+     * URL.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ContactIdentificationEvent instance.
+     *
+     * @var string
+     */
+    const ON_CLICKTHROUGH_IDENTIFICATION = 'mautic.clickthrough_contact_identification';
+
+    /**
      * @deprecated - 2.4 to be removed in 3.0; use Mautic\ChannelBundle\ChannelEvents::ADD_CHANNEL
      *
      * The mautic.add_channel event registers communication channels.
