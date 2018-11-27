@@ -30,7 +30,7 @@ class Version20171208130606 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' != $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql("ALTER TABLE {$this->prefix}lead_devices ADD tracking_id VARCHAR(255) DEFAULT NULL");
     }
@@ -41,7 +41,7 @@ class Version20171208130606 extends AbstractMauticMigration
     public function down(Schema $schema)
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' != $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql("ALTER TABLE {$this->prefix}lead_devices DROP tracking_id");
     }
