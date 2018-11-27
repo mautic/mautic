@@ -220,7 +220,7 @@ class FormBuilderEvent extends Event
         if (!empty($this->validators)) {
             $validationData = (isset($form->getData()['validation'])) ? $form->getData()['validation'] : [];
             foreach ($this->validators as $validator) {
-                if (isset($validator['formType'])) {
+                if (isset($validator['formType']) && isset($validator['fieldType']) && $validator['fieldType'] == $form->getData()['type']) {
                     $form->add(
                         'validation',
                         $validator['formType'],
