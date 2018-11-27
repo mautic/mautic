@@ -60,10 +60,18 @@ class RequestStorageHelper
      * @param string $key
      *
      * @return Request
+     *
+     * @throws \UnexpectedValueException
      */
     public function getRequest($key)
     {
-        return new Request([], $this->cacheStorage->get($key));
+        $cachedRequest = $this->cacheStorage->get($key);
+
+        if (false === $cachedRequest) {
+            throw new \UnexpectedValueException("Request with key '{$key}' was not found in the cache store '{$this->cacheStorage->getAdaptorClassName()}'.");
+        }
+
+        return new Request([], $cachedRequest);
     }
 
     /**
