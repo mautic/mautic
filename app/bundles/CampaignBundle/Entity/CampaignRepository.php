@@ -395,10 +395,10 @@ class CampaignRepository extends CommonRepository
      */
     public function getPendingContactIds($campaignId, ContactLimiter $limiter)
     {
-
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             return [];
         }
+
         $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
 
         $q->select('cl.lead_id')
