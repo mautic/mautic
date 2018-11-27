@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -19,6 +20,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -31,6 +33,7 @@ class EmailControllerTest extends \PHPUnit_Framework_TestCase
     private $modelMock;
     private $emailMock;
     private $controller;
+    private $securityMock;
 
     protected function setUp()
     {
@@ -44,6 +47,7 @@ class EmailControllerTest extends \PHPUnit_Framework_TestCase
         $this->modelMock        = $this->createMock(EmailModel::class);
         $this->emailMock        = $this->createMock(Email::class);
         $this->flashBagMock     = $this->createMock(FlashBagInterface::class);
+        $this->securityMock     = $this->createMock(CorePermissions::class);
         $this->controller       = new EmailController();
         $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);
@@ -73,17 +77,27 @@ class EmailControllerTest extends \PHPUnit_Framework_TestCase
             ->with('session')
             ->willReturn($this->sessionMock);
 
+        $this->securityMock->expects($this->at(0))
+            ->method('isGranted')
+            ->with('email:emails:create')
+            ->willReturn(true);
+
         $this->containerMock->expects($this->at(2))
+            ->method('get')
+            ->with('mautic.security')
+            ->willReturn($this->securityMock);
+
+        $this->containerMock->expects($this->at(3))
             ->method('get')
             ->with('router')
             ->willReturn($this->routerMock);
 
-        $this->containerMock->expects($this->at(3))
+        $this->containerMock->expects($this->at(4))
             ->method('get')
             ->with('translator')
             ->willReturn($this->translatorMock);
 
-        $this->containerMock->expects($this->at(4))
+        $this->containerMock->expects($this->at(5))
             ->method('get')
             ->with('session')
             ->willReturn($this->sessionMock);
@@ -121,17 +135,27 @@ class EmailControllerTest extends \PHPUnit_Framework_TestCase
             ->with('session')
             ->willReturn($this->sessionMock);
 
+        $this->securityMock->expects($this->at(0))
+            ->method('isGranted')
+            ->with('email:emails:create')
+            ->willReturn(true);
+
         $this->containerMock->expects($this->at(2))
+            ->method('get')
+            ->with('mautic.security')
+            ->willReturn($this->securityMock);
+
+        $this->containerMock->expects($this->at(3))
             ->method('get')
             ->with('router')
             ->willReturn($this->routerMock);
 
-        $this->containerMock->expects($this->at(3))
+        $this->containerMock->expects($this->at(4))
             ->method('get')
             ->with('translator')
             ->willReturn($this->translatorMock);
 
-        $this->containerMock->expects($this->at(4))
+        $this->containerMock->expects($this->at(5))
             ->method('get')
             ->with('session')
             ->willReturn($this->sessionMock);
@@ -149,5 +173,46 @@ class EmailControllerTest extends \PHPUnit_Framework_TestCase
 
         $response = $this->controller->sendAction(5);
         $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testSendActionWithoutEmailCreatePermission()
+    {
+        $this->containerMock->expects($this->at(0))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($this->modelFactoryMock);
+
+        $this->modelFactoryMock->expects($this->at(0))
+            ->method('getModel')
+            ->with('email')
+            ->willReturn($this->modelMock);
+
+        $this->modelMock->expects($this->at(0))
+            ->method('getEntity')
+            ->with(5)
+            ->willReturn($this->emailMock);
+
+        $this->containerMock->expects($this->at(1))
+            ->method('get')
+            ->with('session')
+            ->willReturn($this->sessionMock);
+
+        $this->containerMock->expects($this->at(2))
+            ->method('get')
+            ->with('mautic.security')
+            ->willReturn($this->securityMock);
+
+        $this->securityMock->expects($this->once())
+            ->method('isGranted')
+            ->with('email:emails:create')
+            ->willReturn(false);
+
+        $this->containerMock->expects($this->at(3))
+            ->method('get')
+            ->with('mautic.security')
+            ->willReturn($this->securityMock);
+
+        $this->expectException(AccessDeniedHttpException::class);
+        $this->controller->sendAction(5);
     }
 }
