@@ -82,7 +82,7 @@ class TransportChainTest extends AbstractMauticTestCase
             $this->transportChain->sendSms($lead, 'Yeah');
         } catch (\Exception $e) {
             $message = $e->getMessage();
-            $this->assertEquals('Primary SMS transport is not enabled. mautic.test.twilio.mock', $message);
+            $this->assertEquals('Primary SMS transport is not enabled', $message);
         }
     }
 }
