@@ -359,7 +359,6 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                 ],
-                'alias' => 'email_example_send',
             ],
         ],
         'other' => [
