@@ -790,90 +790,12 @@ class PageModel extends FormModel
      */
     public function getHitQuery(Request $request, $page = null)
     {
-        if ($page instanceof Redirect) {
-            //use the configured redirect URL
-            $pageURL = $page->getUrl();
-        } else {
-            //use current URL
-
-            $isPageEvent = false;
-            if (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker')) !== false) {
-                // Tracking pixel is used
-                if ($request->server->get('QUERY_STRING')) {
-                    parse_str($request->server->get('QUERY_STRING'), $query);
-                    $isPageEvent = true;
-                }
-            } elseif (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors')) !== false) {
-                $query       = $request->request->all();
-                $isPageEvent = true;
-            }
-
-            if ($isPageEvent) {
-                $pageURL = $request->server->get('HTTP_REFERER');
-
-                // if additional data were sent with the tracking pixel
-                if (isset($query)) {
-                    // URL attr 'd' is encoded so let's decode it first.
-                    $decoded = false;
-                    if (isset($query['d'])) {
-                        // parse_str auto urldecodes
-                        $query   = $this->decodeArrayFromUrl($query['d'], false);
-                        $decoded = true;
-                    }
-                    if (is_array($query) && !empty($query)) {
-                        if (isset($query['page_url'])) {
-                            $pageURL = $query['page_url'];
-                            if (!$decoded) {
-                                $pageURL = urldecode($pageURL);
-                            }
-                        }
-
-                        if (isset($query['page_referrer'])) {
-                            if (!$decoded) {
-                                $query['page_referrer'] = urldecode($query['page_referrer']);
-                            }
-                        }
-
-                        if (isset($query['page_language'])) {
-                            if (!$decoded) {
-                                $query['page_language'] = urldecode($query['page_language']);
-                            }
-                        }
-
-                        if (isset($query['page_title'])) {
-                            if (!$decoded) {
-                                $query['page_title'] = urldecode($query['page_title']);
-                            }
-                        }
-
-                        if (isset($query['tags'])) {
-                            if (!$decoded) {
-                                $query['tags'] = urldecode($query['tags']);
-                            }
-                        }
-                    }
-                }
-            } else {
-                $pageURL = 'http';
-                if ($request->server->get('HTTPS') == 'on') {
-                    $pageURL .= 's';
-                }
-                $pageURL .= '://';
-                if ($request->server->get('SERVER_PORT') != '80') {
-                    $pageURL .= $request->server->get('SERVER_NAME').':'.$request->server->get('SERVER_PORT').
-                        $request->server->get('REQUEST_URI');
-                } else {
-                    $pageURL .= $request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
-                }
-            }
-        }
-
         if (!isset($query)) {
             $query = $request->query->all();
         }
 
         // Set generated page url
-        $query['page_url'] = $pageURL;
+        $query['page_url'] = $this->getPageUrl($request, $page);
 
         // Process clickthrough if applicable
         if (!empty($query['ct'])) {
@@ -1157,20 +1079,9 @@ class PageModel extends FormModel
     }
 
     /**
-     * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
-     *
-     * @param Page $entity
-     *
-     * @return array
-     */
-    public function getVariants(Page $entity)
-    {
-        return $entity->getVariants();
-    }
-
-    /**
-     * @param null|Page|Redirect $page
-     * @param Lead               $lead
+     * @param      $page
+     * @param Hit  $hit
+     * @param Lead $lead
      */
     private function setLeadManipulator($page, Hit $hit, Lead $lead)
     {
@@ -1195,6 +1106,101 @@ class PageModel extends FormModel
     }
 
     /**
+     * @param Request $request
+     * @param         $page
+     *
+     * @return mixed|string
+     */
+    private function getPageUrl(Request $request, $page)
+    {
+        // Default to page_url set in the query from tracking pixel and/or contactfield token
+        if ($pageURL = $request->get('page_url')) {
+            return $pageURL;
+        }
+
+        if ($page instanceof Redirect) {
+            //use the configured redirect URL
+            return $page->getUrl();
+        }
+
+        // Use the current URL
+        $isPageEvent = false;
+        if (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker')) !== false) {
+            // Tracking pixel is used
+            if ($request->server->get('QUERY_STRING')) {
+                parse_str($request->server->get('QUERY_STRING'), $query);
+                $isPageEvent = true;
+            }
+        } elseif (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors')) !== false) {
+            $query       = $request->request->all();
+            $isPageEvent = true;
+        }
+
+        if ($isPageEvent) {
+            $pageURL = $request->server->get('HTTP_REFERER');
+
+            // if additional data were sent with the tracking pixel
+            if (isset($query)) {
+                // URL attr 'd' is encoded so let's decode it first.
+                $decoded = false;
+                if (isset($query['d'])) {
+                    // parse_str auto urldecodes
+                    $query   = $this->decodeArrayFromUrl($query['d'], false);
+                    $decoded = true;
+                }
+
+                if (is_array($query) && !empty($query)) {
+                    if (isset($query['page_url'])) {
+                        $pageURL = $query['page_url'];
+                        if (!$decoded) {
+                            $pageURL = urldecode($pageURL);
+                        }
+                    }
+
+                    if (isset($query['page_referrer'])) {
+                        if (!$decoded) {
+                            $query['page_referrer'] = urldecode($query['page_referrer']);
+                        }
+                    }
+
+                    if (isset($query['page_language'])) {
+                        if (!$decoded) {
+                            $query['page_language'] = urldecode($query['page_language']);
+                        }
+                    }
+
+                    if (isset($query['page_title'])) {
+                        if (!$decoded) {
+                            $query['page_title'] = urldecode($query['page_title']);
+                        }
+                    }
+
+                    if (isset($query['tags'])) {
+                        if (!$decoded) {
+                            $query['tags'] = urldecode($query['tags']);
+                        }
+                    }
+                }
+            }
+
+            return $pageURL;
+        }
+
+        $pageURL = 'http';
+        if ($request->server->get('HTTPS') == 'on') {
+            $pageURL .= 's';
+        }
+        $pageURL .= '://';
+
+        if (!in_array((int) $request->server->get('SERVER_PORT', 80), [80, 8080, 443])) {
+            return $pageURL.$request->server->get('SERVER_NAME').':'.$request->server->get('SERVER_PORT').
+                $request->server->get('REQUEST_URI');
+        }
+
+        return $pageURL.$request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
+    }
+
+    /**
      * @deprecated 2.13.0; no longer used
      *
      * @param $trackByFingerprint
@@ -1204,6 +1210,18 @@ class PageModel extends FormModel
     }
 
     /**
+     * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
+     *
+     * @param Page $entity
+     *
+     * @return array
+     */
+    public function getVariants(Page $entity)
+    {
+        return $entity->getVariants();
+    }
+
+    /*
      * Cleans query params saving url values.
      *
      * @param $query array

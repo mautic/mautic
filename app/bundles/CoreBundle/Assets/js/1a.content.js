@@ -546,7 +546,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
                     // Set custom buttons with separator between them.
                     toolbarButtons: maxButtons,
                     toolbarButtonsMD: maxButtons,
-                    heightMin: 300
+                    heightMin: 300,
+                    useClasses: false
                 };
 
                 if (textarea.hasClass('editor-basic-fullpage')) {
@@ -569,7 +570,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
                     toolbarButtonsMD: minButtons,
                     toolbarButtonsSM: minButtons,
                     toolbarButtonsXS: minButtons,
-                    heightMin: 100
+                    heightMin: 100,
+                    useClasses: false
                 }));
             }
         });
