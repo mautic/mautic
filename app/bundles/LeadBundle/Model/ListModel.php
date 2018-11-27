@@ -1043,7 +1043,7 @@ class ListModel extends FormModel
                 // Keep CPU down for large lists; sleep per $limit batch
                 $this->batchSleep();
 
-                $removeLeadList = $this->leadSegmentService->getOrphanedLeadListLeads($leadList);
+                $removeLeadList = $this->leadSegmentService->getOrphanedLeadListLeads($leadList, [], $limit);
 
                 if (empty($removeLeadList[$leadList->getId()])) {
                     // Somehow ran out of leads so break out

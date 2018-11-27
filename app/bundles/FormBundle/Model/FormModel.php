@@ -509,7 +509,7 @@ class FormModel extends CommonFormModel
             $theme .= '|';
         }
 
-        if ($lead && $entity->usesProgressiveProfiling()) {
+        if ($lead instanceof Lead && $lead->getId() && $entity->usesProgressiveProfiling()) {
             $submissions = $this->getLeadSubmissions($entity, $lead->getId());
         }
 
@@ -587,6 +587,7 @@ class FormModel extends CommonFormModel
                 'inBuilder'     => false,
             ]
         );
+
         if (!$entity->usesProgressiveProfiling()) {
             $entity->setCachedHtml($html);
 

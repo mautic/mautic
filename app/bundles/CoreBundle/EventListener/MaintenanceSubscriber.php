@@ -14,6 +14,7 @@ namespace Mautic\CoreBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
+use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 
 /**
  * Class MaintenanceSubscriber.
@@ -26,13 +27,20 @@ class MaintenanceSubscriber extends CommonSubscriber
     protected $db;
 
     /**
+     * @var UserTokenRepositoryInterface
+     */
+    private $userTokenRepository;
+
+    /**
      * MaintenanceSubscriber constructor.
      *
-     * @param Connection $db
+     * @param Connection                   $db
+     * @param UserTokenRepositoryInterface $userTokenRepository
      */
-    public function __construct(Connection $db)
+    public function __construct(Connection $db, UserTokenRepositoryInterface $userTokenRepository)
     {
-        $this->db = $db;
+        $this->db                  = $db;
+        $this->userTokenRepository = $userTokenRepository;
     }
 
     /**
@@ -52,11 +60,14 @@ class MaintenanceSubscriber extends CommonSubscriber
     {
         $this->cleanupData($event, 'audit_log');
         $this->cleanupData($event, 'notifications');
+
+        $rows = $this->userTokenRepository->deleteExpired($event->isDryRun());
+        $event->setStat($this->translator->trans('mautic.maintenance.user_tokens'), $rows);
     }
 
     /**
      * @param MaintenanceEvent $event
-     * @param                  $table
+     * @param string           $table
      */
     private function cleanupData(MaintenanceEvent $event, $table)
     {

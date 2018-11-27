@@ -57,9 +57,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
-                <a<?php if ($generalTabError) {
-    echo ' class="text-danger" ';
-} ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                <a<?php if ($generalTabError): echo ' class="text-danger" '; endif; ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.general'); ?>
                     <?php if ($generalTabError): ?>
                         <i class="fa fa-warning"></i>
@@ -85,9 +83,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
 
             <?php if ($showProperties): ?>
             <li role="presentation">
-                <a<?php if ($propertiesTabError) {
-    echo ' class="text-danger" ';
-} ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                <a<?php if ($propertiesTabError): echo ' class="text-danger" '; endif; ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.properties'); ?>
                     <?php if ($propertiesTabError): ?>
                         <i class="fa fa-warning"></i>
