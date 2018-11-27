@@ -17,10 +17,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
 
-/**
- * Class FormValidationSubsriber.
- */
-class FormValidationSubsriber extends CommonSubscriber
+class FormValidationSubscriber extends CommonSubscriber
 {
     /**
      * {@inheritdoc}

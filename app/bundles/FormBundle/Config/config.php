@@ -179,7 +179,7 @@ return [
                 ],
             ],
             'mautic.form.validation.subscriber' => [
-                'class'     => \Mautic\FormBundle\EventListener\FormValidationSubsriber::class,
+                'class'     => \Mautic\FormBundle\EventListener\FormValidationSubscriber::class,
             ],
             'mautic.form.pagebundle.subscriber' => [
                 'class'     => PageSubscriber::class,
