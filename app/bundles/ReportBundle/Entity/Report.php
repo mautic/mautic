@@ -133,7 +133,7 @@ class Report extends FormEntity implements SchedulerInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('system', Type::BOOLEAN);
+        $builder->addField('system', Type::BOOLEAN, array("columnName"=>"`system`"));
 
         $builder->addField('source', Type::STRING);
 
