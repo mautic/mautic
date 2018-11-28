@@ -17,8 +17,10 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\EventListener\ReportSubscriber;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -26,6 +28,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ReportSubscriberTest extends WebTestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+    }
+
     public function testOnReportBuilderAddsPageAndPageHitReports()
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
@@ -40,6 +48,10 @@ class ReportSubscriberTest extends WebTestCase
             ])
             ->getMock();
 
+        $companyReportDataMock = $this->getMockBuilder(CompanyReportData::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $mockEvent->expects($this->once())
             ->method('getStandardColumns')
             ->willReturn([]);
@@ -52,14 +64,14 @@ class ReportSubscriberTest extends WebTestCase
             ->method('getCampaignByChannelColumns')
             ->willReturn([]);
 
-        $mockEvent->expects($this->exactly(2))
+        $mockEvent->expects($this->exactly(3))
             ->method('checkContext')
             ->willReturn(true);
 
         $setTables = [];
         $setGraphs = [];
 
-        $mockEvent->expects($this->exactly(2))
+        $mockEvent->expects($this->exactly(3))
             ->method('addTable')
             ->willReturnCallback(function () use (&$setTables) {
                 $args = func_get_args();
@@ -75,11 +87,16 @@ class ReportSubscriberTest extends WebTestCase
                 $setGraphs[] = $args;
             });
 
-        $subscriber = new ReportSubscriber();
+        $companyReportDataMock->expects($this->once())
+            ->method('getCompanyData')
+            ->with()
+            ->willReturn([]);
+
+        $subscriber = new ReportSubscriber($companyReportDataMock);
 
         $subscriber->onReportBuilder($mockEvent);
 
-        $this->assertCount(2, $setTables);
+        $this->assertCount(3, $setTables);
         $this->assertCount(9, $setGraphs);
     }
 
@@ -92,7 +109,17 @@ class ReportSubscriberTest extends WebTestCase
                 'getQueryBuilder',
                 'addCategoryLeftJoin',
                 'setQueryBuilder',
+                'getReport',
             ])
+            ->getMock();
+
+        $reportMock = $this->createMock(Report::class);
+        $reportMock->expects($this->once())
+            ->method('getGroupBy')
+            ->willReturn('');
+
+        $companyReportDataMock = $this->getMockBuilder(CompanyReportData::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
@@ -116,7 +143,11 @@ class ReportSubscriberTest extends WebTestCase
             ->method('getContext')
             ->willReturn('pages');
 
-        $subscriber = new ReportSubscriber();
+        $mockEvent->expects($this->once())
+            ->method('getReport')
+            ->willReturn($reportMock);
+
+        $subscriber = new ReportSubscriber($companyReportDataMock);
 
         $subscriber->onReportGenerate($mockEvent);
     }
@@ -134,8 +165,18 @@ class ReportSubscriberTest extends WebTestCase
                 'addCampaignByChannelJoin',
                 'applyDateFilters',
                 'setQueryBuilder',
+                'getReport',
             ])
             ->getMock();
+
+        $companyReportDataMock = $this->getMockBuilder(CompanyReportData::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reportMock = $this->createMock(Report::class);
+        $reportMock->expects($this->once())
+            ->method('getGroupBy')
+            ->willReturn('');
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
@@ -158,7 +199,11 @@ class ReportSubscriberTest extends WebTestCase
             ->method('getContext')
             ->willReturn('page.hits');
 
-        $subscriber = new ReportSubscriber();
+        $mockEvent->expects($this->once())
+            ->method('getReport')
+            ->willReturn($reportMock);
+
+        $subscriber = new ReportSubscriber($companyReportDataMock);
 
         $subscriber->onReportGenerate($mockEvent);
     }
@@ -167,7 +212,11 @@ class ReportSubscriberTest extends WebTestCase
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods(['checkContext'])
+            ->setMethods(['checkContext', 'getRequestedGraphs'])
+            ->getMock();
+
+        $companyReportDataMock = $this->getMockBuilder(CompanyReportData::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $mockEvent->expects($this->once())
@@ -177,7 +226,7 @@ class ReportSubscriberTest extends WebTestCase
         $mockEvent->expects($this->never())
             ->method('getRequestedGraphs');
 
-        $subscriber = new ReportSubscriber();
+        $subscriber = new ReportSubscriber($companyReportDataMock);
 
         $subscriber->onReportGraphGenerate($mockEvent);
     }
@@ -192,6 +241,10 @@ class ReportSubscriberTest extends WebTestCase
                 'getOptions',
                 'getRequestedGraphs',
             ])
+            ->getMock();
+
+        $companyReportDataMock = $this->getMockBuilder(CompanyReportData::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $mockTrans = $this->getMockBuilder(Translator::class)
@@ -336,7 +389,7 @@ class ReportSubscriberTest extends WebTestCase
                 ['MauticPageBundle:Hit', $mockHitRepo],
             ]);
 
-        $subscriber = new ReportSubscriber();
+        $subscriber = new ReportSubscriber($companyReportDataMock);
 
         $subscriber->setEntityManager($mockEntityManager);
         $subscriber->setTranslator($mockTrans);

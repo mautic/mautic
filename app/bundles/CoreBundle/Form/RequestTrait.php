@@ -33,6 +33,15 @@ trait RequestTrait
                         if (is_object($entity)) {
                             $setter = 'set'.ucfirst($name);
                             // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
+                            // If value is array and count 1, return value of array as string
+                            if (is_array($params[$name]) && count($params[$name]) == 1) {
+                                $params[$name] = end($params[$name]);
+                            }
+
+                            if ('' === $params[$name]) {
+                                continue;
+                            }
+
                             $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
                             $data = (bool) $data;
                             try {
@@ -49,7 +58,11 @@ trait RequestTrait
                         if ($child->getConfig()->getOption('multiple')) {
                             // Ensure the value is an array
                             if (!is_array($params[$name])) {
-                                $params[$name] = [$params[$name]];
+                                if (strpos($params[$name], '|') !== false) {
+                                    $params[$name] = explode('|', $params[$name]);
+                                } else {
+                                    $params[$name] = [$params[$name]];
+                                }
                             }
                         }
                         break;
@@ -155,6 +168,9 @@ trait RequestTrait
                 break;
             case 'number':
                 $fieldData[$leadField['alias']] = (float) $fieldData[$leadField['alias']];
+                break;
+            case 'email':
+                $fieldData[$leadField['alias']] = InputHelper::email($fieldData[$leadField['alias']]);
                 break;
         }
     }

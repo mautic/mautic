@@ -67,6 +67,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
+                <?php $mauticTemplateVars['item'] = $item; ?>
                 <tr>
                     <td>
                         <?php
@@ -76,6 +77,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                                 'item'            => $item,
                                 'templateButtons' => [
                                     'edit'   => $view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy()),
+                                    'clone'  => $view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy()),
                                     'delete' => $view['security']->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
                                 ],
                                 'routeBase' => 'segment',
@@ -108,7 +110,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             <?php if ($view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
                                 <a href="<?php echo $view['router']->path(
                                     'mautic_segment_action',
-                                    ['objectAction' => 'edit', 'objectId' => $item->getId()]
+                                    ['objectAction' => 'view', 'objectId' => $item->getId()]
                                 ); ?>" data-toggle="ajax">
                                     <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
                                 </a>
@@ -122,6 +124,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             <?php if ($item->isGlobal()): ?>
                                 <i class="fa fa-fw fa-globe"></i>
                             <?php endif; ?>
+                            <?php echo $view['content']->getCustomContent('segment.name', $mauticTemplateVars); ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
                             <div class="text-muted mt-4">

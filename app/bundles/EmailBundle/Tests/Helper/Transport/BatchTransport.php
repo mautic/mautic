@@ -1,10 +1,12 @@
 <?php
 
 /*
- * Created by PhpStorm.
- * User: alan
- * Date: 9/14/16
- * Time: 5:42 PM.
+ * @copyright   2017 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
@@ -14,17 +16,22 @@ use Mautic\EmailBundle\Swiftmailer\Transport\AbstractTokenArrayTransport;
 class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Transport
 {
     private $fromAddresses = [];
+    private $fromNames     = [];
     private $metadatas     = [];
     private $validate      = false;
+    private $maxRecipients;
+    private $numberToFail;
 
     /**
      * BatchTransport constructor.
      *
      * @param bool $validate
      */
-    public function __construct($validate = false)
+    public function __construct($validate = false, $maxRecipients = 4, $numberToFail = 1)
     {
-        $this->validate = true;
+        $this->validate      = $validate;
+        $this->maxRecipients = $maxRecipients;
+        $this->numberToFail  = (int) $numberToFail;
     }
 
     /**
@@ -34,12 +41,17 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
         $this->message         = $message;
-        $this->fromAddresses[] = key($message->getFrom());
+        $from                  = $message->getFrom();
+        $fromEmail             = key($from);
+        $this->fromAddresses[] = $fromEmail;
+        $this->fromNames[]     = $from[$fromEmail];
         $this->metadatas[]     = $this->getMetadata();
 
         $messageArray = $this->messageToArray();
 
-        if ($this->validate) {
+        if ($this->validate && $this->numberToFail) {
+            --$this->numberToFail;
+
             if (empty($messageArray['subject'])) {
                 $this->throwException('Subject empty');
             }
@@ -57,7 +69,7 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
      */
     public function getMaxBatchLimit()
     {
-        return 4;
+        return $this->maxRecipients;
     }
 
     /**
@@ -69,7 +81,9 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
-        return count($message->getTo()) + $toBeAdded;
+        $toCount = count($message->getTo());
+
+        return ('to' === $type) ? $toCount + $toBeAdded : $toCount;
     }
 
     /**
@@ -78,6 +92,14 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     public function getFromAddresses()
     {
         return $this->fromAddresses;
+    }
+
+    /**
+     * return array.
+     */
+    public function getFromNames()
+    {
+        return $this->fromNames;
     }
 
     /**

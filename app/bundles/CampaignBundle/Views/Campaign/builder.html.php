@@ -9,13 +9,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="hide builder campaign-builder">
-    <button type="button" class="btn btn-primary btn-close-campaign-builder" onclick="Mautic.closeCampaignBuilder();">
-        <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
-    </button>
-    <button type="button" class="btn btn-primary btn-apply-builder" onclick="Mautic.saveCampaignFromBuilder();">
-        <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
-    </button>
+<div class="hide builder campaign-builder live">
+    <div class="btns-builder">
+        <button type="button" class="btn btn-primary btn-apply-builder" onclick="Mautic.saveCampaignFromBuilder();">
+            <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
+        </button>
+        <button type="button" class="btn btn-primary btn-close-campaign-builder"
+                onclick="Mautic.closeCampaignBuilder();">
+            <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
+        </button>
+    </div>
     <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">test</div>
     <div class="builder-content">
         <div id="CampaignCanvas">
@@ -37,7 +40,11 @@
             endforeach;
 
             foreach ($campaignEvents as $event):
-                echo $view->render('MauticCampaignBundle:Event:generic.html.php', ['event' => $event, 'campaignId' => $campaignId]);
+                $settings = $eventSettings[$event['eventType']][$event['type']];
+                $template = isset($settings['template']) ? $settings['template'] : 'MauticCampaignBundle:Event:generic.html.php';
+
+                echo $view->render($template,
+                    ['event' => $event, 'campaignId' => $campaignId]);
             endforeach;
 
             echo $view->render('MauticCampaignBundle:Campaign\Builder:index.html.php',
@@ -48,14 +55,14 @@
                 ]
             );
             ?>
-
         </div>
+        <div id="EventJumpOverlay"></div>
     </div>
 </div>
 <!-- dropped coordinates -->
 <input type="hidden" value="" id="droppedX"/>
 <input type="hidden" value="" id="droppedY"/>
-<input type="hidden" value="<?php echo $campaignId; ?>" id="campaignId"/>
+<input type="hidden" value="<?php echo $view->escape($campaignId); ?>" id="campaignId"/>
 
 <?php echo $view->render(
     'MauticCoreBundle:Helper:modal.html.php',
@@ -69,15 +76,19 @@
 
 ?>
 <script>
-    <?php if (!empty($canvasSettings)): ?>
+    /**
+     * We typecast to object here so that an empty value will
+     * be encoded to {} instead of []. Adding JSON_FORCE_OBJECT
+     * is not an option because it does a deep transform to
+     * object, whereas typecasting only does the first level.
+     */
     Mautic.campaignBuilderCanvasSettings =
-        <?php echo json_encode($canvasSettings, JSON_PRETTY_PRINT); ?>;
+    <?php echo json_encode((object) $canvasSettings, JSON_PRETTY_PRINT); ?>;
     Mautic.campaignBuilderCanvasSources =
-        <?php echo json_encode($campaignSources, JSON_PRETTY_PRINT); ?>;
+    <?php echo json_encode((object) $campaignSources, JSON_PRETTY_PRINT); ?>;
     Mautic.campaignBuilderCanvasEvents =
-        <?php echo json_encode($campaignEvents, JSON_PRETTY_PRINT); ?>;
-    <?php endif; ?>
+    <?php echo json_encode((object) $campaignEvents, JSON_PRETTY_PRINT); ?>;
 
     Mautic.campaignBuilderConnectionRestrictions =
-        <?php echo json_encode($eventSettings['connectionRestrictions'], JSON_PRETTY_PRINT); ?>;
+    <?php echo json_encode((object) $eventSettings['connectionRestrictions'], JSON_PRETTY_PRINT); ?>;
 </script>

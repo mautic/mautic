@@ -12,6 +12,8 @@
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Validator\Constraint\PhoneNumberConstraint;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Email;
@@ -66,7 +68,11 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'password'  => [],
         'radiogrp'  => [],
         'select'    => [],
-        'tel'       => [],
+        'tel'       => [
+            'constraints' => [
+                PhoneNumberConstraint::class => ['message' => 'mautic.form.submission.phone.invalid'],
+            ],
+        ],
         'text'      => [],
         'textarea'  => [],
         'url'       => [
@@ -75,6 +81,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 Url::class => ['message' => 'mautic.form.submission.url.invalid'],
             ],
         ],
+        'file' => [],
     ];
 
     /**
@@ -144,9 +151,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @param      $type
-     * @param      $value
-     * @param null $f
+     * @param       $type
+     * @param       $value
+     * @param Field $f
      *
      * @return array
      */
@@ -160,6 +167,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     continue;
                 }
 
+                if ($f !== null && $f->getType() === 'tel' && empty($f->getProperties()['international'])) {
+                    continue;
+                }
                 if ($type == 'captcha') {
                     $captcha = $f->getProperties()['captcha'];
                     if (empty($captcha) && Blank::class !== $constraint) {
@@ -229,7 +239,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
 
                 foreach ($value as $val) {
-                    $val = urldecode($val);
+                    $val = $this->sanitizeValue($val);
                     if (preg_match(
                         '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
                         $formHtml,
@@ -242,7 +252,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 break;
             case 'radiogrp':
-                $value = urldecode($value);
+                $value = $this->sanitizeValue($value);
                 if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio(.*?)"(.*?)value="'.$value.'"(.*?)\/>/i', $formHtml, $match)) {
                     $replace = '<input'.$match[1].'id="mauticform_radiogrp_radio'.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
                         .' checked />';
@@ -255,8 +265,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 if (preg_match($regex, $formHtml, $match)) {
                     $origText = $match[0];
                     $replace  = str_replace(
-                        '<option value="'.urldecode($value).'">',
-                        '<option value="'.urldecode($value).'" selected="selected">',
+                        '<option value="'.$this->sanitizeValue($value).'">',
+                        '<option value="'.$this->sanitizeValue($value).'" selected="selected">',
                         $origText
                     );
                     $formHtml = str_replace($origText, $replace, $formHtml);
@@ -266,8 +276,13 @@ class FormFieldHelper extends AbstractFormFieldHelper
         }
     }
 
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
     public function sanitizeValue($value)
     {
-        return strip_tags(urldecode($value));
+        return str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(urldecode($value)));
     }
 }

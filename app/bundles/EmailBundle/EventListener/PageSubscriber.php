@@ -65,7 +65,6 @@ class PageSubscriber extends CommonSubscriber
         $redirect = $hit->getRedirect();
 
         if ($redirect && $email = $hit->getEmail()) {
-
             //click trigger condition
             $this->campaignEventModel->triggerEvent('email.click', $hit, 'email', $email->getId());
             // Check for an email stat
@@ -89,7 +88,7 @@ class PageSubscriber extends CommonSubscriber
                 // Check to see if it has been marked as opened
                 if (!$stat->isRead()) {
                     // Mark it as read
-                    $this->emailModel->hitEmail($stat, $this->request);
+                    $this->emailModel->hitEmail($stat, $this->request ?: $event->getRequest());
                 }
             }
         }

@@ -120,7 +120,6 @@ class TemplateReference extends BaseTemplateReference
         }
 
         if (empty($template)) {
-
             //try the parent
             return parent::getPath();
         }

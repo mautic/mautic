@@ -64,7 +64,23 @@ class ThemeHelper
      *
      * @var array
      */
-    protected $defaultThemes = ['sunday', 'skyline', 'oxygen', 'goldstar', 'neopolitan', 'blank', 'system'];
+    protected $defaultThemes = [
+        'aurora',
+        'blank',
+        'cards',
+        'fresh-center',
+        'fresh-fixed',
+        'fresh-left',
+        'fresh-wide',
+        'goldstar',
+        'neopolitan',
+        'oxygen',
+        'skyline',
+        'sparse',
+        'sunday',
+        'system',
+        'vibrant',
+    ];
 
     /**
      * ThemeHelper constructor.
@@ -121,7 +137,7 @@ class ThemeHelper
      */
     private function getDirectoryName($newName)
     {
-        return InputHelper::filename($newName, true);
+        return InputHelper::filename($newName);
     }
 
     /**

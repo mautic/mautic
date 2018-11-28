@@ -52,9 +52,7 @@ class SmsController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         $session = $this->get('session');
 
@@ -114,8 +112,6 @@ class SmsController extends FormController
         }
         $session->set('mautic.sms.page', $page);
 
-        $integration = $this->get('mautic.helper.integration')->getIntegrationObject('Twilio');
-
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
@@ -127,7 +123,7 @@ class SmsController extends FormController
                 'permissions' => $permissions,
                 'model'       => $model,
                 'security'    => $this->get('mautic.security'),
-                'configured'  => ($integration && $integration->getIntegrationSettings()->getIsPublished()),
+                'configured'  => count($this->get('mautic.sms.transport_chain')->getEnabledTransports()) > 0,
             ],
             'contentTemplate' => 'MauticSmsBundle:Sms:list.html.php',
             'passthroughVars' => [

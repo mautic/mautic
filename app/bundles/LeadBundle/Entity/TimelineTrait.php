@@ -20,8 +20,8 @@ trait TimelineTrait
     /**
      * @param QueryBuilder $query                 DBAL QueryBuilder
      * @param array        $options               Query optons from LeadTimelineEvent
-     * @param              $eventNameColumn       Name of column to sort event name by
-     * @param              $timestampColumn       Name of column to sort timestamp by
+     * @param string       $eventNameColumn       Name of column to sort event name by
+     * @param string       $timestampColumn       Name of column to sort timestamp by
      * @param array        $serializedColumns     Array of columns to unserialize
      * @param array        $dateTimeColumns       Array of columns to be converted to \DateTime
      * @param null         $resultsParserCallback Callback to custom parse results
@@ -57,10 +57,10 @@ trait TimelineTrait
                 ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'))
                 ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
         } elseif (!empty($options['fromDate'])) {
-            $query->andWhere($query->expr()->gte('fs.date_submitted', ':dateFrom'))
+            $query->andWhere($query->expr()->gte($timestampColumn, ':dateFrom'))
                 ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'));
         } elseif (!empty($options['toDate'])) {
-            $query->andWhere($query->expr()->lte('fs.date_submitted', ':dateTo'))
+            $query->andWhere($query->expr()->lte($timestampColumn, ':dateTo'))
                 ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
         }
 

@@ -21,6 +21,9 @@ return [
                     'mautic.notification.api',
                 ],
             ],
+            'mautic.notification.campaignbundle.condition_subscriber' => [
+                'class'     => 'Mautic\NotificationBundle\EventListener\CampaignConditionSubscriber',
+            ],
             'mautic.notification.pagebundle.subscriber' => [
                 'class'     => 'Mautic\NotificationBundle\EventListener\PageSubscriber',
                 'arguments' => [
@@ -70,6 +73,7 @@ return [
                 'class'     => \Mautic\NotificationBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                    'mautic.lead.model.company_report_data',
                 ],
             ],
         ],

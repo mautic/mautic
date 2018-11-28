@@ -11,6 +11,7 @@
 
 namespace Mautic\FormBundle\Model;
 
+use DOMDocument;
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
@@ -23,6 +24,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -81,6 +83,11 @@ class FormModel extends CommonFormModel
     protected $leadFieldModel;
 
     /**
+     * @var FormUploader
+     */
+    private $formUploader;
+
+    /**
      * FormModel constructor.
      *
      * @param RequestStack        $requestStack
@@ -92,6 +99,7 @@ class FormModel extends CommonFormModel
      * @param LeadModel           $leadModel
      * @param FormFieldHelper     $fieldHelper
      * @param LeadFieldModel      $leadFieldModel
+     * @param FormUploader        $formUploader
      */
     public function __construct(
         RequestStack $requestStack,
@@ -102,7 +110,8 @@ class FormModel extends CommonFormModel
         FieldModel $formFieldModel,
         LeadModel $leadModel,
         FormFieldHelper $fieldHelper,
-        LeadFieldModel $leadFieldModel
+        LeadFieldModel $leadFieldModel,
+        FormUploader $formUploader
     ) {
         $this->request             = $requestStack->getCurrentRequest();
         $this->templatingHelper    = $templatingHelper;
@@ -113,6 +122,7 @@ class FormModel extends CommonFormModel
         $this->leadModel           = $leadModel;
         $this->fieldHelper         = $fieldHelper;
         $this->leadFieldModel      = $leadFieldModel;
+        $this->formUploader        = $formUploader;
     }
 
     /**
@@ -278,16 +288,27 @@ class FormModel extends CommonFormModel
         $existingFields = $entity->getFields()->toArray();
         $deleteFields   = [];
         foreach ($sessionFields as $fieldId) {
-            if (isset($existingFields[$fieldId])) {
-                $entity->removeField($fieldId, $existingFields[$fieldId]);
-                $deleteFields[] = $fieldId;
+            if (!isset($existingFields[$fieldId])) {
+                continue;
             }
+            $this->handleFilesDelete($existingFields[$fieldId]);
+            $entity->removeField($fieldId, $existingFields[$fieldId]);
+            $deleteFields[] = $fieldId;
         }
 
         // Delete fields from db
         if (count($deleteFields)) {
             $this->formFieldModel->deleteEntities($deleteFields);
         }
+    }
+
+    private function handleFilesDelete(Field $field)
+    {
+        if (!$field->isFileType()) {
+            return;
+        }
+
+        $this->formUploader->deleteAllFilesOfFormField($field);
     }
 
     /**
@@ -393,7 +414,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * Obtains the cached HTML of a form and generates it if missing.
+     * Obtains the content.
      *
      * @param Form      $form
      * @param bool|true $withScript
@@ -402,6 +423,27 @@ class FormModel extends CommonFormModel
      * @return string
      */
     public function getContent(Form $form, $withScript = true, $useCache = true)
+    {
+        $html = $this->getFormHtml($form, $useCache);
+
+        if ($withScript) {
+            $html = $this->getFormScript($form)."\n\n".$this->removeScriptTag($html);
+        } else {
+            $html = $this->removeScriptTag($html);
+        }
+
+        return $html;
+    }
+
+    /**
+     * Obtains the cached HTML of a form and generates it if missing.
+     *
+     * @param Form      $form
+     * @param bool|true $useCache
+     *
+     * @return string
+     */
+    public function getFormHtml(Form $form, $useCache = true)
     {
         if ($useCache && !$form->usesProgressiveProfiling()) {
             $cachedHtml = $form->getCachedHtml();
@@ -413,10 +455,6 @@ class FormModel extends CommonFormModel
 
         if (!$form->getInKioskMode()) {
             $this->populateValuesWithLead($form, $cachedHtml);
-        }
-
-        if ($withScript) {
-            $cachedHtml = $this->getFormScript($form)."\n\n".$cachedHtml;
         }
 
         return $cachedHtml;
@@ -592,7 +630,8 @@ class FormModel extends CommonFormModel
      */
     public function deleteEntity($entity)
     {
-        parent::deleteEntity($entity);
+        /* @var Form $entity */
+        $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
             //delete the associated results table
@@ -600,6 +639,7 @@ class FormModel extends CommonFormModel
             $schemaHelper->deleteTable('form_results_'.$entity->deletedId.'_'.$entity->getAlias());
             $schemaHelper->executeChanges();
         }
+        parent::deleteEntity($entity);
     }
 
     /**
@@ -610,12 +650,19 @@ class FormModel extends CommonFormModel
         $entities     = parent::deleteEntities($ids);
         $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         foreach ($entities as $id => $entity) {
+            /* @var Form $entity */
             //delete the associated results table
             $schemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
+            $this->deleteFormFiles($entity);
         }
         $schemaHelper->executeChanges();
 
         return $entities;
+    }
+
+    private function deleteFormFiles(Form $form)
+    {
+        $this->formUploader->deleteFilesOfForm($form);
     }
 
     /**
@@ -695,14 +742,30 @@ class FormModel extends CommonFormModel
      */
     public function getAutomaticJavascript(Form $form)
     {
-        $html = $this->getContent($form);
+        $html       = $this->getContent($form, false);
+        $formScript = $this->getFormScript($form);
 
         //replace line breaks with literal symbol and escape quotations
-        $search  = ["\r\n", "\n", '"'];
-        $replace = ['', '', '\"'];
-        $html    = str_replace($search, $replace, $html);
+        $search        = ["\r\n", "\n", '"'];
+        $replace       = ['', '', '\"'];
+        $html          = str_replace($search, $replace, $html);
+        $oldFormScript = str_replace($search, $replace, $formScript);
+        $newFormScript = $this->generateJsScript($formScript);
 
-        return 'document.write("'.$html.'");';
+        // Write html for all browser and fallback for IE
+        $script = '
+            var scr  = document.currentScript;
+            var html = "'.$html.'";
+            
+            if (scr !== undefined) {
+                scr.insertAdjacentHTML("afterend", html);
+                '.$newFormScript.'
+            } else {
+                document.write("'.$oldFormScript.'"+html);
+            }
+        ';
+
+        return $script;
     }
 
     /**
@@ -725,6 +788,13 @@ class FormModel extends CommonFormModel
                 'theme' => $theme,
             ]
         );
+
+        $html    = $this->getFormHtml($form);
+        $scripts = $this->extractScriptTag($html);
+
+        foreach ($scripts as $item) {
+            $script .= $item."\n";
+        }
 
         return $script;
     }
@@ -758,24 +828,32 @@ class FormModel extends CommonFormModel
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
         $formName = $form->generateFormName();
-        $lead     = $this->leadModel->getCurrentLead();
+        $fields   = $form->getFields();
+        /** @var \Mautic\FormBundle\Entity\Field $field */
+        foreach ($fields as $key => $field) {
+            $leadField  = $field->getLeadField();
+            $isAutoFill = $field->getIsAutoFill();
 
+            // we want work just with matched autofill fields
+            if (!isset($leadField) || !$isAutoFill) {
+                unset($fields[$key]);
+            }
+        }
+        // no fields for populate
+        if (!count($fields)) {
+            return;
+        }
+
+        $lead = $this->leadModel->getCurrentLead();
         if (!$lead instanceof Lead) {
             return;
         }
 
-        $fields = $form->getFields();
-        /** @var \Mautic\FormBundle\Entity\Field $f */
-        foreach ($fields as $f) {
-            $leadField  = $f->getLeadField();
-            $isAutoFill = $f->getIsAutoFill();
+        foreach ($fields as $field) {
+            $value = $lead->getFieldValue($field->getLeadField());
 
-            if (isset($leadField) && $isAutoFill) {
-                $value = $lead->getFieldValue($leadField);
-
-                if (!empty($value)) {
-                    $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
-                }
+            if (!empty($value)) {
+                $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }
     }
@@ -828,6 +906,21 @@ class FormModel extends CommonFormModel
                 'expr'        => 'notLike',
                 'negate_expr' => 'like',
             ],
+            'startsWith' => [
+                'label'       => 'mautic.core.operator.starts.with',
+                'expr'        => 'startsWith',
+                'negate_expr' => 'startsWith',
+            ],
+            'endsWith' => [
+                'label'       => 'mautic.core.operator.ends.with',
+                'expr'        => 'endsWith',
+                'negate_expr' => 'endsWith',
+            ],
+            'contains' => [
+                'label'       => 'mautic.core.operator.contains',
+                'expr'        => 'contains',
+                'negate_expr' => 'contains',
+            ],
         ];
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
@@ -863,5 +956,95 @@ class FormModel extends CommonFormModel
         $results = $q->execute()->fetchAll();
 
         return $results;
+    }
+
+    /**
+     * Extract script from html.
+     *
+     * @param $html
+     *
+     * @return array
+     */
+    private function extractScriptTag($html)
+    {
+        libxml_use_internal_errors(true);
+        $dom = new DOMDocument();
+        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $items = $dom->getElementsByTagName('script');
+
+        $scripts = [];
+        foreach ($items as $script) {
+            $scripts[] = $dom->saveHTML($script);
+        }
+
+        return $scripts;
+    }
+
+    /**
+     * Remove script from html.
+     *
+     * @param $html
+     *
+     * @return string
+     */
+    private function removeScriptTag($html)
+    {
+        libxml_use_internal_errors(true);
+        $dom = new DOMDocument();
+        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $items = $dom->getElementsByTagName('script');
+
+        $remove = [];
+        foreach ($items as $item) {
+            $remove[] = $item;
+        }
+
+        foreach ($remove as $item) {
+            $item->parentNode->removeChild($item);
+        }
+
+        $root   = $dom->documentElement;
+        $result = '';
+        foreach ($root->childNodes as $childNode) {
+            $result .= $dom->saveHTML($childNode);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate dom manipulation javascript to include all script.
+     *
+     * @param $html
+     *
+     * @return string
+     */
+    private function generateJsScript($html)
+    {
+        libxml_use_internal_errors(true);
+        $dom = new DOMDocument();
+        $dom->loadHTML('<div>'.mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8').'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $items = $dom->getElementsByTagName('script');
+
+        $javascript = '';
+        foreach ($items as $key => $script) {
+            if ($script->hasAttribute('src')) {
+                $javascript .= "
+                var script$key = document.createElement('script');
+                script$key.src = '".$script->getAttribute('src')."';
+                document.getElementsByTagName('head')[0].appendChild(script$key);";
+            } else {
+                $scriptContent = $script->nodeValue;
+                $scriptContent = str_replace(["\r\n", "\n", '"'], ['', '', '\"'], $scriptContent);
+
+                $javascript .= "
+                var inlineScript$key = document.createTextNode(\"$scriptContent\");
+                var script$key       = document.createElement('script');
+                script$key.appendChild(inlineScript$key);
+                document.getElementsByTagName('head')[0].appendChild(script$key);";
+            }
+        }
+
+        return $javascript;
     }
 }

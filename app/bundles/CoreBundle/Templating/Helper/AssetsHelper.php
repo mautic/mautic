@@ -415,7 +415,6 @@ class AssetsHelper
                         }
                         $headOutput .= "\n$output";
                         break;
-
                 }
             }
             if ($scriptOpen) {
@@ -568,7 +567,7 @@ class AssetsHelper
     public function makeLinks($text, $protocols = ['http', 'mail'], array $attributes = [])
     {
         // clear tags in text
-        $text = InputHelper::clean($text);
+        $text = InputHelper::url($text, false, $protocols);
 
         // Link attributes
         $attr = '';
@@ -680,7 +679,7 @@ class AssetsHelper
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getName()
     {

@@ -168,7 +168,7 @@ if ($tmpl == 'index') {
                               title="<?php echo $view['translator']->trans('mautic.email.stat.leadcount.tooltip'); ?>">
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailpending').':'.$item->getId()]
+                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_pending').':'.$item->getId()]
                             ); ?>"></a>
                         </span>
                         <span class="mt-xs label label-default hide has-click-event clickable-stat"
@@ -177,14 +177,14 @@ if ($tmpl == 'index') {
                               title="<?php echo $view['translator']->trans('mautic.email.stat.queued.tooltip'); ?>">
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailqueued').':'.$item->getId()]
+                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_queued').':'.$item->getId()]
                             ); ?>"></a>
                         </span>
                         <span class="mt-xs label label-warning has-click-event clickable-stat"
                               id="sent-count-<?php echo $item->getId(); ?>">
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailsent').':'.$item->getId()]
+                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_sent').':'.$item->getId()]
                             ); ?>" data-toggle="tooltip"
                                title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
                                 <div style="width: 50px;">
@@ -196,7 +196,7 @@ if ($tmpl == 'index') {
                               id="read-count-<?php echo $item->getId(); ?>">
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailread').':'.$item->getId()]
+                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_read').':'.$item->getId()]
                             ); ?>" data-toggle="tooltip"
                                title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
                                 <div style="width: 50px;">
@@ -208,7 +208,7 @@ if ($tmpl == 'index') {
                               id="read-percent-<?php echo $item->getId(); ?>">
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailread').':'.$item->getId()]
+                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_read').':'.$item->getId()]
                             ); ?>" data-toggle="tooltip"
                                title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
                                 <div style="width: 50px;">

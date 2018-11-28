@@ -43,6 +43,7 @@ $view['slots']->set('headerTitle', $header);
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php
             echo $view['form']->row($form['category']);
+            echo $view['form']->row($form['allowRestart']);
             echo $view['form']->row($form['isPublished']);
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
@@ -58,4 +59,7 @@ $view['slots']->set('headerTitle', $header);
     'campaignSources' => $campaignSources,
     'eventSettings'   => $eventSettings,
     'canvasSettings'  => $entity->getCanvasSettings(),
-]); ?>
+]);
+
+?>
+

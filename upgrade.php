@@ -387,11 +387,12 @@ function fetch_updates()
 
         // Fetch the package
         try {
-            download_package($update->package);
+            download_package($update);
         } catch (\Exception $e) {
             return [
                 false,
-                "Could not automatically download the package. Please download {$update->package}, place it in the same directory as this upgrade script, and try again.",
+                "Could not automatically download the package. Please download {$update->package}, place it in the same directory as this upgrade script, and try again. ".
+                "When moving the file, name it `{$update->version}-update.zip`",
             ];
         }
 
@@ -402,22 +403,23 @@ function fetch_updates()
 }
 
 /**
- * @param $package
+ * @param object $update
  *
  * @throws Exception
+ *
+ * @return bool
  */
-function download_package($package)
+function download_package($update)
 {
-    if (file_exists(__DIR__.'/'.basename($package))) {
+    $packageName = $update->version.'-update.zip';
+    $target      = __DIR__.'/'.$packageName;
+
+    if (file_exists($target)) {
         return true;
     }
 
-    $data = make_request($package);
+    $data = make_request($update->package);
 
-    // Set the filesystem target
-    $target = __DIR__.'/'.basename($package);
-
-    // Write the response to the filesystem
     if (!file_put_contents($target, $data)) {
         throw new \Exception();
     }
@@ -469,6 +471,15 @@ function clear_mautic_cache()
         process_error_log(['Could not remove the application cache.  You will need to manually delete '.MAUTIC_CACHE_DIR.'.']);
 
         return false;
+    }
+
+    // Follow the same pattern as the console command and flush opcache/apc as appropriate.
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+    }
+
+    if (function_exists('apc_clear_cache')) {
+        apc_clear_cache();
     }
 
     return true;
@@ -529,6 +540,12 @@ function apply_critical_migrations()
 
     $success = true;
 
+    $minExecutionTime = 300;
+    $maxExecutionTime = (int) ini_get('max_execution_time');
+    if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
+        ini_set('max_execution_time', $minExecutionTime);
+    }
+
     if ($criticalMigrations) {
         foreach ($criticalMigrations as $version) {
             if (!run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug', $version])) {
@@ -547,6 +564,12 @@ function apply_critical_migrations()
  */
 function apply_migrations()
 {
+    $minExecutionTime = 300;
+    $maxExecutionTime = (int) ini_get('max_execution_time');
+    if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
+        ini_set('max_execution_time', $minExecutionTime);
+    }
+
     return run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug']);
 }
 
@@ -828,7 +851,6 @@ function move_mautic_core(array $status)
 
     foreach ($fileOnlyDirectories as $dir) {
         if (copy_files($dir, $errorLog)) {
-
             // At this point, we can remove the config directory
             $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT.$dir);
 
@@ -1183,11 +1205,11 @@ function recursive_remove_directory($directory)
         return true;
     } elseif (!is_dir($directory)) {
         return false;
-        // ... if the path is not readable
+    // ... if the path is not readable
     } elseif (!is_readable($directory)) {
         // ... we return false and exit the function
         return false;
-        // ... else if the path is readable
+    // ... else if the path is readable
     } else {
         // we open the directory
         $handle = opendir($directory);
@@ -1203,7 +1225,7 @@ function recursive_remove_directory($directory)
                 if (is_dir($path)) {
                     // we call this function with the new path
                     recursive_remove_directory($path);
-                    // if the new path is a file
+                // if the new path is a file
                 } else {
                     // we remove the file
                     @unlink($path);

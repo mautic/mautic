@@ -21,11 +21,18 @@ use Mautic\LeadBundle\Entity\Lead as Contact;
 /**
  * Class Event.
  */
-class Event
+class Event implements ChannelInterface
 {
     const TYPE_DECISION  = 'decision';
     const TYPE_ACTION    = 'action';
     const TYPE_CONDITION = 'condition';
+
+    const PATH_INACTION = 'no';
+    const PATH_ACTION   = 'yes';
+
+    const TRIGGER_MODE_DATE      = 'date';
+    const TRIGGER_MODE_INTERVAL  = 'interval';
+    const TRIGGER_MODE_IMMEDIATE = 'immediate';
 
     /**
      * @var int
@@ -76,6 +83,26 @@ class Event
      * @var string
      */
     private $triggerIntervalUnit;
+
+    /**
+     * @var null|\DateTime
+     */
+    private $triggerHour;
+
+    /**
+     * @var null|\DateTime
+     */
+    private $triggerRestrictedStartHour;
+
+    /**
+     * @var null|\DateTime
+     */
+    private $triggerRestrictedStopHour;
+
+    /**
+     * @var null|array
+     */
+    private $triggerRestrictedDaysOfWeek = [];
 
     /**
      * @var string
@@ -145,7 +172,6 @@ class Event
      */
     public function __clone()
     {
-        $this->id        = null;
         $this->tempId    = null;
         $this->campaign  = null;
         $this->channel   = null;
@@ -195,6 +221,26 @@ class Event
         $builder->createField('triggerIntervalUnit', 'string')
             ->columnName('trigger_interval_unit')
             ->length(1)
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerHour', 'time')
+            ->columnName('trigger_hour')
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerRestrictedStartHour', 'time')
+            ->columnName('trigger_restricted_start_hour')
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerRestrictedStopHour', 'time')
+            ->columnName('trigger_restricted_stop_hour')
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerRestrictedDaysOfWeek', 'array')
+            ->columnName('trigger_restricted_dow')
             ->nullable()
             ->build();
 
@@ -274,6 +320,10 @@ class Event
                     'triggerDate',
                     'triggerInterval',
                     'triggerIntervalUnit',
+                    'triggerHour',
+                    'triggerRestrictedStartHour',
+                    'triggerRestrictedStopHour',
+                    'triggerRestrictedDaysOfWeek',
                     'triggerMode',
                     'decisionPath',
                     'channel',
@@ -306,6 +356,10 @@ class Event
                      'triggerDate',
                      'triggerInterval',
                      'triggerIntervalUnit',
+                     'triggerHour',
+                    'triggerRestrictedStartHour',
+                    'triggerRestrictedStopHour',
+                    'triggerRestrictedDaysOfWeek',
                      'triggerMode',
                      'children',
                      'parent',
@@ -326,6 +380,10 @@ class Event
                     'triggerDate',
                     'triggerInterval',
                     'triggerIntervalUnit',
+                    'triggerHour',
+                    'triggerRestrictedStartHour',
+                    'triggerRestrictedStopHour',
+                    'triggerRestrictedDaysOfWeek',
                     'triggerMode',
                     'decisionPath',
                     'order',
@@ -377,6 +435,11 @@ class Event
     public function getId()
     {
         return $this->id;
+    }
+
+    public function nullId()
+    {
+        $this->id = null;
     }
 
     /**
@@ -597,13 +660,55 @@ class Event
     }
 
     /**
-     * Get children.
-     *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection|Event[]
      */
     public function getChildren()
     {
         return $this->children;
+    }
+
+    /**
+     * @return ArrayCollection|Event[]
+     */
+    public function getPositiveChildren()
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_ACTION));
+
+        return $this->getChildren()->matching($criteria);
+    }
+
+    /**
+     * @return ArrayCollection|Event[]
+     */
+    public function getNegativeChildren()
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_INACTION));
+
+        return $this->getChildren()->matching($criteria);
+    }
+
+    /**
+     * @param $type
+     *
+     * @return ArrayCollection
+     */
+    public function getChildrenByType($type)
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('type', $type));
+
+        return $this->getChildren()->matching($criteria);
+    }
+
+    /**
+     * @param $type
+     *
+     * @return ArrayCollection
+     */
+    public function getChildrenByEventType($type)
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
+
+        return $this->getChildren()->matching($criteria);
     }
 
     /**
@@ -675,6 +780,33 @@ class Event
     }
 
     /**
+     * @return \DateTime
+     */
+    public function getTriggerHour()
+    {
+        return $this->triggerHour;
+    }
+
+    /**
+     * @param string $triggerHour
+     *
+     * @return Event
+     */
+    public function setTriggerHour($triggerHour)
+    {
+        if (empty($triggerHour)) {
+            $triggerHour = null;
+        } elseif (!$triggerHour instanceof \DateTime) {
+            $triggerHour = new \DateTime($triggerHour);
+        }
+
+        $this->isChanged('triggerHour', $triggerHour ? $triggerHour->format('H:i') : $triggerHour);
+        $this->triggerHour = $triggerHour;
+
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getTriggerIntervalUnit()
@@ -700,11 +832,16 @@ class Event
     }
 
     /**
-     * @param mixed $eventType
+     * @param $eventType
+     *
+     * @return $this
      */
     public function setEventType($eventType)
     {
+        $this->isChanged('eventType', $eventType);
         $this->eventType = $eventType;
+
+        return $this;
     }
 
     /**
@@ -720,6 +857,7 @@ class Event
      */
     public function setTriggerMode($triggerMode)
     {
+        $this->isChanged('triggerMode', $triggerMode);
         $this->triggerMode = $triggerMode;
     }
 
@@ -736,6 +874,7 @@ class Event
      */
     public function setDecisionPath($decisionPath)
     {
+        $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
     }
 
@@ -752,6 +891,7 @@ class Event
      */
     public function setTempId($tempId)
     {
+        $this->isChanged('tempId', $tempId);
         $this->tempId = $tempId;
     }
 
@@ -768,6 +908,7 @@ class Event
      */
     public function setChannel($channel)
     {
+        $this->isChanged('channel', $channel);
         $this->channel = $channel;
     }
 
@@ -784,6 +925,7 @@ class Event
      */
     public function setChannelId($channelId)
     {
+        $this->isChanged('channelId', $channelId);
         $this->channelId = (int) $channelId;
     }
 
@@ -830,6 +972,95 @@ class Event
     public function addContactLog($contactLog)
     {
         $this->contactLog[] = $contactLog;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of triggerRestrictedStartHour.
+     *
+     * @return null|\DateTime
+     */
+    public function getTriggerRestrictedStartHour()
+    {
+        return $this->triggerRestrictedStartHour;
+    }
+
+    /**
+     * Set the value of triggerRestrictedStartHour.
+     *
+     * @param null|\DateTime $triggerRestrictedStartHour
+     *
+     * @return self
+     */
+    public function setTriggerRestrictedStartHour($triggerRestrictedStartHour)
+    {
+        if (empty($triggerRestrictedStartHour)) {
+            $triggerRestrictedStartHour = null;
+        } elseif (!$triggerRestrictedStartHour instanceof \DateTime) {
+            $triggerRestrictedStartHour = new \DateTime($triggerRestrictedStartHour);
+        }
+
+        $this->isChanged('triggerRestrictedStartHour', $triggerRestrictedStartHour ? $triggerRestrictedStartHour->format('H:i') : $triggerRestrictedStartHour);
+
+        $this->triggerRestrictedStartHour = $triggerRestrictedStartHour;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of triggerRestrictedStopHour.
+     *
+     * @return null|\DateTime
+     */
+    public function getTriggerRestrictedStopHour()
+    {
+        return $this->triggerRestrictedStopHour;
+    }
+
+    /**
+     * Set the value of triggerRestrictedStopHour.
+     *
+     * @param null|\DateTime $triggerRestrictedStopHour
+     *
+     * @return self
+     */
+    public function setTriggerRestrictedStopHour($triggerRestrictedStopHour)
+    {
+        if (empty($triggerRestrictedStopHour)) {
+            $triggerRestrictedStopHour = null;
+        } elseif (!$triggerRestrictedStopHour instanceof \DateTime) {
+            $triggerRestrictedStopHour = new \DateTime($triggerRestrictedStopHour);
+        }
+
+        $this->isChanged('triggerRestrictedStopHour', $triggerRestrictedStopHour ? $triggerRestrictedStopHour->format('H:i') : $triggerRestrictedStopHour);
+
+        $this->triggerRestrictedStopHour = $triggerRestrictedStopHour;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of triggerRestrictedDaysOfWeek.
+     *
+     * @return array
+     */
+    public function getTriggerRestrictedDaysOfWeek()
+    {
+        return (array) $this->triggerRestrictedDaysOfWeek;
+    }
+
+    /**
+     * Set the value of triggerRestrictedDaysOfWeek.
+     *
+     * @param null|array $triggerRestrictedDaysOfWeek
+     *
+     * @return self
+     */
+    public function setTriggerRestrictedDaysOfWeek(array $triggerRestrictedDaysOfWeek = null)
+    {
+        $this->triggerRestrictedDaysOfWeek = $triggerRestrictedDaysOfWeek;
+        $this->isChanged('triggerRestrictedDaysOfWeek', $triggerRestrictedDaysOfWeek);
 
         return $this;
     }

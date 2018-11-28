@@ -17,6 +17,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\StageBundle\Entity\Stage;
@@ -200,6 +201,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $color;
 
     /**
+     * @var LeadManipulator
+     */
+    private $manipulator = null;
+
+    /**
      * Sets if the IP was just created by LeadModel::getCurrentLead().
      *
      * @var bool
@@ -219,7 +225,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var string
      */
-    private $preferredProfileImage;
+    private $preferredProfileImage = 'gravatar';
 
     /**
      * @var bool
@@ -292,7 +298,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
             ->addLifecycleEvent('checkAttributionDate', 'prePersist')
-            ->addIndex(['date_added'], 'lead_date_added');
+            ->addLifecycleEvent('checkDateAdded', 'prePersist')
+            ->addIndex(['date_added'], 'lead_date_added')
+            ->addIndex(['date_identified'], 'date_identified');
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()
@@ -903,6 +911,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function setActualPoints($points)
     {
         $this->actualPoints = (int) $points;
+        $this->pointChanges = [];
     }
 
     /**
@@ -1266,6 +1275,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @return bool
      */
+    public function wasAnonymous()
+    {
+        return $this->dateIdentified == null && $this->isAnonymous() === false;
+    }
+
+    /**
+     * @return bool
+     */
     protected function getFirstSocialIdentity()
     {
         if (isset($this->fields['social'])) {
@@ -1283,6 +1300,26 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param LeadManipulator|null $manipulator
+     *
+     * @return self
+     */
+    public function setManipulator(LeadManipulator $manipulator = null)
+    {
+        $this->manipulator = $manipulator;
+
+        return $this;
+    }
+
+    /**
+     * @return LeadManipulator|null
+     */
+    public function getManipulator()
+    {
+        return $this->manipulator;
     }
 
     /**
@@ -1542,7 +1579,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
         if (!empty($attribution) && empty($attributionDate)) {
             $this->addUpdatedField('attribution_date', (new \DateTime())->format('Y-m-d'));
-        } elseif (empty($attribution)) {
+        } elseif (empty($attribution) && !empty($attributionDate)) {
             $this->addUpdatedField('attribution_date', null);
         }
     }
@@ -1552,9 +1589,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function checkDateIdentified()
     {
-        if ($this->dateIdentified == null && $this->isAnonymous() === false) {
+        if ($this->wasAnonymous()) {
             $this->dateIdentified            = new \DateTime();
             $this->changes['dateIdentified'] = ['', $this->dateIdentified];
+        }
+    }
+
+    /**
+     * Set date added if not already set.
+     */
+    public function checkDateAdded()
+    {
+        if (null === $this->getDateAdded()) {
+            $this->setDateAdded(new \DateTime());
         }
     }
 
@@ -1702,6 +1749,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->mobile = $mobile;
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLeadPhoneNumber()
+    {
+        return $this->getMobile() ?: $this->getPhone();
     }
 
     /**

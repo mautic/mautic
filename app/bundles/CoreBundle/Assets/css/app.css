@@ -4301,7 +4301,7 @@ lesshat-selector { -lh-property: 0 ;
   top: 0;
   bottom: 0;
   right: 0;
-  width: 525px;
+  width: 30%;
   height: 100%;
   padding: 15px;
   background-color: #d5d4d4;
@@ -4311,8 +4311,11 @@ lesshat-selector { -lh-property: 0 ;
   position: fixed;
   left: 0;
   top: 0;
-  right: 525px;
+  width: 70%;
   height: 100%;
+}
+.builder-panel #preview .panel-body {
+  padding: 7px 0;
 }
 .code-mode .builder-panel {
   width: 50%;
@@ -4399,6 +4402,7 @@ li.CodeMirror-hint-active {
   }
   .builder .builder-content {
     right: 0;
+    width: 100%;
   }
   .builder .builder-panel-top {
     position: relative;

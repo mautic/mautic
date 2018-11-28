@@ -76,9 +76,7 @@ class CategoryController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         $viewParams = [
             'page'   => $page,
@@ -255,7 +253,6 @@ class CategoryController extends FormController
                 ],
             ]);
         } elseif (!empty($valid)) {
-
             //return edit view to prevent duplicates
             return $this->editAction($bundle, $entity->getId(), true);
         } else {

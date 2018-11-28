@@ -121,6 +121,11 @@ class Mailbox
     const CRITERIA_TO = 'TO';
 
     /**
+     *  Get messages since a specific UID. Eg. UID 2:* will return all messages with UID 2 and above (IMAP includes the given UID).
+     */
+    const CRITERIA_UID = 'UID';
+
+    /**
      *  Match mails that have not been answered.
      */
     const CRITERIA_UNANSWERED = 'UNANSWERED';
@@ -551,9 +556,19 @@ class Mailbox
      */
     public function searchMailbox($criteria = self::CRITERIA_ALL)
     {
-        $mailsIds = imap_search($this->getImapStream(), $criteria, SE_UID);
+        if (preg_match('/'.self::CRITERIA_UID.' ((\d+):(\d+|\*))/', $criteria, $matches)) {
+            // PHP imap_search does not support UID n:* so use imap_fetch_overview instead
+            $messages = imap_fetch_overview($this->getImapStream(), $matches[1], FT_UID);
 
-        return $mailsIds ? $mailsIds : [];
+            $mailIds = [];
+            foreach ($messages as $message) {
+                $mailIds[] = $message->uid;
+            }
+        } else {
+            $mailIds = imap_search($this->getImapStream(), $criteria, SE_UID);
+        }
+
+        return $mailIds ? $mailIds : [];
     }
 
     /**
@@ -845,7 +860,7 @@ class Mailbox
      * @param      $mailId
      * @param bool $markAsSeen
      *
-     * @return Mail
+     * @return Message
      */
     public function getMail($mailId, $markAsSeen = true)
     {
@@ -887,6 +902,18 @@ class Mailbox
                     $this->serverEncoding
                 ) : null;
             }
+        }
+
+        if (isset($headObject->in_reply_to)) {
+            $mail->inReplyTo = $headObject->in_reply_to;
+        }
+
+        if (isset($headObject->return_path)) {
+            $mail->returnPath = $headObject->return_path;
+        }
+
+        if (isset($headObject->references)) {
+            $mail->references = explode("\n", $headObject->references);
         }
 
         $mailStructure = imap_fetchstructure($this->getImapStream(), $mailId, FT_UID);

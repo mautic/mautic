@@ -2,7 +2,6 @@
     /**
      * @author Tomasz Kapusta
      * @copyright 2010
-
      **/
 
     /**
@@ -38,7 +37,7 @@
          * Returns image with every pixel changed by specififed function.
          *
          * @param WideImage_Image $image
-         * @param str             $function
+         * @param string          $function
          * @param int             $value
          *
          * @return WideImage_Image
@@ -63,6 +62,7 @@
 
             return $image;
         }
+
         /**
          * Adds color noise by altering given R,G,B values using specififed amount.
          *
@@ -77,6 +77,7 @@
             $g = self::byte($g + mt_rand(0, $amount) - ($amount >> 1));
             $b = self::byte($b + mt_rand(0, $amount) - ($amount >> 1));
         }
+
         /**
          * Adds mono noise by altering given R,G,B values using specififed amount.
          *
@@ -93,6 +94,7 @@
             $g = self::byte($g + $rand);
             $b = self::byte($b + $rand);
         }
+
         /**
          * Adds salt&pepper noise by altering given R,G,B values using specififed amount.
          *
@@ -115,6 +117,7 @@
                             break;
             }
         }
+
         /**
          * Returns value within (0,255).
          *
