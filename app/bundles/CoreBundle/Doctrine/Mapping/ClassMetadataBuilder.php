@@ -149,7 +149,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      */
     public function addBigIntIdField($fieldName = 'id', $columnName = 'id', $isPrimary = true, $isNullable = false)
     {
-        $this->cm->mapField(
+        $cm = $this->getClassMetadata();
+        $cm->mapField(
             [
                 'fieldName'  => $fieldName,
                 'columnName' => $columnName,
@@ -163,7 +164,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
         );
 
         if ($isPrimary) {
-            $this->cm->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_AUTO);
+            $cm->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_AUTO);
         }
 
         return $this;
