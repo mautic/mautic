@@ -259,11 +259,18 @@ class RealTimeExecutioner
 
         // Check if parent taken path is the path of this event, otherwise exit
         $parentEvent = $event->getParent();
-        if ($parentEvent && $event->getDecisionPath() !== null) {
-            $rotation  = $this->leadRepository->getContactRotations([$this->contact->getId()], $event->getCampaign()->getId());
-            $pathTaken = $parentEvent->getPathTaken($this->contact, $rotation);
+        if ($parentEvent !== null && $event->getDecisionPath() !== null) {
+            $rotation    = $this->leadRepository->getContactRotations([$this->contact->getId()], $event->getCampaign()->getId());
+            $log = $parentEvent->getLogByContactAndRotation($this->contact, $rotation);
 
-            if ($pathTaken === null) {
+            if ($log === null) {
+                throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");
+            }
+
+            $pathTaken   = (int)$log->getNonActionPathTaken();
+            $isScheduled = (int)$log->getIsScheduled();
+
+            if ($isScheduled === 1) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");
             } elseif ($pathTaken === 1 && !$parentEvent->getNegativeChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take negative path, event {$event->getId()} is on positive path.");

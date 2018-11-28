@@ -636,13 +636,13 @@ class Event implements ChannelInterface
     }
 
     /**
-     * Get path taken from log.
+     * Get log for a contact and a rotation.
      *
      * @param Contact $contact
      * @param $rotation
-     * @return int|null
+     * @return LeadEventLog|null
      */
-    public function getPathTaken(Contact $contact, $rotation)
+    public function getLogByContactAndRotation(Contact $contact, $rotation)
     {
         $criteria = Criteria::create()
             ->where(Criteria::expr()->eq('lead', $contact))
@@ -654,7 +654,7 @@ class Event implements ChannelInterface
         $log = $this->getLog()->matching($criteria);
 
         if (count($log)) {
-            return (int)$log->first()->getNonActionPathTaken();
+            return $log->first();
         }
 
         return null;
