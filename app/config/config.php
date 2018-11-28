@@ -204,13 +204,13 @@ $container->setParameter('mautic.famework.csrf_protection', true);
 
 //Doctrine Configuration
 $dbalSettings = [
-    'driver'   => '%mautic.db_driver%',
-    'host'     => '%mautic.db_host%',
-    'port'     => '%mautic.db_port%',
-    'dbname'   => '%mautic.db_name%',
-    'user'     => '%mautic.db_user%',
-    'password' => '%mautic.db_password%',
-    'charset'  => 'UTF8',
+    'driver'                => '%mautic.db_driver%',
+    'host'                  => '%mautic.db_host%',
+    'port'                  => '%mautic.db_port%',
+    'dbname'                => '%mautic.db_name%',
+    'user'                  => '%mautic.db_user%',
+    'password'              => '%mautic.db_password%',
+    'charset'               => 'UTF8',
     'default_table_options' => [
         'charset'    => 'utf8',
         'collate'    => 'utf8_unicode_ci',
