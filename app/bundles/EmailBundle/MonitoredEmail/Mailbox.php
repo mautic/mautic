@@ -556,9 +556,19 @@ class Mailbox
      */
     public function searchMailbox($criteria = self::CRITERIA_ALL)
     {
-        $mailsIds = imap_search($this->getImapStream(), $criteria, SE_UID);
+        if (preg_match('/'.self::CRITERIA_UID.' ((\d+):(\d+|\*))/', $criteria, $matches)) {
+            // PHP imap_search does not support UID n:* so use imap_fetch_overview instead
+            $messages = imap_fetch_overview($this->getImapStream(), $matches[1], FT_UID);
 
-        return $mailsIds ? $mailsIds : [];
+            $mailIds = [];
+            foreach ($messages as $message) {
+                $mailIds[] = $message->uid;
+            }
+        } else {
+            $mailIds = imap_search($this->getImapStream(), $criteria, SE_UID);
+        }
+
+        return $mailIds ? $mailIds : [];
     }
 
     /**

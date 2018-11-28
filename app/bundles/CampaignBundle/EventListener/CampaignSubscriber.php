@@ -40,8 +40,8 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+        $this->ipLookupHelper   = $ipLookupHelper;
+        $this->auditLogModel    = $auditLogModel;
     }
 
     /**
@@ -50,8 +50,8 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_POST_SAVE   => ['onCampaignPostSave', 0],
-            CampaignEvents::CAMPAIGN_POST_DELETE => ['onCampaignDelete', 0],
+            CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
+            CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
         ];
     }
 

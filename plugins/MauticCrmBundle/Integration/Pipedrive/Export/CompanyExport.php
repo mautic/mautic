@@ -10,6 +10,11 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class CompanyExport extends AbstractPipedrive
 {
+    /**
+     * @param Company $company
+     *
+     * @return bool
+     */
     public function pushCompany(Company $company)
     {
         if (!$this->getIntegration()->isCompanySupportEnabled()) {
@@ -26,6 +31,12 @@ class CompanyExport extends AbstractPipedrive
         return $this->create($company, $mappedData);
     }
 
+    /**
+     * @param Company $company
+     * @param array   $mappedData
+     *
+     * @return bool
+     */
     public function create(Company $company, array $mappedData = [])
     {
         if (!$this->getIntegration()->isCompanySupportEnabled()) {
@@ -42,6 +53,9 @@ class CompanyExport extends AbstractPipedrive
 
         try {
             $createdData       = $this->getIntegration()->getApiHelper()->createCompany($mappedData);
+            if (empty($createdData['id'])) {
+                return false;
+            }
             $integrationEntity = $this->createIntegrationCompanyEntity(new \DateTime(), $createdData['id'], $companyId);
 
             $this->em->persist($integrationEntity);
@@ -55,6 +69,12 @@ class CompanyExport extends AbstractPipedrive
         return false;
     }
 
+    /**
+     * @param IntegrationEntity $integrationEntity
+     * @param array             $mappedData
+     *
+     * @return bool
+     */
     public function update(IntegrationEntity $integrationEntity, array $mappedData = [])
     {
         if (!$this->getIntegration()->isCompanySupportEnabled()) {
@@ -75,6 +95,11 @@ class CompanyExport extends AbstractPipedrive
         return false;
     }
 
+    /**
+     * @param Company $company
+     *
+     * @return bool
+     */
     public function delete(Company $company)
     {
         $integrationEntity = $this->getCompanyIntegrationEntity(['internalEntityId' => $company->getId()]);
@@ -105,18 +130,33 @@ class CompanyExport extends AbstractPipedrive
         return false;
     }
 
+    /**
+     * @param Company $company
+     *
+     * @return array
+     */
     private function getMappedCompanyData(Company $company)
     {
         $mappedData    = [];
+
+        if (empty($this->getIntegration()->getIntegrationSettings()->getFeatureSettings()['companyFields'])) {
+            return [];
+        }
+
         $companyFields = $this->getIntegration()->getIntegrationSettings()->getFeatureSettings()['companyFields'];
 
         $accessor = PropertyAccess::createPropertyAccessor();
 
         foreach ($companyFields as $externalField => $internalField) {
-            $fieldName                  = substr($internalField, strlen($company::FIELD_ALIAS));
+            if (strpos($internalField, $company::FIELD_ALIAS, 0) !== false && method_exists($company, 'get'.ucfirst(substr($internalField, strlen($company::FIELD_ALIAS))))) {
+                //for core company field
+                $fieldName = substr($internalField, strlen($company::FIELD_ALIAS));
+            } else {
+                //for custom company field
+                $fieldName = $internalField;
+            }
             $mappedData[$externalField] = $accessor->getValue($company, $fieldName);
         }
-
         $companyIntegrationOwnerId = $this->getCompanyIntegrationOwnerId($company);
         if ($companyIntegrationOwnerId) {
             $mappedData['owner_id'] = $companyIntegrationOwnerId;
@@ -125,6 +165,9 @@ class CompanyExport extends AbstractPipedrive
         return $mappedData;
     }
 
+    /**
+     * @param Company $company
+     */
     private function getCompanyIntegrationOwnerId(Company $company)
     {
         $mauticOwner = $company->getOwner();

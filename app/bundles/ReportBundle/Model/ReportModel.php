@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -542,7 +543,7 @@ class ReportModel extends FormModel
             'dynamicFilters' => (isset($options['dynamicFilters'])) ? $options['dynamicFilters'] : [],
         ];
 
-        /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
+        /** @var QueryBuilder $query */
         $query                 = $reportGenerator->getQuery($dataOptions);
         $options['translator'] = $this->translator;
 
@@ -592,6 +593,13 @@ class ReportModel extends FormModel
             }
         }
 
+        $query->add('orderBy', $order);
+
+        // Allow plugin to manipulate the query
+        $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
+        $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
+        $query = $event->getQuery();
+
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
@@ -605,19 +613,17 @@ class ReportModel extends FormModel
                     $start = 0;
                 }
 
-                $totalResults = $query->execute()->rowCount();
+                if (empty($options['totalResults'])) {
+                    $options['totalResults'] = $totalResults = $this->getTotalCount($query, $debugData);
+                } else {
+                    $totalResults = $options['totalResults'];
+                }
+
                 if ($limit > 0) {
                     $query->setFirstResult($start)
                         ->setMaxResults($limit);
                 }
             }
-
-            $query->add('orderBy', $order);
-
-            // Allow plugin to manipulate the query
-            $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
-            $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
-            $query = $event->getQuery();
 
             $queryTime = microtime(true);
             $data      = $query->execute()->fetchAll();
@@ -666,6 +672,7 @@ class ReportModel extends FormModel
             'contentTemplate' => $contentTemplate,
             'columns'         => $tableDetails['columns'],
             'limit'           => ($paginate) ? $limit : 0,
+            'page'            => ($paginate) ? $reportPage : 1,
             'dateFrom'        => $dataOptions['dateFrom'],
             'dateTo'          => $dataOptions['dateTo'],
             'debug'           => $debugData,
@@ -709,5 +716,26 @@ class ReportModel extends FormModel
         }
 
         return $options;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param array        $debugData
+     *
+     * @return int
+     */
+    private function getTotalCount(QueryBuilder $qb, array &$debugData)
+    {
+        $countQb = clone $qb;
+        $countQb->resetQueryParts();
+
+        $countQb->select('count(*)')
+            ->from('('.$qb->getSQL().')', 'c');
+
+        if (MAUTIC_ENV == 'dev') {
+            $debugData['count_query'] = $countQb->getSQL();
+        }
+
+        return (int) $countQb->execute()->fetchColumn();
     }
 }

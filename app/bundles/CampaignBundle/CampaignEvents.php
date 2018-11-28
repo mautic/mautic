@@ -170,6 +170,24 @@ final class CampaignEvents
     const ON_EVENT_CONDITION_EVALUATION = 'mautic.campaign_on_event_decision_evaluation';
 
     /**
+     * The mautic.campaign_on_event_jump_to_event event is dispatched when a campaign jump to event is triggered.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent instance.
+     *
+     * @var string
+     */
+    const ON_EVENT_JUMP_TO_EVENT = 'mautic.campaign_on_event_jump_to_event';
+
+    /**
+     * The mautic.lead.on_campaign_action_change_membership event is dispatched when the campaign action to change a contact's membership is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP = 'mautic.lead.on_campaign_action_change_membership';
+
+    /**
      * @deprecated 2.13.0; to be removed in 3.0. Listen to ON_EVENT_EXECUTED and ON_EVENT_FAILED
      *
      * The mautic.campaign_on_event_execution event is dispatched when a campaign event is executed.
@@ -191,13 +209,4 @@ final class CampaignEvents
      * @var string
      */
     const ON_EVENT_DECISION_TRIGGER = 'mautic.campaign_on_event_decision_trigger';
-
-    /**
-     * The mautic.lead.on_campaign_action_change_membership event is dispatched when the campaign action to change a contact's membership is executed.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
-     *
-     * @var string
-     */
-    const ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP = 'mautic.lead.on_campaign_action_change_membership';
 }

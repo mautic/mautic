@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\FormBundle\Test;
+namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\SubmissionEvent;
@@ -26,6 +26,7 @@ class SubmissionModelTest extends FormTestAbstract
             'var_name_1' => 'value 1',
             'var_name_2' => 'value 2',
             'email'      => 'test@email.com',
+            'file'       => 'test.jpg',
             'submit'     => '',
             'formId'     => 1,
             'return'     => '',
@@ -41,6 +42,17 @@ class SubmissionModelTest extends FormTestAbstract
 
         $submissionModel = $this->getSubmissionModel();
         $this->assertFalse($submissionModel->saveSubmission($post, $server, $form, $request));
-        $this->assertInstanceOf(SubmissionEvent::class, $submissionModel->saveSubmission($post, $server, $form, $request, true)['submission']);
+        /** @var SubmissionEvent $submissionEvent */
+        $submissionEvent = $submissionModel->saveSubmission($post, $server, $form, $request, true)['submission'];
+        $this->assertInstanceOf(SubmissionEvent::class, $submissionEvent);
+        $alias              = 'email';
+        $token              = '{formfield='.$alias.'}';
+        $tokens[$token]     = $formData[$alias];
+        $this->assertEquals($tokens[$token], $submissionEvent->getTokens()[$token]);
+
+        $alias              = $this->getTestFormFields()['file']['alias'];
+        $token              = '{formfield='.$alias.'}';
+        $tokens[$token]     = $formData[$alias];
+        $this->assertNotEquals($tokens[$token], $submissionEvent->getTokens()[$token]);
     }
 }

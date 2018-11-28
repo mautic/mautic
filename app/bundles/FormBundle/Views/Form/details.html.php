@@ -100,6 +100,14 @@ $showActions = count($activeFormActions);
                                 'MauticCoreBundle:Helper:details.html.php',
                                 ['entity' => $activeForm]
                             ); ?>
+                            <tr>
+                                <td width="20%">
+                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.form.stats.submission_counts'); ?></span>
+                                </td>
+                                <td>
+                                    <?php echo $submissionCounts['unique'].' / '.$submissionCounts['total'] ?>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>

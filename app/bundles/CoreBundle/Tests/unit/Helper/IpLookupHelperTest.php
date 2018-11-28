@@ -85,11 +85,36 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @testdox Check that internal IP is returned if track_private_ip_ranges is set to true
+     *
+     * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
+     */
+    public function testInternalNetworkIpIsReturnedIfSetToTrack()
+    {
+        $request                  = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
+        $mockCoreParametersHelper = $this
+            ->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockCoreParametersHelper->expects($this->any())
+            ->method('getParameter')
+            ->willReturnCallback(
+                function ($param, $defaultValue) {
+                    return $param === 'mautic.track_private_ip_ranges' ? true : $defaultValue;
+                }
+            );
+        $ip      = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
+
+        $this->assertEquals('192.168.0.1', $ip->getIpAddress());
+    }
+
+    /**
      * @param null $request
+     * @param null $mockCoreParametersHelper
      *
      * @return IpLookupHelper
      */
-    private function getIpHelper($request = null)
+    private function getIpHelper($request = null, $mockCoreParametersHelper = null)
     {
         $requestStack = new RequestStack();
 
@@ -114,13 +139,15 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($mockRepository));
 
-        $mockCoreParametersHelper = $this
-            ->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockCoreParametersHelper->expects($this->any())
-            ->method('getParameter')
-            ->willReturn(null);
+        if (is_null($mockCoreParametersHelper)) {
+            $mockCoreParametersHelper = $this
+                ->getMockBuilder(CoreParametersHelper::class)
+                ->disableOriginalConstructor()
+                ->getMock();
+            $mockCoreParametersHelper->expects($this->any())
+                ->method('getParameter')
+                ->willReturn(null);
+        }
 
         return new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper);
     }
