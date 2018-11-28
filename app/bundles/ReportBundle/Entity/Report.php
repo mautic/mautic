@@ -45,7 +45,7 @@ class Report extends FormEntity implements SchedulerInterface
     private $description;
 
     /**
-     * @var string
+     * @var bool
      */
     private $system = false;
 
