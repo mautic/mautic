@@ -45,7 +45,7 @@ class Report extends FormEntity implements SchedulerInterface
     private $description;
 
     /**
-     * @var bool
+     * @var string
      */
     private $system = false;
 
@@ -133,7 +133,8 @@ class Report extends FormEntity implements SchedulerInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('system', Type::BOOLEAN);
+        #$builder->addField('system', Type::BOOLEAN, array("columnName"=>"`system`"));
+        $builder->addField('system', Type::BOOLEAN, array("columnName"=>""));
 
         $builder->addField('source', Type::STRING);
 
