@@ -166,7 +166,7 @@ class Hit
         // created in fixtures instead
         //->addIndex(['url'], 'page_hit_url');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createField('dateHit', 'datetime')
             ->columnName('date_hit')

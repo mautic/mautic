@@ -101,7 +101,7 @@ class LeadDevice
             ->addIndex(['device_model'], 'device_model_search')
             ->addIndex(['device_fingerprint'], 'device_fingerprint_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->addLead(false, 'CASCADE', false);
 

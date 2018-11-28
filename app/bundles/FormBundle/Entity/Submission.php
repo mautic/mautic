@@ -77,7 +77,7 @@ class Submission
             ->addIndex(['tracking_id'], 'form_submission_tracking_search')
             ->addIndex(['date_submitted'], 'form_date_submitted');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('submissions')

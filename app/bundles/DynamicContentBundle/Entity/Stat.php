@@ -80,7 +80,7 @@ class Stat
             ->addIndex(['dynamic_content_id', 'lead_id'], 'stat_dynamic_content_search')
             ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('dynamicContent', 'DynamicContent')
             ->inversedBy('stats')
