@@ -18,10 +18,13 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
+use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 {
@@ -66,10 +69,6 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
     public function testNoContactsResultInEmptyResults()
     {
-        $this->kickoffContactFinder->expects($this->once())
-            ->method('getContactCount')
-            ->willReturn(0);
-
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
         $campaign->expects($this->once())
@@ -78,7 +77,7 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
-        $counter = $this->getExecutioner()->execute($campaign, $limiter);
+        $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -109,22 +108,58 @@ class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
-        $this->scheduler->expects($this->exactly(4))
+        $this->scheduler->expects($this->at(0))
             ->method('getExecutionDateTime')
             ->willReturn(new \DateTime());
 
-        // Schedule one event and execute the other
-        $this->scheduler->expects($this->exactly(4))
-            ->method('shouldSchedule')
-            ->willReturnOnConsecutiveCalls(true, true, false, false);
+        $this->scheduler->expects($this->at(1))
+            ->method('validateAndScheduleEventForContacts')
+            ->willReturn(null);
 
-        $this->scheduler->expects($this->exactly(2))
-            ->method('schedule');
+        $this->scheduler->expects($this->at(2))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
 
-        $this->executioner->expects($this->exactly(2))
-            ->method('executeForContacts');
+        $this->scheduler->expects($this->at(3))
+            ->method('validateAndScheduleEventForContacts')
+            ->willReturn(null);
 
-        $counter = $this->getExecutioner()->execute($campaign, $limiter);
+        $this->scheduler->expects($this->at(4))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
+
+        $this->scheduler->expects($this->at(5))
+            ->method('validateAndScheduleEventForContacts')
+            ->willReturnCallback(function () {
+                throw new NotSchedulableException();
+            });
+
+        $this->scheduler->expects($this->at(6))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
+
+        $this->scheduler->expects($this->at(7))
+            ->method('validateAndScheduleEventForContacts')
+            ->willReturnCallback(function () {
+                throw new NotSchedulableException();
+            });
+
+        $this->executioner->expects($this->exactly(1))
+            ->method('executeEventsForContacts')
+            ->withConsecutive(
+                [
+                    $this->countOf(2),
+                    $this->isInstanceOf(ArrayCollection::class),
+                    $this->isInstanceOf(Counter::class),
+                ],
+                [
+                    $this->countOf(1),
+                        $this->isInstanceOf(ArrayCollection::class),
+                        $this->isInstanceOf(Counter::class),
+                ]
+            );
+
+        $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
         $this->assertEquals(4, $counter->getTotalEvaluated());
         $this->assertEquals(2, $counter->getTotalScheduled());

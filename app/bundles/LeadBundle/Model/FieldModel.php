@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
@@ -127,6 +128,12 @@ class FieldModel extends FormModel
         ],
         'preferred_locale' => [
             'type'     => 'locale',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+        ],
+        'timezone' => [
+            'type'     => 'timezone',
             'fixed'    => true,
             'listable' => true,
             'object'   => 'lead',
@@ -297,15 +304,25 @@ class FieldModel extends FormModel
     protected $uniqueIdentifierFields = [];
 
     /**
+     * @var ListModel
+     */
+    private $leadListModel;
+
+    /**
      * FieldModel constructor.
      *
      * @param IndexSchemaHelper  $indexSchemaHelper
      * @param ColumnSchemaHelper $columnSchemaHelper
+     * @param ListModel          $leadListModel
      */
-    public function __construct(IndexSchemaHelper $indexSchemaHelper, ColumnSchemaHelper $columnSchemaHelper)
-    {
+    public function __construct(
+        IndexSchemaHelper $indexSchemaHelper,
+        ColumnSchemaHelper $columnSchemaHelper,
+        ListModel $leadListModel
+    ) {
         $this->indexSchemaHelper  = $indexSchemaHelper;
         $this->columnSchemaHelper = $columnSchemaHelper;
+        $this->leadListModel      = $leadListModel;
     }
 
     /**
@@ -568,6 +585,32 @@ class FieldModel extends FormModel
     }
 
     /**
+     * Is field used in segment filter?
+     *
+     * @param LeadField $field
+     *
+     * @return bool
+     */
+    public function isUsedField(LeadField $field)
+    {
+        return $this->leadListModel->isFieldUsed($field);
+    }
+
+    /**
+     * Filter used field ids.
+     *
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function filterUsedFieldIds(array $ids)
+    {
+        return array_filter($ids, function ($id) {
+            return $this->isUsedField($this->getEntity($id)) === false;
+        });
+    }
+
+    /**
      * Reorder fields based on passed entity position.
      *
      * @param $entity
@@ -766,6 +809,7 @@ class FieldModel extends FormModel
 
         $leadFields = [];
 
+        /** @var LeadField $f * */
         foreach ($fields as $f) {
             if ($byGroup) {
                 $fieldName                              = $this->translator->trans('mautic.lead.field.group.'.$f->getGroup());
@@ -988,5 +1032,13 @@ class FieldModel extends FormModel
             'type'    => $schemaType,
             'options' => ['notnull' => false],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
+    {
+        return $this->getRepository()->findOneByAlias($alias);
     }
 }

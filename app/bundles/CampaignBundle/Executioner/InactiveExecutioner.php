@@ -147,7 +147,6 @@ class InactiveExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 
@@ -185,7 +184,6 @@ class InactiveExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 
@@ -221,22 +219,24 @@ class InactiveExecutioner implements ExecutionerInterface
         if (!$totalDecisions) {
             throw new NoEventsFoundException();
         }
+        $totalContacts = 0;
+        if (!($this->output instanceof NullOutput)) {
+            $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
 
-        $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
+            $this->output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.decision_count_analyzed',
+                    [
+                        '%decisions%' => $totalDecisions,
+                        '%leads%'     => $totalContacts,
+                        '%batch%'     => $this->limiter->getBatchLimit(),
+                    ]
+                )
+            );
 
-        $this->output->writeln(
-            $this->translator->trans(
-                'mautic.campaign.trigger.decision_count_analyzed',
-                [
-                    '%decisions%' => $totalDecisions,
-                    '%leads%'     => $totalContacts,
-                    '%batch%'     => $this->limiter->getBatchLimit(),
-                ]
-            )
-        );
-
-        if (!$totalContacts) {
-            throw new NoContactsFoundException();
+            if (!$totalContacts) {
+                throw new NoContactsFoundException();
+            }
         }
 
         // Approximate total count because the query to fetch contacts will filter out those that have not arrived to this point in the campaign yet
@@ -248,7 +248,6 @@ class InactiveExecutioner implements ExecutionerInterface
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws NoContactsFoundException
      * @throws Scheduler\Exception\NotSchedulableException
      */
     private function executeEvents()
@@ -267,7 +266,7 @@ class InactiveExecutioner implements ExecutionerInterface
                 $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
 
                 // Loop over all contacts till we've processed all those applicable for this decision
-                while ($contacts->count()) {
+                while ($contacts && $contacts->count()) {
                     // Get the max contact ID before any are removed
                     $batchMinContactId = max($contacts->getKeys()) + 1;
 
@@ -284,10 +283,11 @@ class InactiveExecutioner implements ExecutionerInterface
                     );
 
                     if ($contacts->count()) {
-                        // Execute or schedule the events attached to the inactive side of the decision
-                        $this->executeLogsForInactiveEvents($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
                         // Record decision for these contacts
                         $this->executioner->recordLogsAsExecutedForEvent($decisionEvent, $contacts, true);
+
+                        // Execute or schedule the events attached to the inactive side of the decision
+                        $this->executeLogsForInactiveEvents($inactiveEvents, $contacts, $this->counter, $earliestLastActiveDateTime);
                     }
 
                     // Clear contacts from memory
@@ -315,7 +315,7 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param ArrayCollection $children
+     * @param ArrayCollection $events
      * @param ArrayCollection $contacts
      * @param Counter         $childrenCounter
      * @param \DateTime       $earliestLastActiveDateTime
@@ -327,6 +327,7 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private function executeLogsForInactiveEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter, \DateTime $earliestLastActiveDateTime)
     {
+        $events              = clone $events;
         $eventExecutionDates = $this->scheduler->getSortedExecutionDates($events, $earliestLastActiveDateTime);
 
         /** @var \DateTime $earliestExecutionDate */
@@ -334,10 +335,12 @@ class InactiveExecutioner implements ExecutionerInterface
 
         $executionDate = $this->executioner->getExecutionDate();
 
-        foreach ($events as $event) {
+        foreach ($events as $key => $event) {
             // Ignore decisions
             if (Event::TYPE_DECISION == $event->getEventType()) {
                 $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$event->getId().' as a decision');
+
+                $events->remove($key);
                 continue;
             }
 
@@ -355,10 +358,14 @@ class InactiveExecutioner implements ExecutionerInterface
             if ($this->scheduler->shouldSchedule($eventExecutionDate, $executionDate)) {
                 $childrenCounter->advanceTotalScheduled($contacts->count());
                 $this->scheduler->schedule($event, $eventExecutionDate, $contacts, true);
+
+                $events->remove($key);
                 continue;
             }
+        }
 
-            $this->executioner->executeForContacts($event, $contacts, $childrenCounter, true);
+        if ($events->count()) {
+            $this->executioner->executeEventsForContacts($events, $contacts, $childrenCounter, true);
         }
     }
 }

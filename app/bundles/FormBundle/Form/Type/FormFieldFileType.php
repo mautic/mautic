@@ -91,5 +91,13 @@ class FormFieldFileType extends AbstractType
                 'constraints' => [new LessThanOrEqual(['value' => $maxUploadSize])],
             ]
         );
+
+        $builder->add(
+            'public',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.form.field.file.public',
+            ]
+        );
     }
 }

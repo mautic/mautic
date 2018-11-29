@@ -21,6 +21,7 @@ use Mautic\CampaignBundle\Executioner\Exception\CampaignNotExecutableException;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -193,8 +194,10 @@ class RealTimeExecutioner
      */
     private function executeAssociatedEvents(ArrayCollection $children, \DateTime $now)
     {
+        $children = clone $children;
+
         /** @var Event $child */
-        foreach ($children as $child) {
+        foreach ($children as $key => $child) {
             $executionDate = $this->scheduler->getExecutionDateTime($child, $now);
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$child->getId().
@@ -203,10 +206,13 @@ class RealTimeExecutioner
 
             if ($this->scheduler->shouldSchedule($executionDate, $now)) {
                 $this->scheduler->scheduleForContact($child, $executionDate, $this->contact);
-                continue;
-            }
 
-            $this->executioner->executeForContact($child, $this->contact, $this->responses);
+                $children->remove($key);
+            }
+        }
+
+        if ($children->count()) {
+            $this->executioner->executeEventsForContact($children, $this->contact, $this->responses);
         }
     }
 
@@ -233,8 +239,8 @@ class RealTimeExecutioner
             throw new DecisionNotApplicableException("Event {$event->getId()} is not a decision.");
         }
 
-        // If channels do not match up, there's no need to go further
-        if ($channel && $event->getChannel() && $channel !== $event->getChannel()) {
+        // If channels do not match up at all (not even fuzzy logic i.e. page vs page.redirect), there's no need to go further
+        if ($channel && $event->getChannel() && $channel && strpos($channel, $event->getChannel()) === false) {
             throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");
         }
 
@@ -271,6 +277,18 @@ class RealTimeExecutioner
             throw new CampaignNotExecutableException('Contact does not have any applicable '.$type.' associations.');
         }
 
-        $this->logger->debug('CAMPAIGN: Found '.count($this->events).' events to analyize for contact ID '.$this->contact->getId());
+        // 2.14 BC break workaround - pre 2.14 had a bug that recorded channelId for decisions as 1 regardless of actually ID
+        // if channelIdField was an array and only one item was selected. That caused the channel ID check in evaluateDecisionForContact
+        // to fail resulting in the decision never being evaluated. Therefore we are going to self heal these decisions.
+        /** @var Event $event */
+        foreach ($this->events as $event) {
+            if (1 === $event->getChannelId()) {
+                ChannelExtractor::setChannel($event, $event, $this->collector->getEventConfig($event));
+
+                $this->eventRepository->saveEntity($event);
+            }
+        }
+
+        $this->logger->debug('CAMPAIGN: Found '.count($this->events).' events to analyze for contact ID '.$this->contact->getId());
     }
 }

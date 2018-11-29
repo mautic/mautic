@@ -265,6 +265,10 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.imap';
         }
 
+        if (substr($this->site_url, 0, 5) !== 'https') {
+            $messages[] = 'mautic.install.ssl.certificate';
+        }
+
         if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
             if (!function_exists('posix_isatty')) {
                 $messages[] = 'mautic.install.function.posix';
@@ -362,6 +366,8 @@ class CheckStep implements StepInterface
         }
 
         $last = strtolower($val[strlen($val) - 1]);
+        $val  = (int) $val;
+
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':

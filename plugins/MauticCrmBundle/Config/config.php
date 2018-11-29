@@ -76,6 +76,7 @@ return [
             'mautic.integration.sugarcrm' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration::class,
                 'arguments' => [
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.integration.vtiger' => [
@@ -140,6 +141,7 @@ return [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic_integration.pipedrive.export.company',
                 ],
             ],
         ],

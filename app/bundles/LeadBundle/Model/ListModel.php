@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -325,6 +326,23 @@ class ListModel extends FormModel
                         'include' => [
                             'in',
                             '!in',
+                        ],
+                    ]
+                ),
+                'object' => 'lead',
+            ],
+            'lead_email_sent_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            '!=',
+                            'gt',
+                            'lt',
+                            'gte',
+                            'lte',
                         ],
                     ]
                 ),
@@ -812,6 +830,18 @@ class ListModel extends FormModel
     }
 
     /**
+     * Get a list of preference center lead lists.
+     *
+     * @return mixed
+     */
+    public function getPreferenceCenterLists()
+    {
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getPreferenceCenterList();
+
+        return $lists;
+    }
+
+    /**
      * @param LeadList $entity
      *
      * @return array
@@ -1013,7 +1043,7 @@ class ListModel extends FormModel
                 // Keep CPU down for large lists; sleep per $limit batch
                 $this->batchSleep();
 
-                $removeLeadList = $this->leadSegmentService->getOrphanedLeadListLeads($leadList);
+                $removeLeadList = $this->leadSegmentService->getOrphanedLeadListLeads($leadList, [], $limit);
 
                 if (empty($removeLeadList[$leadList->getId()])) {
                     // Somehow ran out of leads so break out
@@ -1674,5 +1704,27 @@ class ListModel extends FormModel
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts'), $contacts);
 
         return $chart->render();
+    }
+
+    /**
+     * Is custom field used in at least one defined segment?
+     *
+     * @param LeadField $field
+     *
+     * @return bool
+     */
+    public function isFieldUsed(LeadField $field)
+    {
+        $alias       = $field->getAlias();
+        $aliasLength = mb_strlen($alias);
+        $likeContent = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+
+        $filter = [
+            'force'  => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=> $likeContent],
+            ],
+        ];
+
+        return $this->getEntities(['filter' => $filter])->count() !== 0;
     }
 }

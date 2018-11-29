@@ -88,6 +88,11 @@ return [
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
                 'method'     => 'POST',
             ],
+            'mautic_api_contact_clone_campaign' => [
+                'path'       => '/campaigns/clone/{campaignId}',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:cloneCampaign',
+                'method'     => 'POST',
+            ],
 
             // @deprecated 2.6.0 to be removed 3.0
             'bc_mautic_api_campaignaddcontact'        => [
@@ -121,7 +126,7 @@ return [
     'services'   => [
         'events'       => [
             'mautic.campaign.subscriber'                => [
-                'class'     => 'Mautic\CampaignBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
@@ -175,6 +180,14 @@ return [
                     'mautic.campaign.model.campaign',
                 ],
             ],
+            'mautic.campaign.action.jump_to_event.subscriber' => [
+                'class'     => \Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.repository.event',
+                    'mautic.campaign.event_executioner',
+                    'translator',
+                ],
+            ],
         ],
         'forms'        => [
             'mautic.campaign.type.form'                 => [
@@ -201,6 +214,10 @@ return [
             'mautic.campaign.type.action.addremovelead' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType',
                 'alias' => 'campaignevent_addremovelead',
+            ],
+            'mautic.campaign.type.action.jump_to_event' => [
+                'class' => \Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType::class,
+                'alias' => 'campaignevent_jump_to_event',
             ],
             'mautic.campaign.type.canvassettings'       => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
@@ -363,6 +380,7 @@ return [
                 'class'     => \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval::class,
                 'arguments' => [
                     'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.campaign.scheduler'               => [
@@ -408,6 +426,7 @@ return [
                     'monolog.logger.mautic',
                     'mautic.campaign.scheduler',
                     'mautic.campaign.helper.removed_contact_tracker',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
             'mautic.campaign.executioner.kickoff'     => [
