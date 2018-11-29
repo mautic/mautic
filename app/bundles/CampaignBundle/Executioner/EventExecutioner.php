@@ -228,6 +228,7 @@ class EventExecutioner
                 $evaluatedContacts = $this->actionExecutioner->execute($config, $logs);
                 $this->persistLogs($logs);
                 $this->executeConditionEventsForContacts($event, $evaluatedContacts->getPassed(), $counter);
+                $this->executeActionEventsForContacts($event, $evaluatedContacts->getPassed(), $counter);
                 break;
             case Event::TYPE_CONDITION:
                 $evaluatedContacts = $this->conditionExecutioner->execute($config, $logs);
@@ -452,6 +453,32 @@ class EventExecutioner
                 // Clear out removed contacts to prevent a memory leak
                 $this->removedContactTracker->clearRemovedContact($campaignId, $contactId);
             }
+        }
+    }
+
+    /**
+     * @param Event           $event
+     * @param ArrayCollection $contacts
+     * @param Counter|null    $counter
+     *
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
+     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     */
+    private function executeActionEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null)
+    {
+        $childrenCounter = new Counter();
+        $actions         = $event->getChildrenByEventType(Event::TYPE_ACTION);
+        $childrenCounter->advanceEvaluated($actions->count());
+
+        $this->logger->debug('CAMPAIGN: Executing '.$actions->count().' actions under action ID '.$event->getId());
+
+        $this->executeEventsForContacts($actions, $contacts, $childrenCounter);
+
+        if ($counter) {
+            $counter->advanceTotalEvaluated($childrenCounter->getTotalEvaluated());
+            $counter->advanceTotalExecuted($childrenCounter->getTotalExecuted());
         }
     }
 
