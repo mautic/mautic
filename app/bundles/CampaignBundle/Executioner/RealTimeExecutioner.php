@@ -268,11 +268,8 @@ class RealTimeExecutioner
             }
 
             $pathTaken   = (int)$log->getNonActionPathTaken();
-            $isScheduled = (int)$log->getIsScheduled();
 
-            if ($isScheduled === 1) {
-                throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");
-            } elseif ($pathTaken === 1 && !$parentEvent->getNegativeChildren()->contains($event)) {
+            if ($pathTaken === 1 && !$parentEvent->getNegativeChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take negative path, event {$event->getId()} is on positive path.");
             } elseif ($pathTaken === 0 && !$parentEvent->getPositiveChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take positive path, event {$event->getId()} is on negative path.");
