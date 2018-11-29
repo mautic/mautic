@@ -647,9 +647,7 @@ class Event implements ChannelInterface
         $criteria = Criteria::create()
             ->where(Criteria::expr()->eq('lead', $contact))
             ->andWhere(Criteria::expr()->eq('rotation', $rotation))
-            ->orderBy(['id' => 'DESC'])
             ->setMaxResults(1);
-        ;
 
         $log = $this->getLog()->matching($criteria);
 
