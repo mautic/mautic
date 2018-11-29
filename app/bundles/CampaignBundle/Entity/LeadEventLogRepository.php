@@ -454,7 +454,8 @@ class LeadEventLogRepository extends CommonRepository
             $q->expr()->eq('l.campaign_id', ':campaignId'),
             $q->expr()->eq('l.is_scheduled', ':true'),
             $q->expr()->lte('l.trigger_date', ':now'),
-            $q->expr()->eq('c.is_published', 1)
+            $q->expr()->eq('c.is_published', 1),
+            $q->expr()->eq('e.is_published', 1)
         );
 
         $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
@@ -462,6 +463,7 @@ class LeadEventLogRepository extends CommonRepository
         $results = $q->select('COUNT(*) as event_count, l.event_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
             ->join('l', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'l.campaign_id = c.id')
+            ->join('l', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'l.event_id = e.id')
             ->where($expr)
             ->setParameter('campaignId', $campaignId)
             ->setParameter('now', $now->format('Y-m-d H:i:s'))

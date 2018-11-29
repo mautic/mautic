@@ -29,10 +29,9 @@ class EventRepository extends LegacyEventRepository
         $q      = $this
             ->createQueryBuilder('e')
             ->join('e.campaign', 'c');
-        // dont include the unpublished events
         $q->andWhere(
-                $q->expr()->eq('e.isPublished', true)
-            );
+            $q->expr()->eq('e.isPublished', true)
+        );
 
         if (!empty($args['campaign_id'])) {
             $q->andWhere(
@@ -137,7 +136,6 @@ class EventRepository extends LegacyEventRepository
             )
               ->setParameter('eventType', $eventType);
         }
-        // dont include the unpublished events
         $q->andWhere(
             $q->expr()->eq('e.isPublished', true)
         );
@@ -316,7 +314,6 @@ class EventRepository extends LegacyEventRepository
         }
 
         $q->where($expr);
-        // dont include the unpublished events
         $q->andWhere(
             $q->expr()->eq('e.isPublished', true)
         );
