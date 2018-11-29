@@ -616,7 +616,6 @@ SQL;
 
         $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $expr = $q->expr()->andX(
-        // requires PR 6247 (https://github.com/mautic/mautic/pull/6247) where e.is_published is created
             $q->expr()->eq('e.is_published', 1),
             $q->expr()->eq('c.is_published', 1),
             $q->expr()->eq('e.campaign_id', ':campaignId')
@@ -645,8 +644,6 @@ SQL;
         if (!$eventIds) {
             return [];
         }
-        $now = clone $date;
-        $now->setTimezone(new \DateTimeZone('UTC'));
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -663,7 +660,7 @@ SQL;
             ->where($expr)
             ->setParameter('ids', $eventIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
             ->setParameter('true', true)
-            ->setParameter('now', $now->format('Y-m-d H:i:s'))
+            ->setParameter('now', $date)
             ->groupBy('l.event_id')
             ->execute()
             ->fetchAll();
