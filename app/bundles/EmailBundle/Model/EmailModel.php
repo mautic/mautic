@@ -1610,7 +1610,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
 
             if (!isset($user['email'])) {
-                $userEntity        = $this->userModel->getEntity($id);
+                $userEntity = $this->userModel->getEntity($id);
+
+                if ($userEntity === null) {
+                    continue;
+                }
+
                 $user['email']     = $userEntity->getEmail();
                 $user['firstname'] = $userEntity->getFirstName();
                 $user['lastname']  = $userEntity->getLastName();
