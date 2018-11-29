@@ -406,7 +406,7 @@ class InputHelper
             $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], $value, $cdataCount);
 
             // Special handling for conditional blocks
-            $value = preg_replace("/<!--\[if(.*?)\]><!-(.*?)->(.*?)<!--<!\[endif\]-->/is", '<mconditionnegative><mif>$1</mif>$3</mconditionnegative>', $value, -1, $conditionsFoundNegative);
+            $value = preg_replace("/<!--\[if(.*?)\]><!-(.*?)->(.*?)<!--<!\[endif\]-->/is", '<mconditionnonoutlook><mif>$1</mif>$3</mconditionnonoutlook>', $value, -1, $conditionsFoundNonOutlook);
             $value = preg_replace("/<!--\[if(.*?)\]>(.*?)<!\[endif\]-->/is", '<mcondition><mif>$1</mif>$2</mcondition>', $value, -1, $conditionsFound);
 
             // Slecial handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
@@ -443,9 +443,9 @@ class InputHelper
                 $value = preg_replace("/<mcondition><mif>(.*?)<\/mif>(.*?)<\/mcondition>/is", '<!--[if$1]>$2<![endif]-->', $value);
             }
 
-            if ($conditionsFoundNegative) {
-                // Special handling for conditional blocks
-                $value = preg_replace("/<mconditionnegative><mif>(.*?)<\/mif>(.*?)<\/mconditionnegative>/is", '<!--[if$1]><!-->$2<!--<![endif]-->', $value);
+            if ($conditionsFoundNonOutlook) {
+                // Special handling for non Outlook conditional blocks
+                $value = preg_replace("/<mconditionnonoutlook><mif>(.*?)<\/mif>(.*?)<\/mconditionnonoutlook>/is", '<!--[if$1]><!-- -->$2<!--<![endif]-->', $value);
             }
 
             if ($commentCount) {
