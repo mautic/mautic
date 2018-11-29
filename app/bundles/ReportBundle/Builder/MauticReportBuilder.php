@@ -244,7 +244,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         } elseif ($order = $this->entity->getTableOrder()) {
             foreach ($order as $o) {
-                if (!empty($o['column'])) {
+                if (!empty($options['columns'][$o['column']]['formula'])) {
+                    $queryBuilder->orderBy($options['columns'][$o['column']]['formula'], $o['direction']);
+                } elseif (!empty($o['column'])) {
                     $queryBuilder->orderBy($o['column'], $o['direction']);
                 }
             }
