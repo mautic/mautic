@@ -230,19 +230,19 @@ class ContactSegmentFilterDictionary
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
         ];
-        $this->filters['email_id'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table' => 'page_hits',
-            'foreign_field' => 'email_id',
+        $this->filters['email_id'] = [ // kept as email_id for BC
+            'type' => ChannelClickQueryBuilder::getServiceId(),
         ];
-        $this->filters['email_clicked_date'] = [
-            'type'          => ChannelClickQueryBuilder::getServiceId(),
-            'foreign_table' => 'page_hits',
+        $this->filters['email_clicked_link_date'] = [
+            'type' => ChannelClickQueryBuilder::getServiceId(),
         ];
         $this->filters['email_clicked_date'] = [
             'type' => ChannelClickQueryBuilder::getServiceId(),
         ];
-        $this->filters['sms_clicked_date'] = [
+        $this->filters['sms_clicked_link'] = [
+            'type'  => ChannelClickQueryBuilder::getServiceId(),
+        ];
+        $this->filters['sms_clicked_link_date'] = [
             'type'  => ChannelClickQueryBuilder::getServiceId(),
         ];
         $this->filters['sessions']              = [

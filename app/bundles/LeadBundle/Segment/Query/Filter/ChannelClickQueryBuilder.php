@@ -67,16 +67,21 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
         $tableAlias = $this->generateRandomParameterName();
 
         $subQb = $queryBuilder->getConnection()->createQueryBuilder();
+        $expr  = $subQb->expr()->andX(
+            $subQb->expr()->isNotNull($tableAlias.'.redirect_id'),
+            $subQb->expr()->isNotNull($tableAlias.'.lead_id'),
+            $subQb->expr()->eq($tableAlias.'.source', $subQb->expr()->literal($filterChannel))
+        );
+
+        if ($this->isDateBased($filter->getField())) {
+            $expr->add(
+                $subQb->expr()->$filterOperator($tableAlias.'.date_hit', $filter->getParameterHolder($parameters))
+            );
+        }
+
         $subQb->select($tableAlias.'.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $tableAlias)
-            ->where(
-                $subQb->expr()->andX(
-                    $subQb->expr()->isNotNull($tableAlias.'.redirect_id'),
-                    $subQb->expr()->isNotNull($tableAlias.'.lead_id'),
-                    $subQb->expr()->eq($tableAlias.'.source', $subQb->expr()->literal($filterChannel)),
-                    $subQb->expr()->$filterOperator($tableAlias.'.date_hit', $filter->getParameterHolder($parameters))
-                )
-            );
+            ->where($expr);
 
         $queryBuilder->addLogic($queryBuilder->expr()->in('l.id', $subQb->getSQL()), $filter->getGlue());
 
@@ -92,6 +97,21 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
      */
     private function getChannel($name)
     {
-        return str_replace('_clicked_date', '', $name);
+        if ('email_id' === $name) {
+            // BC for existing filter
+            return 'email';
+        }
+
+        return str_replace(['_clicked_link', '_date'], '', $name);
+    }
+
+    /**
+     * @param $name
+     *
+     * @return bool
+     */
+    private function isDateBased($name)
+    {
+        return false !== strpos($name, '_date');
     }
 }
