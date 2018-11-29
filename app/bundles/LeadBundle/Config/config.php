@@ -988,6 +988,13 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.lead.query.builder.channel_click.value' => [
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'mautic.lead.model.lead_segment_filter_factory',
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [

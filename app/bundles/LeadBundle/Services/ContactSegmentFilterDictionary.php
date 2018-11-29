@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\Exception\FilterNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
@@ -233,6 +234,16 @@ class ContactSegmentFilterDictionary
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
             'foreign_field' => 'email_id',
+        ];
+        $this->filters['email_clicked_date'] = [
+            'type'          => ChannelClickQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
+        ];
+        $this->filters['email_clicked_date'] = [
+            'type' => ChannelClickQueryBuilder::getServiceId(),
+        ];
+        $this->filters['sms_clicked_date'] = [
+            'type'  => ChannelClickQueryBuilder::getServiceId(),
         ];
         $this->filters['sessions']              = [
             'type' => SessionsFilterQueryBuilder::getServiceId(),
