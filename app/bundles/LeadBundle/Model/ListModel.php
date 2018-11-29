@@ -540,6 +540,40 @@ class ListModel extends FormModel
                 ),
                 'object' => 'lead',
             ],
+            'email_clicked_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.email_clicked_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            '!=',
+                            'gt',
+                            'lt',
+                            'gte',
+                            'lte',
+                        ],
+                    ]
+                ),
+                'object' => 'lead',
+            ],
+            'sms_clicked_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            '!=',
+                            'gt',
+                            'lt',
+                            'gte',
+                            'lte',
+                        ],
+                    ]
+                ),
+                'object' => 'lead',
+            ],
             'sessions' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.session'),
                 'properties' => ['type' => 'number'],

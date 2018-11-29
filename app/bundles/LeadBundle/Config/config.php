@@ -935,7 +935,15 @@ return [
                     'mautic.lead.model.random_parameter_name',
                     'mautic.lead.repository.lead_segment_query_builder',
                     'doctrine.orm.entity_manager',
-                    'mautic.lead.model.lead_segment_filter_factory', ],
+                    'mautic.lead.model.lead_segment_filter_factory',
+                ],
+            ],
+            'mautic.lead.query.builder.channel_click.value' => [
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'mautic.lead.model.lead_segment_filter_factory',
+                ],
             ],
         ],
         'helpers' => [
