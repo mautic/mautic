@@ -84,13 +84,13 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         $eventList = $campaign->getPublishedEvents();
         $this->assertEquals(2, count($eventList->getValues()));
 
-        $eventModel->deleteEvents([], [17]);
+        $eventModel->deleteEvents([], [19]);
         $eventList = $campaign->getPublishedEvents();
         $this->assertEquals(1, count($eventList->getValues()));
 
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 2, '--contact-ids' => '1,2,3,4']);
-        $byEvent = $this->getCampaignEventLogs([16, 17], 2);
-        $this->assertCount(4, $byEvent[16]);
-        $this->assertCount(0, $byEvent[17]);
+        $byEvent = $this->getCampaignEventLogs([18, 19], 2);
+        $this->assertCount(4, $byEvent[18]);
+        $this->assertCount(0, $byEvent[19]);
     }
 }
