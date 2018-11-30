@@ -91,7 +91,16 @@ class RequestStorageHelper
      */
     public function getTransportNameFromKey($key)
     {
-        list($transportName) = explode(self::KEY_SEPARATOR, $key);
+        // Remove the default cache key prefix if set.
+        if (strpos($key, ':') !== false) {
+            list($prefix, $key) = explode(':', $key);
+        }
+
+        // Take the part before the key separator as the serialized transpot name.
+        list($serializedTransportName) = explode(self::KEY_SEPARATOR, $key);
+
+        // Unserialize transport name to the standard full class name.
+        $transportName = str_replace('|', '\\', $serializedTransportName);
 
         return $transportName;
     }
