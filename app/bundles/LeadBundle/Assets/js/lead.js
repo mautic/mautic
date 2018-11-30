@@ -609,6 +609,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if (fieldType == 'date') {
@@ -618,6 +619,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false,
             closeOnDateSelect: true
         });
@@ -628,6 +630,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if (fieldType == 'lookup_id') {

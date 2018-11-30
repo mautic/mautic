@@ -619,6 +619,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if (fieldType == 'date') {
@@ -628,6 +629,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false,
             closeOnDateSelect: true
         });
@@ -638,6 +640,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if (fieldType == 'lookup_id') {
