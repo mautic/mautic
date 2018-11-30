@@ -969,6 +969,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.tracker.device',
                     'mautic.lead.model.legacy_lead',
+                    'mautic.lead.model.ipaddress',
                 ],
             ],
 
@@ -1199,6 +1200,13 @@ return [
                     'mautic.lead.service.device_creator_service',
                     'mautic.lead.factory.device_detector_factory',
                     'mautic.lead.service.device_tracking_service',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.lead.model.ipaddress' => [
+                'class'     => Mautic\LeadBundle\Model\IpAddressModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                     'monolog.logger.mautic',
                 ],
             ],
