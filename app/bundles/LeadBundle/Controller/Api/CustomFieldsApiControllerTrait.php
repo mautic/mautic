@@ -105,9 +105,9 @@ trait CustomFieldsApiControllerTrait
      * @param Lead|Company $entity
      * @param Form         $form
      * @param array        $parameters
-     * @param bool         $isPost
+     * @param bool         $isPostOrPatch
      */
-    protected function setCustomFieldValues($entity, $form, $parameters, $isPost = false)
+    protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
     {
         //set the custom field values
         //pull the data from the form in order to apply the form's formatting
@@ -115,14 +115,14 @@ trait CustomFieldsApiControllerTrait
             $parameters[$f->getName()] = $f->getData();
         }
 
-        if ($isPost) {
+        if ($isPostOrPatch) {
             // Don't overwrite the contacts accumulated points
             if (isset($parameters['points']) && empty($parameters['points'])) {
                 unset($parameters['points']);
             }
 
-            // When merging a contact because of a unique identifier match in POST /api/contacts//new, all 0 values must be unset because
-            // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setCustomFieldValues
+            // When merging a contact because of a unique identifier match in POST /api/contacts//new or PATCH /api/contacts//edit all 0 values must be unset because
+            // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setFieldValues
             $parameters = array_filter(
                 $parameters,
                 function ($value) {
@@ -135,6 +135,6 @@ trait CustomFieldsApiControllerTrait
             );
         }
 
-        $this->model->setFieldValues($entity, $parameters, !$isPost);
+        $this->model->setFieldValues($entity, $parameters, !$isPostOrPatch);
     }
 }

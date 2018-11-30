@@ -679,7 +679,8 @@ class LeadApiController extends CommonApiController
             unset($parameters['frequencyRules']);
         }
 
-        $this->setCustomFieldValues($entity, $form, $parameters, 'POST' === $this->request->getMethod());
+        $isPostOrPatch = 'POST' === $this->request->getMethod() || 'PATCH' === $this->request->getMethod();
+        $this->setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch);
     }
 
     /**
