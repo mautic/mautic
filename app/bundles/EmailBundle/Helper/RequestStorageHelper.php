@@ -65,6 +65,7 @@ class RequestStorageHelper
      */
     public function getRequest($key)
     {
+        $key           = $this->removeCachePrefix($key);
         $cachedRequest = $this->cacheStorage->get($key);
 
         if (false === $cachedRequest) {
@@ -79,6 +80,8 @@ class RequestStorageHelper
      */
     public function deleteCachedRequest($key)
     {
+        $key = $this->removeCachePrefix($key);
+
         $this->cacheStorage->delete($key);
     }
 
@@ -91,10 +94,7 @@ class RequestStorageHelper
      */
     public function getTransportNameFromKey($key)
     {
-        // Remove the default cache key prefix if set.
-        if (strpos($key, ':') !== false) {
-            list($prefix, $key) = explode(':', $key);
-        }
+        $key = $this->removeCachePrefix($key);
 
         // Take the part before the key separator as the serialized transpot name.
         list($serializedTransportName) = explode(self::KEY_SEPARATOR, $key);
@@ -103,6 +103,22 @@ class RequestStorageHelper
         $transportName = str_replace('|', '\\', $serializedTransportName);
 
         return $transportName;
+    }
+
+    /**
+     * Remove the default cache key prefix if set.
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    private function removeCachePrefix($key)
+    {
+        if (strpos($key, ':') !== false) {
+            list($prefix, $key) = explode(':', $key);
+        }
+
+        return $key;
     }
 
     /**
