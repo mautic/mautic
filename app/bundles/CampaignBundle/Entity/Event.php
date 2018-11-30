@@ -640,6 +640,7 @@ class Event implements ChannelInterface
      *
      * @param Contact $contact
      * @param $rotation
+     *
      * @return LeadEventLog|null
      */
     public function getLogByContactAndRotation(Contact $contact, $rotation)

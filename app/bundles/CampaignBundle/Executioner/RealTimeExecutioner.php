@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner as Executioner;
@@ -26,7 +27,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
-use Mautic\CampaignBundle\Entity\LeadRepository;
 
 class RealTimeExecutioner
 {
@@ -261,13 +261,13 @@ class RealTimeExecutioner
         $parentEvent = $event->getParent();
         if ($parentEvent !== null && $event->getDecisionPath() !== null) {
             $rotation    = $this->leadRepository->getContactRotations([$this->contact->getId()], $event->getCampaign()->getId());
-            $log = $parentEvent->getLogByContactAndRotation($this->contact, $rotation);
+            $log         = $parentEvent->getLogByContactAndRotation($this->contact, $rotation);
 
             if ($log === null) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");
             }
 
-            $pathTaken   = (int)$log->getNonActionPathTaken();
+            $pathTaken   = (int) $log->getNonActionPathTaken();
 
             if ($pathTaken === 1 && !$parentEvent->getNegativeChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take negative path, event {$event->getId()} is on positive path.");
