@@ -105,7 +105,7 @@ class AjaxController extends CommonAjaxController
         $filter    = InputHelper::clean($request->query->get('filter'));
         $leadField = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
         if (!empty($leadField)) {
-            if (strpos($leadField, 'company') === 0) {
+            if (strpos($leadField, 'company') === 0 && $leadField !== 'company') {
                 $results = $this->getModel('lead.company')->getLookupResults('companyfield', [$leadField, $filter]);
                 foreach ($results as $r) {
                     $dataArray[] = ['value' => $r['label']];
