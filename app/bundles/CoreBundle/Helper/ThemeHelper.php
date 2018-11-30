@@ -296,10 +296,12 @@ class ThemeHelper
         $twigTemplate = clone $template;
         $twigTemplate->set('engine', 'twig');
 
-        if ($templating->exists($template)) {
-            return $template->getLogicalName();
+        // Does a twig version exist?
+        if ($templating->exists($twigTemplate)) {
+            return $twigTemplate->getLogicalName();
         }
 
+        // Does a PHP version exist?
         if ($templating->exists($template)) {
             return $template->getLogicalName();
         }
@@ -307,7 +309,7 @@ class ThemeHelper
         // Try any theme as a fall back starting with default
         $this->findThemeWithTemplate($templating, $twigTemplate);
 
-        return $twigTemplate;
+        return $twigTemplate->getLogicalName();
     }
 
     /**
@@ -483,7 +485,7 @@ class ThemeHelper
         }
 
         if ($missingFiles = array_diff($requiredFiles, $foundRequiredFiles)) {
-            throw new \Exception(
+            throw new MauticException\FileNotFoundException(
                 $this->translator->trans(
                     'mautic.core.theme.missing.files',
                     [
