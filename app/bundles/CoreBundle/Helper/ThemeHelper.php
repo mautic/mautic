@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Exception as MauticException;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Templating\EngineInterface;
+use Symfony\Component\Templating\TemplateReference;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ThemeHelper
@@ -294,11 +296,18 @@ class ThemeHelper
         $twigTemplate = clone $template;
         $twigTemplate->set('engine', 'twig');
 
-        if ($templating->exists($twigTemplate)) {
-            return $twigTemplate->getLogicalName();
+        if ($templating->exists($template)) {
+            return $template->getLogicalName();
         }
 
-        return $template->getLogicalName();
+        if ($templating->exists($template)) {
+            return $template->getLogicalName();
+        }
+
+        // Try any theme as a fall back starting with default
+        $this->findThemeWithTemplate($templating, $twigTemplate);
+
+        return $twigTemplate;
     }
 
     /**
@@ -569,5 +578,43 @@ class ThemeHelper
         }
 
         return false;
+    }
+
+    /**
+     * @param EngineInterface   $templating
+     * @param TemplateReference $template
+     *
+     * @throws MauticException\BadConfigurationException
+     * @throws MauticException\FileNotFoundException
+     */
+    private function findThemeWithTemplate(EngineInterface $templating, TemplateReference $template)
+    {
+        preg_match('/^:(.*?):(.*?)$/', $template->getLogicalName(), $match);
+        $requestedThemeName = $match[1];
+
+        // Try the default theme first
+        $defaultTheme = $this->getTheme();
+        if ($requestedThemeName !== $defaultTheme->getTheme()) {
+            $template->set('controller', $defaultTheme->getTheme());
+            if ($templating->exists($template)) {
+                return;
+            }
+        }
+
+        // Find any theme as a fallback
+        $themes = $this->getInstalledThemes('all', true);
+        foreach ($themes as $theme) {
+            // Already handled the default
+            if ($theme['name'] === $defaultTheme->getTheme()) {
+                continue;
+            }
+
+            // Theme name is stored in the controller parameter
+            $template->set('controller', $theme['key']);
+
+            if ($templating->exists($template)) {
+                return;
+            }
+        }
     }
 }
