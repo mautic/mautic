@@ -11,32 +11,13 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Mautic\LeadBundle\Segment\RandomParameterName;
 
 /**
- * Class ForeignValueFilterQueryBuilder.
+ * Class ChannelClickQueryBuilder.
  */
 class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 {
-    /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $leadSegmentFilterFactory;
-
-    /**
-     * ChannelClickQueryBuilder constructor.
-     */
-    public function __construct(
-        RandomParameterName $randomParameterNameService,
-        ContactSegmentFilterFactory $leadSegmentFilterFactory
-    ) {
-        parent::__construct($randomParameterNameService);
-
-        $this->leadSegmentFilterFactory = $leadSegmentFilterFactory;
-    }
-
     /**
      * @return string
      */
