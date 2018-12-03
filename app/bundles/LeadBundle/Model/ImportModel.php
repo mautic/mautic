@@ -289,7 +289,8 @@ class ImportModel extends FormModel
         // Save the end changes so the user could see it
         $this->saveEntity($import);
 
-        if ($import->getCreatedBy()) {
+        // Perhaps implement Import::shouldNotify instead of using Import::canProceed
+        if ($import->getCreatedBy() && !$import->canProceed()) {
             $this->notificationModel->addNotification(
                 $this->translator->trans(
                     'mautic.lead.import.result.info',
@@ -651,9 +652,7 @@ class ImportModel extends FormModel
      */
     public function getImportDir()
     {
-        $tmpDir = $this->pathsHelper->getSystemPath('tmp', true);
-
-        return $tmpDir.'/imports';
+        return $this->pathsHelper->getSystemPath('imports', true);
     }
 
     /**
