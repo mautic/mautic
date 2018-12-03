@@ -15,12 +15,11 @@
         ]
     },
     "require": {
-        "php": ">=5.6.19 <7.2",
+        "php": ">=5.6.19 <7.3",
         "ext-curl": "*",
         "ext-imap": "*",
         "ext-json": "*",
         "ext-zip": "*",
-
         "symfony/console": "~2.8",
         "symfony/debug": "~2.8",
         "symfony/form": "~2.8",
@@ -54,7 +53,7 @@
         "symfony/templating": "~2.1",
 
         "symfony/framework-bundle": "~2.8",
-        "symfony/monolog-bundle": "~2.11",
+        "symfony/monolog-bundle": "^3.3",
         "symfony/security-bundle": "^2.8.41",
         "symfony/swiftmailer-bundle": "~2.3",
 
@@ -77,7 +76,7 @@
         "doctrine/doctrine-migrations-bundle": "~1.1.1",
 
         "knplabs/gaufrette": "0.2",
-        "aws/aws-sdk-php": "~2.8",
+        "aws/aws-sdk-php": "~3.0",
         "rackspace/php-opencloud": "1.12.*",
 
         "knplabs/knp-menu": "^2.0",

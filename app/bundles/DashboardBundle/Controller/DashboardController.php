@@ -49,12 +49,12 @@ class DashboardController extends FormController
             $session = $this->get('session');
             if (!empty($dateRangeFilter['date_from'])) {
                 $from = new \DateTime($dateRangeFilter['date_from']);
-                $session->set('mautic.dashboard.date.from', $from->format($mysqlFormat));
+                $session->set('mautic.daterange.form.from', $from->format($mysqlFormat));
             }
 
             if (!empty($dateRangeFilter['date_to'])) {
                 $to = new \DateTime($dateRangeFilter['date_to']);
-                $session->set('mautic.dashboard.date.to', $to->format($mysqlFormat));
+                $session->set('mautic.daterange.form.to', $to->format($mysqlFormat));
             }
 
             $model->clearDashboardCache();
@@ -321,7 +321,7 @@ class DashboardController extends FormController
     public function exportAction()
     {
         $filename = InputHelper::filename($this->getNameFromRequest(), 'json');
-        $response = new JsonResponse($this->getModel('dashboard')->toArray($name));
+        $response = new JsonResponse($this->getModel('dashboard')->toArray($filename));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');
@@ -376,37 +376,39 @@ class DashboardController extends FormController
         $dir  = $this->container->get('mautic.helper.paths')->getSystemPath("dashboard.$type");
         $path = $dir.'/'.$name.'.json';
 
-        if (file_exists($path) && is_writable($path)) {
-            $widgets = json_decode(file_get_contents($path), true);
-            if (isset($widgets['widgets'])) {
-                $widgets = $widgets['widgets'];
+        if (!file_exists($path) || !is_readable($path)) {
+            $this->addFlash('mautic.dashboard.upload.filenotfound', [], 'error', 'validators');
+
+            return $this->redirect($this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']));
+        }
+
+        $widgets = json_decode(file_get_contents($path), true);
+        if (isset($widgets['widgets'])) {
+            $widgets = $widgets['widgets'];
+        }
+
+        if ($widgets) {
+            /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+            $model = $this->getModel('dashboard');
+
+            $model->clearDashboardCache();
+
+            $currentWidgets = $model->getWidgets();
+
+            if (count($currentWidgets)) {
+                foreach ($currentWidgets as $widget) {
+                    $model->deleteEntity($widget);
+                }
             }
 
-            if ($widgets) {
-                /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
-                $model = $this->getModel('dashboard');
-
-                $model->clearDashboardCache();
-
-                $currentWidgets = $model->getWidgets();
-
-                if (count($currentWidgets)) {
-                    foreach ($currentWidgets as $widget) {
-                        $model->deleteEntity($widget);
-                    }
-                }
-
-                $filter = $model->getDefaultFilter();
-                foreach ($widgets as $widget) {
-                    $widget = $model->populateWidgetEntity($widget, $filter);
-                    $model->saveEntity($widget);
-                }
-
-                return $this->redirect($this->get('router')->generate('mautic_dashboard_index'));
+            $filter = $model->getDefaultFilter();
+            foreach ($widgets as $widget) {
+                $widget = $model->populateWidgetEntity($widget, $filter);
+                $model->saveEntity($widget);
             }
         }
 
-        return $this->redirect($this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']));
+        return $this->redirect($this->get('router')->generate('mautic_dashboard_index'));
     }
 
     /**
@@ -453,16 +455,20 @@ class DashboardController extends FormController
             }
         }
 
-        $dashboardFiles = [];
+        $dashboardFiles = ['user' => [], 'gobal' => []];
         $dashboards     = [];
 
-        // User specific layouts
-        chdir($directories['user']);
-        $dashboardFiles['user'] = glob('*.json');
+        if (is_readable($directories['user'])) {
+            // User specific layouts
+            chdir($directories['user']);
+            $dashboardFiles['user'] = glob('*.json');
+        }
 
-        // Global dashboards
-        chdir($directories['global']);
-        $dashboardFiles['global'] = glob('*.json');
+        if (is_readable($directories['global'])) {
+            // Global dashboards
+            chdir($directories['global']);
+            $dashboardFiles['global'] = glob('*.json');
+        }
 
         foreach ($dashboardFiles as $type => $dirDashboardFiles) {
             $tempDashboard = [];

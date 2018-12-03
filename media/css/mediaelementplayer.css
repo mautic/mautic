@@ -1001,7 +1001,7 @@ div.mejs-speed-button {
 .mejs-poster {
 	text-align: center;
 	background: rgba(0,0,0,0.75);
-	z-index: 1000;
+	z-index: 100000000;
 	color: white;
 }
 

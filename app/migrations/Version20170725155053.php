@@ -29,7 +29,7 @@ class Version20170725155053 extends AbstractMauticMigration
     {
         $table = $schema->getTable($this->prefix.'companies');
 
-        if ($table->hasColumn('score') && $table->getColumn('score')->getNotnull() === false) {
+        if ($table->hasColumn('score') && false === $table->getColumn('score')->getNotnull()) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }

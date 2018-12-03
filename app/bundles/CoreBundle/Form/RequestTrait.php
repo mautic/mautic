@@ -34,7 +34,7 @@ trait RequestTrait
                             $setter = 'set'.ucfirst($name);
                             // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
                             // If value is array and count 1, return value of array as string
-                            if (is_array($params[$name]) && count($params[$name]) == 1) {
+                            if (is_array($params[$name]) && 1 == count($params[$name])) {
                                 $params[$name] = end($params[$name]);
                             }
 
@@ -58,7 +58,7 @@ trait RequestTrait
                         if ($child->getConfig()->getOption('multiple')) {
                             // Ensure the value is an array
                             if (!is_array($params[$name])) {
-                                if (strpos($params[$name], '|') !== false) {
+                                if (false !== strpos($params[$name], '|')) {
                                     $params[$name] = explode('|', $params[$name]);
                                 } else {
                                     $params[$name] = [$params[$name]];
@@ -76,7 +76,7 @@ trait RequestTrait
                             // Date placeholder was used so just ignore it to allow import of the field
                             unset($params[$name]);
                         } else {
-                            if (($timestamp = strtotime($params[$name])) === false) {
+                            if (false === ($timestamp = strtotime($params[$name]))) {
                                 $timestamp = null;
                             }
                             if ($timestamp) {
@@ -139,7 +139,7 @@ trait RequestTrait
                     // Date placeholder was used so just ignore it to allow import of the field
                     unset($fieldData[$leadField['alias']]);
                 } else {
-                    if (($timestamp = strtotime($fieldData[$leadField['alias']])) === false) {
+                    if (false === ($timestamp = strtotime($fieldData[$leadField['alias']]))) {
                         $timestamp = null;
                     }
                     if ($timestamp) {
@@ -159,7 +159,7 @@ trait RequestTrait
                 break;
             case 'multiselect':
                 if (!is_array($fieldData[$leadField['alias']])) {
-                    if (strpos($fieldData[$leadField['alias']], '|') !== false) {
+                    if (false !== strpos($fieldData[$leadField['alias']], '|')) {
                         $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
                     } else {
                         $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];

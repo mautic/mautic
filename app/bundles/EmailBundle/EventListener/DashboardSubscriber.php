@@ -162,6 +162,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'mautic.dashboard.label.company.name',
                     'mautic.dashboard.label.campaign.id',
                     'mautic.dashboard.label.campaign.name',
+                    'mautic.dashboard.label.date.sent',
+                    'mautic.dashboard.label.date.read',
                 ];
 
                 $event->setTemplateData(

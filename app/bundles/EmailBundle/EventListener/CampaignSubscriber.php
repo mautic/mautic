@@ -309,8 +309,8 @@ class CampaignSubscriber implements EventSubscriberInterface
          * @var Lead $contact
          */
         foreach ($contacts as $logId => $contact) {
-            $leadCredentials = $contact->getProfileFields();
-
+            $leadCredentials                      = $contact->getProfileFields();
+            $leadCredentials['primaryIdentifier'] = $contact->getPrimaryIdentifier();
             // Set owner_id to support the "Owner is mailer" feature
             if ($contact->getOwner()) {
                 $leadCredentials['owner_id'] = $contact->getOwner()->getId();
@@ -341,7 +341,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $log = $event->findLogByContactId($contactId);
                 $event->fail(
                     $log,
-                    $this->translator->trans('mautic.email.contact_already_received_marketing_email', ['%contact%' => $contact->getPrimaryIdentifier()])
+                    $this->translator->trans('mautic.email.contact_already_received_marketing_email', ['%contact%' => $credentialArray[$log->getId()]['primaryIdentifier']])
                 );
                 unset($credentialArray[$log->getId()]);
             }

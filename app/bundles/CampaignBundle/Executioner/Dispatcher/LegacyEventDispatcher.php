@@ -99,8 +99,6 @@ class LegacyEventDispatcher
      * @param ArrayCollection       $logs
      * @param                       $wasBatchProcessed
      * @param PendingEvent          $pendingEvent
-     *
-     * @throws \ReflectionException
      */
     public function dispatchCustomEvent(
         AbstractEventAccessor $config,
@@ -255,12 +253,9 @@ class LegacyEventDispatcher
 
     /**
      * @param array        $settings
-     * @param array        $eventArray
      * @param LeadEventLog $log
      *
      * @return mixed
-     *
-     * @throws \ReflectionException
      */
     private function dispatchCallback(array $settings, LeadEventLog $log)
     {
@@ -277,25 +272,29 @@ class LegacyEventDispatcher
             'config'          => $eventArray['properties'],
         ];
 
-        if (is_array($settings['callback'])) {
-            $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-        } elseif (strpos($settings['callback'], '::') !== false) {
-            $parts      = explode('::', $settings['callback']);
-            $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-        } else {
-            $reflection = new \ReflectionMethod(null, $settings['callback']);
-        }
-
-        $pass = [];
-        foreach ($reflection->getParameters() as $param) {
-            if (isset($args[$param->getName()])) {
-                $pass[] = $args[$param->getName()];
+        try {
+            if (is_array($settings['callback'])) {
+                $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
+            } elseif (strpos($settings['callback'], '::') !== false) {
+                $parts      = explode('::', $settings['callback']);
+                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
             } else {
-                $pass[] = null;
+                $reflection = new \ReflectionMethod(null, $settings['callback']);
             }
-        }
 
-        return $reflection->invokeArgs($this, $pass);
+            $pass = [];
+            foreach ($reflection->getParameters() as $param) {
+                if (isset($args[$param->getName()])) {
+                    $pass[] = $args[$param->getName()];
+                } else {
+                    $pass[] = null;
+                }
+            }
+
+            return $reflection->invokeArgs($this, $pass);
+        } catch (\ReflectionException $exception) {
+            return false;
+        }
     }
 
     /**
@@ -372,6 +371,7 @@ class LegacyEventDispatcher
     /**
      * @param              $result
      * @param LeadEventLog $log
+     * @param PendingEvent $pendingEvent
      */
     private function processFailedLog($result, LeadEventLog $log, PendingEvent $pendingEvent)
     {

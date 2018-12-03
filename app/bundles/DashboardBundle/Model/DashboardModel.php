@@ -327,12 +327,13 @@ class DashboardModel extends FormModel
      */
     public function getDefaultFilter()
     {
-        $lastMonth = new \DateTime();
-        $lastMonth->sub(new \DateInterval('P30D'));
+        $dateRangeDefault = $this->coreParametersHelper->getParameter('default_daterange_filter', '-1 month');
+        $dateRangeStart   = new \DateTime();
+        $dateRangeStart->modify($dateRangeDefault);
 
         $today    = new \DateTime();
-        $dateFrom = new \DateTime($this->session->get('mautic.dashboard.date.from', $lastMonth->format('Y-m-d 00:00:00')));
-        $dateTo   = new \DateTime($this->session->get('mautic.dashboard.date.to', $today->format('Y-m-d H:i:s')));
+        $dateFrom = new \DateTime($this->session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
+        $dateTo   = new \DateTime($this->session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
 
         return [
             'dateFrom' => $dateFrom,
