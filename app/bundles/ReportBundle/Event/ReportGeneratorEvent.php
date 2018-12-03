@@ -386,7 +386,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function hasColumn($column)
     {
-        $columns = $this->getReport()->getSelectAndAggregatorAndOrderColumns();
+        $columns = $this->getReport()->getSelectAndAggregatorAndOrderAndGroupByColumns();
 
         if (is_array($column)) {
             foreach ($column as $checkMe) {

@@ -465,9 +465,9 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * @return array
      */
-    public function getSelectAndAggregatorAndOrderColumns()
+    public function getSelectAndAggregatorAndOrderAndGroupByColumns()
     {
-        return array_merge($this->getSelectAndAggregatorColumns(), $this->getOrderColumns());
+        return array_merge($this->getSelectAndAggregatorColumns(), $this->getOrderColumns(), $this->getGroupBy());
     }
 
     /**
