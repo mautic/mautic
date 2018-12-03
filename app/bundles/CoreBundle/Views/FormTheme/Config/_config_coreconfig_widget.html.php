@@ -27,6 +27,7 @@ $template  = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'log_path', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'theme', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'image_path', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'import_path', $template); ?>
         </div>
     </div>
 </div>
@@ -126,7 +127,7 @@ $template  = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'link_shortener_url', $template); ?>
         </div>
         <?php endif; ?>
-        
+
         <?php if (isset($fields['max_entity_lock_time'])): ?>
         <hr class="text-muted" />
         <div class="row">

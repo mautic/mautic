@@ -85,6 +85,7 @@ class PathsHelper
         $this->dashboardUserImportDir = $this->removeTrailingSlash($coreParametersHelper->getParameter('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($coreParametersHelper->getParameter('kernel.cache_dir'));
         $this->kernelLogsDir          = $this->removeTrailingSlash($coreParametersHelper->getParameter('kernel.logs_dir'));
+        $this->importsDir             = $this->removeTrailingSlash($coreParametersHelper->getParameter('import_path'));
     }
 
     /**
@@ -106,6 +107,19 @@ class PathsHelper
                 $path = $this->paths['themes'].'/'.$this->theme;
                 break;
 
+            case 'imports':
+                if (!empty($this->importsDir)) {
+                    if (
+                        !is_dir($this->importsDir) &&
+                        !file_exists($this->importsDir) &&
+                        is_writable($this->importsDir)
+                    ) {
+                        mkdir($this->importsDir, 0755, true);
+                    }
+
+                    return $this->importsDir;
+                }
+                //fall through to temporary
             case 'cache':
             case 'logs':
             case 'temporary':

@@ -17,7 +17,14 @@ use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -103,7 +110,7 @@ class ConfigType extends AbstractType
     {
         $builder->add(
             'site_url',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.site.url',
                 'label_attr' => ['class' => 'control-label'],
@@ -123,7 +130,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'webroot',
-            'page_list',
+            PageListType::class,
             [
                 'label'      => 'mautic.core.config.form.webroot',
                 'label_attr' => ['class' => 'control-label'],
@@ -140,7 +147,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'cache_path',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.cache.path',
                 'label_attr' => ['class' => 'control-label'],
@@ -159,8 +166,28 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'import_path',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.config.form.import.path',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.import.path.tooltip',
+                ],
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    ),
+                ],
+            ]
+        );
+
+        $builder->add(
             'log_path',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.log.path',
                 'label_attr' => ['class' => 'control-label'],
@@ -180,7 +207,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'image_path',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.image.path',
                 'label_attr' => ['class' => 'control-label'],
@@ -213,7 +240,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'locale',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'  => $langChoices,
                 'label'    => 'mautic.core.config.form.locale',
@@ -230,7 +257,7 @@ class ConfigType extends AbstractType
         $builder->add(
             $builder->create(
                 'trusted_hosts',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.core.config.form.trusted.hosts',
                     'label_attr' => ['class' => 'control-label'],
@@ -246,7 +273,7 @@ class ConfigType extends AbstractType
         $builder->add(
             $builder->create(
                 'trusted_proxies',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.core.config.form.trusted.proxies',
                     'label_attr' => ['class' => 'control-label'],
@@ -263,7 +290,7 @@ class ConfigType extends AbstractType
         $builder->add(
             $builder->create(
                 'do_not_track_ips',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'      => 'mautic.core.config.form.do_not_track_ips',
                     'label_attr' => ['class' => 'control-label'],
@@ -280,7 +307,7 @@ class ConfigType extends AbstractType
         $builder->add(
             $builder->create(
                 'do_not_track_bots',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'      => 'mautic.core.config.form.do_not_track_bots',
                     'label_attr' => ['class' => 'control-label'],
@@ -296,7 +323,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'default_pagelimit',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
                     5   => 'mautic.core.pagination.5',
@@ -323,7 +350,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'default_timezone',
-            'timezone',
+            TimezoneType::class,
             [
                 'label'      => 'mautic.core.config.form.default.timezone',
                 'label_attr' => ['class' => 'control-label'],
@@ -339,7 +366,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'cached_data_timeout',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.cached.data.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -361,7 +388,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'date_format_full',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.full',
                 'label_attr' => ['class' => 'control-label'],
@@ -381,7 +408,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'date_format_short',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.short',
                 'label_attr' => ['class' => 'control-label'],
@@ -401,7 +428,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'date_format_dateonly',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.dateonly',
                 'label_attr' => ['class' => 'control-label'],
@@ -421,7 +448,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'date_format_timeonly',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.timeonly',
                 'label_attr' => ['class' => 'control-label'],
@@ -441,7 +468,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'default_daterange_filter',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
                     'midnight'  => 'mautic.core.daterange.0days',
@@ -470,7 +497,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'ip_lookup_service',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'    => $this->ipLookupChoices,
                 'label'      => 'mautic.core.config.form.ip.lookup.service',
@@ -488,7 +515,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'ip_lookup_auth',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.ip.lookup.auth',
                 'label_attr' => ['class' => 'control-label'],
@@ -536,7 +563,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'transifex_username',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.transifex.username',
                 'label_attr' => ['class' => 'control-label'],
@@ -551,7 +578,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'transifex_password',
-            'password',
+            PasswordType::class,
             [
                 'label'      => 'mautic.core.config.form.transifex.password',
                 'label_attr' => ['class' => 'control-label'],
@@ -568,7 +595,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'update_stability',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
                     'alpha'  => 'mautic.core.config.update_stability.alpha',
@@ -588,7 +615,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'link_shortener_url',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.link.shortener',
                 'label_attr' => ['class' => 'control-label'],
@@ -602,7 +629,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'max_entity_lock_time',
-            'number',
+            NumberType::class,
             [
                 'label'      => 'mautic.core.config.form.link.max_entity_lock_time',
                 'label_attr' => ['class' => 'control-label'],
@@ -616,7 +643,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'cors_restrict_domains',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.core.config.cors.restrict.domains',
                 'data'  => (array_key_exists('cors_restrict_domains', $options['data']) && !empty($options['data']['cors_restrict_domains'])),
@@ -631,7 +658,7 @@ class ConfigType extends AbstractType
         $builder->add(
             $builder->create(
                 'cors_valid_domains',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'      => 'mautic.core.config.cors.valid.domains',
                     'label_attr' => ['class' => 'control-label'],

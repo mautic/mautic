@@ -998,6 +998,7 @@ return [
         'log_path'                        => '%kernel.root_dir%/logs',
         'image_path'                      => 'media/images',
         'tmp_path'                        => '%kernel.root_dir%/cache',
+        'import_path'                     => '%kernel.root_dir%/cache/imports',
         'theme'                           => 'Mauve',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
         'db_driver'                       => 'pdo_mysql',
