@@ -47,7 +47,7 @@ return [
             'mautic.cache.adapter.memcached'  => [
                 'class'     => \Mautic\CacheBundle\Cache\Adapter\MemcachedTagAwareAdapter::class,
                 'arguments' => [
-                    '%mautic.memcached%',
+                    '%mautic.cache_adapter_memcached%',
                     '%mautic.cache_prefix%',
                     '%mautic.cache_lifetime%',
                 ],
@@ -56,7 +56,7 @@ return [
             'mautic.cache.adapter.redis'      => [
                 'class'     => \Mautic\CacheBundle\Cache\Adapter\RedisTagAwareAdapter::class,
                 'arguments' => [
-                    '%mautic.redis%',
+                    '%mautic.cache_adapter_redis%',
                     '%mautic.cache_prefix%',
                     '%mautic.cache_lifetime%',
                 ],
@@ -68,10 +68,10 @@ return [
     ],
 
     'parameters' => [
-        'cache_adapter'  => 'mautic.cache.adapter.filesystem',
-        'cache_prefix'   => getenv('DB_NAME') ?: '%mautic.db_name%',
-        'cache_lifetime' => 86400,
-        'memcached'      => [
+        'cache_adapter'           => 'mautic.cache.adapter.filesystem',
+        'cache_prefix'            => getenv('DB_NAME') ?: '%mautic.db_name%',
+        'cache_lifetime'          => 86400,
+        'cache_adapter_memcached' => [
             'servers' => ['memcached://localhost'],
             'options' => [
                 'compression'          => true,
@@ -79,7 +79,7 @@ return [
                 'serializer'           => 'igbinary',
             ],
         ],
-        'redis' => [
+        'cache_adapter_redis'     => [
             'dsn'     => 'redis://localhost',
             'options' => [
                 'lazy'           => false,
