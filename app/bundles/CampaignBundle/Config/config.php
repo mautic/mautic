@@ -461,6 +461,7 @@ return [
                     'mautic.campaign.event_collector',
                     'mautic.campaign.scheduler',
                     'mautic.tracker.contact',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
             'mautic.campaign.executioner.inactive'     => [

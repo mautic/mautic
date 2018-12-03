@@ -636,6 +636,30 @@ class Event implements ChannelInterface
     }
 
     /**
+     * Get log for a contact and a rotation.
+     *
+     * @param Contact $contact
+     * @param $rotation
+     *
+     * @return LeadEventLog|null
+     */
+    public function getLogByContactAndRotation(Contact $contact, $rotation)
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('lead', $contact))
+            ->andWhere(Criteria::expr()->eq('rotation', $rotation))
+            ->setMaxResults(1);
+
+        $log = $this->getLog()->matching($criteria);
+
+        if (count($log)) {
+            return $log->first();
+        }
+
+        return null;
+    }
+
+    /**
      * Add children.
      *
      * @param \Mautic\CampaignBundle\Entity\Event $children
