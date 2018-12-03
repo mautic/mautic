@@ -88,8 +88,7 @@ class LeadExport extends AbstractPipedrive
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
         if (!$integrationEntity) {
             // create new contact
-            die(print_r('aa'));
-
+            
             return $this->create($lead);
         }
 
