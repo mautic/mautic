@@ -26,11 +26,11 @@ class CacheClearSubscriber implements CacheClearerInterface
      */
     private $cacheProvider;
 
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
-    /**
-     * CacheClearSubscriber constructor.
-     */
     public function __construct(AdapterInterface $cacheProvider, LoggerInterface $logger)
     {
         $this->cacheProvider = $cacheProvider;

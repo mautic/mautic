@@ -18,6 +18,9 @@ use Mautic\CacheBundle\EventListener\CacheClearSubscriber;
 
 class CacheClearSubscriberTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var FilesystemTagAwareAdapter
+     */
     private $adapter;
 
     /**
