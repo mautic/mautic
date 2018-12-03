@@ -25,6 +25,16 @@ class ReportExportOptions
      */
     private $page;
 
+    /**
+     * @var \DateTime
+     */
+    private $dateFrom;
+
+    /**
+     * @var \DateTime
+     */
+    private $dateTo;
+
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->batchSize = $coreParametersHelper->getParameter('report_export_batch_size');
@@ -63,5 +73,37 @@ class ReportExportOptions
     public function getNumberOfProcessedResults()
     {
         return $this->page * $this->getBatchSize();
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateFrom()
+    {
+        return $this->dateFrom;
+    }
+
+    /**
+     * @param \DateTime $dateFrom
+     */
+    public function setDateFrom($dateFrom)
+    {
+        $this->dateFrom = $dateFrom;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateTo()
+    {
+        return $this->dateTo;
+    }
+
+    /**
+     * @param \DateTime $dateTo
+     */
+    public function setDateTo($dateTo)
+    {
+        $this->dateTo = $dateTo;
     }
 }

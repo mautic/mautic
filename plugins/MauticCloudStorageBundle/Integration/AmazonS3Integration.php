@@ -13,6 +13,9 @@ namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Aws\S3\S3Client;
 use Gaufrette\Adapter\AwsS3;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 
 /**
  * Class AmazonS3Integration.
@@ -68,6 +71,30 @@ class AmazonS3Integration extends CloudStorageIntegration
     }
 
     /**
+     * @param Form|FormBuilder $builder
+     * @param array            $data
+     * @param string           $formArea
+     */
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ('keys' === $formArea) {
+            $builder->add(
+                'region',
+                TextType::class,
+                [
+                    'label'       => 'mautic.integration.Amazon.region',
+                    'required'    => false,
+                    'attr'        => [
+                        'class'   => 'form-control',
+                    ],
+                    'data'        => empty($data['region']) ? 'us-east-1' : $data['region'],
+                    'required'    => false,
+                ]
+            );
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return AwsS3
@@ -77,7 +104,16 @@ class AmazonS3Integration extends CloudStorageIntegration
         if (!$this->adapter) {
             $keys = $this->getDecryptedApiKeys();
 
-            $service = S3Client::factory(['key' => $keys['client_id'], 'secret' => $keys['client_secret']]);
+            $service = new S3Client(
+                [
+                    'version'     => 'latest',
+                    'region'      => (empty($keys['region'])) ? 'us-east-1' : $keys['region'],
+                    'credentials' => [
+                        'key'    => $keys['client_id'],
+                        'secret' => $keys['client_secret'],
+                    ],
+                ]
+            );
 
             $this->adapter = new AwsS3($service, $keys['bucket']);
         }

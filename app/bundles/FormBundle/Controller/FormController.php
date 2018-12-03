@@ -234,14 +234,17 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
+        $submissionCounts = $this->getModel('form.submission')->getRepository()->getSubmissionCounts($activeForm);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'activeForm'  => $activeForm,
-                    'page'        => $page,
-                    'logs'        => $logs,
-                    'permissions' => $permissions,
-                    'stats'       => [
+                    'activeForm'       => $activeForm,
+                    'submissionCounts' => $submissionCounts,
+                    'page'             => $page,
+                    'logs'             => $logs,
+                    'permissions'      => $permissions,
+                    'stats'            => [
                         'submissionsInTime' => $timeStats,
                     ],
                     'dateRangeForm'     => $dateRangeForm->createView(),
@@ -572,7 +575,9 @@ class FormController extends CommonFormController
                         $model->setFields($entity, $fields);
                         $model->deleteFields($entity, $deletedFields);
 
-                        if (!$alias = $entity->getAlias()) {
+                        $alias = $entity->getAlias();
+
+                        if (empty($alias)) {
                             $alias = $model->cleanAlias($entity->getName(), '', 10);
                             $entity->setAlias($alias);
                         }

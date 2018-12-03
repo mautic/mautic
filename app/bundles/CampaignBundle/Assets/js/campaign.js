@@ -545,13 +545,13 @@ Mautic.campaignBuilderConnectionsMap = {
     'action': {
         'top': {
             'source': ['leadsource'],
-            'action': [],
+            'action': ['bottom'],
             'condition': ['yes', 'no'],
             'decision': ['yes', 'no']
         },
         'bottom': {
             'source': [],
-            'action': [],
+            'action': ['top'],
             'condition': ['top'],
             'decision': ['top']
         }

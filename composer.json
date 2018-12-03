@@ -73,7 +73,7 @@
         "doctrine/doctrine-migrations-bundle": "~1.1.1",
 
         "knplabs/gaufrette": "0.2",
-        "aws/aws-sdk-php": "~2.8",
+        "aws/aws-sdk-php": "~3.0",
         "rackspace/php-opencloud": "1.12.*",
 
         "knplabs/knp-menu": "^2.0",
