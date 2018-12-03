@@ -96,6 +96,7 @@ class FilterType extends AbstractType
                 'regions',
                 'fields',
                 'lists',
+                'campaign',
                 'emails',
                 'deviceTypes',
                 'deviceBrands',
