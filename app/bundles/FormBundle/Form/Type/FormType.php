@@ -106,6 +106,15 @@ class FormType extends AbstractType
             ],
         ]);
 
+        $builder->add(
+            'noIndex',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.form.form.no_index',
+                'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
+            ]
+        );
+
         // Render style for new form by default
         if ($options['data']->getId() === null) {
             $options['data']->setRenderStyle(true);

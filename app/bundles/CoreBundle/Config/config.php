@@ -175,6 +175,9 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.core.configbundle.subscriber.theme' => [
+                'class'     => \Mautic\CoreBundle\EventListener\ConfigThemeSubscriber::class,
+            ],
             'mautic.webpush.js.subscriber' => [
                 'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber',
             ],
@@ -184,10 +187,12 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+
             'mautic.core.maintenance.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\MaintenanceSubscriber',
+                'class'     => Mautic\CoreBundle\EventListener\MaintenanceSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                    'mautic.user.token.repository',
                 ],
             ],
             'mautic.core.request.subscriber' => [
@@ -259,6 +264,10 @@ return [
                 ],
                 'alias' => 'coreconfig',
             ],
+            'mautic.form.type.themeconfig' => [
+                'class' => \Mautic\CoreBundle\Form\Type\ConfigThemeType::class,
+                'alias' => 'themeconfig',
+            ],
             'mautic.form.type.coreconfig.iplookup_download_data_store_button' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType',
                 'alias'     => 'iplookup_download_data_store_button',
@@ -293,6 +302,13 @@ return [
             'mautic.form.type.slot.saveprefsbutton' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
                 'alias'     => 'slot_saveprefsbutton',
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.form.type.slot.successmessage' => [
+                'class'     => Mautic\CoreBundle\Form\Type\SlotSuccessMessageType::class,
+                'alias'     => 'slot_successmessage',
                 'arguments' => [
                     'translator',
                 ],
@@ -724,6 +740,7 @@ return [
                     'mautic.helper.paths',
                     'mautic.helper.templating',
                     'translator',
+                    'mautic.helper.core_parameters',
                 ],
                 'methodCalls' => [
                     'setDefaultTheme' => [
@@ -873,6 +890,14 @@ return [
                     'mautic.schema.helper.column',
                 ],
             ],
+            'mautic.form.list.validator.circular' => [
+                'class'     => Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'request_stack',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
         ],
         'models' => [
             'mautic.core.model.auditlog' => [
@@ -916,9 +941,13 @@ return [
     ],
 
     'ip_lookup_services' => [
+        'extreme-ip' => [
+            'display_name' => 'Extreme-IP',
+            'class'        => 'Mautic\CoreBundle\IpLookup\ExtremeIpLookup',
+        ],
         'freegeoip' => [
-            'display_name' => 'Freegeoip.net',
-            'class'        => 'Mautic\CoreBundle\IpLookup\FreegeoipLookup',
+            'display_name' => 'Ipstack.com',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IpstackLookup',
         ],
         'geobytes' => [
             'display_name' => 'Geobytes',
@@ -963,48 +992,49 @@ return [
     ],
 
     'parameters' => [
-        'site_url'             => '',
-        'webroot'              => '',
-        'cache_path'           => '%kernel.root_dir%/cache',
-        'log_path'             => '%kernel.root_dir%/logs',
-        'image_path'           => 'media/images',
-        'tmp_path'             => '%kernel.root_dir%/cache',
-        'theme'                => 'Mauve',
-        'db_driver'            => 'pdo_mysql',
-        'db_host'              => '127.0.0.1',
-        'db_port'              => 3306,
-        'db_name'              => '',
-        'db_user'              => '',
-        'db_password'          => '',
-        'db_table_prefix'      => '',
-        'db_server_version'    => '5.5',
-        'locale'               => 'en_US',
-        'secret_key'           => '',
-        'dev_hosts'            => null,
-        'trusted_hosts'        => null,
-        'trusted_proxies'      => null,
-        'rememberme_key'       => hash('sha1', uniqid(mt_rand())),
-        'rememberme_lifetime'  => 31536000, //365 days in seconds
-        'rememberme_path'      => '/',
-        'rememberme_domain'    => '',
-        'default_pagelimit'    => 30,
-        'default_timezone'     => 'UTC',
-        'date_format_full'     => 'F j, Y g:i a T',
-        'date_format_short'    => 'D, M d',
-        'date_format_dateonly' => 'F j, Y',
-        'date_format_timeonly' => 'g:i a',
-        'ip_lookup_service'    => 'maxmind_download',
-        'ip_lookup_auth'       => '',
-        'ip_lookup_config'     => [],
-        'transifex_username'   => '',
-        'transifex_password'   => '',
-        'update_stability'     => 'stable',
-        'cookie_path'          => '/',
-        'cookie_domain'        => '',
-        'cookie_secure'        => null,
-        'cookie_httponly'      => false,
-        'do_not_track_ips'     => [],
-        'do_not_track_bots'    => [
+        'site_url'                        => '',
+        'webroot'                         => '',
+        'cache_path'                      => '%kernel.root_dir%/cache',
+        'log_path'                        => '%kernel.root_dir%/logs',
+        'image_path'                      => 'media/images',
+        'tmp_path'                        => '%kernel.root_dir%/cache',
+        'theme'                           => 'Mauve',
+        'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
+        'db_driver'                       => 'pdo_mysql',
+        'db_host'                         => '127.0.0.1',
+        'db_port'                         => 3306,
+        'db_name'                         => '',
+        'db_user'                         => '',
+        'db_password'                     => '',
+        'db_table_prefix'                 => '',
+        'db_server_version'               => '5.5',
+        'locale'                          => 'en_US',
+        'secret_key'                      => '',
+        'dev_hosts'                       => null,
+        'trusted_hosts'                   => null,
+        'trusted_proxies'                 => null,
+        'rememberme_key'                  => hash('sha1', uniqid(mt_rand())),
+        'rememberme_lifetime'             => 31536000, //365 days in seconds
+        'rememberme_path'                 => '/',
+        'rememberme_domain'               => '',
+        'default_pagelimit'               => 30,
+        'default_timezone'                => 'UTC',
+        'date_format_full'                => 'F j, Y g:i a T',
+        'date_format_short'               => 'D, M d',
+        'date_format_dateonly'            => 'F j, Y',
+        'date_format_timeonly'            => 'g:i a',
+        'ip_lookup_service'               => 'maxmind_download',
+        'ip_lookup_auth'                  => '',
+        'ip_lookup_config'                => [],
+        'transifex_username'              => '',
+        'transifex_password'              => '',
+        'update_stability'                => 'stable',
+        'cookie_path'                     => '/',
+        'cookie_domain'                   => '',
+        'cookie_secure'                   => null,
+        'cookie_httponly'                 => false,
+        'do_not_track_ips'                => [],
+        'do_not_track_bots'               => [
             'MSNBOT',
             'msnbot-media',
             'bingbot',
@@ -1046,6 +1076,7 @@ return [
             'facebookexternalhit',
         ],
         'do_not_track_internal_ips' => [],
+        'track_private_ip_ranges'   => false,
         'link_shortener_url'        => null,
         'cached_data_timeout'       => 10,
         'batch_sleep_time'          => 1,
@@ -1054,5 +1085,6 @@ return [
         'cors_valid_domains'        => [],
         'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
         'max_entity_lock_time'      => 0,
+        'default_daterange_filter'  => '-1 month',
     ],
 ];

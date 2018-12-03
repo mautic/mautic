@@ -16,6 +16,8 @@ class PipedriveApi extends CrmApi
      */
     private $transport;
 
+    private $apiFields = [];
+
     /**
      * PipedriveApi constructor.
      *
@@ -110,7 +112,55 @@ class PipedriveApi extends CrmApi
     }
 
     /**
+     * @param string $email
+     *
      * @return array
+     */
+    public function findByEmail($email)
+    {
+        $url = sprintf('%s/%s/find', $this->integration->getApiUrl(), self::PERSONS_API_ENDPOINT);
+
+        $params = [
+            'query' => array_merge($this->getAuthQuery(), [
+                'term'            => $email,
+                'search_by_email' => true,
+            ]),
+        ];
+
+        $response = $this->transport->get($url, $params);
+
+        return $this->getResponseData($response);
+    }
+
+    /**
+     * @param     $name
+     * @param int $start
+     * @param int $limit
+     *
+     * @return array
+     */
+    public function findCompanyByName($name, $start = 0, $limit = 10)
+    {
+        $url = sprintf('%s/%s/find', $this->integration->getApiUrl(), self::ORGANIZATIONS_API_ENDPOINT);
+
+        $params = [
+            'query' => array_merge($this->getAuthQuery(), [
+                'term'            => $name,
+                'start'           => $start,
+                'limit'           => $limit,
+            ]),
+        ];
+
+        $response = $this->transport->get($url, $params);
+
+        return $this->getResponseData($response);
+    }
+
+    /**
+     * @param array  $query
+     * @param string $endpoint
+     *
+     * @return mixed
      */
     public function getDataByEndpoint(array $query, $endpoint)
     {
@@ -132,6 +182,10 @@ class PipedriveApi extends CrmApi
      */
     public function getFields($object = null)
     {
+        if (!empty($this->apiFields[$object])) {
+            return $this->apiFields[$object];
+        }
+
         $params = [
             'query' => $this->getAuthQuery(),
         ];
@@ -140,7 +194,11 @@ class PipedriveApi extends CrmApi
 
         $response = $this->transport->get($url, $params);
 
-        return $this->getResponseData($response);
+        $this->apiFields[$object] = $response;
+
+        $data = $this->getResponseData($response);
+
+        return !empty($data) ? $data : [];
     }
 
     /**

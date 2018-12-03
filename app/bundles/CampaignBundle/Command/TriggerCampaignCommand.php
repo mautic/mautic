@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -156,6 +157,13 @@ class TriggerCampaignCommand extends ModeratedCommand
                 null
             )
             ->addOption(
+                '--campaign-limit',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Limit number of contacts on a per campaign basis',
+                null
+            )
+            ->addOption(
                 '--contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
@@ -240,18 +248,20 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output       = $output;
+        $quiet              = $input->getOption('quiet');
+        $this->output       = $quiet ? new NullOutput() : $output;
         $this->kickoffOnly  = $input->getOption('kickoff-only');
         $this->scheduleOnly = $input->getOption('scheduled-only');
         $this->inactiveOnly = $input->getOption('inactive-only') || $input->getOption('negative-only');
 
-        $batchLimit   = $input->getOption('batch-limit');
-        $contactMinId = $input->getOption('min-contact-id');
-        $contactMaxId = $input->getOption('max-contact-id');
-        $contactId    = $input->getOption('contact-id');
-        $contactIds   = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
-        $threadId     = $input->getOption('thread-id');
-        $maxThreads   = $input->getOption('max-threads');
+        $batchLimit    = $input->getOption('batch-limit');
+        $campaignLimit = $input->getOption('campaign-limit');
+        $contactMinId  = $input->getOption('min-contact-id');
+        $contactMaxId  = $input->getOption('max-contact-id');
+        $contactId     = $input->getOption('contact-id');
+        $contactIds    = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
+        $threadId      = $input->getOption('thread-id');
+        $maxThreads    = $input->getOption('max-threads');
 
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
@@ -259,12 +269,12 @@ class TriggerCampaignCommand extends ModeratedCommand
             return 1;
         }
 
-        $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads);
+        $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         $id = $input->getOption('campaign-id');
-        if (!$this->checkRunStatus($input, $output, $id)) {
+        if (!$this->checkRunStatus($input, $this->output, $id)) {
             return 0;
         }
 
@@ -290,6 +300,9 @@ class TriggerCampaignCommand extends ModeratedCommand
             // Key is ID and not 0
             $campaign = reset($next);
             $this->triggerCampaign($campaign);
+            if ($this->limiter->hasCampaignLimit()) {
+                $this->limiter->resetCampaignLimitRemaining();
+            }
         }
 
         $this->completeRun();

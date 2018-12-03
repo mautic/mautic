@@ -18,6 +18,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -26,12 +27,24 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class CategoryListType extends AbstractType
 {
+    /**
+     * @var EntityManager
+     */
     private $em;
 
+    /**
+     * @var CategoryModel
+     */
     private $model;
 
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
 
+    /**
+     * @var Router
+     */
     private $router;
 
     /**
@@ -50,10 +63,16 @@ class CategoryListType extends AbstractType
         $this->router     = $router;
     }
 
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticCategoryBundle:Category', 'id');
-        $builder->addModelTransformer($transformer);
+        if (true === $options['return_entity']) {
+            $transformer = new IdToEntityModelTransformer($this->em, 'MauticCategoryBundle:Category', 'id');
+            $builder->addModelTransformer($transformer);
+        }
     }
 
     /**
@@ -90,7 +109,8 @@ class CategoryListType extends AbstractType
                     'onchange' => "Mautic.loadAjaxModalBySelectValue(this, 'new', '{$newUrl}', '{$modalHeader}');",
                 ];
             },
-            'required' => false,
+            'required'      => false,
+            'return_entity' => true,
         ]);
 
         $resolver->setRequired(['bundle']);

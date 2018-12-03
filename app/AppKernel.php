@@ -34,14 +34,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 14;
+    const MINOR_VERSION = 15;
 
     /**
      * Patch version number.
      *
      * @const integer
      */
-    const PATCH_VERSION = 1;
+    const PATCH_VERSION = 0;
 
     /**
      * Extra version identifier.
@@ -108,6 +108,14 @@ class AppKernel extends Kernel
 
         if (false === $this->booted) {
             $this->boot();
+        }
+
+        /*
+         * If we've already sent the response headers, and we have a session
+         * set in the request, set that as the session in the container.
+         */
+        if (headers_sent() && $request->getSession()) {
+            $this->getContainer()->set('session', $request->getSession());
         }
 
         // Check for an an active db connection and die with error if unable to connect

@@ -28,6 +28,7 @@ $templates = [
     'timezones'      => 'timezone-template',
     'select'         => 'select-template',
     'lists'          => 'leadlist-template',
+    'campaign'       => 'campaign-template',
     'deviceTypes'    => 'device_type-template',
     'deviceBrands'   => 'device_brand-template',
     'deviceOs'       => 'device_os-template',
@@ -102,7 +103,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                             $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
                                             ?>
                                             <option value="<?php echo $view->escape($value); ?>"
-                                                    id="available_<?php echo $value; ?>"
+                                                    id="available_<?php echo $object.'_'.$value; ?>"
                                                     data-field-object="<?php echo $object; ?>"
                                                     data-field-type="<?php echo $params['properties']['type']; ?>"
                                                     data-field-list="<?php echo $view->escape($list); ?>"
@@ -119,6 +120,11 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             <div class="clearfix"></div>
                         </div>
                         <div class="selected-filters" id="leadlist_filters">
+                            <?php if ($filterErrors): ?>
+                                <div class="alert alert-danger has-error">
+                                    <?php echo $view['form']->errors($form['filters']); ?>
+                                </div>
+                            <?php endif ?>
                             <?php echo $view['form']->widget($form['filters']); ?>
                         </div>
                     </div>
@@ -129,6 +135,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['isGlobal']); ?>
+            <?php echo $view['form']->row($form['isPreferenceCenter']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>
         </div>
     </div>

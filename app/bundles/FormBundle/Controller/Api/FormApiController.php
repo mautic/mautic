@@ -14,6 +14,7 @@ namespace Mautic\FormBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -120,10 +121,13 @@ class FormApiController extends CommonApiController
         $fieldModel  = $this->getModel('form.field');
         $actionModel = $this->getModel('form.action');
         $isNew       = false;
+        $alias       = $entity->getAlias();
 
-        // Set clean alias to prevent SQL errors
-        $alias = $this->model->cleanAlias($entity->getName(), '', 10);
-        $entity->setAlias($alias);
+        if (empty($alias)) {
+            // Set clean alias to prevent SQL errors
+            $alias = $this->model->cleanAlias($entity->getName(), '', 10);
+            $entity->setAlias($alias);
+        }
 
         // Set timestamps
         $this->model->setTimestamps($entity, true, false);
@@ -258,7 +262,7 @@ class FormApiController extends CommonApiController
      *
      * @param $entity
      *
-     * @return Form
+     * @return FormInterface
      */
     protected function createActionEntityForm($entity)
     {
@@ -278,7 +282,7 @@ class FormApiController extends CommonApiController
      *
      * @param $entity
      *
-     * @return Form
+     * @return FormInterface
      */
     protected function createFieldEntityForm($entity)
     {

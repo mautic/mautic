@@ -21,6 +21,7 @@ use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event as Events;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -81,6 +82,11 @@ class DynamicContentSubscriber extends CommonSubscriber
     private $dynamicContentHelper;
 
     /**
+     * @var DynamicContentModel
+     */
+    private $dynamicContentModel;
+
+    /**
      * DynamicContentSubscriber constructor.
      *
      * @param TrackableModel       $trackableModel
@@ -91,6 +97,7 @@ class DynamicContentSubscriber extends CommonSubscriber
      * @param AuditLogModel        $auditLogModel
      * @param LeadModel            $leadModel
      * @param DynamicContentHelper $dynamicContentHelper
+     * @param DynamicContentModel  $dynamicContentModel
      */
     public function __construct(
         TrackableModel $trackableModel,
@@ -100,7 +107,8 @@ class DynamicContentSubscriber extends CommonSubscriber
         FocusTokenHelper $focusTokenHelper,
         AuditLogModel $auditLogModel,
         LeadModel $leadModel,
-        DynamicContentHelper $dynamicContentHelper
+        DynamicContentHelper $dynamicContentHelper,
+        DynamicContentModel $dynamicContentModel
     ) {
         $this->trackableModel       = $trackableModel;
         $this->pageTokenHelper      = $pageTokenHelper;
@@ -110,6 +118,7 @@ class DynamicContentSubscriber extends CommonSubscriber
         $this->auditLogModel        = $auditLogModel;
         $this->leadModel            = $leadModel;
         $this->dynamicContentHelper = $dynamicContentHelper;
+        $this->dynamicContentModel  = $dynamicContentModel;
     }
 
     /**
@@ -189,12 +198,18 @@ class DynamicContentSubscriber extends CommonSubscriber
                 $clickthrough['dynamic_content_id']
             );
 
+            $dwc     =  $this->dynamicContentModel->getEntity($clickthrough['dynamic_content_id']);
+            $utmTags = [];
+            if ($dwc && $dwc instanceof DynamicContent) {
+                $utmTags = $dwc->getUtmTags();
+            }
+
             /**
              * @var string
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {
-                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough);
+                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, false, $utmTags);
             }
 
             $content = str_replace(array_keys($tokens), array_values($tokens), $content);
@@ -245,7 +260,7 @@ class DynamicContentSubscriber extends CommonSubscriber
             }
 
             $newnode = $dom->createDocumentFragment();
-            $newnode->appendXML(mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8'));
+            $newnode->appendXML('<![CDATA['.mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8').']]>');
             $slot->parentNode->replaceChild($newnode, $slot);
         }
 
