@@ -1,9 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Mautic\CacheBundle\Cache\Adapter;
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc. Jan Kozak <galvani78@gmail.com>
@@ -12,6 +8,8 @@ namespace Mautic\CacheBundle\Cache\Adapter;
  * @created     12.9.18
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+namespace Mautic\CacheBundle\Cache\Adapter;
 
 use Mautic\CacheBundle\Exceptions\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\RedisAdapter;

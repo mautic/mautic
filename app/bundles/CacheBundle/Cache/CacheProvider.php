@@ -1,9 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Mautic\CacheBundle\Cache;
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc. Jan Kozak <galvani78@gmail.com>
@@ -12,6 +8,8 @@ namespace Mautic\CacheBundle\Cache;
  * @created     12.9.18
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+namespace Mautic\CacheBundle\Cache;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
@@ -35,7 +33,7 @@ final class CacheProvider implements TagAwareAdapterInterface
      */
     private $psr16;
 
-    public function setCacheAdapter(TagAwareAdapterInterface $adapter): void
+    public function setCacheAdapter(TagAwareAdapterInterface $adapter)
     {
         $this->adapter = $adapter;
 
@@ -47,14 +45,12 @@ final class CacheProvider implements TagAwareAdapterInterface
     /**
      * @return TagAwareAdapterInterface
      */
-    public function getCacheAdapter(): ?TagAwareAdapterInterface
+    public function getCacheAdapter()
     {
         return $this->adapter;
     }
 
     /**
-     * Returns PSR-16 cache object.
-     *
      * @return Psr6Cache
      */
     public function getSimpleCache()
@@ -67,34 +63,48 @@ final class CacheProvider implements TagAwareAdapterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param $key
+     *
+     * @return CacheItem
+     *
+     * @throws InvalidArgumentException
      */
-    public function getItem($key): CacheItem
+    public function getItem($key)
     {
         return $this->getCacheAdapter()->getItem($key);
     }
 
     /**
-     * {@inheritdoc}
+     * @return CacheItem[]|\Traversable
      *
-     * @return \Traversable|CacheItem[]
+     * @throws InvalidArgumentException
      */
     public function getItems(array $keys = [])
     {
         return $this->getCacheAdapter()->getItems($keys);
     }
 
-    public function hasItem($key): bool
+    /**
+     * @param string $key
+     *
+     * @return bool
+     *
+     * @throws InvalidArgumentException
+     */
+    public function hasItem($key)
     {
         return $this->getCacheAdapter()->hasItem($key);
     }
 
-    public function clear(): bool
+    /**
+     * @return bool
+     */
+    public function clear()
     {
         return $this->getCacheAdapter()->clear();
     }
 
-    public function deleteItem($key): bool
+    public function deleteItem($key)
     {
         return $this->getCacheAdapter()->deleteItem($key);
     }
@@ -112,7 +122,7 @@ final class CacheProvider implements TagAwareAdapterInterface
      * @return bool
      *              True if the items were successfully removed. False if there was an error.
      */
-    public function deleteItems(array $keys): bool
+    public function deleteItems(array $keys)
     {
         return $this->getCacheAdapter()->deleteItems($keys);
     }
@@ -126,7 +136,7 @@ final class CacheProvider implements TagAwareAdapterInterface
      * @return bool
      *              True if the item was successfully persisted. False if there was an error.
      */
-    public function save(CacheItemInterface $item): bool
+    public function save(CacheItemInterface $item)
     {
         return $this->getCacheAdapter()->save($item);
     }
@@ -140,7 +150,7 @@ final class CacheProvider implements TagAwareAdapterInterface
      * @return bool
      *              False if the item could not be queued or if a commit was attempted and failed. True otherwise.
      */
-    public function saveDeferred(CacheItemInterface $item): bool
+    public function saveDeferred(CacheItemInterface $item)
     {
         return $this->getCacheAdapter()->saveDeferred($item);
     }
@@ -151,7 +161,7 @@ final class CacheProvider implements TagAwareAdapterInterface
      * @return bool
      *              True if all not-yet-saved items were successfully saved or there were none. False otherwise.
      */
-    public function commit(): bool
+    public function commit()
     {
         return $this->getCacheAdapter()->commit();
     }
