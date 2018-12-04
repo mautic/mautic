@@ -64,6 +64,11 @@ class PathsHelper
     protected $temporaryDir;
 
     /**
+     * @var string
+     */
+    protected $importDir;
+
+    /**
      * @var User
      */
     protected $user;
@@ -85,7 +90,7 @@ class PathsHelper
         $this->dashboardUserImportDir = $this->removeTrailingSlash($coreParametersHelper->getParameter('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($coreParametersHelper->getParameter('kernel.cache_dir'));
         $this->kernelLogsDir          = $this->removeTrailingSlash($coreParametersHelper->getParameter('kernel.logs_dir'));
-        $this->importsDir             = $this->removeTrailingSlash($coreParametersHelper->getParameter('import_path'));
+        $this->importDir              = $this->removeTrailingSlash($coreParametersHelper->getParameter('import_path'));
     }
 
     /**
@@ -108,18 +113,17 @@ class PathsHelper
                 break;
 
             case 'imports':
-                if (!empty($this->importsDir)) {
-                    if (
-                        !is_dir($this->importsDir) &&
-                        !file_exists($this->importsDir) &&
-                        is_writable($this->importsDir)
-                    ) {
-                        mkdir($this->importsDir, 0755, true);
-                    }
-
-                    return $this->importsDir;
+                if (empty($this->importDir)) {
+                    $this->importDir = $this->getSystemPath('tmp');
+                    $this->importDir .= '/imports';
                 }
-                //fall through to temporary
+
+                if (!is_dir($this->importDir) && !file_exists($this->importDir) && is_writable($this->importDir)) {
+                    mkdir($this->importDir, 0755, true);
+                }
+
+                return $this->importDir;
+
             case 'cache':
             case 'logs':
             case 'temporary':
