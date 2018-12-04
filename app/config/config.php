@@ -364,7 +364,7 @@ $container->loadFromExtension('noxlogic_rate_limit', [
   ],
   'fos_oauth_key_listener' => true,
   'display_headers'        => true,
-  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of %mautic.api_rate_limiter_limit% API calls by hour.", "details": [] } ]}',
+  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of %mautic.api_rate_limiter_limit% API calls per hour.", "details": [] } ]}',
 ]);
 
 $container->setParameter(
