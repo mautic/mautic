@@ -21,9 +21,9 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
     /**
      * @var string
      *
-     * @see https://www.percona.com/blog/2015/04/29/generated-virtual-columns-in-mysql-5-7-labs
+     * @see https://dev.mysql.com/doc/refman/5.7/en/innodb-foreign-key-constraints.html#innodb-foreign-key-generated-columns
      */
-    private const MYSQL_MINIMUM_VERSION = '5.7.7';
+    private const MYSQL_MINIMUM_VERSION = '5.7.14';
 
     /**
      * @var string
