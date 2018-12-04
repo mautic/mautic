@@ -14,7 +14,7 @@ namespace MauticPlugin\MauticCrmBundle\Api\Zoho\Xml;
 class Writer
 {
     /**
-     * @var object
+     * @var XmlObject
      */
     protected $object;
 
@@ -30,7 +30,7 @@ class Writer
      */
     public function __construct($object)
     {
-        $this->object = new Object($object);
+        $this->object = new XmlObject($object);
 
         return $this;
     }
