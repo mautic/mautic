@@ -39,7 +39,7 @@ class GeneratedColumnsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetGeneratedColumnsIfNotSupported()
     {
-        $notSupportedMySqlVersion = '5.6.0';
+        $notSupportedMySqlVersion = '5.7.13';
 
         $this->versionProvider->expects($this->once())
             ->method('getVersion')
@@ -56,7 +56,7 @@ class GeneratedColumnsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetGeneratedColumnsIfSupported()
     {
-        $supportedMySqlVersion = '8.0.0';
+        $supportedMySqlVersion = '5.7.14';
 
         $event = new GeneratedColumnsEvent();
         $event->addGeneratedColumn(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
@@ -72,7 +72,7 @@ class GeneratedColumnsProviderTest extends \PHPUnit_Framework_TestCase
         $generatedColumns = $this->provider->getGeneratedColumns();
 
         $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
-        $this->assertCount(1, $generatedColumns);
+        $this->assertGreaterThanOrEqual(1, count($generatedColumns));
 
         // Ensure that the cache works and dispatcher is called only once
         $generatedColumns = $this->provider->getGeneratedColumns();
