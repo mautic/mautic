@@ -787,12 +787,13 @@ return [
         'resubscribe_message'          => null,
         'monitored_email'              => [
             'general' => [
-                'address'    => null,
-                'host'       => null,
-                'port'       => '993',
-                'encryption' => '/ssl',
-                'user'       => null,
-                'password'   => null,
+                'address'         => null,
+                'host'            => null,
+                'port'            => '993',
+                'encryption'      => '/ssl',
+                'user'            => null,
+                'password'        => null,
+                'use_attachments' => false,
             ],
             'EmailBundle_bounces' => [
                 'address'           => null,

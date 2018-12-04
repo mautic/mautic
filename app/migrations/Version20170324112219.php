@@ -38,7 +38,7 @@ class Version20170324112219 extends AbstractMauticMigration
             ->fetch()
         ;
 
-        if ($row !== false) {
+        if (false !== $row) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }

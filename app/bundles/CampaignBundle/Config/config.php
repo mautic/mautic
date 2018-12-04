@@ -204,6 +204,7 @@ return [
                 'arguments' => [
                     'mautic.campaign.model.campaign',
                     'translator',
+                    'mautic.security',
                 ],
                 'alias'     => 'campaign_list',
             ],
@@ -461,6 +462,7 @@ return [
                     'mautic.campaign.event_collector',
                     'mautic.campaign.scheduler',
                     'mautic.tracker.contact',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
             'mautic.campaign.executioner.inactive'     => [

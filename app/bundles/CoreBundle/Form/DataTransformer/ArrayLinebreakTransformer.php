@@ -25,7 +25,7 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
      */
     public function transform($array)
     {
-        if ($array === null) {
+        if (null === $array) {
             return '';
         }
 

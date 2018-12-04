@@ -1,18 +1,24 @@
-dist: precise
-
 language: php
 
 services:
   - mysql
 
 php:
-  - 5.6.19
+  - 5.6
   - 7.0
   - 7.1
+  - 7.2
+
+cache:
+  directories:
+    - $HOME/.composer/cache
 
 before_install:
   # Create mautictest database
   - mysql -e 'CREATE DATABASE mautictest;'
+
+  # increase memory limit for all PHP processes
+  - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
   # turn off XDebug
   - phpenv config-rm xdebug.ini || return
@@ -32,11 +38,11 @@ install:
 script:
 
   # Run PHPUnit
-  - bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --fail-on-warning
+  - bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --fail-on-warning
 
   # Run PHPSTAN analysis for PHP 7+
   - if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.6" ]]; then ~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/DashboardBundle app/bundles/ConfigBundle app/bundles/CampaignBundle app/bundles/WebhookBundle app/bundles/LeadBundle app/bundles/FormBundle; fi
 
   # Check if the code standards weren't broken.
-  # Run it only on PHP 7.1 which should be the fastest. No need to run it for all PHP versions
-  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then bin/php-cs-fixer fix -v --dry-run --diff; fi
+  # Run it only on PHP 7.2 which should be the fastest. No need to run it for all PHP versions
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ]]; then bin/php-cs-fixer fix -v --dry-run --diff; fi

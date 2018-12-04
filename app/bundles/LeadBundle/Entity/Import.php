@@ -623,8 +623,11 @@ class Import extends FormEntity
      */
     public function start()
     {
-        $this->setDateStarted(new \DateTime())
-            ->setStatus(self::IN_PROGRESS);
+        if (empty($this->getDateStarted())) {
+            $this->setDateStarted(new \DateTime());
+        }
+
+        $this->setStatus(self::IN_PROGRESS);
 
         return $this;
     }

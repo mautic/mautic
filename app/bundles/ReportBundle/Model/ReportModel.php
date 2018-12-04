@@ -282,7 +282,41 @@ class ReportModel extends FormModel
     {
         $data = $this->buildAvailableReports($context);
 
-        return (!isset($data['tables'])) ? [] : $data['tables'];
+        $data = (!isset($data['tables'])) ? [] : $data['tables'];
+
+        if (array_key_exists('columns', $data)) {
+            $data['columns'] = $this->preventSameAliases($data['columns']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Prevent same aliases using numeric suffixes for each alias.
+     *
+     * @param array $columns
+     *
+     * @return array
+     */
+    private function preventSameAliases(array $columns)
+    {
+        $existingAliases = [];
+
+        foreach ($columns as $key => $column) {
+            $alias = $column['alias'];
+
+            // Count suffixes
+            if (!array_key_exists($alias, $existingAliases)) {
+                $existingAliases[$alias] = 1;
+            } else {
+                ++$existingAliases[$alias];
+            }
+
+            // Add numeric suffix
+            $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+        }
+
+        return $columns;
     }
 
     /**
