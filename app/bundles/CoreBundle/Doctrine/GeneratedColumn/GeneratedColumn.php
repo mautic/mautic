@@ -126,9 +126,8 @@ final class GeneratedColumn implements GeneratedColumnInterface
      */
     public function getAlterTableSql()
     {
-        return "ALTER TABLE {$this->getTableName()}
-            ADD {$this->getColumnName()} {$this->getColumnDefinition()},
-            ADD INDEX `{$this->getIndexName()}`({$this->indexColumnsToString()})";
+        return "ALTER TABLE {$this->getTableName()} ADD {$this->getColumnName()} {$this->getColumnDefinition()};
+            ALTER TABLE {$this->getTableName()} ADD INDEX `{$this->getIndexName()}`({$this->indexColumnsToString()})";
     }
 
     /**
