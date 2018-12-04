@@ -27,37 +27,41 @@ class Version20181204000000 extends AbstractMauticMigration
             ->fetchAll();
 
         foreach ($roles as $role) {
-            $unserializedArray = unserialize($role["readable_permissions"]);
+            $unserializedArray = unserialize($role['readable_permissions']);
 
-            if ($unserializedArray !== NULL && isset($unserializedArray["campaign:campaigns"])) {
+            if (null !== $unserializedArray && isset($unserializedArray['campaign:campaigns'])) {
                 $newPermissions = [];
 
-                if (in_array('view', $unserializedArray["campaign:campaigns"])) {
+                if (in_array('full', $unserializedArray['campaign:campaigns'])) {
+                    $newPermissions[] = 'full';
+                }
+
+                if (in_array('view', $unserializedArray['campaign:campaigns'])) {
                     $newPermissions[] = 'viewown';
                     $newPermissions[] = 'viewother';
                 }
 
-                if (in_array('edit', $unserializedArray["campaign:campaigns"])) {
+                if (in_array('edit', $unserializedArray['campaign:campaigns'])) {
                     $newPermissions[] = 'editown';
                     $newPermissions[] = 'editother';
                 }
 
-                if (in_array('create', $unserializedArray["campaign:campaigns"])) {
+                if (in_array('create', $unserializedArray['campaign:campaigns'])) {
                     $newPermissions[] = 'create';
                 }
 
-                if (in_array('delete', $unserializedArray["campaign:campaigns"])) {
+                if (in_array('delete', $unserializedArray['campaign:campaigns'])) {
                     $newPermissions[] = 'deleteown';
                     $newPermissions[] = 'deleteother';
                 }
 
-                if (in_array('publish', $unserializedArray["campaign:campaigns"])) {
+                if (in_array('publish', $unserializedArray['campaign:campaigns'])) {
                     $newPermissions[] = 'publishown';
                     $newPermissions[] = 'publishother';
                 }
 
-                $unserializedArray["campaign:campaigns"] = $newPermissions;
-                $serializedArray = serialize($unserializedArray);
+                $unserializedArray['campaign:campaigns'] = $newPermissions;
+                $serializedArray                         = serialize($unserializedArray);
 
                 $this->connection->update(MAUTIC_TABLE_PREFIX.'roles',
                     [
