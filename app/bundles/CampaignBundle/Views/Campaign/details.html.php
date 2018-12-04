@@ -20,10 +20,22 @@ $view['slots']->set(
         [
             'item'            => $campaign,
             'templateButtons' => [
-                'edit'   => $permissions['campaign:campaigns:edit'],
-                'clone'  => $permissions['campaign:campaigns:create'],
-                'delete' => $permissions['campaign:campaigns:delete'],
-                'close'  => $permissions['campaign:campaigns:view'],
+                'edit'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:editown'],
+                    $permissions['campaign:campaigns:editother'],
+                    $campaign->getCreatedBy()
+                ),
+                'clone'    => $permissions['campaign:campaigns:create'],
+                'delete'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:deleteown'],
+                    $permissions['campaign:campaigns:deleteother'],
+                    $campaign->getCreatedBy()
+                ),
+                'close'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:viewown'],
+                    $permissions['campaign:campaigns:viewother'],
+                    $campaign->getCreatedBy()
+                ),
             ],
             'routeBase' => 'campaign',
         ]
