@@ -114,7 +114,10 @@ class CampaignModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:Campaign');
+        $repo = $this->em->getRepository('MauticCampaignBundle:Campaign');
+        $repo->setCurrentUser($this->userHelper->getUser());
+
+        return $repo;
     }
 
     /**
@@ -632,7 +635,7 @@ class CampaignModel extends CommonFormModel
             $repo   = $this->getRepository();
             $leadId = $lead->getId();
             //get the campaigns the lead is currently part of
-            $campaigns[$leadId] = $repo->getPublishedCampaigns(null, $lead->getId(), $forList);
+            $campaigns[$leadId] = $repo->getPublishedCampaigns(null, $lead->getId(), $forList, $this->security->isGranted($this->getPermissionBase().':viewother'));
         }
 
         return $campaigns[$lead->getId()];
@@ -650,7 +653,7 @@ class CampaignModel extends CommonFormModel
         static $campaigns = [];
 
         if (empty($campaigns)) {
-            $campaigns = $this->getRepository()->getPublishedCampaigns(null, null, $forList);
+            $campaigns = $this->getRepository()->getPublishedCampaigns(null, null, $forList, $this->security->isGranted($this->getPermissionBase().':viewother'));
         }
 
         return $campaigns;

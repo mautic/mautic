@@ -71,8 +71,8 @@ class PathsHelper
     /**
      * PathsHelper constructor.
      *
-     * @param CoreParametersHelper
-     * @param UserHelper $userHelper
+     * @param UserHelper           $userHelper
+     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper)
     {
@@ -82,7 +82,7 @@ class PathsHelper
         $this->imagePath              = $this->removeTrailingSlash($coreParametersHelper->getParameter('image_path'));
         $this->dashboardImportDir     = $this->removeTrailingSlash($coreParametersHelper->getParameter('dashboard_import_dir'));
         $this->temporaryDir           = $this->removeTrailingSlash($coreParametersHelper->getParameter('tmp_path'));
-        $this->dashboardImportUserDir = $this->removeTrailingSlash($coreParametersHelper->getParameter('dashboard_import_user_dir'));
+        $this->dashboardUserImportDir = $this->removeTrailingSlash($coreParametersHelper->getParameter('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($coreParametersHelper->getParameter('kernel.cache_dir'));
         $this->kernelLogsDir          = $this->removeTrailingSlash($coreParametersHelper->getParameter('kernel.logs_dir'));
     }
@@ -116,8 +116,8 @@ class PathsHelper
                 } elseif ('logs' === $name) {
                     return $this->kernelLogsDir;
                 } else {
-                    if (!is_dir($this->temporaryDir) && !file_exists($this->temporaryDir)) {
-                        mkdir($this->temporaryDir, 0755);
+                    if (!is_dir($this->temporaryDir) && !file_exists($this->temporaryDir) && is_writable($this->temporaryDir)) {
+                        mkdir($this->temporaryDir, 0755, true);
                     }
 
                     return $this->temporaryDir;
@@ -142,8 +142,7 @@ class PathsHelper
 
                 $userPath .= '/'.$this->user->getId();
 
-                // @todo check is_writable
-                if (!is_dir($userPath) && !file_exists($userPath)) {
+                if (!is_dir($userPath) && !file_exists($userPath) && is_writable($userPath)) {
                     mkdir($userPath, 0755);
                 }
 

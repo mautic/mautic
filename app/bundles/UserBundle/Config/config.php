@@ -144,6 +144,13 @@ return [
             'mautic.user.route.subscriber' => [
                 'class' => 'Mautic\UserBundle\EventListener\RouteSubscriber',
             ],
+            'mautic.user.security_subscriber' => [
+                'class'     => 'Mautic\UserBundle\EventListener\SecuritySubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.user' => [
@@ -207,6 +214,11 @@ return [
                 'class'     => 'Mautic\UserBundle\Entity\UserRepository',
                 'arguments' => 'Mautic\UserBundle\Entity\User',
                 'factory'   => ['@mautic.user.manager', 'getRepository'],
+            ],
+            'mautic.user.token.repository' => [
+                'class'     => 'Mautic\UserBundle\Entity\UserTokenRepository',
+                'arguments' => 'Mautic\UserBundle\Entity\UserToken',
+                'factory'   => ['@doctrine', 'getRepository'],
             ],
             'mautic.permission.manager' => [
                 'class'     => 'Doctrine\ORM\EntityManager',

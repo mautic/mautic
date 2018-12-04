@@ -34,14 +34,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 14;
+    const MINOR_VERSION = 15;
 
     /**
      * Patch version number.
      *
      * @const integer
      */
-    const PATCH_VERSION = 2;
+    const PATCH_VERSION = 0;
 
     /**
      * Extra version identifier.
@@ -92,12 +92,12 @@ class AppKernel extends Kernel
                 $base   = $request->getBaseUrl();
                 $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
-                if ((strpos(strtolower($_SERVER['SERVER_SOFTWARE']), 'apache') === false
+                if (stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache') === false
                     || !file_exists(__DIR__.'../.htaccess')
                     && strpos(
                         $base,
                         'index'
-                    ) === false)
+                    ) === false
                 ) {
                     $prefix .= '/index.php';
                 }
@@ -108,6 +108,14 @@ class AppKernel extends Kernel
 
         if (false === $this->booted) {
             $this->boot();
+        }
+
+        /*
+         * If we've already sent the response headers, and we have a session
+         * set in the request, set that as the session in the container.
+         */
+        if (headers_sent() && $request->getSession()) {
+            $this->getContainer()->set('session', $request->getSession());
         }
 
         // Check for an an active db connection and die with error if unable to connect
@@ -374,7 +382,7 @@ class AppKernel extends Kernel
     {
         $parameters = $this->getLocalParams();
         if (isset($parameters['cache_path'])) {
-            $envFolder = (strpos($parameters['cache_path'], -1) != '/') ? '/'.$this->environment : $this->environment;
+            $envFolder = (substr($parameters['cache_path'], -1) != '/') ? '/'.$this->environment : $this->environment;
 
             return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['cache_path'].$envFolder);
         } else {

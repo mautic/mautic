@@ -235,7 +235,7 @@ class CheckStep implements StepInterface
         if (extension_loaded('xdebug')) {
             $cfgValue = ini_get('xdebug.max_nesting_level');
 
-            if (!call_user_func(create_function('$cfgValue', 'return $cfgValue > 100;'), $cfgValue)) {
+            if ($cfgValue <= 100) {
                 $messages[] = 'mautic.install.xdebug.nesting';
             }
         }
@@ -263,6 +263,10 @@ class CheckStep implements StepInterface
 
         if (!function_exists('imap_open')) {
             $messages[] = 'mautic.install.extension.imap';
+        }
+
+        if (substr($this->site_url, 0, 5) !== 'https') {
+            $messages[] = 'mautic.install.ssl.certificate';
         }
 
         if (!defined('PHP_WINDOWS_VERSION_BUILD')) {

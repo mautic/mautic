@@ -16,6 +16,10 @@ return [
                 'path'       => '/emails/{page}',
                 'controller' => 'MauticEmailBundle:Email:index',
             ],
+            'mautic_email_graph_stats' => [
+                'path'       => '/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
+                'controller' => 'MauticEmailBundle:EmailGraphStats:view',
+            ],
             'mautic_email_action' => [
                 'path'       => '/emails/{objectAction}/{objectId}',
                 'controller' => 'MauticEmailBundle:Email:execute',
@@ -111,6 +115,20 @@ return [
                     'mautic.helper.message',
                 ],
             ],
+            'mautic.email.queue.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\QueueSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
+            ],
+            'mautic.email.momentum.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\MomentumSubscriber::class,
+                'arguments' => [
+                    'mautic.transport.momentum.callback',
+                    'mautic.queue.service',
+                    'mautic.email.helper.request.storage',
+                ],
+            ],
             'mautic.email.monitored.bounce.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\ProcessBounceSubscriber::class,
                 'arguments' => [
@@ -192,9 +210,6 @@ return [
                     'mautic.email.model.send_email_to_user',
                 ],
             ],
-            'mautic.email.calendarbundle.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\CalendarSubscriber',
-            ],
             'mautic.email.search.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\SearchSubscriber',
                 'arguments' => [
@@ -250,6 +265,12 @@ return [
                 'class'     => \Mautic\EmailBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.email.subscriber.contact_tracker' => [
+                'class'     => \Mautic\EmailBundle\EventListener\TrackingSubscriber::class,
+                'arguments' => [
+                    'mautic.email.repository.stat',
                 ],
             ],
         ],
@@ -555,20 +576,6 @@ return [
                     'mautic.helper.paths',
                 ],
             ],
-            'mautic.email.repository.emailReply' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\EmailReply::class,
-                ],
-            ],
-            'mautic.email.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\Stat::class,
-                ],
-            ],
             'mautic.message.search.contact' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class,
                 'arguments' => [
@@ -656,6 +663,12 @@ return [
                     'mautic.email.repository.stat',
                 ],
             ],
+            'mautic.email.helper.request.storage' => [
+                'class'     => \Mautic\EmailBundle\Helper\RequestStorageHelper::class,
+                'arguments' => [
+                    'mautic.helper.cache_storage',
+                ],
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
@@ -673,6 +686,7 @@ return [
                     'mautic.email.model.send_email_to_contacts',
                     'mautic.tracker.device',
                     'mautic.page.repository.redirect',
+                    'mautic.helper.cache_storage',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
@@ -722,6 +736,22 @@ return [
                 'tag' => 'validator.constraint_validator',
             ],
         ],
+        'repositories' => [
+            'mautic.email.repository.emailReply' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\EmailReply::class,
+                ],
+            ],
+            'mautic.email.repository.stat' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\Stat::class,
+                ],
+            ],
+        ],
     ],
     'parameters' => [
         'mailer_api_key'               => null, // Api key from mail delivery provider.
@@ -751,12 +781,13 @@ return [
         'resubscribe_message'          => null,
         'monitored_email'              => [
             'general' => [
-                'address'    => null,
-                'host'       => null,
-                'port'       => '993',
-                'encryption' => '/ssl',
-                'user'       => null,
-                'password'   => null,
+                'address'         => null,
+                'host'            => null,
+                'port'            => '993',
+                'encryption'      => '/ssl',
+                'user'            => null,
+                'password'        => null,
+                'use_attachments' => false,
             ],
             'EmailBundle_bounces' => [
                 'address'           => null,

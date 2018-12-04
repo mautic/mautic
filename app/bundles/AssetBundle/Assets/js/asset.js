@@ -1,6 +1,6 @@
 //AssetBundle
 Mautic.assetOnLoad = function (container) {
-    if (typeof mauticAssetUploadEndpoint !== 'undefined' && mQuery('div#dropzone').length) {
+    if (typeof mauticAssetUploadEndpoint !== 'undefined' && typeof Mautic.assetDropzone == 'undefined' && mQuery('div#dropzone').length) {
         Mautic.initializeDropzone();
     }
 };

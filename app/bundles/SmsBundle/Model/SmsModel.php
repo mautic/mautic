@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -269,8 +268,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             if (count($contacts)) {
                 /** @var Lead $lead */
                 foreach ($contacts as $lead) {
-                    $leadId = $lead->getId();
-
+                    $leadId          = $lead->getId();
+                    $stat            = $this->createStatEntry($sms, $lead, $channel, false);
                     $leadPhoneNumber = $lead->getLeadPhoneNumber();
 
                     if (empty($leadPhoneNumber)) {
@@ -291,7 +290,14 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         new TokenReplacementEvent(
                             $smsEvent->getContent(),
                             $lead,
-                            ['channel' => ['sms', $sms->getId()]]
+                            [
+                                'channel' => [
+                                    'sms',          // Keep BC pre 2.14.1
+                                    $sms->getId(),  // Keep BC pre 2.14.1
+                                    'sms' => $sms->getId(),
+                                ],
+                                'stat'    => $stat->getTrackingHash(),
+                            ]
                         )
                     );
 
@@ -308,9 +314,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
+                        unset($stat);
                     } else {
                         $sendResult['sent'] = true;
-                        $stats[]            = $this->createStatEntry($sms, $lead, $channel, false);
+                        $stats[]            = $stat;
                         ++$sentCount;
                     }
 
@@ -354,6 +361,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $source = $source[0];
         }
         $stat->setSource($source);
+        $stat->setTrackingHash(str_replace('.', '', uniqid('', true)));
 
         if ($persist) {
             $this->getStatRepository()->saveEntity($stat);

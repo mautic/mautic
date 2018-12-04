@@ -29,7 +29,7 @@ class Version20170728110351 extends AbstractMauticMigration
     {
         $table = $schema->getTable($this->prefix.'companies_leads');
 
-        if ($table->hasColumn('is_primary') && $table->getColumn('is_primary')->getNotnull() === false) {
+        if ($table->hasColumn('is_primary') && false === $table->getColumn('is_primary')->getNotnull()) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }

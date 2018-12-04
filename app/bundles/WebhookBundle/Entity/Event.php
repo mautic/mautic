@@ -102,7 +102,7 @@ class Event
     }
 
     /**
-     * @return mixed
+     * @return Webhook
      */
     public function getWebhook()
     {
@@ -110,9 +110,11 @@ class Event
     }
 
     /**
-     * @param mixed $webhook
+     * @param Webhook $webhook
+     *
+     * @return $this
      */
-    public function setWebhook($webhook)
+    public function setWebhook(Webhook $webhook)
     {
         $this->webhook = $webhook;
 

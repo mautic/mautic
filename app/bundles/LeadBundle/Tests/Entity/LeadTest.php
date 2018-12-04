@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
@@ -278,6 +279,25 @@ class LeadTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($email, $changes['email'][1]);
         $this->assertEquals($email, $changes['fields']['email'][1]);
+    }
+
+    public function testIpAddressChanges()
+    {
+        $ip1 = (new IpAddress())->setIpAddress('1.2.3.4');
+        $ip2 = (new IpAddress())->setIpAddress('1.2.3.5');
+
+        $contact = new Lead();
+
+        $this->assertCount(0, $contact->getChanges());
+
+        $contact->addIpAddress($ip1);
+        $changes = $contact->getChanges();
+
+        $this->assertSame(['1.2.3.4' => $ip1], $contact->getChanges()['ipAddressList']);
+
+        $contact->addIpAddress($ip2);
+
+        $this->assertSame(['1.2.3.4' => $ip1, '1.2.3.5' => $ip2], $contact->getChanges()['ipAddressList']);
     }
 
     /**
