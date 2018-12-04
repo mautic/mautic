@@ -89,8 +89,8 @@ class LeadSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($details = $event->getChanges()) {
-            // Unset dateLastActive and dateModified to prevent un-necessary audit log entries
-            unset($details['dateLastActive'], $details['dateModified']);
+            // Unset dateLastActive and dateModified and ipAddress to prevent un-necessary audit log entries
+            unset($details['dateLastActive'], $details['dateModified'], $details['ipAddressList']);
             if (empty($details)) {
                 return;
             }
@@ -620,7 +620,14 @@ class LeadSubscriber extends CommonSubscriber
     protected function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $eventLogRepo = $this->em->getRepository('MauticLeadBundle:LeadEventLog');
-        $imports      = $eventLogRepo->getEventsByLead('lead', 'import', $event->getLead(), $event->getQueryOptions());
+        $imports      = $eventLogRepo->getEvents(
+            $event->getLead(),
+            'lead',
+            'import',
+            ['failed', 'inserted', 'updated'],
+            $event->getQueryOptions()
+        );
+
         // Add to counter
         $event->addToCounter($eventTypeKey, $imports);
 
