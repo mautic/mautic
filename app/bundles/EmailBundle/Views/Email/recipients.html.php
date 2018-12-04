@@ -30,6 +30,7 @@
     </div>
 
 
+<?php echo $view['form']->row($form['lead_to_example']); ?>
 <?php echo $view['form']->row($form['emails']); ?>
 <?php echo $view['form']->end($form); ?>
 
