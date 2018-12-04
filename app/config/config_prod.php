@@ -62,7 +62,7 @@ $container->loadFromExtension('monolog', [
 
 //Twig Configuration
 $container->loadFromExtension('twig', [
-    'cache'       => '%mautic.tmp_path%/%kernel.environment%/twig',
+    'cache'       => '%mautic.cache_path%/%kernel.environment%/twig',
     'auto_reload' => true,
 ]);
 
