@@ -20,6 +20,10 @@ class Version20181204000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
+        /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
+        $security            = $this->container->get('mautic.security');
+        $campaignPermissions = $security->getPermissionObject('campaign');
+
         $roles = $this->connection->createQueryBuilder()
             ->select('r.*')
             ->from(MAUTIC_TABLE_PREFIX.'roles', 'r')
@@ -69,6 +73,23 @@ class Version20181204000000 extends AbstractMauticMigration
                     ],
                     [
                         'id' => $role['id'],
+                    ]
+                );
+
+                $bit = 0;
+                foreach ($newPermissions as $permission) {
+                    $bit += $campaignPermissions->getValue('campaigns', $permission);
+                }
+
+                $this->connection->update(
+                    MAUTIC_TABLE_PREFIX.'permissions',
+                    [
+                        'bitwise' => $bit,
+                    ],
+                    [
+                        'role_id' => $role['id'],
+                        'bundle'  => 'campaign',
+                        'name'    => 'campaigns',
                     ]
                 );
             }
