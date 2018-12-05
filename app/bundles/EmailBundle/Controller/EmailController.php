@@ -1461,6 +1461,9 @@ class EmailController extends FormController
                                 'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
                                 'viewParameters'  => $viewParameters,
                                 'contentTemplate' => 'MauticEmailBundle:Email:view',
+                                'passthroughVars' => [
+                                    'closeModal' => 1,
+                                ],
                                 'flashes'         => [
                                     [
                                         'type'    => 'error',
