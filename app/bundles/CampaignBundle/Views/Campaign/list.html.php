@@ -28,8 +28,7 @@ if ($tmpl == 'index') {
                         'target'          => '#campaignTable',
                         'routeBase'       => 'campaign',
                         'templateButtons' => [
-                            'delete' => $permissions['campaign:campaigns:deleteown']
-                            || $permissions['campaign:campaigns:deleteother'],
+                            'delete' => $permissions['campaign:campaigns:delete'],
                         ],
                     ]
                 );
@@ -78,18 +77,9 @@ if ($tmpl == 'index') {
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => $view['security']->hasEntityAccess(
-                                        $permissions['campaign:campaigns:editown'],
-                                        $permissions['campaign:campaigns:editother'],
-                                        $item->getCreatedBy()
-                                    ),
+                                    'edit'   => $permissions['campaign:campaigns:edit'],
                                     'clone'  => $permissions['campaign:campaigns:create'],
-
-                                    'delete'   => $view['security']->hasEntityAccess(
-                                        $permissions['campaign:campaigns:deleteown'],
-                                        $permissions['campaign:campaigns:deleteother'],
-                                        $item->getCreatedBy()
-                                    ),
+                                    'delete' => $permissions['campaign:campaigns:delete'],
                                 ],
                                 'routeBase' => 'campaign',
                             ]
