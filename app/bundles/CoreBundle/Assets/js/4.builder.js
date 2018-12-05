@@ -1201,6 +1201,12 @@ Mautic.initSlotListeners = function() {
                 return;
             }
 
+            if(slot.html() == '') {
+                slot.addClass('empty');
+            }else{
+                slot.removeClass('empty');
+            }
+
             slot.append(focus);
             deleteLink.click(function(e) {
                 // if slot is DEC, delete it from the outside form
