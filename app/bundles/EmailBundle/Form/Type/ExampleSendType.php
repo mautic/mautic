@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -37,30 +38,30 @@ class ExampleSendType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $leads = $this->leadModel->getEntities(
-            [
-                'limit'          => 25,
-                'filter'         => $options['filter'],
-                'orderBy'        => 'l.firstname,l.lastname,l.company,l.email',
-                'orderByDir'     => 'ASC',
-                'withTotalCount' => false,
-            ]
-        );
-
         $leadChoices = [];
-        foreach ($leads as $l) {
-            $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
+        if (!empty($options['require_filter']) && !empty($options['filter'])) {
+            $leads = $this->leadModel->getEntities(
+                [
+                    'limit'          => 25,
+                    'filter'         => $options['filter'],
+                    'orderBy'        => 'l.firstname,l.lastname,l.company,l.email',
+                    'orderByDir'     => 'ASC',
+                    'withTotalCount' => false,
+                ]
+            );
+            foreach ($leads as $l) {
+                $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
+            }
         }
 
         $builder->add(
             'lead_to_example',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'     => $leadChoices,
                 'label'       => 'mautic.email.send.example.contact',
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
-                'empty_value' => '',
                 'attr'        => [
                     'class' => 'form-control',
                 ],
@@ -105,6 +106,6 @@ class ExampleSendType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(['filter']);
+        $resolver->setOptional(['filter', 'require_filter']);
     }
 }

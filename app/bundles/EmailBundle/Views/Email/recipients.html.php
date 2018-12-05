@@ -16,6 +16,7 @@
         'searchId'    => (empty($searchId)) ? null : $searchId,
         'searchValue' => $searchValue,
         'action'      => $currentRoute,
+        'placeholder' => 'mautic.email.send.example.placeholder',
         'searchHelp'  => false,
         'target'      => '.contact-example-options',
         'tmpl'        => 'update',
@@ -28,7 +29,6 @@
     <div class="hide">
         <?php echo $view['form']->row($form['buttons']); ?>
     </div>
-
 
 <?php echo $view['form']->row($form['lead_to_example']); ?>
 <?php echo $view['form']->row($form['emails']); ?>

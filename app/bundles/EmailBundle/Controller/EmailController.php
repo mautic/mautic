@@ -1394,14 +1394,13 @@ class EmailController extends FormController
             3600 * 24 * 31
         );
 
-        $filter            = [];
-        $filter['force'][] = ['column' => 'l.email', 'expr' => 'neq', 'value' => ''];
-        if (!empty($search)) {
+        $filter = [];
+        if ($search) {
             $filter = [
                 'string' => $search,
+                'force'  => [['column' => 'l.email', 'expr' => 'neq', 'value' => '']],
             ];
         }
-
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'sendExample', 'objectId' => $objectId]);
         $user   = $this->get('mautic.helper.user')->getUser();
 
@@ -1412,8 +1411,9 @@ class EmailController extends FormController
                 'lead_to_example' => !empty($savedData['lead_to_example']) ? $savedData['lead_to_example'] : '',
             ],
             [
-                'action'  => $action,
-                'filter'  => $filter,
+                'action'         => $action,
+                'filter'         => $filter,
+                'require_filter' => true,
             ]
         );
 
