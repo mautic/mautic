@@ -31,7 +31,6 @@ class CampaignApiController extends CommonApiController
         $this->entityClass      = 'Mautic\CampaignBundle\Entity\Campaign';
         $this->entityNameOne    = 'campaign';
         $this->entityNameMulti  = 'campaigns';
-        $this->permissionBase   = 'campaign:campaigns';
         $this->serializerGroups = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
 
         parent::initialize($event);
