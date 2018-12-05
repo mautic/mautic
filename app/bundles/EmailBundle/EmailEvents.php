@@ -175,6 +175,16 @@ final class EmailEvents
     const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.email.on_campaign_trigger_decision';
 
     /**
+     * The mautic.email.on_campaign_trigger_decision event is fired when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_DECISION_TYPE_PARENT_ALLOW = 'mautic.email.on_campaign_decision_type_parent';
+
+    /**
      * The mautic.email.on_campaign_trigger_condition event is dispatched when the campaign condition triggers.
      *
      * The event listener receives a

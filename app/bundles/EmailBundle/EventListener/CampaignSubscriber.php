@@ -20,6 +20,7 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Event\AllowedEventTypeDecisionEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
@@ -29,6 +30,7 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -57,6 +59,9 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     protected $campaignEventModel;
 
+    /** @var array */
+    private $allowedEventTypesForDecisions;
+
     /**
      * @var SendEmailToUser
      */
@@ -68,11 +73,18 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @param LeadModel         $leadModel
-     * @param EmailModel        $emailModel
-     * @param EventModel        $eventModel
-     * @param MessageQueueModel $messageQueueModel
-     * @param SendEmailToUser   $sendEmailToUser
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @param LeadModel                $leadModel
+     * @param EmailModel               $emailModel
+     * @param EventModel               $eventModel
+     * @param MessageQueueModel        $messageQueueModel
+     * @param SendEmailToUser          $sendEmailToUser
+     * @param TranslatorInterface      $translator
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         LeadModel $leadModel,
@@ -80,7 +92,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         EventModel $eventModel,
         MessageQueueModel $messageQueueModel,
         SendEmailToUser $sendEmailToUser,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->leadModel          = $leadModel;
         $this->emailModel         = $emailModel;
@@ -88,6 +101,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->messageQueueModel  = $messageQueueModel;
         $this->sendEmailToUser    = $sendEmailToUser;
         $this->translator         = $translator;
+        $this->dispatcher         = $eventDispatcher;
     }
 
     /**
@@ -110,6 +124,26 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @return array
+     */
+    private function getAllowedTypesForDecisions()
+    {
+        if (isset($this->allowedEventTypesForDecisions)) {
+            return $this->allowedEventTypesForDecisions;
+        }
+
+        $this->allowedEventTypesForDecisions = [];
+
+        if ($this->dispatcher->hasListeners(EmailEvents::ON_CAMPAIGN_DECISION_TYPE_PARENT_ALLOW)) {
+            $emailParentTypeEvent = new AllowedEventTypeDecisionEvent();
+            $this->dispatcher->dispatch(EmailEvents::ON_CAMPAIGN_DECISION_TYPE_PARENT_ALLOW, $emailParentTypeEvent);
+            $this->allowedEventTypesForDecisions = $emailParentTypeEvent->getTypes();
+        }
+
+        return $this->allowedEventTypesForDecisions;
+    }
+
+    /**
      * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
@@ -122,9 +156,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
                 'connectionRestrictions' => [
                     'source' => [
-                        'action' => [
-                            'email.send',
-                        ],
+                        'action' => $this->getAllowedTypesForDecisions(),
                     ],
                 ],
             ]
@@ -139,9 +171,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'formType'               => 'email_click_decision',
                 'connectionRestrictions' => [
                     'source' => [
-                        'action' => [
-                            'email.send',
-                        ],
+                        'action' => $this->getAllowedTypesForDecisions(),
                     ],
                 ],
             ]
@@ -169,9 +199,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                     'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
                     'connectionRestrictions' => [
                         'source' => [
-                            'action' => [
-                                'email.send',
-                            ],
+                            'action' => $this->getAllowedTypesForDecisions(),
                         ],
                     ],
                 ]
@@ -233,8 +261,8 @@ class CampaignSubscriber implements EventSubscriberInterface
             return $event->setResult(false);
         }
 
-        //check to see if the parent event is a "send email" event and that it matches the current email opened or clicked
-        if (!empty($eventParent) && $eventParent['type'] === 'email.send') {
+        //check to see if the parent event is a from allowed events from  EmailParentTypeEvent and that it matches the current email opened or clicked
+        if (!empty($eventParent) && in_array($eventParent['type'], $this->getAllowedTypesForDecisions())) {
             // click decision
             if ($event->checkContext('email.click')) {
                 /** @var Hit $hit */
