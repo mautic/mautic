@@ -113,6 +113,11 @@ class WebhookModel extends FormModel
     protected $eventsOrderByDir;
 
     /**
+     * @var array
+     */
+    private $queuedPayloads = [];
+
+    /**
      * WebhookModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -244,19 +249,22 @@ class WebhookModel extends FormModel
             $webhook       = $event->getWebhook();
             $webhookList[] = $webhook;
 
-            $webhook->addQueue($this->queueWebhook($webhook, $event, $payload, $serializationGroups));
+            if (!isset($this->queuedPayloads[$webhook->getId()])) {
+                $this->queuedPayloads[$webhook->getId()] = [];
+            }
+            $this->queuedPayloads[$webhook->getId()] = $this->queueWebhook($webhook, $event, $payload, $serializationGroups);
 
-            // add the queuelist and save everything if command process
-            if ($this->queueMode == self::COMMAND_PROCESS) {
-                $this->saveEntity($webhook);
+            if (self::COMMAND_PROCESS === $this->queueMode) {
+                // Queue to the database to process later
+                $this->getQueueRepository()->saveEntity($this->queuedPayloads[$webhook->getId()]);
             }
         }
 
-        if ($this->queueMode == self::IMMEDIATE_PROCESS) {
+        if (self::IMMEDIATE_PROCESS === $this->queueMode) {
+            // Immediately process
             $this->processWebhooks($webhookList);
+            $this->queuedPayloads = [];
         }
-
-        return;
     }
 
     /**
@@ -513,7 +521,7 @@ class WebhookModel extends FormModel
         if ($this->queueMode === self::COMMAND_PROCESS) {
             $queuesArray = $this->getWebhookQueues($webhook);
         } else {
-            $queuesArray = [$webhook->getQueues()];
+            $queuesArray = isset($this->queuedPayloads[$webhook->getId()]) ? $this->queuedPayloads[$webhook->getId()] : [$webhook->getQueues()];
         }
 
         /* @var WebhookQueue $queue */

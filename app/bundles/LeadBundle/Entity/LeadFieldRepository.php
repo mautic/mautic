@@ -116,9 +116,41 @@ class LeadFieldRepository extends CommonRepository
         return $qb->select('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                 ->where($qb->expr()->eq('object', ':object'))
-                ->setParameter('f.object', $object)
+                ->setParameter('object', $object)
                 ->orderBy('f.field_order', 'ASC')
                 ->execute()->fetchAll();
+    }
+
+    /**
+     * Add company left join.
+     *
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     */
+    private function addCompanyLeftJoin($q)
+    {
+        $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
+        $q->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'company', 'companies_lead.company_id = company.id');
+    }
+
+    /**
+     * Return property by field alias and join tables.
+     *
+     * @param string                                                       $field
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     */
+    public function getPropertyByField($field, $q)
+    {
+        $columnAlias = 'l.';
+        // Join company tables If we're trying search by company fields
+        if (in_array($field, array_column($this->getFieldAliases('company'), 'alias'))) {
+            $this->addCompanyLeftJoin($q);
+            $columnAlias = 'company.';
+        } elseif (in_array($field, ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term'])) {
+            $q->join('l', MAUTIC_TABLE_PREFIX.'lead_utmtags', 'u', 'l.id = u.lead_id');
+            $columnAlias = 'u.';
+        }
+
+        return $columnAlias.$field;
     }
 
     /**
@@ -160,14 +192,7 @@ class LeadFieldRepository extends CommonRepository
                 return false;
             }
         } else {
-            // Standard field / UTM field
-            $utmField = in_array($field, ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term']);
-            if ($utmField) {
-                $q->join('l', MAUTIC_TABLE_PREFIX.'lead_utmtags', 'u', 'l.id = u.lead_id');
-                $property = 'u.'.$field;
-            } else {
-                $property = 'l.'.$field;
-            }
+            $property = $this->getPropertyByField($field, $q);
             if ($operatorExpr === 'empty' || $operatorExpr === 'notEmpty') {
                 $q->where(
                     $q->expr()->andX(
@@ -260,7 +285,7 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             }
-            if ($utmField) {
+            if (strpos($property, 'u.') === 0) {
                 // Match only against the latest UTM properties.
                 $q->orderBy('u.date_added', 'DESC');
                 $q->setMaxResults(1);

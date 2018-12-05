@@ -83,7 +83,8 @@ Mautic.launchBuilder = function (formName, actionName) {
             'categorylist',
             'preferredchannel',
             'channelfrequency',
-            'saveprefsbutton'
+            'saveprefsbutton',
+            'successmessage'
         ];
         mQuery.each(slots, function(i, s){
             if (isPrefCenterEnabled) {
@@ -1200,6 +1201,12 @@ Mautic.initSlotListeners = function() {
                 return;
             }
 
+            if(slot.html() == '') {
+                slot.addClass('empty');
+            }else{
+                slot.removeClass('empty');
+            }
+
             slot.append(focus);
             deleteLink.click(function(e) {
                 // if slot is DEC, delete it from the outside form
@@ -1390,12 +1397,6 @@ Mautic.initSlotListeners = function() {
 
                 var builderEl = parent.mQuery('.builder');
 
-                if (builderEl.length && builderEl.hasClass('email-builder')) {
-                    buttons = parent.mQuery.grep(buttons, function (value) {
-                        return value != 'insertGatedVideo';
-                    });
-                }
-
                 var froalaOptions = {
                     toolbarButtons: buttons,
                     toolbarButtonsMD: buttons,
@@ -1405,6 +1406,13 @@ Mautic.initSlotListeners = function() {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 };
+
+                if (builderEl.length && builderEl.hasClass('email-builder')) {
+                    buttons = parent.mQuery.grep(buttons, function (value) {
+                        return value != 'insertGatedVideo';
+                    });
+                    froalaOptions.imageOutputSize = true;
+                }
 
                 // prevent overriding variant content in editor
                 if (focusType !== 'dynamicContent') {
@@ -1825,7 +1833,8 @@ Mautic.prepareBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
             'categorylist',
             'preferredchannel',
             'channelfrequency',
-            'saveprefsbutton'
+            'saveprefsbutton',
+            'successmessage'
         ];
         mQuery.each(slots, function (i, s) {
             // delete existing tokens

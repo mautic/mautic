@@ -550,6 +550,18 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
     {
+        if (!isset($fieldsToUpdate['leadFields'])) {
+            return $fieldsToUpdate;
+        }
+
+        if (null === $objects || is_array($objects)) {
+            return $fieldsToUpdate['leadFields'];
+        }
+
+        if (isset($fieldsToUpdate['leadFields'][$objects])) {
+            return $fieldsToUpdate['leadFields'][$objects];
+        }
+
         return $fieldsToUpdate;
     }
 

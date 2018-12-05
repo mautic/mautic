@@ -640,8 +640,6 @@ class PageModel extends FormModel
         // Check if this is a unique page hit
         $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
 
-        $clickthrough = $this->generateClickThrough($hit);
-
         if (!empty($page)) {
             if ($page instanceof Page) {
                 $hit->setPageLanguage($page->getLanguage());
@@ -661,16 +659,14 @@ class PageModel extends FormModel
                     $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
 
                     // If this is a trackable, up the trackable counts as well
-                    if (!empty($clickthrough['channel'])) {
-                        if (count($clickthrough['channel']) === 1) {
-                            $channelId = reset($clickthrough['channel']);
-                            $channel   = key($clickthrough['channel']);
-                        } else {
-                            $channel   = $clickthrough['channel'][0];
-                            $channelId = (int) $clickthrough['channel'][1];
-                        }
-
-                        $this->pageTrackableModel->getRepository()->upHitCount($page->getId(), $channel, $channelId, 1, $isUnique);
+                    if ($hit->getSource() && $hit->getSourceId()) {
+                        $this->pageTrackableModel->getRepository()->upHitCount(
+                            $page->getId(),
+                            $hit->getSource(),
+                            $hit->getSourceId(),
+                            1,
+                            $isUnique
+                        );
                     }
                 } catch (\Exception $exception) {
                     if (MAUTIC_ENV === 'dev') {

@@ -56,18 +56,32 @@ class ContactFrequencyType extends AbstractType
             );
         }
 
-        $builder->add(
-            'lead_lists',
-            LeadListType::class,
-            [
-                'global_only' => $options['public_view'],
-                'label'       => 'mautic.lead.form.list',
-                'label_attr'  => ['class' => 'control-label'],
-                'multiple'    => true,
-                'expanded'    => $options['public_view'],
-                'required'    => false,
-            ]
-        );
+        if (!$options['public_view']) {
+            $builder->add(
+                'lead_lists',
+                'leadlist_choices',
+                [
+                    'label'      => 'mautic.lead.form.list',
+                    'label_attr' => ['class' => 'control-label'],
+                    'multiple'   => true,
+                    'expanded'   => $options['public_view'],
+                    'required'   => false,
+                ]
+            );
+        } elseif ($showContactSegments) {
+            $builder->add(
+                'lead_lists',
+                'leadlist_choices',
+                [
+                    'preference_center_only' => $options['preference_center_only'],
+                    'label'                  => 'mautic.lead.form.list',
+                    'label_attr'             => ['class' => 'control-label'],
+                    'multiple'               => true,
+                    'expanded'               => true,
+                    'required'               => false,
+                ]
+            );
+        }
 
         if (!$options['public_view'] || $showContactCategories) {
             $builder->add(
@@ -109,7 +123,8 @@ class ContactFrequencyType extends AbstractType
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(
             [
-                'public_view' => false,
+                'public_view'            => false,
+                'preference_center_only' => false,
             ]
         );
     }

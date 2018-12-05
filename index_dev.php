@@ -29,6 +29,5 @@ if (extension_loaded('apc') && in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', 
 \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('dev');
 
 $kernel = new AppKernel('dev', true);
-$kernel->loadClassCache();
 
 Stack\run((new MiddlewareBuilder('dev'))->resolve($kernel));

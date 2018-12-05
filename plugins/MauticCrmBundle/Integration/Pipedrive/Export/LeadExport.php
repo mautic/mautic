@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
@@ -10,18 +11,59 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class LeadExport extends AbstractPipedrive
 {
+    /**
+     * @var CompanyExport
+     */
+    private $companyExport;
+
+    /**
+     * LeadExport constructor.
+     *
+     * @param EntityManager $em
+     * @param CompanyExport $companyExport
+     */
+    public function __construct(EntityManager $em, CompanyExport $companyExport)
+    {
+        $this->em            = $em;
+        $this->companyExport = $companyExport;
+    }
+
+    /**
+     * @param Lead $lead
+     *
+     * @return bool
+     */
     public function create(Lead $lead)
     {
+        // stop for anynomouse
+        if ($lead->isAnonymous() || empty($lead->getEmail())) {
+            return false;
+        }
+
         $mappedData        = $this->getMappedLeadData($lead);
         $leadId            = $lead->getId();
-        $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
 
-        if ($integrationEntity) {
-            return false;
-        } // user has integration with Pipedrive
+        /** @var IntegrationEntity $integrationEntity */
+        $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
+        $personData        = $this->getIntegration()->getApiHelper()->findByEmail($lead->getEmail());
+        // Pipedrive contact already exists, then create just integration entity
+        if (!$integrationEntity && !empty($personData)) {
+            $integrationEntityCreate = $this->createIntegrationLeadEntity(new \DateTime(), $personData[0]['id'], $leadId);
+            $integrationEntity       = clone $integrationEntityCreate;
+            $this->em->persist($integrationEntityCreate);
+            $this->em->flush();
+        }
+
+        // Integration entity exist and Pipedrive contact exist, then just update Pipedrive contact
+        if ($integrationEntity && !empty($personData)) {
+            return $this->update($lead);
+        }
 
         try {
             $createdLeadData   = $this->getIntegration()->getApiHelper()->createLead($mappedData, $lead);
+            if (empty($createdLeadData['id'])) {
+                return false;
+            }
             $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $createdLeadData['id'], $leadId);
 
             $this->em->persist($integrationEntity);
@@ -35,13 +77,19 @@ class LeadExport extends AbstractPipedrive
         return false;
     }
 
+    /**
+     * @param Lead $lead
+     *
+     * @return bool
+     */
     public function update(Lead $lead)
     {
         $leadId            = $lead->getId();
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
-
         if (!$integrationEntity) {
-            return false;
+            // create new contact
+
+            return $this->create($lead);
         }
 
         try {
@@ -61,6 +109,11 @@ class LeadExport extends AbstractPipedrive
         return false;
     }
 
+    /**
+     * @param Lead $lead
+     *
+     * @return bool
+     */
     public function delete(Lead $lead)
     {
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $lead->getId()]);
@@ -83,6 +136,11 @@ class LeadExport extends AbstractPipedrive
         return false;
     }
 
+    /**
+     * @param Lead $lead
+     *
+     * @return mixed
+     */
     private function getMappedLeadData(Lead $lead)
     {
         $mappedData = [];
@@ -91,6 +149,9 @@ class LeadExport extends AbstractPipedrive
         $accessor = PropertyAccess::createPropertyAccessor();
 
         foreach ($leadFields as $externalField => $internalField) {
+            if (in_array($externalField, self::NO_ALLOWED_FIELDS_TO_EXPORT)) {
+                continue;
+            }
             $mappedData[$externalField] = $accessor->getValue($lead, $internalField);
         }
 
@@ -117,6 +178,22 @@ class LeadExport extends AbstractPipedrive
         $leadCompany = array_pop($leadCompanies);
 
         $integrationEntityCompany = $this->getCompanyIntegrationEntity(['internalEntityId' => $leadCompany->getCompany()->getId()]);
+
+        if (!$integrationEntityCompany) {
+            // check if company already exist on Pipedrive
+            $companyData = $this->getIntegration()->getApiHelper()->findCompanyByName($leadCompany->getCompany()->getName(), 0, 1);
+            if (!empty($companyData)) {
+                $integrationEntityCompany = $this->createIntegrationLeadEntity(new \DateTime(), $companyData[0]['id'], $leadCompany->getCompany()->getId());
+                $this->em->persist($integrationEntityCompany);
+                $this->em->flush();
+            } else {
+                // create new company on Pipedrive
+                $this->companyExport->setIntegration($this->getIntegration());
+                if ($this->companyExport->pushCompany($leadCompany->getCompany())) {
+                    $integrationEntityCompany = $this->getCompanyIntegrationEntity(['internalEntityId' => $leadCompany->getCompany()->getId()]);
+                }
+            }
+        }
 
         if (!$integrationEntityCompany) {
             return 0;
