@@ -174,7 +174,6 @@ return [
                     'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_user',
                     'translator',
-                    'event_dispatcher',
                 ],
             ],
             'mautic.email.campaignbundle.condition_subscriber' => [
