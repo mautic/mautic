@@ -150,22 +150,47 @@ class ImportModel extends FormModel
     }
 
     /**
-     * Check if there are some IN_PROGRESS imports which got stuck for a while.
-     * Set those as failed.
+     * Returns import max runtime status from the configuration
+     * when max runtime has been exceeded.
+     *
+     * @param int $default
+     *
+     * @return int
      */
-    public function setGhostImportsAsFailed()
+    public function getImportMaxRuntimeStatus($default = 4)
     {
-        $ghostDelay = 2;
-        $imports    = $this->getRepository()->getGhostImports($ghostDelay, 5);
+        $status = 'mautic.lead.import.status.';
+
+        return $status.$this->config->getParameter('import_max_runtime_status', $default);
+    }
+
+    /**
+     * Check if there are some IN_PROGRESS imports which have exceded maximum runtime.
+     * Set those to ghost import status.
+     */
+    public function setMaxImportsRuntimeStatus()
+    {
+        $maxImportRuntime = $this->config->getParameter('max_import_runtime', 2);
+        $imports          = $this->getRepository()->getGhostImports($maxImportRuntime, 5);
 
         if (empty($imports)) {
             return null;
         }
 
+        $status   = $this->getMaxImportRuntimeStatus();
+        $infoVars = [
+            '%limit%' => $maxImportRuntime,
+            '%status' => $this->translator->trans('mautic.lead.import.status.'.$status),
+        ];
+
+        /** @var Import $import */
         foreach ($imports as $import) {
-            $import->setStatus($import::FAILED)
-                ->setStatusInfo($this->translator->trans('mautic.lead.import.ghost.limit.hit', ['%limit%' => $ghostDelay]))
-                ->removeFile();
+            $import->setStatus($status)
+                ->setStatusInfo($this->translator->trans('mautic.lead.import.max.runtime.hit', $infoVars));
+
+            if (Import::FAILED === $status) {
+                $import->removeFile();
+            }
 
             if ($import->getCreatedBy()) {
                 $this->notificationModel->addNotification(
@@ -175,7 +200,7 @@ class ImportModel extends FormModel
                     ),
                     'info',
                     false,
-                    $this->translator->trans('mautic.lead.import.failed'),
+                    $this->translator->trans('mautic.lead.import.'.$status),
                     'fa-download',
                     null,
                     $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
@@ -222,7 +247,7 @@ class ImportModel extends FormModel
      */
     public function beginImport(Import $import, Progress $progress, $limit = 0)
     {
-        $this->setGhostImportsAsFailed();
+        $this->setMaxImportsRuntimeStatus();
 
         if (!$import) {
             $msg = 'import is empty, closing the import process';
