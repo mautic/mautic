@@ -437,7 +437,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
             switch ($g) {
                 case 'mautic.email.graph.line.stats':
-                    $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
+                    $chartQuery->setGeneratedColumnProvider($this->generatedColumnsProvider);
                     $chart     = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $sendQuery = clone $queryBuilder;
                     $readQuery = clone $origQuery;
