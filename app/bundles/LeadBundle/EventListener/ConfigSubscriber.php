@@ -32,13 +32,11 @@ class ConfigSubscriber extends CommonSubscriber
 
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
-        $params = $event->getParametersFromConfig('MauticLeadBundle');
         $event->addForm([
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'leadconfig',
             'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
-            'parameters' => $params,
-//            'parameters' => $event->getParametersFromConfig('MauticLeadBundle'),
+            'parameters' => $event->getParametersFromConfig('MauticLeadBundle'),
         ]);
     }
 }

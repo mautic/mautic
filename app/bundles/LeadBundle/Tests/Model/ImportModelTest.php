@@ -151,7 +151,7 @@ class ImportModelTest extends StandardImportTestHelper
     public function testStartImportWhenParallelLimitHit()
     {
         $model = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit', 'logDebug'])
+            ->setMethods(['checkParallelImportLimit', 'setMaxImportsRuntimeStatus', 'saveEntity', 'getParallelImportLimit', 'logDebug'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -184,7 +184,7 @@ class ImportModelTest extends StandardImportTestHelper
     public function testBeginImportWhenParallelLimitHit()
     {
         $model = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit'])
+            ->setMethods(['checkParallelImportLimit', 'setMaxImportsRuntimeStatus', 'saveEntity', 'getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -220,7 +220,7 @@ class ImportModelTest extends StandardImportTestHelper
     public function testStartImportWhenDatabaseException()
     {
         $model = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
+            ->setMethods(['checkParallelImportLimit', 'setMaxImportsRuntimeStatus', 'saveEntity', 'logDebug', 'process'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -254,7 +254,7 @@ class ImportModelTest extends StandardImportTestHelper
     public function testBeginImportWhenDatabaseException()
     {
         $model = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
+            ->setMethods(['checkParallelImportLimit', 'setMaxImportsRuntimeStatus', 'saveEntity', 'logDebug', 'process'])
             ->disableOriginalConstructor()
             ->getMock();
 
