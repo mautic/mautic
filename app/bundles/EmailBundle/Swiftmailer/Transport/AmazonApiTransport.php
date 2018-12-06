@@ -307,7 +307,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * Initialize the token buckets for throttling.
-     * 
+     *
      * @throws \Exception
      */
     private function initializeThrottles()
@@ -460,7 +460,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * Parse message into a template and recipients with their respective replacement tokens.
-     * 
+     *
      * @param \Swift_Mime_Message $message
      *
      * @return array of a template and a message
