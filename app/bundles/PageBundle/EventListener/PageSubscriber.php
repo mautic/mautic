@@ -186,6 +186,7 @@ class PageSubscriber extends CommonSubscriber
         $payload                = $event->getPayload();
         $request                = $payload['request'];
         $trackingNewlyGenerated = $payload['isNew'];
+        $hitId                  = $payload['hitId'];
         $pageId                 = $payload['pageId'];
         $leadId                 = $payload['leadId'];
         $isRedirect             = !empty($payload['isRedirect']);
@@ -193,8 +194,16 @@ class PageSubscriber extends CommonSubscriber
         $pageRepo               = $this->em->getRepository('MauticPageBundle:Page');
         $redirectRepo           = $this->em->getRepository('MauticPageBundle:Redirect');
         $leadRepo               = $this->em->getRepository('MauticLeadBundle:Lead');
-        $hit                    = $hitRepo->find((int) $payload['hitId']);
+        $hit                    = $hitId ? $hitRepo->find((int) $hitId) : null;
         $lead                   = $leadId ? $leadRepo->find((int) $leadId) : null;
+
+        // On the off chance that the queue contains a message which does not
+        // reference a valid Hit, discard it to avoid clogging the queue.
+        if (null === $hit) {
+            $event->setResult(QueueConsumerResults::REJECT);
+
+            return;
+        }
 
         if ($isRedirect) {
             $page = $pageId ? $redirectRepo->find((int) $pageId) : null;
