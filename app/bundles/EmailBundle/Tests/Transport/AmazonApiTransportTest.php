@@ -1,4 +1,4 @@
-+<?php
+<?php
 
 /*
  * @copyright   2015 Mautic Contributors. All rights reserved
