@@ -91,6 +91,13 @@ class EmailStep implements StepInterface
     public $mailer_spool_type = 'memory'; // file|memory
 
     /*
+     * Amazon API Region
+     *
+     * @var string
+     */
+    public $mailer_amazon_api_region = 'us-east-1';
+
+    /*
      * Spool path
      *
      * @var string

@@ -339,6 +339,27 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'mailer_amazon_api_region',
+            'choice',
+            [
+                'choices'     => [
+                    'eu-west-1' => 'mautic.email.config.mailer.amazon_api_region.eu_west_1',
+                    'us-east-1' => 'mautic.email.config.mailer.amazon_api_region.us_east_1',
+                    'us-west-2' => 'mautic.email.config.mailer.amazon_api_region.us_west_2',
+                ],
+                'label'       => 'mautic.email.config.mailer.amazon_api_region',
+                'required'    => false,
+                'attr'        => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getAmazonApiService().']}',
+                    'tooltip'      => 'mautic.email.config.mailer.amazon_api_region.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'empty_value' => false,
+            ]
+        );
+
+        $builder->add(
             'mailer_port',
             'text',
             [

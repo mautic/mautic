@@ -80,15 +80,16 @@ class EmailStepType extends AbstractType
             'choice',
             [
                 'choices' => [
-                    'mail'                      => 'mautic.email.config.mailer_transport.mail',
-                    'mautic.transport.mandrill' => 'mautic.email.config.mailer_transport.mandrill',
-                    'mautic.transport.mailjet'  => 'mautic.email.config.mailer_transport.mailjet',
-                    'mautic.transport.sendgrid' => 'mautic.email.config.mailer_transport.sendgrid',
-                    'mautic.transport.amazon'   => 'mautic.email.config.mailer_transport.amazon',
-                    'mautic.transport.postmark' => 'mautic.email.config.mailer_transport.postmark',
-                    'gmail'                     => 'mautic.email.config.mailer_transport.gmail',
-                    'smtp'                      => 'mautic.email.config.mailer_transport.smtp',
-                    'sendmail'                  => 'mautic.email.config.mailer_transport.sendmail',
+                    'mail'                        => 'mautic.email.config.mailer_transport.mail',
+                    'mautic.transport.mandrill'   => 'mautic.email.config.mailer_transport.mandrill',
+                    'mautic.transport.mailjet'    => 'mautic.email.config.mailer_transport.mailjet',
+                    'mautic.transport.sendgrid'   => 'mautic.email.config.mailer_transport.sendgrid',
+                    'mautic.transport.amazon'     => 'mautic.email.config.mailer_transport.amazon',
+                    'mautic.transport.amazon_api' => 'mautic.email.config.mailer_transport.amazon_api',
+                    'mautic.transport.postmark'   => 'mautic.email.config.mailer_transport.postmark',
+                    'gmail'                       => 'mautic.email.config.mailer_transport.gmail',
+                    'smtp'                        => 'mautic.email.config.mailer_transport.smtp',
+                    'sendmail'                    => 'mautic.email.config.mailer_transport.sendmail',
                 ],
                 'label'       => 'mautic.install.form.email.transport',
                 'label_attr'  => ['class' => 'control-label'],
@@ -208,6 +209,26 @@ class EmailStepType extends AbstractType
         );
 
         $builder->add('mailer_spool_path', 'hidden');
+
+        $builder->add(
+            'mailer_amazon_api_region',
+            'choice',
+            [
+                'choices'     => [
+                    'eu-west-1' => 'mautic.email.config.mailer.amazon_api_region.eu_west_1',
+                    'us-east-1' => 'mautic.email.config.mailer.amazon_api_region.us_east_1',
+                    'us-west-2' => 'mautic.email.config.mailer.amazon_api_region.us_west_2',
+                ],
+                'label'       => 'mautic.email.config.mailer.amazon_api_region',
+                'label_attr'  => ['class' => 'control-label'],
+                'required'    => false,
+                'attr'        => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.amazon_api_region.tooltip',
+                ],
+                'empty_value' => false,
+            ]
+        );
 
         $builder->add(
             'buttons',

@@ -17,6 +17,7 @@ class TransportType
      */
     private $transportTypes = [
         'mautic.transport.amazon'       => 'mautic.email.config.mailer_transport.amazon',
+        'mautic.transport.amazon_api'   => 'mautic.email.config.mailer_transport.amazon_api',
         'mautic.transport.elasticemail' => 'mautic.email.config.mailer_transport.elasticemail',
         'gmail'                         => 'mautic.email.config.mailer_transport.gmail',
         'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
@@ -52,6 +53,7 @@ class TransportType
         'mautic.transport.sendgrid',
         'mautic.transport.elasticemail',
         'mautic.transport.amazon',
+        'mautic.transport.amazon_api',
         'mautic.transport.postmark',
         'gmail',
         // smtp is left out on purpose as the auth_mode will manage displaying this field
@@ -65,6 +67,7 @@ class TransportType
         'mautic.transport.sendgrid',
         'mautic.transport.elasticemail',
         'mautic.transport.amazon',
+        'mautic.transport.amazon_api',
         'mautic.transport.postmark',
         'gmail',
         // smtp is left out on purpose as the auth_mode will manage displaying this field
@@ -202,6 +205,14 @@ class TransportType
     public function getAmazonService()
     {
         return '"mautic.transport.amazon"';
+    }
+
+    /**
+     * @return string
+     */
+    public function getAmazonApiService()
+    {
+        return '"mautic.transport.amazon_api"';
     }
 
     /**

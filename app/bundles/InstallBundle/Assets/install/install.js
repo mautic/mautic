@@ -34,6 +34,12 @@ var MauticInstaller = {
                 mQuery('#authDetails').removeClass('hide');
             }
         }
+
+        if (mailer == 'mautic.transport.amazon_api') {
+            mQuery('#amazonApiRegion').removeClass('hide');
+        } else {
+            mQuery('#amazonApiRegion').addClass('hide');
+        }
     },
 
     toggleAuthDetails: function (auth) {

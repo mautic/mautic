@@ -78,6 +78,16 @@ if ($tmpl == 'index') {
             </div>
         </div>
     </div>
+    <?php
+    $hide = ($mailer == 'amazon_api') ? '' : ' class="hide"';
+    ?>
+    <div id="amazonApiRegion"<?php echo $hide; ?>>
+        <div class="row">
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['mailer_amazon_api_region']); ?>
+            </div>
+        </div>
+    </div>
     <div class="row mt-20">
         <div class="col-sm-9">
             <?php echo $view->render('MauticInstallBundle:Install:navbar.html.php', ['step' => $index, 'count' => $count, 'completedSteps' => $completedSteps]); ?>
