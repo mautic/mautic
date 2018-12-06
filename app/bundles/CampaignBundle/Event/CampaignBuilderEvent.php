@@ -180,7 +180,9 @@ class CampaignBuilderEvent extends Event
     public function addConnectionRestriction($type, $key, $restrictionType, $restrictonKey)
     {
         if (isset($this->$type) && in_array($key, array_keys($this->$type))) {
-            $this->$type[$key]['connectionRestrictions']['source'][$restrictionType][] = $restrictonKey;
+            $param                                                               = $this->$type; // fix for PHP 5.6
+            $param[$key]['connectionRestrictions']['source'][$restrictionType][] = $restrictonKey;
+            $this->$type                                                         =$param;
         }
     }
 
