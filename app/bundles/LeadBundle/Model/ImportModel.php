@@ -170,14 +170,14 @@ class ImportModel extends FormModel
      */
     public function setMaxImportsRuntimeStatus()
     {
-        $maxImportRuntime = $this->config->getParameter('max_import_runtime', 2);
+        $maxImportRuntime = $this->config->getParameter('import_max_runtime', 2);
         $imports          = $this->getRepository()->getGhostImports($maxImportRuntime, 5);
 
         if (empty($imports)) {
             return null;
         }
 
-        $status   = $this->getMaxImportRuntimeStatus();
+        $status   = $this->getImportMaxRuntimeStatus();
         $infoVars = [
             '%limit%' => $maxImportRuntime,
             '%status' => $this->translator->trans('mautic.lead.import.status.'.$status),
