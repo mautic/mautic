@@ -204,7 +204,6 @@ return [
                 'arguments' => [
                     'mautic.campaign.model.campaign',
                     'translator',
-                    'mautic.security',
                 ],
                 'alias'     => 'campaign_list',
             ],
