@@ -12,6 +12,7 @@
 namespace Mautic\StatsBundle\Aggregate\Collection\DAO;
 
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
+use Mautic\StatsBundle\Aggregate\Collection\Stats\HourStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat;
 
@@ -41,11 +42,15 @@ class StatsDAO
      */
     public function getYears()
     {
+        ksort($this->years);
+
         return $this->years;
     }
 
     /**
      * @return MonthStat[]
+     *
+     * @throws \Exception
      */
     public function getMonths()
     {
@@ -53,15 +58,20 @@ class StatsDAO
         foreach ($this->years as $year => $yearStats) {
             $months = $yearStats->getStats();
             foreach ($months as $month => $monthStats) {
-                $flattenedMonths["$year-$month"] = $monthStats;
+                $label                   = (new \DateTime("$year-$month-01 00:00:00"))->format('Y-m');
+                $flattenedMonths[$label] = $monthStats;
             }
         }
+
+        ksort($flattenedMonths);
 
         return $flattenedMonths;
     }
 
     /**
      * @return DayStat[]
+     *
+     * @throws \Exception
      */
     public function getDays()
     {
@@ -72,15 +82,20 @@ class StatsDAO
             $stats = $monthStats->getStats();
 
             foreach ($stats as $day => $dayStats) {
-                $flattenedDays["$month-$day"] = $dayStats;
+                $label                 = (new \DateTime("$month-$day 00:00:00"))->format('Y-m-d');
+                $flattenedDays[$label] = $dayStats;
             }
         }
+
+        ksort($flattenedDays);
 
         return $flattenedDays;
     }
 
     /**
-     * @return int[]
+     * @return HourStat[]
+     *
+     * @throws \Exception
      */
     public function getHours()
     {
@@ -91,9 +106,12 @@ class StatsDAO
             $stats = $dayStats->getStats();
 
             foreach ($stats as $hour => $hourStat) {
-                $flattenedHours["$day $hour"] = $hourStat->getCount();
+                $label                  = (new \DateTime("$day $hour:00:00"))->format('Y-m-d H');
+                $flattenedHours[$label] = $hourStat->getCount();
             }
         }
+
+        ksort($flattenedHours);
 
         return $flattenedHours;
     }
