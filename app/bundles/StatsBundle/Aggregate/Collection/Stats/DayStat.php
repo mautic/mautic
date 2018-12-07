@@ -77,7 +77,7 @@ class DayStat implements StatInterface
      */
     public function getAverage()
     {
-        if (count($this->stats)) {
+        if (count($this->stats) === 0) {
             return 0;
         }
 
