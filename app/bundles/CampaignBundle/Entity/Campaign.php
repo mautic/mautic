@@ -263,7 +263,7 @@ class Campaign extends FormEntity
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }
-        } elseif ($prop == 'tags') {
+        } elseif ('tags' === $prop) {
             if ($val instanceof Tag) {
                 $this->changes['tags']['added'][] = $val->getTag();
             } else {

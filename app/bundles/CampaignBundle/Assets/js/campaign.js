@@ -2002,7 +2002,6 @@ Mautic.createCampaignTag = function (el) {
     });
 };
 
-
 /**
  * Update the "Jump to Event" select list to be available events.
  */

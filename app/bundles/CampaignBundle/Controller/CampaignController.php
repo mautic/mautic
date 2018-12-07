@@ -579,12 +579,12 @@ class CampaignController extends AbstractStandardFormController
     {
         $session = $this->get('session');
 
-        $modifiedEvents = $session->get('mautic.campaign.'.$id.'.tags.modified', []);
-        $deletedEvents  = $session->get('mautic.campaign.'.$id.'.tags.deleted', []);
+        $modifiedTags = $session->get('mautic.campaign.'.$id.'.tags.modified', []);
+        $deletedTags  = $session->get('mautic.campaign.'.$id.'.tags.deleted', []);
 
-        $events = array_diff_key($modifiedEvents, array_flip($deletedEvents));
+        $tags = array_diff_key($modifiedTags, array_flip($deletedTags));
 
-        return [$modifiedEvents, $deletedEvents, $events];
+        return [$modifiedTags, $deletedTags, $tags];
     }
 
     /**
