@@ -12,23 +12,23 @@
 namespace Mautic\StatsBundle\Aggregate;
 
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatDAO;
-use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
+use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 
 class Calculator
 {
     /**
-     * @var StatCollection
+     * @var StatsDAO
      */
-    private $statCollection;
+    private $statsDAO;
 
     /**
      * Calculator constructor.
      *
-     * @param StatCollection $statCollection
+     * @param StatsDAO $statsDAO
      */
-    public function __construct(StatCollection $statCollection)
+    public function __construct(StatsDAO $statsDAO)
     {
-        $this->statCollection = $statCollection;
+        $this->statsDAO = $statsDAO;
     }
 
     /**
@@ -41,7 +41,7 @@ class Calculator
     public function getSumByYear($labelFormat = 'Y')
     {
         $statDAO = new StatDAO();
-        foreach ($this->statCollection->getStats()->getYears() as $year => $stats) {
+        foreach ($this->statsDAO->getYears() as $year => $stats) {
             $label = (new \DateTime($year))->format($labelFormat);
 
             $statDAO->addStat($label, $stats->getSum());
@@ -60,7 +60,7 @@ class Calculator
     public function getSumByMonth($labelFormat = 'n')
     {
         $statDAO = new StatDAO();
-        foreach ($this->statCollection->getStats()->getMonths() as $month => $stats) {
+        foreach ($this->statsDAO->getMonths() as $month => $stats) {
             $label = (new \DateTime($month))->format($labelFormat);
 
             $statDAO->addStat($label, $stats->getSum());
@@ -79,7 +79,7 @@ class Calculator
     public function getSumByDay($labelFormat = 'd')
     {
         $statDAO = new StatDAO();
-        foreach ($this->statCollection->getStats()->getDays() as $day => $stats) {
+        foreach ($this->statsDAO->getDays() as $day => $stats) {
             $label = (new \DateTime($day))->format($labelFormat);
 
             $statDAO->addStat($label, $stats->getSum());
@@ -98,7 +98,7 @@ class Calculator
     public function getSumByHour($labelFormat = 'G')
     {
         $statDAO = new StatDAO();
-        foreach ($this->statCollection->getStats()->getDays() as $day => $stats) {
+        foreach ($this->statsDAO->getDays() as $day => $stats) {
             $label = (new \DateTime($day))->format($labelFormat);
 
             $statDAO->addStat($label, $stats->getSum());
@@ -117,7 +117,7 @@ class Calculator
     public function getAverageByYear($labelFormat = 'Y')
     {
         $statDAO = new StatDAO();
-        foreach ($this->statCollection->getStats()->getYears() as $year => $stats) {
+        foreach ($this->statsDAO->getYears() as $year => $stats) {
             $label = (new \DateTime($year))->format($labelFormat);
 
             $statDAO->addStat($label, $stats->getAverage());
@@ -136,7 +136,7 @@ class Calculator
     public function getAverageByMonth($labelFormat = 'n')
     {
         $statDAO = new StatDAO();
-        foreach ($this->statCollection->getStats()->getMonths() as $month => $stats) {
+        foreach ($this->statsDAO->getMonths() as $month => $stats) {
             $label = (new \DateTime($month))->format($labelFormat);
 
             $statDAO->addStat($label, $stats->getAverage());
@@ -155,7 +155,7 @@ class Calculator
     public function getAverageByDay($labelFormat = 'd')
     {
         $statDAO = new StatDAO();
-        foreach ($this->statCollection->getStats()->getDays() as $day => $stats) {
+        foreach ($this->statsDAO->getDays() as $day => $stats) {
             $label = (new \DateTime($day))->format($labelFormat);
 
             $statDAO->addStat($label, $stats->getAverage());
@@ -174,7 +174,7 @@ class Calculator
     public function getAverageByHour($labelFormat = 'G')
     {
         $statDAO = new StatDAO();
-        foreach ($this->statCollection->getStats()->getDays() as $day => $stats) {
+        foreach ($this->statsDAO->getDays() as $day => $stats) {
             $label = (new \DateTime($day))->format($labelFormat);
 
             $statDAO->addStat($label, $stats->getAverage());

@@ -27,6 +27,16 @@ class Collector
     private $eventDispatcher;
 
     /**
+     * Collector constructor.
+     *
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
      * @param string    $statName
      * @param \DateTime $fromDateTime
      * @param \DateTime $toDateTime
