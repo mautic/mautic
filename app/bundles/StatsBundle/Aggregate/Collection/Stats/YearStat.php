@@ -19,17 +19,36 @@ class YearStat implements StatInterface
     private $stats = [];
 
     /**
+     * @var int
+     */
+    private $year;
+
+    /**
+     * YearStat constructor.
+     *
+     * @param $year
+     */
+    public function __construct($year)
+    {
+        $this->year = (int) $year;
+    }
+
+    /**
      * @param $month
      *
      * @return MonthStat
+     *
+     * @throws \Exception
      */
     public function getMonth($month)
     {
-        if (!isset($this->stats[$month])) {
-            $this->stats[$month] = new MonthStat();
+        $key = (new \DateTime("{$this->year}-$month-01 00:00:00"))->format('Y-m');
+
+        if (!isset($this->stats[$key])) {
+            $this->stats[$key] = new MonthStat($key);
         }
 
-        return $this->stats[$month];
+        return $this->stats[$key];
     }
 
     /**

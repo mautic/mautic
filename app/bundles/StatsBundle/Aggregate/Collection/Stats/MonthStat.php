@@ -19,17 +19,36 @@ class MonthStat implements StatInterface
     private $stats = [];
 
     /**
+     * @var string
+     */
+    private $month;
+
+    /**
+     * MonthStat constructor.
+     *
+     * @param string $month
+     */
+    public function __construct($month)
+    {
+        $this->month = $month;
+    }
+
+    /**
      * @param $day
      *
      * @return DayStat
+     *
+     * @throws \Exception
      */
     public function getDay($day)
     {
-        if (!isset($this->stats[$day])) {
-            $this->stats[$day] = new DayStat();
+        $key = (new \DateTime("{$this->month}-$day 00:00:00"))->format('Y-m-d');
+
+        if (!isset($this->stats[$key])) {
+            $this->stats[$key] = new DayStat($key);
         }
 
-        return $this->stats[$day];
+        return $this->stats[$key];
     }
 
     /**

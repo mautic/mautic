@@ -19,17 +19,36 @@ class DayStat implements StatInterface
     private $stats = [];
 
     /**
+     * @var string
+     */
+    private $day;
+
+    /**
+     * DayStat constructor.
+     *
+     * @param string $day
+     */
+    public function __construct($day)
+    {
+        $this->day = $day;
+    }
+
+    /**
      * @param $hour
      *
      * @return HourStat
+     *
+     * @throws \Exception
      */
     public function getHour($hour)
     {
-        if (!isset($this->stats[$hour])) {
-            $this->stats[$hour] = new HourStat();
+        $key = (new \DateTime("{$this->day} $hour:00:00"))->format('Y-m-d H');
+
+        if (!isset($this->stats[$key])) {
+            $this->stats[$key] = new HourStat($key);
         }
 
-        return $this->stats[$hour];
+        return $this->stats[$key];
     }
 
     /**

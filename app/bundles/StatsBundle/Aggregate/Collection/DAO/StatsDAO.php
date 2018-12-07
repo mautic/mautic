@@ -31,7 +31,7 @@ class StatsDAO
     public function getYear($year)
     {
         if (!isset($this->years[$year])) {
-            $this->years[$year] = new YearStat();
+            $this->years[$year] = new YearStat($year);
         }
 
         return $this->years[$year];
@@ -55,11 +55,10 @@ class StatsDAO
     public function getMonths()
     {
         $flattenedMonths = [];
-        foreach ($this->years as $year => $yearStats) {
+        foreach ($this->years as $yearStats) {
             $months = $yearStats->getStats();
             foreach ($months as $month => $monthStats) {
-                $label                   = (new \DateTime("$year-$month-01 00:00:00"))->format('Y-m');
-                $flattenedMonths[$label] = $monthStats;
+                $flattenedMonths[$month] = $monthStats;
             }
         }
 
@@ -78,12 +77,11 @@ class StatsDAO
         $flattenedDays = [];
 
         $months = $this->getMonths();
-        foreach ($months as $month => $monthStats) {
+        foreach ($months as $monthStats) {
             $stats = $monthStats->getStats();
 
             foreach ($stats as $day => $dayStats) {
-                $label                 = (new \DateTime("$month-$day 00:00:00"))->format('Y-m-d');
-                $flattenedDays[$label] = $dayStats;
+                $flattenedDays[$day] = $dayStats;
             }
         }
 
@@ -102,12 +100,11 @@ class StatsDAO
         $flattenedHours = [];
 
         $days = $this->getDays();
-        foreach ($days as $day => $dayStats) {
+        foreach ($days as $dayStats) {
             $stats = $dayStats->getStats();
 
             foreach ($stats as $hour => $hourStat) {
-                $label                  = (new \DateTime("$day $hour:00:00"))->format('Y-m-d H');
-                $flattenedHours[$label] = $hourStat->getCount();
+                $flattenedHours[$hour] = $hourStat->getCount();
             }
         }
 
