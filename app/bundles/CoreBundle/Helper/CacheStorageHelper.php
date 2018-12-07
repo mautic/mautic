@@ -87,10 +87,7 @@ class CacheStorageHelper
         }
 
         if (is_null($cacheProvider)) {
-            if (!is_null($namespace) && 'mautic_' != $namespace) {
-                trigger_error('Service is deprecated. Use mautic.cache.provider service and tags instead. Your namespace is '.$namespace, E_USER_DEPRECATED);
-            }
-            $this->setCacheAdaptor();
+            $this->setCacheAdaptor();   // This is for BC compatibility reasons
         } else {
             $this->adaptor = $cacheProvider;
         }

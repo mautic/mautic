@@ -13,6 +13,7 @@ namespace Mautic\CacheBundle\Tests\EventListener;
 
 use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
 use Mautic\CacheBundle\EventListener\CacheClearSubscriber;
+use Monolog\Logger;
 
 class CacheClearSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,15 +31,18 @@ class CacheClearSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->random  = sha1((string) time());
-        $this->adapter = $this->getMockBuilder(FilesystemTagAwareAdapter::class)->enableProxyingToOriginalMethods()
-                              ->setMethods(['clear', 'getCacheAdapter'])
+        $this->adapter = $this->getMockBuilder(FilesystemTagAwareAdapter::class)
+                              ->disableOriginalConstructor()
+                              ->setMethods(['clear', 'getCacheAdapter', 'commit'])
                               ->getMock();
+        $this->adapter->method('clear')->willReturn($this->random);
+        $this->adapter->method('commit')->willReturn(null);
     }
 
     public function testClear()
     {
         $this->adapter->expects($this->once())->method('clear')->willReturn($this->random);
-        $subscriber = new CacheClearSubscriber($this->adapter);
+        $subscriber = new CacheClearSubscriber($this->adapter, new Logger('test'));
         $subscriber->clear('aaa');
     }
 }

@@ -40,12 +40,16 @@ class CacheClearSubscriber implements CacheClearerInterface
     /**
      * @param string $cacheDir
      *
-     * @throws \ReflectionException
+     * @throws \Exception
      */
     public function clear($cacheDir)
     {
-        $reflect = new \ReflectionClass($this->cacheProvider->getCacheAdapter());
-        $adapter = $reflect->getShortName();
+        try {
+            $reflect = new \ReflectionClass($this->cacheProvider->getCacheAdapter());
+            $adapter = $reflect->getShortName();
+        } catch (\ReflectionException $e) {
+            $adapter = 'unknown';
+        }
 
         if (!$this->cacheProvider->clear()) {
             $this->logger->emergency('Failed to clear the Mautic cache.', ['adapter' => $adapter]);
