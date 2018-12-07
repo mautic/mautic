@@ -23,7 +23,7 @@ class DayStat implements StatInterface
      *
      * @return HourStat
      */
-    public function getStat($hour)
+    public function getHour($hour)
     {
         if (!isset($this->stats[$hour])) {
             $this->stats[$hour] = new HourStat();

@@ -23,7 +23,7 @@ class MonthStat implements StatInterface
      *
      * @return DayStat
      */
-    public function getStat($day)
+    public function getDay($day)
     {
         if (!isset($this->stats[$day])) {
             $this->stats[$day] = new DayStat();

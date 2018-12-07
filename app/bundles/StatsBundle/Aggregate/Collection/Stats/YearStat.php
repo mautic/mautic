@@ -23,7 +23,7 @@ class YearStat implements StatInterface
      *
      * @return MonthStat
      */
-    public function getStat($month)
+    public function getMonth($month)
     {
         if (!isset($this->stats[$month])) {
             $this->stats[$month] = new MonthStat();

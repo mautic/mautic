@@ -19,13 +19,6 @@ interface StatInterface
     public function getStats();
 
     /**
-     * @param mixed $key
-     *
-     * @return StatInterface
-     */
-    public function getStat($key);
-
-    /**
      * @return int
      */
     public function getSum();
