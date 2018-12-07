@@ -5497,9 +5497,9 @@ div:empty[data-slot],div.empty[data-slot],.codemodeHtmlContainer:empty {
 div:empty[data-slot]:before,div.empty[data-slot]:before,.codemodeHtmlContainer:empty:before  {
   content: "\f044";
   font: normal normal normal 14px/1 FontAwesome;
-  position: absolute;
+  position:absolute;
   left: 2px;
   top: 2px;
-  color: gray;
-  font-size: small;
+  color:gray;
+  font-size:small;
 }
