@@ -11,6 +11,7 @@
 
 namespace Mautic\StatsBundle\Aggregate\Collection;
 
+use Mautic\StatsBundle\Aggregate\Calculator;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 
 class StatCollection
@@ -93,5 +94,13 @@ class StatCollection
     public function getStats()
     {
         return $this->stats;
+    }
+
+    /**
+     * @return Calculator
+     */
+    public function getCalculator()
+    {
+        return new Calculator($this->stats);
     }
 }
