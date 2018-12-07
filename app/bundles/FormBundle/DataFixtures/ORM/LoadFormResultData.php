@@ -16,7 +16,9 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
