@@ -12,6 +12,7 @@
 namespace Mautic\StatsBundle\Event;
 
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
+use Mautic\StatsBundle\Event\Options\EventOptions;
 use Symfony\Component\EventDispatcher\Event;
 
 class AggregateStatRequestEvent extends Event
@@ -32,29 +33,29 @@ class AggregateStatRequestEvent extends Event
     private $toDateTime;
 
     /**
-     * @var int|null
-     */
-    private $itemId;
-
-    /**
      * @var StatCollection
      */
     private $statCollection;
 
     /**
-     * StatRequestEvent constructor.
+     * @var EventOptions
+     */
+    private $options;
+
+    /**
+     * AggregateStatRequestEvent constructor.
      *
      * @param string             $statName
      * @param \DateTimeInterface $fromDateTime
      * @param \DateTimeInterface $toDateTime
-     * @param int|null           $itemId
+     * @param EventOptions       $eventOptions
      */
-    public function __construct($statName, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, $itemId)
+    public function __construct($statName, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, EventOptions $eventOptions)
     {
         $this->statName     = $statName;
         $this->fromDateTime = $fromDateTime;
         $this->toDateTime   = $toDateTime;
-        $this->itemId       = $itemId;
+        $this->options      = $eventOptions;
 
         $this->statCollection = new StatCollection($statName);
     }
@@ -92,11 +93,11 @@ class AggregateStatRequestEvent extends Event
     }
 
     /**
-     * @return int|null
+     * @return EventOptions
      */
-    public function getItemId()
+    public function getOptions()
     {
-        return $this->itemId;
+        return $this->options;
     }
 
     /**
