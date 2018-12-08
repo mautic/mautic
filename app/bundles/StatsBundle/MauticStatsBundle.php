@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\StageBundle;
+namespace Mautic\StatsBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
