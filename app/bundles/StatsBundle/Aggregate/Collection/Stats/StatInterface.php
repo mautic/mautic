@@ -26,5 +26,5 @@ interface StatInterface
     /**
      * @return int
      */
-    public function getAverage();
+    public function getCount();
 }

@@ -75,14 +75,8 @@ class MonthStat implements StatInterface
     /**
      * @return int
      */
-    public function getAverage()
+    public function getCount()
     {
-        if (count($this->stats) === 0) {
-            return 0;
-        }
-
-        $sum = $this->getSum();
-
-        return $sum / count($this->stats);
+        return count($this->stats);
     }
 }

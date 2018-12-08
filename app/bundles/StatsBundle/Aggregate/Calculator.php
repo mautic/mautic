@@ -31,6 +31,10 @@ class Calculator
         $this->statsDAO = $statsDAO;
     }
 
+    public function getSumsByBestUnit()
+    {
+    }
+
     /**
      * @param string $labelFormat
      *
@@ -38,13 +42,14 @@ class Calculator
      *
      * @throws \Exception
      */
-    public function getSumByYear($labelFormat = 'Y')
+    public function getSumsByYear($labelFormat = 'Y')
     {
         $statDAO = new StatDAO();
         foreach ($this->statsDAO->getYears() as $year => $stats) {
-            $label = (new \DateTime($year))->format($labelFormat);
-
-            $statDAO->addStat($label, $stats->getSum());
+            $statDAO->addStat(
+                $this->getYearLabel($year, $labelFormat),
+                $stats->getSum()
+            );
         }
 
         return $statDAO;
@@ -57,13 +62,14 @@ class Calculator
      *
      * @throws \Exception
      */
-    public function getSumByMonth($labelFormat = 'n')
+    public function getSumsByMonth($labelFormat = 'n')
     {
         $statDAO = new StatDAO();
         foreach ($this->statsDAO->getMonths() as $month => $stats) {
-            $label = (new \DateTime($month))->format($labelFormat);
-
-            $statDAO->addStat($label, $stats->getSum());
+            $statDAO->addStat(
+                $this->getMonthLabel($month, $labelFormat),
+                $stats->getSum()
+            );
         }
 
         return $statDAO;
@@ -76,70 +82,88 @@ class Calculator
      *
      * @throws \Exception
      */
-    public function getSumByDay($labelFormat = 'd')
+    public function getSumsByDay($labelFormat = 'j')
     {
         $statDAO = new StatDAO();
         foreach ($this->statsDAO->getDays() as $day => $stats) {
-            $label = (new \DateTime($day))->format($labelFormat);
-
-            $statDAO->addStat($label, $stats->getSum());
+            $statDAO->addStat(
+                $this->getDayLabel($day, $labelFormat),
+                $stats->getSum()
+            );
         }
 
         return $statDAO;
     }
 
     /**
+     * Get per month average for each year. This assumes that a stat is injected
+     * per month even if the sum is 0.
+     *
      * @param string $labelFormat
      *
      * @return StatDAO
      *
      * @throws \Exception
      */
-    public function getSumByHour($labelFormat = 'G')
+    public function getMonthlyAveragesByYear($labelFormat = 'Y')
     {
         $statDAO = new StatDAO();
-        foreach ($this->statsDAO->getDays() as $day => $stats) {
-            $label = (new \DateTime($day))->format($labelFormat);
+        $counts  = [];
+        $sums    = [];
 
-            $statDAO->addStat($label, $stats->getSum());
-        }
-
-        return $statDAO;
-    }
-
-    /**
-     * @param string $labelFormat
-     *
-     * @return StatDAO
-     *
-     * @throws \Exception
-     */
-    public function getAverageByYear($labelFormat = 'Y')
-    {
-        $statDAO = new StatDAO();
         foreach ($this->statsDAO->getYears() as $year => $stats) {
-            $label = (new \DateTime($year))->format($labelFormat);
+            $key = $this->getYearLabel($year, $labelFormat);
+            if (!isset($counts[$key])) {
+                $counts[$key] = 0;
+                $sums[$key]   = 0;
+            }
 
-            $statDAO->addStat($label, $stats->getAverage());
+            $counts[$key] += $stats->getCount();
+            $sums[$key] += $stats->getSum();
+        }
+
+        foreach ($counts as $key => $count) {
+            $statDAO->addStat(
+                $key,
+                $count ? $sums[$key] / $count : 0
+            );
         }
 
         return $statDAO;
     }
 
     /**
+     * Get per day average for each month. This assumes that a stat is injected
+     * per day even if the sum is 0.
+     *
      * @param string $labelFormat
      *
      * @return StatDAO
      *
      * @throws \Exception
      */
-    public function getAverageByMonth($labelFormat = 'n')
+    public function getDailyAveragesByMonth($labelFormat = 'n')
     {
         $statDAO = new StatDAO();
+        $counts  = [];
+        $sums    = [];
+
         foreach ($this->statsDAO->getMonths() as $month => $stats) {
-            $label = (new \DateTime($month))->format($labelFormat);
+            $key = $this->getMonthLabel($month, $labelFormat);
+            if (!isset($counts[$key])) {
+                $counts[$key] = 0;
+                $sums[$key]   = 0;
+            }
 
-            $statDAO->addStat($label, $stats->getAverage());
+            $counts[$key] += $stats->getCount();
+            $sums[$key] += $stats->getSum();
+        }
+
+        foreach ($counts as $key => $count) {
+            $statDAO->addStat(
+                $key,
+                $count ? $sums[$key] / $count : 0
+            );
         }
 
         return $statDAO;
@@ -152,34 +176,69 @@ class Calculator
      *
      * @throws \Exception
      */
-    public function getAverageByDay($labelFormat = 'd')
+    public function getHourlyAveragesByDay($labelFormat = 'j')
     {
         $statDAO = new StatDAO();
-        foreach ($this->statsDAO->getDays() as $day => $stats) {
-            $label = (new \DateTime($day))->format($labelFormat);
+        $counts  = [];
+        $sums    = [];
 
-            $statDAO->addStat($label, $stats->getAverage());
+        foreach ($this->statsDAO->getDays() as $day => $stats) {
+            $key = $this->getDayLabel($day, $labelFormat);
+            if (!isset($counts[$key])) {
+                $counts[$key] = 0;
+                $sums[$key]   = 0;
+            }
+
+            $counts[$key] += $stats->getCount();
+            $sums[$key] += $stats->getSum();
+        }
+
+        foreach ($counts as $key => $count) {
+            $statDAO->addStat(
+                $key,
+                $count ? $sums[$key] / $count : 0
+            );
         }
 
         return $statDAO;
     }
 
     /**
-     * @param string $labelFormat
+     * @param $year
+     * @param $labelFormat
      *
-     * @return StatDAO
+     * @return string
      *
      * @throws \Exception
      */
-    public function getAverageByHour($labelFormat = 'G')
+    private function getYearLabel($year, $labelFormat)
     {
-        $statDAO = new StatDAO();
-        foreach ($this->statsDAO->getDays() as $day => $stats) {
-            $label = (new \DateTime($day))->format($labelFormat);
+        return (new \DateTime("$year-01-01 00:00:00"))->format($labelFormat);
+    }
 
-            $statDAO->addStat($label, $stats->getAverage());
-        }
+    /**
+     * @param $month
+     * @param $labelFormat
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    private function getMonthLabel($month, $labelFormat)
+    {
+        return (new \DateTime("$month-01 00:00:00"))->format($labelFormat);
+    }
 
-        return $statDAO;
+    /**
+     * @param $day
+     * @param $labelFormat
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    private function getDayLabel($day, $labelFormat)
+    {
+        return (new \DateTime("$day 00:00:00"))->format($labelFormat);
     }
 }
