@@ -113,11 +113,6 @@ class WebhookModel extends FormModel
     protected $eventsOrderByDir;
 
     /**
-     * @var array
-     */
-    private $queuedPayloads = [];
-
-    /**
      * WebhookModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -248,22 +243,19 @@ class WebhookModel extends FormModel
         foreach ($webhookEvents as $event) {
             $webhook       = $event->getWebhook();
             $webhookList[] = $webhook;
-
-            if (!isset($this->queuedPayloads[$webhook->getId()])) {
-                $this->queuedPayloads[$webhook->getId()] = [];
-            }
-            $this->queuedPayloads[$webhook->getId()] = $this->queueWebhook($webhook, $event, $payload, $serializationGroups);
+            $queue         = $this->queueWebhook($webhook, $event, $payload, $serializationGroups);
 
             if (self::COMMAND_PROCESS === $this->queueMode) {
                 // Queue to the database to process later
-                $this->getQueueRepository()->saveEntity($this->queuedPayloads[$webhook->getId()]);
+                $this->getQueueRepository()->saveEntity($queue);
+            } else {
+                $webhook->addQueue($queue);
             }
         }
 
         if (self::IMMEDIATE_PROCESS === $this->queueMode) {
             // Immediately process
             $this->processWebhooks($webhookList);
-            $this->queuedPayloads = [];
         }
     }
 
@@ -521,7 +513,7 @@ class WebhookModel extends FormModel
         if ($this->queueMode === self::COMMAND_PROCESS) {
             $queuesArray = $this->getWebhookQueues($webhook);
         } else {
-            $queuesArray = isset($this->queuedPayloads[$webhook->getId()]) ? $this->queuedPayloads[$webhook->getId()] : [$webhook->getQueues()];
+            $queuesArray = [$webhook->getQueues()];
         }
 
         /* @var WebhookQueue $queue */
