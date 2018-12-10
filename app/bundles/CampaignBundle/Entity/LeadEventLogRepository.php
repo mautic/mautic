@@ -645,9 +645,10 @@ SQL;
             return [];
         }
 
-        $this->getSlaveConnection($limiter);
-
-        $q = $this->createQueryBuilder();
+        $now = clone $date;
+        $now->setTimezone(new \DateTimeZone('UTC'));
+        
+        $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
         $expr = $q->expr()->andX(
             $q->expr()->in('l.event_id', ':ids'),
             $q->expr()->lte('l.trigger_date', ':now'),
@@ -661,7 +662,7 @@ SQL;
             ->where($expr)
             ->setParameter('ids', $eventIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
             ->setParameter('true', true)
-            ->setParameter('now', $date)
+            ->setParameter('now', $now->format('Y-m-d H:i:s'))
             ->groupBy('l.event_id')
             ->execute()
             ->fetchAll();
