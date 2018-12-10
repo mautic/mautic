@@ -237,8 +237,6 @@ class WebhookModel extends FormModel
             return;
         }
 
-        $webhookList = [];
-
         /** @var \Mautic\WebhookBundle\Entity\Event $event */
         foreach ($webhookEvents as $event) {
             $webhook = $event->getWebhook();
