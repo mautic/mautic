@@ -550,7 +550,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getOldestTriggeredDate()
     {
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb = $this->getSlaveConnection()->createQueryBuilder();
         $qb->select('log.date_triggered')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->orderBy('log.date_triggered', 'ASC')
@@ -570,7 +570,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation)
     {
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb = $this->getSlaveConnection()->createQueryBuilder();
         $qb->select('log.rotation')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
