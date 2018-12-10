@@ -205,7 +205,7 @@ class ContactTrackerTest extends \PHPUnit_Framework_TestCase
             ->method('getTrackedLead')
             ->willReturn(null);
 
-        $this->coreParametersHelperMock->expects($this->once())
+        $this->coreParametersHelperMock->expects($this->any())
             ->method('getParameter')
             ->willReturn(true);
 

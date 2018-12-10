@@ -87,6 +87,11 @@ class Field
     private $properties = [];
 
     /**
+     * @var array
+     */
+    private $validation = [];
+
+    /**
      * @var Form
      */
     private $form;
@@ -211,6 +216,10 @@ class Field
             ->nullable()
             ->build();
 
+        $builder->createField('validation', 'json_array')
+            ->nullable()
+            ->build();
+
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
@@ -254,6 +263,7 @@ class Field
                     'helpMessage',
                     'order',
                     'properties',
+                    'validation',
                     'labelAttributes',
                     'inputAttributes',
                     'containerAttributes',
@@ -477,6 +487,31 @@ class Field
     public function getProperties()
     {
         return $this->properties;
+    }
+
+    /**
+     * Set validation.
+     *
+     * @param array $validation
+     *
+     * @return Field
+     */
+    public function setValidation($validation)
+    {
+        $this->isChanged('validation', $validation);
+        $this->validation = $validation;
+
+        return $this;
+    }
+
+    /**
+     * Get validation.
+     *
+     * @return array
+     */
+    public function getValidation()
+    {
+        return $this->validation;
     }
 
     /**
@@ -836,7 +871,7 @@ class Field
             return true;
         }
 
-        // Hide the field if there is the submission count limit and hide it untill the limit is overcame
+        // Hide the field if there is the submission count limit and hide it until the limit is overcame
         if ($this->showAfterXSubmissions > 0 && $this->showAfterXSubmissions > count($submissions)) {
             return false;
         }

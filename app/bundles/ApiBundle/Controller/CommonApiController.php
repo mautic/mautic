@@ -1220,7 +1220,7 @@ class CommonApiController extends FOSRestController implements MauticController
      *
      * @return Response|array
      */
-    protected function returnError($msg, $code = Codes::HTTP_OK, $details = [])
+    protected function returnError($msg, $code = Codes::HTTP_INTERNAL_SERVER_ERROR, $details = [])
     {
         if ($this->get('translator')->hasId($msg, 'flashes')) {
             $msg = $this->get('translator')->trans($msg, [], 'flashes');

@@ -116,6 +116,8 @@ class ConfigBuilderEvent extends Event
     }
 
     /**
+     * Get default parameters from config defined in bundles.
+     *
      * @param $bundle
      *
      * @return array

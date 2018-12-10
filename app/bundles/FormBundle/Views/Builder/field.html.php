@@ -11,6 +11,7 @@
 $template       = '<div class="col-md-6">{content}</div>';
 $toggleTemplate = '<div class="col-md-3">{content}</div>';
 $properties     = (isset($form['properties'])) ? $form['properties'] : [];
+$validation     = (isset($form['validation'])) ? $form['validation'] : [];
 
 $showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']) || isset($form['alias']);
 $showBehavior   = isset($form['showWhenValueExists']) || isset($properties['showWhenValueExists']);
@@ -56,9 +57,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
-                <a<?php if ($generalTabError) {
-    echo ' class="text-danger" ';
-} ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                <a<?php if ($generalTabError): echo ' class="text-danger" '; endif; ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.general'); ?>
                     <?php if ($generalTabError): ?>
                         <i class="fa fa-warning"></i>
@@ -84,9 +83,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
 
             <?php if ($showProperties): ?>
             <li role="presentation">
-                <a<?php if ($propertiesTabError) {
-    echo ' class="text-danger" ';
-} ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                <a<?php if ($propertiesTabError): echo ' class="text-danger" '; endif; ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.properties'); ?>
                     <?php if ($propertiesTabError): ?>
                         <i class="fa fa-warning"></i>
@@ -168,9 +165,40 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <?php if (isset($form['isRequired'])): ?>
             <div role="tabpanel" class="tab-pane" id="required">
                     <div class="row">
-                        <?php echo $view['form']->rowIfExists($form, 'validationMessage', $template); ?>
-                        <?php echo $view['form']->rowIfExists($form, 'isRequired', $toggleTemplate); ?>
+                        <?php echo $view['form']->rowIfExists($form, 'isRequired', '<div class="col-md-4">{content}</div>'); ?>
+                        <?php echo $view['form']->rowIfExists($form, 'validationMessage', '<div class="col-md-8">{content}</div>'); ?>
                     </div>
+                <div class="row">
+                    <?php
+                    $i = 0;
+                    foreach ($validation as $name => $property):
+                        if ($form['validation'][$name]->isRendered() || $name == 'labelAttributes') {
+                            continue;
+                        }
+
+                        if ($form['validation'][$name]->vars['block_prefixes'][1] == 'hidden') :
+                            echo $view['form']->row($form['validation'][$name]);
+                        else:
+                            $col = 8;
+                            if ($form['validation'][$name]->vars['block_prefixes'][1] == 'choice'):
+                                $col = 4;
+                                endif;
+                            ?>
+                            <div class="col-md-<?php echo $col; ?>">
+                                <?php echo $view['form']->row($form['validation'][$name]); ?>
+                            </div>
+                            <?php
+                            if (9 == $col) :
+                                $i++;
+                                if (0 == $i % 2) :
+                                    ?>
+                                    <div class="clearfix"></div>
+                                    <?php
+                                endif;
+                            endif;
+                        endif; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
             <?php endif; ?>
 

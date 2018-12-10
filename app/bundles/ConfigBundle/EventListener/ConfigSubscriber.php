@@ -13,6 +13,7 @@ namespace Mautic\ConfigBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
@@ -21,11 +22,24 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
  */
 class ConfigSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CoreParametersHelper
+     */
     protected $paramHelper;
 
-    public function __construct(CoreParametersHelper $paramHelper)
+    /**
+     * @var ConfigChangeLogger
+     */
+    private $configChangeLogger;
+
+    /**
+     * @param CoreParametersHelper $paramHelper
+     * @param ConfigChangeLogger   $configChangeLogger
+     */
+    public function __construct(CoreParametersHelper $paramHelper, ConfigChangeLogger $configChangeLogger)
     {
-        $this->paramHelper = $paramHelper;
+        $this->paramHelper        = $paramHelper;
+        $this->configChangeLogger = $configChangeLogger;
     }
 
     /**
@@ -34,7 +48,8 @@ class ConfigSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            ConfigEvents::CONFIG_PRE_SAVE => ['escapePercentCharacters', 1000],
+            ConfigEvents::CONFIG_PRE_SAVE  => ['escapePercentCharacters', 1000],
+            ConfigEvents::CONFIG_POST_SAVE => ['onConfigPostSave', 0],
         ];
     }
 
@@ -60,5 +75,18 @@ class ConfigSubscriber extends CommonSubscriber
             }
         });
         $event->setConfig($config);
+    }
+
+    /**
+     * @param ConfigEvent $event
+     */
+    public function onConfigPostSave(ConfigEvent $event)
+    {
+        if ($originalNormData = $event->getOriginalNormData()) {
+            // We have something to log
+            $this->configChangeLogger
+                ->setOriginalNormData($originalNormData)
+                ->log($event->getNormData());
+        }
     }
 }

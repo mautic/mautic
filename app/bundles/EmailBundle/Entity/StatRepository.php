@@ -56,20 +56,18 @@ class StatRepository extends CommonRepository
     public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('ph.url')
+        $q->select('distinct ph.url, ph.date_hit')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->where('ph.email_id = :emailId')
             ->andWhere('ph.lead_id = :leadId')
             ->setParameter('leadId', $contactId)
-            ->setParameter('emailId', $emailId)
-            ->groupBy('ph.url');
+            ->setParameter('emailId', $emailId);
 
         $result = $q->execute()->fetchAll();
-        $data   = [];
 
         if ($result) {
             foreach ($result as $row) {
-                $data[] = $row['url'];
+                $data[$row['date_hit']] = $row['url'];
             }
         }
 
@@ -96,12 +94,12 @@ class StatRepository extends CommonRepository
         $campaignId = null,
         $segmentId = null
     ) {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id')
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
             ->addSelect('e.name AS email_name')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 's.email_id = ph.email_id AND s.lead_id = ph.lead_id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.source = "email" and ph.source_id = s.email_id and ph.lead_id = s.lead_id')
             ->addSelect('COUNT(ph.id) AS link_hits');
 
         if ($createdByUserId !== null) {
@@ -113,7 +111,17 @@ class StatRepository extends CommonRepository
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
 
-        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 's.lead_id = cl.lead_id')
+        $companyJoinOnExpr = $q->expr()->andX(
+            $q->expr()->eq('s.lead_id', 'cl.lead_id')
+        );
+        if (null === $companyId) {
+            // Must force a one to one relationship
+            $companyJoinOnExpr->add(
+                $q->expr()->eq('cl.is_primary', 1)
+            );
+        }
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', $companyJoinOnExpr)
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies', 'c', 'cl.company_id = c.id')
             ->addSelect('c.id AS company_id')
             ->addSelect('c.companyname AS company_name');
@@ -123,7 +131,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('companyId', $companyId);
         }
 
-        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source_id = ce.id AND s.source = "campaign.event"')
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source = "campaign.event" and s.source_id = ce.id')
             ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
             ->addSelect('campaign.id AS campaign_id')
             ->addSelect('campaign.name AS campaign_name');
@@ -138,7 +146,27 @@ class StatRepository extends CommonRepository
             ->addSelect('ll.name AS segment_name');
 
         if ($segmentId !== null) {
-            $q->andWhere('s.list_id = :segmentId')
+            $sb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $sb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
+                ->where(
+                    $sb->expr()->andX(
+                        $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
+                        $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
+                        $sb->expr()->eq('lll.manually_removed', 0)
+                    )
+                );
+
+            // Filter for both broadcasts and campaign related segments
+            $q->andWhere(
+                $q->expr()->orX(
+                    $q->expr()->eq('s.list_id', ':segmentId'),
+                    $q->expr()->andX(
+                        $q->expr()->isNull('s.list_id'),
+                        sprintf('EXISTS (%s)', $sb->getSQL())
+                    )
+                )
+            )
                 ->setParameter('segmentId', $segmentId);
         }
 

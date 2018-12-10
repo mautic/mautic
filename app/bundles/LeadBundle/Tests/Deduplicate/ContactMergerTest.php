@@ -114,17 +114,32 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
     public function testMergeIpAddresses()
     {
         $winner = new Lead();
-        $winner->addIpAddress((new IpAddress())->setIpAddress('1.2.3.4'));
-        $winner->addIpAddress((new IpAddress())->setIpAddress('4.3.2.1'));
+        $winner->addIpAddress((new IpAddress('1.2.3.4'))->setIpDetails('from winner'));
+        $winner->addIpAddress((new IpAddress('4.3.2.1'))->setIpDetails('from winner'));
+        $winner->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails('from winner'));
 
-        $loser  = new Lead();
-        $loser->addIpAddress((new IpAddress())->setIpAddress('5.6.7.8'));
-        $loser->addIpAddress((new IpAddress())->setIpAddress('8.7.6.5'));
+        $loser = new Lead();
+        $loser->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails('from loser'));
+        $loser->addIpAddress((new IpAddress('8.7.6.5'))->setIpDetails('from loser'));
 
         $this->getMerger()->mergeIpAddressHistory($winner, $loser);
 
         $ipAddresses = $winner->getIpAddresses();
         $this->assertCount(4, $ipAddresses);
+
+        $ipAddressArray = $ipAddresses->toArray();
+
+        $expectedIpAddressArray = [
+            '1.2.3.4' => 'from winner',
+            '4.3.2.1' => 'from winner',
+            '5.6.7.8' => 'from winner',
+            '8.7.6.5' => 'from loser',
+        ];
+
+        foreach ($expectedIpAddressArray as $ipAddress => $ipId) {
+            $this->assertSame($ipAddress, $ipAddressArray[$ipAddress]->getIpAddress());
+            $this->assertSame($ipId, $ipAddressArray[$ipAddress]->getIpDetails());
+        }
     }
 
     public function testMergeFieldDataWithLoserAsNewlyUpdated()

@@ -233,12 +233,12 @@ class PointModel extends CommonFormModel
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
 
         $persist = [];
+        /** @var Point $action */
         foreach ($availablePoints as $action) {
-            //if it's already been done, then skip it
-            if (isset($completedActions[$action->getId()])) {
+            //if it's already been done or not repeatable, then skip it
+            if (!$action->getRepeatable() && isset($completedActions[$action->getId()])) {
                 continue;
             }
-
             //make sure the action still exists
             if (!isset($availableActions['actions'][$action->getType()])) {
                 continue;
@@ -296,23 +296,26 @@ class PointModel extends CommonFormModel
                     $event = new PointActionEvent($action, $lead);
                     $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
 
-                    $log = new LeadPointLog();
-                    $log->setIpAddress($ipAddress);
-                    $log->setPoint($action);
-                    $log->setLead($lead);
-                    $log->setDateFired(new \DateTime());
-
-                    $persist[] = $log;
+                    if (!$action->getRepeatable()) {
+                        $log = new LeadPointLog();
+                        $log->setIpAddress($ipAddress);
+                        $log->setPoint($action);
+                        $log->setLead($lead);
+                        $log->setDateFired(new \DateTime());
+                        $persist[] = $log;
+                    }
                 }
             }
         }
 
         if (!empty($persist)) {
-            $this->leadModel->saveEntity($lead);
             $this->getRepository()->saveEntities($persist);
-
             // Detach logs to reserve memory
             $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
+        }
+
+        if (!empty($lead->getpointchanges())) {
+            $this->leadModel->saveEntity($lead);
         }
     }
 

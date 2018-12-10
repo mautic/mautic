@@ -142,7 +142,6 @@ class KickoffExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 
@@ -213,21 +212,24 @@ class KickoffExecutioner implements ExecutionerInterface
                 $this->progressBar->advance($contacts->count());
                 $this->counter->advanceEvaluated($contacts->count());
 
-                // Check if the event should be scheduled (let the schedulers do the debug logging)
-                $executionDate = $this->scheduler->getExecutionDateTime($event, $now);
-                $this->logger->debug(
-                    'CAMPAIGN: Event ID# '.$event->getId().
-                    ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
-                    ' compared to '.$now->format('Y-m-d H:i:s')
-                );
+                try {
+                    // Get the date the event would be executed on as if it was based on days only
+                    $executionDate = $this->scheduler->getExecutionDateTime($event, $now);
+                    $this->logger->debug(
+                        'CAMPAIGN: Event ID# '.$event->getId().
+                        ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
+                        ' compared to '.$now->format('Y-m-d H:i:s')
+                    );
 
-                if ($this->scheduler->shouldSchedule($executionDate, $now)) {
+                    // Adjust the hour based on contact timezone if applicable
+                    $this->scheduler->validateAndScheduleEventForContacts($event, $executionDate, $contacts, $now);
+
                     $this->counter->advanceTotalScheduled($contacts->count());
-                    $this->scheduler->schedule($event, $executionDate, $contacts);
-
                     $rootEvents->remove($key);
 
                     continue;
+                } catch (NotSchedulableException $exception) {
+                    // Execute the event
                 }
             }
 

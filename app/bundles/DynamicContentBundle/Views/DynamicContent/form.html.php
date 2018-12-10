@@ -30,6 +30,7 @@ $templates = [
     'timezones'      => 'timezone-template',
     'select'         => 'select-template',
     'lists'          => 'leadlist-template',
+    'campaign'       => 'campaign-template',
     'deviceTypes'    => 'device_type-template',
     'deviceBrands'   => 'device_brand-template',
     'deviceOs'       => 'device_os-template',
@@ -121,7 +122,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                                             ) : '{}';
                                                             ?>
                                                             <option value="<?php echo $view->escape($value); ?>"
-                                                                    id="available_<?php echo $value; ?>"
+                                                                    id="available_<?php echo $object.'_'.$value; ?>"
                                                                     data-field-object="<?php echo $object; ?>"
                                                                     data-field-type="<?php echo $params['properties']['type']; ?>"
                                                                     data-field-list="<?php echo $view->escape($list); ?>"

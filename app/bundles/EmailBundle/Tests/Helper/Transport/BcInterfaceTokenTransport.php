@@ -66,7 +66,8 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
-        $toCount = count($message->getTo());
+        $to      = $message->getTo();
+        $toCount = (is_array($to) || $to instanceof \Countable) ? count($to) : 0;
 
         return ('to' === $type) ? $toCount + $toBeAdded : $toCount;
     }

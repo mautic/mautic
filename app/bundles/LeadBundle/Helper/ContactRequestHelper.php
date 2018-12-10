@@ -14,15 +14,16 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Exception\ContactNotFoundException;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactRequestHelper
@@ -38,9 +39,9 @@ class ContactRequestHelper
     private $coreParametersHelper;
 
     /**
-     * @var StatRepository
+     * @var EventDispatcherInterface
      */
-    private $emailStatRepository;
+    private $eventDispatcher;
 
     /**
      * @var LeadDeviceRepository
@@ -85,36 +86,36 @@ class ContactRequestHelper
     /**
      * ContactRequestHelper constructor.
      *
-     * @param LeadModel            $leadModel
-     * @param ContactTracker       $contactTracker
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param StatRepository       $emailStatRepository
-     * @param LeadDeviceRepository $leadDeviceRepository
-     * @param RequestStack         $requestStack
-     * @param Logger               $logger
+     * @param LeadModel                $leadModel
+     * @param ContactTracker           $contactTracker
+     * @param CoreParametersHelper     $coreParametersHelper
+     * @param IpLookupHelper           $ipLookupHelper
+     * @param LeadDeviceRepository     $leadDeviceRepository
+     * @param RequestStack             $requestStack
+     * @param Logger                   $logger
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         LeadModel $leadModel,
         ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
         IpLookupHelper $ipLookupHelper,
-        StatRepository $emailStatRepository,
         LeadDeviceRepository $leadDeviceRepository,
         RequestStack $requestStack,
-        Logger $logger
+        Logger $logger,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->leadModel            = $leadModel;
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
-        $this->emailStatRepository  = $emailStatRepository;
         $this->leadDeviceRepository = $leadDeviceRepository;
         $this->request              = $requestStack->getCurrentRequest();
         $this->logger               = $logger;
+        $this->eventDispatcher      = $eventDispatcher;
     }
 
     /**
-     * @param Lead  $trackedContact
      * @param array $queryFields
      *
      * @return Lead
@@ -123,7 +124,6 @@ class ContactRequestHelper
     {
         $this->trackedContact = $this->contactTracker->getContact();
         $this->queryFields    = $queryFields;
-
         try {
             $foundContact         = $this->getContactFromUrl();
             $this->trackedContact = $foundContact;
@@ -155,7 +155,7 @@ class ContactRequestHelper
         }
 
         try {
-            $contact = $this->getContactFromEmailClickthrough($clickthrough);
+            $contact = $this->getContactFromClickthrough($clickthrough);
 
             return $contact;
         } catch (ContactNotFoundException $exception) {
@@ -163,23 +163,25 @@ class ContactRequestHelper
 
         $this->setEmailFromClickthroughIdentification($clickthrough);
 
-        /** @var Lead $foundContact */
-        list($foundContact, $this->publiclyUpdatableFieldValues) = $this->leadModel->checkForDuplicateContact(
-            $this->queryFields,
-            $this->trackedContact,
-            true,
-            true
-        );
-        if ($foundContact->getId() !== $this->trackedContact->getId()) {
-            // A contact was found by a publicly updatable field
-            return $foundContact;
+        /* @var Lead $foundContact */
+        if (!empty($this->queryFields)) {
+            list($foundContact, $this->publiclyUpdatableFieldValues) = $this->leadModel->checkForDuplicateContact(
+                $this->queryFields,
+                $this->trackedContact,
+                true,
+                true
+            );
+            if ($foundContact->getId() !== $this->trackedContact->getId()) {
+                // A contact was found by a publicly updatable field
+                return $foundContact;
+            }
         }
 
         return $this->getContactByFingerprint();
     }
 
     /**
-     * Identify a contact through a clickthrough URL in an email.
+     * Identify a contact through a clickthrough URL.
      *
      * @param array $clickthrough
      *
@@ -187,36 +189,24 @@ class ContactRequestHelper
      *
      * @throws ContactNotFoundException
      */
-    private function getContactFromEmailClickthrough(array $clickthrough)
+    private function getContactFromClickthrough(array $clickthrough)
     {
-        // Nothing left to identify by so stick to the tracked lead
-        if (empty($clickthrough['channel']['email']) && empty($clickthrough['stat'])) {
-            throw new ContactNotFoundException();
-        }
+        $event = new ContactIdentificationEvent($clickthrough);
+        $this->eventDispatcher->dispatch(LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION, $event);
 
-        /** @var Stat $stat */
-        $stat = $this->emailStatRepository->findOneBy(['trackingHash' => $clickthrough['stat']]);
-
-        if (!$stat) {
-            // Stat doesn't exist so use the tracked lead
-            throw new ContactNotFoundException();
-        }
-
-        if ($stat->getEmail() && (int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
-            // Email ID mismatch - fishy so use tracked lead
-            throw new ContactNotFoundException();
-        }
-
-        if ($statLead = $stat->getLead()) {
-            $this->logger->addDebug("LEAD: Contact ID# {$statLead->getId()} tracked through clickthrough query from email.");
+        if ($contact = $event->getIdentifiedContact()) {
+            $this->logger->addDebug("LEAD: Contact ID# {$contact->getId()} tracked through clickthrough query by the ".$event->getIdentifier().' channel');
 
             // Merge tracked visitor into the clickthrough contact
-            return $this->mergeWithTrackedContact($statLead);
+            return $this->mergeWithTrackedContact($contact);
         }
 
         throw new ContactNotFoundException();
     }
 
+    /**
+     * @param array $clickthrough
+     */
     private function setEmailFromClickthroughIdentification(array $clickthrough)
     {
         if (!$this->coreParametersHelper->getParameter('track_by_tracking_url') || !empty($queryFields['email'])) {
@@ -274,13 +264,15 @@ class ContactRequestHelper
             $this->trackedContact->addIpAddress($ipAddress);
         }
 
-        $this->leadModel->setFieldValues(
-            $this->trackedContact,
-            $this->publiclyUpdatableFieldValues,
-            false,
-            true,
-            true
-        );
+        if (!empty($this->publiclyUpdatableFieldValues)) {
+            $this->leadModel->setFieldValues(
+                $this->trackedContact,
+                $this->publiclyUpdatableFieldValues,
+                false,
+                true,
+                true
+            );
+        }
 
         // Assume a web request as this is likely a tracking request from DWC or tracking code
         $this->trackedContact->setManipulator(
