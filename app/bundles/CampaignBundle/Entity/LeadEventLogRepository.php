@@ -645,8 +645,9 @@ SQL;
             return [];
         }
 
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $this->getSlaveConnection($limiter);
 
+        $q = $this->createQueryBuilder();
         $expr = $q->expr()->andX(
             $q->expr()->in('l.event_id', ':ids'),
             $q->expr()->lte('l.trigger_date', ':now'),
