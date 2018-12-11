@@ -175,8 +175,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         DNC $doNotContact,
         GeneratedColumnsProviderInterface $generatedColumnsProvider,
         StatsCollectionHelper $statsCollectionHelper
-    )
-    {
+    ) {
         $this->ipLookupHelper           = $ipLookupHelper;
         $this->themeHelper              = $themeHelper;
         $this->mailboxHelper            = $mailboxHelper;
@@ -915,6 +914,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param      $unit
      *
      * @return array
+     *
+     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
     public function getEmailGeneralStats($email, $includeVariants, $unit, \DateTime $dateFrom, \DateTime $dateTo)
     {
@@ -930,32 +931,32 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $fetchOptions->setEmailIds($ids);
 
         $chart->setDataset(
-            'mautic.email.sent.emails',
+            $this->translator->trans('mautic.email.sent.emails'),
             $this->statsCollectionHelper->fetchSentStats($dateFrom, $dateTo, $fetchOptions)
         );
 
         $chart->setDataset(
-            'mautic.email.read.emails',
+            $this->translator->trans('mautic.email.read.emails'),
             $this->statsCollectionHelper->fetchOpenedStats($dateFrom, $dateTo, $fetchOptions)
         );
 
         $chart->setDataset(
-            'mautic.email.failed.emails',
+            $this->translator->trans('mautic.email.failed.emails'),
             $this->statsCollectionHelper->fetchFailedStats($dateFrom, $dateTo, $fetchOptions)
         );
 
         $chart->setDataset(
-            'mautic.email.clicked',
+            $this->translator->trans('mautic.email.clicked'),
             $this->statsCollectionHelper->fetchClickedStats($dateFrom, $dateTo, $fetchOptions)
         );
 
         $chart->setDataset(
-            'mautic.email.unsubscribed',
+            $this->translator->trans('mautic.email.unsubscribed'),
             $this->statsCollectionHelper->fetchUnsubscribedStats($dateFrom, $dateTo, $fetchOptions)
         );
 
         $chart->setDataset(
-            'mautic.email.bounced',
+            $this->translator->trans('mautic.email.bounced'),
             $this->statsCollectionHelper->fetchBouncedStats($dateFrom, $dateTo, $fetchOptions)
         );
 
@@ -1891,42 +1892,42 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $chart = new LineChart($unit, $dateFrom, $dateTo);
         if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'sent_and_opened']) || !$flag || in_array('sent', $datasets)) {
             $chart->setDataset(
-                'mautic.email.sent.emails',
+                $this->translator->trans('mautic.email.sent.emails'),
                 $this->statsCollectionHelper->fetchSentStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
 
         if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'sent_and_opened', 'opened']) || in_array('opened', $datasets)) {
             $chart->setDataset(
-                'mautic.email.read.emails',
+                $this->translator->trans('mautic.email.read.emails'),
                 $this->statsCollectionHelper->fetchOpenedStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
 
         if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'failed']) || in_array('failed', $datasets)) {
             $chart->setDataset(
-                'mautic.email.failed.emails',
+                $this->translator->trans('mautic.email.failed.emails'),
                 $this->statsCollectionHelper->fetchFailedStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
 
         if (in_array($flag, ['all', 'clicked']) || in_array('clicked', $datasets)) {
             $chart->setDataset(
-                'mautic.email.clicked',
+                $this->translator->trans('mautic.email.clicked'),
                 $this->statsCollectionHelper->fetchClickedStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
 
         if (in_array($flag, ['all', 'unsubscribed']) || in_array('unsubscribed', $datasets)) {
             $chart->setDataset(
-                'mautic.email.unsubscribed',
+                $this->translator->trans('mautic.email.unsubscribed'),
                 $this->statsCollectionHelper->fetchUnsubscribedStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
 
         if (in_array($flag, ['all', 'bounced']) || in_array('bounced', $datasets)) {
             $chart->setDataset(
-                'mautic.email.bounced',
+                $this->translator->trans('mautic.email.bounced'),
                 $this->statsCollectionHelper->fetchBouncedStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
