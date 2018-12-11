@@ -26,7 +26,11 @@ class StatDAO
      */
     public function addStat($key, $value)
     {
-        $this->stats[$key] = $value;
+        if (!isset($this->stats[$key])) {
+            $this->stats[$key] = 0;
+        }
+
+        $this->stats[$key] += $value;
 
         return $this;
     }

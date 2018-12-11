@@ -23,13 +23,27 @@ class Calculator
     private $statsDAO;
 
     /**
+     * @var \DateTime|null
+     */
+    private $fromDateTime;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $toDateTime;
+
+    /**
      * Calculator constructor.
      *
-     * @param StatsDAO $statsDAO
+     * @param StatsDAO       $statsDAO
+     * @param \DateTime|null $fromDateTime
+     * @param \DateTime|null $toDateTime
      */
-    public function __construct(StatsDAO $statsDAO)
+    public function __construct(StatsDAO $statsDAO, \DateTime $fromDateTime = null, \DateTime $toDateTime = null)
     {
-        $this->statsDAO = $statsDAO;
+        $this->statsDAO     = $statsDAO;
+        $this->fromDateTime = $fromDateTime;
+        $this->toDateTime   = $toDateTime;
     }
 
     /**
@@ -42,7 +56,8 @@ class Calculator
     public function getSumsByYear($labelFormat = 'Y')
     {
         $statDAO  = new StatDAO();
-        $lastYear = null;
+        $lastYear = $this->fromDateTime ? $this->fromDateTime->format('Y') : null;
+
         foreach ($this->statsDAO->getYears() as $thisYear => $stats) {
             CalculatorHelper::fillInMissingYears($statDAO, $lastYear, $thisYear, $labelFormat);
 
@@ -54,6 +69,10 @@ class Calculator
             $lastYear = $thisYear;
         }
 
+        if ($this->toDateTime) {
+            CalculatorHelper::fillInMissingYears($statDAO, $lastYear, $this->toDateTime->format('Y'), $labelFormat);
+        }
+
         return $statDAO;
     }
 
@@ -64,10 +83,11 @@ class Calculator
      *
      * @throws \Exception
      */
-    public function getSumsByMonth($labelFormat = 'n')
+    public function getSumsByMonth($labelFormat = 'Y-m')
     {
         $statDAO   = new StatDAO();
-        $lastMonth = null;
+        $lastMonth = $this->fromDateTime ? $this->fromDateTime->format('Y-m') : null;
+
         foreach ($this->statsDAO->getMonths() as $thisMonth => $stats) {
             CalculatorHelper::fillInMissingMonths($statDAO, $lastMonth, $thisMonth, $labelFormat);
 
@@ -79,6 +99,10 @@ class Calculator
             $lastMonth = $thisMonth;
         }
 
+        if ($this->toDateTime) {
+            CalculatorHelper::fillInMissingMonths($statDAO, $lastMonth, $this->toDateTime->format('Y-m'), $labelFormat);
+        }
+
         return $statDAO;
     }
 
@@ -89,10 +113,11 @@ class Calculator
      *
      * @throws \Exception
      */
-    public function getSumsByDay($labelFormat = 'j')
+    public function getSumsByDay($labelFormat = 'Y-m-d')
     {
         $statDAO   = new StatDAO();
-        $yesterday = null;
+        $yesterday = $this->fromDateTime ? $this->fromDateTime->format('Y-m-d') : null;
+
         foreach ($this->statsDAO->getDays() as $today => $stats) {
             CalculatorHelper::fillInMissingDays($statDAO, $yesterday, $today, $labelFormat);
 
@@ -104,6 +129,10 @@ class Calculator
             $yesterday = $today;
         }
 
+        if ($this->toDateTime) {
+            CalculatorHelper::fillInMissingDays($statDAO, $yesterday, $this->toDateTime->format('Y-m-d'), $labelFormat);
+        }
+
         return $statDAO;
     }
 
@@ -114,10 +143,11 @@ class Calculator
      *
      * @throws \Exception
      */
-    public function getCountsByHour($labelFormat = 'H')
+    public function getCountsByHour($labelFormat = 'Y-m-d H')
     {
         $statDAO  = new StatDAO();
-        $lastHour = null;
+        $lastHour = $this->fromDateTime ? $this->fromDateTime->format('Y-m-d H') : null;
+
         foreach ($this->statsDAO->getHours() as $thisHour => $stats) {
             CalculatorHelper::fillInMissingHours($statDAO, $lastHour, $thisHour, $labelFormat);
 
@@ -129,122 +159,8 @@ class Calculator
             $lastHour = $thisHour;
         }
 
-        return $statDAO;
-    }
-
-    /**
-     * Get per month average for each year. This assumes that a stat is injected
-     * per month even if the sum is 0.
-     *
-     * @param string $labelFormat
-     *
-     * @return StatDAO
-     *
-     * @throws \Exception
-     */
-    public function getMonthlyAveragesByYear($labelFormat = 'Y')
-    {
-        $statDAO = new StatDAO();
-        $counts  = [];
-        $sums    = [];
-
-        foreach ($this->statsDAO->getYears() as $year => $stats) {
-            $key = CalculatorHelper::getYearLabel($year, $labelFormat);
-            if (!isset($counts[$key])) {
-                $counts[$key] = 0;
-                $sums[$key]   = 0;
-            }
-
-            $counts[$key] += $stats->getCount();
-            $sums[$key] += $stats->getSum();
-        }
-
-        $lastYear = null;
-        foreach ($counts as $thisYear => $count) {
-            CalculatorHelper::fillInMissingYears($statDAO, $lastYear, $thisYear, $labelFormat);
-
-            $lastYear = $thisYear;
-        }
-
-        return $statDAO;
-    }
-
-    /**
-     * Get per day average for each month. This assumes that a stat is injected
-     * per day even if the sum is 0.
-     *
-     * @param string $labelFormat
-     *
-     * @return StatDAO
-     *
-     * @throws \Exception
-     */
-    public function getDailyAveragesByMonth($labelFormat = 'n')
-    {
-        $statDAO = new StatDAO();
-        $counts  = [];
-        $sums    = [];
-
-        foreach ($this->statsDAO->getMonths() as $month => $stats) {
-            $key = CalculatorHelper::getMonthLabel($month, $labelFormat);
-            if (!isset($counts[$key])) {
-                $counts[$key] = 0;
-                $sums[$key]   = 0;
-            }
-
-            $counts[$key] += $stats->getCount();
-            $sums[$key] += $stats->getSum();
-        }
-
-        $lastMonth = null;
-        foreach ($counts as $thisMonth => $count) {
-            CalculatorHelper::fillInMissingMonths($statDAO, $lastMonth, $thisMonth, $labelFormat);
-
-            $statDAO->addStat(
-                $thisMonth,
-                $count ? $sums[$thisMonth] / $count : 0
-            );
-
-            $lastMonth = $thisMonth;
-        }
-
-        return $statDAO;
-    }
-
-    /**
-     * @param string $labelFormat
-     *
-     * @return StatDAO
-     *
-     * @throws \Exception
-     */
-    public function getHourlyAveragesByDay($labelFormat = 'j')
-    {
-        $statDAO = new StatDAO();
-        $counts  = [];
-        $sums    = [];
-
-        foreach ($this->statsDAO->getDays() as $day => $stats) {
-            $key = CalculatorHelper::getDayLabel($day, $labelFormat);
-            if (!isset($counts[$key])) {
-                $counts[$key] = 0;
-                $sums[$key]   = 0;
-            }
-
-            $counts[$key] += $stats->getCount();
-            $sums[$key] += $stats->getSum();
-        }
-
-        $yesterday = null;
-        foreach ($counts as $today => $count) {
-            CalculatorHelper::fillInMissingDays($statDAO, $yesterday, $today, $labelFormat);
-
-            $statDAO->addStat(
-                $today,
-                $count ? $sums[$today] / $count : 0
-            );
-
-            $yesterday = $today;
+        if ($this->toDateTime) {
+            CalculatorHelper::fillInMissingHours($statDAO, $lastHour, $this->toDateTime->format('Y-m-d H'), $labelFormat);
         }
 
         return $statDAO;

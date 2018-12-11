@@ -55,12 +55,10 @@ class CalculatorHelper
         $lastYear = new \DateTime(self::getYearDateString($lastYear));
         $thisYear = new \DateTime(self::getYearDateString($thisYear));
 
-        do {
+        while ($lastYear < $thisYear) {
             $lastYear->modify('+1 year');
             $statDAO->addStat($lastYear->format($labelFormat), 0);
-
-            $lastYear = $thisYear;
-        } while ($lastYear < $thisYear);
+        }
     }
 
     /**
@@ -103,12 +101,10 @@ class CalculatorHelper
         $lastMonth = new \DateTime(self::getMonthDateString($lastMonth));
         $thisMonth = new \DateTime(self::getMonthDateString($thisMonth));
 
-        do {
+        while ($lastMonth < $thisMonth) {
             $lastMonth->modify('+1 month');
             $statDAO->addStat($lastMonth->format($labelFormat), 0);
-
-            $lastMonth = $thisMonth;
-        } while ($lastMonth < $thisMonth);
+        }
     }
 
     /**
@@ -151,12 +147,10 @@ class CalculatorHelper
         $yesterday = new \DateTime(self::getDayDateString($yesterday));
         $today     = new \DateTime(self::getDayDateString($today));
 
-        do {
+        while ($yesterday < $today) {
             $yesterday->modify('+1 day');
             $statDAO->addStat($yesterday->format($labelFormat), 0);
-
-            $yesterday = $today;
-        } while ($yesterday < $today);
+        }
     }
 
     /**
@@ -199,11 +193,9 @@ class CalculatorHelper
         $lastHour = new \DateTime(self::getHourDateString($lastHour));
         $thisHour = new \DateTime(self::getHourDateString($thisHour));
 
-        do {
+        while ($lastHour < $thisHour) {
             $lastHour->modify('+1 hour');
             $statDAO->addStat($lastHour->format($labelFormat), 0);
-
-            $lastHour = $thisHour;
-        } while ($lastHour < $thisHour);
+        }
     }
 }

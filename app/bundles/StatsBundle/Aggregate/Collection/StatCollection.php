@@ -50,8 +50,6 @@ class StatCollection
     }
 
     /**
-     * Add a stat by datetime components represented in UTC.
-     *
      * @param int $year
      * @param int $month
      * @param int $day
@@ -59,6 +57,8 @@ class StatCollection
      * @param int $count
      *
      * @return $this
+     *
+     * @throws \Exception
      */
     public function addStat($year, $month, $day, $hour, $count)
     {
@@ -77,6 +77,8 @@ class StatCollection
      * @param int       $count
      *
      * @return $this
+     *
+     * @throws \Exception
      */
     public function addStatByDateTime(\DateTime $dateTime, $count)
     {
@@ -84,8 +86,8 @@ class StatCollection
 
         $this->addStat(
             $dateTime->format('Y'),
-            $dateTime->format('m'),
-            $dateTime->format('d'),
+            $dateTime->format('n'),
+            $dateTime->format('j'),
             $dateTime->format('h'),
             $count
         );
@@ -117,15 +119,18 @@ class StatCollection
     }
 
     /**
+     * @param \DateTime $fromDateTime
+     * @param \DateTime $toDateTime
+     *
      * @return Calculator
      */
-    public function getCalculator()
+    public function getCalculator(\DateTime $fromDateTime, \DateTime $toDateTime)
     {
         if (null !== $this->calculator) {
             return $this->calculator;
         }
 
-        $this->calculator = new Calculator($this->stats);
+        $this->calculator = new Calculator($this->stats, $fromDateTime, $toDateTime);
 
         return $this->calculator;
     }
