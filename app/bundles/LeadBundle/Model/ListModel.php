@@ -257,13 +257,13 @@ class ListModel extends FormModel
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
                 'properties' => ['type' => 'date'],
-                'operators'  => $this->getOperatorsForFieldType('default'),
+                'operators'  => $this->getOperatorsForFieldType('date'),
                 'object'     => 'lead',
             ],
             'date_identified' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_identified'),
                 'properties' => ['type' => 'date'],
-                'operators'  => $this->getOperatorsForFieldType('default'),
+                'operators'  => $this->getOperatorsForFieldType('date'),
                 'object'     => 'lead',
             ],
             'last_active' => [

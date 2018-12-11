@@ -54,6 +54,7 @@ trait OperatorListTrait
                 'in',
                 '!in',
                 'date',
+                'anniversary',
             ],
         ],
         'multiselect' => [

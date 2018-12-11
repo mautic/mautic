@@ -426,7 +426,7 @@ Mautic.convertLeadFilterInput = function(el) {
     var matches   = regExp.exec(mQuery(el).attr('id'));
     var filterNum = matches[1];
     var filterId  = '#' + prefix + '_filters_' + filterNum + '_filter';
-
+    var filterType  = '#' + prefix + '_filters_' + filterNum + '_type';
     // Reset has-error
     if (mQuery(filterId).parent().hasClass('has-error')) {
         mQuery(filterId).parent().find('div.help-block').hide();
@@ -438,6 +438,23 @@ Mautic.convertLeadFilterInput = function(el) {
 
     if (disabled) {
         mQuery(filterId).val('');
+    }
+
+    if (mQuery(filterType).val() == 'date' && operator == 'anniversary') {
+        mQuery(filterId).datetimepicker('destroy').removeClass('calendar-activated');
+        mQuery(filterId).val('-1 day');
+    }else{
+        mQuery(filterId).datetimepicker({
+            timepicker: false,
+            format: 'Y-m-d',
+            lazyInit: true,
+            validateOnBlur: false,
+            allowBlank: true,
+            scrollInput: false,
+            closeOnDateSelect: true
+        });
+        mQuery(filterId).val('');
+
     }
 
     var newName = '';
@@ -482,7 +499,6 @@ Mautic.convertLeadFilterInput = function(el) {
 
         // Destroy the chosen and recreate
         Mautic.destroyChosen(mQuery(filterId));
-
         mQuery(filterId).attr('data-placeholder', placeholder);
 
         Mautic.activateChosenSelect(mQuery(filterId));
@@ -653,6 +669,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
     } else {
         mQuery(filter).attr('type', fieldType);
     }
+
 
     var operators = mQuery(filterId).data('field-operators');
     mQuery('#' + filterIdBase + 'operator').html('');
