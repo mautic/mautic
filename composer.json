@@ -112,7 +112,8 @@
         "simshaun/recurr": "^3.0",
         "ramsey/uuid": "^3.7",
         "sendgrid/sendgrid": "~6.0",
-        "noxlogic/ratelimit-bundle": "^1.11"
+        "noxlogic/ratelimit-bundle": "^1.11",
+        "cweagans/composer-patches": "^1.6"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
@@ -158,6 +159,11 @@
     },
     "extra": {
         "symfony-app-dir": "app",
-        "symfony-web-dir": "../"
+        "symfony-web-dir": "../",
+        "patches": {
+            "doctrine/orm": {
+                "#6991 Support PHP 7.3 without dropping support for 5.6/7.0": "https://github.com/doctrine/doctrine2/commit/07fc401d255a4cdb4a557147d1c8a3fc7a0c718d.diff"
+            }
+        }
     }
 }
