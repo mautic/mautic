@@ -41,7 +41,10 @@ use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
+use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
+use Mautic\EmailBundle\Stats\Helper\FilterTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -62,6 +65,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     use VariantModelTrait;
     use TranslationModelTrait;
     use BuilderModelTrait;
+    use FilterTrait;
 
     /**
      * @var IpLookupHelper
@@ -149,9 +153,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $doNotContact;
 
     /**
-     * @var GeneratedColumnsProviderInterface
+     * @var StatsCollectionHelper
      */
-    private $generatedColumnsProvider;
+    private $statsCollectionHelper;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -169,8 +173,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         CacheStorageHelper $cacheStorageHelper,
         ContactTracker $contactTracker,
         DNC $doNotContact,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider
-    ) {
+        GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        StatsCollectionHelper $statsCollectionHelper
+    )
+    {
         $this->ipLookupHelper           = $ipLookupHelper;
         $this->themeHelper              = $themeHelper;
         $this->mailboxHelper            = $mailboxHelper;
@@ -187,6 +193,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->contactTracker           = $contactTracker;
         $this->doNotContact             = $doNotContact;
         $this->generatedColumnsProvider = $generatedColumnsProvider;
+        $this->statsCollectionHelper    = $statsCollectionHelper;
     }
 
     /**
@@ -915,12 +922,44 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $email = $this->getEntity($email);
         }
 
-        $filter = [
-            'email_id' => ($includeVariants) ? $email->getRelatedEntityIds() : [$email->getId()],
-            'flag'     => 'all',
-        ];
+        $ids = ($includeVariants) ? $email->getRelatedEntityIds() : [$email->getId()];
 
-        return $this->getEmailsLineChartData($unit, $dateFrom, $dateTo, null, $filter);
+        $chart = new LineChart($unit, $dateFrom, $dateTo);
+
+        $fetchOptions = new EmailStatOptions();
+        $fetchOptions->setEmailIds($ids);
+
+        $chart->setDataset(
+            'mautic.email.sent.emails',
+            $this->statsCollectionHelper->fetchSentStats($dateFrom, $dateTo, $fetchOptions)
+        );
+
+        $chart->setDataset(
+            'mautic.email.read.emails',
+            $this->statsCollectionHelper->fetchOpenedStats($dateFrom, $dateTo, $fetchOptions)
+        );
+
+        $chart->setDataset(
+            'mautic.email.failed.emails',
+            $this->statsCollectionHelper->fetchFailedStats($dateFrom, $dateTo, $fetchOptions)
+        );
+
+        $chart->setDataset(
+            'mautic.email.clicked',
+            $this->statsCollectionHelper->fetchClickedStats($dateFrom, $dateTo, $fetchOptions)
+        );
+
+        $chart->setDataset(
+            'mautic.email.unsubscribed',
+            $this->statsCollectionHelper->fetchUnsubscribedStats($dateFrom, $dateTo, $fetchOptions)
+        );
+
+        $chart->setDataset(
+            'mautic.email.bounced',
+            $this->statsCollectionHelper->fetchBouncedStats($dateFrom, $dateTo, $fetchOptions)
+        );
+
+        return $chart->render();
     }
 
     /**
@@ -1814,204 +1853,85 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true)
     {
-        $datasets   = ArrayHelper::pickValue('dataset', $filter, []);
-        $flag       = ArrayHelper::pickValue('flag', $filter);
-        $companyId  = ArrayHelper::pickValue('companyId', $filter);
-        $campaignId = ArrayHelper::pickValue('campaignId', $filter);
-        $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
-        $chart      = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
+        $fetchOptions = new EmailStatOptions();
+        $fetchOptions->setLabelFormat($dateFormat)
+            ->setCanViewOthers($canViewOthers);
 
-        $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
-
-        if ('sent_and_opened_and_failed' == $flag || 'all' == $flag || 'sent_and_opened' == $flag || !$flag || in_array('sent', $datasets)) {
-            $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
-            if (!$canViewOthers) {
-                $this->limitQueryToCreator($q);
-            }
-            $this->addCompanyFilter($q, $companyId);
-            $this->addCampaignFilter($q, $campaignId);
-            $this->addSegmentFilter($q, $segmentId);
-            $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->translator->trans('mautic.email.sent.emails'), $data);
+        if (isset($filter['flag'])) {
+            $flag = $filter['flag'];
+            unset($filter['flag']);
         }
 
-        if ('sent_and_opened_and_failed' == $flag || 'all' == $flag || 'sent_and_opened' == $flag || 'opened' == $flag || in_array('opened', $datasets)) {
-            $q = $query->prepareTimeDataQuery('email_stats', 'date_read', $filter);
-            if (!$canViewOthers) {
-                $this->limitQueryToCreator($q);
-            }
-            $this->addCompanyFilter($q, $companyId);
-            $this->addCampaignFilter($q, $campaignId);
-            $this->addSegmentFilter($q, $segmentId);
-            $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->translator->trans('mautic.email.read.emails'), $data);
+        $datasets = isset($filter['dataset']) ? $filter['dataset'] : [];
+        unset($filter['dataset']);
+
+        if (isset($filter['companyId'])) {
+            $fetchOptions->setCompanyId((int) $filter['companyId']);
+            unset($filter['companyId']);
         }
 
-        if ('sent_and_opened_and_failed' == $flag || 'all' == $flag || 'failed' == $flag || in_array('failed', $datasets)) {
-            $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
-            if (!$canViewOthers) {
-                $this->limitQueryToCreator($q);
-            }
-            $q->andWhere($q->expr()->eq('t.is_failed', ':true'))
-                ->setParameter('true', true, 'boolean');
-            $this->addCompanyFilter($q, $companyId);
-            $this->addCampaignFilter($q, $campaignId);
-            $this->addSegmentFilter($q, $segmentId);
-            $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->translator->trans('mautic.email.failed.emails'), $data);
+        if (isset($filter['campaignId'])) {
+            $fetchOptions->setCampaignId((int) $filter['campaignId']);
+            unset($filter['campaignId']);
         }
 
-        if ('all' == $flag || 'clicked' == $flag || in_array('clicked', $datasets)) {
-            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', []);
-
-            if (null !== $segmentId) {
-                $q->innerJoin('t', '(SELECT DISTINCT email_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'email_stats WHERE list_id = :segmentId)', 'es', 't.source_id = es.email_id');
-                $q->setParameter('segmentId', $segmentId);
-            }
-
-            $q->andWhere('t.source = :source');
-            $q->setParameter('source', 'email');
-
-            if (isset($filter['email_id'])) {
-                if (is_array($filter['email_id'])) {
-                    $q->andWhere('t.source_id IN (:email_ids)');
-                    $q->setParameter('email_ids', $filter['email_id'], \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
-                } else {
-                    $q->andWhere('t.source_id = :email_id');
-                    $q->setParameter('email_id', $filter['email_id']);
-                }
-            }
-
-            if (!$canViewOthers) {
-                $this->limitQueryToCreator($q);
-            }
-            $this->addCompanyFilter($q, $companyId);
-            $this->addCampaignFilterForEmailSource($q, $campaignId);
-            $this->addSegmentFilter($q, $segmentId, 'es');
-            $data = $query->loadAndBuildTimeData($q);
-
-            $chart->setDataset($this->translator->trans('mautic.email.clicked'), $data);
+        if (isset($filter['segmentId'])) {
+            $fetchOptions->setSegmentId((int) $filter['segmentId']);
+            unset($filter['segmentId']);
         }
 
-        if ('all' == $flag || 'unsubscribed' == $flag || in_array('unsubscribed', $datasets)) {
-            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers, $companyId, $campaignId, $segmentId);
-            $chart->setDataset($this->translator->trans('mautic.email.unsubscribed'), $data);
+        if (isset($filter['email_id'])) {
+            $fetchOptions->setEmailIds((array) $filter['email_id']);
+            unset($filter['email_id']);
         }
 
-        if ('all' == $flag || 'bounced' == $flag || in_array('bounced', $datasets)) {
-            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::BOUNCED, $canViewOthers, $companyId, $campaignId, $segmentId);
-            $chart->setDataset($this->translator->trans('mautic.email.bounced'), $data);
+        // Set anything left over to be passed to prepareTimeDataQuery
+        $fetchOptions->setFilters($filter);
+
+        $chart = new LineChart($unit, $dateFrom, $dateTo);
+        if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'sent_and_opened']) || !$flag || in_array('sent', $datasets)) {
+            $chart->setDataset(
+                'mautic.email.sent.emails',
+                $this->statsCollectionHelper->fetchSentStats($dateFrom, $dateTo, $fetchOptions)
+            );
+        }
+
+        if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'sent_and_opened', 'opened']) || in_array('opened', $datasets)) {
+            $chart->setDataset(
+                'mautic.email.read.emails',
+                $this->statsCollectionHelper->fetchOpenedStats($dateFrom, $dateTo, $fetchOptions)
+            );
+        }
+
+        if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'failed']) || in_array('failed', $datasets)) {
+            $chart->setDataset(
+                'mautic.email.failed.emails',
+                $this->statsCollectionHelper->fetchFailedStats($dateFrom, $dateTo, $fetchOptions)
+            );
+        }
+
+        if (in_array($flag, ['all', 'clicked']) || in_array('clicked', $datasets)) {
+            $chart->setDataset(
+                'mautic.email.clicked',
+                $this->statsCollectionHelper->fetchClickedStats($dateFrom, $dateTo, $fetchOptions)
+            );
+        }
+
+        if (in_array($flag, ['all', 'unsubscribed']) || in_array('unsubscribed', $datasets)) {
+            $chart->setDataset(
+                'mautic.email.unsubscribed',
+                $this->statsCollectionHelper->fetchUnsubscribedStats($dateFrom, $dateTo, $fetchOptions)
+            );
+        }
+
+        if (in_array($flag, ['all', 'bounced']) || in_array('bounced', $datasets)) {
+            $chart->setDataset(
+                'mautic.email.bounced',
+                $this->statsCollectionHelper->fetchBouncedStats($dateFrom, $dateTo, $fetchOptions)
+            );
         }
 
         return $chart->render();
-    }
-
-    /**
-     * Modifies the line chart query for the DNC.
-     *
-     * @param          $reason
-     * @param          $canViewOthers
-     * @param int|null $companyId
-     * @param int|null $campaignId
-     * @param int|null $segmentId
-     *
-     * @return array
-     */
-    public function getDncLineChartDataset(ChartQuery &$query, array $filter, $reason, $canViewOthers, $companyId = null, $campaignId = null, $segmentId = null)
-    {
-        $dncFilter = isset($filter['email_id']) ? ['channel_id' => $filter['email_id']] : [];
-        $q         = $query->prepareTimeDataQuery('lead_donotcontact', 'date_added', $dncFilter);
-        $q->andWhere('t.channel = :channel')
-            ->setParameter('channel', 'email')
-            ->andWhere($q->expr()->eq('t.reason', ':reason'))
-            ->setParameter('reason', $reason);
-
-        $q->leftJoin('t', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 't.channel_id = es.email_id AND t.channel = "email" AND t.lead_id = es.lead_id');
-
-        if (!$canViewOthers) {
-            $this->limitQueryToCreator($q);
-        }
-        $this->addCompanyFilter($q, $companyId);
-        $this->addCampaignFilter($q, $campaignId, 'es');
-        $this->addSegmentFilter($q, $segmentId, 'es');
-
-        return $data = $query->loadAndBuildTimeData($q);
-    }
-
-    /**
-     * @param int|null $companyId
-     * @param string   $fromAlias
-     */
-    private function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't')
-    {
-        if (!$companyId) {
-            return;
-        }
-
-        $sb = $this->em->getConnection()->createQueryBuilder();
-
-        $sb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
-            ->where(
-                $sb->expr()->andX(
-                    $sb->expr()->eq('cl.company_id', ':companyId'),
-                    $sb->expr()->eq('cl.lead_id', $fromAlias.'.lead_id')
-                )
-            );
-
-        $q->andWhere(
-            sprintf('EXISTS (%s)', $sb->getSql())
-        )->setParameter('companyId', $companyId);
-    }
-
-    /**
-     * @param int|null $campaignId
-     * @param string   $fromAlias
-     */
-    private function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
-    {
-        if ($campaignId) {
-            $q->innerJoin($fromAlias, '(SELECT DISTINCT event_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId)', 'clel', $fromAlias.'.source_id = clel.event_id AND '.$fromAlias.'.source = "campaign.event" AND '.$fromAlias.'.lead_id = clel.lead_id')
-                ->setParameter('campaignId', $campaignId);
-        }
-    }
-
-    /**
-     * @param int|null $campaignId
-     * @param string   $fromAlias
-     */
-    private function addCampaignFilterForEmailSource(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
-    {
-        if ($campaignId) {
-            $q->innerJoin($fromAlias, '(SELECT DISTINCT channel_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId AND channel = "email")', 'clel', $fromAlias.'.source_id = clel.channel_id AND '.$fromAlias.'.source = "email" AND '.$fromAlias.'.lead_id = clel.lead_id')
-                ->setParameter('campaignId', $campaignId);
-        }
-    }
-
-    /**
-     * @param int|null $segmentId
-     * @param string   $fromAlias
-     */
-    private function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't')
-    {
-        if ($segmentId) {
-            $sb = $this->em->getConnection()->createQueryBuilder();
-
-            $sb->select('null')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
-                ->where(
-                    $sb->expr()->andX(
-                        $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
-                        $sb->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
-                        $sb->expr()->eq('lll.manually_removed', 0)
-                    )
-                );
-
-            $q->andWhere(
-                sprintf('EXISTS (%s)', $sb->getSql())
-            )->setParameter('segmentId', $segmentId);
-        }
     }
 
     /**

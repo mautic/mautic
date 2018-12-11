@@ -32,6 +32,11 @@ class StatCollection
     private $stats;
 
     /**
+     * @var Calculator
+     */
+    private $calculator;
+
+    /**
      * StatCollection constructor.
      *
      * @param string   $statName
@@ -89,6 +94,21 @@ class StatCollection
     }
 
     /**
+     * @param $dateTimeInUTC
+     * @param $count
+     *
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count)
+    {
+        $this->addStatByDateTime(new \DateTime($dateTimeInUTC, new \DateTimeZone('UTC')), $count);
+
+        return $this;
+    }
+
+    /**
      * @return StatsDAO
      */
     public function getStats()
@@ -101,6 +121,12 @@ class StatCollection
      */
     public function getCalculator()
     {
-        return new Calculator($this->stats);
+        if (null !== $this->calculator) {
+            return $this->calculator;
+        }
+
+        $this->calculator = new Calculator($this->stats);
+
+        return $this->calculator;
     }
 }

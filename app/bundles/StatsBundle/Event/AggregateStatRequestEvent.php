@@ -12,7 +12,7 @@
 namespace Mautic\StatsBundle\Event;
 
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
-use Mautic\StatsBundle\Event\Options\EventOptions;
+use Mautic\StatsBundle\Event\Options\FetchOptions;
 use Symfony\Component\EventDispatcher\Event;
 
 class AggregateStatRequestEvent extends Event
@@ -38,7 +38,7 @@ class AggregateStatRequestEvent extends Event
     private $statCollection;
 
     /**
-     * @var EventOptions
+     * @var FetchOptions
      */
     private $options;
 
@@ -48,15 +48,14 @@ class AggregateStatRequestEvent extends Event
      * @param string             $statName
      * @param \DateTimeInterface $fromDateTime
      * @param \DateTimeInterface $toDateTime
-     * @param EventOptions       $eventOptions
+     * @param FetchOptions       $eventOptions
      */
-    public function __construct($statName, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, EventOptions $eventOptions)
+    public function __construct($statName, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, FetchOptions $eventOptions)
     {
-        $this->statName     = $statName;
-        $this->fromDateTime = $fromDateTime;
-        $this->toDateTime   = $toDateTime;
-        $this->options      = $eventOptions;
-
+        $this->statName       = $statName;
+        $this->fromDateTime   = $fromDateTime;
+        $this->toDateTime     = $toDateTime;
+        $this->options        = $eventOptions;
         $this->statCollection = new StatCollection($statName);
     }
 
@@ -93,7 +92,7 @@ class AggregateStatRequestEvent extends Event
     }
 
     /**
-     * @return EventOptions
+     * @return FetchOptions
      */
     public function getOptions()
     {
@@ -106,5 +105,39 @@ class AggregateStatRequestEvent extends Event
     public function getStatCollection()
     {
         return $this->statCollection;
+    }
+
+    /**
+     * @param string|array $context
+     *
+     * @return bool
+     */
+    public function checkContext($context)
+    {
+        if (is_array($context)) {
+            return in_array($this->statName, $context);
+        }
+
+        return $context === $this->statName;
+    }
+
+    /**
+     * @param string|array $prefix
+     *
+     * @return bool
+     */
+    public function checkContextPrefix($prefix)
+    {
+        if (is_array($prefix)) {
+            foreach ($prefix as $string) {
+                if (strpos($this->statName, $string) === 0) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return strpos($this->statName, $prefix) === 0;
     }
 }

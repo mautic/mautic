@@ -13,7 +13,7 @@ namespace Mautic\StatsBundle\Aggregate;
 
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 use Mautic\StatsBundle\Event\AggregateStatRequestEvent;
-use Mautic\StatsBundle\Event\Options\EventOptions;
+use Mautic\StatsBundle\Event\Options\FetchOptions;
 use Mautic\StatsBundle\StatEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -41,17 +41,17 @@ class Collector
      * @param string            $statName
      * @param \DateTime         $fromDateTime
      * @param \DateTime         $toDateTime
-     * @param EventOptions|null $eventOptions
+     * @param FetchOptions|null $fetchOptions
      *
      * @return StatCollection
      */
-    public function fetchStats($statName, \DateTime $fromDateTime, \DateTime $toDateTime, EventOptions $eventOptions = null)
+    public function fetchStats($statName, \DateTime $fromDateTime, \DateTime $toDateTime, FetchOptions $fetchOptions = null)
     {
-        if (null === $eventOptions) {
-            $eventOptions = new EventOptions();
+        if (null === $fetchOptions) {
+            $fetchOptions = new FetchOptions();
         }
 
-        $event = new AggregateStatRequestEvent($statName, $fromDateTime, $toDateTime, $eventOptions);
+        $event = new AggregateStatRequestEvent($statName, $fromDateTime, $toDateTime, $fetchOptions);
 
         $this->eventDispatcher->dispatch(StatEvents::AGGREGATE_STAT_REQUEST, $event);
 

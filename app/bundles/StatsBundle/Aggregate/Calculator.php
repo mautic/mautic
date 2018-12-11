@@ -13,6 +13,7 @@ namespace Mautic\StatsBundle\Aggregate;
 
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatDAO;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
+use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
 class Calculator
 {
@@ -31,10 +32,6 @@ class Calculator
         $this->statsDAO = $statsDAO;
     }
 
-    public function getSumsByBestUnit()
-    {
-    }
-
     /**
      * @param string $labelFormat
      *
@@ -44,12 +41,17 @@ class Calculator
      */
     public function getSumsByYear($labelFormat = 'Y')
     {
-        $statDAO = new StatDAO();
-        foreach ($this->statsDAO->getYears() as $year => $stats) {
+        $statDAO  = new StatDAO();
+        $lastYear = null;
+        foreach ($this->statsDAO->getYears() as $thisYear => $stats) {
+            CalculatorHelper::fillInMissingYears($statDAO, $lastYear, $thisYear, $labelFormat);
+
             $statDAO->addStat(
-                $this->getYearLabel($year, $labelFormat),
+                CalculatorHelper::getYearLabel($thisYear, $labelFormat),
                 $stats->getSum()
             );
+
+            $lastYear = $thisYear;
         }
 
         return $statDAO;
@@ -64,12 +66,17 @@ class Calculator
      */
     public function getSumsByMonth($labelFormat = 'n')
     {
-        $statDAO = new StatDAO();
-        foreach ($this->statsDAO->getMonths() as $month => $stats) {
+        $statDAO   = new StatDAO();
+        $lastMonth = null;
+        foreach ($this->statsDAO->getMonths() as $thisMonth => $stats) {
+            CalculatorHelper::fillInMissingMonths($statDAO, $lastMonth, $thisMonth, $labelFormat);
+
             $statDAO->addStat(
-                $this->getMonthLabel($month, $labelFormat),
+                CalculatorHelper::getMonthLabel($thisMonth, $labelFormat),
                 $stats->getSum()
             );
+
+            $lastMonth = $thisMonth;
         }
 
         return $statDAO;
@@ -84,12 +91,42 @@ class Calculator
      */
     public function getSumsByDay($labelFormat = 'j')
     {
-        $statDAO = new StatDAO();
-        foreach ($this->statsDAO->getDays() as $day => $stats) {
+        $statDAO   = new StatDAO();
+        $yesterday = null;
+        foreach ($this->statsDAO->getDays() as $today => $stats) {
+            CalculatorHelper::fillInMissingDays($statDAO, $yesterday, $today, $labelFormat);
+
             $statDAO->addStat(
-                $this->getDayLabel($day, $labelFormat),
+                CalculatorHelper::getDayLabel($today, $labelFormat),
                 $stats->getSum()
             );
+
+            $yesterday = $today;
+        }
+
+        return $statDAO;
+    }
+
+    /**
+     * @param string $labelFormat
+     *
+     * @return StatDAO
+     *
+     * @throws \Exception
+     */
+    public function getCountsByHour($labelFormat = 'H')
+    {
+        $statDAO  = new StatDAO();
+        $lastHour = null;
+        foreach ($this->statsDAO->getHours() as $thisHour => $stats) {
+            CalculatorHelper::fillInMissingHours($statDAO, $lastHour, $thisHour, $labelFormat);
+
+            $statDAO->addStat(
+                CalculatorHelper::getHourLabel($thisHour, $labelFormat),
+                $stats->getCount()
+            );
+
+            $lastHour = $thisHour;
         }
 
         return $statDAO;
@@ -112,7 +149,7 @@ class Calculator
         $sums    = [];
 
         foreach ($this->statsDAO->getYears() as $year => $stats) {
-            $key = $this->getYearLabel($year, $labelFormat);
+            $key = CalculatorHelper::getYearLabel($year, $labelFormat);
             if (!isset($counts[$key])) {
                 $counts[$key] = 0;
                 $sums[$key]   = 0;
@@ -122,11 +159,11 @@ class Calculator
             $sums[$key] += $stats->getSum();
         }
 
-        foreach ($counts as $key => $count) {
-            $statDAO->addStat(
-                $key,
-                $count ? $sums[$key] / $count : 0
-            );
+        $lastYear = null;
+        foreach ($counts as $thisYear => $count) {
+            CalculatorHelper::fillInMissingYears($statDAO, $lastYear, $thisYear, $labelFormat);
+
+            $lastYear = $thisYear;
         }
 
         return $statDAO;
@@ -149,7 +186,7 @@ class Calculator
         $sums    = [];
 
         foreach ($this->statsDAO->getMonths() as $month => $stats) {
-            $key = $this->getMonthLabel($month, $labelFormat);
+            $key = CalculatorHelper::getMonthLabel($month, $labelFormat);
             if (!isset($counts[$key])) {
                 $counts[$key] = 0;
                 $sums[$key]   = 0;
@@ -159,11 +196,16 @@ class Calculator
             $sums[$key] += $stats->getSum();
         }
 
-        foreach ($counts as $key => $count) {
+        $lastMonth = null;
+        foreach ($counts as $thisMonth => $count) {
+            CalculatorHelper::fillInMissingMonths($statDAO, $lastMonth, $thisMonth, $labelFormat);
+
             $statDAO->addStat(
-                $key,
-                $count ? $sums[$key] / $count : 0
+                $thisMonth,
+                $count ? $sums[$thisMonth] / $count : 0
             );
+
+            $lastMonth = $thisMonth;
         }
 
         return $statDAO;
@@ -183,7 +225,7 @@ class Calculator
         $sums    = [];
 
         foreach ($this->statsDAO->getDays() as $day => $stats) {
-            $key = $this->getDayLabel($day, $labelFormat);
+            $key = CalculatorHelper::getDayLabel($day, $labelFormat);
             if (!isset($counts[$key])) {
                 $counts[$key] = 0;
                 $sums[$key]   = 0;
@@ -193,52 +235,18 @@ class Calculator
             $sums[$key] += $stats->getSum();
         }
 
-        foreach ($counts as $key => $count) {
+        $yesterday = null;
+        foreach ($counts as $today => $count) {
+            CalculatorHelper::fillInMissingDays($statDAO, $yesterday, $today, $labelFormat);
+
             $statDAO->addStat(
-                $key,
-                $count ? $sums[$key] / $count : 0
+                $today,
+                $count ? $sums[$today] / $count : 0
             );
+
+            $yesterday = $today;
         }
 
         return $statDAO;
-    }
-
-    /**
-     * @param $year
-     * @param $labelFormat
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    private function getYearLabel($year, $labelFormat)
-    {
-        return (new \DateTime("$year-01-01 00:00:00"))->format($labelFormat);
-    }
-
-    /**
-     * @param $month
-     * @param $labelFormat
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    private function getMonthLabel($month, $labelFormat)
-    {
-        return (new \DateTime("$month-01 00:00:00"))->format($labelFormat);
-    }
-
-    /**
-     * @param $day
-     * @param $labelFormat
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    private function getDayLabel($day, $labelFormat)
-    {
-        return (new \DateTime("$day 00:00:00"))->format($labelFormat);
     }
 }

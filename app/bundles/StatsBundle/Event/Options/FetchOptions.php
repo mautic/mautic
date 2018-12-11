@@ -11,12 +11,17 @@
 
 namespace Mautic\StatsBundle\Event\Options;
 
-class EventOptions
+class FetchOptions
 {
     /**
      * @var array
      */
     private $options = [];
+
+    /**
+     * @var int|null
+     */
+    private $itemId;
 
     /**
      * @param int $value
@@ -25,7 +30,7 @@ class EventOptions
      */
     public function setItemId($value)
     {
-        $this->options['item_id'] = $value;
+        $this->itemId = $value;
 
         return $this;
     }
@@ -35,7 +40,7 @@ class EventOptions
      */
     public function getItemId()
     {
-        return $this->getOption('item_id');
+        return $this->itemId;
     }
 
     /**
@@ -52,16 +57,17 @@ class EventOptions
     }
 
     /**
-     * @param $key
+     * @param string $key
+     * @param null   $default
      *
      * @return mixed
      */
-    public function getOption($key)
+    public function getOption($key, $default = null)
     {
         if (isset($this->options[$key])) {
             return $this->options[$key];
         }
 
-        return null;
+        return $default;
     }
 }
