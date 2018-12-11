@@ -35,11 +35,15 @@ class StatsCollectionHelper
     private $helperContainer;
 
     /**
+     * StatsCollectionHelper constructor.
+     */
+    public function __construct(StatHelperContainer $helperContainer)
+    {
+        $this->helperContainer = $helperContainer;
+    }
+
+    /**
      * Fetch stats from listeners.
-     *
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
      *
      * @return mixed
      *
@@ -53,10 +57,6 @@ class StatsCollectionHelper
     /**
      * Fetch stats from listeners.
      *
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
-     *
      * @return mixed
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
@@ -68,10 +68,6 @@ class StatsCollectionHelper
 
     /**
      * Fetch stats from listeners.
-     *
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
      *
      * @return mixed
      *
@@ -85,10 +81,6 @@ class StatsCollectionHelper
     /**
      * Fetch stats from listeners.
      *
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
-     *
      * @return mixed
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
@@ -100,10 +92,6 @@ class StatsCollectionHelper
 
     /**
      * Fetch stats from listeners.
-     *
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
      *
      * @return mixed
      *
@@ -117,10 +105,6 @@ class StatsCollectionHelper
     /**
      * Fetch stats from listeners.
      *
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
-     *
      * @return mixed
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
@@ -133,11 +117,7 @@ class StatsCollectionHelper
     /**
      * Generate stats from Mautic's raw data.
      *
-     * @param                  $statName
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
-     * @param StatCollection   $statCollection
+     * @param $statName
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */

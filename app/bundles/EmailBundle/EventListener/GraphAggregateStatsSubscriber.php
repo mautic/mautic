@@ -24,6 +24,14 @@ class GraphAggregateStatsSubscriber implements EventSubscriberInterface
     private $statsCollectionHelper;
 
     /**
+     * GraphAggregateStatsSubscriber constructor.
+     */
+    public function __construct(StatsCollectionHelper $statsCollectionHelper)
+    {
+        $this->statsCollectionHelper = $statsCollectionHelper;
+    }
+
+    /**
      * @return array
      */
     public static function getSubscribedEvents()
@@ -33,9 +41,6 @@ class GraphAggregateStatsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param AggregateStatRequestEvent $event
-     */
     public function getStatRequest(AggregateStatRequestEvent $event)
     {
         if (!$event->checkContextPrefix(StatsCollectionHelper::GENERAL_STAT_PREFIX.'-')) {

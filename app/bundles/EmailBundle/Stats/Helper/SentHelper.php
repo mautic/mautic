@@ -27,10 +27,7 @@ class SentHelper extends AbstractHelper
     }
 
     /**
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
-     * @param StatCollection   $statCollection
+     * @throws \Exception
      */
     public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection)
     {
