@@ -307,13 +307,15 @@ class ReportModel extends FormModel
 
             // Count suffixes
             if (!array_key_exists($alias, $existingAliases)) {
-                $existingAliases[$alias] = 1;
+                $existingAliases[$alias] = 0;
             } else {
                 ++$existingAliases[$alias];
             }
 
             // Add numeric suffix
-            $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+            if ($existingAliases[$alias] > 0) {
+                $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+            }
         }
 
         return $columns;
