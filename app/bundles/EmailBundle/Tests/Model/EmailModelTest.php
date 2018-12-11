@@ -30,6 +30,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
@@ -182,6 +183,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private $doNotContact;
 
+    /**
+     * @var StatsCollectionHelper|MockObject
+     */
+    private $statsCollectionHelper;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -211,6 +217,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->doNotContact             = $this->createMock(DoNotContact::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
+        $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -228,7 +235,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
-            $this->generatedColumnsProvider
+            $this->generatedColumnsProvider,
+            $this->statsCollectionHelper
         );
 
         $this->emailModel->setTranslator($this->translator);
@@ -608,7 +616,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
-            $this->generatedColumnsProvider
+            $this->generatedColumnsProvider,
+            $this->statsCollectionHelper
         );
 
         $emailModel->setTranslator($this->translator);
