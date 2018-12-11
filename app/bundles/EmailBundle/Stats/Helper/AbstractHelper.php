@@ -76,7 +76,7 @@ abstract class AbstractHelper implements StatHelperInterface
     public function fetchStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
     {
         $statCollection = $this->collector->fetchStats($this->getName(), $fromDateTime, $toDateTime, $options);
-        $calculator     = $statCollection->getCalculator();
+        $calculator     = $statCollection->getCalculator($fromDateTime, $toDateTime);
 
         // Format into what is required for the graphs
         switch ($this->getUnit($fromDateTime, $toDateTime)) {
@@ -96,7 +96,7 @@ abstract class AbstractHelper implements StatHelperInterface
         }
 
         // Chart.js only care about the values
-        return array_keys($stats->getStats());
+        return array_values($stats->getStats());
     }
 
     /**
@@ -119,10 +119,11 @@ abstract class AbstractHelper implements StatHelperInterface
      * Joins the email table and limits created_by to currently logged in user.
      *
      * @param QueryBuilder $q
+     * @param string       $emailIdColumn
      */
-    protected function limitQueryToCreator(QueryBuilder $q)
+    protected function limitQueryToCreator(QueryBuilder $q, $emailIdColumn = 't.email_id')
     {
-        $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
+        $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = '.$emailIdColumn)
             ->andWhere('e.created_by = :userId')
             ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
