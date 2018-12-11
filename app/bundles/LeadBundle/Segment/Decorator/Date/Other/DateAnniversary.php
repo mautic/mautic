@@ -78,7 +78,9 @@ class DateAnniversary implements FilterDecoratorInterface
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $dateTimeHelper = $this->dateDecorator->getDefaultDate();
+        $filter         =  $contactSegmentFilterCrate->getFilter();
+        $relativeFilter =  str_replace('anniversary ', '', $filter);
+        $dateTimeHelper = $this->dateDecorator->getDefaultDate($relativeFilter);
 
         return $dateTimeHelper->toUtcString('%-m-d');
     }

@@ -68,6 +68,11 @@ class DateOptionFactory
             return new DateDefault($this->dateDecorator, $originalValue);
         }
 
+        // relative date to anniversary (for example anniversary -7 days)
+        if (strpos($timeframe, 'anniversary') !== false) {
+            return new DateAnniversary($this->dateDecorator);
+        }
+
         switch ($timeframe) {
             case 'birthday':
             case 'anniversary':
