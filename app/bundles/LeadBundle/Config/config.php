@@ -423,6 +423,16 @@ return [
                     'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
+            'mautic.lead.reportbundle.report_dnc_subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ReportDNCSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.reportbundle.fields_builder',
+                    'mautic.lead.model.company_report_data',
+                    'translator',
+                    'router',
+                    'mautic.channel.helper.channel_list',
+                ],
+            ],
             'mautic.lead.reportbundle.report_utm_tag_subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\ReportUtmTagSubscriber::class,
                 'arguments' => [
