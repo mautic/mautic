@@ -117,11 +117,6 @@ class OperatorOptions
             'expr'        => 'contains',
             'negate_expr' => 'contains',
         ],
-        'anniversary' => [
-            'label'       => 'mautic.lead.list.form.operator.anniversary',
-            'expr'        => 'date',
-            'negate_expr' => 'date',
-        ],
     ];
 
     public static function getFilterExpressionFunctions()
