@@ -211,10 +211,8 @@ trait FilterTrait
             case 'time':
             case 'date':
             case 'datetime':
-            if ($data['operator'] !== 'anniversary') {
                 $attr['data-toggle'] = $fieldType;
-            }
-            break;
+                break;
             case 'lookup_id':
                 $type        = 'hidden';
                 $displayType = 'text';
