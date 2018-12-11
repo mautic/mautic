@@ -41,13 +41,13 @@ class GraphAggregateStatsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function getStatRequest(AggregateStatRequestEvent $event)
+    public function onStatRequest(AggregateStatRequestEvent $event)
     {
         if (!$event->checkContextPrefix(StatsCollectionHelper::GENERAL_STAT_PREFIX.'-')) {
             return;
         }
 
-        $this->statsCollectionHelper->collectStats(
+        $this->statsCollectionHelper->generateStats(
             $event->getStatName(),
             $event->getFromDateTime(),
             $event->getToDateTime(),
