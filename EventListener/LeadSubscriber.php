@@ -108,7 +108,7 @@ class LeadSubscriber extends CommonSubscriber
         if (isset($changes['dnc_channel_status'])) {
             $dncChanges = [];
             foreach ($changes['dnc_channel_status'] as $channel => $change) {
-                $oldValue = $change['old_reason'];
+                $oldValue = isset($change['old_reason']) ? $change['old_reason'] : '';
                 $newValue = $change['reason'];
 
                 $dncChanges['mautic_internal_dnc_'.$channel] = [$oldValue, $newValue];
