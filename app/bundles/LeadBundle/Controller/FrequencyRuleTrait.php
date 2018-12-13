@@ -80,12 +80,13 @@ trait FrequencyRuleTrait
             'lead_contact_frequency_rules',
             $data,
             [
-                'action'                 => $action,
-                'channels'               => $allChannels,
-                'public_view'            => $isPublic,
-                'preference_center_only' => $isPreferenceCenter,
-                'allow_extra_fields'     => true,
-            ]
+                'action'                   => $action,
+                'channels'                 => $allChannels,
+                'public_view'              => $isPublic,
+                'preference_center_only'   => $isPreferenceCenter,
+                'allow_extra_fields'       => true,
+                'is_preference_center_page'=> ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())),
+        ]
         );
 
         $method = $this->request->getMethod();

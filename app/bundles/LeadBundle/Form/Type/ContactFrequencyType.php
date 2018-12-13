@@ -42,16 +42,22 @@ class ContactFrequencyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $showContactCategories = $this->coreParametersHelper->getParameter('show_contact_categories');
-        $showContactSegments   = $this->coreParametersHelper->getParameter('show_contact_segments');
+        // Preferences center don't need check it, because we check tokens on page
+        $showContactCategories = $showContactSegments = true;
+        if (!$options['is_preference_center_page']) {
+            $showContactCategories = $this->coreParametersHelper->getParameter('show_contact_categories');
+            $showContactSegments   = $this->coreParametersHelper->getParameter('show_contact_segments');
+        }
         // var_dump($options['data'], $options['channels']);die;
         if (!empty($options['channels'])) {
             $builder->add(
                 'lead_channels',
                 ContactChannelsType::class,
                 [
-                    'channels' => $options['channels'],
-                    'data'     => $options['data']['lead_channels'],
+                    'channels'                  => $options['channels'],
+                    'data'                      => $options['data']['lead_channels'],
+                    'public_view'               => $options['public_view'],
+                    'is_preference_center_page' => $options['is_preference_center_page'],
                 ]
             );
         }
@@ -123,8 +129,9 @@ class ContactFrequencyType extends AbstractType
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(
             [
-                'public_view'            => false,
-                'preference_center_only' => false,
+                'public_view'               => false,
+                'preference_center_only'    => false,
+                'is_preference_center_page' => false,
             ]
         );
     }
