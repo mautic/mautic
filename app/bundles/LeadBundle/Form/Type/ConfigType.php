@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\LeadBundle\Entity\Import;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -54,7 +55,7 @@ class ConfigType extends AbstractType
         );
 
         $statusChoices = [];
-        foreach ([7, 4, 5] as $validStatus) {
+        foreach ([Import::DELAYED, Import::FAILED, Import::STOPPED] as $validStatus) {
             $statusChoices[$validStatus] = 'mautic.lead.import.status.'.$validStatus;
         }
         $builder->add(
