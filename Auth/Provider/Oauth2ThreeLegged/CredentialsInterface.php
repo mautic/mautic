@@ -21,7 +21,12 @@ interface CredentialsInterface
     public function getClientId(): string;
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getAccessToken(): string;
+    public function getAccessToken(): ?string;
+
+    /**
+     * @return null|string
+     */
+    public function getCallbackUrl(): ?string;
 }
