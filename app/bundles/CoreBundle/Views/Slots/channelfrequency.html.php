@@ -22,7 +22,7 @@ $channelNumber = 0;
             <td>
                 <div class="text-left">
                     <input type="checkbox" id="<?php echo $channel->value; ?>"
-                           name="lead_contact_frequency_rules[subscribed_channels][]"
+                           name="lead_contact_frequency_rules[lead_channels][subscribed_channels][]"
                            onclick="togglePreferredChannel(this.value);"
                            value="<?php echo $view->escape($channel->value); ?>" <?php echo $checked; ?>>
                     <label for="<?php echo $channel->value; ?>" id="is-contactable-<?php echo $channel->value; ?>" data-channel="<?php echo $channelName; ?>">
