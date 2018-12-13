@@ -211,7 +211,12 @@ class PageSubscriber extends CommonSubscriber
             $page = $pageId ? $pageRepo->find((int) $pageId) : null;
         }
 
-        $this->pageModel->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated, false);
-        $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
+        // Also reject messages when processing causes any other exception.
+        try {
+            $this->pageModel->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated, false);
+            $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
+        } catch (\Exception $e) {
+            $event->setResult(QueueConsumerResults::REJECT);
+        }
     }
 }
