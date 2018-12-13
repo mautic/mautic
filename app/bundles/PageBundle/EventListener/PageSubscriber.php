@@ -198,8 +198,8 @@ class PageSubscriber extends CommonSubscriber
         $lead                   = $leadId ? $leadRepo->find((int) $leadId) : null;
 
         // On the off chance that the queue contains a message which does not
-        // reference a valid Hit, discard it to avoid clogging the queue.
-        if (null === $hit) {
+        // reference a valid Hit or Lead, discard it to avoid clogging the queue.
+        if (null === $hit || null === $lead) {
             $event->setResult(QueueConsumerResults::REJECT);
 
             return;
