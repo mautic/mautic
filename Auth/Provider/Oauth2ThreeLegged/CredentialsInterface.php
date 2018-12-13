@@ -18,7 +18,37 @@ interface CredentialsInterface
     /**
      * @return string
      */
-    public function getClientId(): string;
+    public function getAuthorizationUrl(): string;
+
+    /**
+     * @return string
+     */
+    public function getRequestTokenUrl(): string;
+
+    /**
+     * @return string
+     */
+    public function getAccessTokenUrl(): string;
+
+    /**
+     * @return null|string
+     */
+    public function getAuthCallbackUrl(): ?string;
+
+    /**
+     * @return null|string
+     */
+    public function getClientId(): ?string;
+
+    /**
+     * @return null|string
+     */
+    public function getClientSecret(): ?string;
+
+    /**
+     * @return null|string
+     */
+    public function getBearerToken(): ?string;
 
     /**
      * @return null|string
@@ -28,5 +58,5 @@ interface CredentialsInterface
     /**
      * @return null|string
      */
-    public function getCallbackUrl(): ?string;
+    public function getRequestToken(): ?string;
 }
