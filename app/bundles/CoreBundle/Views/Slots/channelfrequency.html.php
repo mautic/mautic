@@ -13,7 +13,7 @@ $channelNumber = 0;
 ?>
 <?php if (isset($form)) : ?>
 <table class="table table-striped">
-    <?php foreach ($form['lead_channels']['subscribed_channels']->vars['choices'] as $channel):
+    <?php foreach ($form['lead_channels']['subscribed_channels']->vars['choices'] as $key=>$channel):
         $contactMe   = isset($leadChannels[$channel->value]);
         $checked     = $contactMe ? 'checked' : '';
         $channelName = strtolower($view['channel']->getChannelLabel($channel->value));
@@ -21,8 +21,11 @@ $channelNumber = 0;
         <tr>
             <td>
                 <div class="text-left">
+                    <input type="hidden" id="<?php echo $channel->value; ?>"
+                           name="lead_contact_frequency_rules[lead_channels][subscribed_channels][<?php echo $key; ?>]"
+                           value="">
                     <input type="checkbox" id="<?php echo $channel->value; ?>"
-                           name="lead_contact_frequency_rules[lead_channels][subscribed_channels][]"
+                           name="lead_contact_frequency_rules[lead_channels][subscribed_channels][<?php echo $key; ?>]"
                            onclick="togglePreferredChannel(this.value);"
                            value="<?php echo $view->escape($channel->value); ?>" <?php echo $checked; ?>>
                     <label for="<?php echo $channel->value; ?>" id="is-contactable-<?php echo $channel->value; ?>" data-channel="<?php echo $channelName; ?>">
