@@ -1855,8 +1855,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true)
     {
         $fetchOptions = new EmailStatOptions();
-        $fetchOptions->setLabelFormat($dateFormat)
-            ->setCanViewOthers($canViewOthers);
+        $fetchOptions->setCanViewOthers($canViewOthers);
 
         if (isset($filter['flag'])) {
             $flag = $filter['flag'];
@@ -1889,7 +1888,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         // Set anything left over to be passed to prepareTimeDataQuery
         $fetchOptions->setFilters($filter);
 
-        $chart = new LineChart($unit, $dateFrom, $dateTo);
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'sent_and_opened']) || !$flag || in_array('sent', $datasets)) {
             $chart->setDataset(
                 $this->translator->trans('mautic.email.sent.emails'),
