@@ -58,4 +58,16 @@ class QueueConsumerEvent extends CommonEvent
     {
         $this->result = $result;
     }
+
+    /**
+     * Checks if the event is for specific transport.
+     *
+     * @param string $transport
+     *
+     * @return bool
+     */
+    public function checkTransport($transport)
+    {
+        return isset($this->payload['transport']) && $this->payload['transport'] === $transport;
+    }
 }

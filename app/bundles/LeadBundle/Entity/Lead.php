@@ -23,9 +23,6 @@ use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class Lead.
- */
 class Lead extends FormEntity implements CustomFieldEntityInterface
 {
     use CustomFieldEntityTrait;
@@ -269,9 +266,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     private $channelRules = [];
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->ipAddresses      = new ArrayCollection();
@@ -345,9 +339,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addInverseJoinColumn('ip_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('ipAddress')
+            ->cascadeDetach()
             ->cascadeMerge()
             ->cascadePersist()
-            ->cascadeDetach()
             ->build();
 
         $builder->createOneToMany('pushIds', 'Mautic\NotificationBundle\Entity\PushID')
@@ -539,7 +533,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 $this->changes['owner'] = [$current->getId(), $val->getId()];
             }
         } elseif ($prop == 'ipAddresses') {
-            $this->changes['ipAddresses'] = ['', $val->getIpAddress()];
+            $this->changes['ipAddresses'] = ['', $val->getIpAddress()]; // Kept for BC. Not a good way to track changes on a collection
+
+            if (empty($this->changes['ipAddressList'])) {
+                $this->changes['ipAddressList'] = [];
+            }
+
+            $this->changes['ipAddressList'][$val->getIpAddress()] = $val;
         } elseif ($prop == 'tags') {
             if ($val instanceof Tag) {
                 $this->changes['tags']['added'][] = $val->getTag();

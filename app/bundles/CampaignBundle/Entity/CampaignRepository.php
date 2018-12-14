@@ -395,6 +395,10 @@ class CampaignRepository extends CommonRepository
      */
     public function getPendingContactIds($campaignId, ContactLimiter $limiter)
     {
+        if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
+            return [];
+        }
+
         $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
 
         $q->select('cl.lead_id')
@@ -427,14 +431,20 @@ class CampaignRepository extends CommonRepository
         )
             ->setParameter('campaignId', (int) $campaignId);
 
-        $results = $q->execute()->fetchAll();
+        if ($limiter->hasCampaignLimit() && $limiter->getCampaignLimitRemaining() < $limiter->getBatchLimit()) {
+            $q->setMaxResults($limiter->getCampaignLimitRemaining());
+        }
 
-        $leads = [];
+        $results = $q->execute()->fetchAll();
+        $leads   = [];
         foreach ($results as $r) {
             $leads[] = $r['lead_id'];
         }
-
         unset($results);
+
+        if ($limiter->hasCampaignLimit()) {
+            $limiter->reduceCampaignLimitRemaining(count($leads));
+        }
 
         return $leads;
     }

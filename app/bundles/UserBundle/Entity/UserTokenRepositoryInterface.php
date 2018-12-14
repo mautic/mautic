@@ -29,4 +29,13 @@ interface UserTokenRepositoryInterface
      * @return bool
      */
     public function verify(UserToken $token);
+
+    /**
+     * Delete expired user tokens.
+     *
+     * @param bool $isDryRun
+     *
+     * @return int Number of selected or deleted rows
+     */
+    public function deleteExpired($isDryRun = false);
 }

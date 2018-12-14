@@ -53,9 +53,13 @@ class ReloadHelperTest extends \PHPUnit_Framework_TestCase
             'MauticPlugin\MauticCitrixBundle' => [$this->createMock(ClassMetadata::class)],
         ];
 
+        $sampleSchema = $this->createMock(Schema::class);
+        $sampleSchema->method('getTables')
+                ->willReturn([]);
+
         $this->sampleSchemas = [
-            'MauticPlugin\MauticZapierBundle' => $this->createMock(Schema::class),
-            'MauticPlugin\MauticCitrixBundle' => $this->createMock(Schema::class),
+            'MauticPlugin\MauticZapierBundle' => $sampleSchema,
+            'MauticPlugin\MauticCitrixBundle' => $sampleSchema,
         ];
 
         $this->sampleAllPlugins = [

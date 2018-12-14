@@ -488,6 +488,23 @@ return [
                     'mautic.lead.repository.lead_event_log',
                 ],
             ],
+            'mautic.lead.timeline_events.campaign.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\TimelineEventLogCampaignSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_event_log',
+                    'mautic.helper.user',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.timeline_events.segment.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\TimelineEventLogSegmentSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_event_log',
+                    'mautic.helper.user',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
             'mautic.lead.subscriber.segment' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\SegmentSubscriber',
                 'arguments' => [
@@ -513,6 +530,7 @@ return [
                     'mautic.stage.model.stage',
                     'mautic.category.model.category',
                     'mautic.helper.user',
+                    'mautic.campaign.model.campaign',
                 ],
                 'alias' => 'leadlist',
             ],
@@ -689,7 +707,9 @@ return [
             ],
             'mautic.form.type.lead_fields' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadFieldsType',
-                'arguments' => ['mautic.factory'],
+                'arguments' => [
+                    'mautic.lead.model.field',
+                ],
                 'alias'     => 'leadfields_choices',
             ],
             'mautic.form.type.lead_dashboard_leads_in_time_widget' => [
@@ -950,6 +970,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.tracker.device',
                     'mautic.lead.model.legacy_lead',
+                    'mautic.lead.model.ipaddress',
                 ],
             ],
 
@@ -1180,6 +1201,13 @@ return [
                     'mautic.lead.service.device_creator_service',
                     'mautic.lead.factory.device_detector_factory',
                     'mautic.lead.service.device_tracking_service',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.lead.model.ipaddress' => [
+                'class'     => Mautic\LeadBundle\Model\IpAddressModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                     'monolog.logger.mautic',
                 ],
             ],
