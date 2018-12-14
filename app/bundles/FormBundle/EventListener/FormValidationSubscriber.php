@@ -48,7 +48,9 @@ class FormValidationSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param Events\ValidationEvent $event
+     * Custom validation     *.
+     *
+     *@param Events\ValidationEvent $event
      */
     public function onFormValidate(Events\ValidationEvent $event)
     {
