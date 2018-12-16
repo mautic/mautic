@@ -21,9 +21,10 @@ use Mautic\CoreBundle\Entity\CommonEntity;
  */
 class FrequencyRule extends CommonEntity
 {
-    const TIME_DAY   = 'DAY';
-    const TIME_WEEK  = 'WEEK';
-    const TIME_MONTH = 'MONTH';
+    const TIME_MINUTE   = 'MINUTE';
+    const TIME_DAY      = 'DAY';
+    const TIME_WEEK     = 'WEEK';
+    const TIME_MONTH    = 'MONTH';
 
     /**
      * @var int

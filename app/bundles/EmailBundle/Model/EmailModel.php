@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -137,21 +138,27 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $cacheStorageHelper;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * EmailModel constructor.
      *
-     * @param IpLookupHelper     $ipLookupHelper
-     * @param ThemeHelper        $themeHelper
-     * @param Mailbox            $mailboxHelper
-     * @param MailHelper         $mailHelper
-     * @param LeadModel          $leadModel
-     * @param CompanyModel       $companyModel
-     * @param TrackableModel     $pageTrackableModel
-     * @param UserModel          $userModel
-     * @param MessageQueueModel  $messageQueueModel
-     * @param SendEmailToContact $sendModel
-     * @param DeviceTracker      $deviceTracker
-     * @param RedirectRepository $redirectRepository
-     * @param CacheStorageHelper $cacheStorageHelper
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param ThemeHelper          $themeHelper
+     * @param Mailbox              $mailboxHelper
+     * @param MailHelper           $mailHelper
+     * @param LeadModel            $leadModel
+     * @param CompanyModel         $companyModel
+     * @param TrackableModel       $pageTrackableModel
+     * @param UserModel            $userModel
+     * @param MessageQueueModel    $messageQueueModel
+     * @param SendEmailToContact   $sendModel
+     * @param DeviceTracker        $deviceTracker
+     * @param RedirectRepository   $redirectRepository
+     * @param CacheStorageHelper   $cacheStorageHelper
+     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -166,7 +173,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         SendEmailToContact $sendModel,
         DeviceTracker $deviceTracker,
         RedirectRepository $redirectRepository,
-        CacheStorageHelper $cacheStorageHelper
+        CacheStorageHelper $cacheStorageHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->ipLookupHelper        = $ipLookupHelper;
         $this->themeHelper           = $themeHelper;
@@ -181,6 +189,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->deviceTracker         = $deviceTracker;
         $this->redirectRepository    = $redirectRepository;
         $this->cacheStorageHelper    = $cacheStorageHelper;
+        $this->coreParametersHelper  = $coreParametersHelper;
     }
 
     /**
@@ -1361,7 +1370,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         // Process frequency rules for email
-        if ($isMarketing && count($sendTo)) {
+        if (count($sendTo)
+            && ($this->coreParametersHelper->getParameter('enforce_frequency_check')
+                || $isMarketing)) {
             $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
             $this->messageQueueModel->processFrequencyRules(

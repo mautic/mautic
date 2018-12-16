@@ -46,7 +46,9 @@ class FrequencyRuleRepository extends CommonRepository
         }
 
         if (!empty($defaultFrequencyTime)) {
-            $q->andWhere('ch.'.$statSentColumn.' >= case fr.frequency_time 
+            // @todo this should accept time unit, such as 5 MINUTE
+            $q->andWhere('ch.'.$statSentColumn.' >= case fr.frequency_time
+                    when \'MINUTE\' then DATE_SUB(NOW(),INTERVAL 1 MINUTE) 
                     when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH) 
                     when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY) 
                     when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK)
@@ -55,6 +57,7 @@ class FrequencyRuleRepository extends CommonRepository
                 ->setParameter('frequencyTime', $defaultFrequencyTime);
         } else {
             $q->andWhere('(ch.'.$statSentColumn.' >= case fr.frequency_time
+                     when \'MINUTE\' then DATE_SUB(NOW(),INTERVAL 1 MINUTE)
                      when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH)
                      when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY)
                      when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK)
