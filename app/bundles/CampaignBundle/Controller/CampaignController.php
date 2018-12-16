@@ -354,6 +354,8 @@ class CampaignController extends AbstractStandardFormController
         }
 
         if ($isClone) {
+            list($this->addedSources, $this->deletedSources, $campaignSources) = $this->getSessionSources($objectId, $isClone);
+            $this->getCampaignModel()->setLeadSources($entity, $campaignSources, []);
             // If this is a clone, we need to save the entity first to properly build the events, sources and canvas settings
             $this->getCampaignModel()->getRepository()->saveEntity($entity);
             // Set as new so that timestamps are still hydrated

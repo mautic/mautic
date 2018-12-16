@@ -228,7 +228,11 @@ class DynamicContentSubscriber extends CommonSubscriber
             return;
         }
 
-        $content   = $event->getContent();
+        $content = $event->getContent();
+        if (empty($content)) {
+            return;
+        }
+
         $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
         $leadArray = [];
         if ($lead instanceof Lead) {
@@ -260,7 +264,7 @@ class DynamicContentSubscriber extends CommonSubscriber
             }
 
             $newnode = $dom->createDocumentFragment();
-            $newnode->appendXML(mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8'));
+            $newnode->appendXML('<![CDATA['.mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8').']]>');
             $slot->parentNode->replaceChild($newnode, $slot);
         }
 

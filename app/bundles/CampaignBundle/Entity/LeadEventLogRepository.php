@@ -387,7 +387,12 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter)
     {
+        if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
+            return new ArrayCollection();
+        }
+
         $this->getSlaveConnection($limiter);
+
         $q = $this->createQueryBuilder('o');
 
         $q->select('o, e, c')
@@ -408,7 +413,17 @@ class LeadEventLogRepository extends CommonRepository
 
         $this->updateOrmQueryFromContactLimiter('o', $q, $limiter);
 
-        return new ArrayCollection($q->getQuery()->getResult());
+        if ($limiter->hasCampaignLimit() && $limiter->getCampaignLimitRemaining() < $limiter->getBatchLimit()) {
+            $q->setMaxResults($limiter->getCampaignLimitRemaining());
+        }
+
+        $result = new ArrayCollection($q->getQuery()->getResult());
+
+        if ($limiter->hasCampaignLimit()) {
+            $limiter->reduceCampaignLimitRemaining($result->count());
+        }
+
+        return $result;
     }
 
     /**

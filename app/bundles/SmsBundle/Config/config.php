@@ -50,6 +50,12 @@ return [
             'mautic.sms.configbundle.subscriber' => [
                 'class' => Mautic\SmsBundle\EventListener\ConfigSubscriber::class,
             ],
+            'mautic.sms.subscriber.contact_tracker' => [
+                'class'     => \Mautic\SmsBundle\EventListener\TrackingSubscriber::class,
+                'arguments' => [
+                    'mautic.sms.repository.stat',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.sms' => [
@@ -136,6 +142,15 @@ return [
         'integrations' => [
             'mautic.integration.twilio' => [
                 'class' => \Mautic\SmsBundle\Integration\TwilioIntegration::class,
+            ],
+        ],
+        'repositories' => [
+            'mautic.sms.repository.stat' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\SmsBundle\Entity\Stat::class,
+                ],
             ],
         ],
     ],
