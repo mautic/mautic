@@ -214,6 +214,7 @@ return [
         'sms_sending_phone_number' => null,
         'sms_frequency_number'     => null,
         'sms_frequency_time'       => null,
+        'sms_frequency_unit'       => 1,
         'sms_transport'            => 'mautic.sms.transport.twilio',
     ],
 ];

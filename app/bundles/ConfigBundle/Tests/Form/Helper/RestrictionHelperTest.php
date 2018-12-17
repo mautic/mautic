@@ -141,6 +141,7 @@ class RestrictionHelperTest extends TypeTestCase
                 'default_signature_text'              => null,
                 'email_frequency_number'              => null,
                 'email_frequency_time'                => null,
+                'email_frequency_unit'                => 1,
                 'show_contact_preferences'            => false,
                 'show_contact_frequency'              => false,
                 'show_contact_pause_dates'            => false,

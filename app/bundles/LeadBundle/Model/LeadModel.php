@@ -1166,8 +1166,11 @@ class LeadModel extends FormModel
      * @param Lead $lead
      * @param null $data
      * @param null $leadLists
+     * @param bool $persist
      *
      * @return bool Returns true
+     *
+     * @throws \Exception
      */
     public function setFrequencyRules(Lead $lead, $data = null, $leadLists = null, $persist = true)
     {
@@ -1186,11 +1189,13 @@ class LeadModel extends FormModel
             $frequencyRule->setLead($lead);
             $frequencyRule->setDateAdded(new \DateTime());
 
-            if (!empty($data['lead_channels']['frequency_number_'.$ch]) && !empty($data['lead_channels']['frequency_time_'.$ch])) {
+            if (!empty($data['lead_channels']['frequency_number_'.$ch]) && !empty($data['lead_channels']['frequency_time_'.$ch]) && !empty($data['lead_channels']['frequency_unit_'.$ch])) {
                 $frequencyRule->setFrequencyNumber($data['lead_channels']['frequency_number_'.$ch]);
+                $frequencyRule->setFrequencyUnit($data['lead_channels']['frequency_unit_'.$ch]);
                 $frequencyRule->setFrequencyTime($data['lead_channels']['frequency_time_'.$ch]);
             } else {
                 $frequencyRule->setFrequencyNumber(null);
+                $frequencyRule->setFrequencyUnit(null);
                 $frequencyRule->setFrequencyTime(null);
             }
 

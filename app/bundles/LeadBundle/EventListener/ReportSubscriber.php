@@ -711,6 +711,10 @@ class ReportSubscriber extends CommonSubscriber
                 'label' => 'mautic.lead.report.frequency.frequency_number',
                 'type'  => 'int',
             ],
+            'lf.frequency_unit' => [
+                'label' => 'mautic.lead.report.frequency.frequency_unit',
+                'type'  => 'int',
+            ],
             'lf.frequency_time' => [
                 'label' => 'mautic.lead.report.frequency.frequency_time',
                 'type'  => 'string',

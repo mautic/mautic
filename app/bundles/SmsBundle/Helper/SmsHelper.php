@@ -50,6 +50,14 @@ class SmsHelper
      * @var bool
      */
     private $disableTrackableUrls;
+    /**
+     * @var int
+     */
+    private $smsFrequencyNumber;
+    /**
+     * @var int
+     */
+    private $smsFrequencyUnit;
 
     /**
      * SmsHelper constructor.
@@ -70,6 +78,7 @@ class SmsHelper
         $integration                = $integrationHelper->getIntegrationObject('Twilio');
         $settings                   = $integration->getIntegrationSettings()->getFeatureSettings();
         $this->smsFrequencyNumber   = $settings['frequency_number'];
+        $this->smsFrequencyUnit     = $settings['frequency_unit'];
         $this->disableTrackableUrls = !empty($settings['disable_trackable_urls']) ? true : false;
     }
 

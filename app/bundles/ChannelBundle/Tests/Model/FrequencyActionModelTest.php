@@ -100,6 +100,7 @@ class FrequencyActionModelTest extends \PHPUnit_Framework_TestCase
         $params   = [
             'subscribed_channels'            => ['email', 'sms'],
             'frequency_number_email'         => '2',
+            'frequency_unit_email'           => 1,
             'frequency_time_email'           => 'WEEK',
             'preferred_channel'              => 'email',
             'contact_pause_start_date_email' => '2018-05-13',

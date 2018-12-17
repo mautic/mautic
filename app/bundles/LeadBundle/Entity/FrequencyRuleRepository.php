@@ -19,24 +19,25 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class FrequencyRuleRepository extends CommonRepository
 {
     /**
-     * @param        $channel
-     * @param        $leadIds
-     * @param        $defaultFrequencyNumber
-     * @param        $defaultFrequencyTime
+     * @param   $channel
+     * @param   $leadIds
+     * @param   $defaultFrequencyNumber
+     * @param   $defaultFrequencyTime
+     * @param $defaultFrequencyUnit
      * @param string $statTable
-     * @param string $statSentColumn
      * @param string $statContactColumn
+     * @param string $statSentColumn
      *
      * @return array
      */
-    public function getAppliedFrequencyRules($channel, $leadIds, $defaultFrequencyNumber, $defaultFrequencyTime, $statTable = 'email_stats', $statContactColumn = 'lead_id', $statSentColumn = 'date_sent')
+    public function getAppliedFrequencyRules($channel, $leadIds, $defaultFrequencyNumber, $defaultFrequencyTime, $defaultFrequencyUnit, $statTable = 'email_stats', $statContactColumn = 'lead_id', $statSentColumn = 'date_sent')
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $selectFrequency = ($defaultFrequencyNumber) ? 'IFNULL(fr.frequency_number,:defaultNumber) as frequency_number' : 'fr.frequency_number';
-        $selectNumber    = ($defaultFrequencyTime) ? 'IFNULL(fr.frequency_time,:frequencyTime) as frequency_time' : 'fr.frequency_time';
+        $selectFrequency   = ($defaultFrequencyNumber) ? 'IFNULL(fr.frequency_number,:defaultNumber) as frequency_number' : 'fr.frequency_number';
+        $selectTimeUnit    = ($defaultFrequencyTime) && ($defaultFrequencyUnit) ? 'IFNULL(fr.frequency_time,:frequencyTime) as frequency_time, IFNULL(fr.frequency_unit,:frequencyUnit) as frequency_unit' : 'fr.frequency_time, fr.frequency_unit';
 
-        $q->select("ch.$statContactColumn, $selectFrequency, $selectNumber")
+        $q->select("ch.$statContactColumn, $selectFrequency, $selectTimeUnit")
             ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
             ->leftJoin('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.{$statContactColumn} = fr.lead_id");
 
@@ -45,16 +46,16 @@ class FrequencyRuleRepository extends CommonRepository
                 ->setParameter('channel', $channel);
         }
 
-        if (!empty($defaultFrequencyTime)) {
-            // @todo this should accept time unit, such as 5 MINUTE
+        if (!empty($defaultFrequencyTime) && !empty($defaultFrequencyUnit)) {
             $q->andWhere('ch.'.$statSentColumn.' >= case fr.frequency_time
-                    when \'MINUTE\' then DATE_SUB(NOW(),INTERVAL 1 MINUTE) 
-                    when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH) 
-                    when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY) 
-                    when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK)
-                    else DATE_SUB(NOW(),INTERVAL 1 '.$defaultFrequencyTime.')
+                    when \'MINUTE\' then DATE_SUB(NOW(),INTERVAL IFNULL(fr.frequency_unit,:frequencyUnit) MINUTE) 
+                    when \'MONTH\' then DATE_SUB(NOW(),INTERVAL IFNULL(fr.frequency_unit,:frequencyUnit) MONTH) 
+                    when \'DAY\' then DATE_SUB(NOW(),INTERVAL IFNULL(fr.frequency_unit,:frequencyUnit) DAY) 
+                    when \'WEEK\' then DATE_SUB(NOW(),INTERVAL IFNULL(fr.frequency_unit,:frequencyUnit) WEEK)
+                    else DATE_SUB(NOW(),INTERVAL '.$defaultFrequencyUnit.' '.$defaultFrequencyTime.')
                     end')
-                ->setParameter('frequencyTime', $defaultFrequencyTime);
+                ->setParameter('frequencyTime', $defaultFrequencyTime)
+                ->setParameter('frequencyUnit', $defaultFrequencyUnit);
         } else {
             $q->andWhere('(ch.'.$statSentColumn.' >= case fr.frequency_time
                      when \'MINUTE\' then DATE_SUB(NOW(),INTERVAL 1 MINUTE)
@@ -72,7 +73,7 @@ class FrequencyRuleRepository extends CommonRepository
             $q->expr()->in("ch.$statContactColumn", $leadIds)
         );
 
-        $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_number");
+        $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_unit, fr.frequency_number");
 
         $havingAnd = 'AND '.$q->expr()->in("ch.$statContactColumn", $leadIds);
         if ($defaultFrequencyNumber != null) {
@@ -98,7 +99,7 @@ class FrequencyRuleRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select(
-            'fr.id, fr.frequency_time, fr.frequency_number, fr.channel, fr.preferred_channel, fr.pause_from_date, fr.pause_to_date, fr.lead_id'
+            'fr.id, fr.frequency_unit, fr.frequency_time, fr.frequency_number, fr.channel, fr.preferred_channel, fr.pause_from_date, fr.pause_to_date, fr.lead_id'
         )
           ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr');
 
@@ -147,7 +148,7 @@ class FrequencyRuleRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('fr.id, fr.frequency_time, fr.frequency_number, fr.channel, fr.pause_from_date, fr.pause_to_date')
+        $q->select('fr.id, fr.frequency_unit, fr.frequency_time, fr.frequency_number, fr.channel, fr.pause_from_date, fr.pause_to_date')
             ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr');
         $q->where('fr.preferred_channel = :preferredChannel')
             ->setParameter('preferredChannel', true, 'boolean');

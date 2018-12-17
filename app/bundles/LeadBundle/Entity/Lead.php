@@ -1987,6 +1987,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      *
      * @param array $frequencyRules
      * @param array $dncRules
+     *
+     * @return array
      */
     public static function generateChannelRules(array $frequencyRules, array $dncRules)
     {
@@ -1999,6 +2001,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     'pause_from_date'   => $rule->getPauseFromDate(),
                     'pause_to_date'     => $rule->getPauseToDate(),
                     'preferred_channel' => $rule->getPreferredChannel(),
+                    'frequency_unit'    => $rule->getFrequencyUnit(),
                     'frequency_time'    => $rule->getFrequencyTime(),
                     'frequency_number'  => $rule->getFrequencyNumber(),
                 ];
@@ -2031,7 +2034,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 }
 
                 if ($a['preferred_channel'] === $b['preferred_channel']) {
-                    if (!$a['frequency_time'] || !$b['frequency_time'] || !$a['frequency_number'] || !$b['frequency_number']) {
+                    if (!$a['frequency_time'] || !$b['frequency_time'] || !$a['frequency_number']
+                        || !$b['frequency_number'] || !$a['frequency_unit'] || !$b['frequency_unit']) {
                         return 0;
                     }
 
@@ -2041,26 +2045,40 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                             return 0;
                         }
 
-                        return ($a['frequency_number'] > $b['frequency_number']) ? -1 : 1;
+                        // Compare frequency numbers per unit amount (e.g., per minute, per hour etc)
+                        // This is because unit amounts are now dynamic, not necessarily always 1 MINUTE, 1 WEEK etc.
+                        // It can be 2 MINUTES as well.
+                        $unitAmountA = $a['frequency_unit'] || 1;
+                        $unitAmountB = $b['frequency_unit'] || 1;
+
+                        return (($a['frequency_number'] / $unitAmountA) > ($b['frequency_number'] / $unitAmountB)) ? -1 : 1;
                     } else {
-                        $convertToMonth = function ($number, $unit) {
+                        $convertToMonth = function ($number, $unit, $unitAmount) {
+                            // Default is 1 MINUTE, 1 WEEK, 1 MONTH
+                            if (!$unitAmount) {
+                                $unitAmount = 1;
+                            }
+
                             switch ($unit) {
                                 case FrequencyRule::TIME_MONTH:
-                                    $number = (int) $number;
+                                    $number = (int) $number / $unitAmount;
                                     break;
                                 case FrequencyRule::TIME_WEEK:
-                                    $number = $number * 4;
+                                    $number = $number * (4 / $unitAmount);
                                     break;
                                 case FrequencyRule::TIME_DAY:
-                                    $number = $number * 30;
+                                    $number = $number * (30 / $unitAmount);
+                                    break;
+                                case FrequencyRule::TIME_MINUTE:
+                                    $number = $number * (43200 / $unitAmount);
                                     break;
                             }
 
                             return $number;
                         };
 
-                        $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
-                        $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
+                        $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time'], $a['frequency_time']);
+                        $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time'], $b['frequency_time']);
 
                         if ($aFrequency === $bFrequency) {
                             return 0;

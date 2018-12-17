@@ -47,6 +47,11 @@ class FrequencyRule extends CommonEntity
     private $frequencyNumber;
 
     /**
+     * @var int
+     */
+    private $frequencyUnit;
+
+    /**
      * @var string
      */
     private $frequencyTime;
@@ -90,6 +95,8 @@ class FrequencyRule extends CommonEntity
 
         $builder->addNamedField('frequencyNumber', 'smallint', 'frequency_number', true);
 
+        $builder->addNamedField('frequencyUnit', 'smallint', 'frequency_unit', true);
+
         $builder->createField('frequencyTime', 'string')
             ->columnName('frequency_time')
             ->nullable()
@@ -126,6 +133,7 @@ class FrequencyRule extends CommonEntity
                      [
                          'channel',
                          'frequencyNumber',
+                         'frequencyUnit',
                          'frequencyTime',
                          'preferredChannel',
                          'pauseFromDate',
@@ -209,6 +217,28 @@ class FrequencyRule extends CommonEntity
         $this->isChanged('frequencyNumber', $frequencyNumber);
 
         $this->frequencyNumber = $frequencyNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFrequencyUnit()
+    {
+        return $this->frequencyUnit;
+    }
+
+    /**
+     * @param int $frequencyUnit
+     *
+     * @return FrequencyRule
+     */
+    public function setFrequencyUnit($frequencyUnit)
+    {
+        $this->isChanged('frequencyUnit', $frequencyUnit);
+
+        $this->frequencyUnit = $frequencyUnit;
 
         return $this;
     }

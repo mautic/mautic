@@ -42,6 +42,8 @@ trait FrequencyRuleTrait
      * @param bool  $isPreferenceCenter
      *
      * @return bool|Form
+     *
+     * @throws \Exception
      */
     protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
     {
@@ -108,8 +110,11 @@ trait FrequencyRuleTrait
      * @param null       $leadChannels
      * @param bool       $isPublic
      * @param null       $frequencyRules
+     * @param bool       $isPreferenceCenter
      *
      * @return array
+     *
+     * @throws \Exception
      */
     protected function getFrequencyRuleFormData(Lead $lead, array $allChannels = null, $leadChannels = null, $isPublic = false, $frequencyRules = null, $isPreferenceCenter = false)
     {
@@ -133,7 +138,9 @@ trait FrequencyRuleTrait
             if (isset($frequencyRules[$channel])) {
                 $frequencyRule                                       = $frequencyRules[$channel];
                 $data['lead_channels']['frequency_number_'.$channel] = $frequencyRule['frequency_number'];
+                $data['lead_channels']['frequency_unit_'.$channel]   = $frequencyRule['frequency_unit'];
                 $data['lead_channels']['frequency_time_'.$channel]   = $frequencyRule['frequency_time'];
+
                 if ($frequencyRule['pause_from_date']) {
                     $data['lead_channels']['contact_pause_start_date_'.$channel] = new \DateTime($frequencyRule['pause_from_date']);
                 }

@@ -17,11 +17,13 @@ function togglePreferredChannel(channel){
        if(status)
            {
                 document.getElementById('lead_contact_frequency_rules_frequency_number_' + channel).disabled = false;
+                document.getElementById('lead_contact_frequency_rules_frequency_unit_' + channel).disabled = false;
                 document.getElementById('lead_contact_frequency_rules_frequency_time_' + channel).disabled = false;
                 document.getElementById('lead_contact_frequency_rules_contact_pause_start_date_' + channel).disabled = false;
                 document.getElementById('lead_contact_frequency_rules_contact_pause_end_date_' + channel).disabled = false;
             } else {
                 document.getElementById('lead_contact_frequency_rules_frequency_number_' + channel).disabled = true;
+                document.getElementById('lead_contact_frequency_rules_frequency_unit_' + channel).disabled = true;
                 document.getElementById('lead_contact_frequency_rules_frequency_time_' + channel).disabled = true;
                 document.getElementById('lead_contact_frequency_rules_contact_pause_start_date_' + channel).disabled = true;
                 document.getElementById('lead_contact_frequency_rules_contact_pause_end_date_' + channel).disabled = true;
@@ -72,11 +74,13 @@ JS;
                                         <label class="text-muted"><?php echo $view['translator']->trans($form['frequency_number_'.$channel->value]->vars['label']); ?></label>
                                         <?php echo $view['form']->widget($form['frequency_number_'.$channel->value]); ?>
                                         <?php echo $view['form']->label($form['frequency_time_'.$channel->value]); ?>
+                                        <?php echo $view['form']->widget($form['frequency_unit_'.$channel->value]); ?>
                                         <?php echo $view['form']->widget($form['frequency_time_'.$channel->value]); ?>
                                     </div>
                                 <?php else:
                                     unset($form['frequency_time_'.$channel->value]);
                                     unset($form['frequency_number_'.$channel->value]);
+                                    unset($form['frequency_unit_'.$channel->value]);
                                 endif; ?>
                                 <?php if ($showContactPauseDates):?>
                                     <div class="col-md-6">

@@ -63,7 +63,13 @@
                                     $attr['class'] .= ' pull-left';
                                     ?>
                                     <?php echo $view['form']->widget($form['lead_channels']['frequency_number_'.$channel->value], ['attr' => $attr]); ?>
-                                    <?php echo $view['form']->label($form['lead_channels']['frequency_time_'.$channel->value]); ?>
+
+                                    <?php
+                                    $attr = $form['lead_channels']['frequency_unit_'.$channel->value]->vars['attr'];
+                                    $attr['class'] .= ' pull-left';
+                                    ?>
+                                    <?php echo $view['form']->label($form['lead_channels']['frequency_time_'.$channel->value]) ?>
+                                    <?php echo $view['form']->widget($form['lead_channels']['frequency_unit_'.$channel->value], ['attr' => $attr]); ?>
                                     <div class="frequency-select"><?php echo $view['form']->widget($form['lead_channels']['frequency_time_'.$channel->value]); ?></div>
                                 </div>
                             </div>

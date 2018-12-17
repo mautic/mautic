@@ -825,6 +825,7 @@ return [
         'default_signature_text'              => null,
         'email_frequency_number'              => null,
         'email_frequency_time'                => null,
+        'email_frequency_unit'                => 1,
         'enforce_frequency_check'             => false,
         'show_contact_preferences'            => false,
         'show_contact_frequency'              => false,

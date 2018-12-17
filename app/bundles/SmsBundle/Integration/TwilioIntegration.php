@@ -120,6 +120,16 @@ class TwilioIntegration extends AbstractIntegration
                         'class' => 'form-control frequency',
                     ],
                 ]);
+            $builder->add('frequency_unit', 'number',
+                [
+                    'precision'  => 0,
+                    'label'      => 'mautic.sms.list.frequency.unit',
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => false,
+                    'attr'       => [
+                        'class' => 'form-control frequency',
+                    ],
+                ]);
             $builder->add('frequency_time', 'choice',
                 [
                     'choices' => [

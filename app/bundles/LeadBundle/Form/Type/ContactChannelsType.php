@@ -94,16 +94,34 @@ class ContactChannelsType extends AbstractType
                 );
 
                 $builder->add(
+                    'frequency_unit_'.$channel,
+                    'integer',
+                    [
+                        'precision'  => 0,
+                        'label'      => 'mautic.lead.list.frequency.unit',
+                        'label_attr' => ['class' => 'text-muted fw-n label1'],
+                        'attr'       => array_merge(
+                            $attr,
+                            [
+                                'class' => 'frequency form-control',
+                            ]
+                        ),
+                        'required' => false,
+                    ]
+                );
+
+                $builder->add(
                     'frequency_time_'.$channel,
                     'choice',
                     [
                         'choices' => [
-                            FrequencyRule::TIME_DAY   => 'mautic.core.time.days',
-                            FrequencyRule::TIME_WEEK  => 'mautic.core.time.weeks',
-                            FrequencyRule::TIME_MONTH => 'mautic.core.time.months',
+                            FrequencyRule::TIME_MINUTE  => 'mautic.core.time.minutes',
+                            FrequencyRule::TIME_DAY     => 'mautic.core.time.days',
+                            FrequencyRule::TIME_WEEK    => 'mautic.core.time.weeks',
+                            FrequencyRule::TIME_MONTH   => 'mautic.core.time.months',
                         ],
                         'label'      => 'mautic.lead.list.frequency.times',
-                        'label_attr' => ['class' => 'text-muted fw-n frequency-label label2'],
+                        'label_attr' => ['class' => 'text-muted fw-n frequency-label label2 pull-left'],
                         'multiple'   => false,
                         'required'   => false,
                         'attr'       => array_merge(

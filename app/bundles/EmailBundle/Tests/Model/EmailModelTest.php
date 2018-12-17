@@ -572,8 +572,17 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
 
         $this->emailRepository->method('getDoNotEmailList')
             ->will($this->returnValue([]));
-        $this->frequencyRepository->method('getAppliedFrequencyRules')
-            ->will($this->returnValue([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]));
+        $statRepository = $this->getMockBuilder(StatRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $frequencyRepository = $this->getMockBuilder(FrequencyRuleRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $frequencyRepository->method('getAppliedFrequencyRules')
+            ->will($this->returnValue([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY', 'frequency_unit' => 1]]));
+        $messageRepository = $this->getMockBuilder(MessageRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')

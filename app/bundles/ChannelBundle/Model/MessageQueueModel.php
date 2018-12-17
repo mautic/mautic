@@ -78,6 +78,8 @@ class MessageQueueModel extends FormModel
      * @param string $statSentColumn
      *
      * @return array
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
     public function processFrequencyRules(
         array &$leads,
@@ -98,12 +100,14 @@ class MessageQueueModel extends FormModel
         $frequencyRulesRepo     = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
         $defaultFrequencyNumber = $this->coreParametersHelper->getParameter($channel.'_frequency_number');
         $defaultFrequencyTime   = $this->coreParametersHelper->getParameter($channel.'_frequency_time');
+        $defaultFrequencyUnit   = $this->coreParametersHelper->getParameter($channel.'_frequency_unit');
 
         $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules(
             $channel,
             $leadIds,
             $defaultFrequencyNumber,
             $defaultFrequencyTime,
+            $defaultFrequencyUnit,
             $statTableName,
             $statContactColumn,
             $statSentColumn
@@ -112,7 +116,7 @@ class MessageQueueModel extends FormModel
         $queuedContacts = [];
         if (!empty($dontSendTo)) {
             foreach ($dontSendTo as $frequencyRuleMet) {
-                $scheduleInterval = '1'.substr($frequencyRuleMet['frequency_time'], 0, 1);
+                $scheduleInterval = $frequencyRuleMet['frequency_unit'].substr($frequencyRuleMet['frequency_time'], 0, 1);
                 if ($messageQueue && isset($messageQueue[$frequencyRuleMet['lead_id']])) {
                     $this->rescheduleMessage($messageQueue[$frequencyRuleMet['lead_id']], $scheduleInterval);
                 } else {
@@ -146,6 +150,8 @@ class MessageQueueModel extends FormModel
      * @param array $options
      *
      * @return bool
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
     public function addToQueue(
         $leads,
@@ -162,7 +168,7 @@ class MessageQueueModel extends FormModel
         if (!$scheduledInterval) {
             $scheduledDate = new \DateTime();
         } elseif (!$scheduledInterval instanceof \DateTime) {
-            $scheduledInterval = (('H' === $scheduledInterval) ? 'PT' : 'P').$scheduledInterval;
+            $scheduledInterval = (('H' === $scheduledInterval || 'M' === $scheduledInterval) ? 'PT' : 'P').$scheduledInterval;
             $scheduledDate     = (new \DateTime())->add(new \DateInterval($scheduledInterval));
         }
 
@@ -346,7 +352,7 @@ class MessageQueueModel extends FormModel
             if (null == $rescheduleInterval) {
                 $rescheduleInterval = 'PT15M';
             } else {
-                $rescheduleInterval = (('H' === $rescheduleInterval) ? 'PT' : 'P').$rescheduleInterval;
+                $rescheduleInterval = (('H' === $rescheduleInterval || 'M' === $rescheduleInterval) ? 'PT' : 'P').$rescheduleInterval;
             }
 
             $rescheduleTo->add(new \DateInterval($rescheduleInterval));
