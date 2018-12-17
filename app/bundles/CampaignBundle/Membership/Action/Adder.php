@@ -80,13 +80,13 @@ class Adder
      */
     public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction)
     {
-        if (!$campaignMember->getCampaign()->allowRestart()) {
+        $wasRemoved = $campaignMember->wasManuallyRemoved();
+        if (!($wasRemoved && $isManualAction) && !$campaignMember->getCampaign()->allowRestart()) {
             // A contact cannot restart this campaign
 
             throw new ContactCannotBeAddedToCampaignException();
         }
 
-        $wasRemoved = $campaignMember->wasManuallyRemoved();
         if ($wasRemoved && !$isManualAction && null === $campaignMember->getDateLastExited()) {
             // Prevent contacts from being added back if they were manually removed but automatically added back
 
