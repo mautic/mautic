@@ -140,14 +140,14 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param       $leads
-     * @param       $channel
-     * @param       $channelId
-     * @param null  $scheduledInterval
-     * @param int   $maxAttempts
-     * @param int   $priority
-     * @param null  $campaignEventId
-     * @param array $options
+     * @param        $leads
+     * @param        $channel
+     * @param        $channelId
+     * @param string $scheduledInterval
+     * @param int    $maxAttempts
+     * @param int    $priority
+     * @param null   $campaignEventId
+     * @param array  $options
      *
      * @return bool
      *
@@ -230,6 +230,8 @@ class MessageQueueModel extends FormModel
      * @param $queue
      *
      * @return int
+     *
+     * @throws \Exception
      */
     public function processMessageQueue($queue)
     {
@@ -332,10 +334,12 @@ class MessageQueueModel extends FormModel
     /**
      * @param        $message
      * @param string $rescheduleInterval
-     * @param null   $leadId
-     * @param null   $channel
-     * @param null   $channelId
+     * @param int    $leadId
+     * @param string $channel
+     * @param int    $channelId
      * @param bool   $persist
+     *
+     * @throws \Exception
      */
     public function rescheduleMessage($message, $rescheduleInterval = null, $leadId = null, $channel = null, $channelId = null, $persist = false)
     {

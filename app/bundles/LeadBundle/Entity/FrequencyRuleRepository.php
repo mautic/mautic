@@ -89,8 +89,8 @@ class FrequencyRuleRepository extends CommonRepository
     }
 
     /**
-     * @param null $channel
-     * @param null $leadIds
+     * @param string       $channel
+     * @param string|array $leadIds
      *
      * @return array
      */

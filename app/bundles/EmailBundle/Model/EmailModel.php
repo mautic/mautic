@@ -1099,7 +1099,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $listErrors = $this->sendEmail($email, $leads, $options);
 
                 if (!empty($listErrors)) {
-                    $listFailedCount = count($listErrors);
+                    $listFailedCount = is_array($listErrors) ? count($listErrors) : 0;
 
                     $sentCount -= $listFailedCount;
                     $failedCount += $listFailedCount;
