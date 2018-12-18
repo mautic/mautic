@@ -55,8 +55,6 @@ class DashboardController extends FormController
         $dateRangeFilter['date_to']   = $filter['dateTo']->format(WidgetService::FORMAT_HUMAN);
         $dateRangeForm                = $this->get('form.factory')->create('daterange', $dateRangeFilter, ['action' => $action]);
 
-        $model->populateWidgetsContent($widgets, $filter);
-
         return $this->delegateView([
             'viewParameters' => [
                 'security'      => $this->get('mautic.security'),
@@ -89,15 +87,9 @@ class DashboardController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'security'      => $this->get('mautic.security'),
                 'widget'        => $widget,
             ],
             'contentTemplate' => 'MauticDashboardBundle:Dashboard:widget.html.php',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_dashboard_index',
-                'mauticContent' => 'dashboard',
-                'route'         => $this->generateUrl('mautic_dashboard_index'),
-            ],
         ]);
     }
 
