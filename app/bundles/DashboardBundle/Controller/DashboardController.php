@@ -14,6 +14,7 @@ namespace Mautic\DashboardBundle\Controller;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\DashboardBundle\Dashboard\Widget as WidgetService;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Form\Type\UploadType;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -41,8 +42,6 @@ class DashboardController extends AbstractFormController
             return $this->applyDashboardFileAction('global.default');
         }
 
-        $humanFormat     = 'M j, Y';
-        $mysqlFormat     = 'Y-m-d';
         $action          = $this->generateUrl('mautic_dashboard_index');
         $dateRangeFilter = $this->request->get('daterange', []);
 
@@ -51,23 +50,26 @@ class DashboardController extends AbstractFormController
             $session = $this->get('session');
             if (!empty($dateRangeFilter['date_from'])) {
                 $from = new \DateTime($dateRangeFilter['date_from']);
-                $session->set('mautic.daterange.form.from', $from->format($mysqlFormat));
+                $session->set('mautic.daterange.form.from', $from->format(WidgetService::FORMAT_MYSQL));
             }
 
             if (!empty($dateRangeFilter['date_to'])) {
                 $to = new \DateTime($dateRangeFilter['date_to']);
-                $session->set('mautic.daterange.form.to', $to->format($mysqlFormat.' 23:59:59'));
+                $session->set('mautic.daterange.form.to', $to->format(WidgetService::FORMAT_MYSQL.' 23:59:59'));
             }
 
             $model->clearDashboardCache();
         }
 
+        // Set new date range to the session, if present in POST
+        $this->get('mautic.dashboard.widget')->setFilter($this->request);
+
         // Load date range from session
         $filter = $model->getDefaultFilter();
 
         // Set the final date range to the form
-        $dateRangeFilter['date_from'] = $filter['dateFrom']->format($humanFormat);
-        $dateRangeFilter['date_to']   = $filter['dateTo']->format($humanFormat);
+        $dateRangeFilter['date_from'] = $filter['dateFrom']->format(WidgetService::FORMAT_HUMAN);
+        $dateRangeFilter['date_to']   = $filter['dateTo']->format(WidgetService::FORMAT_HUMAN);
         $dateRangeForm                = $this->get('form.factory')->create(DateRangeType::class, $dateRangeFilter, ['action' => $action]);
 
         $model->populateWidgetsContent($widgets, $filter);
@@ -79,6 +81,35 @@ class DashboardController extends AbstractFormController
                 'dateRangeForm' => $dateRangeForm->createView(),
             ],
             'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_dashboard_index',
+                'mauticContent' => 'dashboard',
+                'route'         => $this->generateUrl('mautic_dashboard_index'),
+            ],
+        ]);
+    }
+
+    /**
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function widgetAction()
+    {
+        $request = $this->get('request_stack')->getCurrentRequest();
+        if (!$request->isXmlHttpRequest()) {
+            return $this->redirectToRoute('mautic_dashboard_index');
+        }
+
+        $widgetId = (int) $request->attributes->get('widgetId');
+        /** @var @WidgetService $widgetService */
+        $widgetService = $this->get('mautic.dashboard.widget');
+        $widget        = $widgetService->get($widgetId);
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'security'      => $this->get('mautic.security'),
+                'widget'        => $widget,
+            ],
+            'contentTemplate' => 'MauticDashboardBundle:Dashboard:widget.html.php',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_dashboard_index',
                 'mauticContent' => 'dashboard',
