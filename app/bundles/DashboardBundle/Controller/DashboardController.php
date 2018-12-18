@@ -90,17 +90,16 @@ class DashboardController extends AbstractFormController
     /**
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function widgetAction()
+    public function widgetAction($widgetId)
     {
         $request = $this->get('request_stack')->getCurrentRequest();
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('mautic_dashboard_index');
         }
 
-        $widgetId = (int) $request->attributes->get('widgetId');
         /** @var @WidgetService $widgetService */
         $widgetService = $this->get('mautic.dashboard.widget');
-        $widget        = $widgetService->get($widgetId);
+        $widget        = $widgetService->get((int) $widgetId);
 
         return $this->delegateView([
             'viewParameters' => [
