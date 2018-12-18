@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class Widget
 {
@@ -61,9 +63,13 @@ class Widget
         /** @var \Mautic\DashboardBundle\Entity\Widget $widget */
         $widget = $this->dashboardModel->getEntity($widgetId);
 
+        if (!$widget->getId()) {
+            throw new NotFoundHttpException('Not found.');
+        }
+
         if ($widget->getCreatedBy() !== $this->userHelper->getUser()->getId()) {
             // Unauthorized access
-            return false;
+            throw new AccessDeniedException();
         }
 
         $filter = $this->dashboardModel->getDefaultFilter();
