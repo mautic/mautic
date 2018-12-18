@@ -90,6 +90,14 @@ class BuilderSectionType extends AbstractType
             'required'   => false,
             'attr'       => ['class' => 'form-control'],
         ]);
+
+        // Wrapper - Background Position
+        $builder->add('wrapper-background-position', 'text', [
+            'label'      => 'mautic.core.wrapper.background.position',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => ['class' => 'form-control'],
+        ]);
     }
 
     /**
