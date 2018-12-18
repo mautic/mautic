@@ -13,6 +13,7 @@ Mautic.loadWidgets = function () {
             url: '/s/dashboard/widget/'+widgetId+'?ignoreAjax=true',
         }).done(function(response) {
             element.html(response);
+            Mautic.renderCharts();
         });
     });
 }
