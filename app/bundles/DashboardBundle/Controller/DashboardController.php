@@ -18,6 +18,7 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class DashboardController.
@@ -77,10 +78,10 @@ class DashboardController extends FormController
     {
         $request = $this->get('request_stack')->getCurrentRequest();
         if (!$request->isXmlHttpRequest()) {
-            return $this->redirectToRoute('mautic_dashboard_index');
+            throw new NotFoundHttpException('Not found.');
         }
 
-        /** @var @WidgetService $widgetService */
+        /** @var WidgetService $widgetService */
         $widgetService = $this->get('mautic.dashboard.widget');
         $widget        = $widgetService->get((int) $widgetId);
 
