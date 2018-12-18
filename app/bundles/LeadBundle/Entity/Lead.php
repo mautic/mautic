@@ -620,7 +620,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
