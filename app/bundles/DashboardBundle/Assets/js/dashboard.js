@@ -2,7 +2,20 @@
 Mautic.dashboardOnLoad = function (container) {
     Mautic.initWidgetSorting();
     Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
+    Mautic.loadWidgets();
 };
+
+Mautic.loadWidgets = function () {
+    jQuery('.widget').each(function() {
+        let widgetId = jQuery(this).attr('data-widget-id');
+        let element = jQuery('.widget[data-widget-id="'+widgetId+'"]');
+        jQuery.ajax({
+            url: 'http://mautic-cloud.local/index_dev.php/s/dashboard/widget/'+widgetId+'?ignoreAjax=true',
+        }).done(function(response) {
+            element.html(response);
+        });
+    });
+}
 
 Mautic.dashboardOnUnload = function(id) {
     // Trash initialized dashboard vars on app content change.
