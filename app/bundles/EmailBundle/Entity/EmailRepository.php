@@ -630,6 +630,7 @@ class EmailRepository extends CommonRepository
             ->where($this->getTableAlias().'.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->andWhere('e.isPublished = 0')
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
 
