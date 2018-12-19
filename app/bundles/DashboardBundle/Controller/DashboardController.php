@@ -100,6 +100,7 @@ class DashboardController extends AbstractFormController
 
         /** @var WidgetService $widgetService */
         $widgetService = $this->get('mautic.dashboard.widget');
+        $widgetService->setFilter($request);
         $widget        = $widgetService->get((int) $widgetId);
 
         return $this->delegateView([

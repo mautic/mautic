@@ -1,22 +1,51 @@
 //DashboardBundle
+Mautic.widhgetUrl = '/s/dashboard/widget/';
+
 Mautic.dashboardOnLoad = function (container) {
     Mautic.initWidgetSorting();
     Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
     Mautic.loadWidgets();
+    Mautic.initDashboardFilter();
+
+};
+
+Mautic.initDashboardFilter = function () {
+    // Ajaxify dashboard filter results
+    var form = jQuery('form[name="daterange"]');
+    form
+        .unbind('submit')
+        .on('submit', function(e){
+            e.preventDefault();
+            jQuery('.widget').each(function() {
+                let widgetId = jQuery(this).attr('data-widget-id');
+                let element = jQuery('.widget[data-widget-id="' + widgetId + '"]');
+                jQuery.ajax({
+                    type: 'POST',
+                    url: Mautic.widhgetUrl + widgetId + '?ignoreAjax=true',
+                    data: form.serializeArray(),
+                    success: function (response) {
+                        element.html(response);
+                        Mautic.renderCharts();
+                    }
+                });
+            });
+            e.stopPropagation();
+        });
 };
 
 Mautic.loadWidgets = function () {
+    // Ajaxify dashboard load
     jQuery('.widget').each(function() {
         let widgetId = jQuery(this).attr('data-widget-id');
         let element = jQuery('.widget[data-widget-id="'+widgetId+'"]');
         jQuery.ajax({
-            url: '/s/dashboard/widget/'+widgetId+'?ignoreAjax=true',
+            url: Mautic.widhgetUrl+widgetId+'?ignoreAjax=true',
         }).done(function(response) {
             element.html(response);
             Mautic.renderCharts();
         });
     });
-}
+};
 
 Mautic.dashboardOnUnload = function(id) {
     // Trash initialized dashboard vars on app content change.
