@@ -2059,9 +2059,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                                 $unitAmount = 1;
                             }
 
+                            $number = (int) $number;
+                            $unitAmount = (int) $unitAmount;
+
                             switch ($unit) {
                                 case FrequencyRule::TIME_MONTH:
-                                    $number = (int) $number / $unitAmount;
+                                    $number = $number / $unitAmount;
                                     break;
                                 case FrequencyRule::TIME_WEEK:
                                     $number = $number * (4 / $unitAmount);
@@ -2077,8 +2080,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                             return $number;
                         };
 
-                        $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time'], $a['frequency_time']);
-                        $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time'], $b['frequency_time']);
+                        $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time'], $a['frequency_unit']);
+                        $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time'], $b['frequency_unit']);
 
                         if ($aFrequency === $bFrequency) {
                             return 0;

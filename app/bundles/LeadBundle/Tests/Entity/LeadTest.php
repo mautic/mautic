@@ -27,6 +27,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
             'channel1' => [
                 'frequencyNumber'  => '',
                 'frequencyTime'    => '',
+                'frequencyUnit'    => '',
                 'preferredChannel' => 0,
                 'pauseFromDate'    => '2016-01-01',
                 'pauseToDate'      => '2100-01-01',
@@ -34,6 +35,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
             'channel2' => [
                 'frequencyNumber'  => '',
                 'frequencyTime'    => '',
+                'frequencyUnit'    => '',
                 'preferredChannel' => 1,
                 'pauseFromDate'    => '',
                 'pauseToDate'      => '',
@@ -41,6 +43,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
             'channel3' => [
                 'frequencyNumber'  => '7',
                 'frequencyTime'    => FrequencyRule::TIME_DAY, // 210
+                'frequencyUnit'    => 1,
                 'preferredChannel' => 0,
                 'pauseFromDate'    => '',
                 'pauseToDate'      => '',
@@ -48,6 +51,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
             'channel4' => [
                 'frequencyNumber'  => '',
                 'frequencyTime'    => '',
+                'frequencyUnit'    => '',
                 'preferredChannel' => 0,
                 'pauseFromDate'    => '',
                 'pauseToDate'      => '',
@@ -55,6 +59,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
             'channel5' => [
                 'frequencyNumber'  => '10',
                 'frequencyTime'    => FrequencyRule::TIME_WEEK, // 40
+                'frequencyUnit'    => 1,
                 'preferredChannel' => 0,
                 'pauseFromDate'    => '',
                 'pauseToDate'      => '',
@@ -62,6 +67,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
             'channel6' => [
                 'frequencyNumber'  => '10',
                 'frequencyTime'    => FrequencyRule::TIME_MONTH, // 10
+                'frequencyUnit'    => 1,
                 'preferredChannel' => 0,
                 'pauseFromDate'    => '',
                 'pauseToDate'      => '',
@@ -75,6 +81,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
                 ->setPreferredChannel($rule['preferredChannel'])
                 ->setFrequencyNumber($rule['frequencyNumber'])
                 ->setFrequencyTime($rule['frequencyTime'])
+                ->setFrequencyUnit($rule['frequencyUnit'])
                 ->setChannel($channel)
                 ->setPauseFromDate(($rule['pauseFromDate']) ? new \DateTime($rule['pauseFromDate']) : null)
                 ->setPauseToDate((($rule['pauseToDate']) ? new \DateTime($rule['pauseToDate']) : null));
