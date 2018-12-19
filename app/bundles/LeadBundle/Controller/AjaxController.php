@@ -127,10 +127,17 @@ class AjaxController extends CommonAjaxController
         }
 
         $field      = $fieldModel->getEntityByAlias($fieldAlias);
-        $isList     = in_array($field->getType(), ['lookup', 'select', 'multiselect', 'timezone', 'region', 'country']);
         $isBehavior = empty($field);
 
-        if ($isBehavior || !$isList) {
+        if ($isBehavior) {
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        // Selet field types that make sense to provide typeahead for.
+        $isLookup     = in_array($field->getType(), ['lookup']);
+        $shouldLookup = in_array($field->getAlias(), ['city', 'company', 'title']);
+
+        if (!$isLookup && !$shouldLookup) {
             return $this->sendJsonResponse($dataArray);
         }
 
