@@ -970,6 +970,21 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
 };
 
 /**
+ * Check and destroy chosen select
+ *
+ * @param el
+ */
+Mautic.destroyChosen = function(el) {
+    var eventObject = mQuery._data(el.get(0), 'events');
+
+    // Check if object has chosen event
+    if (eventObject !== undefined && eventObject['chosen:activate'] !== undefined) {
+        el.chosen('destroy');
+        el.off('chosen:activate chosen:close chosen:open chosen:updated'); //Clear chosen events because chosen('destroy') doesn't
+    }
+};
+
+/**
  * Activate a typeahead lookup
  *
  * @param field

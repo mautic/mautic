@@ -35,14 +35,19 @@ class DateHelper extends Helper
     /**
      * DateHelper constructor.
      *
-     * @param                     $dateFullFormat
-     * @param                     $dateShortFormat
-     * @param                     $dateOnlyFormat
-     * @param                     $timeOnlyFormat
+     * @param string              $dateFullFormat
+     * @param string              $dateShortFormat
+     * @param string              $dateOnlyFormat
+     * @param string              $timeOnlyFormat
      * @param TranslatorInterface $translator
      */
-    public function __construct($dateFullFormat, $dateShortFormat, $dateOnlyFormat, $timeOnlyFormat, TranslatorInterface $translator)
-    {
+    public function __construct(
+        $dateFullFormat,
+        $dateShortFormat,
+        $dateOnlyFormat,
+        $timeOnlyFormat,
+        TranslatorInterface $translator
+    ) {
         $this->formats = [
             'datetime' => $dateFullFormat,
             'short'    => $dateShortFormat,
@@ -163,6 +168,12 @@ class DateHelper extends Helper
     {
         if (empty($datetime)) {
             return '';
+        }
+
+        if ($datetime instanceof \DateTime) {
+            // Fix time shift with timezone conversion into string representation
+            $timezone  = ($datetime->getTimezone()->getName() === 'UTC') ? 'utc' : $timezone;
+            $datetime  = $datetime->format($fromFormat);
         }
 
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);

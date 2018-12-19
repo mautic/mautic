@@ -170,8 +170,8 @@ class CoreSubscriber extends CommonSubscriber
 
             //dispatch on login events
             if ($this->dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
-                $event = new LoginEvent($this->userHelper->getUser());
-                $this->dispatcher->dispatch(UserEvents::USER_LOGIN, $event);
+                $loginEvent = new LoginEvent($this->userHelper->getUser());
+                $this->dispatcher->dispatch(UserEvents::USER_LOGIN, $loginEvent);
             }
         } else {
             $session->remove('mautic.user');

@@ -237,26 +237,19 @@ class WebhookModel extends FormModel
             return;
         }
 
-        $webhookList = [];
-
         /** @var \Mautic\WebhookBundle\Entity\Event $event */
         foreach ($webhookEvents as $event) {
-            $webhook       = $event->getWebhook();
-            $webhookList[] = $webhook;
+            $webhook = $event->getWebhook();
+            $queue   = $this->queueWebhook($webhook, $event, $payload, $serializationGroups);
 
-            $webhook->addQueue($this->queueWebhook($webhook, $event, $payload, $serializationGroups));
-
-            // add the queuelist and save everything if command process
-            if ($this->queueMode == self::COMMAND_PROCESS) {
-                $this->saveEntity($webhook);
+            if (self::COMMAND_PROCESS === $this->queueMode) {
+                // Queue to the database to process later
+                $this->getQueueRepository()->saveEntity($queue);
+            } else {
+                // Immediately process
+                $this->processWebhook($webhook, $queue);
             }
         }
-
-        if ($this->queueMode == self::IMMEDIATE_PROCESS) {
-            $this->processWebhooks($webhookList);
-        }
-
-        return;
     }
 
     /**
@@ -301,17 +294,18 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @param Webhook $webhook
+     * @param Webhook      $webhook
+     * @param WebhookQueue $queue
      *
      * @return bool
      */
-    public function processWebhook(Webhook $webhook)
+    public function processWebhook(Webhook $webhook, WebhookQueue $queue = null)
     {
         // instantiate new http class
         $http = new Http();
 
         // get the webhook payload
-        $payload = $this->getWebhookPayload($webhook);
+        $payload = $this->getWebhookPayload($webhook, $queue);
 
         // if there wasn't a payload we can stop here
         if (empty($payload)) {
@@ -337,7 +331,7 @@ class WebhookModel extends FormModel
             $this->addLog($webhook, $response->code, (microtime(true) - $start), $response->body);
 
             // throw an error exception if we don't get a 200 back
-            if ($response->code >= 300 && $response->code < 200) {
+            if ($response->code >= 300 || $response->code < 200) {
                 // The reciever of the webhook is telling us to stop bothering him with our requests by code 410
                 if ($response->code == 410) {
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
@@ -498,11 +492,12 @@ class WebhookModel extends FormModel
     /**
      * Get the payload from the webhook.
      *
-     * @param Webhook $webhook
+     * @param Webhook      $webhook
+     * @param WebhookQueue $queue
      *
      * @return array
      */
-    public function getWebhookPayload(Webhook $webhook)
+    public function getWebhookPayload(Webhook $webhook, WebhookQueue $queue = null)
     {
         if ($payload = $webhook->getPayload()) {
             return $payload;
@@ -513,7 +508,7 @@ class WebhookModel extends FormModel
         if ($this->queueMode === self::COMMAND_PROCESS) {
             $queuesArray = $this->getWebhookQueues($webhook);
         } else {
-            $queuesArray = [$webhook->getQueues()];
+            $queuesArray = [isset($queue) ? [$queue] : []];
         }
 
         /* @var WebhookQueue $queue */
@@ -541,10 +536,6 @@ class WebhookModel extends FormModel
 
                     // Clear the WebhookQueue entity from memory
                     $this->em->detach($queue);
-                } else {
-                    // remove the queue from the webhook right away so it won't get persisted to DB
-                    // This happens on immediate send only
-                    $webhook->removeQueue($queue);
                 }
             }
         }

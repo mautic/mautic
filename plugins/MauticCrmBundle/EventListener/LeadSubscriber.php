@@ -62,20 +62,27 @@ class LeadSubscriber extends CommonSubscriber
     public function onLeadPostSave(Events\LeadEvent $event)
     {
         $lead = $event->getLead();
+        if ($lead->isAnonymous()) {
+            // Ignore this contact
+            return;
+        }
         if ($lead->getEventData('pipedrive.webhook')) {
             // Don't export what was just imported
             return;
         }
-
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
+        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
             return;
         }
-
         $this->leadExport->setIntegration($integrationObject);
-        $this->leadExport->update($lead);
+
+        $changes = $lead->getChanges(true);
+        if (!empty($changes['dateIdentified'])) {
+            $this->leadExport->create($lead);
+        } else {
+            $this->leadExport->update($lead);
+        }
     }
 
     /**
@@ -91,11 +98,9 @@ class LeadSubscriber extends CommonSubscriber
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
+        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
             return;
         }
-
         $this->leadExport->setIntegration($integrationObject);
         $this->leadExport->delete($lead);
     }
@@ -113,11 +118,9 @@ class LeadSubscriber extends CommonSubscriber
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
+        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
             return;
         }
-
         $this->leadExport->setIntegration($integrationObject);
         $this->leadExport->update($lead);
     }

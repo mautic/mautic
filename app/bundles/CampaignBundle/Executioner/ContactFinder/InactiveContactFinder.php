@@ -78,6 +78,11 @@ class InactiveContactFinder
      */
     public function getContacts($campaignId, Event $decisionEvent, ContactLimiter $limiter)
     {
+        if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
+            // Limit was reached but do not trigger the NoContactsFoundException
+            return new ArrayCollection();
+        }
+
         // Get list of all campaign leads
         $decisionParentEvent            = $decisionEvent->getParent();
         $this->campaignMemberDatesAdded = $this->campaignLeadRepository->getInactiveContacts(

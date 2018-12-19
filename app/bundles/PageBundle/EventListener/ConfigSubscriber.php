@@ -59,6 +59,7 @@ class ConfigSubscriber extends CommonSubscriber
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
             // parameters defined this way because of the reason as above.
             'parameters' => [
+                'anonymize_ip'                          => false,
                 'track_contact_by_ip'                   => false,
                 'track_by_tracking_url'                 => false,
                 'track_by_fingerprint'                  => false,

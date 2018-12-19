@@ -88,6 +88,51 @@ class ListApiController extends CommonApiController
     }
 
     /**
+     * Adds a leads to a list.
+     *
+     * @param int $id segement ID
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function addLeadsAction($id)
+    {
+        $contactIds = $this->request->request->get('ids');
+        if (null === $contactIds) {
+            return $this->returnError('mautic.core.error.badrequest', Codes::HTTP_BAD_REQUEST);
+        }
+
+        $entity = $this->model->getEntity($id);
+
+        if (null === $entity) {
+            return $this->notFound();
+        }
+
+        // Does the user have access to the list
+        $lists = $this->model->getUserLists();
+        if (!isset($lists[$id])) {
+            return $this->accessDenied();
+        }
+
+        $responseDetail = [];
+        foreach ($contactIds as $contactId) {
+            $contact = $this->checkLeadAccess($contactId, 'edit');
+            if ($contact instanceof Response) {
+                $responseDetail[$contactId] = ['success' => false];
+            } else {
+                /* @var \Mautic\LeadBundle\Entity\Lead $contact */
+                $this->getModel('lead')->addToLists($contact, $entity);
+                $responseDetail[$contact->getId()] = ['success' => true];
+            }
+        }
+
+        $view = $this->view(['success' => 1, 'details' => $responseDetail], Codes::HTTP_OK);
+
+        return $this->handleView($view);
+    }
+
+    /**
      * Removes given contact from a list.
      *
      * @param int $id     List ID
