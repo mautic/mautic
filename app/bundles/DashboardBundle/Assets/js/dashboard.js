@@ -37,6 +37,7 @@ Mautic.dashboardFilterPreventSubmit = function() {
     button.html('<i class="fa fa-spin fa-spinner"></i>');
     jQuery('.widget').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
     form
+        .unbind('submit')
         .on('submit', function(e){
             e.stopPropagation();
         });
