@@ -250,7 +250,7 @@ class ScheduledExecutioner implements ExecutionerInterface
 
         // replaces call to getScheduledCounts
         $eventIds        = $this->repo->getPublishedEventIds($this->campaign->getId());
-        $scheduledEvents = $this->repo->getScheduledEvents($eventIds, $this->now, $this->limiter);
+        $scheduledEvents = $this->repo->getScheduledEvents($eventIds, $this->now, $this->limiter, $withCounts);
 
         $totalScheduledCount   = $scheduledEvents ? array_sum($scheduledEvents) : 0;
         $this->scheduledEvents = $scheduledEvents ? array_keys($scheduledEvents) : [];
