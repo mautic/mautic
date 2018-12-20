@@ -41,7 +41,7 @@ Mautic.dashboardFilterPreventSubmit = function() {
     form
         .unbind('submit')
         .on('submit', function(e){
-            e.stopPropagation();
+            e.preventDefault();
         });
 };
 
