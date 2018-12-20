@@ -18,6 +18,7 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -232,19 +233,13 @@ class DashboardController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $returnUrl = $this->generateUrl('mautic_dashboard_index');
-        $success   = 0;
-        $flashes   = [];
+        $request = $this->get('request_stack')->getCurrentRequest();
 
-        $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticDashboardBundle:Dashboard:index',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_dashboard_index',
-                'success'       => $success,
-                'mauticContent' => 'dashboard',
-            ],
-        ];
+        if (!$request->isXmlHttpRequest()) {
+            throw new BadRequestHttpException();
+        }
+
+        $success = 1;
 
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
         $model  = $this->getModel('dashboard');
@@ -255,6 +250,7 @@ class DashboardController extends FormController
                 'msg'     => 'mautic.api.client.error.notfound',
                 'msgVars' => ['%id%' => $objectId],
             ];
+            $success = 0;
         } else {
             $model->deleteEntity($entity);
             $name      = $entity->getName();
@@ -268,13 +264,11 @@ class DashboardController extends FormController
             ];
         }
 
-        return $this->postActionRedirect(
-            array_merge(
-                $postActionVars,
-                [
-                    'flashes' => $flashes,
-                ]
-            )
+        return new JsonResponse(
+            [
+                'success' => $success,
+                'flashes' => $flashes,
+            ]
         );
     }
 
