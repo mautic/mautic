@@ -24,6 +24,7 @@ if (!isset($class)) {
         </span>
         <?php echo $view['form']->widget($dateRangeForm['date_to']); ?>
         <span class="input-group-btn">
+            <div class="spinner" style="display:none;"><i class="fa fa-spin fa-spinner"></i></div>
             <?php echo $view['form']->row($dateRangeForm['apply']); ?>
         </span>
     </div>
