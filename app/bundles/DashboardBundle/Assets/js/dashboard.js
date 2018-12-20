@@ -1,21 +1,56 @@
 //DashboardBundle
 Mautic.widhgetUrl = '/s/dashboard/widget/';
 
+Mautic.dashboardSubmitButtonText = ''; // Button text, to be get and shown instead of spinner
+
 Mautic.dashboardOnLoad = function (container) {
-    Mautic.initWidgetSorting();
-    Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
     Mautic.loadWidgets();
     Mautic.initDashboardFilter();
+    Mautic.initWidgetSorting();
+    Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
+};
 
+Mautic.loadWidgets = function () {
+    // Ajaxify dashboard load
+    Mautic.dashboardFilterPreventSubmit();
+
+    jQuery('.widget').each(function() {
+        let widgetId = jQuery(this).attr('data-widget-id');
+        let element = jQuery('.widget[data-widget-id="'+widgetId+'"]');
+        jQuery.ajax({
+            url: Mautic.widhgetUrl+widgetId+'?ignoreAjax=true',
+        }).done(function(response) {
+            element.html(response);
+            Mautic.renderCharts();
+        });
+    });
+
+    jQuery(document).ajaxComplete(function(){
+        Mautic.initDashboardFilter();
+    });
+};
+
+Mautic.dashboardFilterPreventSubmit = function() {
+    let form = jQuery('form[name="daterange"]');
+    let button = form.find('button:first');
+    Mautic.dashboardSubmitButtonText = button.text();
+    button.html('<i class="fa fa-spin fa-spinner"></i>');
+    jQuery('.widget').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
+    form
+        .on('submit', function(e){
+            e.stopPropagation();
+        });
 };
 
 Mautic.initDashboardFilter = function () {
     // Ajaxify dashboard filter results
-    var form = jQuery('form[name="daterange"]');
+    let form = jQuery('form[name="daterange"]');
+    form.find('button').html(Mautic.dashboardSubmitButtonText);
     form
         .unbind('submit')
         .on('submit', function(e){
             e.preventDefault();
+            Mautic.dashboardFilterPreventSubmit();
             jQuery('.widget').each(function() {
                 let widgetId = jQuery(this).attr('data-widget-id');
                 let element = jQuery('.widget[data-widget-id="' + widgetId + '"]');
@@ -29,22 +64,7 @@ Mautic.initDashboardFilter = function () {
                     }
                 });
             });
-            e.stopPropagation();
         });
-};
-
-Mautic.loadWidgets = function () {
-    // Ajaxify dashboard load
-    jQuery('.widget').each(function() {
-        let widgetId = jQuery(this).attr('data-widget-id');
-        let element = jQuery('.widget[data-widget-id="'+widgetId+'"]');
-        jQuery.ajax({
-            url: Mautic.widhgetUrl+widgetId+'?ignoreAjax=true',
-        }).done(function(response) {
-            element.html(response);
-            Mautic.renderCharts();
-        });
-    });
 };
 
 Mautic.dashboardOnUnload = function(id) {

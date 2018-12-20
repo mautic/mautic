@@ -127,3 +127,12 @@
     }
 }
 
+form[name="daterange"] button {
+    width: 62px;
+}
+
+#dashboard-widgets .spinner {
+    text-align: center;
+    line-height: 250px;
+    font-size: 24px;
+}
