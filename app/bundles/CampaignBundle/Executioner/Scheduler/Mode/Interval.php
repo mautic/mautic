@@ -170,8 +170,9 @@ class Interval implements ScheduleModeInterface
         }
 
         if (
-            null === $event->getTriggerHour() && (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour())
-            && empty($event->getTriggerRestrictedDaysOfWeek())
+            null === $event->getTriggerHour() &&
+            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
+            empty($event->getTriggerRestrictedDaysOfWeek())
         ) {
             return false;
         }
@@ -206,7 +207,8 @@ class Interval implements ScheduleModeInterface
         } elseif ($startTime && $endTime) {
             $groupDateTime = $this->getExecutionDateTimeBetweenHours($contact, $startTime, $endTime, $diff, $eventId, $compareFromDateTime);
         } else {
-            $groupDateTime = $compareFromDateTime;
+            $groupDateTime = clone $compareFromDateTime;
+            $groupDateTime->add($diff);
         }
 
         if ($daysOfWeek) {
@@ -331,7 +333,13 @@ class Interval implements ScheduleModeInterface
         $testStopDateTime = clone $groupExecutionDate;
         $testStopDateTime->setTime($endTime->format('H'), $endTime->format('i'));
 
-        if ($groupExecutionDate < $testStartDateTime || $groupExecutionDate > $testStopDateTime) {
+        if ($groupExecutionDate < $testStartDateTime) {
+            // Too early so set it to the start date
+            return $testStartDateTime;
+        }
+
+        if ($groupExecutionDate > $testStopDateTime) {
+            // Too late so try again tomorrow
             $groupExecutionDate->modify('+1 day')->setTime($startTime->format('H'), $startTime->format('i'));
         }
 

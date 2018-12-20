@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityRepository;
@@ -766,7 +767,7 @@ class CommonRepository extends EntityRepository
     /**
      * Persist an array of entities.
      *
-     * @param array $entities
+     * @param array|ArrayCollection $entities
      */
     public function saveEntities($entities)
     {

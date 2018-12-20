@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Tests\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
@@ -62,6 +63,11 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
      */
     private $contactTracker;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|LeadRepository
+     */
+    private $leadRepository;
+
     protected function setUp()
     {
         $this->leadModel = $this->getMockBuilder(LeadModel::class)
@@ -89,6 +95,10 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->contactTracker = $this->getMockBuilder(ContactTracker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -415,7 +425,8 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
             $this->decisionExecutioner,
             $this->eventCollector,
             $this->eventScheduler,
-            $this->contactTracker
+            $this->contactTracker,
+            $this->leadRepository
         );
     }
 }

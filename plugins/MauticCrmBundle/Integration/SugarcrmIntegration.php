@@ -520,7 +520,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $leadIds
                         );
 
-                        $saugarLeadData = [];
+                        $sugarLeadData = [];
                         foreach ($sugarIds as $ids) {
                             $leadId = $ids['internal_entity_id'];
                             if (isset($leadActivity[$leadId])) {

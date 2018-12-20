@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -27,7 +28,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -179,6 +179,11 @@ class LeadModel extends FormModel
     private $legacyLeadModel;
 
     /**
+     * @var IpAddressModel
+     */
+    private $ipAddressModel;
+
+    /**
      * @var bool
      */
     private $repoSetup = false;
@@ -194,8 +199,6 @@ class LeadModel extends FormModel
     private $fieldsByGroup = [];
 
     /**
-     * LeadModel constructor.
-     *
      * @param RequestStack         $requestStack
      * @param CookieHelper         $cookieHelper
      * @param IpLookupHelper       $ipLookupHelper
@@ -213,6 +216,7 @@ class LeadModel extends FormModel
      * @param ContactTracker       $contactTracker
      * @param DeviceTracker        $deviceTracker
      * @param LegacyLeadModel      $legacyLeadModel
+     * @param IpAddressModel       $ipAddressModel
      */
     public function __construct(
         RequestStack $requestStack,
@@ -231,7 +235,8 @@ class LeadModel extends FormModel
         UserProvider $userProvider,
         ContactTracker $contactTracker,
         DeviceTracker $deviceTracker,
-        LegacyLeadModel $legacyLeadModel
+        LegacyLeadModel $legacyLeadModel,
+        IpAddressModel $ipAddressModel
     ) {
         $this->request              = $requestStack->getCurrentRequest();
         $this->cookieHelper         = $cookieHelper;
@@ -250,6 +255,7 @@ class LeadModel extends FormModel
         $this->contactTracker       = $contactTracker;
         $this->deviceTracker        = $deviceTracker;
         $this->legacyLeadModel      = $legacyLeadModel;
+        $this->ipAddressModel       = $ipAddressModel;
     }
 
     /**
@@ -535,6 +541,8 @@ class LeadModel extends FormModel
 
         $this->setEntityDefaultValues($entity);
 
+        $this->ipAddressModel->saveIpAddressesReferencesForContact($entity);
+
         parent::saveEntity($entity, $unlock);
 
         if (!empty($company)) {
@@ -779,6 +787,38 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Obtains a list of leads based a list of IDs.
+     *
+     * @param array $ids
+     *
+     * @return Paginator
+     */
+    public function getLeadsByIds(array $ids)
+    {
+        return $this->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => 'l.id',
+                        'expr'   => 'in',
+                        'value'  => $ids,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @param Lead $contact
+     *
+     * @return bool
+     */
+    public function canEditContact(Lead $contact)
+    {
+        return $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser());
+    }
+
+    /**
      * Gets the details of a lead if not already set.
      *
      * @param $lead
@@ -902,8 +942,6 @@ class LeadModel extends FormModel
     public function getContactFromRequest($queryFields = [])
     {
         // @todo Instantiate here until we can remove circular dependency on LeadModel in order to make it a service
-        /** @var StatRepository $emailStatRepository */
-        $emailStatRepository = $this->em->getRepository('MauticEmailBundle:Stat');
         $requestStack        = new RequestStack();
         $requestStack->push($this->request);
         $contactRequestHelper = new ContactRequestHelper(
@@ -911,10 +949,10 @@ class LeadModel extends FormModel
             $this->contactTracker,
             $this->coreParametersHelper,
             $this->ipLookupHelper,
-            $emailStatRepository,
             $this->getDeviceRepository(),
             $requestStack,
-            $this->logger
+            $this->logger,
+            $this->dispatcher
         );
 
         return $contactRequestHelper->getContactFromQuery($queryFields);
@@ -995,11 +1033,11 @@ class LeadModel extends FormModel
      *
      * @return mixed
      */
-    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false)
+    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
 
-        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic);
+        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
 
     /**
@@ -1139,8 +1177,8 @@ class LeadModel extends FormModel
         $channels       = $this->getPreferenceChannels();
 
         foreach ($channels as $ch) {
-            if (empty($data['preferred_channel'])) {
-                $data['preferred_channel'] = $ch;
+            if (empty($data['lead_channels']['preferred_channel'])) {
+                $data['lead_channels']['preferred_channel'] = $ch;
             }
 
             $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
@@ -1148,19 +1186,19 @@ class LeadModel extends FormModel
             $frequencyRule->setLead($lead);
             $frequencyRule->setDateAdded(new \DateTime());
 
-            if (!empty($data['frequency_number_'.$ch]) && !empty($data['frequency_time_'.$ch])) {
-                $frequencyRule->setFrequencyNumber($data['frequency_number_'.$ch]);
-                $frequencyRule->setFrequencyTime($data['frequency_time_'.$ch]);
+            if (!empty($data['lead_channels']['frequency_number_'.$ch]) && !empty($data['lead_channels']['frequency_time_'.$ch])) {
+                $frequencyRule->setFrequencyNumber($data['lead_channels']['frequency_number_'.$ch]);
+                $frequencyRule->setFrequencyTime($data['lead_channels']['frequency_time_'.$ch]);
             } else {
                 $frequencyRule->setFrequencyNumber(null);
                 $frequencyRule->setFrequencyTime(null);
             }
 
-            $frequencyRule->setPauseFromDate(!empty($data['contact_pause_start_date_'.$ch]) ? $data['contact_pause_start_date_'.$ch] : null);
-            $frequencyRule->setPauseToDate(!empty($data['contact_pause_end_date_'.$ch]) ? $data['contact_pause_end_date_'.$ch] : null);
+            $frequencyRule->setPauseFromDate(!empty($data['lead_channels']['contact_pause_start_date_'.$ch]) ? $data['lead_channels']['contact_pause_start_date_'.$ch] : null);
+            $frequencyRule->setPauseToDate(!empty($data['lead_channels']['contact_pause_end_date_'.$ch]) ? $data['lead_channels']['contact_pause_end_date_'.$ch] : null);
 
             $frequencyRule->setLead($lead);
-            $frequencyRule->setPreferredChannel($data['preferred_channel'] === $ch);
+            $frequencyRule->setPreferredChannel($data['lead_channels']['preferred_channel'] === $ch);
 
             if ($persist) {
                 $entities[$ch] = $frequencyRule;

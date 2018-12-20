@@ -8,8 +8,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$leadId   = $lead->getId();
-$leadName = $lead->getPrimaryIdentifier();
 ?>
 
     <?php echo $view['form']->start($form); ?>
@@ -37,8 +35,7 @@ $leadName = $lead->getPrimaryIdentifier();
             </thead>
             <tbody >
 
-
-            <?php foreach ($form['subscribed_channels']->vars['choices'] as $channel): ?>
+            <?php foreach ($form['lead_channels']['subscribed_channels']->vars['choices'] as $channel): ?>
                 <?php
                 $contactMe     = isset($leadChannels[$channel->value]);
                 $isContactable = $contactMe ? '' : 'text-muted';
@@ -49,7 +46,7 @@ $leadName = $lead->getPrimaryIdentifier();
                 <tr>
                     <th style="vertical-align: top" class="col-md-1">
                         <input type="checkbox" id="<?php echo $channel->value ?>"
-                               name="lead_contact_frequency_rules[subscribed_channels][]" class="control-label"
+                               name="lead_contact_frequency_rules[lead_channels][subscribed_channels][]" class="control-label"
                                onclick="Mautic.togglePreferredChannel(this.value);"
                                value="<?php echo $view->escape($channel->value) ?>" <?php echo $checked; ?>>
                     </th>
@@ -62,19 +59,19 @@ $leadName = $lead->getPrimaryIdentifier();
                             <div>
                                 <div class="pull-left">
                                     <?php
-                                    $attr = $form['frequency_number_'.$channel->value]->vars['attr'];
+                                    $attr = $form['lead_channels']['frequency_number_'.$channel->value]->vars['attr'];
                                     $attr['class'] .= ' pull-left';
                                     ?>
-                                    <?php echo $view['form']->widget($form['frequency_number_'.$channel->value], ['attr' => $attr]); ?>
-                                    <?php echo $view['form']->label($form['frequency_time_'.$channel->value]); ?>
-                                    <div class="frequency-select"><?php echo $view['form']->widget($form['frequency_time_'.$channel->value]); ?></div>
+                                    <?php echo $view['form']->widget($form['lead_channels']['frequency_number_'.$channel->value], ['attr' => $attr]); ?>
+                                    <?php echo $view['form']->label($form['lead_channels']['frequency_time_'.$channel->value]); ?>
+                                    <div class="frequency-select"><?php echo $view['form']->widget($form['lead_channels']['frequency_time_'.$channel->value]); ?></div>
                                 </div>
                             </div>
                     </td>
                 <td class="col-md-1" style="vertical-align: top;" align="center">
                         <input type="radio" id="preferred_<?php echo $channel->value ?>"
-                               name="lead_contact_frequency_rules[preferred_channel]" class="contact"
-                               value="<?php echo $view->escape($channel->value) ?>" <?php if ($form['preferred_channel']->vars['value'] == $channel->value) {
+                               name="lead_contact_frequency_rules[lead_channels][preferred_channel]" class="contact"
+                               value="<?php echo $view->escape($channel->value) ?>" <?php if ($form['lead_channels']['preferred_channel']->vars['value'] == $channel->value) {
                                         echo $checked;
                                     } ?> <?php echo $disabled; ?>>
 
@@ -88,11 +85,11 @@ $leadName = $lead->getPrimaryIdentifier();
                                 <label class="text-muted fw-n"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
                             </div>
                             <div>
-                                <?php echo $view['form']->widget($form['contact_pause_start_date_'.$channel->value]); ?>
+                                <?php echo $view['form']->widget($form['lead_channels']['contact_pause_start_date_'.$channel->value]); ?>
                                 <div style="float:left;">
-                                    <?php echo $view['form']->label($form['contact_pause_end_date_'.$channel->value]); ?>
+                                    <?php echo $view['form']->label($form['lead_channels']['contact_pause_end_date_'.$channel->value]); ?>
                                 </div>
-                                    <?php echo $view['form']->widget($form['contact_pause_end_date_'.$channel->value]); ?>
+                                    <?php echo $view['form']->widget($form['lead_channels']['contact_pause_end_date_'.$channel->value]); ?>
                             </div>
                         </div>
                         <div class="clearfix"></div>
@@ -104,8 +101,8 @@ $leadName = $lead->getPrimaryIdentifier();
     </div>
     <div id="categories" class="tab-pane fade">
         <?php
-        unset($form['preferred_channel']);
-        unset($form['subscribed_channels']); ?>
+        unset($form['lead_channels']['preferred_channel']);
+        unset($form['lead_channels']['subscribed_channels']); ?>
 
         <table class="table" width="100%">
             <thead >

@@ -20,8 +20,8 @@ class WriterTest extends \PHPUnit_Framework_TestCase
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer::row()
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer::write()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Object::add()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Object::write()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\XmlObject::add()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\XmlObject::write()
      */
     public function testXmlWithSingleRow()
     {
@@ -49,8 +49,8 @@ XML;
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer::row()
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer::write()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Object::add()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Object::write()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\XmlObject::add()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\XmlObject::write()
      */
     public function testXmlWithMultipleRows()
     {
@@ -96,8 +96,8 @@ XML;
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer::row()
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer::write()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Object::add()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Object::write()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\XmlObject::add()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\XmlObject::write()
      */
     public function testXmlWithEmptyRow()
     {

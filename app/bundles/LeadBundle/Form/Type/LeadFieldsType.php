@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -21,14 +21,17 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class LeadFieldsType extends AbstractType
 {
-    private $model;
+    /**
+     * @var FieldModel
+     */
+    protected $fieldModel;
 
     /**
-     * @param MauticFactory $factory
+     * @param FieldModel $fieldModel
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(FieldModel $fieldModel)
     {
-        $this->model = $factory->getModel('lead.field');
+        $this->fieldModel = $fieldModel;
     }
 
     /**
@@ -37,12 +40,15 @@ class LeadFieldsType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         /** @var \Mautic\LeadBundle\Model\FieldModel $model */
-        $model = $this->model;
+        $model = $this->fieldModel;
         $resolver->setDefaults([
             'choices' => function (Options $options) use ($model) {
                 $fieldList = $model->getFieldList();
                 if ($options['with_tags']) {
                     $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
+                }
+                if ($options['with_company_fields']) {
+                    $fieldList['Company'] = $model->getFieldList(false, true, ['isPublished' => true, 'object' => 'company']);
                 }
                 if ($options['with_utm']) {
                     $fieldList['UTM']['utm_campaign'] = 'mautic.lead.field.utmcampaign';
@@ -54,10 +60,11 @@ class LeadFieldsType extends AbstractType
 
                 return $fieldList;
             },
-            'global_only' => false,
-            'required'    => false,
-            'with_tags'   => false,
-            'with_utm'    => false,
+            'global_only'           => false,
+            'required'              => false,
+            'with_company_fields'   => false,
+            'with_tags'             => false,
+            'with_utm'              => false,
         ]);
     }
 
