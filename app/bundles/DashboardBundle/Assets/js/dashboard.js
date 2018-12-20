@@ -2,6 +2,7 @@
 Mautic.widhgetUrl = '/s/dashboard/widget/';
 
 Mautic.dashboardSubmitButtonText = ''; // Button text, to be get and shown instead of spinner
+Mautic.dashboardSubmitButtonWidth = 32;
 
 Mautic.dashboardOnLoad = function (container) {
     Mautic.loadWidgets();
@@ -34,6 +35,7 @@ Mautic.dashboardFilterPreventSubmit = function() {
     let form = jQuery('form[name="daterange"]');
     let button = form.find('button:first');
     Mautic.dashboardSubmitButtonText = button.text();
+    Mautic.dashboardSubmitButtonWidth = button.width();
     button.html('<i class="fa fa-spin fa-spinner"></i>');
     jQuery('.widget').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
     form
@@ -46,7 +48,9 @@ Mautic.dashboardFilterPreventSubmit = function() {
 Mautic.initDashboardFilter = function () {
     // Ajaxify dashboard filter results
     let form = jQuery('form[name="daterange"]');
-    form.find('button').html(Mautic.dashboardSubmitButtonText);
+    form.find('button')
+        .html(Mautic.dashboardSubmitButtonText)
+        .width(Mautic.dashboardSubmitButtonWidth);
     form
         .unbind('submit')
         .on('submit', function(e){
