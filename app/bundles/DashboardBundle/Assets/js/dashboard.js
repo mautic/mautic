@@ -11,6 +11,21 @@ Mautic.dashboardOnLoad = function (container) {
     Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
 };
 
+Mautic.initWidget = function (element, widget) {
+    element.html(widget);
+    Mautic.renderCharts();
+    jQuery('.remove-widget')
+        .unbind('click')
+        .on('click', function(e) {
+            e.preventDefault();
+            element = jQuery(this);
+            let url = element.attr('href');
+            element.closest('.widget').remove();
+            jQuery.ajax({url: url});
+            e.stopPropagation();
+        });
+};
+
 Mautic.loadWidgets = function () {
     // Ajaxify dashboard load
     Mautic.dashboardFilterPreventSubmit();
@@ -21,8 +36,7 @@ Mautic.loadWidgets = function () {
         jQuery.ajax({
             url: Mautic.widhgetUrl+widgetId+'?ignoreAjax=true',
         }).done(function(response) {
-            element.html(response);
-            Mautic.renderCharts();
+            Mautic.initWidget(element, response);
         });
     });
 
