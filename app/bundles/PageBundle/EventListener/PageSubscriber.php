@@ -199,7 +199,7 @@ class PageSubscriber extends CommonSubscriber
             $this->pageModel->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated, false);
             $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
         } else {
-            $this->factory->getLogger()->log('error', 'Error processing page hit ' . $pageId . ' for ' . $leadId);
+            $this->factory->getLogger()->log('error', 'Error processing page hit '.$pageId.' for '.$leadId);
             $event->setResult(QueueConsumerResults::REJECT);
         }
     }
