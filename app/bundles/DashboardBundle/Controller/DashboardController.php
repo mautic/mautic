@@ -238,7 +238,7 @@ class DashboardController extends AbstractFormController
     }
 
     /**
-     * Deletes the entity.
+     * Deletes entity if exists.
      *
      * @param int $objectId
      *
@@ -252,19 +252,11 @@ class DashboardController extends AbstractFormController
             throw new BadRequestHttpException();
         }
 
-        $success = 1;
-
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
         $model  = $this->getModel('dashboard');
         $entity = $model->getEntity($objectId);
-        if (null === $entity) {
-            $flashes[] = [
-                'type'    => 'error',
-                'msg'     => 'mautic.api.client.error.notfound',
-                'msgVars' => ['%id%' => $objectId],
-            ];
-            $success = 0;
-        } else {
+
+        if ($entity) {
             $model->deleteEntity($entity);
             $name      = $entity->getName();
             $flashes[] = [
@@ -279,8 +271,7 @@ class DashboardController extends AbstractFormController
 
         return new JsonResponse(
             [
-                'success' => $success,
-                'flashes' => $flashes,
+                'success' => 1,
             ]
         );
     }
