@@ -12,7 +12,6 @@ Mautic.dashboardSubmitButton = false; // Button text, to be get and shown instea
  */
 Mautic.dashboardOnLoad = function (container) {
     Mautic.loadWidgets();
-    // Mautic.initWidgetSorting();
 };
 
 /**
@@ -109,7 +108,7 @@ Mautic.widgetOnLoad = function(container, response) {
     Mautic.renderCharts(widgetHtml);
     Mautic.renderMaps(widgetHtml);
     Mautic.initWidgetRemoveEvents();
-    // Mautic.saveWidgetSorting();
+    Mautic.initWidgetSorting();
     Mautic.initDashboardFilter();
 };
 
