@@ -1,17 +1,47 @@
 //DashboardBundle
-Mautic.widhgetUrl = '/s/dashboard/widget/';
+Mautic.widgetUrl = '/s/dashboard/widget/';
 
 Mautic.dashboardSubmitButtonText = ''; // Button text, to be get and shown instead of spinner
 Mautic.dashboardSubmitButtonWidth = 32;
 
+/**
+ * Init dashboard events
+ * @param container
+ */
 Mautic.dashboardOnLoad = function (container) {
     Mautic.loadWidgets();
     Mautic.initDashboardFilter();
-    Mautic.initWidgetSorting();
+    // Mautic.initWidgetSorting();
     Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
 };
 
-Mautic.initWidget = function (element, widget) {
+/**
+ * Load all widgets on initial page render
+ */
+Mautic.loadWidgets = function () {
+    Mautic.dashboardFilterPreventSubmit();
+
+    jQuery('.widget').each(function() {
+        let widgetId = jQuery(this).attr('data-widget-id');
+        let element = jQuery('.widget[data-widget-id="'+widgetId+'"]');
+        jQuery.ajax({
+            url: Mautic.widgetUrl+widgetId+'?ignoreAjax=true',
+        }).done(function(response) {
+            Mautic.renderAndInitWidget(element, response);
+        });
+    });
+
+    jQuery(document).ajaxComplete(function(){
+        Mautic.initDashboardFilter();
+    });
+};
+
+/**
+ * Render and init events of widget
+ * @param element Html element to be filled with widget
+ * @param widget Widget html content
+ */
+Mautic.renderAndInitWidget = function (element, widget) {
     element.html(widget);
     Mautic.renderCharts();
     jQuery('.remove-widget')
@@ -26,25 +56,9 @@ Mautic.initWidget = function (element, widget) {
         });
 };
 
-Mautic.loadWidgets = function () {
-    // Ajaxify dashboard load
-    Mautic.dashboardFilterPreventSubmit();
-
-    jQuery('.widget').each(function() {
-        let widgetId = jQuery(this).attr('data-widget-id');
-        let element = jQuery('.widget[data-widget-id="'+widgetId+'"]');
-        jQuery.ajax({
-            url: Mautic.widhgetUrl+widgetId+'?ignoreAjax=true',
-        }).done(function(response) {
-            Mautic.initWidget(element, response);
-        });
-    });
-
-    jQuery(document).ajaxComplete(function(){
-        Mautic.initDashboardFilter();
-    });
-};
-
+/**
+ * Prevent filter from submit, show spinner instead of send button
+ */
 Mautic.dashboardFilterPreventSubmit = function() {
     let form = jQuery('form[name="daterange"]');
     let button = form.find('button:first');
@@ -59,8 +73,10 @@ Mautic.dashboardFilterPreventSubmit = function() {
         });
 };
 
+/**
+ * Init dashboard filter events after widget load
+ */
 Mautic.initDashboardFilter = function () {
-    // Ajaxify dashboard filter results
     let form = jQuery('form[name="daterange"]');
     form.find('button')
         .html(Mautic.dashboardSubmitButtonText)
@@ -75,7 +91,7 @@ Mautic.initDashboardFilter = function () {
                 let element = jQuery('.widget[data-widget-id="' + widgetId + '"]');
                 jQuery.ajax({
                     type: 'POST',
-                    url: Mautic.widhgetUrl + widgetId + '?ignoreAjax=true',
+                    url: Mautic.widgetUrl + widgetId + '?ignoreAjax=true',
                     data: form.serializeArray(),
                     success: function (response) {
                         element.html(response);
@@ -272,7 +288,6 @@ Mautic.initWidgetRemoveButtons = function (scope) {
             }
         });
     });
-
 };
 
 Mautic.exportDashboardLayout = function(text, baseUrl) {
