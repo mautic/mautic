@@ -95,6 +95,7 @@ class DashboardController extends AbstractFormController
     public function widgetAction($widgetId)
     {
         $request = $this->get('request_stack')->getCurrentRequest();
+
         if (!$request->isXmlHttpRequest()) {
             throw new NotFoundHttpException('Not found.');
         }
@@ -104,11 +105,21 @@ class DashboardController extends AbstractFormController
         $widgetService->setFilter($request);
         $widget        = $widgetService->get((int) $widgetId);
 
-        return $this->delegateView([
-            'viewParameters' => [
-                'widget'        => $widget,
-            ],
-            'contentTemplate' => 'MauticDashboardBundle:Dashboard:widget.html.php',
+        if (!$widget) {
+            throw new NotFoundHttpException('Not found.');
+        }
+
+        $response = $this->render(
+            'MauticDashboardBundle:Dashboard:widget.html.php',
+            ['widget' => $widget]
+        );
+
+        return new JsonResponse([
+            'success'      => 1,
+            'widgetId'     => $widgetId,
+            'widgetHtml'   => $response->getContent(),
+            'widgetWidth'  => $widget->getWidth(),
+            'widgetHeight' => $widget->getHeight(),
         ]);
     }
 

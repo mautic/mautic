@@ -23,37 +23,17 @@ Mautic.loadWidgets = function () {
 
     jQuery('.widget').each(function() {
         let widgetId = jQuery(this).attr('data-widget-id');
-        let element = jQuery('.widget[data-widget-id="'+widgetId+'"]');
+        let container = jQuery('.widget[data-widget-id="'+widgetId+'"]');
         jQuery.ajax({
             url: Mautic.widgetUrl+widgetId+'?ignoreAjax=true',
         }).done(function(response) {
-            Mautic.renderAndInitWidget(element, response);
+            Mautic.widgetOnLoad(container, response);
         });
     });
 
     jQuery(document).ajaxComplete(function(){
         Mautic.initDashboardFilter();
     });
-};
-
-/**
- * Render and init events of widget
- * @param element Html element to be filled with widget
- * @param widget Widget html content
- */
-Mautic.renderAndInitWidget = function (element, widget) {
-    element.html(widget);
-    Mautic.renderCharts();
-    jQuery('.remove-widget')
-        .unbind('click')
-        .on('click', function(e) {
-            e.preventDefault();
-            element = jQuery(this);
-            let url = element.attr('href');
-            element.closest('.widget').remove();
-            jQuery.ajax({url: url});
-            e.stopPropagation();
-        });
 };
 
 /**
@@ -129,9 +109,23 @@ Mautic.widgetOnLoad = function(container, response) {
         .css('height', response.widgetHeight + '%');
     Mautic.renderCharts(widgetHtml);
     Mautic.renderMaps(widgetHtml);
-    Mautic.initWidgetRemoveButtons(widgetHtml);
-    Mautic.saveWidgetSorting();
-}
+    Mautic.initWidgetRemoveEvents();
+    // Mautic.saveWidgetSorting();
+    Mautic.initDashboardFilter();
+};
+
+Mautic.initWidgetRemoveEvents = function () {
+    jQuery('.remove-widget')
+        .unbind('click')
+        .on('click', function(e) {
+            e.preventDefault();
+            element = jQuery(this);
+            let url = element.attr('href');
+            element.closest('.widget').remove();
+            jQuery.ajax({url: url});
+            e.stopPropagation();
+        });
+};
 
 Mautic.initWidgetSorting = function () {
     var widgetsWrapper = mQuery('#dashboard-widgets');
