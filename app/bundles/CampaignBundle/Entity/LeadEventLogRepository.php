@@ -408,6 +408,7 @@ class LeadEventLogRepository extends CommonRepository
                     $q->expr()->eq('e.isPublished', 1)
                 )
             )
+            ->orderBy('o.triggerDate', 'ASC')
             ->setParameter('eventId', (int) $eventId)
             ->setParameter('now', $now)
             ->setParameter('true', true, Type::BOOLEAN);
