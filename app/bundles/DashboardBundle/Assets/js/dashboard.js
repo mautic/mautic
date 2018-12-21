@@ -1,8 +1,10 @@
 //DashboardBundle
 Mautic.widgetUrl = '/s/dashboard/widget/';
 
-Mautic.dashboardSubmitButtonText = ''; // Button text, to be get and shown instead of spinner
-Mautic.dashboardSubmitButtonWidth = 32;
+/**
+ * @type jQuery DOM element to be replaced with spinner
+ */
+Mautic.dashboardSubmitButton = false; // Button text, to be get and shown instead of spinner
 
 /**
  * Init dashboard events
@@ -10,9 +12,7 @@ Mautic.dashboardSubmitButtonWidth = 32;
  */
 Mautic.dashboardOnLoad = function (container) {
     Mautic.loadWidgets();
-    Mautic.initDashboardFilter();
     // Mautic.initWidgetSorting();
-    Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
 };
 
 /**
@@ -57,30 +57,12 @@ Mautic.renderAndInitWidget = function (element, widget) {
 };
 
 /**
- * Prevent filter from submit, show spinner instead of send button
- */
-Mautic.dashboardFilterPreventSubmit = function() {
-    let form = jQuery('form[name="daterange"]');
-    let button = form.find('button:first');
-    Mautic.dashboardSubmitButtonText = button.text();
-    Mautic.dashboardSubmitButtonWidth = button.width();
-    button.html('<i class="fa fa-spin fa-spinner"></i>');
-    jQuery('.widget').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
-    form
-        .unbind('submit')
-        .on('submit', function(e){
-            e.preventDefault();
-        });
-};
-
-/**
  * Init dashboard filter events after widget load
  */
 Mautic.initDashboardFilter = function () {
     let form = jQuery('form[name="daterange"]');
     form.find('button')
-        .html(Mautic.dashboardSubmitButtonText)
-        .width(Mautic.dashboardSubmitButtonWidth);
+        .replaceWith(Mautic.dashboardSubmitButton);
     form
         .unbind('submit')
         .on('submit', function(e){
@@ -99,6 +81,22 @@ Mautic.initDashboardFilter = function () {
                     }
                 });
             });
+        });
+};
+
+/**
+ * Prevent filter from submit, show spinner instead of send button
+ */
+Mautic.dashboardFilterPreventSubmit = function() {
+    let form = jQuery('form[name="daterange"]');
+    let button = form.find('button:first');
+    Mautic.dashboardSubmitButton = button.clone();
+    button.html('<i class="fa fa-spin fa-spinner"></i>');
+    jQuery('.widget').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
+    form
+        .unbind('submit')
+        .on('submit', function(e){
+            e.preventDefault();
         });
 };
 
@@ -272,21 +270,6 @@ Mautic.updateWidgetForm = function (element) {
             Mautic.onPageLoad('#widget_params');
         }
         Mautic.removeLabelLoadingIndicator();
-    });
-};
-
-Mautic.initWidgetRemoveButtons = function (scope) {
-    scope.find('.remove-widget').on('click', function(e) {
-        e.preventDefault();
-        var button = mQuery(this);
-        var wrapper = button.closest('.widget');
-        var widgetId = wrapper.attr('data-widget-id');
-        wrapper.hide('slow');
-        Mautic.ajaxActionRequest('dashboard:delete', {widget: widgetId}, function(response) {
-            if (!response.success) {
-                wrapper.show('slow');
-            }
-        });
     });
 };
 
