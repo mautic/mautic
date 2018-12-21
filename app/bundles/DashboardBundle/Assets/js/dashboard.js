@@ -56,8 +56,7 @@ Mautic.initDashboardFilter = function () {
                     url: Mautic.widgetUrl + widgetId + '?ignoreAjax=true',
                     data: form.serializeArray(),
                     success: function (response) {
-                        element.html(response);
-                        Mautic.renderCharts();
+                        Mautic.widgetOnLoad(element, response);
                     }
                 });
             });
