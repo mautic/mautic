@@ -46,10 +46,10 @@ class CsvExporter
                 $type       = $reportDataResult->getType($k);
                 $typeString = $type !== 'string';
 
-                $row[] = $typeString ? $this->formatterHelper->_($v, $type, true) : $v;
+                $row[] = '"'.($typeString ? $this->formatterHelper->_($v, $type, true) : $v).'"';
             }
 
-            fputcsv($handle, $row);
+            fputcsv($handle, $row, ',', chr(0));
         }
     }
 
