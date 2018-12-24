@@ -48,8 +48,7 @@ class CsvExporter
 
                 $row[] = '"'.($typeString ? $this->formatterHelper->_($v, $type, true) : $v).'"';
             }
-
-            fputcsv($handle, $row, ',', chr(0));
+            fputs($handle, implode($row, ',')."\n");
         }
     }
 
