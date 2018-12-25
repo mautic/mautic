@@ -140,6 +140,8 @@ class BaseDecorator implements FilterDecoratorInterface
             case 'regexp':
             case '!regexp':
                 return $this->prepareRegex($filter);
+            case 'in':
+            case '!in':
             case 'multiselect':
             case '!multiselect':
                 $filter = (array) $filter;
