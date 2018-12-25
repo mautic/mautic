@@ -166,7 +166,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($contactSegmentFilterCrate->isContactType());
         $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
         $this->assertSame([2, 4], $contactSegmentFilterCrate->getFilter());
-        $this->assertSame('multiselect', $contactSegmentFilterCrate->getOperator());
+        $this->assertSame('in', $contactSegmentFilterCrate->getOperator());
         $this->assertFalse($contactSegmentFilterCrate->isBooleanType());
         $this->assertFalse($contactSegmentFilterCrate->isDateType());
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
@@ -194,7 +194,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($contactSegmentFilterCrate->isContactType());
         $this->assertFalse($contactSegmentFilterCrate->isCompanyType());
         $this->assertSame([2, 4], $contactSegmentFilterCrate->getFilter());
-        $this->assertSame('!multiselect', $contactSegmentFilterCrate->getOperator());
+        $this->assertSame('!in', $contactSegmentFilterCrate->getOperator());
         $this->assertFalse($contactSegmentFilterCrate->isBooleanType());
         $this->assertFalse($contactSegmentFilterCrate->isDateType());
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
