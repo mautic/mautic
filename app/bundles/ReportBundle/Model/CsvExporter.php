@@ -58,6 +58,6 @@ class CsvExporter
      */
     private function putHeader(ReportDataResult $reportDataResult, $handle)
     {
-        fputcsv($handle, $reportDataResult->getHeaders());
+        fputs($handle, '"'.implode('","', $reportDataResult->getHeaders()).'"'."\n");
     }
 }
