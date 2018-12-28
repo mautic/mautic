@@ -20,6 +20,7 @@ use Mautic\DashboardBundle\Form\Type\UploadType;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -257,11 +258,15 @@ class DashboardController extends AbstractFormController
      */
     public function deleteAction($objectId)
     {
+        /** @var Request $request */
         $request = $this->get('request_stack')->getCurrentRequest();
 
         if (!$request->isXmlHttpRequest()) {
             throw new BadRequestHttpException();
         }
+
+        $flashes = [];
+        $success = 0;
 
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
         $model  = $this->getModel('dashboard');
@@ -278,11 +283,19 @@ class DashboardController extends AbstractFormController
                     '%id%'   => $objectId,
                 ],
             ];
+            $success = 1;
+        } else {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.api.client.error.notfound',
+                'msgVars' => ['%id%' => $objectId],
+            ];
         }
 
-        return new JsonResponse(
+        return $this->postActionRedirect(
             [
-                'success' => 1,
+                'success' => $success,
+                'flashes' => $flashes,
             ]
         );
     }
