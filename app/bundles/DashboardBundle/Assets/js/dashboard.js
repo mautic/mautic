@@ -69,6 +69,7 @@ Mautic.dashboardFilterPreventSubmit = function() {
     let form = jQuery('form[name="daterange"]');
     let button = form.find('button:first');
     Mautic.dashboardSubmitButton = button.clone();
+    button.width(button.width()+'px'); // Keep button width
     button.html('<i class="fa fa-spin fa-spinner"></i>');
     jQuery('.widget').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
     form
