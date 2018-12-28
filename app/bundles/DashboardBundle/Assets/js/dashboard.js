@@ -120,8 +120,12 @@ Mautic.initWidgetRemoveEvents = function () {
             element = jQuery(this);
             let url = element.attr('href');
             element.closest('.widget').remove();
-            jQuery.ajax({url: url});
-            e.stopPropagation();
+            jQuery.ajax({
+                url: url,
+                // success: function (response) {
+                //     Mautic.setFlashes(response.flashes);
+                // }
+            });
         });
 };
 
