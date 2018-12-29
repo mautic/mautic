@@ -313,6 +313,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         }
                     }
 
+                    $prefix     = isset($fieldOptions['prefix']) ? $fieldOptions['prefix'] : '';
+                    $suffix     = isset($fieldOptions['suffix']) ? $fieldOptions['suffix'] : '';
+                    $selectText = 'CONCAT(\''.$prefix.'\', '.$selectText.',\''.$suffix.'\')';
+
                     if (isset($fieldOptions['alias'])) {
                         $selectText .= ' AS '.$fieldOptions['alias'];
                     }
