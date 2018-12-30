@@ -439,14 +439,14 @@ class InputHelper
                 $value = str_replace(['<mcdata>', '</mcdata>'], ['<![CDATA[', ']]>'], $value);
             }
 
-            if ($conditionsFound) {
-                // Special handling for conditional blocks
-                $value = preg_replace("/<mcondition><mif>(.*?)<\/mif>(.*?)<\/mcondition>/is", '<!--[if$1]>$2<![endif]-->', $value);
-            }
-
             if ($conditionsFoundNonOutlook) {
                 // Special handling for non Outlook conditional blocks
                 $value = preg_replace("/<mconditionnonoutlook><mif>(.*?)<\/mif>(.*?)<\/mconditionnonoutlook>/is", '<!--[if$1]><!-- -->$2<!--<![endif]-->', $value);
+            }
+
+            if ($conditionsFound) {
+                // Special handling for conditional blocks
+                $value = preg_replace("/<mcondition><mif>(.*?)<\/mif>(.*?)<\/mcondition>/is", '<!--[if$1]>$2<![endif]-->', $value);
             }
 
             if ($commentCount) {
