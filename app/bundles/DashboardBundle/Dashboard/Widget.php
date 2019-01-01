@@ -20,9 +20,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class Widget
 {
-    const
-        FORMAT_HUMAN   = 'M j, Y';
-    const FORMAT_MYSQL = 'Y-m-d';
+    const FORMAT_HUMAN   = 'M j, Y';
+    const FORMAT_MYSQL   = 'Y-m-d';
 
     /**
      * @var DashboardModel
