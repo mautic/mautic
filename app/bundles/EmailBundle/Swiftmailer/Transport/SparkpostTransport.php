@@ -42,16 +42,27 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $transportCallback;
 
     /**
+     * @var Sparkpost
+     */
+    private $sparkpostClient;
+
+    /**
      * @param string              $apiKey
      * @param TranslatorInterface $translator
      * @param TransportCallback   $transportCallback
+     * @param Sparkpost           $sparkpostClient
      */
-    public function __construct($apiKey, TranslatorInterface $translator, TransportCallback $transportCallback)
-    {
+    public function __construct(
+        $apiKey,
+        TranslatorInterface $translator,
+        TransportCallback $transportCallback,
+        Sparkpost $sparkpostClient
+    ) {
         $this->setApiKey($apiKey);
 
         $this->translator        = $translator;
         $this->transportCallback = $transportCallback;
+        $this->sparkpostClient   = $sparkpostClient;
     }
 
     /**
@@ -84,6 +95,8 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * @return SparkPost
+     *
+     * @deprecated Use $this->sparkpostClient instead. To be removed in 3.0.
      */
     protected function createSparkPost()
     {
@@ -112,14 +125,13 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         try {
-            $sparkPost        = $this->createSparkPost();
             $sparkPostMessage = $this->getSparkPostMessage($message);
-            $response         = $sparkPost->transmissions->post($sparkPostMessage);
+            $promise          = $this->sparkpostClient->transmissions->post($sparkPostMessage);
 
-            $response = $response->wait();
+            $response = $promise->wait();
             if (200 == (int) $response->getStatusCode()) {
                 $results = $response->getBody();
-                if (!$sendCount = $results['results']['total_accepted_recipients']) {
+                if (empty($results['results']['total_accepted_recipients']) || !$sendCount = $results['results']['total_accepted_recipients']) {
                     $this->processImmediateSendFeedback($sparkPostMessage, $results);
                 }
             }
@@ -192,7 +204,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 'metadata'          => [],
             ];
 
-            if (isset($metadata[$to['email']])) {
+            if (isset($metadata[$to['email']]['tokens'])) {
                 foreach ($metadata[$to['email']]['tokens'] as $token => $value) {
                     $recipient['substitution_data'][$mergeVars[$token]] = $value;
                 }
@@ -214,30 +226,20 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             // CC and BCC fields need to be included as a normal TO address with token duplication
             // https://www.sparkpost.com/docs/faq/cc-bcc-with-rest-api/ - token duplication is not mentioned here
             // See test for CC and BCC too
-            $substitution_data = $recipient['substitution_data'];
-            if (!empty($message['recipients']['cc'])) {
-                foreach ($message['recipients']['cc'] as $cc => $content) {
-                    $recipient    = [
-                        'address'           => [
-                            'email' => $cc,
-                        ],
-                        'header_to'         => $to['email'],
-                        'substitution_data' => $substitution_data,
-                    ];
-                    $recipients[] = $recipient;
-                }
-            }
+            foreach (['cc', 'bcc'] as $copyType) {
+                if (!empty($message['recipients'][$copyType])) {
+                    foreach ($message['recipients'][$copyType] as $email => $content) {
+                        $copyRecipient = [
+                            'address'   => ['email' => $email],
+                            'header_to' => $to['email'],
+                        ];
 
-            if (!empty($message['recipients']['bcc'])) {
-                foreach ($message['recipients']['bcc'] as $bcc => $content) {
-                    $recipient    = [
-                        'address'           => [
-                            'email' => $bcc,
-                        ],
-                        'header_to'         => $to['email'],
-                        'substitution_data' => $substitution_data,
-                    ];
-                    $recipients[] = $recipient;
+                        if (!empty($recipient['substitution_data'])) {
+                            $copyRecipient['substitution_data'] = $recipient['substitution_data'];
+                        }
+
+                        $recipients[] = $copyRecipient;
+                    }
                 }
             }
         }
@@ -371,7 +373,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * Check for SparkPost rejection as they will not send a webhook for a single recipient rejected immediately.
+     * Check for SparkPost rejection for immediate error messages.
      *
      * @param array $message
      * @param array $response
@@ -379,8 +381,8 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     private function processImmediateSendFeedback(array $message, array $response)
     {
         if (!empty($response['errors'][0]['code']) && 1902 == (int) $response['errors'][0]['code']) {
-            $comments     = $response['errors'][0]['description'];
-            $emailAddress = $message['recipients']['to'][0]['email'];
+            $comments     = $this->getErrorMessageFromResponse($response);
+            $emailAddress = $message['recipients'][0]['address']['email'];
             $metadata     = $this->getMetadata();
 
             if (isset($metadata[$emailAddress]) && isset($metadata[$emailAddress]['leadId'])) {
@@ -388,6 +390,27 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $this->transportCallback->addFailureByContactId($metadata[$emailAddress]['leadId'], $comments, DoNotContact::BOUNCED, $emailId);
             }
         }
+    }
+
+    /**
+     * Sparkpost renamed the error message property name from 'description' to 'message'.
+     * Ensure that we get the error message before and after the change is made.
+     *
+     * @see https://www.sparkpost.com/blog/error-handling-transmissions-api
+     *
+     * @param array $response
+     *
+     * @return string
+     */
+    private function getErrorMessageFromResponse(array $response)
+    {
+        if (isset($response['errors'][0]['description'])) {
+            return $response['errors'][0]['description'];
+        } elseif (isset($response['errors'][0]['message'])) {
+            return $response['errors'][0]['message'];
+        }
+
+        return 'Unknown error message';
     }
 
     /**

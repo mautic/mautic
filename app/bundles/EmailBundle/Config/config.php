@@ -526,6 +526,14 @@ return [
                     'setPassword' => ['%mautic.mailer_password%'],
                 ],
             ],
+            'mautic.transport.sparkpost.client' => [
+                'class'     => \SparkPost\SparkPost::class,
+                'factory'   => ['@mautic.sparkpost.factory', 'create'],
+                'arguments' => [
+                    '',
+                    '%mautic.mailer_api_key%',
+                ],
+            ],
             'mautic.transport.sparkpost' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
@@ -533,6 +541,7 @@ return [
                     '%mautic.mailer_api_key%',
                     'translator',
                     'mautic.email.model.transport_callback',
+                    'mautic.transport.sparkpost.client',
                 ],
             ],
             'mautic.sparkpost.factory' => [
