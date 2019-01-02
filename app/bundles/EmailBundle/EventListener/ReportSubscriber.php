@@ -110,13 +110,13 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'hits',
                 'label'   => 'mautic.email.report.hits_count',
                 'type'    => 'string',
-                'formula' => $channelUrlTrackables.'hits',
+                'formula' => 'IFNULL('.$channelUrlTrackables.'hits, 0)',
             ],
             'unique_hits' => [
                 'alias'   => 'unique_hits',
                 'label'   => 'mautic.email.report.unique_hits_count',
                 'type'    => 'string',
-                'formula' => $channelUrlTrackables.'unique_hits',
+                'formula' => 'IFNULL('.$channelUrlTrackables.'unique_hits, 0)',
             ],
             'hits_ratio' => [
                 'alias'   => 'hits_ratio',
