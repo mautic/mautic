@@ -139,7 +139,7 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => 'mautic.email.report.unsubscribed_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM lead_donotcontact dnc), \'0.0\')',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
                 'suffix'  => '%',
             ],
             'bounced' => [
@@ -152,7 +152,7 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'bounced_ratio',
                 'label'   => 'mautic.email.report.bounced_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM lead_donotcontact dnc), \'0.0\')',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
                 'suffix'  => '%',
             ],
             $prefix.'revision' => [
