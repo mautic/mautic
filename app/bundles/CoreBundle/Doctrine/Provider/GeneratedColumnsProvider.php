@@ -23,14 +23,14 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
      *
      * @see https://dev.mysql.com/doc/refman/5.7/en/innodb-foreign-key-constraints.html#innodb-foreign-key-generated-columns
      */
-    private const MYSQL_MINIMUM_VERSION = '5.7.14';
+    const MYSQL_MINIMUM_VERSION = '5.7.14';
 
     /**
      * @var string
      *
      * @see https://mariadb.com/kb/en/library/generated-columns
      */
-    private const MARIADB_MINIMUM_VERSION = '5.2';
+    const MARIADB_MINIMUM_VERSION = '5.2';
 
     /**
      * @var VersionProviderInterface
