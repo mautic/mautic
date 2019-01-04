@@ -22,7 +22,7 @@ class GeneratedType extends Type
     /**
      * @var string
      */
-    public const GENERATED = 'generated';
+    const GENERATED = 'generated';
 
     /**
      * @param array            $fieldDeclaration
