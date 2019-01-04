@@ -21,7 +21,7 @@ final class VersionProvider implements VersionProviderInterface
      *
      * @see app/bundles/CoreBundle/Config/config.php and look for 'db_server_version'.
      */
-    private const DEFAULT_CONFIG_VERSION = '5.5';
+    const DEFAULT_CONFIG_VERSION = '5.5';
 
     /**
      * @var Connection
