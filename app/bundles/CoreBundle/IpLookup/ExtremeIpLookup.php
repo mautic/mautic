@@ -31,6 +31,7 @@ class ExtremeIpLookup extends AbstractRemoteDataLookup
     protected function getUrl()
     {
         $auth = !empty($this->auth) ? "?key={$this->auth}" : '';
+
         return 'https://extreme-ip-lookup.com/json/'.$this->ip.$auth;
     }
 
