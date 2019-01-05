@@ -382,6 +382,12 @@ return [
             'mautic.lead.emailbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\EmailSubscriber',
             ],
+            'mautic.lead.emailbundle.subscriber.owner' => [
+                'class'     => 'Mautic\LeadBundle\EventListener\OwnerSubscriber',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ],
+            ],
             'mautic.lead.formbundle.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\FormSubscriber',
                 'arguments' => [
