@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -17,9 +17,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class EmailSubscriber.
- */
 class OwnerSubscriber implements EventSubscriberInterface
 {
     /**
@@ -104,6 +101,13 @@ class OwnerSubscriber implements EventSubscriberInterface
         $event->addToken(self::buildToken('last_name'), '');
     }
 
+    /**
+     * Creates a token using defined pattern.
+     *
+     * @param string $field
+     *
+     * @return string
+     */
     private static function buildToken($field)
     {
         return sprintf(self::$ownerFieldSprintf, $field);
