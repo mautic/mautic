@@ -100,8 +100,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function __construct()
     {
-        $this->stats           = new ArrayCollection();
-        $this->variantChildren = new ArrayCollection();
+        $this->stats               = new ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
+        $this->variantChildren     = new ArrayCollection();
     }
 
     /**
@@ -109,10 +110,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function __clone()
     {
-        $this->id              = null;
-        $this->sentCount       = 0;
-        $this->stats           = new ArrayCollection();
-        $this->variantChildren = new ArrayCollection();
+        $this->id                  = null;
+        $this->sentCount           = 0;
+        $this->stats               = new ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
+        $this->variantChildren     = new ArrayCollection();
 
         parent::__clone();
     }

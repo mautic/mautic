@@ -28,7 +28,7 @@ class Version20170113143922 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         $table = $schema->getTable($this->prefix.'push_notifications');
-        if ($table->hasColumn('button') && $table->getColumn('button')->getNotnull() === false) {
+        if ($table->hasColumn('button') && false === $table->getColumn('button')->getNotnull()) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }

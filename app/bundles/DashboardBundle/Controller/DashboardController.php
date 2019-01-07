@@ -49,12 +49,12 @@ class DashboardController extends FormController
             $session = $this->get('session');
             if (!empty($dateRangeFilter['date_from'])) {
                 $from = new \DateTime($dateRangeFilter['date_from']);
-                $session->set('mautic.dashboard.date.from', $from->format($mysqlFormat));
+                $session->set('mautic.daterange.form.from', $from->format($mysqlFormat));
             }
 
             if (!empty($dateRangeFilter['date_to'])) {
                 $to = new \DateTime($dateRangeFilter['date_to']);
-                $session->set('mautic.dashboard.date.to', $to->format($mysqlFormat));
+                $session->set('mautic.daterange.form.to', $to->format($mysqlFormat));
             }
 
             $model->clearDashboardCache();

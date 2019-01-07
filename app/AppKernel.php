@@ -41,7 +41,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const PATCH_VERSION = 0;
+    const PATCH_VERSION = 1;
 
     /**
      * Extra version identifier.
@@ -92,12 +92,12 @@ class AppKernel extends Kernel
                 $base   = $request->getBaseUrl();
                 $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
-                if ((strpos(strtolower($_SERVER['SERVER_SOFTWARE']), 'apache') === false
+                if (stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache') === false
                     || !file_exists(__DIR__.'../.htaccess')
                     && strpos(
                         $base,
                         'index'
-                    ) === false)
+                    ) === false
                 ) {
                     $prefix .= '/index.php';
                 }
@@ -192,6 +192,7 @@ class AppKernel extends Kernel
             new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
             new LightSaml\SpBundle\LightSamlSpBundle(),
             new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
+            new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
             // These two bundles do DI based on config, so they need to be loaded after config is declared in MauticQueueBundle
             new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
             new Leezy\PheanstalkBundle\LeezyPheanstalkBundle(),
@@ -382,7 +383,7 @@ class AppKernel extends Kernel
     {
         $parameters = $this->getLocalParams();
         if (isset($parameters['cache_path'])) {
-            $envFolder = (strpos($parameters['cache_path'], -1) != '/') ? '/'.$this->environment : $this->environment;
+            $envFolder = (substr($parameters['cache_path'], -1) != '/') ? '/'.$this->environment : $this->environment;
 
             return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['cache_path'].$envFolder);
         } else {

@@ -23,6 +23,11 @@ use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
 class TokenHelper
 {
     /**
+     * @var array
+     */
+    private static $parameters;
+
+    /**
      * @param string $content
      * @param array  $lead
      * @param bool   $replace If true, search/replace will be executed on $content and the modified $content returned
@@ -111,10 +116,10 @@ class TokenHelper
                 case 'time':
                     $dt   = new DateTimeHelper($value);
                     $date = $dt->getDateTime()->format(
-                        (new ParamsLoaderHelper())->getParameters()['date_format_dateonly']
+                        self::getParameter('date_format_dateonly')
                     );
                     $time = $dt->getDateTime()->format(
-                        (new ParamsLoaderHelper())->getParameters()['date_format_timeonly']
+                        self::getParameter('date_format_timeonly')
                     );
                     switch ($defaultValue) {
                         case 'datetime':
@@ -163,5 +168,19 @@ class TokenHelper
         $fallbackCheck = explode('|', $match);
 
         return $fallbackCheck[0];
+    }
+
+    /**
+     * @param string $parameter
+     *
+     * @return mixed
+     */
+    private static function getParameter($parameter)
+    {
+        if (null === self::$parameters) {
+            self::$parameters = (new ParamsLoaderHelper())->getParameters();
+        }
+
+        return self::$parameters[$parameter];
     }
 }

@@ -1529,7 +1529,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         false,
                         0,
                         0,
-                        "'".$campaignMembers[$memberId]."'"
+                        [$campaignMembers[$memberId]]
                     );
                     if ($existingCampaignMember) {
                         foreach ($existingCampaignMember as $member) {

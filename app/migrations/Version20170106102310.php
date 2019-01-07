@@ -135,7 +135,7 @@ SQL;
                 $field      = !empty($eventsWithChannels[$eventType]['channelIdField']) ? $eventsWithChannels[$eventType]['channelIdField'] : null;
                 if ($field && isset($properties[$field])) {
                     if (is_array($properties[$field])) {
-                        if (count($properties[$field]) === 1) {
+                        if (1 === count($properties[$field])) {
                             $channelId = $properties[$field][0];
                         }
                     } elseif (!empty($properties[$field])) {

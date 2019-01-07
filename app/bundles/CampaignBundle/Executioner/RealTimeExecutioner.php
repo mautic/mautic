@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner as Executioner;
@@ -85,6 +86,11 @@ class RealTimeExecutioner
     private $responses;
 
     /**
+     * @var LeadRepository
+     */
+    private $leadRepository;
+
+    /**
      * RealTimeExecutioner constructor.
      *
      * @param LoggerInterface  $logger
@@ -95,6 +101,7 @@ class RealTimeExecutioner
      * @param EventCollector   $collector
      * @param EventScheduler   $scheduler
      * @param ContactTracker   $contactTracker
+     * @param LeadRepository   $leadRepository
      */
     public function __construct(
         LoggerInterface $logger,
@@ -104,7 +111,8 @@ class RealTimeExecutioner
         Executioner $decisionExecutioner,
         EventCollector $collector,
         EventScheduler $scheduler,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        LeadRepository $leadRepository
     ) {
         $this->logger              = $logger;
         $this->leadModel           = $leadModel;
@@ -114,6 +122,7 @@ class RealTimeExecutioner
         $this->collector           = $collector;
         $this->scheduler           = $scheduler;
         $this->contactTracker      = $contactTracker;
+        $this->leadRepository      = $leadRepository;
     }
 
     /**
@@ -240,12 +249,31 @@ class RealTimeExecutioner
         }
 
         // If channels do not match up at all (not even fuzzy logic i.e. page vs page.redirect), there's no need to go further
-        if ($channel && $event->getChannel() && $channel && strpos($channel, $event->getChannel()) === false) {
+        if ($channel && $event->getChannel() && strpos($channel, $event->getChannel()) === false) {
             throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");
         }
 
         if ($channel && $channelId && $event->getChannelId() && $channelId !== $event->getChannelId()) {
             throw new DecisionNotApplicableException("Channel IDs, $channelId and {$event->getChannelId()}, do not match for $channel.");
+        }
+
+        // Check if parent taken path is the path of this event, otherwise exit
+        $parentEvent = $event->getParent();
+        if ($parentEvent !== null && $event->getDecisionPath() !== null) {
+            $rotation    = $this->leadRepository->getContactRotations([$this->contact->getId()], $event->getCampaign()->getId());
+            $log         = $parentEvent->getLogByContactAndRotation($this->contact, $rotation);
+
+            if ($log === null) {
+                throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");
+            }
+
+            $pathTaken   = (int) $log->getNonActionPathTaken();
+
+            if ($pathTaken === 1 && !$parentEvent->getNegativeChildren()->contains($event)) {
+                throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take negative path, event {$event->getId()} is on positive path.");
+            } elseif ($pathTaken === 0 && !$parentEvent->getPositiveChildren()->contains($event)) {
+                throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take positive path, event {$event->getId()} is on negative path.");
+            }
         }
 
         /** @var DecisionAccessor $config */

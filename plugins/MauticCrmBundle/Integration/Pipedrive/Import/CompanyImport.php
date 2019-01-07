@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -52,16 +53,27 @@ class CompanyImport extends AbstractImport
         // prevent listeners from exporting
         $company->setEventData('pipedrive.webhook', 1);
 
-        $data    = $this->convertPipedriveData($data);
+        $data       = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(SELF::ORGANIZATION_ENTITY_TYPE));
+        $mappedData = $this->getMappedCompanyData($data);
+
+        // find company exists
+        $findCompany = IdentifyCompanyHelper::findCompany($mappedData, $this->companyModel);
+        if (isset($findCompany[0]['id'])) {
+            throw new \Exception('Company already exist', Response::HTTP_CONFLICT);
+        }
+
+        $this->companyModel->setFieldValues($company, $mappedData);
+        $this->companyModel->saveEntity($company);
+
         if ($data['owner_id']) {
             $this->addOwnerToCompany($data['owner_id'], $company);
         }
 
-        $mappedData = $this->getMappedCompanyData($data);
-        $this->companyModel->setFieldValues($company, $mappedData);
-        $this->companyModel->saveEntity($company);
+        $integrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $data['id']]);
 
-        $integrationEntity = $this->createIntegrationCompanyEntity(new \DateTime(), $data['id'], $company->getId());
+        if (!$integrationEntity) {
+            $integrationEntity = $this->createIntegrationCompanyEntity(new \DateTime(), $data['id'], $company->getId());
+        }
         $this->em->persist($integrationEntity);
         $this->em->flush();
 
@@ -94,12 +106,13 @@ class CompanyImport extends AbstractImport
         // prevent listeners from exporting
         $company->setEventData('pipedrive.webhook', 1);
 
-        $data    = $this->convertPipedriveData($data);
+        $data    = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(SELF::ORGANIZATION_ENTITY_TYPE));
         if ($data['owner_id']) {
             $this->addOwnerToCompany($data['owner_id'], $company);
         }
 
         $mappedData = $this->getMappedCompanyData($data);
+
         $this->companyModel->setFieldValues($company, $mappedData);
         $this->companyModel->saveEntity($company);
 
