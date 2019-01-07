@@ -113,11 +113,6 @@ class WebhookModel extends FormModel
     protected $eventsOrderByDir;
 
     /**
-     * @var array
-     */
-    private $queuedPayloads = [];
-
-    /**
      * WebhookModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -242,28 +237,18 @@ class WebhookModel extends FormModel
             return;
         }
 
-        $webhookList = [];
-
         /** @var \Mautic\WebhookBundle\Entity\Event $event */
         foreach ($webhookEvents as $event) {
-            $webhook       = $event->getWebhook();
-            $webhookList[] = $webhook;
-
-            if (!isset($this->queuedPayloads[$webhook->getId()])) {
-                $this->queuedPayloads[$webhook->getId()] = [];
-            }
-            $this->queuedPayloads[$webhook->getId()] = $this->queueWebhook($webhook, $event, $payload, $serializationGroups);
+            $webhook = $event->getWebhook();
+            $queue   = $this->queueWebhook($webhook, $event, $payload, $serializationGroups);
 
             if (self::COMMAND_PROCESS === $this->queueMode) {
                 // Queue to the database to process later
-                $this->getQueueRepository()->saveEntity($this->queuedPayloads[$webhook->getId()]);
+                $this->getQueueRepository()->saveEntity($queue);
+            } else {
+                // Immediately process
+                $this->processWebhook($webhook, $queue);
             }
-        }
-
-        if (self::IMMEDIATE_PROCESS === $this->queueMode) {
-            // Immediately process
-            $this->processWebhooks($webhookList);
-            $this->queuedPayloads = [];
         }
     }
 
@@ -309,17 +294,18 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @param Webhook $webhook
+     * @param Webhook      $webhook
+     * @param WebhookQueue $queue
      *
      * @return bool
      */
-    public function processWebhook(Webhook $webhook)
+    public function processWebhook(Webhook $webhook, WebhookQueue $queue = null)
     {
         // instantiate new http class
         $http = new Http();
 
         // get the webhook payload
-        $payload = $this->getWebhookPayload($webhook);
+        $payload = $this->getWebhookPayload($webhook, $queue);
 
         // if there wasn't a payload we can stop here
         if (empty($payload)) {
@@ -506,11 +492,12 @@ class WebhookModel extends FormModel
     /**
      * Get the payload from the webhook.
      *
-     * @param Webhook $webhook
+     * @param Webhook      $webhook
+     * @param WebhookQueue $queue
      *
      * @return array
      */
-    public function getWebhookPayload(Webhook $webhook)
+    public function getWebhookPayload(Webhook $webhook, WebhookQueue $queue = null)
     {
         if ($payload = $webhook->getPayload()) {
             return $payload;
@@ -521,7 +508,7 @@ class WebhookModel extends FormModel
         if ($this->queueMode === self::COMMAND_PROCESS) {
             $queuesArray = $this->getWebhookQueues($webhook);
         } else {
-            $queuesArray = isset($this->queuedPayloads[$webhook->getId()]) ? $this->queuedPayloads[$webhook->getId()] : [$webhook->getQueues()];
+            $queuesArray = [isset($queue) ? [$queue] : []];
         }
 
         /* @var WebhookQueue $queue */
@@ -549,10 +536,6 @@ class WebhookModel extends FormModel
 
                     // Clear the WebhookQueue entity from memory
                     $this->em->detach($queue);
-                } else {
-                    // remove the queue from the webhook right away so it won't get persisted to DB
-                    // This happens on immediate send only
-                    $webhook->removeQueue($queue);
                 }
             }
         }

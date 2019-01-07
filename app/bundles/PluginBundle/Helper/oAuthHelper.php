@@ -73,7 +73,9 @@ class oAuthHelper
 
         if (!empty($this->settings['double_encode_basestring_parameters'])) {
             // Parameters must be encoded before going through buildBaseString
-            array_walk($parameters, create_function('&$val, $key, $oauth', '$val = $oauth->encode($val);'), $this);
+            array_walk($parameters, function (&$val, $key, $oauth) {
+                $val = $oauth->encode($val);
+            }, $this);
         }
 
         $signature = array_merge($headers, $parameters);

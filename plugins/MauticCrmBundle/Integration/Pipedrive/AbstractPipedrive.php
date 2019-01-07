@@ -8,10 +8,11 @@ use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 
 abstract class AbstractPipedrive
 {
-    const PERSON_ENTITY_TYPE       = 'person';
-    const LEAD_ENTITY_TYPE         = 'lead';
-    const ORGANIZATION_ENTITY_TYPE = 'organization';
-    const COMPANY_ENTITY_TYPE      = 'company';
+    const PERSON_ENTITY_TYPE          = 'person';
+    const LEAD_ENTITY_TYPE            = 'lead';
+    const ORGANIZATION_ENTITY_TYPE    = 'organization';
+    const COMPANY_ENTITY_TYPE         = 'company';
+    const NO_ALLOWED_FIELDS_TO_EXPORT = ['ID'];
 
     /**
      * @var PipedriveIntegration
@@ -23,11 +24,17 @@ abstract class AbstractPipedrive
      */
     protected $em;
 
+    /**
+     * @param PipedriveIntegration $integration
+     */
     public function setIntegration(PipedriveIntegration $integration)
     {
         $this->integration = $integration;
     }
 
+    /**
+     * @return PipedriveIntegration
+     */
     public function getIntegration()
     {
         return $this->integration;
@@ -44,13 +51,14 @@ abstract class AbstractPipedrive
      *
      * @return array
      */
-    protected function convertPipedriveData(array $data = [], array $objectFields = [])
+    protected function convertPipedriveData(array $data = [], $objectFields = [])
     {
         // Convert multiselect data
         // Pipedrive webhook return IDs not labels, but  Mautic to Pipedrive sync labels
         if (!empty($objectFields)) {
+            $keys = array_keys($data);
             foreach ($objectFields as $field) {
-                if ($field['field_type'] == 'set' && in_array($field['key'], array_keys($data))) {
+                if (in_array($field['field_type'], ['set', 'enum']) && in_array($field['key'], $keys)) {
                     $pipedriveContactFieldOptions = array_flip(explode(',', $data[$field['key']]));
                     $pipedriveAllFieldOptions     = array_combine(array_values(array_column($field['options'], 'id')),
                         array_column($field['options'], 'label'));
@@ -83,16 +91,39 @@ abstract class AbstractPipedrive
         return $data;
     }
 
+    /**
+     * @param $date
+     * @param $integrationEntityId
+     * @param $internalEntityId
+     *
+     * @return IntegrationEntity
+     */
     public function createIntegrationLeadEntity($date, $integrationEntityId, $internalEntityId)
     {
         return $this->createIntegrationEntity($date, $integrationEntityId, $internalEntityId, self::PERSON_ENTITY_TYPE, self::LEAD_ENTITY_TYPE);
     }
 
+    /**
+     * @param $date
+     * @param $integrationEntityId
+     * @param $internalEntityId
+     *
+     * @return IntegrationEntity
+     */
     public function createIntegrationCompanyEntity($date, $integrationEntityId, $internalEntityId)
     {
         return $this->createIntegrationEntity($date, $integrationEntityId, $internalEntityId, self::ORGANIZATION_ENTITY_TYPE, self::COMPANY_ENTITY_TYPE);
     }
 
+    /**
+     * @param $date
+     * @param $integrationEntityId
+     * @param $internalEntityId
+     * @param $integrationEntityName
+     * @param $internalEntityName
+     *
+     * @return IntegrationEntity
+     */
     private function createIntegrationEntity($date, $integrationEntityId, $internalEntityId, $integrationEntityName, $internalEntityName)
     {
         $integrationEntity = new IntegrationEntity();
@@ -107,6 +138,11 @@ abstract class AbstractPipedrive
         return $integrationEntity;
     }
 
+    /**
+     * @param array $criteria
+     *
+     * @return IntegrationEntity|null|object
+     */
     protected function getLeadIntegrationEntity(array $criteria = [])
     {
         $criteria['integrationEntity'] = self::PERSON_ENTITY_TYPE;
@@ -115,6 +151,11 @@ abstract class AbstractPipedrive
         return $this->getIntegrationEntity($criteria);
     }
 
+    /**
+     * @param array $criteria
+     *
+     * @return IntegrationEntity|null|object
+     */
     protected function getCompanyIntegrationEntity(array $criteria = [])
     {
         $criteria['integrationEntity'] = self::ORGANIZATION_ENTITY_TYPE;
@@ -123,6 +164,11 @@ abstract class AbstractPipedrive
         return $this->getIntegrationEntity($criteria);
     }
 
+    /**
+     * @param array $criteria
+     *
+     * @return IntegrationEntity|null|object
+     */
     private function getIntegrationEntity(array $criteria = [])
     {
         $criteria['integration'] = $this->getIntegration()->getName();

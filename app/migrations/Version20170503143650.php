@@ -29,7 +29,7 @@ class Version20170503143650 extends AbstractMauticMigration
     {
         $table = $schema->getTable($this->prefix.'push_notification_stats');
 
-        if ($table->hasColumn('date_read') && $table->getColumn('date_read')->getNotNull() === false) {
+        if ($table->hasColumn('date_read') && false === $table->getColumn('date_read')->getNotNull()) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
