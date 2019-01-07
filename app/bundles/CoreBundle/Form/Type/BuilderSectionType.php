@@ -40,6 +40,55 @@ class BuilderSectionType extends AbstractType
             ]
         );
 
+        // Content - Background Image
+        $builder->add('content-background-image', 'url', [
+            'label'      => 'mautic.core.content.background.image',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class' => 'form-control',
+                'value' => 'none',
+            ],
+        ]);
+
+        // Content - Background Repeat
+        $builder->add(
+            'content-background-repeat',
+            ChoiceType::class,
+            [
+                'choices' => [
+                    'no-repeat'    => 'no-repeat',
+                    'repeat'       => 'repeat',
+                    'repeat-x'     => 'repeat-x',
+                    'repeat-y'     => 'repeat-y',
+                    'space'        => 'space',
+                    'round'        => 'round',
+                    'repeat-space' => 'repeat-space',
+                    'space-round'  => 'space-round',
+                ],
+                'label'      => 'mautic.core.content.background.repeat',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
+
+        // Content - Background Size Width
+        $builder->add('content-background-size', 'text', [
+            'label'      => 'mautic.core.content.background.size',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => ['class' => 'form-control'],
+        ]);
+
+        // Content - Background Position
+        $builder->add('content-background-position', 'text', [
+            'label'      => 'mautic.core.content.background.position',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => ['class' => 'form-control'],
+        ]);
+
         // Wrapper - Background Color
         $builder->add(
             'wrapper-background-color',

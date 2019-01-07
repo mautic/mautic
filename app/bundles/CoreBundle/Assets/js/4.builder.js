@@ -758,27 +758,47 @@ Mautic.initSectionListeners = function() {
                 sectionForm.find('#builder_section_content-background-color').val(Mautic.rgb2hex(section.css('backgroundColor')));
             }
 
+            // Prefill The Content Background Image
+            if (bgImage = section.css('background-image')) {
+                sectionForm.find('#builder_section_content-background-image').val(bgImage.replace(/url\((?:'|")(.+)(?:'|")\)/g, '$1'));
+            }
+
+            // Prefill The Content Background Size
+            if (bgSize = section.css('background-size')) {
+                sectionForm.find('#builder_section_content-background-size').val(bgSize || 'auto auto');
+            }
+
+            // Prefill The Content Background Repeat
+            if (bgRepeat = section.css('background-repeat')) {
+                sectionForm.find('#builder_section_content-background-repeat').val(bgRepeat);
+            }
+
+            // Prefill The Content Background Position
+            if (bgPosition = section.css('background-position')) {
+                sectionForm.find('#builder_section_content-background-position').val(bgPosition);
+            }
+
             // Prefill the sectionform with section wrapper color
             if (sectionWrapper.css('background-color') !== 'rgba(0, 0, 0, 0)') {
                 sectionForm.find('#builder_section_wrapper-background-color').val(Mautic.rgb2hex(sectionWrapper.css('backgroundColor')));
             }
 
-            // Prefill The Background Image
+            // Prefill The Wrapper Background Image
             if (bgImage = sectionWrapper.css('background-image')) {
                 sectionForm.find('#builder_section_wrapper-background-image').val(bgImage.replace(/url\((?:'|")(.+)(?:'|")\)/g, '$1'));
             }
 
-            // Prefill The Background Size
+            // Prefill The Wrapper Background Size
             if (bgSize = sectionWrapper.css('background-size')) {
                 sectionForm.find('#builder_section_wrapper-background-size').val(bgSize || 'auto auto');
             }
 
-            // Prefill The Background Repeat
+            // Prefill The Wrapper Background Repeat
             if (bgRepeat = sectionWrapper.css('background-repeat')) {
                 sectionForm.find('#builder_section_wrapper-background-repeat').val(bgRepeat);
             }
 
-            // Prefill The Background Position
+            // Prefill The Wrapper Background Position
             if (bgPosition = sectionWrapper.css('background-position')) {
                 sectionForm.find('#builder_section_wrapper-background-position').val(bgPosition);
             }
@@ -794,6 +814,18 @@ Mautic.initSectionListeners = function() {
                 switch (field.attr('id')) {
                     case 'builder_section_content-background-color':
                         Mautic.sectionBackgroundChanged(section, field.val());
+                        break;
+                    case 'builder_section_content-background-image':
+                        Mautic.sectionBackgroundImageChanged(section, field.val());
+                        break;
+                    case 'builder_section_content-background-repeat':
+                        section.css('background-repeat', field.val());
+                        break;
+                    case 'builder_section_content-background-size':
+                        Mautic.sectionBackgroundSize(section, field.val());
+                        break;
+                    case 'builder_section_content-background-position':
+                        section.css('background-position', field.val());
                         break;
                     case 'builder_section_wrapper-background-color':
                         Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
@@ -974,9 +1006,16 @@ Mautic.updateOutlookTag = function (element) {
     if (parent.mQuery('.builder').hasClass('email-builder')) {
 
         var sectionForm = parent.mQuery('#section-form-container');
-        var color = sectionForm.find('#builder_section_wrapper-background-color').val() ? '#'+sectionForm.find('#builder_section_wrapper-background-color').val() : '';
-        var image = sectionForm.find('#builder_section_wrapper-background-image').val();
-        var size  = sectionForm.find('#builder_section_wrapper-background-size').val();
+
+        if (element[0].hasAttribute('data-section-wrapper')) {
+            var color = sectionForm.find('#builder_section_wrapper-background-color').val() ? '#'+sectionForm.find('#builder_section_wrapper-background-color').val() : '';
+            var image = sectionForm.find('#builder_section_wrapper-background-image').val();
+            var size  = sectionForm.find('#builder_section_wrapper-background-size').val();
+        } else {
+            var color = sectionForm.find('#builder_section_content-background-color').val() ? '#'+sectionForm.find('#builder_section_content-background-color').val() : '';
+            var image = sectionForm.find('#builder_section_content-background-image').val();
+            var size  = sectionForm.find('#builder_section_content-background-size').val();
+        }
 
         if (element.html().match(/<!--\[if gte mso 9\]>[\s\S]*?<!\[endif\]-->/gm) == null) {
             element.prepend(
@@ -1003,7 +1042,6 @@ Mautic.updateOutlookTag = function (element) {
                 if (i == 0) {
                     mQuery(this)[0].data = e.data.replace(/src\s*=\s*".*?"/mg, 'src="' + image + '"');
                     mQuery(this)[0].data = e.data.replace(/color\s*=\s*".*?"/mg, 'color="' + color + '"');
-
 
                     if (!size) {
                         mQuery(this)[0].data = e.data.replace(/rect\s*style=\s*".*?"/mg, 'rect style="mso-width-percent:1000;"');
