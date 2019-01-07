@@ -117,7 +117,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         return [
             self::buildToken('email')      => '[Owner Email]',
             self::buildToken('first_name') => '[Owner First Name]',
-            self::buildToken('last_name')  => '[Last Name]',
+            self::buildToken('last_name')  => '[Owner Last Name]',
         ];
     }
 
