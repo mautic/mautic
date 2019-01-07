@@ -59,9 +59,7 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     public function onEmailDisplay(EmailSendEvent $event)
     {
-        $event->addToken(self::buildToken('email'), '[Owner Email]');
-        $event->addToken(self::buildToken('first_name'), '[Owner First Name]');
-        $event->addToken(self::buildToken('last_name'), '[Owner Last Name]');
+        $event->addTokens($this->getFakeTokens());
     }
 
     /**
@@ -72,14 +70,20 @@ class OwnerSubscriber implements EventSubscriberInterface
         $contact = $event->getLead();
 
         if (isset($contact['owner_id']) === false) {
-            $this->addEmptyTokens($event);
+            $event->addTokens($this->getEmptyTokens());
+
+            return;
+        }
+
+        if ($contact['owner_id'] === 0) {
+            $event->addTokens($this->getFakeTokens());
 
             return;
         }
 
         $owner = $this->leadModel->getRepository()->getLeadOwner($contact['owner_id']);
         if ($owner === false) {
-            $this->addEmptyTokens($event);
+            $event->addTokens($this->getEmptyTokens());
 
             return;
         }
@@ -92,13 +96,29 @@ class OwnerSubscriber implements EventSubscriberInterface
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
      *
-     * @param EmailSendEvent $event
+     * @return array
      */
-    private function addEmptyTokens(EmailSendEvent $event)
+    private function getEmptyTokens()
     {
-        $event->addToken(self::buildToken('email'), '');
-        $event->addToken(self::buildToken('first_name'), '');
-        $event->addToken(self::buildToken('last_name'), '');
+        return [
+            self::buildToken('email')      => '',
+            self::buildToken('first_name') => '',
+            self::buildToken('last_name')  => '',
+        ];
+    }
+
+    /**
+     * Used to replace all owner tokens with emptiness so not to email out tokens.
+     *
+     * @return array
+     */
+    private function getFakeTokens()
+    {
+        return [
+            self::buildToken('email')      => '[Owner Email]',
+            self::buildToken('first_name') => '[Owner First Name]',
+            self::buildToken('last_name')  => '[Last Name]',
+        ];
     }
 
     /**
