@@ -23,6 +23,11 @@ trait MatchFilterForLeadTrait
      */
     protected function matchFilterForLead(array $filter, array $lead)
     {
+        if ($lead['id'] == 0) {
+            // Lead in generated for preview with faked data
+            return false;
+        }
+
         $groups   = [];
         $groupNum = 0;
 
