@@ -185,17 +185,12 @@ class DateTimeHelper
             $format = $this->format;
         }
 
-        return $this->datetime->format($format);
-    }
-
-    /**
-     * @param string|null $format
-     *
-     * @return string
-     */
-    public function getTranslatedString($format = null)
-    {
-        return str_replace($this->dictionary, array_keys($this->dictionary), $this->getString($format));
+        // If we use DateTimeHelper as service, then replace months/days with translations
+        if ($this->translator instanceof TranslatorInterface) {
+            return str_replace($this->dictionary, array_keys($this->dictionary), $this->datetime->format($format));
+        } else {
+            return $this->datetime->format($format);
+        }
     }
 
     /**
@@ -238,9 +233,7 @@ class DateTimeHelper
         $values = array_merge($months, $days);
         $keys   = $values;
         array_walk($keys, function (&$key) {
-            if ($this->translator instanceof TranslatorInterface) {
-                $key = $this->translator->trans('mautic.core.date.'.strtolower($key));
-            }
+            $key = $this->translator->trans('mautic.core.date.'.strtolower($key));
         });
 
         return array_combine($keys, $values);

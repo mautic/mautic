@@ -87,7 +87,7 @@ class ContactTokenReplacer extends TokenReplacer
                 case 'time':
                     $this->dateTimeHelper->setDateTime($value);
                     $dt   = $this->dateTimeHelper;
-                    $date = $dt->getTranslatedString($this->coreParametersHelper->getParameter('date_format_dateonly'));
+                    $date = $dt->getString($this->coreParametersHelper->getParameter('date_format_dateonly'));
                     $time = $dt->getDateTime()->format(
                         $this->coreParametersHelper->getParameter('date_format_timeonly')
                     );
