@@ -1473,7 +1473,7 @@ class MailHelper
             if (!empty($headers['List-Unsubscribe'])) {
                 if (strpos($headers['List-Unsubscribe'], $listUnsubscribeHeader) === false) {
                     // Ensure Mautic's is always part of this header
-                    $headers['List-Unsubscribe'] .= ',' . $listUnsubscribeHeader;
+                    $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
                 }
             } else {
                 $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
