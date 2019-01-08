@@ -238,7 +238,9 @@ class DateTimeHelper
         $values = array_merge($months, $days);
         $keys   = $values;
         array_walk($keys, function (&$key) {
-            $key = $this->translator->trans('mautic.core.date.'.strtolower($key));
+            if ($this->translator instanceof TranslatorInterface) {
+                $key = $this->translator->trans('mautic.core.date.'.strtolower($key));
+            }
         });
 
         return array_combine($keys, $values);
