@@ -124,6 +124,14 @@ $mauticBundles  = array_filter(
 );
 unset($buildBundles);
 
+// Load extra annotations
+$container->loadFromExtension('sensio_framework_extra', [
+    'router'  => ['annotations' => false],
+    'request' => ['converters' => false],
+    'view'    => ['annotations' => true],
+    'cache'   => ['annotations' => false],
+]);
+
 // Sort Mautic's bundles into Core and Plugins
 $setBundles = $setPluginBundles = [];
 foreach ($mauticBundles as $bundle) {
