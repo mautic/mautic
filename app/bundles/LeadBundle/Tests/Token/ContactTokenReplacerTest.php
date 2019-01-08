@@ -12,7 +12,9 @@
 namespace Mautic\LeadBundle\Tests\Token;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Token\ContactTokenReplacer;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,10 +37,22 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
 
     private $contactTokenReplacer;
 
+    private function getDateTimeMock()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(function ($key) {
+                return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
+            });
+
+        return new DateTimeHelper('', 'Y-m-d H:i:s', 'UTC', $translator);
+    }
+
     public function setUp()
     {
         $coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
-        $this->contactTokenReplacer = new ContactTokenReplacer($coreParametersHelperMock);
+        $this->contactTokenReplacer = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock());
         $this->regex                = $this->contactTokenReplacer->getRegex();
         parent::setUp();
     }
@@ -89,18 +103,64 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
         $coreParametersHelperMock->expects($this->at(0))
             ->method('getParameter')
             ->with('date_format_dateonly')
-            ->willReturn('d. m. Y');
+            ->willReturn('F j, Y g:i a T');
 
         $coreParametersHelperMock->expects($this->at(1))
             ->method('getParameter')
             ->with('date_format_timeonly')
             ->willReturn('g:i a');
 
-        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock());
         $token              = '{contactfield=date|datetime}';
         $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
         $this->assertNotEmpty($tokenList[$token]);
         $this->assertNotSame($this->lead['date'], $tokenList[$token]);
+    }
+
+    public function testReplaceDateTranslatedFormatValue()
+    {
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+
+        $coreParametersHelperMock->expects($this->at(0))
+            ->method('getParameter')
+            ->with('date_format_dateonly')
+            ->willReturn('F');
+
+        $coreParametersHelperMock->expects($this->at(1))
+            ->method('getParameter')
+            ->with('date_format_timeonly')
+            ->willReturn('g:i a');
+
+        $dt                 = $this->getDateTimeMock();
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $dt);
+        $token              = '{contactfield=date|date}';
+        $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
+        $dt->setDateTime($this->lead['date']);
+        $this->assertNotEmpty($tokenList[$token]);
+        $this->assertSame(strtolower($dt->getDateTime()->format('F')), current($tokenList));
+    }
+
+    public function testReplaceDateDayTranslatedFormatValue()
+    {
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+
+        $coreParametersHelperMock->expects($this->at(0))
+            ->method('getParameter')
+            ->with('date_format_dateonly')
+            ->willReturn('D');
+
+        $coreParametersHelperMock->expects($this->at(1))
+            ->method('getParameter')
+            ->with('date_format_timeonly')
+            ->willReturn('g:i a');
+
+        $dt                 = $this->getDateTimeMock();
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $dt);
+        $token              = '{contactfield=date|date}';
+        $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
+        $dt->setDateTime($this->lead['date']);
+        $this->assertNotEmpty($tokenList[$token]);
+        $this->assertSame(strtolower($dt->getDateTime()->format('D')), strtolower(current($tokenList)));
     }
 
     public function testReplaceDateFormatValue()
@@ -117,7 +177,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
             ->with('date_format_timeonly')
             ->willReturn('g:i a');
 
-        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock());
         $token              = '{contactfield=date|time}';
         $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
         $this->assertNotEmpty($tokenList[$token]);
@@ -138,7 +198,7 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
             ->with('date_format_timeonly')
             ->willReturn('g:i a');
 
-        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock);
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock());
         $token              = '{contactfield=date|time}';
         $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
         $this->assertNotEmpty($tokenList[$token]);

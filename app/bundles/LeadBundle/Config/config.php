@@ -835,6 +835,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Token\ContactTokenReplacer::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'mautic.helper.datetime',
                 ],
             ],
         ],

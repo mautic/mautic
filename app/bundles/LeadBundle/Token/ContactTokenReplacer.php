@@ -29,11 +29,17 @@ class ContactTokenReplacer extends TokenReplacer
     private $coreParametersHelper;
 
     /**
+     * @var DateTimeHelper
+     */
+    private $dateTimeHelper;
+
+    /**
      * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(CoreParametersHelper $coreParametersHelper, DateTimeHelper $dateTimeHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->dateTimeHelper       = $dateTimeHelper;
     }
 
     /**
@@ -79,10 +85,9 @@ class ContactTokenReplacer extends TokenReplacer
                 case 'datetime':
                 case 'date':
                 case 'time':
-                    $dt   = new DateTimeHelper($value);
-                    $date = $dt->getDateTime()->format(
-                        $this->coreParametersHelper->getParameter('date_format_dateonly')
-                    );
+                    $this->dateTimeHelper->setDateTime($value);
+                    $dt   = $this->dateTimeHelper;
+                    $date = $dt->getTranslatedString($this->coreParametersHelper->getParameter('date_format_dateonly'));
                     $time = $dt->getDateTime()->format(
                         $this->coreParametersHelper->getParameter('date_format_timeonly')
                     );
