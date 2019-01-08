@@ -28,10 +28,36 @@ class ImportRepository extends CommonRepository
      */
     public function getGhostImports($ghostDelay = 2, $limit = null)
     {
+        $dt = new \DateTime();
+
+        list($hours, $partial) = explode('.', sprintf('%01.4f', $ghostDelay));
+
+        if ($hours) {
+            $dt->modify("-$hours hours");
+        }
+
+        if ($partial) {
+            $partialDelay            = 60.0 * ($ghostDelay - $hours);
+            list($minutes, $partial) = explode('.', sprintf('%01.4f', $partialDelay));
+
+            if ($minutes) {
+                $dt->modify("-$minutes minutes");
+            }
+
+            if ($partial) {
+                $partialDelay            = 60.0 * ($partialDelay - $minutes);
+                list($seconds, $partial) = explode('.', sprintf('%01.3f', $partialDelay));
+
+                if ($seconds) {
+                    $dt->modify("-$seconds seconds");
+                }
+            }
+        }
+
         $q = $this->getQueryForStatuses([Import::IN_PROGRESS]);
         $q->select($this->getTableAlias())
             ->andWhere($q->expr()->lt($this->getTableAlias().'.dateModified', ':delay'))
-            ->setParameter('delay', (new \DateTime())->modify('-'.$ghostDelay.' hours'));
+            ->setParameter('delay', $dt);
 
         if ($limit !== null) {
             $q->setFirstResult(0)
