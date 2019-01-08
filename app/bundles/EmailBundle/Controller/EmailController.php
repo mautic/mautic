@@ -1476,7 +1476,8 @@ class EmailController extends FormController
                 $field = "[$field]";
             }
         );
-        $fields['id'] = 0;
+        $fields['id']       = 0;
+        $fields['owner_id'] = 0;
 
         // Send to current user
         $user  = $this->user;
