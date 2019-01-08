@@ -186,7 +186,7 @@ class DateTimeHelper
         }
 
         // If we use DateTimeHelper as service, then replace months/days with translations
-        if ($this->translator instanceof TranslatorInterface) {
+        if (!empty($this->dictionary)) {
             return str_replace($this->dictionary, array_keys($this->dictionary), $this->datetime->format($format));
         } else {
             return $this->datetime->format($format);
@@ -200,6 +200,10 @@ class DateTimeHelper
      */
     private function getDictionary()
     {
+        if (!$this->translator instanceof TranslatorInterface) {
+            return [];
+        }
+
         $months = [
             'January',
             'February',
