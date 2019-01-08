@@ -59,7 +59,9 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     public function onEmailDisplay(EmailSendEvent $event)
     {
-        $event->addTokens($this->getFakeTokens());
+        $contact = $event->getLead();
+
+        $event->addTokens($this->getGeneratedTokens($contact));
     }
 
     /**
@@ -69,28 +71,40 @@ class OwnerSubscriber implements EventSubscriberInterface
     {
         $contact = $event->getLead();
 
-        if (isset($contact['owner_id']) === false) {
-            $event->addTokens($this->getEmptyTokens());
+        $event->addTokens($this->getGeneratedTokens($contact));
+    }
 
-            return;
+    /**
+     * Generates an array of tokens based on the given token.
+     *
+     * * If contact[owner_id] === 0, then we need fake data
+     * * If contact[owner_id] === null, then we should blank out tokens
+     * * If contact[owner_id] > 0 AND User exists, then we should fill in tokens
+     *
+     * @param array $contact
+     *
+     * @return array
+     */
+    private function getGeneratedTokens(array $contact)
+    {
+        if (isset($contact['owner_id']) === false) {
+            return $this->getEmptyTokens();
         }
 
         if ($contact['owner_id'] === 0) {
-            $event->addTokens($this->getFakeTokens());
-
-            return;
+            return $this->getFakeTokens();
         }
 
         $owner = $this->leadModel->getRepository()->getLeadOwner($contact['owner_id']);
         if ($owner === false) {
-            $event->addTokens($this->getEmptyTokens());
-
-            return;
+            return $this->getEmptyTokens();
         }
 
-        $event->addToken(self::buildToken('email'), (string) $owner['email']);
-        $event->addToken(self::buildToken('first_name'), (string) $owner['first_name']);
-        $event->addToken(self::buildToken('last_name'), (string) $owner['last_name']);
+        return [
+            self::buildToken('email')      => (string) $owner['email'],
+            self::buildToken('first_name') => (string) $owner['first_name'],
+            self::buildToken('last_name')  => (string) $owner['last_name'],
+        ];
     }
 
     /**
