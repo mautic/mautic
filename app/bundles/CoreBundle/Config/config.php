@@ -419,9 +419,9 @@ return [
             'mautic.helper.datetime' => [
                 'class'     => \Mautic\CoreBundle\Helper\DateTimeHelper::class,
                 'arguments' => [
-                    '"string"',
-                    '"fromFormat"',
-                    '"timezone"',
+                    '""',
+                    '"Y-m-d H:i:s"',
+                    '"UTC"',
                     'translator',
                 ],
             ],
