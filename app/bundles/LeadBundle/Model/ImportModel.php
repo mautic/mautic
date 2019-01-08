@@ -159,9 +159,7 @@ class ImportModel extends FormModel
      */
     public function getImportMaxRuntimeStatus($default = 4)
     {
-        $status = 'mautic.lead.import.status.';
-
-        return $status.$this->config->getParameter('import_max_runtime_status', $default);
+        return $this->config->getParameter('import_max_runtime_status', $default);
     }
 
     /**
