@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
 /**
  * Class CacheStorageHelper.
  *
- * @deprecated to be removed soon. use mautic.cache.provider instead
+ * @deprecated This helper is deprecated in favor of CacheBundle
  */
 class CacheStorageHelper
 {
@@ -71,15 +71,12 @@ class CacheStorageHelper
     protected $expirations = [];
 
     /**
-     * CacheStorageHelper constructor.
-     *
      * @param      $adaptor
      * @param null $namespace
      * @param null $cacheDir
      * @param int  $defaultExpiration
-     * @param null $cacheProvider
      */
-    public function __construct($adaptor, $namespace = null, Connection $connection = null, $cacheDir = null, $defaultExpiration = 0, $cacheProvider = null)
+    public function __construct($adaptor, $namespace = null, Connection $connection = null, $cacheDir = null, $defaultExpiration = 0)
     {
         $this->cacheDir          = $cacheDir.'/data';
         $this->adaptor           = $adaptor;
@@ -98,11 +95,7 @@ class CacheStorageHelper
             $this->adaptor = self::ADAPTOR_FILESYSTEM;
         }
 
-        if (is_null($cacheProvider)) {
-            $this->setCacheAdaptor();   // This is for BC compatibility reasons
-        } else {
-            $this->adaptor = $cacheProvider;
-        }
+        $this->setCacheAdaptor();
     }
 
     /**
@@ -110,15 +103,13 @@ class CacheStorageHelper
      */
     public function getAdaptorClassName()
     {
-        return is_null($this->cacheAdaptor) ? false : get_class($this->cacheAdaptor);
+        return get_class($this->cacheAdaptor);
     }
 
     /**
      * @param      $name
      * @param      $data
      * @param null $expiration
-     *
-     * @deprecated
      *
      * @return bool
      *
@@ -142,10 +133,8 @@ class CacheStorageHelper
     }
 
     /**
-     * @param      $name
-     * @param null $maxAge
-     *
-     * @deprecated
+     * @param     $name
+     * @param int $maxAge @deprecated 2.6.0 to be removed in 3.0; set expiration when using set()
      *
      * @return bool|mixed
      *
@@ -167,8 +156,6 @@ class CacheStorageHelper
     }
 
     /**
-     * @deprecated
-     *
      * @param $name
      */
     public function delete($name)
@@ -195,10 +182,8 @@ class CacheStorageHelper
     }
 
     /**
-     * @param string $namespace
-     * @param int    $defaultExpiration
-     *
-     * @deprecated
+     * @param null $namespace
+     * @param null $defaultExpiration
      *
      * @return CacheStorageHelper;
      */
@@ -220,7 +205,7 @@ class CacheStorageHelper
     }
 
     /**
-     * @deprecated
+     * Creates adapter.
      */
     protected function setCacheAdaptor()
     {
