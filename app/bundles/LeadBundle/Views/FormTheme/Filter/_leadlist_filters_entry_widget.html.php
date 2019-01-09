@@ -10,9 +10,16 @@
  */
 $isPrototype = ('__name__' == $form->vars['name']);
 $filterType  = $form['field']->vars['value'];
-$inGroup     = (isset($form->vars['data']['glue']) && 'and' === $form->vars['data']['glue']);
-$object      = (isset($form->vars['data']['object'])) ? $form->vars['data']['object'] : 'lead';
+$inGroup     = 'and' === $form->vars['data']['glue'];
+$isBehavior  = isset($fields['behaviors'][$filterType]['label']);
 $class       = (isset($form->vars['data']['object']) && 'company' == $form->vars['data']['object']) ? 'fa-building' : 'fa-user';
+
+if ($isBehavior) {
+    $object = 'behaviors';
+} else {
+    $object = (isset($form->vars['data']['object'])) ? $form->vars['data']['object'] : 'lead';
+}
+
 if (!$isPrototype && !isset($fields[$object][$filterType]['label'])) {
     return;
 }
