@@ -286,7 +286,7 @@ class OwnerSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Translator
+     * @return Translator|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getMockTranslator()
     {
