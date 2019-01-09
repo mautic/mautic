@@ -12,7 +12,9 @@ foreach ($form as $i => $filter) {
     $isPrototype = ($filter->vars['name'] == '__name__');
     $filterType  = $filter['field']->vars['value'];
     foreach ($form->parent->vars['fields'] as $object => $objectfields) {
-        if ($isPrototype || isset($objectfields[$filter->vars['value']['field']])) {
+        $isField    = isset($objectfields[$filter->vars['value']['field']]);
+        $isBehavior = isset($form->parent->vars['fields']['behaviors'][$filter->vars['value']['field']]);
+        if ($isPrototype || $isField || $isBehavior) {
             echo $view['form']->widget($filter, ['first' => ($i === 0)]);
         }
     }
