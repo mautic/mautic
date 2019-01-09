@@ -1860,6 +1860,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if (isset($filter['flag'])) {
             $flag = $filter['flag'];
             unset($filter['flag']);
+        } else {
+            $flag = [];
         }
 
         $datasets = isset($filter['dataset']) ? $filter['dataset'] : [];
