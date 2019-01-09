@@ -62,10 +62,22 @@ class CacheStorageHelper
     protected $defaultExpiration;
 
     /**
+     * Semi BC support for pre 2.6.0.
+     *
+     * @deprecated 2.6.0 to be removed in 3.0
+     *
+     * @var array
+     */
+    protected $expirations = [];
+
+    /**
+     * CacheStorageHelper constructor.
+     *
      * @param      $adaptor
      * @param null $namespace
      * @param null $cacheDir
      * @param int  $defaultExpiration
+     * @param null $cacheProvider
      */
     public function __construct($adaptor, $namespace = null, Connection $connection = null, $cacheDir = null, $defaultExpiration = 0, $cacheProvider = null)
     {
@@ -94,6 +106,14 @@ class CacheStorageHelper
     }
 
     /**
+     * @return string|false
+     */
+    public function getAdaptorClassName()
+    {
+        return is_null($this->cacheAdaptor) ? false : get_class($this->cacheAdaptor);
+    }
+
+    /**
      * @param      $name
      * @param      $data
      * @param null $expiration
@@ -118,7 +138,7 @@ class CacheStorageHelper
 
         $cacheItem->set($data);
 
-        $this->cacheAdaptor->save($cacheItem);
+        return $this->cacheAdaptor->save($cacheItem);
     }
 
     /**
@@ -175,8 +195,8 @@ class CacheStorageHelper
     }
 
     /**
-     * @param null $namespace
-     * @param null $defaultExpiration
+     * @param string $namespace
+     * @param int    $defaultExpiration
      *
      * @deprecated
      *
@@ -201,9 +221,6 @@ class CacheStorageHelper
 
     /**
      * @deprecated
-     *
-     * @param $namespace
-     * @param $defaultExpiration
      */
     protected function setCacheAdaptor()
     {

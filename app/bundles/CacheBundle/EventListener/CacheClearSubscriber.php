@@ -52,10 +52,8 @@ class CacheClearSubscriber implements CacheClearerInterface
         }
 
         if (!$this->cacheProvider->clear()) {
-            $this->logger->emergency('Failed to clear the Mautic cache.', ['adapter' => $adapter]);
+            $this->logger->emergency('Failed to clear Mautic cache.', ['adapter' => $adapter]);
             throw new \Exception('Failed to clear '.$adapter);
         }
-
-        $this->logger->info('Cleared Mautic cache.', ['adapter'=>$adapter]);
     }
 }
