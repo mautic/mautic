@@ -11,7 +11,7 @@
 $isPrototype = ($form->vars['name'] == '__name__');
 $filterType  = $form['field']->vars['value'];
 $inGroup     = $form->vars['data']['glue'] === 'and';
-$isBehavior  = isset($fields['behaviors'][$filterType]['label']) ? 'behaviors' : 'lead';
+$isBehavior  = isset($fields['behaviors'][$filterType]['label']);
 $class       = (isset($form->vars['data']['object']) && $form->vars['data']['object'] == 'company') ? 'fa-building' : 'fa-user';
 
 if ($isBehavior) {
