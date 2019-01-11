@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Services;
 
+use Mautic\LeadBundle\Event\LeadListDictionaryGeneratedEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
@@ -18,13 +20,26 @@ use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactSegmentFilterDictionary extends \ArrayIterator
 {
     private $translations;
 
-    public function __construct()
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * ContactSegmentFilterDictionary constructor.
+     *
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
+        $this->dispatcher = $dispatcher;
+
         $this->translations['lead_email_read_count'] = [
             'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
             'foreign_table'       => 'email_stats',
@@ -230,6 +245,13 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'field'         => 'campaign_id',
             'where'         => 'campaign_leads.manually_removed = 0',
         ];
+
+        if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_DICTIONARY_GENERATED)) {
+            $event = new LeadListDictionaryGeneratedEvent($this->translations);
+            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_DICTIONARY_GENERATED, $event);
+            $this->translations = $event->getTranslations();
+            $event              = null;
+        }
 
         parent::__construct($this->translations);
     }
