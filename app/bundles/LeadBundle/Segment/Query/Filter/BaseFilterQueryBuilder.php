@@ -65,6 +65,12 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
 
+        $tableAlias      = $this->generateRandomParameterName();
+        $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
+        $subQueryBuilder
+            ->select('NULL')->from($filter->getTable(), $tableAlias)
+            ->andWhere($tableAlias.'.id = l.id');
+
         switch ($filterOperator) {
             case 'empty':
                 $expression = new CompositeExpression(CompositeExpression::TYPE_OR,
@@ -117,6 +123,18 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                     $queryBuilder->expr()->isNull('l.'.$filter->getField())
                 );
                 break;
+            case 'notGt':
+            case 'notLt':
+                $expr       = strtolower(str_replace('not', '', $filterOperator));
+                $expression = $subQueryBuilder->expr()->orX(
+                    $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
+                    $subQueryBuilder->expr()->$expr($tableAlias.'.'.$filter->getField(), $filterParametersHolder)
+                );
+
+                $subQueryBuilder->andWhere($expression);
+
+                $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
+                break;
             case 'multiselect':
             case '!multiselect':
                 $operator    = $filterOperator === 'multiselect' ? 'regexp' : 'notRegexp';
@@ -131,7 +149,9 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
         }
 
-        $queryBuilder->addLogic($expression, $filterGlue);
+        if (!in_array($filterOperator, ['notGt', 'notLt'])) {
+            $queryBuilder->addLogic($expression, $filterGlue);
+        }
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 

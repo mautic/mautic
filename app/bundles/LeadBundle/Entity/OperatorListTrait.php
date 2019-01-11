@@ -51,6 +51,8 @@ trait OperatorListTrait
         ],
         'default' => [
             'exclude' => [
+                '!gt',
+                '!lt',
                 'in',
                 '!in',
                 'date',
@@ -172,7 +174,6 @@ trait OperatorListTrait
         if (null === $type) {
             return;
         }
-
         if ($type === 'boolean') {
             $type = 'bool';
         } elseif (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
