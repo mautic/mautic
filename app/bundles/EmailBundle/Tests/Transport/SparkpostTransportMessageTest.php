@@ -14,8 +14,8 @@ namespace Mautic\EmailBundle\Tests\Transport;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
-use SparkPost\SparkPost;
 
 class SparkpostTransportMessageTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +23,7 @@ class SparkpostTransportMessageTest extends \PHPUnit_Framework_TestCase
     {
         $translator        = $this->createMock(Translator::class);
         $transportCallback = $this->createMock(TransportCallback::class);
-        $sparkpostClient   = $this->createMock(SparkPost::class);
+        $sparkpostFactory  = $this->createMock(SparkpostFactoryInterface::class);
 
         $message = new MauticMessage('Test subject', 'First Name: {formfield=first_name}');
         $message->addFrom('from@xx.xx');
@@ -55,7 +55,7 @@ class SparkpostTransportMessageTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $sparkpost = new SparkpostTransport('1234', $translator, $transportCallback, $sparkpostClient);
+        $sparkpost = new SparkpostTransport('1234', $translator, $transportCallback, $sparkpostFactory);
 
         $sparkpostMessage = $sparkpost->getSparkPostMessage($message);
 

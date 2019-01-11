@@ -17,6 +17,7 @@ use Http\Adapter\Guzzle6\Client;
 use Http\Promise\Promise;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use SparkPost\SparkPost;
@@ -33,6 +34,7 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
     private $stream;
     private $message;
     private $headers;
+    private $sparkpostFactory;
     private $sparkpostClient;
     private $sparkpostTransport;
 
@@ -48,12 +50,13 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
         $this->stream             = $this->createMock(Stream::class);
         $this->message            = $this->createMock(MauticMessage::class);
         $this->headers            = $this->createMock(\Swift_Mime_HeaderSet::class);
+        $this->sparkpostFactory   = $this->createMock(SparkpostFactoryInterface::class);
         $this->sparkpostClient    = new SparkPost($this->httpClient, ['key' => '1234']);
         $this->sparkpostTransport = new SparkpostTransport(
             '1234',
             $this->translator,
             $this->transportCallback,
-            $this->sparkpostClient
+            $this->sparkpostFactory
         );
 
         $this->translator->method('trans')
@@ -67,6 +70,7 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
         $this->message->method('getHeaders')->willReturn($this->headers);
         $this->headers->method('getAll')->willReturn([]);
         $this->response->method('getBody')->willReturn($this->stream);
+        $this->sparkpostFactory->method('create')->willReturn($this->sparkpostClient);
     }
 
     public function testWebhookPayloadIsProcessed()

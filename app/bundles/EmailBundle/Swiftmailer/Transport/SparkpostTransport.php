@@ -14,8 +14,8 @@
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use GuzzleHttp\Client;
-use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 use Mautic\EmailBundle\Model\TransportCallback;
+use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,27 +42,27 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $transportCallback;
 
     /**
-     * @var Sparkpost
+     * @var SparkpostFactoryInterface
      */
-    private $sparkpostClient;
+    private $sparkpostFactory;
 
     /**
-     * @param string              $apiKey
-     * @param TranslatorInterface $translator
-     * @param TransportCallback   $transportCallback
-     * @param Sparkpost           $sparkpostClient
+     * @param string                    $apiKey
+     * @param TranslatorInterface       $translator
+     * @param TransportCallback         $transportCallback
+     * @param SparkpostFactoryInterface $sparkpostFactory
      */
     public function __construct(
         $apiKey,
         TranslatorInterface $translator,
         TransportCallback $transportCallback,
-        Sparkpost $sparkpostClient
+        SparkpostFactoryInterface $sparkpostFactory
     ) {
         $this->setApiKey($apiKey);
 
         $this->translator        = $translator;
         $this->transportCallback = $transportCallback;
-        $this->sparkpostClient   = $sparkpostClient;
+        $this->sparkpostFactory  = $sparkpostFactory;
     }
 
     /**
@@ -94,16 +94,20 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @return SparkPost
+     * Creates new SparkPost HTTP client.
+     * If no API key is provided then the default one is used.
      *
-     * @deprecated Use $this->sparkpostClient instead. To be removed in 3.0.
+     * @param string $apiKey
+     *
+     * @return SparkPost
      */
-    protected function createSparkPost()
+    protected function createSparkPost($apiKey = null)
     {
-        $httpAdapter = new GuzzleAdapter(new Client());
-        $sparky      = new SparkPost($httpAdapter, ['key' => $this->apiKey]);
+        if (null === $apiKey) {
+            $apiKey = $this->apiKey;
+        }
 
-        return $sparky;
+        return $this->sparkpostFactory->create('', $apiKey);
     }
 
     /**
@@ -126,7 +130,8 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
         try {
             $sparkPostMessage = $this->getSparkPostMessage($message);
-            $promise          = $this->sparkpostClient->transmissions->post($sparkPostMessage);
+            $sparkPostClient  = $this->createSparkPost();
+            $promise          = $sparkPostClient->transmissions->post($sparkPostMessage);
 
             $response = $promise->wait();
             if (200 == (int) $response->getStatusCode()) {
