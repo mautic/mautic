@@ -1178,7 +1178,19 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             );
         }
         foreach ($tables as $table) {
-            $q->$joinType($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
+            $exists = false;
+            if (isset($joins[$table['from_alias']])) {
+                foreach ($joins[$table['from_alias']] as $standingJoin) {
+                    if ($standingJoin['joinAlias'] === $table['alias']) { // There can be just one alias
+                        $exists = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!$exists) {
+                $q->$joinType($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
+            }
         }
 
         if ($whereExpression) {
