@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
-use JMS\Serializer\EventDispatcher\EventDispatcherInterface;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\CompanyDecorator;
@@ -20,6 +19,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DecoratorFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -93,7 +93,7 @@ class DecoratorFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private function getDecoratorFactory()
     {
-        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary();
+        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($this->createMock(EventDispatcherInterface::class));
         $baseDecorator                  = $this->createMock(BaseDecorator::class);
         $customMappedDecorator          = $this->createMock(CustomMappedDecorator::class);
         $companyDecorator               = $this->createMock(CompanyDecorator::class);
