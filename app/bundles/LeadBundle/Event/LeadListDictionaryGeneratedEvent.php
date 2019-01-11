@@ -27,7 +27,7 @@ class LeadListDictionaryGeneratedEvent extends Event
 
     /**
      * @param $key
-     * @param $options
+     * @param array $options
      */
     public function addTranslation($key, $options)
     {
