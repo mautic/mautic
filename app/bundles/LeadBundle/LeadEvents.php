@@ -557,7 +557,7 @@ final class LeadEvents
      * The mautic.list_filters_dictionary_generated event is dispatched when the ContactSegmentFilterDictionary for filters was generated.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent instance.
+     * Mautic\LeadBundle\Event\LeadListDictionaryGeneratedEvent instance.
      *
      * @var string
      */
