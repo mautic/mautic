@@ -63,7 +63,9 @@ trait FilterTrait
         $operator    = isset($data['operator']) ? $data['operator'] : '';
         $field       = [];
 
-        if (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
+        if (isset($options['fields']['behaviors'][$fieldName])) {
+            $field = $options['fields']['behaviors'][$fieldName];
+        } elseif (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
             $field = $options['fields'][$data['object']][$fieldName];
         }
 
