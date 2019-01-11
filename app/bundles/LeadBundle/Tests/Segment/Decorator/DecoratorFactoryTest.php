@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
+use JMS\Serializer\EventDispatcher\EventDispatcherInterface;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\CompanyDecorator;
@@ -63,7 +64,7 @@ class DecoratorFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testDateDecorator()
     {
-        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary();
+        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($this->createMock(EventDispatcherInterface::class));
         $baseDecorator                  = $this->createMock(BaseDecorator::class);
         $customMappedDecorator          = $this->createMock(CustomMappedDecorator::class);
         $companyDecorator               = $this->createMock(CompanyDecorator::class);
