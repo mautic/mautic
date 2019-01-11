@@ -27,7 +27,7 @@ final class SparkpostFactory implements SparkpostFactoryInterface
      *
      * @return SparkPost
      */
-    public function create($host = '', $apiKey, $port = null)
+    public function create($host, $apiKey, $port = null)
     {
         if ((strpos($host, '://') === false && substr($host, 0, 1) != '/')) {
             $host = 'https://'.$host;
