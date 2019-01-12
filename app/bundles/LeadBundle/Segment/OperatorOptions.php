@@ -41,12 +41,12 @@ class OperatorOptions
         ],
         'lt' => [
             'label'       => 'mautic.lead.list.form.operator.lessthan',
-            'expr'        => 'notLt',
-            'negate_expr' => 'lt',
+            'expr'        => 'lt',
+            'negate_expr' => 'gt',
         ],
         '!lt' => [
             'label'       => 'mautic.lead.list.form.operator.notlessthan',
-            'expr'        => 'gt',
+            'expr'        => 'notLt',
             'negate_expr' => 'lt',
         ],
         'lte' => [
