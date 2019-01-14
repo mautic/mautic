@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
-use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
