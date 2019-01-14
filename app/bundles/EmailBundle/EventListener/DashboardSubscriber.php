@@ -11,13 +11,15 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType;
+use Mautic\EmailBundle\Form\Type\DashboardMostHitEmailRedirectsWidgetType;
+use Mautic\EmailBundle\Form\Type\DashboardSentEmailToContactsWidgetType;
 use Mautic\EmailBundle\Model\EmailModel;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -34,13 +36,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'emails.in.time' => [
-            'formAlias' => 'email_dashboard_emails_in_time_widget',
+            'formAlias' => DashboardEmailsInTimeWidgetType::class,
         ],
         'sent.email.to.contacts' => [
-            'formAlias' => 'email_dashboard_sent_email_to_contacts_widget',
+            'formAlias' => DashboardSentEmailToContactsWidgetType::class,
         ],
         'most.hit.email.redirects' => [
-            'formAlias' => 'email_dashboard_most_hit_email_redirects_widget',
+            'formAlias' => DashboardMostHitEmailRedirectsWidgetType::class,
         ],
         'ignored.vs.read.emails'   => [],
         'upcoming.emails'          => [],
@@ -84,26 +86,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('email:emails:viewother');
+        $defaultLimit  = $this->getDefaultLimit($event->getWidget());
 
         if ($event->getType() == 'emails.in.time') {
-            $widget = $event->getWidget();
-            $params = $widget->getParams();
-
-            if (isset($params['flag'])) {
-                $params['filter']['flag'] = $params['flag'];
-            }
-            if (isset($params['dataset'])) {
-                $params['filter']['dataset'] = $params['dataset'];
-            }
-            if (isset($params['companyId'])) {
-                $params['filter']['companyId'] = $params['companyId'];
-            }
-            if (isset($params['campaignId'])) {
-                $params['filter']['campaignId'] = $params['campaignId'];
-            }
-            if (isset($params['segmentId'])) {
-                $params['filter']['segmentId'] = $params['segmentId'];
-            }
+            $widget     = $event->getWidget();
+            $params     = $widget->getParams();
+            $filterKeys = ['flag', 'dataset', 'companyId', 'campaignId', 'segmentId'];
 
             if (!$event->isCached()) {
                 $event->setTemplateData([
@@ -114,7 +102,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
-                        $params['filter'],
+                        ArrayHelper::select($filterKeys, $params),
                         $canViewOthers
                     ),
                 ]);
@@ -129,26 +117,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                if (empty($params['limit'])) {
-                    // Count the emails limit from the widget height
-                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
-                } else {
-                    $limit = $params['limit'];
-                }
-                $companyId = null;
-                if (isset($params['filter']['companyId'])) {
-                    $companyId = $params['filter']['companyId'];
-                }
-                $campaignId = null;
-                if (isset($params['filter']['campaignId'])) {
-                    $campaignId = $params['filter']['campaignId'];
-                }
-                $segmentId = null;
-                if (isset($params['filter']['segmentId'])) {
-                    $segmentId = $params['filter']['segmentId'];
-                }
-
-                $headItems = [
+                $headItems  = [
                     'mautic.dashboard.label.contact.id',
                     'mautic.dashboard.label.contact.email.address',
                     'mautic.dashboard.label.contact.open',
@@ -170,13 +139,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     [
                         'headItems' => $headItems,
                         'bodyItems' => $this->emailModel->getSentEmailToContactData(
-                            $limit,
+                            ArrayHelper::getValue('limit', $params, $defaultLimit),
                             $params['dateFrom'],
                             $params['dateTo'],
                             ['groupBy' => 'sends', 'canViewOthers' => $canViewOthers],
-                            $companyId,
-                            $campaignId,
-                            $segmentId
+                            ArrayHelper::getValue('companyId', $params),
+                            ArrayHelper::getValue('campaignId', $params),
+                            ArrayHelper::getValue('segmentId', $params)
                         ),
                     ]
                 );
@@ -191,24 +160,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                if (empty($params['limit'])) {
-                    // Count the emails limit from the widget height
-                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
-                } else {
-                    $limit = $params['limit'];
-                }
-                $companyId = null;
-                if (isset($params['filter']['companyId'])) {
-                    $companyId = $params['filter']['companyId'];
-                }
-                $campaignId = null;
-                if (isset($params['filter']['campaignId'])) {
-                    $campaignId = $params['filter']['campaignId'];
-                }
-                $segmentId = null;
-                if (isset($params['filter']['segmentId'])) {
-                    $segmentId = $params['filter']['segmentId'];
-                }
                 $event->setTemplateData([
                     'headItems' => [
                         'mautic.dashboard.label.url',
@@ -218,13 +169,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         'mautic.dashboard.label.email.name',
                     ],
                     'bodyItems' => $this->emailModel->getMostHitEmailRedirects(
-                        $limit,
+                        ArrayHelper::getValue('limit', $params, $defaultLimit),
                         $params['dateFrom'],
                         $params['dateTo'],
                         ['groupBy' => 'sends', 'canViewOthers' => $canViewOthers],
-                        $companyId,
-                        $campaignId,
-                        $segmentId
+                        ArrayHelper::getValue('companyId', $params),
+                        ArrayHelper::getValue('campaignId', $params),
+                        ArrayHelper::getValue('segmentId', $params)
                     ),
                 ]);
             }
@@ -265,16 +216,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'most.sent.emails') {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-
-                if (empty($params['limit'])) {
-                    // Count the emails limit from the widget height
-                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
-                } else {
-                    $limit = $params['limit'];
-                }
-
                 $emails = $this->emailModel->getEmailStatList(
-                    $limit,
+                    ArrayHelper::getValue('limit', $params, $defaultLimit),
                     $params['dateFrom'],
                     $params['dateTo'],
                     [],
@@ -317,16 +260,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'most.read.emails') {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-
-                if (empty($params['limit'])) {
-                    // Count the emails limit from the widget height
-                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
-                } else {
-                    $limit = $params['limit'];
-                }
-
                 $emails = $this->emailModel->getEmailStatList(
-                    $limit,
+                    ArrayHelper::getValue('limit', $params, $defaultLimit),
                     $params['dateFrom'],
                     $params['dateTo'],
                     [],
@@ -369,16 +304,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'created.emails') {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-
-                if (empty($params['limit'])) {
-                    // Count the emails limit from the widget height
-                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
-                } else {
-                    $limit = $params['limit'];
-                }
-
                 $emails = $this->emailModel->getEmailList(
-                    $limit,
+                    ArrayHelper::getValue('limit', $params, $defaultLimit),
                     $params['dateFrom'],
                     $params['dateTo'],
                     [],
@@ -438,5 +365,17 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
             $event->stopPropagation();
         }
+    }
+
+    /**
+     * Count the row limit from the widget height.
+     *
+     * @param Widget $widget
+     *
+     * @return int
+     */
+    private function getDefaultLimit(Widget $widget)
+    {
+        return round((($widget->getHeight() - 80) / 35) - 1);
     }
 }
