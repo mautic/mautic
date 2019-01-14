@@ -55,6 +55,10 @@ class CalculatorHelper
         $lastYear = new \DateTime(self::getYearDateString($lastYear));
         $thisYear = new \DateTime(self::getYearDateString($thisYear));
 
+        if (!isset($statDAO->getStats()[$lastYear->format($labelFormat)])) {
+            $statDAO->addStat($lastYear->format($labelFormat), 0);
+        }
+
         while ($lastYear < $thisYear) {
             $lastYear->modify('+1 year');
             $statDAO->addStat($lastYear->format($labelFormat), 0);
@@ -100,6 +104,10 @@ class CalculatorHelper
 
         $lastMonth = new \DateTime(self::getMonthDateString($lastMonth));
         $thisMonth = new \DateTime(self::getMonthDateString($thisMonth));
+
+        if (!isset($statDAO->getStats()[$lastMonth->format($labelFormat)])) {
+            $statDAO->addStat($lastMonth->format($labelFormat), 0);
+        }
 
         while ($lastMonth < $thisMonth) {
             $lastMonth->modify('+1 month');

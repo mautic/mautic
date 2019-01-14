@@ -105,7 +105,16 @@ class StatCollection
      */
     public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count)
     {
-        $this->addStatByDateTime(new \DateTime($dateTimeInUTC, new \DateTimeZone('UTC')), $count);
+        switch (true) {
+            case strlen($dateTimeInUTC) == 4 and is_numeric($dateTimeInUTC):
+                $dateTime = (new \DateTime('now', new \DateTimeZone('UTC')))
+                    ->setDate($dateTimeInUTC, 1, 1)
+                    ->setTime(0, 0);
+                break;
+            default:
+                $dateTime = new \DateTime($dateTimeInUTC, new \DateTimeZone('UTC'));
+        }
+        $this->addStatByDateTime($dateTime, $count);
 
         return $this;
     }

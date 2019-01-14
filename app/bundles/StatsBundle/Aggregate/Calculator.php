@@ -165,4 +165,16 @@ class Calculator
 
         return $statDAO;
     }
+
+    public function getSum()
+    {
+        $statDAO  = new StatDAO();
+        $sum      = 0;
+
+        foreach ($this->statsDAO->getYears() as $thisYear => $stats) {
+            $sum += $stats->getSum();
+        }
+
+        return $statDAO;
+    }
 }
