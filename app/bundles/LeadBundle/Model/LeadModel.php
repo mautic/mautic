@@ -28,7 +28,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -180,6 +179,11 @@ class LeadModel extends FormModel
     private $legacyLeadModel;
 
     /**
+     * @var IpAddressModel
+     */
+    private $ipAddressModel;
+
+    /**
      * @var bool
      */
     private $repoSetup = false;
@@ -195,8 +199,6 @@ class LeadModel extends FormModel
     private $fieldsByGroup = [];
 
     /**
-     * LeadModel constructor.
-     *
      * @param RequestStack         $requestStack
      * @param CookieHelper         $cookieHelper
      * @param IpLookupHelper       $ipLookupHelper
@@ -214,6 +216,7 @@ class LeadModel extends FormModel
      * @param ContactTracker       $contactTracker
      * @param DeviceTracker        $deviceTracker
      * @param LegacyLeadModel      $legacyLeadModel
+     * @param IpAddressModel       $ipAddressModel
      */
     public function __construct(
         RequestStack $requestStack,
@@ -232,7 +235,8 @@ class LeadModel extends FormModel
         UserProvider $userProvider,
         ContactTracker $contactTracker,
         DeviceTracker $deviceTracker,
-        LegacyLeadModel $legacyLeadModel
+        LegacyLeadModel $legacyLeadModel,
+        IpAddressModel $ipAddressModel
     ) {
         $this->request              = $requestStack->getCurrentRequest();
         $this->cookieHelper         = $cookieHelper;
@@ -251,6 +255,7 @@ class LeadModel extends FormModel
         $this->contactTracker       = $contactTracker;
         $this->deviceTracker        = $deviceTracker;
         $this->legacyLeadModel      = $legacyLeadModel;
+        $this->ipAddressModel       = $ipAddressModel;
     }
 
     /**
@@ -535,6 +540,8 @@ class LeadModel extends FormModel
         $this->processManipulator($entity);
 
         $this->setEntityDefaultValues($entity);
+
+        $this->ipAddressModel->saveIpAddressesReferencesForContact($entity);
 
         parent::saveEntity($entity, $unlock);
 
@@ -935,8 +942,6 @@ class LeadModel extends FormModel
     public function getContactFromRequest($queryFields = [])
     {
         // @todo Instantiate here until we can remove circular dependency on LeadModel in order to make it a service
-        /** @var StatRepository $emailStatRepository */
-        $emailStatRepository = $this->em->getRepository('MauticEmailBundle:Stat');
         $requestStack        = new RequestStack();
         $requestStack->push($this->request);
         $contactRequestHelper = new ContactRequestHelper(
@@ -944,10 +949,10 @@ class LeadModel extends FormModel
             $this->contactTracker,
             $this->coreParametersHelper,
             $this->ipLookupHelper,
-            $emailStatRepository,
             $this->getDeviceRepository(),
             $requestStack,
-            $this->logger
+            $this->logger,
+            $this->dispatcher
         );
 
         return $contactRequestHelper->getContactFromQuery($queryFields);
@@ -1028,11 +1033,11 @@ class LeadModel extends FormModel
      *
      * @return mixed
      */
-    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false)
+    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
 
-        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic);
+        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
 
     /**

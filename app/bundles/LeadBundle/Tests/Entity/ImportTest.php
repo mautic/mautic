@@ -123,10 +123,19 @@ class ImportTest extends StandardImportTestHelper
         $this->assertSame(Import::QUEUED, $import->getStatus());
         $this->assertNull($import->getDateStarted());
 
+        // Date started will be set when the start is called for the first time.
         $import->start();
 
+        $startDate = $import->getDateStarted();
+
         $this->assertSame(Import::IN_PROGRESS, $import->getStatus());
-        $this->assertTrue($import->getDateStarted() instanceof \DateTime);
+        $this->assertTrue($startDate instanceof \DateTime);
+
+        // But the date started will not change when started for the second time.
+        $import->end(false);
+        $import->start();
+
+        $this->assertSame($startDate, $import->getDateStarted());
     }
 
     public function testEnd()

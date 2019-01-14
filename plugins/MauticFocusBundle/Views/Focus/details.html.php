@@ -35,7 +35,7 @@ $view['slots']->set(
                 'close' => $view['security']->isGranted('plugin:focus:items:view'),
             ],
             'routeBase' => 'focus',
-            'langVar'   => 'mautic.focus',
+            'langVar'   => 'focus',
         ]
     )
 );

@@ -215,6 +215,11 @@ return [
                 'arguments' => 'Mautic\UserBundle\Entity\User',
                 'factory'   => ['@mautic.user.manager', 'getRepository'],
             ],
+            'mautic.user.token.repository' => [
+                'class'     => 'Mautic\UserBundle\Entity\UserTokenRepository',
+                'arguments' => 'Mautic\UserBundle\Entity\UserToken',
+                'factory'   => ['@doctrine', 'getRepository'],
+            ],
             'mautic.permission.manager' => [
                 'class'     => 'Doctrine\ORM\EntityManager',
                 'arguments' => 'Mautic\UserBundle\Entity\Permission',

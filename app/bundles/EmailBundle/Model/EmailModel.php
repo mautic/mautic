@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -131,6 +132,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $redirectRepository;
 
     /**
+     * @var CacheStorageHelper
+     */
+    private $cacheStorageHelper;
+
+    /**
      * EmailModel constructor.
      *
      * @param IpLookupHelper     $ipLookupHelper
@@ -145,6 +151,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param SendEmailToContact $sendModel
      * @param DeviceTracker      $deviceTracker
      * @param RedirectRepository $redirectRepository
+     * @param CacheStorageHelper $cacheStorageHelper
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -158,7 +165,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         MessageQueueModel $messageQueueModel,
         SendEmailToContact $sendModel,
         DeviceTracker $deviceTracker,
-        RedirectRepository $redirectRepository
+        RedirectRepository $redirectRepository,
+        CacheStorageHelper $cacheStorageHelper
     ) {
         $this->ipLookupHelper        = $ipLookupHelper;
         $this->themeHelper           = $themeHelper;
@@ -172,6 +180,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->sendModel             = $sendModel;
         $this->deviceTracker         = $deviceTracker;
         $this->redirectRepository    = $redirectRepository;
+        $this->cacheStorageHelper    = $cacheStorageHelper;
     }
 
     /**
@@ -377,6 +386,33 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * Return a list of entities.
+     *
+     * @param array $args [start, limit, filter, orderBy, orderByDir]
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
+     */
+    public function getEntities(array $args = [])
+    {
+        $entities = parent::getEntities($args);
+
+        foreach ($entities as $entity) {
+            $queued  = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
+            $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
+
+            if ($queued) {
+                $entity->setQueuedCount($queued);
+            }
+
+            if ($pending) {
+                $entity->setPendingCount($pending);
+            }
+        }
+
+        return $entities;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param $action
@@ -503,32 +539,21 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->em->persist($email);
         }
 
+        $this->em->persist($stat);
+
+        // Flush the email stat entity in different transactions than the device stat entity to avoid deadlocks.
+        $this->flushAndCatch();
+
         if ($lead) {
+            $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
             $emailOpenStat = new StatDevice();
             $emailOpenStat->setIpAddress($ipAddress);
-            $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
             $emailOpenStat->setDevice($trackedDevice);
             $emailOpenStat->setDateOpened($readDateTime->toUtcString());
             $emailOpenStat->setStat($stat);
-        }
 
-        $this->em->persist($stat);
-
-        if ($lead) {
             $this->em->persist($emailOpenStat);
-        }
-
-        try {
-            $this->em->flush();
-        } catch (\Exception $ex) {
-            if (MAUTIC_ENV === 'dev') {
-                throw $ex;
-            } else {
-                $this->logger->addError(
-                    $ex->getMessage(),
-                    ['exception' => $ex]
-                );
-            }
+            $this->flushAndCatch();
         }
     }
 
@@ -944,6 +969,18 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $countWithMaxMin
         );
 
+        if (!empty($total)) {
+            if ($countOnly && $countWithMaxMin) {
+                $toStore = $total['count'];
+            } elseif ($countOnly) {
+                $toStore = $total;
+            } else {
+                $toStore = count($total);
+            }
+
+            $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'pending'), $toStore);
+        }
+
         return $total;
     }
 
@@ -960,7 +997,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $ids[] = $email->getId();
         }
 
-        return $this->messageQueueModel->getQueuedChannelCount('email', $ids);
+        $queued = (int) $this->messageQueueModel->getQueuedChannelCount('email', $ids);
+
+        if ($queued) {
+            $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
+        }
+
+        return $queued;
     }
 
     /**

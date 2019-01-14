@@ -26,6 +26,7 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\Event;
@@ -178,7 +179,15 @@ class FormModel extends CommonFormModel
             return new Form();
         }
 
-        return parent::getEntity($id);
+        $entity = parent::getEntity($id);
+
+        if ($entity && $entity->getFields()) {
+            foreach ($entity->getFields() as $field) {
+                $this->addLeadFieldOptions($field);
+            }
+        }
+
+        return $entity;
     }
 
     /**
@@ -500,7 +509,7 @@ class FormModel extends CommonFormModel
             $theme .= '|';
         }
 
-        if ($lead && $entity->usesProgressiveProfiling()) {
+        if ($lead instanceof Lead && $lead->getId() && $entity->usesProgressiveProfiling()) {
             $submissions = $this->getLeadSubmissions($entity, $lead->getId());
         }
 
@@ -578,6 +587,7 @@ class FormModel extends CommonFormModel
                 'inBuilder'     => false,
             ]
         );
+
         if (!$entity->usesProgressiveProfiling()) {
             $entity->setCachedHtml($html);
 
@@ -1077,5 +1087,58 @@ class FormModel extends CommonFormModel
         }
 
         return $javascript;
+    }
+
+    /**
+     * Finds out whether the.
+     *
+     * @param Field $field
+     */
+    private function addLeadFieldOptions(Field $formField)
+    {
+        $formFieldProps    = $formField->getProperties();
+        $contactFieldAlias = $formField->getLeadField();
+
+        if (empty($formFieldProps['syncList']) || empty($contactFieldAlias)) {
+            return;
+        }
+
+        $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);
+
+        if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
+            return;
+        }
+
+        $contactFieldProps = $contactField->getProperties();
+
+        switch ($contactField->getType()) {
+            case 'select':
+            case 'multiselect':
+            case 'lookup':
+                $list = isset($contactFieldProps['list']) ? $contactFieldProps['list'] : [];
+                break;
+            case 'boolean':
+                $list = [$contactFieldProps['no'], $contactFieldProps['yes']];
+                break;
+            case 'country':
+                $list = ContactFieldHelper::getCountryChoices();
+                break;
+            case 'region':
+                $list = ContactFieldHelper::getRegionChoices();
+                break;
+            case 'timezone':
+                $list = ContactFieldHelper::getTimezonesChoices();
+                break;
+            case 'locale':
+                $list = ContactFieldHelper::getLocaleChoices();
+                break;
+            default:
+                return;
+        }
+
+        if (!empty($list)) {
+            $formFieldProps['list'] = ['list' => $list];
+            $formField->setProperties($formFieldProps);
+        }
     }
 }

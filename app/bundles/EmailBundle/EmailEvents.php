@@ -224,4 +224,14 @@ final class EmailEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
+
+    /**
+     * The mautic.email.on_transport_webhook event is fired when an email transport service sends Mautic a webhook request.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\TransportWebhookEvent
+     *
+     * @var string
+     */
+    const ON_TRANSPORT_WEBHOOK = 'mautic.email.on_transport_webhook';
 }

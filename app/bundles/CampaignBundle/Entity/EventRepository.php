@@ -75,7 +75,8 @@ class EventRepository extends LegacyEventRepository
             ->where(
                 $parentQb->expr()->eq('parent_log_event.event', 'e.parent'),
                 $parentQb->expr()->eq('parent_log_event.lead', 'l.lead'),
-                $parentQb->expr()->eq('parent_log_event.rotation', 'l.rotation')
+                $parentQb->expr()->eq('parent_log_event.rotation', 'l.rotation'),
+                $parentQb->expr()->eq('parent_log_event.isScheduled', 0)
             );
 
         $q = $this->createQueryBuilder('e', 'e.id');

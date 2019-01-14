@@ -152,6 +152,7 @@ class SmsSubscriber extends CommonSubscriber
                     'sms',
                     $clickthrough['channel'][1]
                 );
+
                 /**
                  * @var string
                  * @var Trackable $trackable

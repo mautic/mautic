@@ -170,8 +170,9 @@ class Interval implements ScheduleModeInterface
         }
 
         if (
-            null === $event->getTriggerHour() && (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour())
-            && empty($event->getTriggerRestrictedDaysOfWeek())
+            null === $event->getTriggerHour() &&
+            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
+            empty($event->getTriggerRestrictedDaysOfWeek())
         ) {
             return false;
         }
