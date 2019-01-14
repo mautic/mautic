@@ -62,6 +62,7 @@ class FormFieldTelType extends AbstractType
                     'tooltip'      => $this->translator->trans('mautic.core.form.default').': '.$this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'),
                     'data-show-on' => '{"formfield_validation_international_1": "checked"}',
                 ],
+                'required' => false,
             ]
         );
     }

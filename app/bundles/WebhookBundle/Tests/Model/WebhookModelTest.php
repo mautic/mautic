@@ -117,7 +117,6 @@ class WebhookModelTest extends \PHPUnit_Framework_TestCase
         $queue->setPayload('{"the": "payload"}');
         $queue->setEvent($event);
         $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
-        $webhook->addQueue($queue);
 
         $this->parametersHelperMock->expects($this->at(5))
             ->method('getParameter')
@@ -133,7 +132,7 @@ class WebhookModelTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->assertEquals($expectedPayload, $this->initModel()->getWebhookPayload($webhook));
+        $this->assertEquals($expectedPayload, $this->initModel()->getWebhookPayload($webhook, $queue));
     }
 
     private function initModel()
