@@ -365,6 +365,26 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
+     * Get filter value from a specific filter.
+     *
+     * @param string $column
+     *
+     * @return mixed
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function getFilterValue($column)
+    {
+        foreach ($this->getFilters() as $field) {
+            if ($column === $field['column']) {
+                return $field['value'];
+            }
+        }
+
+        throw new \UnexpectedValueException("Column {$column} doesn't have any filter.");
+    }
+
+    /**
      * @return mixed
      */
     public function getDescription()
