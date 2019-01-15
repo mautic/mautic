@@ -278,6 +278,9 @@ trait FilterTrait
             case 'lookup':
             default:
                 if ('number' !== $fieldType) {
+                    if (!isset($data['field'])) {
+                        return;
+                    }
                     $attr = array_merge(
                         $attr,
                         [
