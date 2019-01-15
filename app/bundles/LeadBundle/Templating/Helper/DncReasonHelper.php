@@ -45,13 +45,13 @@ class DncReasonHelper extends Helper
     {
         switch ($reasonId) {
             case DoNotContact::UNSUBSCRIBED:
-                $reason = $this->translator->trans('mautic.lead.event.donotcontact_unsubscribed');
+                $reasonKey = 'mautic.lead.event.donotcontact_unsubscribed';
                 break;
             case DoNotContact::BOUNCED:
-                $reason = $this->translator->trans('mautic.lead.event.donotcontact_bounced');
+                $reasonKey = 'mautic.lead.event.donotcontact_bounced';
                 break;
             case DoNotContact::MANUAL:
-                $reason = $this->translator->trans('mautic.lead.event.donotcontact_manual');
+                $reasonKey = 'mautic.lead.event.donotcontact_manual';
                 break;
             default:
                 throw new InvalidArgumentException(
@@ -59,7 +59,7 @@ class DncReasonHelper extends Helper
                 );
         }
 
-        return $reason;
+        return $this->translator->trans($reasonKey);
     }
 
     /**
