@@ -362,11 +362,12 @@ return [
     'services' => [
         'events' => [
             'mautic.lead.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\LeadSubscriber',
+                'class'     => Mautic\LeadBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.lead.event.dispatcher',
+                    'mautic.helper.template.dnc_reason',
                 ],
                 'methodCalls' => [
                     'setModelFactory' => ['mautic.model.factory'],
