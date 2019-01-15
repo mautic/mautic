@@ -315,6 +315,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         }
                     }
 
+                    // support for prefix and suffix to value in query
+                    $prefix     = isset($fieldOptions['prefix']) ? $fieldOptions['prefix'] : '';
+                    $suffix     = isset($fieldOptions['suffix']) ? $fieldOptions['suffix'] : '';
+                    if ($prefix || $suffix) {
+                        $selectText = 'CONCAT(\''.$prefix.'\', '.$selectText.',\''.$suffix.'\')';
+                    }
+
                     if (isset($fieldOptions['alias'])) {
                         $selectText .= ' AS '.$fieldOptions['alias'];
                     }
