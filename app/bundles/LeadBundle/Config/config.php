@@ -948,6 +948,11 @@ return [
                 'class'     => \Mautic\LeadBundle\Helper\FieldAliasHelper::class,
                 'arguments' => ['mautic.lead.model.field'],
             ],
+            'mautic.helper.template.dnc_reason' => [
+                'class'     => Mautic\LeadBundle\Templating\Helper\DncReasonHelper::class,
+                'arguments' => ['translator'],
+                'alias'     => 'lead_dnc_reason',
+            ],
         ],
         'models' => [
             'mautic.lead.model.lead' => [
