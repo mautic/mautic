@@ -37,23 +37,6 @@ class LeadEventLogRepository extends CommonRepository
         return $this->getSpecificRows($importId, 'failed', $args, $bundle, $object);
     }
 
-    public function getEntities(array $args = [])
-    {
-        $entities = parent::getEntities($args);
-        $entities = iterator_to_array($entities);
-
-        foreach ($entities as $key => $row) {
-            if (
-                isset($row['properties']['error'])
-                && preg_match('/SQLSTATE\[\w+\]: (.*)/', $row['properties']['error'], $matches)
-            ) {
-                $entities[$key]['properties']['error'] = $matches[1];
-            }
-        }
-
-        return $entities;
-    }
-
     /**
      * Returns paginator with specific type of rows.
      *
