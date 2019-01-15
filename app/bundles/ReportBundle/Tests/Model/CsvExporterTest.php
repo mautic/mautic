@@ -12,6 +12,7 @@
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
@@ -39,11 +40,15 @@ class CsvExporterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $formatterHelperMock = new FormatterHelper($appVersion, $dateHelperMock, $translator);
 
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
 
-        $csvExporter = new CsvExporter($formatterHelperMock);
+        $csvExporter = new CsvExporter($formatterHelperMock, $coreParametersHelperMock);
 
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_csv_export_test_');
         $file    = fopen($tmpFile, 'w');
