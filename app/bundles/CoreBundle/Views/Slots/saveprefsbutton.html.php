@@ -34,7 +34,7 @@ if (isset($form)) {
         unset($form['lead_channels']['contact_pause_start_date_email'], $form['lead_channels']['contact_pause_end_date_email']);
     }
     if (!$showContactFrequency) {
-        unset($form['lead_channels']['subscribed_channels'], $form['lead_channels']['frequency_number_email'], $form['lead_channels']['frequency_time_email']);
+        unset($form['lead_channels']['frequency_number_email'], $form['lead_channels']['frequency_time_email']);
     }
     if (!$showContactPreferredChannels) {
         unset($form['lead_channels']['preferred_channel']);
