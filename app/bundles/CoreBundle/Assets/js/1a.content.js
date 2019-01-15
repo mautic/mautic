@@ -333,14 +333,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.activateMultiSelect(this);
     });
 
-    mQuery(container + " *[data-toggle='field-lookup']").each(function (index) {
-        var target = mQuery(this).attr('data-target');
-        var options = mQuery(this).attr('data-options');
-        var field = mQuery(this).attr('id');
-        var action = mQuery(this).attr('data-action');
-
-        Mautic.activateFieldTypeahead(field, target, options, action);
-    });
+    Mautic.activateLookupTypeahead(mQuery(container));
 
     // Fix dropdowns in responsive tables - https://github.com/twbs/bootstrap/issues/11037#issuecomment-163746965
     mQuery(container + " .table-responsive").on('shown.bs.dropdown', function (e) {
@@ -718,7 +711,22 @@ Mautic.onPageLoad = function (container, response, inModal) {
 };
 
 /**
- *
+ * @param jQueryObject
+ */
+Mautic.activateLookupTypeahead = function(containerEl) {
+    containerEl.find("*[data-toggle='field-lookup']").each(function () {
+        var lookup = mQuery(this);
+
+        Mautic.activateFieldTypeahead(
+            lookup.attr('id'),
+            lookup.attr('data-target'),
+            lookup.attr('data-options'),
+            lookup.attr('data-action')
+        );
+    });
+};
+
+/**
  * @param jQueryObject
  */
 Mautic.makeConfirmationsAlive = function(jQueryObject) {

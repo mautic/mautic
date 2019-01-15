@@ -330,11 +330,11 @@ class PublicController extends CommonFormController
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
                 $leadModel = $this->getModel('lead');
                 $leadModel->setCurrentLead($lead);
-            }
 
-            // Set lead lang
-            if ($lead->getPreferredLocale()) {
-                $this->translator->setLocale($lead->getPreferredLocale());
+                // Set lead lang
+                if ($lead->getPreferredLocale()) {
+                    $this->translator->setLocale($lead->getPreferredLocale());
+                }
             }
 
             $model->removeDoNotContact($stat->getEmailAddress());
