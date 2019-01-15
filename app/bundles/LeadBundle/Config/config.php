@@ -940,7 +940,7 @@ return [
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
-                'class'     => 'Mautic\LeadBundle\Templating\Helper\AvatarHelper',
+                'class'     => Mautic\LeadBundle\Templating\Helper\AvatarHelper::class,
                 'arguments' => ['mautic.factory'],
                 'alias'     => 'lead_avatar',
             ],
