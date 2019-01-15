@@ -103,14 +103,18 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendWithOldErrorResponse()
     {
-        $payload = '{  
-            "errors":[  
-              {
+        $templateCheckPayload = '{
+            "results": {
+                "subject": "Summer deals for Natalie",
+                "html": "<b>Check out these deals Natalie!</b>"
+            }
+        }';
+        $transmissionPayload = '{  
+            "errors":[{
                 "description":"Unconfigured or unverified sending domain.",
                 "code":"1902",
                 "message":"Invalid domain"
-              }
-            ]
+            }]
         }';
 
         $this->message->method('getMetadata')->willReturn(['jane@doe.email' => ['leadId' => 21]]);
@@ -118,12 +122,21 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
         $this->message->method('getFrom')->willReturn(['john@doe.email' => 'John']);
         $this->message->method('getTo')->willReturn(['jane@doe.email' => 'Jane']);
         $this->response->method('getStatusCode')->willReturn(200);
-        $this->stream->method('__toString')->willReturn($payload);
+
+        $this->stream->expects($this->at(0))
+            ->method('__toString')
+            ->willReturn($templateCheckPayload);
+
+        $this->stream->expects($this->at(1))
+            ->method('__toString')
+            ->willReturn($transmissionPayload);
+
         $this->transportCallback
             ->expects($this->once())
             ->method('addFailureByContactId')
             ->with(21, 'Unconfigured or unverified sending domain.', DoNotContact::BOUNCED, null);
 
+        $this->expectExceptionMessage('Unconfigured or unverified sending domain.');
         $this->sparkpostTransport->send($this->message);
     }
 
@@ -132,7 +145,13 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendWithNewErrorResponse()
     {
-        $payload = '{  
+        $templateCheckPayload = '{
+            "results": {
+                "subject": "Summer deals for Natalie",
+                "html": "<b>Check out these deals Natalie!</b>"
+            }
+        }';
+        $transmissionPayload = '{  
             "errors":[  
               {
                 "code":"1902",
@@ -146,12 +165,21 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
         $this->message->method('getFrom')->willReturn(['john@doe.email' => 'John']);
         $this->message->method('getTo')->willReturn(['jane@doe.email' => 'Jane']);
         $this->response->method('getStatusCode')->willReturn(200);
-        $this->stream->method('__toString')->willReturn($payload);
+
+        $this->stream->expects($this->at(0))
+            ->method('__toString')
+            ->willReturn($templateCheckPayload);
+
+        $this->stream->expects($this->at(1))
+            ->method('__toString')
+            ->willReturn($transmissionPayload);
+
         $this->transportCallback
             ->expects($this->once())
             ->method('addFailureByContactId')
             ->with(21, 'Invalid domain', DoNotContact::BOUNCED, null);
 
+        $this->expectExceptionMessage('Invalid domain');
         $this->sparkpostTransport->send($this->message);
     }
 

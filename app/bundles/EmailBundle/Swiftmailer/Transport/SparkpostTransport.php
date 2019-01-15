@@ -131,15 +131,19 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         try {
             $sparkPostMessage = $this->getSparkPostMessage($message);
             $sparkPostClient  = $this->createSparkPost();
-            $promise          = $sparkPostClient->transmissions->post($sparkPostMessage);
 
+            $this->checkTemplateIsValid($sparkPostClient, $sparkPostMessage);
+
+            $promise  = $sparkPostClient->transmissions->post($sparkPostMessage);
             $response = $promise->wait();
-            if (200 == (int) $response->getStatusCode()) {
-                $results = $response->getBody();
-                if (empty($results['results']['total_accepted_recipients']) || !$sendCount = $results['results']['total_accepted_recipients']) {
-                    $this->processImmediateSendFeedback($sparkPostMessage, $results);
-                }
+            $body     = $response->getBody();
+
+            if ($errorMessage = $this->getErrorMessageFromResponseBody($body)) {
+                $this->processImmediateSendFeedback($sparkPostMessage, $body);
+                throw new \Exception($errorMessage);
             }
+
+            $sendCount = $body['results']['total_accepted_recipients'];
         } catch (\Exception $e) {
             $this->throwException($e->getMessage());
         }
@@ -386,7 +390,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     private function processImmediateSendFeedback(array $message, array $response)
     {
         if (!empty($response['errors'][0]['code']) && 1902 == (int) $response['errors'][0]['code']) {
-            $comments     = $this->getErrorMessageFromResponse($response);
+            $comments     = $this->getErrorMessageFromResponseBody($response);
             $emailAddress = $message['recipients'][0]['address']['email'];
             $metadata     = $this->getMetadata();
 
@@ -407,7 +411,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      *
      * @return string
      */
-    private function getErrorMessageFromResponse(array $response)
+    private function getErrorMessageFromResponseBody(array $response)
     {
         if (isset($response['errors'][0]['description'])) {
             return $response['errors'][0]['description'];
@@ -415,7 +419,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             return $response['errors'][0]['message'];
         }
 
-        return 'Unknown error message';
+        return null;
     }
 
     /**
@@ -463,6 +467,32 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             case 'link_unsubscribe':
                 $this->transportCallback->addFailureByAddress($email, 'unsubscribed', DoNotContact::UNSUBSCRIBED);
                 break;
+        }
+    }
+
+    /**
+     * Checks with Sparkpost whether the email template is valid.
+     * Substitution data are taken from the first recipient.
+     *
+     * @param Sparkpost $sparkPostClient
+     * @param array     $sparkPostMessage
+     *
+     * @throws \UnexpectedValueException
+     */
+    private function checkTemplateIsValid(Sparkpost $sparkPostClient, array $sparkPostMessage)
+    {
+        // Take substitution_data from the first recipient.
+        if (empty($sparkPostMessage['substitution_data']) && isset($sparkPostMessage['recipients'][0]['substitution_data'])) {
+            $sparkPostMessage['substitution_data'] = $sparkPostMessage['recipients'][0]['substitution_data'];
+            unset($sparkPostMessage['recipients']);
+        }
+
+        $promise  = $sparkPostClient->request('POST', 'utils/content-previewer', $sparkPostMessage);
+        $response = $promise->wait();
+        $body     = $response->getBody();
+
+        if ($errorMessage = $this->getErrorMessageFromResponseBody($body)) {
+            throw new \UnexpectedValueException($errorMessage);
         }
     }
 }
