@@ -282,7 +282,7 @@ trait FilterTrait
                         $attr,
                         [
                             'data-toggle' => 'field-lookup',
-                            'data-target' => $data['field'],
+                            'data-target' => isset($data['field']) ? $data['field'] : '',
                             'data-action' => 'lead:fieldList',
                             'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
                         ]
