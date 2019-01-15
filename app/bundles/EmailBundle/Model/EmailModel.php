@@ -2061,19 +2061,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * @param QueryBuilder $q
-     * @param int|null     $campaignId
-     * @param string       $fromAlias
-     */
-    private function addCampaignFilterForEmailSource(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
-    {
-        if ($campaignId !== null) {
-            $q->innerJoin($fromAlias, '(SELECT DISTINCT channel_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId AND channel = "email")', 'clel', $fromAlias.'.source_id = clel.channel_id AND '.$fromAlias.'.source = "email" AND '.$fromAlias.'.lead_id = clel.lead_id')
-                ->setParameter('campaignId', $campaignId);
-        }
-    }
-
-    /**
-     * @param QueryBuilder $q
      * @param int|null     $segmentId
      * @param string       $fromAlias
      */
