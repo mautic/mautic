@@ -60,9 +60,9 @@ trait FilterTrait
 
         $field = [];
 
-        if (!isset($data['object'])) {
-            $data['object'] = 'lead';
-        }
+        /*    if (!isset($data['object'])) {
+                $data['object'] = 'lead';
+            }*/
 
         if (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
             $field = $options['fields'][$data['object']][$fieldName];
