@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -9,15 +9,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use DeviceDetector\Parser\Device\DeviceParserAbstract;
+
 ?>
 
 <table class="table table-bordered table-striped mb-0">
     <thead>
         <tr>
             <th class="timeline-icon"></th>
-            <th><?php use DeviceDetector\Parser\Device\DeviceParserAbstract;
-
-echo $view['translator']->trans('mautic.lead.device.header'); ?></th>
+            <th><?php echo $view['translator']->trans('mautic.lead.device.header'); ?></th>
             <th><?php echo $view['translator']->trans('mautic.lead.device_os_name.header'); ?></th>
             <th><?php echo $view['translator']->trans('mautic.lead.device_os_version.header'); ?></th>
             <th><?php echo $view['translator']->trans('mautic.lead.device_browser.header'); ?></th>
