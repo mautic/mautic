@@ -100,7 +100,12 @@ if (!isset($_GET)) {
                     } else {
                         $thumbnail = false;
                     }
-                    $fm->preview($thumbnail);
+
+                    try {
+                        $fm->preview($thumbnail);
+                    } catch (\Exception $e) {
+                        $fm->error($e->getMessage());
+                    }
                 }
                 break;
         }

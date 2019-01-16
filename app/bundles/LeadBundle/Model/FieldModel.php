@@ -138,6 +138,12 @@ class FieldModel extends FormModel
             'listable' => true,
             'object'   => 'lead',
         ],
+        'last_active' => [
+            'type'     => 'datetime',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+        ],
         'attribution_date' => [
             'type'     => 'datetime',
             'fixed'    => true,

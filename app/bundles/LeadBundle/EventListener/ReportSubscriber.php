@@ -409,8 +409,10 @@ class ReportSubscriber extends CommonSubscriber
 
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
-            $queryBuilder->resetQueryPart('join');
-            $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
+            if ($queryBuilder->getQueryPart('from')[0]['alias'] === 'lp') {
+                $queryBuilder->resetQueryPart('join');
+                $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
+            }
 
             switch ($g) {
                 case 'mautic.lead.graph.pie.attribution_stages':

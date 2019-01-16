@@ -314,13 +314,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $config        = $this->mergeConfigToFeatureSettings([]);
         $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
 
-        // Default to new company
-        $company         = new Company();
-        $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $this->companyModel);
-        if (!empty($existingCompany[2])) {
-            $company = $existingCompany[2];
-        }
-
         $companyFieldTypes = $this->fieldModel->getFieldListWithProperties('company');
         foreach ($matchedFields as $companyField => $value) {
             if (isset($companyFieldTypes[$companyField]['type'])) {
@@ -338,6 +331,13 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                         break;
                 }
             }
+        }
+
+        // Default to new company
+        $company         = new Company();
+        $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $this->companyModel);
+        if (!empty($existingCompany[2])) {
+            $company = $existingCompany[2];
         }
 
         if (!empty($existingCompany[2])) {
