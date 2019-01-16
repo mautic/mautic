@@ -589,9 +589,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
     {
         $createdByUserId = null;
-        if (!empty($options['canViewOthers'])) {
+        $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
+
+        if (!$canViewOthers) {
             $createdByUserId = $this->userHelper->getUser()->getId();
         }
+
         $stats = $this->getStatRepository()->getSentEmailToContactData($limit, $dateFrom, $dateTo, $createdByUserId, $companyId, $campaignId, $segmentId);
         $data  = [];
 
@@ -651,7 +654,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
     {
         $createdByUserId = null;
-        if (!empty($options['canViewOthers'])) {
+        $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
+
+        if (!$canViewOthers) {
             $createdByUserId = $this->userHelper->getUser()->getId();
         }
 
@@ -1924,7 +1929,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         if ($flag == 'all' || $flag == 'clicked' || in_array('clicked', $datasets)) {
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', []);
-            $q->leftJoin('t', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 't.source_id = es.email_id AND es.source = "email"');
+
+            if ($segmentId !== null) {
+                $q->innerJoin('t', '(SELECT DISTINCT email_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'email_stats WHERE list_id = :segmentId)', 'es', 't.source_id = es.email_id');
+                $q->setParameter('segmentId', $segmentId);
+            }
+
+            $q->andWhere('t.source = :source');
+            $q->setParameter('source', 'email');
 
             if (isset($filter['email_id'])) {
                 if (is_array($filter['email_id'])) {
@@ -1940,7 +1952,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $this->limitQueryToCreator($q);
             }
             $this->addCompanyFilter($q, $companyId);
-            $this->addCampaignFilter($q, $campaignId);
+            $this->addCampaignFilterForEmailSource($q, $campaignId);
             $this->addSegmentFilter($q, $segmentId, 'es');
             $data = $query->loadAndBuildTimeData($q);
 
@@ -2163,7 +2175,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getEmailStatList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = [])
     {
-        $q = $this->em->getConnection()->createQueryBuilder();
+        $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
+        $q             = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS count, e.id, e.name')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
@@ -2171,7 +2184,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             ->groupBy('e.id')
             ->setMaxResults($limit);
 
-        if (!empty($options['canViewOthers'])) {
+        if (!$canViewOthers) {
             $q->andWhere('e.created_by = :userId')
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
@@ -2205,12 +2218,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getEmailList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = [])
     {
-        $q = $this->em->getConnection()->createQueryBuilder();
+        $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
+        $q             = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.name, t.date_added, t.date_modified')
             ->from(MAUTIC_TABLE_PREFIX.'emails', 't')
             ->setMaxResults($limit);
 
-        if (!empty($options['canViewOthers'])) {
+        if (!$canViewOthers) {
             $q->andWhere('t.created_by = :userId')
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
