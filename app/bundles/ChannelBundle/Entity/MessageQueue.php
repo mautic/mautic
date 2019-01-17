@@ -139,7 +139,7 @@ class MessageQueue
             ->addIndex(['success'], 'message_success')
             ->addIndex(['channel', 'channel_id'], 'message_channel_search');
 
-        $builder->addBigIntIdField();
+        $builder->addId();
 
         $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');

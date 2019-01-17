@@ -297,7 +297,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addIndex(['date_identified'], 'date_identified')
             ->addIndex(['last_active'], 'last_active_search');
 
-        $builder->addBigIntIdField();
+        $builder->createField('id', 'integer')
+            ->makePrimaryKey()
+            ->generatedValue()
+            ->build();
 
         $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
             ->fetchLazy()

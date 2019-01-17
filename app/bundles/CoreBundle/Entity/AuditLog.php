@@ -82,7 +82,7 @@ class AuditLog
             ->addIndex(['bundle', 'object', 'action', 'object_id'], 'timeline_search')
             ->addIndex(['date_added'], 'date_added_index');
 
-        $builder->addBigIntIdField();
+        $builder->addId();
 
         $builder->createField('userId', 'integer')
             ->columnName('user_id')
