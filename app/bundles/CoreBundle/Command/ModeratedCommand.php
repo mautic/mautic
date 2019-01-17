@@ -72,6 +72,29 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         $this->bypassLocking  = $input->getOption('bypass-locking');
         $lockMode             = $input->getOption('lock_mode');
 
+        // If NewRelic is enabled relay the context of this transaction for debugging.
+        try {
+            if (
+                function_exists('newrelic_name_transaction')
+                && $nrCommand = (string) $input->getArgument('command')
+            ) {
+                call_user_func('newrelic_name_transaction', $nrCommand);
+                if (
+                    function_exists('newrelic_add_custom_parameter')
+                    && $nrOptions = $input->getOptions()
+                ) {
+                    foreach ($nrOptions as $key => $value) {
+                        call_user_func(
+                            'newrelic_add_custom_parameter',
+                            (string) $key,
+                            (string) $value
+                        );
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+        }
+
         if (!in_array($lockMode, ['pid', 'file_lock'])) {
             $output->writeln('<error>Unknown locking method specified.</error>');
 
