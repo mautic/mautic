@@ -137,7 +137,9 @@ class DynamicContentFilterEntryType extends AbstractType
                         'tags',
                         'dnc_bounced',
                         'dnc_unsubscribed',
+                        'dnc_unsubscribed_manually',
                         'dnc_bounced_sms',
+                        'dnc_unsubscribed_sms_manually',
                         'dnc_unsubscribed_sms',
                         'hit_url',
                     ]

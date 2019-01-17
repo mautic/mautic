@@ -41,6 +41,16 @@ class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
             $doNotContactParts->getParameterType(),
             'Type for dnc_unsubscribed should be unsubscribed'
         );
+
+        $field             = 'dnc_unsubscribed_manually';
+        $doNotContactParts = new DoNotContactParts($field);
+
+        $this->assertSame('email', $doNotContactParts->getChannel());
+        $this->assertSame(
+            DoNotContact::MANUAL,
+            $doNotContactParts->getParameterType(),
+            'Type for dnc_manual should be manual'
+        );
     }
 
     /**
@@ -67,6 +77,16 @@ class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
             DoNotContact::UNSUBSCRIBED,
             $doNotContactParts->getParameterType(),
             'Type for dnc_unsubscribed_sms should be unsubscribed'
+        );
+
+        $field             = 'dnc_unsubscribed_sms_manually';
+        $doNotContactParts = new DoNotContactParts($field);
+
+        $this->assertSame('sms', $doNotContactParts->getChannel());
+        $this->assertSame(
+            DoNotContact::MANUAL,
+            $doNotContactParts->getParameterType(),
+            'Type for dnc_unsubscribed_sms_manually should be manual'
         );
     }
 }

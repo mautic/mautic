@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Services;
 
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
@@ -88,7 +89,15 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
+        $this->translations['dnc_unsubscribed_manually'] = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
+
         $this->translations['dnc_unsubscribed_sms'] = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
+
+        $this->translations['dnc_unsubscribed_sms_manually'] = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
@@ -193,6 +202,26 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         $this->translations['url_title'] = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
+        ];
+
+        // Clicked any link from an email ever
+        $this->translations['email_id'] = [ // kept as email_id for BC
+            'type' => ChannelClickQueryBuilder::getServiceId(),
+        ];
+
+        // Clicked any link from an email based on time
+        $this->translations['email_clicked_link_date'] = [
+            'type' => ChannelClickQueryBuilder::getServiceId(),
+        ];
+
+        // Clicked any link from a sms based on time
+        $this->translations['sms_clicked_link'] = [
+            'type'  => ChannelClickQueryBuilder::getServiceId(),
+        ];
+
+        // Clicked any link from a sms based on time
+        $this->translations['sms_clicked_link_date'] = [
+            'type'  => ChannelClickQueryBuilder::getServiceId(),
         ];
 
         $this->translations['sessions'] = [
