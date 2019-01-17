@@ -566,6 +566,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
             'fast',
             function () {
                 mQuery(this).remove();
+                Mautic.reorderSegmentFilters();
             }
         );
     });
