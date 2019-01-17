@@ -135,10 +135,16 @@ class ContactSegmentFilterDictionary
         $this->filters['dnc_manual_email']     = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
+        $this->filters['dnc_unsubscribed_manually'] = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
         $this->filters['dnc_unsubscribed_sms']          = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
         $this->filters['dnc_manual_sms']     = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
+        $this->filters['dnc_unsubscribed_sms_manually'] = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
         $this->filters['leadlist']                      = [

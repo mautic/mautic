@@ -22,14 +22,21 @@ class DoNotContactParts
     public function __construct($field)
     {
         $parts         = explode('_', $field);
-        $this->type    = $parts[1];
-        $this->channel = 3 === count($parts) ? $parts[2] : 'email';
+        switch (true) {
+            case preg_match('/_manually$/', $field):
+                $this->type    = DoNotContact::MANUAL;
+                $this->channel = count($parts) === 4 ? $parts[2] : 'email';
+                break;
+            default:
+                $this->type    = $parts[1] === 'bounced' ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+                $this->channel = count($parts) === 3 ? $parts[2] : 'email';
+        }
     }
 
     /**
      * @return string
      */
-    public function getChannel()
+    public function getChannel(): string
     {
         return $this->channel;
     }
@@ -37,7 +44,7 @@ class DoNotContactParts
     /**
      * @return int
      */
-    public function getParameterType()
+    public function getParameterType(): int
     {
         switch ($this->type) {
             case 'bounced':
