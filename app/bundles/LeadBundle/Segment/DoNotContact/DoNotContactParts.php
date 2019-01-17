@@ -36,7 +36,7 @@ class DoNotContactParts
     /**
      * @return string
      */
-    public function getChannel(): string
+    public function getChannel()
     {
         return $this->channel;
     }
@@ -44,7 +44,7 @@ class DoNotContactParts
     /**
      * @return int
      */
-    public function getParameterType(): int
+    public function getParameterType()
     {
         switch ($this->type) {
             case 'bounced':
