@@ -12,7 +12,7 @@
 ?>
 <?php if (isset($form)) : ?>
     <?php if ($showContactPreferredChannels):?>
-        <div class="preferred_channel text-left"><?php echo $view['form']->rowIfExists($form['lead_channels']['preferred_channel']); ?></div>
+        <div class="preferred_channel text-left"><?php echo $view['form']->row($form['lead_channels']['preferred_channel']); ?></div>
         <?php
     else:
         unset($form['lead_channels']['preferred_channel']);
