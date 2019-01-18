@@ -51,9 +51,9 @@ class ContactFrequencyType extends AbstractType
                 'lead_channels',
                 ContactChannelsType::class,
                 [
-                    'channels'                  => $options['channels'],
-                    'data'                      => $options['data']['lead_channels'],
-                    'public_view'               => $options['public_view'],
+                    'channels'    => $options['channels'],
+                    'data'        => $options['data']['lead_channels'],
+                    'public_view' => $options['public_view'],
                 ]
             );
         }
@@ -127,7 +127,6 @@ class ContactFrequencyType extends AbstractType
             [
                 'public_view'               => false,
                 'preference_center_only'    => false,
-                'is_preference_center_page' => false,
             ]
         );
     }
