@@ -31,13 +31,9 @@ class ContactChannelsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // Preferences center don't need check it, because we check tokens on page
-        $showContactFrequency = $showContactPauseDates = $showContactPreferredChannels = true;
-        if (!$options['is_preference_center_page']) {
-            $showContactFrequency         = $this->coreParametersHelper->getParameter('show_contact_frequency');
-            $showContactPauseDates        = $this->coreParametersHelper->getParameter('show_contact_pause_dates');
-            $showContactPreferredChannels = $this->coreParametersHelper->getParameter('show_contact_preferred_channels');
-        }
+        $showContactFrequency         = $this->coreParametersHelper->getParameter('show_contact_frequency');
+        $showContactPauseDates        = $this->coreParametersHelper->getParameter('show_contact_pause_dates');
+        $showContactPreferredChannels = $this->coreParametersHelper->getParameter('show_contact_preferred_channels');
 
         $builder->add(
             'subscribed_channels',
@@ -202,7 +198,6 @@ class ContactChannelsType extends AbstractType
             [
                 'public_view'               => false,
                 'save_button'               => false,
-                'is_preference_center_page' => false,
             ]
         );
     }

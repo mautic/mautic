@@ -42,12 +42,9 @@ class ContactFrequencyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // Preferences center don't need check it, because we check tokens on page
-        $showContactCategories = $showContactSegments = true;
-        if (!$options['is_preference_center_page']) {
-            $showContactCategories = $this->coreParametersHelper->getParameter('show_contact_categories');
-            $showContactSegments   = $this->coreParametersHelper->getParameter('show_contact_segments');
-        }
+        $showContactCategories = $this->coreParametersHelper->getParameter('show_contact_categories');
+        $showContactSegments   = $this->coreParametersHelper->getParameter('show_contact_segments');
+
         // var_dump($options['data'], $options['channels']);die;
         if (!empty($options['channels'])) {
             $builder->add(
@@ -57,7 +54,6 @@ class ContactFrequencyType extends AbstractType
                     'channels'                  => $options['channels'],
                     'data'                      => $options['data']['lead_channels'],
                     'public_view'               => $options['public_view'],
-                    'is_preference_center_page' => $options['is_preference_center_page'],
                 ]
             );
         }

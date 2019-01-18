@@ -85,7 +85,6 @@ trait FrequencyRuleTrait
                 'public_view'              => $isPublic,
                 'preference_center_only'   => $isPreferenceCenter,
                 'allow_extra_fields'       => true,
-                'is_preference_center_page'=> ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())),
         ]
         );
 
