@@ -812,7 +812,11 @@ class LeadListRepository extends CommonRepository
             if ($details['type'] === 'datetime' || $details['type'] === 'date') {
                 $relativeDateStrings = $this->getRelativeDateStrings();
                 // Check if the column type is a date/time stamp
-                $isTimestamp = ($details['type'] === 'datetime' || $columnType instanceof UTCDateTimeType);
+                $isTimestamp = (
+                    $details['type'] === 'date' ||
+                    $details['type'] === 'datetime' ||
+                    $columnType instanceof UTCDateTimeType ||
+                    $columnType instanceof DateType);
                 $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func) {
                     $key             = array_search($string, $relativeDateStrings);
                     $dtHelper        = new DateTimeHelper('midnight today', null, 'local');
@@ -971,16 +975,16 @@ class LeadListRepository extends CommonRepository
                         $dateTime = $date->format('Y-m-d H:i:s');
                         $dtHelper->setDateTime($dateTime, null);
 
+                        $modifier   = $string;
                         $isRelative = true;
                     }
 
                     if ($isRelative) {
                         if ($requiresBetween) {
                             $startWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
-
                             $dtHelper->modify($modifier);
                             $endWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
-
+                            //
                             // Use a between statement
                             $func              = ($func == 'neq') ? 'notBetween' : 'between';
                             $details['filter'] = [$startWith, $endWith];
