@@ -51,8 +51,6 @@ trait OperatorListTrait
         ],
         'default' => [
             'exclude' => [
-                '!gt',
-                '!lt',
                 'in',
                 '!in',
                 'date',
@@ -90,8 +88,18 @@ trait OperatorListTrait
     public function getFilterExpressionFunctions($operator = null)
     {
         $operatorOption = OperatorOptions::getFilterExpressionFunctions();
+        $this->modifyOperators($operatorOption);
 
         return (null === $operator) ? $operatorOption : $operatorOption[$operator];
+    }
+
+    /**
+     * Method for modify operators in each model separately.
+     *
+     * @param $operatorOption
+     */
+    public function modifyOperators($operatorOption)
+    {
     }
 
     /**

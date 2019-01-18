@@ -246,6 +246,26 @@ class ListModel extends FormModel
     }
 
     /**
+     * !gt and !lt just supported by segmetns at the moment.
+     *
+     * @param $operatorOption
+     */
+    public function modifyOperators(&$operatorOption)
+    {
+        $operatorOption['!gt'] = [
+            'label'       => 'mautic.lead.list.form.operator.notgreaterthan',
+            'expr'        => 'notGt',
+            'negate_expr' => 'gt',
+        ];
+
+        $operatorOption['!lt'] = [
+            'label'       => 'mautic.lead.list.form.operator.notlessthan',
+            'expr'        => 'notLt',
+            'negate_expr' => 'lt',
+        ];
+    }
+
+    /**
      * Get a list of field choices for filters.
      *
      * @return array
@@ -257,7 +277,6 @@ class ListModel extends FormModel
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
                 'properties' => ['type' => 'date'],
-                'operators'  => $this->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
             'date_identified' => [
@@ -751,7 +770,6 @@ class ListModel extends FormModel
             $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
             $choices = $event->getChoices();
         }
-
         //get list of custom fields
         $fields = $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities(
             [
