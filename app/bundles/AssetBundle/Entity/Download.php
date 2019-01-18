@@ -88,7 +88,10 @@ class Download
             ->addIndex(['source', 'source_id'], 'download_source_search')
             ->addIndex(['date_download'], 'asset_date_download');
 
-        $builder->addBigIntIdField();
+        $builder->createField('id', 'integer')
+            ->isPrimaryKey()
+            ->generatedValue()
+            ->build();
 
         $builder->createField('dateDownload', 'datetime')
             ->columnName('date_download')

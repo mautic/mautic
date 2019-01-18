@@ -70,7 +70,7 @@ class PointsChangeLog
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\PointsChangeLogRepository')
             ->addIndex(['date_added'], 'point_date_added');
 
-        $builder->addBigIntIdField();
+        $builder->addId();
 
         $builder->addLead(false, 'CASCADE', false, 'pointsChangeLog');
 
