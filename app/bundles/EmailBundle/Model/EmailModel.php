@@ -14,7 +14,6 @@ namespace Mautic\EmailBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -1852,7 +1851,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @return array
      */
-    public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true)
+    public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setCanViewOthers($canViewOthers);
@@ -1860,8 +1859,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if (isset($filter['flag'])) {
             $flag = $filter['flag'];
             unset($filter['flag']);
-        } else {
-            $flag = [];
         }
 
         $datasets = isset($filter['dataset']) ? $filter['dataset'] : [];
