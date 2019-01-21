@@ -955,7 +955,6 @@ class LeadListRepository extends CommonRepository
                             $startWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
                             $dtHelper->modify($modifier);
                             $endWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
-                            //
                             // Use a between statement
                             $func              = ('neq' == $func) ? 'notBetween' : 'between';
                             $details['filter'] = [$startWith, $endWith];
