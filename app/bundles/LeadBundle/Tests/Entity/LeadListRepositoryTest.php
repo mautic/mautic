@@ -124,15 +124,15 @@ class LeadListRepositoryTest extends AbstractMauticTestCase
 
         $this->container = $this->client->getContainer();
         $this->em        = $this->container->get('doctrine')->getManager();
-        //$fieldModel = $this->container->get('mautic.lead.model.field');
+        $fieldModel      = $this->container->get('mautic.lead.model.field');
 
-        //        $field = new LeadField();
-        //        $field->setName('renewal_date')
-        //              ->setAlias('renewal_date')
-        //              ->setType('date')
-        //              ->setObject('lead');
-        //
-        //        $fieldModel->saveEntity($field);
+        $field = new LeadField();
+        $field->setName('renewal_date')
+              ->setAlias('renewal_date')
+              ->setType('date')
+              ->setObject('lead');
+
+        $fieldModel->saveEntity($field);
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
         $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
@@ -140,11 +140,6 @@ class LeadListRepositoryTest extends AbstractMauticTestCase
         //$fieldModel->deleteEntity($field);
 
         $string = (string) $expr;
-    }
-
-    public function setUp()
-    {
-        parent::setUp();
     }
 
     public function testExcludeSegmentFilterWithFiltersAppendNotExistsSubQuery()
@@ -366,9 +361,9 @@ class LeadListRepositoryTest extends AbstractMauticTestCase
     {
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
         $mockRepository = $this->getMockBuilder(LeadListRepository::class)
-                               ->disableOriginalConstructor()
-                               ->setMethods(['getEntityManager', 'getRelativeDateStrings'])
-                               ->getMock();
+           ->disableOriginalConstructor()
+           ->setMethods(['getEntityManager', 'getRelativeDateStrings'])
+           ->getMock();
 
         $mockConnection = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
