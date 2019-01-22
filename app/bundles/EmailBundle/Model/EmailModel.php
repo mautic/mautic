@@ -1861,7 +1861,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setCanViewOthers($canViewOthers);
 
-        $flag    = ArrayHelper::pickValue('flag', $filter['flag'], false);
+        $flag    = ArrayHelper::pickValue('flag', $filter, false);
         $dataset = ArrayHelper::pickValue('dataset', $filter, []);
 
         if (isset($filter['companyId'])) {
