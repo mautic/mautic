@@ -128,9 +128,9 @@ class LeadListRepositoryTest extends AbstractMauticTestCase
 
         $field = new LeadField();
         $field->setName('renewal_date')
-              ->setAlias('renewal_date')
-              ->setType('date')
-              ->setObject('lead');
+            ->setAlias('renewal_date')
+            ->setType('date')
+            ->setObject('lead');
 
         $fieldModel->saveEntity($field);
 
