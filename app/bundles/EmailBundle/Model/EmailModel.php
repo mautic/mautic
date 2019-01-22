@@ -1843,26 +1843,26 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of emails sent and read.
      *
-     * @param          $reason
-     * @param          $canViewOthers
-     * @param int|null $companyId
-     * @param int|null $campaignId
-     * @param int|null $segmentId
+     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
      *
      * @return array
+     *
+     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
-    public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
-    {
+    public function getEmailsLineChartData(
+        string $unit,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        $dateFormat = null,
+        array $filter = [],
+        bool $canViewOthers = true
+    ) {
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setCanViewOthers($canViewOthers);
 
-        if (isset($filter['flag'])) {
-            $flag = $filter['flag'];
-            unset($filter['flag']);
-        }
-
-        $datasets = isset($filter['dataset']) ? $filter['dataset'] : [];
-        unset($filter['dataset']);
+        $flag    = ArrayHelper::pickValue('flag', $filter['flag'], false);
+        $dataset = ArrayHelper::pickValue('dataset', $filter, []);
 
         if (isset($filter['companyId'])) {
             $fetchOptions->setCompanyId((int) $filter['companyId']);
@@ -1888,42 +1888,42 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $fetchOptions->setFilters($filter);
 
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'sent_and_opened']) || !$flag || in_array('sent', $datasets)) {
+        if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'sent_and_opened']) || !$flag || in_array('sent', $dataset)) {
             $chart->setDataset(
                 $this->translator->trans('mautic.email.sent.emails'),
                 $this->statsCollectionHelper->fetchSentStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
 
-        if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'sent_and_opened', 'opened']) || in_array('opened', $datasets)) {
+        if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'sent_and_opened', 'opened']) || in_array('opened', $dataset)) {
             $chart->setDataset(
                 $this->translator->trans('mautic.email.read.emails'),
                 $this->statsCollectionHelper->fetchOpenedStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
 
-        if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'failed']) || in_array('failed', $datasets)) {
+        if (in_array($flag, ['all', 'sent_and_opened_and_failed', 'failed']) || in_array('failed', $dataset)) {
             $chart->setDataset(
                 $this->translator->trans('mautic.email.failed.emails'),
                 $this->statsCollectionHelper->fetchFailedStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
 
-        if (in_array($flag, ['all', 'clicked']) || in_array('clicked', $datasets)) {
+        if (in_array($flag, ['all', 'clicked']) || in_array('clicked', $dataset)) {
             $chart->setDataset(
                 $this->translator->trans('mautic.email.clicked'),
                 $this->statsCollectionHelper->fetchClickedStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
 
-        if (in_array($flag, ['all', 'unsubscribed']) || in_array('unsubscribed', $datasets)) {
+        if (in_array($flag, ['all', 'unsubscribed']) || in_array('unsubscribed', $dataset)) {
             $chart->setDataset(
                 $this->translator->trans('mautic.email.unsubscribed'),
                 $this->statsCollectionHelper->fetchUnsubscribedStats($dateFrom, $dateTo, $fetchOptions)
             );
         }
 
-        if (in_array($flag, ['all', 'bounced']) || in_array('bounced', $datasets)) {
+        if (in_array($flag, ['all', 'bounced']) || in_array('bounced', $dataset)) {
             $chart->setDataset(
                 $this->translator->trans('mautic.email.bounced'),
                 $this->statsCollectionHelper->fetchBouncedStats($dateFrom, $dateTo, $fetchOptions)

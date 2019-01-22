@@ -73,8 +73,7 @@ class StatCollection
     }
 
     /**
-     * @param \DateTime $dateTime
-     * @param int       $count
+     * @param int $count
      *
      * @return $this
      *
@@ -105,14 +104,12 @@ class StatCollection
      */
     public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count)
     {
-        switch (true) {
-            case strlen($dateTimeInUTC) == 4 and is_numeric($dateTimeInUTC):
-                $dateTime = (new \DateTime('now', new \DateTimeZone('UTC')))
-                    ->setDate($dateTimeInUTC, 1, 1)
-                    ->setTime(0, 0);
-                break;
-            default:
-                $dateTime = new \DateTime($dateTimeInUTC, new \DateTimeZone('UTC'));
+        if (4 == strlen($dateTimeInUTC) and is_numeric($dateTimeInUTC)) {
+            $dateTime = (new \DateTime('now', new \DateTimeZone('UTC')))
+                ->setDate($dateTimeInUTC, 1, 1)
+                ->setTime(0, 0);
+        } else {
+            $dateTime = new \DateTime($dateTimeInUTC, new \DateTimeZone('UTC'));
         }
         $this->addStatByDateTime($dateTime, $count);
 
@@ -128,18 +125,13 @@ class StatCollection
     }
 
     /**
-     * @param \DateTime $fromDateTime
-     * @param \DateTime $toDateTime
-     *
      * @return Calculator
      */
     public function getCalculator(\DateTime $fromDateTime, \DateTime $toDateTime)
     {
-        if (null !== $this->calculator) {
-            return $this->calculator;
+        if (is_null($this->calculator)) {
+            $this->calculator = new Calculator($this->stats, $fromDateTime, $toDateTime);
         }
-
-        $this->calculator = new Calculator($this->stats, $fromDateTime, $toDateTime);
 
         return $this->calculator;
     }
