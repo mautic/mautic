@@ -124,7 +124,7 @@ class AggregateStatRequestEvent extends Event
      */
     public function checkContexts(array $contexts)
     {
-        return in_array($this->statName, $context, true);
+        return in_array($this->statName, $contexts, true);
     }
 
     /**
