@@ -142,7 +142,7 @@ class AggregateStatRequestEvent extends Event
      *
      * @return bool
      */
-    public function checkContextPrefixes($prefixes)
+    public function checkContextPrefixes(array $prefixes)
     {
         foreach ($prefixes as $string) {
             if (strpos($this->statName, $string) === 0) {
