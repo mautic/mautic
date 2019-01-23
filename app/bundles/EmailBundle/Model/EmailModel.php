@@ -1864,24 +1864,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $flag    = ArrayHelper::pickValue('flag', $filter, false);
         $dataset = ArrayHelper::pickValue('dataset', $filter, []);
 
-        if (isset($filter['companyId'])) {
-            $fetchOptions->setCompanyId((int) $filter['companyId']);
-            unset($filter['companyId']);
+        if (!is_null($companyId = ArrayHelper::pickValue('companyId', $filter, null))) {
+            $fetchOptions->setCompanyId((int) $companyId);
         }
 
-        if (isset($filter['campaignId'])) {
-            $fetchOptions->setCampaignId((int) $filter['campaignId']);
-            unset($filter['campaignId']);
+        if (!is_null($campaignId = ArrayHelper::pickValue('campaignId', $filter, null))) {
+            $fetchOptions->setCampaignId((int) $campaignId);
         }
 
-        if (isset($filter['segmentId'])) {
-            $fetchOptions->setSegmentId((int) $filter['segmentId']);
-            unset($filter['segmentId']);
+        if (!is_null($segmentId = ArrayHelper::pickValue('segmentId', $filter, null))) {
+            $fetchOptions->setSegmentId((int) $segmentId);
         }
 
-        if (isset($filter['email_id'])) {
-            $fetchOptions->setEmailIds((array) $filter['email_id']);
-            unset($filter['email_id']);
+        if (!is_null($emailId = ArrayHelper::pickValue('email_id', $filter, null))) {
+            $fetchOptions->setEmailIds([(int) $emailId]);
         }
 
         // Set anything left over to be passed to prepareTimeDataQuery

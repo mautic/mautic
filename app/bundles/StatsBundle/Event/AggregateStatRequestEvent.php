@@ -108,36 +108,48 @@ class AggregateStatRequestEvent extends Event
     }
 
     /**
-     * @param string|array $context
+     * @param string $context
      *
      * @return bool
      */
-    public function checkContext($context)
+    public function checkContext(string $context)
     {
-        if (is_array($context)) {
-            return in_array($this->statName, $context);
-        }
-
-        return $context === $this->statName;
+        return $this->statName === $context;
     }
 
     /**
-     * @param string|array $prefix
+     * @param array $context
      *
      * @return bool
      */
-    public function checkContextPrefix($prefix)
+    public function checkContexts(array $context)
     {
-        if (is_array($prefix)) {
-            foreach ($prefix as $string) {
-                if (strpos($this->statName, $string) === 0) {
-                    return true;
-                }
-            }
+        return in_array($this->statName, $context);
+    }
 
-            return false;
+    /**
+     * @param string $prefix
+     *
+     * @return bool
+     */
+    public function checkContextPrefix(string $prefix)
+    {
+        return strpos($this->statName, $prefix) === 0;
+    }
+
+    /**
+     * @param array $prefixes
+     *
+     * @return bool
+     */
+    public function checkContextPrefixes(array $prefixes)
+    {
+        foreach ($prefixes as $string) {
+            if (strpos($this->statName, $string) === 0) {
+                return true;
+            }
         }
 
-        return strpos($this->statName, $prefix) === 0;
+        return false;
     }
 }
