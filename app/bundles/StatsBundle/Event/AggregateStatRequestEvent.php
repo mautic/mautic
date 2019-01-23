@@ -118,7 +118,7 @@ class AggregateStatRequestEvent extends Event
     }
 
     /**
-     * @param array $context
+     * @param array $contexts
      *
      * @return bool
      */
