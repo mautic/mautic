@@ -86,23 +86,22 @@ class MaintenanceSubscriber extends CommonSubscriber
             }
 
             $rows = 0;
-            $qb->setMaxResults(2000)->setFirstResult(0);
+            $qb->setMaxResults(10000)->setFirstResult(0);
 
             $qb2 = $this->db->createQueryBuilder();
             while (true) {
                 $leadsIds = array_column($qb->execute()->fetchAll(), 'id');
-
                 if (sizeof($leadsIds) === 0) {
                     break;
                 }
-
-                $rows += $qb2->delete(MAUTIC_TABLE_PREFIX.'leads')
-                  ->where(
-                    $qb2->expr()->in(
-                      'id', $leadsIds
-                    )
-                  )
-                  ->execute();
+                foreach ($leadsIds as $leadId) {
+                    $rows += $qb2->delete(MAUTIC_TABLE_PREFIX.'leads')
+                      ->where(
+                        $qb2->expr()->eq(
+                          'id', $leadId
+                        )
+                      )->execute();
+                }
             }
         }
 
