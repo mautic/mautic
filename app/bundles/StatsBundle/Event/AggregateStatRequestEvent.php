@@ -112,7 +112,7 @@ class AggregateStatRequestEvent extends Event
      *
      * @return bool
      */
-    public function checkContext(string $context)
+    public function checkContext($context)
     {
         return $this->statName === $context;
     }
@@ -122,9 +122,9 @@ class AggregateStatRequestEvent extends Event
      *
      * @return bool
      */
-    public function checkContexts(array $context)
+    public function checkContexts($context)
     {
-        return in_array($this->statName, $context);
+        return in_array($this->statName, $context, true);
     }
 
     /**
@@ -132,7 +132,7 @@ class AggregateStatRequestEvent extends Event
      *
      * @return bool
      */
-    public function checkContextPrefix(string $prefix)
+    public function checkContextPrefix($prefix)
     {
         return strpos($this->statName, $prefix) === 0;
     }
@@ -142,7 +142,7 @@ class AggregateStatRequestEvent extends Event
      *
      * @return bool
      */
-    public function checkContextPrefixes(array $prefixes)
+    public function checkContextPrefixes($prefixes)
     {
         foreach ($prefixes as $string) {
             if (strpos($this->statName, $string) === 0) {
