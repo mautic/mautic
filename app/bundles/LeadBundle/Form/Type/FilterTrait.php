@@ -60,6 +60,7 @@ trait FilterTrait
 
         $field = [];
 
+        // Prepare to remove this code
         if (!isset($data['object'])) {
             $data['object'] = 'lead';
         }
