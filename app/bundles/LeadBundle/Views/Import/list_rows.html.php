@@ -40,7 +40,10 @@
         </td>
         <td class="visible-md visible-lg"><?php echo $item->getRunTime() ? $view['date']->formatRange($item->getRunTime()) : ''; ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getProgressPercentage(); ?>%</td>
-        <td class="visible-md visible-lg"><?php echo $item->getLineCount(); ?></td>
+        <td class="visible-md visible-lg"><span class="mt-xs label label-primary has-click-event clickable-stat"><a href="<?php echo $view['router']->path(
+                    'mautic_contact_index',
+                    ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.import_id').':'.$item->getId()]
+                ); ?>"><?php echo $item->getLineCount(); ?></a></span></td>
         <td class="visible-md visible-lg"><span class="mt-xs label label-primary has-click-event clickable-stat"><a href="<?php echo $view['router']->path(
                 'mautic_contact_index',
                 ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.import_id').':'.$item->getId().' '.$view['translator']->trans('mautic.lead.lead.searchcommand.import_action').':inserted']
