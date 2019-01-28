@@ -1017,7 +1017,9 @@ Mautic.updateOutlookTag = function (element) {
             var size  = sectionForm.find('#builder_section_content-background-size').val();
         }
 
-        if (element.html().match(/<!--\[if gte mso 9\]>[\s\S]*?<!\[endif\]-->/gm) == null) {
+        var comments = element.contents().filter(function(){return this.nodeType == 8;});
+
+        if (comments.length === 0) {
             element.prepend(
                 '<!--[if gte mso 9]>\n' +
                 '<v:rect style="" xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false">\n' +
@@ -1034,11 +1036,7 @@ Mautic.updateOutlookTag = function (element) {
             );
         }
 
-        element
-            .contents()
-            .filter(function(){
-                return this.nodeType == 8;
-            }).each(function(i, e){
+        comments.each(function(i, e) {
                 if (i == 0) {
                     mQuery(this)[0].data = e.data.replace(/src\s*=\s*".*?"/mg, 'src="' + image + '"');
                     mQuery(this)[0].data = e.data.replace(/color\s*=\s*".*?"/mg, 'color="' + color + '"');
