@@ -526,6 +526,10 @@ class LeadModel extends FormModel
                     $entity->addUpdatedField('zipcode', $details['zipcode']);
                 }
             }
+
+            if (!$entity->getCompany() && !empty($details['organization'])) {
+                $entity->addUpdatedField('company', $details['organization']);
+            }
         }
 
         $updatedFields = $entity->getUpdatedFields();

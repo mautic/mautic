@@ -605,9 +605,6 @@ class PageModel extends FormModel
 
         $query = $this->cleanQuery($query);
 
-        $hit->setQuery($query);
-        $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
-
         if (isset($query['page_referrer'])) {
             $hit->setReferer($query['page_referrer']);
         }
@@ -615,8 +612,13 @@ class PageModel extends FormModel
             $hit->setPageLanguage($query['page_language']);
         }
         if (isset($query['page_title'])) {
-            $hit->setUrlTitle($query['page_title']);
+            $safeTitle = InputHelper::transliterate($query['page_title']);
+            $hit->setUrlTitle($safeTitle);
+            $query['page_title'] = $safeTitle;
         }
+
+        $hit->setQuery($query);
+        $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
 
         // Add entry to contact log table
         $this->setLeadManipulator($page, $hit, $lead);

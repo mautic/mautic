@@ -54,10 +54,18 @@ class DateDecorator extends CustomMappedDecorator
     }
 
     /**
+     * @param null|string $relativeDate
+     *
      * @return DateTimeHelper
      */
-    public function getDefaultDate()
+    public function getDefaultDate($relativeDate = null)
     {
-        return new DateTimeHelper('midnight today', null, $this->coreParametersHelper->getParameter('default_timezone') ? $this->coreParametersHelper->getParameter('default_timezone') : 'local');
+        $timezone = $this->coreParametersHelper->getParameter('default_timezone', 'local');
+
+        if ($relativeDate) {
+            return new DateTimeHelper($relativeDate, null, $timezone);
+        } else {
+            return new DateTimeHelper('midnight today', null, $timezone);
+        }
     }
 }
