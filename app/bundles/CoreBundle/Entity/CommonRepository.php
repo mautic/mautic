@@ -1451,17 +1451,19 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * Build an associative array out of an indexed array using PDO bounding notation
+     * Build an associative array out of an indexed array using PDO bounding notation.
+     *
      * @param $valuesArray
+     *
      * @return array
      */
     public function buildWhereInParameters($valuesArray)
     {
-        $newArray = array();
+        $newArray = [];
         foreach ($valuesArray as $key => &$value) {
-            $newArray[":id" . $key] = $value;
+            $newArray[':id'.$key] = $value;
         }
-        unset ($value);
+        unset($value);
 
         return $newArray;
     }
