@@ -124,6 +124,14 @@ $mauticBundles  = array_filter(
 );
 unset($buildBundles);
 
+// Load extra annotations
+$container->loadFromExtension('sensio_framework_extra', [
+    'router'  => ['annotations' => false],
+    'request' => ['converters' => false],
+    'view'    => ['annotations' => true],
+    'cache'   => ['annotations' => false],
+]);
+
 // Sort Mautic's bundles into Core and Plugins
 $setBundles = $setPluginBundles = [];
 foreach ($mauticBundles as $bundle) {
@@ -204,13 +212,18 @@ $container->setParameter('mautic.famework.csrf_protection', true);
 
 //Doctrine Configuration
 $dbalSettings = [
-    'driver'   => '%mautic.db_driver%',
-    'host'     => '%mautic.db_host%',
-    'port'     => '%mautic.db_port%',
-    'dbname'   => '%mautic.db_name%',
-    'user'     => '%mautic.db_user%',
-    'password' => '%mautic.db_password%',
-    'charset'  => 'UTF8',
+    'driver'                => '%mautic.db_driver%',
+    'host'                  => '%mautic.db_host%',
+    'port'                  => '%mautic.db_port%',
+    'dbname'                => '%mautic.db_name%',
+    'user'                  => '%mautic.db_user%',
+    'password'              => '%mautic.db_password%',
+    'charset'               => 'UTF8',
+    'default_table_options' => [
+        'charset'    => 'utf8',
+        'collate'    => 'utf8_unicode_ci',
+        'row_format' => 'DYNAMIC',
+    ],
     'types'    => [
         'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
         'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType',
@@ -342,6 +355,29 @@ $container->loadFromExtension('jms_serializer', [
             'options' => JSON_PRETTY_PRINT,
         ],
     ],
+]);
+
+$container->loadFromExtension('doctrine_cache', [
+  'providers' => [
+    'api_rate_limiter_cache' => '%mautic.api_rate_limiter_cache%',
+  ],
+]);
+
+$api_rate_limiter_limit = $container->getParameter('mautic.api_rate_limiter_limit');
+$container->loadFromExtension('noxlogic_rate_limit', [
+  'enabled'           => $api_rate_limiter_limit == 0 ? false : true,
+  'storage_engine'    => 'doctrine',
+  'doctrine_provider' => 'api_rate_limiter_cache',
+  'path_limits'       => [
+    [
+      'path'   => '/api',
+      'limit'  => '%mautic.api_rate_limiter_limit%',
+      'period' => 3600,
+    ],
+  ],
+  'fos_oauth_key_listener' => true,
+  'display_headers'        => true,
+  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of %mautic.api_rate_limiter_limit% API calls per hour.", "details": [] } ]}',
 ]);
 
 $container->setParameter(

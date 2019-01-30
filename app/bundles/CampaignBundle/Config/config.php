@@ -88,6 +88,11 @@ return [
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
                 'method'     => 'POST',
             ],
+            'mautic_api_contact_clone_campaign' => [
+                'path'       => '/campaigns/clone/{campaignId}',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:cloneCampaign',
+                'method'     => 'POST',
+            ],
 
             // @deprecated 2.6.0 to be removed 3.0
             'bc_mautic_api_campaignaddcontact'        => [
@@ -199,6 +204,7 @@ return [
                 'arguments' => [
                     'mautic.campaign.model.campaign',
                     'translator',
+                    'mautic.security',
                 ],
                 'alias'     => 'campaign_list',
             ],
@@ -456,6 +462,7 @@ return [
                     'mautic.campaign.event_collector',
                     'mautic.campaign.scheduler',
                     'mautic.tracker.contact',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
             'mautic.campaign.executioner.inactive'     => [

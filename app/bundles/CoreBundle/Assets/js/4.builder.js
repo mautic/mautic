@@ -83,7 +83,8 @@ Mautic.launchBuilder = function (formName, actionName) {
             'categorylist',
             'preferredchannel',
             'channelfrequency',
-            'saveprefsbutton'
+            'saveprefsbutton',
+            'successmessage'
         ];
         mQuery.each(slots, function(i, s){
             if (isPrefCenterEnabled) {
@@ -1200,6 +1201,12 @@ Mautic.initSlotListeners = function() {
                 return;
             }
 
+            if(slot.html() == '') {
+                slot.addClass('empty');
+            }else{
+                slot.removeClass('empty');
+            }
+
             slot.append(focus);
             deleteLink.click(function(e) {
                 // if slot is DEC, delete it from the outside form
@@ -1826,7 +1833,8 @@ Mautic.prepareBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
             'categorylist',
             'preferredchannel',
             'channelfrequency',
-            'saveprefsbutton'
+            'saveprefsbutton',
+            'successmessage'
         ];
         mQuery.each(slots, function (i, s) {
             // delete existing tokens

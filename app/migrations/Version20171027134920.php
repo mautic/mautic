@@ -29,7 +29,7 @@ class Version20171027134920 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' != $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $idx = $this->generatePropertyName('report_schedulers', 'idx', ['report_id']);
         $fk  = $this->generatePropertyName('report_schedulers', 'fk', ['report_id']);
@@ -44,7 +44,7 @@ class Version20171027134920 extends AbstractMauticMigration
     public function down(Schema $schema)
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' != $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql("DROP TABLE {$this->prefix}reports_schedulers");
     }

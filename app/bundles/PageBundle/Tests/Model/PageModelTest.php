@@ -11,12 +11,35 @@
 
 namespace Mautic\PageBundle\Tests\Model;
 
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Tests\PageTestAbstract;
 use ReflectionClass;
+use Symfony\Component\HttpFoundation\Request;
 
 class PageModelTest extends PageTestAbstract
 {
+    public function testUtf8CharsInTitle()
+    {
+        $providedTitle = '你好，世界';
+        $expectedTitle = 'ni hao, shi jie';
+        $hit           = new Hit();
+        $page          = new Page();
+        $request       = new Request();
+        $contact       = new Lead();
+        $pageModel     = $this->getPageModel();
+
+        $hit->setIpAddress(new IpAddress());
+        $hit->setQuery(['page_title' => $providedTitle]);
+
+        $pageModel->processPageHit($hit, $page, $request, $contact, false);
+
+        $this->assertSame($expectedTitle, $hit->getUrlTitle());
+        $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
+    }
+
     public function testGenerateUrl_WhenCalled_ReturnsValidUrl()
     {
         $page = new Page();

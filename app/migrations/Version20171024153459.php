@@ -30,7 +30,7 @@ class Version20171024153459 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' != $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql("ALTER TABLE {$this->prefix}reports ADD is_scheduled TINYINT(1) NOT NULL, ADD schedule_unit VARCHAR(255) DEFAULT NULL, ADD schedule_day VARCHAR(255) DEFAULT NULL, ADD schedule_month_frequency VARCHAR(255) DEFAULT NULL");
     }
@@ -41,7 +41,7 @@ class Version20171024153459 extends AbstractMauticMigration
     public function down(Schema $schema)
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' != $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql("ALTER TABLE {$this->prefix}reports DROP is_scheduled, DROP schedule_unit, DROP schedule_day, DROP schedule_month_frequency");
     }

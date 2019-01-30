@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -22,7 +23,14 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:integration:pipedrive:push');
+        $this->setName('mautic:integration:pipedrive:push')
+            ->setDescription('Pushes the data from Mautic to Pipedrive')
+            ->addOption(
+                '--restart',
+                null,
+                InputOption::VALUE_NONE,
+                'Restart intgeration'
+            );
 
         parent::configure();
     }
@@ -45,6 +53,16 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
             return;
         }
 
+        if ($input->getOption('restart')) {
+            $this->io->note(
+                $this->getContainer()->get('templating.helper.translator')->trans(
+                    'mautic.plugin.config.integration.restarted',
+                    ['%integration%' => $integrationObject->getName()]
+                )
+            );
+            $integrationObject->removeIntegrationEntities();
+        }
+
         if ($integrationObject->isCompanySupportEnabled()) {
             $this->io->title('Pushing Companies');
             $companyExport = $this->getContainer()->get('mautic_integration.pipedrive.export.company');
@@ -52,13 +70,12 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
 
             $companies = $em->getRepository(Company::class)->findAll();
             foreach ($companies as $company) {
-                if ($companyExport->create($company)) {
+                if ($companyExport->pushCompany($company)) {
                     ++$pushed;
                 }
             }
+            $this->io->text('Pushed '.$pushed);
         }
-
-        $this->io->text('Pushed '.$pushed);
 
         $leads = $em->getRepository(Lead::class)->findAll();
         $this->io->title('Pushing Leads');

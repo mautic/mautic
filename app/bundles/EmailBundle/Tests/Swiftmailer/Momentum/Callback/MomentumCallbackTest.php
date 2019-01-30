@@ -20,9 +20,7 @@ class MomentumTransportTest extends \PHPUnit_Framework_TestCase
 {
     public function testWebhookPayloadIsProcessed()
     {
-        $transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $transportCallback = $this->createMock(TransportCallback::class);
 
         $transportCallback->expects($this->exactly(6))
             ->method('addFailureByHashId')
@@ -38,11 +36,7 @@ class MomentumTransportTest extends \PHPUnit_Framework_TestCase
 
         $transportCallback->expects($this->once())
             ->method('addFailureByAddress')
-            ->with(
-                'bounce@example.com',
-                'MAIL REFUSED - IP (17.99.99.99) is in black list',
-                DoNotContact::BOUNCED
-            );
+            ->with('bounce@example.com', 'MAIL REFUSED - IP (17.99.99.99) is in black list', DoNotContact::BOUNCED);
 
         $momentumCallback = new MomentumCallback($transportCallback);
 

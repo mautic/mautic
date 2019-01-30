@@ -74,6 +74,30 @@ class CampaignController extends AbstractStandardFormController
     protected $sessionId;
 
     /**
+     * @return array
+     */
+    protected function getPermissions()
+    {
+        //set some permissions
+        return (array) $this->get('mautic.security')->isGranted(
+            [
+                'campaign:campaigns:viewown',
+                'campaign:campaigns:viewother',
+                'campaign:campaigns:create',
+                'campaign:campaigns:editown',
+                'campaign:campaigns:editother',
+                'campaign:campaigns:cloneown',
+                'campaign:campaigns:cloneother',
+                'campaign:campaigns:deleteown',
+                'campaign:campaigns:deleteother',
+                'campaign:campaigns:publishown',
+                'campaign:campaigns:publishother',
+            ],
+            'RETURN_ARRAY'
+        );
+    }
+
+    /**
      * Deletes a group of entities.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
@@ -354,6 +378,8 @@ class CampaignController extends AbstractStandardFormController
         }
 
         if ($isClone) {
+            list($this->addedSources, $this->deletedSources, $campaignSources) = $this->getSessionSources($objectId, $isClone);
+            $this->getCampaignModel()->setLeadSources($entity, $campaignSources, []);
             // If this is a clone, we need to save the entity first to properly build the events, sources and canvas settings
             $this->getCampaignModel()->getRepository()->saveEntity($entity);
             // Set as new so that timestamps are still hydrated

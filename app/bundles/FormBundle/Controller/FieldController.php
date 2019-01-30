@@ -13,6 +13,8 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Event\FormBuilderEvent;
+use Mautic\FormBundle\FormEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -396,6 +398,10 @@ class FieldController extends CommonFormController
             ['customParameters' => $customParams]
         );
         $form->get('formId')->setData($formId);
+
+        $event      = new FormBuilderEvent($this->get('translator'));
+        $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
+        $event->addValidatorsToBuilder($form);
 
         return $form;
     }

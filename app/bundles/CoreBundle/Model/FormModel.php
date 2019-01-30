@@ -441,4 +441,24 @@ class FormModel extends AbstractCommonModel
 
         return $alias;
     }
+
+    /**
+     * Catch the exception in production and log the error.
+     * Throw the exception in the dev mode only.
+     */
+    protected function flushAndCatch()
+    {
+        try {
+            $this->em->flush();
+        } catch (\Exception $ex) {
+            if (MAUTIC_ENV === 'dev') {
+                throw $ex;
+            }
+
+            $this->logger->addError(
+                $ex->getMessage(),
+                ['exception' => $ex]
+            );
+        }
+    }
 }

@@ -1762,6 +1762,11 @@ abstract class AbstractIntegration
             }
 
             // Rest of the objects are merged and assumed to be leadFields
+            // BC compatibility If extends fields to objects - 0 === contacts
+            if (isset($availableIntegrationFields[0])) {
+                $leadFields = array_merge($leadFields, $availableIntegrationFields[0]);
+            }
+
             foreach ($submittedObjects as $object) {
                 if (isset($availableIntegrationFields[$object])) {
                     $leadFields = array_merge($leadFields, $availableIntegrationFields[$object]);

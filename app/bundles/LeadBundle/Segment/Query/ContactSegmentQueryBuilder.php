@@ -109,8 +109,15 @@ class ContactSegmentQueryBuilder
      */
     public function wrapInCount(QueryBuilder $qb)
     {
+        /** @var Connection $connection */
+        $connection = $this->entityManager->getConnection();
+        if ($connection instanceof MasterSlaveConnection) {
+            // Prefer a slave connection if available.
+            $connection->connect('slave');
+        }
+
         // Add count functions to the query
-        $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
+        $queryBuilder = new QueryBuilder($connection);
 
         //  If there is any right join in the query we need to select its it
         $primary = $qb->guessPrimaryLeadContactIdColumn();
