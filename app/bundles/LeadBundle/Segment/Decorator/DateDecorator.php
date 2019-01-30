@@ -30,11 +30,17 @@ class DateDecorator extends CustomMappedDecorator
     }
 
     /**
+     * @param null|string $relativeDate
+     *
      * @return DateTimeHelper
      */
-    public function getDefaultDate()
+    public function getDefaultDate($relativeDate = null)
     {
-        return new DateTimeHelper('midnight today', null, 'UTC');
+        if ($relativeDate) {
+            return new DateTimeHelper($relativeDate, null, 'UTC');
+        } else {
+            return new DateTimeHelper('midnight today', null, 'UTC');
+        }
     }
 
     /**
