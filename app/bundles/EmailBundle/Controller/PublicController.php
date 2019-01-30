@@ -168,7 +168,6 @@ class PublicController extends CommonFormController
             $template = $theme->getTheme();
         }
         $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
-
         if (!empty($stat)) {
             if ($lead = $stat->getLead()) {
                 // Set the lead as current lead
@@ -217,10 +216,7 @@ class PublicController extends CommonFormController
                     // check if tokens are present
                     $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
                         false !== strpos($html, BuilderSubscriber::saveprefsRegex);
-                    $frequencyPresent = false !== strpos($html, 'data-slot="channelfrequency"') ||
-                        false !== strpos($html, BuilderSubscriber::channelfrequency);
-                    $tokensPresent    = $savePrefsPresent && $frequencyPresent;
-                    if ($tokensPresent) {
+                    if ($savePrefsPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
                         $params = array_merge(
