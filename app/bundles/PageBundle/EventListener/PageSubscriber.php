@@ -188,7 +188,7 @@ class PageSubscriber extends CommonSubscriber
         $trackingNewlyGenerated = $payload['isNew'];
         $pageId                 = $payload['pageId'];
         $leadId                 = $payload['leadId'];
-        $isRedirect             = $payload['isRedirect'];
+        $isRedirect             = !empty($payload['isRedirect']);
         $hitRepo                = $this->em->getRepository('MauticPageBundle:Hit');
         $pageRepo               = $this->em->getRepository('MauticPageBundle:Page');
         $redirectRepo           = $this->em->getRepository('MauticPageBundle:Redirect');
