@@ -17,7 +17,6 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -200,11 +199,6 @@ class LeadModel extends FormModel
     private $fieldsByGroup = [];
 
     /**
-     * @var IpAddressRepository
-     */
-    private $ipAddressRepository;
-
-    /**
      * @param RequestStack         $requestStack
      * @param CookieHelper         $cookieHelper
      * @param IpLookupHelper       $ipLookupHelper
@@ -223,7 +217,6 @@ class LeadModel extends FormModel
      * @param DeviceTracker        $deviceTracker
      * @param LegacyLeadModel      $legacyLeadModel
      * @param IpAddressModel       $ipAddressModel
-     * @param IpAddressRepository  $ipAddressRepository
      */
     public function __construct(
         RequestStack $requestStack,
@@ -243,8 +236,7 @@ class LeadModel extends FormModel
         ContactTracker $contactTracker,
         DeviceTracker $deviceTracker,
         LegacyLeadModel $legacyLeadModel,
-        IpAddressModel $ipAddressModel,
-        IpAddressRepository $ipAddressRepository
+        IpAddressModel $ipAddressModel
     ) {
         $this->request              = $requestStack->getCurrentRequest();
         $this->cookieHelper         = $cookieHelper;
@@ -264,7 +256,6 @@ class LeadModel extends FormModel
         $this->deviceTracker        = $deviceTracker;
         $this->legacyLeadModel      = $legacyLeadModel;
         $this->ipAddressModel       = $ipAddressModel;
-        $this->ipAddressRepository  = $ipAddressRepository;
     }
 
     /**
@@ -1448,7 +1439,7 @@ class LeadModel extends FormModel
             $addresses = explode(',', $data[$fields['ip']]);
             foreach ($addresses as $address) {
                 $address = trim($address);
-                if (!$ipAddress = $this->ipAddressRepository->findOneByIpAddress($address)) {
+                if (!$ipAddress = $this->ipAddressModel->findOneByIpAddress($address)) {
                     $ipAddress = new IpAddress();
                     $ipAddress->setIpAddress($address);
                 }
