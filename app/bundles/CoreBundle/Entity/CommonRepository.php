@@ -1460,10 +1460,9 @@ class CommonRepository extends EntityRepository
     public function buildWhereInParameters($valuesArray)
     {
         $newArray = [];
-        foreach ($valuesArray as $key => &$value) {
+        foreach ($valuesArray as $key => $value) {
             $newArray[':id'.$key] = $value;
         }
-        unset($value);
 
         return $newArray;
     }
