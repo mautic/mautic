@@ -17,6 +17,7 @@ use GuzzleHttp\Client;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Psr\Log\LoggerInterface;
 use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -47,22 +48,30 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $sparkpostFactory;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param string                    $apiKey
      * @param TranslatorInterface       $translator
      * @param TransportCallback         $transportCallback
      * @param SparkpostFactoryInterface $sparkpostFactory
+     * @param LoggerInterface           $logger
      */
     public function __construct(
         $apiKey,
         TranslatorInterface $translator,
         TransportCallback $transportCallback,
-        SparkpostFactoryInterface $sparkpostFactory
+        SparkpostFactoryInterface $sparkpostFactory,
+        LoggerInterface $logger
     ) {
         $this->setApiKey($apiKey);
 
         $this->translator        = $translator;
         $this->transportCallback = $transportCallback;
         $this->sparkpostFactory  = $sparkpostFactory;
+        $this->logger            = $logger;
     }
 
     /**
@@ -382,6 +391,39 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
+     * Checks with Sparkpost whether the email template is valid.
+     * Substitution data are taken from the first recipient.
+     *
+     * @param Sparkpost $sparkPostClient
+     * @param array     $sparkPostMessage
+     *
+     * @throws \UnexpectedValueException
+     */
+    protected function checkTemplateIsValid(Sparkpost $sparkPostClient, array $sparkPostMessage)
+    {
+        // Take substitution_data from the first recipient.
+        if (empty($sparkPostMessage['substitution_data']) && isset($sparkPostMessage['recipients'][0]['substitution_data'])) {
+            $sparkPostMessage['substitution_data'] = $sparkPostMessage['recipients'][0]['substitution_data'];
+            unset($sparkPostMessage['recipients']);
+        }
+
+        $promise  = $sparkPostClient->request('POST', 'utils/content-previewer', $sparkPostMessage);
+        $response = $promise->wait();
+        $body     = $response->getBody();
+
+        if ($response->getStatusCode() === 403) {
+            // We cannot fail as it would be a BC break. Throw a warning and continue.
+            $this->logger->warning("The permission 'Templates: Preview' is not enabled. Enable it to let Mautic check email template validity before send.");
+
+            return;
+        }
+
+        if ($errorMessage = $this->getErrorMessageFromResponseBody($body)) {
+            throw new \UnexpectedValueException($errorMessage);
+        }
+    }
+
+    /**
      * Check for SparkPost rejection for immediate error messages.
      *
      * @param array $message
@@ -467,32 +509,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             case 'link_unsubscribe':
                 $this->transportCallback->addFailureByAddress($email, 'unsubscribed', DoNotContact::UNSUBSCRIBED);
                 break;
-        }
-    }
-
-    /**
-     * Checks with Sparkpost whether the email template is valid.
-     * Substitution data are taken from the first recipient.
-     *
-     * @param Sparkpost $sparkPostClient
-     * @param array     $sparkPostMessage
-     *
-     * @throws \UnexpectedValueException
-     */
-    private function checkTemplateIsValid(Sparkpost $sparkPostClient, array $sparkPostMessage)
-    {
-        // Take substitution_data from the first recipient.
-        if (empty($sparkPostMessage['substitution_data']) && isset($sparkPostMessage['recipients'][0]['substitution_data'])) {
-            $sparkPostMessage['substitution_data'] = $sparkPostMessage['recipients'][0]['substitution_data'];
-            unset($sparkPostMessage['recipients']);
-        }
-
-        $promise  = $sparkPostClient->request('POST', 'utils/content-previewer', $sparkPostMessage);
-        $response = $promise->wait();
-        $body     = $response->getBody();
-
-        if ($errorMessage = $this->getErrorMessageFromResponseBody($body)) {
-            throw new \UnexpectedValueException($errorMessage);
         }
     }
 }

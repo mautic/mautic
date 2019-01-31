@@ -20,6 +20,7 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Psr\Log\LoggerInterface;
 use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -37,6 +38,7 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
     private $sparkpostFactory;
     private $sparkpostClient;
     private $sparkpostTransport;
+    private $logger;
 
     protected function setUp()
     {
@@ -51,12 +53,14 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
         $this->message            = $this->createMock(MauticMessage::class);
         $this->headers            = $this->createMock(\Swift_Mime_HeaderSet::class);
         $this->sparkpostFactory   = $this->createMock(SparkpostFactoryInterface::class);
+        $this->logger             = $this->createMock(LoggerInterface::class);
         $this->sparkpostClient    = new SparkPost($this->httpClient, ['key' => '1234']);
         $this->sparkpostTransport = new SparkpostTransport(
             '1234',
             $this->translator,
             $this->transportCallback,
-            $this->sparkpostFactory
+            $this->sparkpostFactory,
+            $this->logger
         );
 
         $this->translator->method('trans')

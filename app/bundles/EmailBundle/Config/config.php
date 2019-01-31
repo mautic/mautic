@@ -534,6 +534,7 @@ return [
                     'translator',
                     'mautic.email.model.transport_callback',
                     'mautic.sparkpost.factory',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.sparkpost.factory' => [
