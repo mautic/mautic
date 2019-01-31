@@ -11,19 +11,33 @@
 
 namespace Mautic\LeadBundle\Services;
 
+use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactSegmentFilterDictionary extends \ArrayIterator
 {
     private $translations;
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
-    public function __construct()
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
         $this->translations['lead_email_read_count'] = [
             'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
@@ -37,11 +51,11 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['lead_email_received'] = [
-            'type'                 => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table_field'  => 'lead_id',
-            'foreign_table'        => 'email_stats',
-            'field'                => 'email_id',
-            'where'                => 'email_stats.is_read = 1',
+            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table_field' => 'lead_id',
+            'foreign_table'       => 'email_stats',
+            'field'               => 'email_id',
+            'where'               => 'email_stats.is_read = 1',
         ];
 
         $this->translations['hit_url_count'] = [
@@ -84,7 +98,7 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
-        $this->translations['dnc_manual_email'] = [
+        $this->translations['dnc_unsubscribed_manually'] = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
@@ -154,12 +168,6 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
             'foreign_field' => 'page_id',
-        ];
-
-        $this->translations['email_id'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table' => 'page_hits',
-            'foreign_field' => 'email_id',
         ];
 
         $this->translations['redirect_id'] = [
@@ -235,12 +243,20 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'where'         => 'campaign_leads.manually_removed = 0',
         ];
 
-        $this->translations['lead_asset_download'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table' => 'asset_downloads',
-            'field'         => 'asset_id',
-        ];
+        $this->translator = $translator;
+        $this->dispatcher = $dispatcher;
+        $this->fetchTranslationsFromSubscribers();
 
         parent::__construct($this->translations);
+    }
+
+    private function fetchTranslationsFromSubscribers()
+    {
+        // Add custom choices
+        if ($this->dispatcher->hasListeners(LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE)) {
+            $event = new SegmentDictionaryGenerationEvent($this->translations);
+            $this->dispatcher->dispatch(LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE, $event);
+            $this->translations = $event->getTranslations();
+        }
     }
 }

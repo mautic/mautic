@@ -89,7 +89,6 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         if (!isset($this->choices[$object])) {
             $this->choices[$object] = [];
         }
-
         if (!array_key_exists($choiceKey, $this->choices[$object])) {
             $this->choices[$object][$choiceKey] = $choiceConfig;
         }

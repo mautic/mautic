@@ -1075,7 +1075,10 @@ return [
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [
                 'class'     => \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary::class,
-                'arguments' => [],
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
+                ],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder::class,
