@@ -166,7 +166,7 @@ class ContactSegmentFilterCrate
     /**
      * @return string|null
      */
-    private function getType()
+    public function getType()
     {
         return $this->type;
     }
