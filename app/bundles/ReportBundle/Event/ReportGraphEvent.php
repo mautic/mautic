@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Event;
 
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 
@@ -41,6 +42,13 @@ class ReportGraphEvent extends AbstractReportEvent
         $this->context         = $report->getSource();
         $this->requestedGraphs = $graphs;
         $this->queryBuilder    = $queryBuilder;
+
+        // Prefer a slave connection if available.
+        $connection = $this->queryBuilder->getConnection();
+        if ($connection instanceof MasterSlaveConnection) {
+            $connection->connect('slave');
+            $this->queryBuilder = new QueryBuilder($connection);
+        }
     }
 
     /**
