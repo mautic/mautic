@@ -415,6 +415,15 @@ return [
                 ],
             ],
         ],
+        'repositories' => [
+            'mautic.repository.ip_address' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\CoreBundle\Entity\IpAddress::class,
+                ],
+            ],
+        ],
         'helpers' => [
             'mautic.helper.app_version' => [
                 'class' => \Mautic\CoreBundle\Helper\AppVersion::class,

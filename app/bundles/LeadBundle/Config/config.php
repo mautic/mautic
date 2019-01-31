@@ -971,6 +971,7 @@ return [
                     'mautic.tracker.device',
                     'mautic.lead.model.legacy_lead',
                     'mautic.lead.model.ipaddress',
+                    'mautic.repository.ip_address',
                 ],
             ],
 
