@@ -591,6 +591,7 @@ final class LeadEvents
      */
     const LIST_FILTERS_CHOICES_ON_GENERATE = 'mautic.list_filters_choices_on_generate';
 
+    const SEGMENT_DICTIONARY_ON_GENERATE = 'mautic.list_dictionary_on_generate';
     /**
      * The event is dispatched to allow inserting segment filters translations.
      *
