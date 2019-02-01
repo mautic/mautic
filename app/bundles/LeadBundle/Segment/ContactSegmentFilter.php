@@ -109,14 +109,6 @@ class ContactSegmentFilter
     /**
      * @return mixed
      */
-    public function getType()
-    {
-        return $this->contactSegmentFilterCrate->getType();
-    }
-
-    /**
-     * @return mixed
-     */
     public function getTable()
     {
         return $this->filterDecorator->getTable($this->contactSegmentFilterCrate);
