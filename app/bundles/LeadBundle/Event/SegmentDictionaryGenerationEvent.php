@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * @copyright  2014 Mautic Contributors. All rights reserved
- * @author      Mautic
+ * @copyright  2019 Mautic Contributors. All rights reserved
+ * @author      Mautic, Jan Kozak <galvani78@gmail.com
  *
  * @link        http://mautic.org
  *
@@ -13,6 +15,12 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 
+/**
+ * SegmentDictionaryGenerationEvent is dispatched while dictionary to transform frontend filters into
+ *  translation understandable by segment service is run.
+ *
+ * This is not related to language translations at all
+ */
 class SegmentDictionaryGenerationEvent extends CommonEvent
 {
     /**
@@ -20,19 +28,33 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
      */
     private $translations;
 
-    public function __construct(array $translations = [])
+    /**
+     * SegmentDictionaryGenerationEvent constructor.
+     *
+     * @param array $translations
+     */
+    public function __construct($translations = [])
     {
         $this->translations = $translations;
     }
 
-    public function addTranslation($key, $attributes): self
+    /**
+     * @param string $key
+     * @param array  $attributes
+     *
+     * @return SegmentDictionaryGenerationEvent
+     */
+    public function addTranslation(string $key, $attributes)
     {
         $this->translations[$key] = $attributes;
 
         return $this;
     }
 
-    public function getTranslations(): array
+    /**
+     * @return array
+     */
+    public function getTranslations()
     {
         return $this->translations;
     }
