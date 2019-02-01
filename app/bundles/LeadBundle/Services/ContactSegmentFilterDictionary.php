@@ -24,6 +24,9 @@ use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * ContactSegmentFilterDictionary.
+ */
 class ContactSegmentFilterDictionary extends \ArrayIterator
 {
     private $translations;
@@ -37,6 +40,12 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
      */
     private $dispatcher;
 
+    /**
+     * ContactSegmentFilterDictionary constructor.
+     *
+     * @param TranslatorInterface      $translator
+     * @param EventDispatcherInterface $dispatcher
+     */
     public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
         $this->translations['lead_email_read_count'] = [
@@ -203,6 +212,29 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'foreign_table' => 'page_hits',
         ];
 
+<<<<<<< HEAD
+=======
+        // Clicked any link from an email ever, kept as email_id for BC
+        $this->translations['email_id'] = [
+            'type' => ChannelClickQueryBuilder::getServiceId(),
+        ];
+
+        // Clicked any link from an email based on time
+        $this->translations['email_clicked_link_date'] = [
+            'type' => ChannelClickQueryBuilder::getServiceId(),
+        ];
+
+        // Clicked any link from a sms based on time
+        $this->translations['sms_clicked_link'] = [
+            'type' => ChannelClickQueryBuilder::getServiceId(),
+        ];
+
+        // Clicked any link from a sms based on time
+        $this->translations['sms_clicked_link_date'] = [
+            'type' => ChannelClickQueryBuilder::getServiceId(),
+        ];
+
+>>>>>>> e9de8f189... code style fixes
         $this->translations['sessions'] = [
             'type' => SessionsFilterQueryBuilder::getServiceId(),
         ];
@@ -250,6 +282,9 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         parent::__construct($this->translations);
     }
 
+    /**
+     * return void.
+     */
     private function fetchTranslationsFromSubscribers()
     {
         // Add custom choices
