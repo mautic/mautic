@@ -11,7 +11,6 @@
 
 namespace Mautic\ReportBundle\Event;
 
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -72,13 +71,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
         $this->options           = $options;
         $this->queryBuilder      = $qb;
         $this->channelListHelper = $channelListHelper;
-
-        // Prefer a slave connection if available.
-        $connection = $this->queryBuilder->getConnection();
-        if ($connection instanceof MasterSlaveConnection) {
-            $connection->connect('slave');
-            $this->queryBuilder = new QueryBuilder($connection);
-        }
     }
 
     /**
