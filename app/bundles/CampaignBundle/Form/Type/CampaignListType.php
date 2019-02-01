@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -34,12 +35,18 @@ class CampaignListType extends AbstractType
     protected $translator;
 
     /**
+     * @var bool
+     */
+    private $canViewOther = false;
+
+    /**
      * @param MauticFactory $factory
      */
-    public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator)
+    public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
     {
-        $this->model      = $campaignModel;
-        $this->translator = $translator;
+        $this->model        = $campaignModel;
+        $this->translator   = $translator;
+        $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }
 
     /**
@@ -51,7 +58,7 @@ class CampaignListType extends AbstractType
             [
                 'choices'      => function (Options $options) {
                     $choices   = [];
-                    $campaigns = $this->model->getRepository()->getPublishedCampaigns(null, null, true);
+                    $campaigns = $this->model->getRepository()->getPublishedCampaigns(null, null, true, $this->canViewOther);
                     foreach ($campaigns as $campaign) {
                         $choices[$campaign['id']] = $campaign['name'];
                     }

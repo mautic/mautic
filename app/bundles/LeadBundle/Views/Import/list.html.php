@@ -73,6 +73,13 @@ endif;
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'sessionVar' => $sessionVar,
+                    'orderBy'    => $tablePrefix.'.createdByUser',
+                    'text'       => 'mautic.core.create.by.past.tense',
+                    'class'      => 'col-created visible-md visible-lg',
+                ]);
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                    'sessionVar' => $sessionVar,
                     'orderBy'    => $tablePrefix.'.dateAdded',
                     'text'       => 'mautic.core.date.added',
                     'class'      => 'col-date-added visible-md visible-lg',

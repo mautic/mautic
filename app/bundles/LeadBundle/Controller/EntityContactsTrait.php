@@ -108,10 +108,11 @@ trait EntityContactsTrait
 
             return $this->postActionRedirect(
                 [
-                    'returnUrl'       => $returnUrl,
-                    'viewParameters'  => ['page' => $lastPage, 'objectId' => $entityId],
-                    'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
-                    'passthroughVars' => [
+                    'returnUrl'         => $returnUrl,
+                    'viewParameters'    => ['page' => $lastPage, 'objectId' => $entityId],
+                    'contentTemplate'   => 'MauticLeadBundle:Lead:grid.html.php',
+                    'forwardController' => false,
+                    'passthroughVars'   => [
                         'mauticContent' => $sessionVar.'Contacts',
                     ],
                 ]
