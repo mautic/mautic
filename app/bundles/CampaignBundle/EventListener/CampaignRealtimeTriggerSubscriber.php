@@ -40,8 +40,8 @@ class CampaignRealtimeTriggerSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_LEADCHANGE         => ['onCampaignLeadChange', -1],
-            CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE     => ['onCampaignLeadChange', -2],
+            CampaignEvents::CAMPAIGN_ON_LEADCHANGE     => ['onCampaignLeadChange', -1],
+            CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE => ['onCampaignLeadChange', -2],
         ];
     }
 
@@ -50,13 +50,13 @@ class CampaignRealtimeTriggerSubscriber implements EventSubscriberInterface
      */
     public function onCampaignLeadChange(CampaignLeadChangeEvent $event)
     {
-        $leads = $event->getLeads();
-        // If not batch change
-        if (empty($leads)) {
-            $leads = [$event->getLead()];
-        }
-        foreach ($leads as $lead) {
-            if ($event->getCampaign()->isTriggerRealtime() && $event->wasAdded()) {
+        if ($event->getCampaign()->isTriggerRealtime() && $event->wasAdded()) {
+            $leads = $event->getLeads();
+            // If not batch change
+            if (empty($leads)) {
+                $leads = [$event->getLead()];
+            }
+            foreach ($leads as $lead) {
                 $contactLimiterer = new ContactLimiter(null, $lead->getId());
                 $this->kickoffExecutioner->execute($event->getCampaign(), $contactLimiterer);
             }
