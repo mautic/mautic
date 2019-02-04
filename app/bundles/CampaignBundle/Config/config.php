@@ -125,6 +125,12 @@ return [
 
     'services'   => [
         'events'       => [
+            'mautic.campaign.realtime_trigger.subscriber' => [
+                'class'     => \Mautic\CampaignBundle\EventListener\CampaignRealtimeTriggerSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.executioner.kickoff',
+                ],
+            ],
             'mautic.campaign.subscriber'                => [
                 'class'     => \Mautic\CampaignBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
