@@ -23,7 +23,6 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\ReportEvents;
 
 /**
@@ -65,7 +64,6 @@ class ReportSubscriber extends CommonSubscriber
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
             ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
-           // ReportEvents::REPORT_QUERY_PRE_EXECUTE => ['onReportQueryPreExecute', 0],
         ];
     }
 
@@ -81,7 +79,6 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         $prefix               = 'e.';
-        $statPrefix           = 'es.';
         $variantParent        = 'vp.';
         $channelUrlTrackables = 'cut.';
         $doNotContact         = 'dnc.';
@@ -139,26 +136,26 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'unsubscribed',
                 'label'   => 'mautic.email.report.unsubscribed',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT COUNT(dnc.id) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE  dnc.reason= '.DoNotContact::UNSUBSCRIBED.' and and dnc.channel_id=e.id and dnc.channel = \'email\'), 0)',
+                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'unsubscribed_ratio' => [
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => 'mautic.email.report.unsubscribed_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE dnc.channel_id='.$prefix.'id and dnc.channel = email), \'0.0\')',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
                 'suffix'  => '%',
             ],
             'bounced' => [
                 'alias'   => 'bounced',
                 'label'   => 'mautic.email.report.bounced',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT COUNT(dnc.id) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE  dnc.reason= '.DoNotContact::BOUNCED.' and and dnc.channel_id='.$prefix.'id and dnc.channel = \'email\'), 0)',
+                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'bounced_ratio' => [
                 'alias'   => 'bounced_ratio',
                 'label'   => 'mautic.email.report.bounced_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE dnc.channel_id=e.id and dnc.channel = email), \'0.0\')',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
                 'suffix'  => '%',
             ],
             $prefix.'revision' => [
@@ -203,10 +200,17 @@ class ReportSubscriber extends CommonSubscriber
 
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS)) {
             // Ratios are not applicable for individual stats
-            unset($columns['hits_ratio'], $columns['unique_ratio']);
+            unset($columns['read_ratio'], $columns['unsubscribed_ratio'], $columns['bounced_ratio'], $columns['hits_ratio'], $columns['unique_ratio']);
 
             // Email counts are not applicable for individual stats
-            unset($columns[$prefix.'variant_sent_count'], $columns[$prefix.'variant_read_count']);
+            unset($columns[$prefix.'read_count'], $columns[$prefix.'variant_sent_count'], $columns[$prefix.'variant_read_count']);
+
+            // Prevent null DNC records from filtering the results
+            $columns['unsubscribed']['type']    = 'bool';
+            $columns['unsubscribed']['formula'] = 'IF(dnc.id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0)';
+
+            $columns['bounced']['type']    = 'bool';
+            $columns['bounced']['formula'] = 'IF(dnc.id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.', 1, 0)';
 
             // clicked column for individual stats
             $columns['is_hit'] = [
@@ -216,9 +220,6 @@ class ReportSubscriber extends CommonSubscriber
                 'formula' => 'IF('.$channelUrlTrackables.'hits is NULL, 0, 1)',
             ];
 
-            // change SQL for stats and ratio, grab from stats table as SUM/COUNT etc.
-            $columns[$prefix.'read_count']['formula'] = 'SUM('.$statPrefix.'is_read)';
-            $columns['read_ratio']['formula']         = 'IFNULL(ROUND((SUM('.$statPrefix.'is_read)/COUNT('.$statPrefix.'id))*100, 1), \'0.0\')';
             // time between sent and read
             $columns['read_delay'] = [
                 'alias'   => 'read_delay',
@@ -227,26 +228,7 @@ class ReportSubscriber extends CommonSubscriber
                 'formula' => 'IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), \'-\')',
             ];
 
-            // Prevent null DNC records from filtering the results
-
-            // channel_url_trackables subquery
-            $qbDoNotContact        = $this->db->createQueryBuilder();
-            $qbDoNotContact->select('COUNT(dnc.id)')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
-                ->where('dnc.reason = '.DoNotContact::UNSUBSCRIBED)
-                ->andWhere('dnc.channel_id=es.email_id')
-                ->andWhere('dnc.channel=\'email\'');
-
-            $columns[$prefix.'sent_count']['formula'] = 'COUNT(es.id)';
-
-            // unsubscribed & bounced
-            // try find result for each email_stats row
-            $columns['unsubscribed']['formula']       = 'SUM(IFNULL(('.$this->generatDncQueryBuilder('es.email_id', DoNotContact::UNSUBSCRIBED, 'dnc.date_added', 'dnc.lead_id=es.lead_id')->getSQL().'), 0))';
-            $columns['unsubscribed_ratio']['formula'] = 'IFNULL(ROUND(('.$columns['unsubscribed']['formula'].'/'.$columns[$prefix.'sent_count']['formula'].')*100,1), \'0.0\')';
-
-            $columns['bounced']['formula']       =  'SUM(IFNULL(('.$this->generatDncQueryBuilder('es.email_id', DoNotContact::BOUNCED, 'dnc.date_added', 'dnc.lead_id=es.lead_id')->getSQL().'), 0))';
-            $columns['bounced_ratio']['formula'] = 'IFNULL(ROUND(('.$columns['bounced']['formula'].'/'.$columns[$prefix.'sent_count']['formula'].')*100,1), \'0.0\')';
-
+            $statPrefix  = 'es.';
             $statColumns = [
                 $statPrefix.'email_address' => [
                     'label' => 'mautic.email.report.stat.email_address',
@@ -325,7 +307,7 @@ class ReportSubscriber extends CommonSubscriber
     {
         $context    = $event->getContext();
         $qb         = $event->getQueryBuilder();
-        $hasGroupBy = $event->hasgroupby();
+        $hasGroupBy = $event->hasGroupBy();
 
         // channel_url_trackables subquery
         $qbcut        = $this->db->createQueryBuilder();
@@ -356,12 +338,12 @@ class ReportSubscriber extends CommonSubscriber
                 }
 
                 if ($event->hasColumn($dncColumns) || $event->hasFilter($dncColumns)) {
-                    /* $qb->leftJoin(
-                         'e',
-                         MAUTIC_TABLE_PREFIX.'lead_donotcontact',
-                         'dnc',
-                         'e.id = dnc.channel_id AND dnc.channel=\'email\''
-                     );*/
+                    $qb->leftJoin(
+                        'e',
+                        MAUTIC_TABLE_PREFIX.'lead_donotcontact',
+                        'dnc',
+                        'e.id = dnc.channel_id AND dnc.channel=\'email\''
+                    );
                 }
 
                 break;
@@ -374,10 +356,6 @@ class ReportSubscriber extends CommonSubscriber
                     ->addLeadLeftJoin($qb, 'es')
                     ->addIpAddressLeftJoin($qb, 'es')
                     ->applyDateFilters($qb, 'date_sent', 'es');
-
-                if (!$hasGroupBy) {
-                    $qb->groupBy('es.id');
-                }
 
                 if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
                     $qbcut->select(
@@ -412,7 +390,7 @@ class ReportSubscriber extends CommonSubscriber
                 if ($this->companyReportData->eventHasCompanyColumns($event)) {
                     $event->addCompanyLeftJoin($qb);
                 }
-                //$this->columnTranslator($event);
+
                 break;
         }
 
@@ -632,29 +610,6 @@ class ReportSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param ReportQueryEvent $event
-     */
-    public function onReportQueryPreExecute(ReportQueryEvent $event)
-    {
-        $options = $event->getOptions();
-        $query   = $event->getQuery();
-        if (empty($options['dateFrom'])) {
-            $options['dateFrom'] = new \DateTime();
-            $options['dateFrom']->modify('-30 days');
-        }
-
-        if (empty($options['dateTo'])) {
-            $options['dateTo'] = new \DateTime();
-        }
-
-        /*$queryBuilder->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
-        $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
-        $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));*/
-    /*    die(print_r($event->getOptions()));
-        die(print_r($query->getSql()));*/
-    }
-
-    /**
      * Add the Do Not Contact table to the query builder.
      *
      * @param QueryBuilder $qb
@@ -689,31 +644,5 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         return false;
-    }
-
-    /**
-     * @param      $equalColumn
-     * @param int  $dncType
-     * @param null $dateColumn
-     * @param null $and
-     *
-     * @return QueryBuilder
-     */
-    private function generatDncQueryBuilder($equalColumn, $dncType = DoNotContact::UNSUBSCRIBED, $dateColumn = null, $and = null)
-    {
-        $qbDoNotContact        = $this->db->createQueryBuilder();
-        $qbDoNotContact->select('1')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
-            ->where('dnc.reason = '.$dncType)
-            ->andWhere('dnc.channel_id='.$equalColumn)
-            ->andWhere('dnc.channel=\'email\'');
-        if ($dateColumn) {
-            $qbDoNotContact->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $dateColumn));
-        }
-        if ($and) {
-            $qbDoNotContact->andWhere($and);
-        }
-
-        return $qbDoNotContact;
     }
 }
