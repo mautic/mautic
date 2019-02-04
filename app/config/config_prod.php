@@ -23,6 +23,21 @@ if (function_exists('apcu_store')) {
             'result_cache_driver'   => 'array',
         ],
     ]);
+} elseif (function_exists('apc_store')) {
+    // Validation caching does not work in Mautic currently - https://github.com/mautic/mautic/issues/6259
+    // $container->loadFromExtension('framework', array(
+    //     'validation' => array(
+    //         'cache' => 'apc',
+    //     )
+    // ));
+    $container->loadFromExtension('doctrine', [
+        'orm' => [
+            'metadata_cache_driver' => 'apc',
+            'query_cache_driver'    => 'apc',
+            // You can use APC for result caching if using a single node in production, otherwise Redis works well.
+            'result_cache_driver'   => 'array',
+        ],
+    ]);
 }
 
 $debugMode = $container->hasParameter('mautic.debug') ? $container->getParameter('mautic.debug') : $container->getParameter('kernel.debug');
