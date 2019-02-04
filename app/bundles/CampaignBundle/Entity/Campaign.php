@@ -164,7 +164,7 @@ class Campaign extends FormEntity
 
         $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
 
-        $builder->addNamedField('triggerRealtime', 'integer', 'trigger_realtime');
+        $builder->addNamedField('triggerRealtime', 'boolean', 'trigger_realtime');
     }
 
     /**
