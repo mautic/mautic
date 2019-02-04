@@ -110,6 +110,11 @@ trait RequestTrait
             $masks['description'] = 'html';
         }
 
+        if (!isset($masks['signature'])) {
+            // Add signature to support HTML
+            $masks['signature'] = 'html';
+        }
+
         $params = InputHelper::_($params, $masks);
     }
 
