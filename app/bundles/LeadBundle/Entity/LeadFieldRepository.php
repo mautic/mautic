@@ -29,7 +29,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @return array
      */
-    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = 'lead')
+    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.alias')
@@ -47,9 +47,11 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter(':true', true, 'boolean');
         }
 
-        $q->andWhere(
-            $q->expr()->eq('l.object', ':object')
-        )->setParameter('object', $object);
+        if ($object) {
+            $q->andWhere(
+                $q->expr()->eq('l.object', ':object')
+            )->setParameter('object', $object);
+        }
 
         $results = $q->execute()->fetchAll();
         $aliases = [];
