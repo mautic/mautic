@@ -98,8 +98,9 @@ class ReportSubscriber implements EventSubscriberInterface
                 'suffix'  => '%',
             ],
             $prefix.'sent_count' => [
-                'label' => 'mautic.email.report.sent_count',
-                'type'  => 'int',
+                'label'   => 'mautic.email.report.sent_count',
+                'type'    => 'int',
+                'formula' => 'IFNULL(('.$this->generateSentCountBuilder()->getSQL().'), 0)',
             ],
             'hits' => [
                 'alias'   => 'hits',
@@ -131,13 +132,13 @@ class ReportSubscriber implements EventSubscriberInterface
                 'alias'   => 'unsubscribed',
                 'label'   => 'mautic.email.report.unsubscribed',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'formula' => 'IFNULL(('.$this->generateDncQueryBuilder(DoNotContact::UNSUBSCRIBED)->getSQL().'), 0)',
             ],
             'unsubscribed_ratio' => [
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => 'mautic.email.report.unsubscribed_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'formula' => 'ROUND(IFNULL(IFNULL(('.$this->generateDncQueryBuilder(DoNotContact::UNSUBSCRIBED)->getSQL().'), 0)/IFNULL(('.$this->generateSentCountBuilder()->getSQL().'), 0)*100,0),1)',
                 'suffix'  => '%',
             ],
             'bounced' => [
@@ -639,5 +640,37 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param int $dncType
+     *
+     * @return QueryBuilder
+     */
+    private function generateDncQueryBuilder($dncType = DoNotContact::UNSUBSCRIBED)
+    {
+        $qbDoNotContact        = $this->db->createQueryBuilder();
+        $qbDoNotContact->select('COUNT(dnc.id)')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
+            ->where('dnc.reason = '.$dncType)
+            ->andWhere('dnc.channel_id=e.id')
+            ->andWhere('dnc.channel=\'email\'')
+            ->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', 'dnc.date_added'));
+
+        return $qbDoNotContact;
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    private function generateSentCountBuilder()
+    {
+        $qbDoNotContact        = $this->db->createQueryBuilder();
+        $qbDoNotContact->select('COUNT(es.id)')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
+            ->andWhere('es.email_id=e.id')
+            ->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', 'es.date_sent'));
+
+        return $qbDoNotContact;
     }
 }
