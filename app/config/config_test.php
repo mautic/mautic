@@ -53,6 +53,24 @@ $container->loadFromExtension('swiftmailer', [
     'disable_delivery' => true,
 ]);
 
+if (function_exists('apcu_store')) {
+    $container->loadFromExtension('doctrine', [
+        'orm' => [
+            'metadata_cache_driver' => 'apcu',
+            'query_cache_driver'    => 'apcu',
+            'result_cache_driver'   => 'array',
+        ],
+    ]);
+} elseif (function_exists('apc_store')) {
+    $container->loadFromExtension('doctrine', [
+        'orm' => [
+            'metadata_cache_driver' => 'apc',
+            'query_cache_driver'    => 'apc',
+            'result_cache_driver'   => 'array',
+        ],
+    ]);
+}
+
 $container->loadFromExtension('doctrine', [
     'dbal' => [
         'default_connection' => 'default',
