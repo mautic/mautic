@@ -104,8 +104,8 @@ class ReportSubscriber extends CommonSubscriber
                 'suffix'  => '%',
             ],
             $prefix.'sent_count' => [
-                'label'   => 'mautic.email.report.sent_count',
-                'type'    => 'int',
+                'label' => 'mautic.email.report.sent_count',
+                'type'  => 'int',
             ],
             'hits' => [
                 'alias'   => 'hits',
@@ -318,7 +318,8 @@ class ReportSubscriber extends CommonSubscriber
         switch ($context) {
             case self::CONTEXT_EMAILS:
                 $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
-                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id')
+                    ->innerJoin('e', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 'e.id = es.email_id');
 
                 $event->addCategoryLeftJoin($qb, 'e');
 
@@ -334,7 +335,7 @@ class ReportSubscriber extends CommonSubscriber
                     $event->setColumnFormula('unique_ratio', 'IFNULL(ROUND(('.$event->getColumnFormula('unique_hits').'/'.$event->getColumnFormula('e.sent_count').')*100, 1), \'0.0\')');
                 }
 
-                $event->applyDateFilters($qb, 'date_added', 'e');
+                $event->applyDateFilters($qb, 'date_sent', 'es');
 
                 if (!$hasGroupBy) {
                     $qb->groupBy('e.id');
@@ -679,6 +680,9 @@ class ReportSubscriber extends CommonSubscriber
     }
 
     /**
+     * @param string $column
+     * @param string $dateColumn
+     *
      * @return QueryBuilder
      */
     private function generateEmailStatsBuilder($column = 'COUNT(es.id)', $dateColumn = 'es.date_sent')
