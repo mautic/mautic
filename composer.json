@@ -64,7 +64,7 @@
         "doctrine/dbal": "~2.5.4",
         "doctrine/common": "~2.5.3",
         "doctrine/annotations": "1.2.*,>=1.2.7",
-        "doctrine/cache": "~1.5.4",
+        "doctrine/cache": "^1.6",
         "doctrine/migrations": "~1.2.2",
         "doctrine/orm": "~2.5.4",
         "doctrine/doctrine-bundle": "1.6.13",
