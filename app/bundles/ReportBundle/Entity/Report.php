@@ -507,6 +507,18 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
+     * @param $key
+     *
+     * @return mixed
+     */
+    public function getSetting($key)
+    {
+        if (isset($this->settings[$key])) {
+            return $this->settings[$key];
+        }
+    }
+
+    /**
      * @return bool
      */
     public function isScheduled()

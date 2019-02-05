@@ -173,6 +173,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
             new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper)
         );
 
+        $options = $event->getOptions();
+
         // Build the QUERY
         $queryBuilder = $event->getQueryBuilder();
 

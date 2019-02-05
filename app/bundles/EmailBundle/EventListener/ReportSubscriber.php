@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -81,7 +82,7 @@ class ReportSubscriber extends CommonSubscriber
         $prefix               = 'e.';
         $variantParent        = 'vp.';
         $channelUrlTrackables = 'cut.';
-        $doNotContact         = 'dnc.';
+
         $columns              = [
             $prefix.'subject' => [
                 'label' => 'mautic.email.subject',
@@ -105,7 +106,6 @@ class ReportSubscriber extends CommonSubscriber
             $prefix.'sent_count' => [
                 'label'   => 'mautic.email.report.sent_count',
                 'type'    => 'int',
-                'formula' => 'IFNULL(('.$this->generateSentCountBuilder()->getSQL().'), 0)',
             ],
             'hits' => [
                 'alias'   => 'hits',
@@ -143,7 +143,7 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => 'mautic.email.report.unsubscribed_ratio',
                 'type'    => 'string',
-                'formula' => 'ROUND(IFNULL(IFNULL(('.$this->generateDncQueryBuilder(DoNotContact::UNSUBSCRIBED)->getSQL().'), 0)/IFNULL(('.$this->generateSentCountBuilder()->getSQL().'), 0)*100,0),1)',
+                'formula' => 'ROUND(IFNULL(IFNULL(('.$this->generateDncQueryBuilder(DoNotContact::UNSUBSCRIBED)->getSQL().'), 0)/'.$prefix.'sent_count*100,0),1)',
                 'suffix'  => '%',
             ],
             'bounced' => [
@@ -156,7 +156,7 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'bounced_ratio',
                 'label'   => 'mautic.email.report.bounced_ratio',
                 'type'    => 'string',
-                'formula' => 'ROUND(IFNULL(IFNULL(('.$this->generateDncQueryBuilder(DoNotContact::BOUNCED)->getSQL().'), 0)/IFNULL(('.$this->generateSentCountBuilder()->getSQL().'), 0)*100,0),1)',
+                'formula' => 'ROUND(IFNULL(IFNULL(('.$this->generateDncQueryBuilder(DoNotContact::BOUNCED)->getSQL().'), 0)/'.$prefix.'sent_count*100,0),1)',
                 'suffix'  => '%',
             ],
             $prefix.'revision' => [
@@ -320,8 +320,21 @@ class ReportSubscriber extends CommonSubscriber
                 $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
                     ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
 
-                $event->addCategoryLeftJoin($qb, 'e')
-                    ->applyDateFilters($qb, 'date_added', 'e');
+                $event->addCategoryLeftJoin($qb, 'e');
+
+                //If using date range filter, then use query with date range for results
+                if (!$event->getReport()->getSetting('hideDateRangeFilter')) {
+                    $event->setColumnFormula('e.sent_count', 'IFNULL(('.$this->generateEmailStatsBuilder()->getSQL().'), 0)');
+                    $event->setColumnFormula('e.read_count', 'IFNULL(('.$this->generateEmailStatsBuilder('SUM(es.is_read)', 'es.date_read')->getSQL().'), 0)');
+                    $event->setColumnFormula('read_ratio', 'IFNULL(ROUND(('.$event->getColumnFormula('e.read_count').'/'.$event->getColumnFormula('e.sent_count').')*100, 1), \'0.0\')');
+
+                    $event->setColumnFormula('hits', 'IFNULL(('.$this->generateHitsBuilder()->getSQL().'), 0)');
+                    $event->setColumnFormula('unique_hits', 'IFNULL(('.$this->generateHitsBuilder('COUNT(DISTINCT ph.lead_id)')->getSQL().'), 0)');
+                    $event->setColumnFormula('hits_ratio', 'IFNULL(ROUND(('.$event->getColumnFormula('hits').'/'.$event->getColumnFormula('e.sent_count').')*100, 1), \'0.0\')');
+                    $event->setColumnFormula('unique_ratio', 'IFNULL(ROUND(('.$event->getColumnFormula('unique_hits').'/'.$event->getColumnFormula('e.sent_count').')*100, 1), \'0.0\')');
+                }
+
+                $event->applyDateFilters($qb, 'date_added', 'e');
 
                 if (!$hasGroupBy) {
                     $qb->groupBy('e.id');
@@ -668,13 +681,30 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @return QueryBuilder
      */
-    private function generateSentCountBuilder()
+    private function generateEmailStatsBuilder($column = 'COUNT(es.id)', $dateColumn = 'es.date_sent')
     {
         $qbDoNotContact        = $this->db->createQueryBuilder();
-        $qbDoNotContact->select('COUNT(es.id)')
+        $qbDoNotContact->select(''.$column.'')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
             ->andWhere('es.email_id=e.id')
-            ->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', 'es.date_sent'));
+            ->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $dateColumn));
+
+        return $qbDoNotContact;
+    }
+
+    /**
+     * @param string $column
+     * @param string $dateColumn
+     *
+     * @return QueryBuilder
+     */
+    private function generateHitsBuilder($column = 'COUNT(ph.id)', $dateColumn = 'ph.date_hit')
+    {
+        $qbDoNotContact        = $this->db->createQueryBuilder();
+        $qbDoNotContact->select($column)
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+            ->andWhere('ph.email_id=e.id')
+            ->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $dateColumn));
 
         return $qbDoNotContact;
     }
