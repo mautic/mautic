@@ -217,6 +217,14 @@ class PageSubscriber extends CommonSubscriber
             $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
         } catch (\Exception $e) {
             $event->setResult(QueueConsumerResults::REJECT);
+
+            // Log the exception with event payload as context.
+            if ($this->logger) {
+                $this->logger->addError(
+                    'QUEUE CONSUMER ERROR ('.QueueEvents::PAGE_HIT.'): '.$e->getMessage(),
+                    $payload
+                );
+            }
         }
     }
 }
