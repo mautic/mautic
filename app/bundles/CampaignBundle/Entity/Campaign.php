@@ -687,7 +687,7 @@ class Campaign extends FormEntity
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getTriggerRealtime()
     {
@@ -695,7 +695,7 @@ class Campaign extends FormEntity
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isTriggerRealtime()
     {
