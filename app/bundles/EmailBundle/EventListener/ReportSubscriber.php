@@ -204,7 +204,7 @@ class ReportSubscriber extends CommonSubscriber
             unset($columns['read_ratio'], $columns['unsubscribed_ratio'], $columns['bounced_ratio'], $columns['hits_ratio'], $columns['unique_ratio']);
 
             // Email counts are not applicable for individual stats
-            unset($columns[$prefix.'read_count'], $columns[$prefix.'variant_sent_count'], $columns[$prefix.'variant_read_count']);
+            unset($columns[$prefix.'sent_count'], $columns[$prefix.'read_count'], $columns[$prefix.'variant_sent_count'], $columns[$prefix.'variant_read_count']);
 
             // Prevent null DNC records from filtering the results
             $columns['unsubscribed']['type']    = 'bool';
