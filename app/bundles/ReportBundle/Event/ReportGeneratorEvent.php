@@ -166,6 +166,25 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * @param $column
+     * @param $formula
+     */
+    public function setColumnFormula($column, $formula)
+    {
+        $this->options['columns'][$column]['formula'] = $formula;
+    }
+
+    /**
+     * @param $column
+     */
+    public function getColumnFormula($column)
+    {
+        if (isset($this->options['columns'][$column]['formula'])) {
+            return $this->options['columns'][$column]['formula'];
+        }
+    }
+
+    /**
      * @return ExpressionBuilder|null
      */
     public function getFilterExpression()
@@ -328,6 +347,17 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false)
     {
+        // hidden date range
+        if ($this->getReport()->getSetting('hideDateRangeFilter')) {
+            $this->options['dateTo']   = new \DateTime();
+            $this->options['dateFrom'] = new \DateTime();
+            $this->options['dateFrom']->modify('-99 years');
+            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
+            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
+
+            return $this;
+        }
+
         if ($tablePrefix) {
             $tablePrefix .= '.';
         }
