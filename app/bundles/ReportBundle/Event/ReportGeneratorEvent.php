@@ -175,16 +175,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * @param $column
-     */
-    public function getColumnFormula($column)
-    {
-        if (isset($this->options['columns'][$column]['formula'])) {
-            return $this->options['columns'][$column]['formula'];
-        }
-    }
-
-    /**
      * @return ExpressionBuilder|null
      */
     public function getFilterExpression()
@@ -345,7 +335,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      *
      * @return $this
      */
-    public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn = '', $tablePrefix = 't', $dateOnly = false)
+    public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false)
     {
         // hidden date range
         if ($this->getReport()->getSetting('hideDateRangeFilter')) {
@@ -372,16 +362,11 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         if ($dateOnly) {
-            if ($dateColumn) {
-                $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
-            }
-
+            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
         } else {
-            if ($dateColumn) {
-                $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
-            }
+            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
         }
