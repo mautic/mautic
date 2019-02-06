@@ -149,7 +149,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 'alias'    => 'bounced_ratio',
                 'label'    => 'mautic.email.report.bounced_ratio',
                 'type'     => 'string',
-                'formular' => 'ROUND((dnc.bounced/e.sent_count)*100,2)',
+                'formula'  => 'ROUND((dnc.bounced/e.sent_count)*100,2)',
                 'suffix'   => '%',
             ],
             $prefix.'revision' => [
