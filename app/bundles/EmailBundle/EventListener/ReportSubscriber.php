@@ -142,6 +142,7 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => 'mautic.email.report.unsubscribed_ratio',
                 'type'    => 'string',
+                'formular'=> 'ROUND((dnc.unsubscribed/e.sent_count)*100,2)',
                 'suffix'  => '%',
             ],
             'bounced' => [
@@ -150,10 +151,11 @@ class ReportSubscriber extends CommonSubscriber
                 'type'    => 'string',
             ],
             'bounced_ratio' => [
-                'alias'   => 'bounced_ratio',
-                'label'   => 'mautic.email.report.bounced_ratio',
-                'type'    => 'string',
-                'suffix'  => '%',
+                'alias'    => 'bounced_ratio',
+                'label'    => 'mautic.email.report.bounced_ratio',
+                'type'     => 'string',
+                'formular' => 'ROUND((dnc.bounced/e.sent_count)*100,2)',
+                'suffix'   => '%',
             ],
             $prefix.'revision' => [
                 'label' => 'mautic.email.report.revision',
@@ -333,13 +335,6 @@ class ReportSubscriber extends CommonSubscriber
 
                 $event->setColumnFormula('unsubscribed', 'dnc.unsubscribed');
                 $event->setColumnFormula('bounced', 'dnc.bounced');
-                if ($event->getReport()->getSetting('hideDateRangeFilter')) {
-                    $event->setColumnFormula('unsubscribed_ratio', 'ROUND((dnc.unsubscribed/e.sent_count)*100,2)');
-                    $event->setColumnFormula('bounced_ratio', 'ROUND((dnc.bounced/e.sent_count)*100,2)');
-                } else {
-                    $event->setColumnFormula('unsubscribed_ratio', 'ROUND((dnc.unsubscribed/stats.sent_count)*100,2)');
-                    $event->setColumnFormula('bounced_ratio', 'ROUND((dnc.bounced/stats.sent_count)*100,2)');
-                }
 
                 if ($event->getReport()->getSetting('hideDateRangeFilter')) {
                     if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
@@ -357,6 +352,9 @@ class ReportSubscriber extends CommonSubscriber
 
                 //If using date range filter, then use query with date range for results
                 if (!$event->getReport()->getSetting('hideDateRangeFilter')) {
+                    $event->setColumnFormula('unsubscribed_ratio', 'ROUND((dnc.unsubscribed/stats.sent_count)*100,2)');
+                    $event->setColumnFormula('bounced_ratio', 'ROUND((dnc.bounced/stats.sent_count)*100,2)');
+
                     // email_stats with date range
                     if ($event->hasColumn($statsColumn) || $event->hasFilter($statsColumn)) {
                         $subQuery = $this->db->createQueryBuilder();
@@ -392,8 +390,8 @@ class ReportSubscriber extends CommonSubscriber
                     }
                 }
 
-                // Just set params to query
-                $event->applyDateFilters($qb);
+                $qb->setParameter('dateTo', (new \DateTime())->format('Y-m-d H:i:s'));
+                $qb->setParameter('dateFrom', (new \DateTime())->modify('-99 years')->format('Y-m-d H:i:s'));
 
                 if (!$hasGroupBy) {
                     $qb->groupBy('e.id');
