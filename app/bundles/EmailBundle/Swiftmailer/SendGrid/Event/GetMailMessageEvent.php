@@ -26,7 +26,7 @@ class GetMailMessageEvent extends Event
     /**
      * Constructor.
      *
-     * @param Mail $mail
+     * @param Mail               $mail
      * @param Swift_Mime_Message $message
      */
     public function __construct(Mail $mail, Swift_Mime_Message $message)
