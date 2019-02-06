@@ -348,10 +348,8 @@ class ReportSubscriber extends CommonSubscriber
                         ->groupBy('cut2.channel_id');
                         $qb->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id');
                     }
-                }
-
-                //If using date range filter, then use query with date range for results
-                if (!$event->getReport()->getSetting('hideDateRangeFilter')) {
+                } else {
+                    //If using date range filter, then use query with date range for results
                     $event->setColumnFormula('unsubscribed_ratio', 'ROUND((dnc.unsubscribed/stats.sent_count)*100,2)');
                     $event->setColumnFormula('bounced_ratio', 'ROUND((dnc.bounced/stats.sent_count)*100,2)');
 
@@ -390,8 +388,7 @@ class ReportSubscriber extends CommonSubscriber
                     }
                 }
 
-                $qb->setParameter('dateTo', (new \DateTime())->format('Y-m-d H:i:s'));
-                $qb->setParameter('dateFrom', (new \DateTime())->modify('-99 years')->format('Y-m-d H:i:s'));
+                $event->applyDateFilters($qb);
 
                 if (!$hasGroupBy) {
                     $qb->groupBy('e.id');
