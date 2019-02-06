@@ -367,6 +367,7 @@ class LeadController extends FormController
                     'engagementData'    => $this->getEngagementData($lead),
                     'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
+                    'devices'           => $this->get('mautic.lead.repository.lead_device')->getLeadDevices($lead),
                     'auditlog'          => $this->getAuditlogs($lead),
                     'doNotContact'      => end($dnc),
                     'leadNotes'         => $this->forward(
@@ -965,7 +966,10 @@ class LeadController extends FormController
         if (true === $form) {
             return $this->postActionRedirect(
                 [
-                    'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
+                    'returnUrl'       => $this->generateUrl('mautic_contact_action', [
+                        'objectId'     => $lead->getId(),
+                        'objectAction' => 'view',
+                    ]),
                     'viewParameters'  => $viewParameters,
                     'contentTemplate' => 'MauticLeadBundle:Lead:view',
                     'passthroughVars' => [

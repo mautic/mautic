@@ -244,18 +244,16 @@ if (!$isEmbedded) {
             </div>
             <!--/ email detail collapseable toggler -->
 
-            <?php echo $view->render(
-                'MauticEmailBundle:Email:graph.html.php',
-                [
-                    'stats'         => $stats,
-                    'statsDevices'  => $statsDevices,
-                    'emailType'     => $emailType,
-                    'email'         => $email,
-                    'isVariant'     => ($showTranslations || $showVariants),
-                    'showAllStats'  => $showAllStats,
-                    'dateRangeForm' => $dateRangeForm,
-                ]
-            ); ?>
+            <?php
+            $isVariant = $showTranslations || $showVariants ?: 0;
+            $dateFrom  = new \DateTime($dateRangeForm->children['date_from']->vars['data']);
+            $dateTo    = new \DateTime($dateRangeForm->children['date_to']->vars['data']);
+            ?>
+            <div id="emailGraphStats" data-graph-url="<?php echo $view['router']->path('mautic_email_graph_stats', ['objectId' => $email->getId(), 'isVariant' => $isVariant, 'dateFrom' => $dateFrom->format('Y-m-d'), 'dateTo' => $dateTo->format('Y-m-d')]); ?>">
+                <div class="spinner">
+                    <i class="fa fa-spin fa-spinner"></i>
+                </div>
+            </div>
 
             <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
 

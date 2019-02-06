@@ -301,6 +301,14 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
+            'campaign' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.campaign'),
+                'properties' => [
+                    'type' => 'campaign',
+                ],
+                'operators' => $this->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
+            ],
             'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
                 'properties' => [
@@ -326,6 +334,23 @@ class ListModel extends FormModel
                         'include' => [
                             'in',
                             '!in',
+                        ],
+                    ]
+                ),
+                'object' => 'lead',
+            ],
+            'lead_email_sent_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            '!=',
+                            'gt',
+                            'lt',
+                            'gte',
+                            'lte',
                         ],
                     ]
                 ),
@@ -751,7 +776,7 @@ class ListModel extends FormModel
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
-            if (in_array($type, ['lookup', 'multiselect', 'boolean'])) {
+            if (in_array($type, ['select', 'multiselect', 'boolean'])) {
                 if ('boolean' == $type) {
                     //create a lookup list with ID
                     $properties['list'] = [
@@ -808,6 +833,18 @@ class ListModel extends FormModel
     public function getGlobalLists()
     {
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getGlobalLists();
+
+        return $lists;
+    }
+
+    /**
+     * Get a list of preference center lead lists.
+     *
+     * @return mixed
+     */
+    public function getPreferenceCenterLists()
+    {
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getPreferenceCenterList();
 
         return $lists;
     }
@@ -1014,7 +1051,7 @@ class ListModel extends FormModel
                 // Keep CPU down for large lists; sleep per $limit batch
                 $this->batchSleep();
 
-                $removeLeadList = $this->leadSegmentService->getOrphanedLeadListLeads($leadList);
+                $removeLeadList = $this->leadSegmentService->getOrphanedLeadListLeads($leadList, [], $limit);
 
                 if (empty($removeLeadList[$leadList->getId()])) {
                     // Somehow ran out of leads so break out

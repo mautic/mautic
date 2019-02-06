@@ -28,6 +28,7 @@ $templates = [
     'timezones'      => 'timezone-template',
     'select'         => 'select-template',
     'lists'          => 'leadlist-template',
+    'campaign'       => 'campaign-template',
     'deviceTypes'    => 'device_type-template',
     'deviceBrands'   => 'device_brand-template',
     'deviceOs'       => 'device_os-template',
@@ -134,6 +135,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['isGlobal']); ?>
+            <?php echo $view['form']->row($form['isPreferenceCenter']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>
         </div>
     </div>

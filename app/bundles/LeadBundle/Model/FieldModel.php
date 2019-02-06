@@ -16,6 +16,7 @@ use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
@@ -138,6 +139,12 @@ class FieldModel extends FormModel
         ],
         'timezone' => [
             'type'     => 'timezone',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+        ],
+        'last_active' => [
+            'type'     => 'datetime',
             'fixed'    => true,
             'listable' => true,
             'object'   => 'lead',
@@ -884,5 +891,13 @@ class FieldModel extends FormModel
     public static function getSchemaDefinition($alias, $type, $isUnique = false)
     {
         return SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
+    {
+        return $this->getRepository()->findOneByAlias($alias);
     }
 }

@@ -178,6 +178,9 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.form.validation.subscriber' => [
+                'class'     => \Mautic\FormBundle\EventListener\FormValidationSubscriber::class,
+            ],
             'mautic.form.pagebundle.subscriber' => [
                 'class'     => PageSubscriber::class,
                 'arguments' => [
@@ -253,6 +256,9 @@ return [
             'mautic.form.type.field' => [
                 'class'       => FieldType::class,
                 'alias'       => 'formfield',
+                'arguments'   => [
+                    'translator',
+                ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
@@ -284,6 +290,12 @@ return [
             ],
             'mautic.form.type.field_propertypagebreak' => [
                 'class'     => FormFieldPageBreakType::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.form.type.field_propertytel' => [
+                'class'     => \Mautic\FormBundle\Form\Type\FormFieldTelType::class,
                 'arguments' => [
                     'translator',
                 ],

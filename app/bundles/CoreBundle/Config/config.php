@@ -187,10 +187,12 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+
             'mautic.core.maintenance.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\MaintenanceSubscriber',
+                'class'     => Mautic\CoreBundle\EventListener\MaintenanceSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                    'mautic.user.token.repository',
                 ],
             ],
             'mautic.core.request.subscriber' => [
@@ -300,6 +302,13 @@ return [
             'mautic.form.type.slot.saveprefsbutton' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
                 'alias'     => 'slot_saveprefsbutton',
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.form.type.slot.successmessage' => [
+                'class'     => Mautic\CoreBundle\Form\Type\SlotSuccessMessageType::class,
+                'alias'     => 'slot_successmessage',
                 'arguments' => [
                     'translator',
                 ],
@@ -821,7 +830,6 @@ return [
             ],
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
-            'monolog.handler.stream.class'    => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
 
             // Form extensions
             'mautic.form.extension.custom' => [
@@ -932,6 +940,10 @@ return [
     ],
 
     'ip_lookup_services' => [
+        'extreme-ip' => [
+            'display_name' => 'Extreme-IP',
+            'class'        => 'Mautic\CoreBundle\IpLookup\ExtremeIpLookup',
+        ],
         'freegeoip' => [
             'display_name' => 'Ipstack.com',
             'class'        => 'Mautic\CoreBundle\IpLookup\IpstackLookup',
@@ -1072,5 +1084,6 @@ return [
         'cors_valid_domains'        => [],
         'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
         'max_entity_lock_time'      => 0,
+        'default_daterange_filter'  => '-1 month',
     ],
 ];

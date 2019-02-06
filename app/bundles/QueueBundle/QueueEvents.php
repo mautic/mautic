@@ -26,4 +26,6 @@ final class QueueEvents
     const EMAIL_HIT = 'mautic.queue_email_hit';
 
     const PAGE_HIT = 'mautic.queue_page_hit';
+
+    const TRANSPORT_WEBHOOK = 'mautic.queue_transport_webhook';
 }

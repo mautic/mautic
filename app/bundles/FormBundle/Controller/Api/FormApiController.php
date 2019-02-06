@@ -121,10 +121,13 @@ class FormApiController extends CommonApiController
         $fieldModel  = $this->getModel('form.field');
         $actionModel = $this->getModel('form.action');
         $isNew       = false;
+        $alias       = $entity->getAlias();
 
-        // Set clean alias to prevent SQL errors
-        $alias = $this->model->cleanAlias($entity->getName(), '', 10);
-        $entity->setAlias($alias);
+        if (empty($alias)) {
+            // Set clean alias to prevent SQL errors
+            $alias = $this->model->cleanAlias($entity->getName(), '', 10);
+            $entity->setAlias($alias);
+        }
 
         // Set timestamps
         $this->model->setTimestamps($entity, true, false);

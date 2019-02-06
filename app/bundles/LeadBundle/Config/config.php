@@ -229,6 +229,11 @@ return [
                 'controller' => 'MauticLeadBundle:Api\ListApi:addLead',
                 'method'     => 'POST',
             ],
+            'mautic_api_segmentaddcontacts' => [
+                'path'       => '/segments/{id}/contacts/add',
+                'controller' => 'MauticLeadBundle:Api\ListApi:addLeads',
+                'method'     => 'POST',
+            ],
             'mautic_api_segmentremovecontact' => [
                 'path'       => '/segments/{id}/contact/{leadId}/remove',
                 'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
@@ -483,6 +488,23 @@ return [
                     'mautic.lead.repository.lead_event_log',
                 ],
             ],
+            'mautic.lead.timeline_events.campaign.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\TimelineEventLogCampaignSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_event_log',
+                    'mautic.helper.user',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.timeline_events.segment.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\TimelineEventLogSegmentSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_event_log',
+                    'mautic.helper.user',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
             'mautic.lead.subscriber.segment' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\SegmentSubscriber',
                 'arguments' => [
@@ -508,6 +530,7 @@ return [
                     'mautic.stage.model.stage',
                     'mautic.category.model.category',
                     'mautic.helper.user',
+                    'mautic.campaign.model.campaign',
                 ],
                 'alias' => 'leadlist',
             ],
@@ -684,7 +707,9 @@ return [
             ],
             'mautic.form.type.lead_fields' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadFieldsType',
-                'arguments' => ['mautic.factory'],
+                'arguments' => [
+                    'mautic.lead.model.field',
+                ],
                 'alias'     => 'leadfields_choices',
             ],
             'mautic.form.type.lead_dashboard_leads_in_time_widget' => [
@@ -945,6 +970,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.tracker.device',
                     'mautic.lead.model.legacy_lead',
+                    'mautic.lead.model.ipaddress',
                 ],
             ],
 
@@ -1059,6 +1085,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_operator',
                     'mautic.lead.repository.lead_segment_filter_descriptor',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.model.lead_segment.decorator.date.optionFactory' => [
@@ -1183,6 +1210,7 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
+
             'mautic.lead.field.schema_definition' => [
                 'class'     => Mautic\LeadBundle\Field\SchemaDefinition::class,
             ],
@@ -1268,6 +1296,14 @@ return [
                     'mautic.core.model.notification',
                     'mautic.user.model.user',
                     'translator',
+                  ],
+            ],
+            'mautic.lead.model.ipaddress' => [
+                'class'     => Mautic\LeadBundle\Model\IpAddressModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'monolog.logger.mautic',
+
                 ],
             ],
         ],

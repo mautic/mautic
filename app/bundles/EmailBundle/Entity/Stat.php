@@ -145,11 +145,11 @@ class Stat
             ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
             ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
             ->addIndex(['is_failed'], 'stat_email_failed_search')
-            ->addIndex(['is_read'], 'stat_email_read_search')
+            ->addIndex(['is_read', 'date_sent'], 'is_read_date_sent')
             ->addIndex(['tracking_hash'], 'stat_email_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_email_source_search')
             ->addIndex(['date_sent'], 'email_date_sent')
-            ->addIndex(['date_read'], 'email_date_read');
+            ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead');
 
         $builder->addId();
 

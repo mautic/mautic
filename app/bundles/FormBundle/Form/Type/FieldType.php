@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -24,6 +25,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 class FieldType extends AbstractType
 {
     use FormFieldTrait;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * FieldType constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
@@ -223,7 +239,11 @@ class FieldType extends AbstractType
                 [
                     'label'      => 'mautic.form.field.form.validationmsg',
                     'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
+                    'attr'       => [
+                        'class'        => 'form-control',
+                        'tooltip'      => $this->translator->trans('mautic.core.form.default').': '.$this->translator->trans('mautic.form.field.generic.required', [], 'validators'),
+                        'data-show-on' => '{"formfield_isRequired_1": "checked"}',
+                    ],
                     'required'   => false,
                 ]
             );
@@ -479,6 +499,7 @@ class FieldType extends AbstractType
                 case 'number':
                 case 'text':
                 case 'url':
+                case 'tel':
                     $builder->add(
                         'properties',
                         'formfield_placeholder',
@@ -515,27 +536,6 @@ class FieldType extends AbstractType
                     $builder->add(
                         'properties',
                         FormFieldFileType::class,
-                        [
-                            'label' => false,
-                            'data'  => $propertiesData,
-                        ]
-                    );
-                    break;
-                case 'tel':
-                    if (empty($propertiesData['international'])) {
-                        $propertiesData['international'] = false;
-                    }
-                    $builder->add(
-                        'properties',
-                        FormFieldTelType::class,
-                        [
-                            'label' => false,
-                            'data'  => $propertiesData,
-                        ]
-                    );
-                    $builder->add(
-                        'properties',
-                        'formfield_placeholder',
                         [
                             'label' => false,
                             'data'  => $propertiesData,

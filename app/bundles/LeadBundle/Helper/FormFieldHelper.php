@@ -122,7 +122,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      */
     public static function getListTypes()
     {
-        return ['select', 'boolean', 'lookup', 'country', 'region', 'timezone', 'locale'];
+        return ['select', 'multiselect', 'boolean', 'lookup', 'country', 'region', 'timezone', 'locale'];
     }
 
     /**
