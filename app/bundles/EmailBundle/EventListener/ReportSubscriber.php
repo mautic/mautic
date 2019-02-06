@@ -142,7 +142,7 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => 'mautic.email.report.unsubscribed_ratio',
                 'type'    => 'string',
-                'formular'=> 'ROUND((dnc.unsubscribed/e.sent_count)*100,2)',
+                'formula' => 'ROUND((dnc.unsubscribed/e.sent_count)*100,2)',
                 'suffix'  => '%',
             ],
             'bounced' => [
