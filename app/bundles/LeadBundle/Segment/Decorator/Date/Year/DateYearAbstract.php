@@ -30,7 +30,7 @@ abstract class DateYearAbstract extends DateOptionAbstract
      */
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
-        return $dateTimeHelper->toUtcString('Y-%');
+        return $dateTimeHelper->toLocalString('Y-%');
     }
 
     /**
