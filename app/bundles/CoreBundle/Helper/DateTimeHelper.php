@@ -75,7 +75,7 @@ class DateTimeHelper
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
-        $this->local = new \DateTimeZone(date_default_timezone_get());
+        $this->local = new \DateTimeZone($timezone);
 
         if ($datetime instanceof \DateTime) {
             $this->datetime = $datetime;
