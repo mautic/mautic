@@ -132,26 +132,22 @@ class ReportSubscriber implements EventSubscriberInterface
                 'alias'   => 'unsubscribed',
                 'label'   => 'mautic.email.report.unsubscribed',
                 'type'    => 'string',
-                'formula' => 'IFNULL(('.$this->generateDncQueryBuilder(DoNotContact::UNSUBSCRIBED)->getSQL().'), 0)',
             ],
             'unsubscribed_ratio' => [
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => 'mautic.email.report.unsubscribed_ratio',
                 'type'    => 'string',
-                'formula' => 'ROUND(IFNULL(IFNULL(('.$this->generateDncQueryBuilder(DoNotContact::UNSUBSCRIBED)->getSQL().'), 0)/'.$prefix.'sent_count*100,0),1)',
                 'suffix'  => '%',
             ],
             'bounced' => [
                 'alias'   => 'bounced',
                 'label'   => 'mautic.email.report.bounced',
                 'type'    => 'string',
-                'formula' => 'IFNULL(('.$this->generateDncQueryBuilder(DoNotContact::BOUNCED)->getSQL().'), 0)',
             ],
             'bounced_ratio' => [
                 'alias'   => 'bounced_ratio',
                 'label'   => 'mautic.email.report.bounced_ratio',
                 'type'    => 'string',
-                'formula' => 'ROUND(IFNULL(IFNULL(('.$this->generateDncQueryBuilder(DoNotContact::BOUNCED)->getSQL().'), 0)/'.$prefix.'sent_count*100,0),1)',
                 'suffix'  => '%',
             ],
             $prefix.'revision' => [
@@ -306,35 +302,41 @@ class ReportSubscriber implements EventSubscriberInterface
         // channel_url_trackables subquery
         $qbcut        = $this->db->createQueryBuilder();
         $clickColumns = ['hits', 'unique_hits', 'hits_ratio', 'unique_ratio', 'is_hit'];
+        $statsColumn  = ['e.sent_count', 'e.read_count', 'read_ratio'];
         $dncColumns   = ['unsubscribed', 'unsubscribed_ratio', 'bounced', 'bounced_ratio'];
-
         switch ($context) {
             case self::CONTEXT_EMAILS:
                 $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
-                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id')
-                    ->innerJoin('e', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 'e.id = es.email_id');
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
 
                 $event->addCategoryLeftJoin($qb, 'e');
 
-                //If using date range filter, then use query with date range for results
-                if (!$event->getReport()->getSetting('hideDateRangeFilter')) {
-                    $event->setColumnFormula('e.sent_count', 'IFNULL(('.$this->generateEmailStatsBuilder()->getSQL().'), 0)');
-                    $event->setColumnFormula('e.read_count', 'IFNULL(('.$this->generateEmailStatsBuilder('SUM(es.is_read)', 'es.date_read')->getSQL().'), 0)');
-                    $event->setColumnFormula('read_ratio', 'IFNULL(ROUND(('.$event->getColumnFormula('e.read_count').'/'.$event->getColumnFormula('e.sent_count').')*100, 1), \'0.0\')');
+                // DoNotContact stats with and without date range
+                $subQuery = $this->db->createQueryBuilder();
+                $subQuery->select(
+                    'SUM(IF(donot.reason = '.DoNotContact::UNSUBSCRIBED.',1, 0)) as unsubscribed',
+                    'SUM(IF(donot.reason = '.DoNotContact::BOUNCED.',1, 0)) as bounced',
+                    'donot.channel_id as channel_id'
+                )
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'donot')
+                    ->where(sprintf('%1$s BETWEEN :dateFrom AND :dateTo', 'donot.date_added'))
+                    ->andWhere('donot.channel=\'email\'')
+                    ->groupBy('donot.channel_id');
+                $qb->innerJoin('e', sprintf('(%s)', $subQuery->getSQL()), 'dnc', 'e.id = dnc.channel_id');
 
-                    $event->setColumnFormula('hits', 'IFNULL(('.$this->generateHitsBuilder()->getSQL().'), 0)');
-                    $event->setColumnFormula('unique_hits', 'IFNULL(('.$this->generateHitsBuilder('COUNT(DISTINCT ph.lead_id)')->getSQL().'), 0)');
-                    $event->setColumnFormula('hits_ratio', 'IFNULL(ROUND(('.$event->getColumnFormula('hits').'/'.$event->getColumnFormula('e.sent_count').')*100, 1), \'0.0\')');
-                    $event->setColumnFormula('unique_ratio', 'IFNULL(ROUND(('.$event->getColumnFormula('unique_hits').'/'.$event->getColumnFormula('e.sent_count').')*100, 1), \'0.0\')');
+                $event->setColumnFormula('unsubscribed', 'dnc.unsubscribed');
+                $event->setColumnFormula('bounced', 'dnc.bounced');
+                if ($event->getReport()->getSetting('hideDateRangeFilter')) {
+                    $event->setColumnFormula('unsubscribed_ratio', 'ROUND((dnc.unsubscribed/e.sent_count)*100,2)');
+                    $event->setColumnFormula('bounced_ratio', 'ROUND((dnc.bounced/e.sent_count)*100,2)');
+                } else {
+                    $event->setColumnFormula('unsubscribed_ratio', 'ROUND((dnc.unsubscribed/stats.sent_count)*100,2)');
+                    $event->setColumnFormula('bounced_ratio', 'ROUND((dnc.bounced/stats.sent_count)*100,2)');
                 }
 
-                $event->applyDateFilters($qb, 'date_sent', 'es');
-
-                if (!$hasGroupBy) {
-                    $qb->groupBy('e.id');
-                }
-                if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
-                    $qbcut->select(
+                if ($event->getReport()->getSetting('hideDateRangeFilter')) {
+                    if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
+                        $qbcut->select(
                         'COUNT(cut2.channel_id) AS trackable_count, SUM(cut2.hits) AS hits',
                         'SUM(cut2.unique_hits) AS unique_hits',
                         'cut2.channel_id'
@@ -342,16 +344,52 @@ class ReportSubscriber implements EventSubscriberInterface
                         ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut2')
                         ->where('cut2.channel = \'email\'')
                         ->groupBy('cut2.channel_id');
-                    $qb->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id');
+                        $qb->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id');
+                    }
                 }
 
-                if ($event->hasColumn($dncColumns) || $event->hasFilter($dncColumns)) {
-                    $qb->leftJoin(
-                        'e',
-                        MAUTIC_TABLE_PREFIX.'lead_donotcontact',
-                        'dnc',
-                        'e.id = dnc.channel_id AND dnc.channel=\'email\''
-                    );
+                //If using date range filter, then use query with date range for results
+                if (!$event->getReport()->getSetting('hideDateRangeFilter')) {
+                    // email_stats with date range
+                    if ($event->hasColumn($statsColumn) || $event->hasFilter($statsColumn)) {
+                        $subQuery = $this->db->createQueryBuilder();
+                        $subQuery->select(
+                            'COUNT(es.email_id) as sent_count',
+                            'SUM(es.is_read) as read_count',
+                            'es.email_id as email_id'
+                        )
+                            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
+                            ->where(sprintf('%1$s BETWEEN :dateFrom AND :dateTo', 'es.date_sent'))
+                            ->groupBy('es.email_id');
+                        $qb->innerJoin('e', sprintf('(%s)', $subQuery->getSQL()), 'stats', 'e.id = stats.email_id');
+                        $event->setColumnFormula('e.sent_count', 'stats.sent_count');
+                        $event->setColumnFormula('e.read_count', 'stats.read_count');
+                        $event->setColumnFormula('e.read_ratio', 'ROUND((stats.read_count/stats.sent_count)*100,1)');
+
+                        // clicks stats with date range
+                        $subQuery = $this->db->createQueryBuilder();
+                        $subQuery->select(
+                            'COUNT(ph.id) as hits',
+                            'COUNT(DISTINCT ph.lead_id) as unique_hits',
+                            'ph.email_id as email_id'
+                        )
+                            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+                            ->where(sprintf('%1$s BETWEEN :dateFrom AND :dateTo', 'ph.date_hit'))
+                            ->andWhere('ph.email_id IS NOT NULL')
+                            ->groupBy('ph.email_id');
+                        $qb->innerJoin('e', sprintf('(%s)', $subQuery->getSQL()), 'hits', 'e.id = hits.email_id');
+                        $event->setColumnFormula('hits', 'hits.hits');
+                        $event->setColumnFormula('unique_hits', 'hits.unique_hits');
+                        $event->setColumnFormula('hits_ratio', 'ROUND((hits.hits/stats.sent_count)*100,1)');
+                        $event->setColumnFormula('unique_ratio', 'ROUND((hits.unique_hits/stats.sent_count)*100,1)');
+                    }
+                }
+
+                // Just set params to query
+                $event->applyDateFilters($qb);
+
+                if (!$hasGroupBy) {
+                    $qb->groupBy('e.id');
                 }
 
                 break;
@@ -654,57 +692,5 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         return false;
-    }
-
-    /**
-     * @param int $dncType
-     *
-     * @return QueryBuilder
-     */
-    private function generateDncQueryBuilder($dncType = DoNotContact::UNSUBSCRIBED)
-    {
-        $qbDoNotContact        = $this->db->createQueryBuilder();
-        $qbDoNotContact->select('COUNT(dnc.id)')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
-            ->where('dnc.reason = '.$dncType)
-            ->andWhere('dnc.channel_id=e.id')
-            ->andWhere('dnc.channel=\'email\'')
-            ->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', 'dnc.date_added'));
-
-        return $qbDoNotContact;
-    }
-
-    /**
-     * @param string $column
-     * @param string $dateColumn
-     *
-     * @return QueryBuilder
-     */
-    private function generateEmailStatsBuilder($column = 'COUNT(es.id)', $dateColumn = 'es.date_sent')
-    {
-        $qbDoNotContact        = $this->db->createQueryBuilder();
-        $qbDoNotContact->select(''.$column.'')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
-            ->andWhere('es.email_id=e.id')
-            ->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $dateColumn));
-
-        return $qbDoNotContact;
-    }
-
-    /**
-     * @param string $column
-     * @param string $dateColumn
-     *
-     * @return QueryBuilder
-     */
-    private function generateHitsBuilder($column = 'COUNT(ph.id)', $dateColumn = 'ph.date_hit')
-    {
-        $qbDoNotContact        = $this->db->createQueryBuilder();
-        $qbDoNotContact->select($column)
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
-            ->andWhere('ph.email_id=e.id')
-            ->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $dateColumn));
-
-        return $qbDoNotContact;
     }
 }
