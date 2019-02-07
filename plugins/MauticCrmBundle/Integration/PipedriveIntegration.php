@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
+use MauticPlugin\MauticCrmBundle\Api\PipedriveApi;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -197,7 +198,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
     /**
      * Get the API helper.
      *
-     * @return object
+     * @return PipedriveApi object
      */
     public function getApiHelper()
     {
@@ -247,6 +248,19 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'label_attr'  => ['class' => ''],
                     'empty_value' => false,
                     'required'    => false,
+                ]
+            );
+
+            $builder->add(
+                'activityEvents',
+                'choice',
+                [
+                    'choices'    => $this->leadModel->getEngagementTypes(),
+                    'expanded'   => true,
+                    'multiple'   => true,
+                    'label'      => 'mautic.pipedrive.form.activityEvents',
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => false,
                 ]
             );
         }

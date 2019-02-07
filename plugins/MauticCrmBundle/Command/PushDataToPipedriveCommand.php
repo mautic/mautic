@@ -41,6 +41,7 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $integrationHelper = $this->getContainer()->get('mautic.helper.integration');
+        /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
         $this->io          = new SymfonyStyle($input, $output);
         $em                = $this->getContainer()->get('doctrine')->getManager();
@@ -52,7 +53,6 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
 
             return;
         }
-
         if ($input->getOption('restart')) {
             $this->io->note(
                 $this->getContainer()->get('templating.helper.translator')->trans(

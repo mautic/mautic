@@ -19,6 +19,9 @@ class PipedriveApi extends CrmApi
 
     private $apiFields = [];
 
+    /** @var null|array */
+    private $activities = null;
+
     /**
      * PipedriveApi constructor.
      *
@@ -169,8 +172,7 @@ class PipedriveApi extends CrmApi
             'query' => array_merge($this->getAuthQuery(), $query),
         ];
 
-        $url = sprintf('%s/%s', $this->integration->getApiUrl(), $endpoint);
-
+        $url      = sprintf('%s/%s', $this->integration->getApiUrl(), $endpoint);
         $response = $this->transport->get($url, $params);
 
         return json_decode($response->getBody(), true);
@@ -229,6 +231,50 @@ class PipedriveApi extends CrmApi
             'form_params' => $data,
             'query'       => $this->getAuthQuery(),
         ];
+    }
+
+    /**
+     * @param string $activityName
+     *
+     * @return array
+     */
+    public function getOrCreateActivity($activityName)
+    {
+        $activities = $this->getActivities();
+
+        // return If already exists
+        if (isset($activities[$activityName])) {
+            return $activities[$activityName];
+        }
+
+        // new activity
+        $data             = [];
+        $data['name']     = $activityName;
+        $data['icon_key'] = 'pricetag';
+        $data['color']    = '4e5e9e';
+
+        $params   = $this->getRequestParameters($data);
+        $url      = sprintf('%s/%s', $this->integration->getApiUrl(), self::ACTIVITY_TYPES);
+        $response = $this->transport->post($url, $params);
+
+        $data                                   = $this->getResponseData($response);
+
+        return $this->activities[$activityName] = $data;
+    }
+
+    /**
+     * @return array
+     */
+    private function getActivities()
+    {
+        if (null !== $this->activities) {
+            return $this->activities;
+        }
+
+        $activities = $this->getDataByEndpoint([], 'activityTypes');
+
+        //return data by name
+        return $this->activities = array_combine(array_column($activities['data'], 'name'), $activities['data']);
     }
 
     /**
