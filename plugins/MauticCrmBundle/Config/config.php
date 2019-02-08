@@ -142,6 +142,12 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic_integration.pipedrive.export.company',
+                ],
+            ],
+            'mautic_integration.pipedrive.export.activities' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\ActivitiesExport::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
                 ],
             ],
