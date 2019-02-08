@@ -16,7 +16,11 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Form\Type\LeadImportFieldType;
 use Mautic\LeadBundle\Form\Type\LeadImportType;
+use Mautic\LeadBundle\Event\ImportInitEvent;
+use Mautic\LeadBundle\Event\ImportMappingEvent;
+use Mautic\LeadBundle\Form\Type\LeadImportFieldType;
 use Mautic\LeadBundle\Helper\Progress;
+use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Form;
@@ -25,6 +29,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ImportController extends FormController
 {
@@ -157,18 +162,28 @@ class ImportController extends FormController
         //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
         ini_set('auto_detect_line_endings', true);
 
-        $object = $this->getObjectFromRequest();
-
-        $this->get('session')->set('mautic.import.object', $object);
-
         /** @var \Mautic\LeadBundle\Model\ImportModel $importModel */
         $importModel = $this->getModel($this->getModelName());
 
-        $session = $this->get('session');
+        $dispatcher = $this->container->get('event_dispatcher');
 
-        if (!$this->get('mautic.security')->isGranted('lead:imports:create')) {
+        try {
+            $initEvent = $dispatcher->dispatch(
+                LeadEvents::IMPORT_ON_INITIALIZE,
+                new ImportInitEvent($this->request->get('object'))
+            );
+        } catch (AccessDeniedException $e) {
             return $this->accessDenied();
         }
+
+        if (!$initEvent->objectIsSupported()) {
+            return $this->notFound();
+        }
+
+        $session = $this->get('session');
+        $object  = $initEvent->getObjectSingular();
+
+        $session->set('mautic.import.object', $object);
 
         // Move the file to cache and rename it
         $forceStop = $this->request->get('cancel', false);
@@ -200,11 +215,10 @@ class ImportController extends FormController
                 break;
             case self::STEP_MATCH_FIELDS:
 
-                /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-                $fieldModel    = $this->getModel('lead.field');
-                $leadFields    = $fieldModel->getFieldList(false, false);
-                $importFields  = $session->get('mautic.'.$object.'.import.importfields', []);
-                $companyFields = $fieldModel->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']);
+                $event = $dispatcher->dispatch(
+                    LeadEvents::IMPORT_ON_FIELD_MAPPING,
+                    new ImportMappingEvent($this->request->get('object'))
+                );
 
                 try {
                     $form = $this->get('form.factory')->create(
@@ -213,9 +227,8 @@ class ImportController extends FormController
                         [
                             'object'           => $object,
                             'action'           => $action,
-                            'lead_fields'      => $leadFields,
-                            'company_fields'   => $companyFields,
-                            'import_fields'    => $importFields,
+                            'all_fields'       => $event->getFields(),
+                            'import_fields'    => $session->get('mautic.'.$object.'.import.importfields', []),
                             'line_count_limit' => $this->getLineCountLimit(),
                         ]
                     );
@@ -449,7 +462,10 @@ class ImportController extends FormController
 
         if (self::STEP_UPLOAD_CSV === $step || self::STEP_MATCH_FIELDS === $step) {
             $contentTemplate = 'MauticLeadBundle:Import:new.html.php';
-            $viewParameters  = ['form' => $form->createView()];
+            $viewParameters  = [
+                'form'       => $form->createView(),
+                'objectName' => $initEvent->getObjectName(),
+            ];
         } else {
             $contentTemplate = 'MauticLeadBundle:Import:progress.html.php';
             $viewParameters  = [
@@ -457,6 +473,7 @@ class ImportController extends FormController
                 'import'     => $import,
                 'complete'   => $complete,
                 'failedRows' => $importModel->getFailedRows($import->getId()),
+                'objectName' => $initEvent->getObjectName(),
             ];
         }
 
@@ -465,19 +482,17 @@ class ImportController extends FormController
 
             return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
         } else {
-            $activeLink = 'lead' === $object ? '#mautic_contact_index' : '#mautic_company_index';
-
             return $this->delegateView(
                 [
                     'viewParameters'  => $viewParameters,
                     'contentTemplate' => $contentTemplate,
                     'passthroughVars' => [
-                        'activeLink'    => $activeLink,
+                        'activeLink'    => $initEvent->getActiveLink(),
                         'mauticContent' => 'leadImport',
                         'route'         => $this->generateUrl(
                             'mautic_import_action',
                             [
-                                'object'       => 'lead' === $object ? 'contacts' : 'companies',
+                                'object'       => $initEvent->getRouteObjectName(),
                                 'objectAction' => 'new',
                             ]
                         ),
@@ -665,6 +680,9 @@ class ImportController extends FormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
+    /**
+     * @deprecated to be removed in 3.0
+     */
     protected function getObjectFromRequest()
     {
         $objectInRequest = $this->request->get('object');

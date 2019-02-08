@@ -42,41 +42,17 @@ class LeadImportFieldType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $specialFields = [
-            'mautic.lead.import.label.dateAdded'      => 'dateAdded',
-            'mautic.lead.import.label.createdByUser'  => 'createdByUser',
-            'mautic.lead.import.label.dateModified'   => 'dateModified',
-            'mautic.lead.import.label.modifiedByUser' => 'modifiedByUser',
-            'mautic.lead.import.label.lastActive'     => 'lastActive',
-            'mautic.lead.import.label.dateIdentified' => 'dateIdentified',
-            'mautic.lead.import.label.ip'             => 'ip',
-            'mautic.lead.import.label.points'         => 'points',
-            'mautic.lead.import.label.stage'          => 'stage',
-            'mautic.lead.import.label.doNotEmail'     => 'doNotEmail',
-            'mautic.lead.import.label.ownerusername'  => 'ownerusername',
-        ];
-
-        $importChoiceFields = [
-            'mautic.lead.contact'        => array_flip($options['lead_fields']),
-            'mautic.lead.company'        => array_flip($options['company_fields']),
-            'mautic.lead.special_fields' => $specialFields,
-        ];
-
-        if ('lead' !== $options['object']) {
-            unset($importChoiceFields['mautic.lead.contact']);
-        }
-
         foreach ($options['import_fields'] as $field => $label) {
             $builder->add(
                 $field,
                 ChoiceType::class,
                 [
-                    'choices'           => $importChoiceFields,
-                    'label'             => $label,
-                    'required'          => false,
-                    'label_attr'        => ['class' => 'control-label'],
-                    'attr'              => ['class' => 'form-control'],
-                    'data'              => $this->getDefaultValue($field, $options['import_fields']),
+                    'choices'    => $options['all_fields'],
+                    'label'      => $label,
+                    'required'   => false,
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control'],
+                    'data'       => $this->getDefaultValue($field, $options['import_fields']),
                 ]
             );
         }
@@ -166,7 +142,7 @@ class LeadImportFieldType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['lead_fields', 'import_fields', 'company_fields', 'object']);
+        $resolver->setRequired(['all_fields', 'import_fields', 'object']);
         $resolver->setDefaults(['line_count_limit' => 0]);
     }
 
