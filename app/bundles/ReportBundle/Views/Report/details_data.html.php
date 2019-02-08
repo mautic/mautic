@@ -85,7 +85,7 @@ $graphContent = $view->render(
                                     $columnName = isset($columns[$aggregator['column']]['alias']) ? $columns[$aggregator['column']]['label'] : '';
                                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                         'sessionVar' => 'report.'.$report->getId(),
-                                        'orderBy'    => $aggregator['function'],
+                                        'orderBy'    => '`'.$aggregator['function'].' '.$aggregator['column'].'`',
                                         'text'       => $aggregator['function'].' '.$columnName,
                                         'dataToggle' => '',
                                         'target'     => '.report-content',
