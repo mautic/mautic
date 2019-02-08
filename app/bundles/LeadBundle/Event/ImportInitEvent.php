@@ -131,4 +131,12 @@ class ImportInitEvent extends Event
 
         return false;
     }
+
+    /**
+     * @param bool $objectSupported
+     */
+    public function setObjectIsSupported($objectSupported)
+    {
+        $this->objectSupported = $objectSupported;
+    }
 }
