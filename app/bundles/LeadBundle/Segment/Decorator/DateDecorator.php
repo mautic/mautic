@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
@@ -23,23 +24,32 @@ use Symfony\Component\Translation\TranslatorInterface;
 class DateDecorator extends CustomMappedDecorator
 {
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * DateDecorator constructor.
+     * CustomMappedDecorator constructor.
      *
      * @param ContactSegmentFilterOperator   $contactSegmentFilterOperator
      * @param ContactSegmentFilterDictionary $contactSegmentFilterDictionary
+     * @param CoreParametersHelper           $coreParametersHelper
      * @param TranslatorInterface            $translator
      */
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator,
-        ContactSegmentFilterDictionary $contactSegmentFilterDictionary, TranslatorInterface $translator
+        ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
+        CoreParametersHelper $coreParametersHelper,
+        TranslatorInterface $translator
     ) {
         parent::__construct($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
-        $this->translator = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -114,10 +124,12 @@ class DateDecorator extends CustomMappedDecorator
      */
     public function getDefaultDate($relativeDate = null)
     {
+        $timezone = $this->coreParametersHelper->getParameter('default_timezone', 'local');
+
         if ($relativeDate) {
-            return new DateTimeHelper($relativeDate, null, 'local');
+            return new DateTimeHelper($relativeDate, null, $timezone);
         } else {
-            return new DateTimeHelper('midnight today', null, 'local');
+            return new DateTimeHelper('midnight today', null, $timezone);
         }
     }
 }

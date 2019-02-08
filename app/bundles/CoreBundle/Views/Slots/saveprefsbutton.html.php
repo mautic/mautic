@@ -31,14 +31,15 @@ if (isset($form)) {
         unset($form['lead_lists']);
     }
     if (!$showContactPauseDates) {
-        unset($form['contact_pause_start_date_email'], $form['contact_pause_end_date_email']);
+        unset($form['lead_channels']['contact_pause_start_date_email'], $form['lead_channels']['contact_pause_end_date_email']);
     }
     if (!$showContactFrequency) {
-        unset($form['frequency_number_email'], $form['frequency_time_email']);
+        unset($form['lead_channels']['frequency_number_email'], $form['lead_channels']['frequency_time_email']);
     }
     if (!$showContactPreferredChannels) {
-        unset($form['preferred_channel']);
+        unset($form['lead_channels']['preferred_channel']);
     }
+    unset($form['lead_channels']);
     // add close form tag before the custom tag to prevent cascading forms
     // in case there is already an unsubscribe form on the page
     // that's why we can't use the bodyclose customdeclaration
