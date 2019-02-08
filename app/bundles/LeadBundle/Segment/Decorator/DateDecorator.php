@@ -59,12 +59,19 @@ class DateDecorator extends CustomMappedDecorator
      */
     public function hasAnniversaryDate($timeframe)
     {
-        return in_array($this->getTimeframe($timeframe), $this->getAnniversaryTranslationsVariants());
+        return in_array($this->getAnniversaryString($timeframe), $this->getAnniversaryTranslationsVariants());
     }
 
-    private function getTimeframe($timeframe)
+    /**
+     * Return timeframe.
+     *
+     * @param $timeframe
+     *
+     * @return string
+     */
+    private function getAnniversaryString($timeframe)
     {
-        return trim(str_replace($this->getAnniversaryDateFilter($timeframe), '', $timeframe));
+        return trim(str_replace($this->getAnniversaryRelativeDate($timeframe), '', $timeframe));
     }
 
     /**
@@ -74,7 +81,7 @@ class DateDecorator extends CustomMappedDecorator
      *
      * @return string
      */
-    public function getAnniversaryDateFilter($filter)
+    public function getAnniversaryRelativeDate($filter)
     {
         return trim(str_replace($this->getAnniversaryTranslationsVariants(), '', $filter));
     }
