@@ -10,10 +10,11 @@
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
-$object = $app->getRequest()->get('object', 'contacts');
+$object     = $app->getRequest()->get('object', 'contacts');
+$objectName = $view['translator']->trans($objectName);
 
 $view['slots']->set('mauticContent', 'leadImport');
-$view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.import.leads', ['%object%' => $object]));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.import.leads', ['%object%' => $objectName]));
 
 $percent    = $progress->toPercent();
 $id         = ($complete) ? 'leadImportProgressComplete' : 'leadImportProgress';
