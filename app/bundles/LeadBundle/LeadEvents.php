@@ -379,14 +379,14 @@ final class LeadEvents
     const IMPORT_ON_FIELD_MAPPING = 'mautic.lead_import_on_field_mapping';
 
     /**
-     * The mautic.lead_import_batch_on_process event is dispatched when the import batch is processing.
+     * The mautic.lead_import_on_process event is dispatched when the import batch is processing.
      *
      * The event listener receives a
      * Mautic\LeadBundle\Event\ImportEvent instance.
      *
      * @var string
      */
-    const IMPORT_BATCH_ON_PROCESS = 'mautic.lead_import_batch_on_process';
+    const IMPORT_ON_PROCESS = 'mautic.lead_import_on_process';
 
     /**
      * The mautic.lead_import_batch_processed event is dispatched after an import batch is processed.

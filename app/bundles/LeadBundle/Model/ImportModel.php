@@ -352,7 +352,7 @@ class ImportModel extends FormModel
 
                 try {
                     $event = $this->dispatcher->dispatch(
-                        LeadEvents::IMPORT_BATCH_ON_PROCESS,
+                        LeadEvents::IMPORT_ON_PROCESS,
                         new ImportProcessEvent($import, $eventLog, $data)
                     );
 

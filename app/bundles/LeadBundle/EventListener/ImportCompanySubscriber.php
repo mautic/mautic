@@ -61,7 +61,7 @@ class ImportCompanySubscriber extends CommonSubscriber
         return [
             LeadEvents::IMPORT_ON_INITIALIZE    => ['onImportInit'],
             LeadEvents::IMPORT_ON_FIELD_MAPPING => ['onFieldMapping'],
-            LeadEvents::IMPORT_BATCH_ON_PROCESS => ['onImportProcess'],
+            LeadEvents::IMPORT_ON_PROCESS       => ['onImportProcess'],
         ];
     }
 
@@ -111,7 +111,7 @@ class ImportCompanySubscriber extends CommonSubscriber
         if ($event->importIsForObject('company')) {
             $event->setWasMerged($this->companyModel->import(
                 $event->getImport()->getMatchedFields(),
-                $event->getData(),
+                $event->getRowData(),
                 $event->getImport()->getDefault('owner')
             ));
         }

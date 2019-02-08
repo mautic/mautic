@@ -30,7 +30,7 @@ class ImportProcessEvent extends Event
     /**
      * @var array
      */
-    private $data;
+    private $rowData;
 
     /**
      * @var bool
@@ -40,13 +40,13 @@ class ImportProcessEvent extends Event
     /**
      * @param Import       $import
      * @param LeadEventLog $eventLog
-     * @param array        $data
+     * @param array        $rowData
      */
-    public function __construct(Import $import, LeadEventLog $eventLog, array $data)
+    public function __construct(Import $import, LeadEventLog $eventLog, array $rowData)
     {
         $this->import   = $import;
         $this->eventLog = $eventLog;
-        $this->data     = $data;
+        $this->rowData  = $rowData;
     }
 
     /**
@@ -68,9 +68,9 @@ class ImportProcessEvent extends Event
     /**
      * @return array
      */
-    public function getData()
+    public function getRowData()
     {
-        return $this->data;
+        return $this->rowData;
     }
 
     /**

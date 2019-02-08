@@ -61,7 +61,7 @@ class ImportContactSubscriber extends CommonSubscriber
         return [
             LeadEvents::IMPORT_ON_INITIALIZE    => 'onImportInit',
             LeadEvents::IMPORT_ON_FIELD_MAPPING => 'onFieldMapping',
-            LeadEvents::IMPORT_BATCH_ON_PROCESS => 'onImportProcess',
+            LeadEvents::IMPORT_ON_PROCESS       => 'onImportProcess',
         ];
     }
 
@@ -120,7 +120,7 @@ class ImportContactSubscriber extends CommonSubscriber
             $import = $event->getImport();
             $merged = $this->contactModel->import(
                 $import->getMatchedFields(),
-                $event->getData(),
+                $event->getRowData(),
                 $import->getDefault('owner'),
                 $import->getDefault('list'),
                 $import->getDefault('tags'),
