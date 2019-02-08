@@ -142,6 +142,7 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic_integration.pipedrive.export.company',
+                    'mautic.lead.model.lead',
                 ],
             ],
         ],

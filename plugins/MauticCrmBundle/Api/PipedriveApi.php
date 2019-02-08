@@ -12,6 +12,7 @@ class PipedriveApi extends CrmApi
     const PERSONS_API_ENDPOINT       = 'persons';
     const USERS_API_ENDPOINT         = 'users';
     const ACTIVITY_TYPES             = 'activityTypes';
+    const ACTIVITIES                 = 'activities';
     /**
      * @var TransportInterface
      */
@@ -234,20 +235,51 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param string $activityName
+     * @param array $data
      *
      * @return array
      */
-    public function getOrCreateActivity($activityName)
+    public function addActivity($data)
     {
-        $activities = $this->getActivities();
+        // "subject": "something",
+        // DONE 0/1
+        // "done": "1",
+        // "type": "Custom5",
+        // "person_id": "1"
+        //due_date - YYYY-MM-DD
+        //due_time
+        //     $engagements = $this->leadModel->getEngagements($contact, $filters, null, $page, 100, false);
+        $params     = $this->getRequestParameters($data);
+        $url        = sprintf('%s/%s', $this->integration->getApiUrl(), self::ACTIVITIES);
+        $response   = $this->transport->post($url, $params);
 
+        return $data = $this->getResponseData($response);
+        https://api.pipedrive.com/v1/activities?api_token=55823430e7a428a5c0383c4fe61c49aa97a9dbaa
+    }
+
+    /**
+     * @param string $activityName
+     *
+     * @return array|mixed
+     */
+    public function getActivityType($activityName)
+    {
+        $activities = $this->getActivityTypes();
         // return If already exists
         if (isset($activities[$activityName])) {
             return $activities[$activityName];
         }
 
-        // new activity
+        return false;
+    }
+
+    /**
+     * @param $activityName
+     *
+     * @return array
+     */
+    public function createActivityType($activityName)
+    {
         $data             = [];
         $data['name']     = $activityName;
         $data['icon_key'] = 'pricetag';
@@ -257,7 +289,7 @@ class PipedriveApi extends CrmApi
         $url      = sprintf('%s/%s', $this->integration->getApiUrl(), self::ACTIVITY_TYPES);
         $response = $this->transport->post($url, $params);
 
-        $data                                   = $this->getResponseData($response);
+        $data = $this->getResponseData($response);
 
         return $this->activities[$activityName] = $data;
     }
@@ -265,7 +297,7 @@ class PipedriveApi extends CrmApi
     /**
      * @return array
      */
-    private function getActivities()
+    private function getActivityTypes()
     {
         if (null !== $this->activities) {
             return $this->activities;
