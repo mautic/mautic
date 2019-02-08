@@ -71,7 +71,7 @@ class DateOptionFactory
         switch ($timeframe) {
             case 'birthday':
             case 'anniversary':
-            case $this->dateDecorator->hasAnniversaryDate($timeframe):
+            case $timeframe && ($this->dateDecorator->hasAnniversaryDate($timeframe)):
                 return new DateAnniversary($this->dateDecorator);
             case 'today':
                 return new DateDayToday($this->dateDecorator, $dateOptionParameters);

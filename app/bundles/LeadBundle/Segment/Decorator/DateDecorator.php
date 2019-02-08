@@ -59,27 +59,34 @@ class DateDecorator extends CustomMappedDecorator
      */
     public function hasAnniversaryDate($timeframe)
     {
-        return $timeframe && (
-                false !== strpos($timeframe, $this->getAnniversaryTranslation('anniversary')) ||
-                false !== strpos($timeframe, $this->getAnniversaryTranslation('birthday'))
-            );
+        return in_array($this->getTimeframe($timeframe), $this->getAnniversaryTranslationsVariants());
     }
 
-    public function getAnniversaryDateFilter($filter)
+    private function getTimeframe($timeframe)
     {
-        return trim(str_replace($this->getAnniversaryTranslations(), '', $filter));
+        return trim(str_replace($this->getAnniversaryDateFilter($timeframe), '', $timeframe));
     }
 
     /**
-     * @param string $key
+     * Return all after anniversary/birthday string, for example -1 day.
+     *
+     * @param $filter
      *
      * @return string
      */
-    private function getAnniversaryTranslation($key)
+    public function getAnniversaryDateFilter($filter)
     {
-        if (isset($this->getAnniversaryTranslations()[$key])) {
-            return $this->getAnniversaryTranslations()[$key];
-        }
+        return trim(str_replace($this->getAnniversaryTranslationsVariants(), '', $filter));
+    }
+
+    /**
+     * Return all possible variants for anniversary - translations + basic.
+     *
+     * @return array
+     */
+    private function getAnniversaryTranslationsVariants()
+    {
+        return array_merge($this->getAnniversaryTranslations(), array_keys($this->getAnniversaryTranslations()));
     }
 
     /**
@@ -89,7 +96,7 @@ class DateDecorator extends CustomMappedDecorator
     {
         return  [
             'anniversary' => $this->translator->trans('mautic.lead.list.anniversary'),
-            'birthday'    => $this->translator->trans('mautic.lead.list.anniversary'),
+            'birthday'    => $this->translator->trans('mautic.lead.list.birthday'),
         ];
     }
 
