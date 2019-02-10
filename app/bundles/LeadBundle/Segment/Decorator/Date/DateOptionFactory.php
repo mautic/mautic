@@ -71,10 +71,7 @@ class DateOptionFactory
         switch ($timeframe) {
             case 'birthday':
             case 'anniversary':
-            case $timeframe && (
-                    false !== strpos($timeframe, 'anniversary') ||
-                    false !== strpos($timeframe, 'birthday')
-                ):
+            case $timeframe && ($this->dateDecorator->dateRelativeParser($timeframe)->hasRelativeDate()):
                 return new DateAnniversary($this->dateDecorator);
             case 'today':
                 return new DateDayToday($this->dateDecorator, $dateOptionParameters);

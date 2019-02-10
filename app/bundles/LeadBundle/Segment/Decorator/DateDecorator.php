@@ -12,10 +12,13 @@
 namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateRelativeParser;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use Mautic\LeadBundle\Services\DateAnniversaryDictionary;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class DateDecorator.
@@ -28,19 +31,27 @@ class DateDecorator extends CustomMappedDecorator
     private $coreParametersHelper;
 
     /**
+     * @var DateAnniversaryDictionary
+     */
+    private $anniversaryDictionary;
+
+    /**
      * CustomMappedDecorator constructor.
      *
      * @param ContactSegmentFilterOperator   $contactSegmentFilterOperator
      * @param ContactSegmentFilterDictionary $contactSegmentFilterDictionary
      * @param CoreParametersHelper           $coreParametersHelper
+     * @param TranslatorInterface            $translator
      */
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator,
         ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        DateAnniversaryDictionary $anniversaryDictionary
     ) {
         parent::__construct($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->coreParametersHelper  = $coreParametersHelper;
+        $this->anniversaryDictionary = $anniversaryDictionary;
     }
 
     /**
@@ -51,6 +62,16 @@ class DateDecorator extends CustomMappedDecorator
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         throw new \Exception('Instance of Date option needs to implement this function');
+    }
+
+    /**
+     * @param $timeframe
+     *
+     * @return DateRelativeParser
+     */
+    public function dateRelativeParser($timeframe)
+    {
+        return new DateRelativeParser($this->anniversaryDictionary->getTranslations(), $timeframe, 'date ');
     }
 
     /**
