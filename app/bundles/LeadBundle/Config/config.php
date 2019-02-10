@@ -836,6 +836,7 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.datetime',
+                    'translator',
                 ],
             ],
         ],

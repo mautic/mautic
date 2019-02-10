@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Token\TokenReplacer;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactTokenReplacer extends TokenReplacer
 {
@@ -34,12 +35,23 @@ class ContactTokenReplacer extends TokenReplacer
     private $dateTimeHelper;
 
     /**
-     * @param CoreParametersHelper $coreParametersHelper
+     * @var TranslatorInterface
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, DateTimeHelper $dateTimeHelper)
-    {
+    private $translator;
+
+    /**
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param DateTimeHelper       $dateTimeHelper
+     * @param TranslatorInterface  $translator
+     */
+    public function __construct(
+        CoreParametersHelper $coreParametersHelper,
+        DateTimeHelper $dateTimeHelper,
+        TranslatorInterface $translator
+    ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->dateTimeHelper       = $dateTimeHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -85,10 +97,12 @@ class ContactTokenReplacer extends TokenReplacer
                 case 'datetime':
                 case 'date':
                 case 'time':
+                case $modifier && $this->hasAnniversary($modifier):
                     $this->dateTimeHelper->setDateTime($value);
-                    $dt   = $this->dateTimeHelper;
-                    $date = $dt->getString($this->coreParametersHelper->getParameter('date_format_dateonly'));
-                    $time = $dt->getDateTime()->format(
+                    $date = $this->dateTimeHelper->getString(
+                        $this->coreParametersHelper->getParameter('date_format_dateonly')
+                    );
+                    $time = $this->dateTimeHelper->getDateTime()->format(
                         $this->coreParametersHelper->getParameter('date_format_timeonly')
                     );
                     switch ($modifier) {
@@ -101,6 +115,8 @@ class ContactTokenReplacer extends TokenReplacer
                         case 'time':
                             $value = $time;
                             break;
+                        case $modifier && $this->hasAnniversary($modifier):
+                            break;
                     }
                     break;
             }
@@ -110,6 +126,50 @@ class ContactTokenReplacer extends TokenReplacer
         } else {
             return $value ?: $modifier;
         }
+    }
+
+    /**
+     * @param $modifier
+     *
+     * @return bool
+     */
+    private function hasAnniversary($modifier)
+    {
+        foreach ($this->getAnniversaryDictionary() as $string) {
+            if (false !== strpos($modifier, 'date '.$string)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getAnniversaryPart($timeframe)
+    {
+        return  trim(str_replace($this->getAnniversaryRelativeDate($timeframe), '', $timeframe));
+    }
+
+    /**
+     * Return all after anniversary/birthday string, for example -1 day.
+     *
+     * @param $filter
+     *
+     * @return string
+     */
+    public function getAnniversaryRelativeDate($filter)
+    {
+        return trim(str_replace($this->getAnniversaryDictionary(), '', $filter));
+    }
+
+    /**
+     * @return array
+     */
+    private function getAnniversaryDictionary()
+    {
+        return [
+            'anniversary',
+            $this->translator->trans('mautic.lead.list.anniversary'),
+        ];
     }
 
     /**
