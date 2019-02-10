@@ -12,10 +12,11 @@
 namespace Mautic\LeadBundle\Token;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateRelativeParser;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Token\TokenReplacer;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Services\DateAnniversaryDictionary;
 
 class ContactTokenReplacer extends TokenReplacer
 {
@@ -35,23 +36,25 @@ class ContactTokenReplacer extends TokenReplacer
     private $dateTimeHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var DateAnniversaryDictionary
      */
-    private $translator;
+    private $anniversaryDictionary;
 
     /**
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param DateTimeHelper       $dateTimeHelper
-     * @param TranslatorInterface  $translator
+     * @param CoreParametersHelper      $coreParametersHelper
+     * @param DateTimeHelper            $dateTimeHelper
+     * @param DateAnniversaryDictionary $anniversaryDictionary
+     *
+     * @internal param TranslatorInterface $translator
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         DateTimeHelper $dateTimeHelper,
-        TranslatorInterface $translator
+        DateAnniversaryDictionary $anniversaryDictionary
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->dateTimeHelper       = $dateTimeHelper;
-        $this->translator           = $translator;
+        $this->coreParametersHelper  = $coreParametersHelper;
+        $this->dateTimeHelper        = $dateTimeHelper;
+        $this->anniversaryDictionary = $anniversaryDictionary;
     }
 
     /**
@@ -88,8 +91,8 @@ class ContactTokenReplacer extends TokenReplacer
         } elseif (isset($fields['companies'][0][$alias])) {
             $value = $fields['companies'][0][$alias];
         }
-
         if ($value) {
+            $relativeDateParser = new DateRelativeParser($this->anniversaryDictionary->getTranslations(), $modifier, 'date');
             switch ($modifier) {
                 case 'true':
                     $value = urlencode($value);
@@ -97,8 +100,14 @@ class ContactTokenReplacer extends TokenReplacer
                 case 'datetime':
                 case 'date':
                 case 'time':
-                case $modifier && $this->hasAnniversary($modifier):
+                case $modifier && $relativeDateParser->hasRelativeDate():
+                if ($relativeDateParser->hasRelativeDate()) {
                     $this->dateTimeHelper->setDateTime($value);
+                    $this->dateTimeHelper->modify($relativeDateParser->getRelativeDate());
+                    $modifier = 'date';
+                } else {
+                    $this->dateTimeHelper->setDateTime($value);
+                }
                     $date = $this->dateTimeHelper->getString(
                         $this->coreParametersHelper->getParameter('date_format_dateonly')
                     );
@@ -115,8 +124,6 @@ class ContactTokenReplacer extends TokenReplacer
                         case 'time':
                             $value = $time;
                             break;
-                        case $modifier && $this->hasAnniversary($modifier):
-                            break;
                     }
                     break;
             }
@@ -126,50 +133,6 @@ class ContactTokenReplacer extends TokenReplacer
         } else {
             return $value ?: $modifier;
         }
-    }
-
-    /**
-     * @param $modifier
-     *
-     * @return bool
-     */
-    private function hasAnniversary($modifier)
-    {
-        foreach ($this->getAnniversaryDictionary() as $string) {
-            if (false !== strpos($modifier, 'date '.$string)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function getAnniversaryPart($timeframe)
-    {
-        return  trim(str_replace($this->getAnniversaryRelativeDate($timeframe), '', $timeframe));
-    }
-
-    /**
-     * Return all after anniversary/birthday string, for example -1 day.
-     *
-     * @param $filter
-     *
-     * @return string
-     */
-    public function getAnniversaryRelativeDate($filter)
-    {
-        return trim(str_replace($this->getAnniversaryDictionary(), '', $filter));
-    }
-
-    /**
-     * @return array
-     */
-    private function getAnniversaryDictionary()
-    {
-        return [
-            'anniversary',
-            $this->translator->trans('mautic.lead.list.anniversary'),
-        ];
     }
 
     /**

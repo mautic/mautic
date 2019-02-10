@@ -19,6 +19,9 @@ class DateRelativeParser
     /** @var string */
     private $timeframe;
 
+    /** @var string */
+    private $prefix;
+
     /**
      * DateRelativeParser constructor.
      *
@@ -29,7 +32,7 @@ class DateRelativeParser
     public function __construct(array $dictionary, $timeframe, $prefix = '')
     {
         $this->dictionary = $dictionary;
-        $this->timeframe  = str_replace($prefix, '', $timeframe);
+        $this->timeframe  = trim(str_replace($prefix, '', $timeframe));
     }
 
     /**
@@ -37,6 +40,14 @@ class DateRelativeParser
      */
     public function hasRelativeDate()
     {
+        if (empty($this->timeframe)) {
+            return false;
+        }
+
+        if ($this->getRelativeDate() == $this->timeframe) {
+            return true;
+        }
+
         return in_array($this->getRelativeString(), $this->getDictionaryVariants());
     }
 
