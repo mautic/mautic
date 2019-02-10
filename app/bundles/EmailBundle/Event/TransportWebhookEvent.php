@@ -53,7 +53,7 @@ class TransportWebhookEvent extends Event
      */
     public function getRequest()
     {
-        $this->request = $request;
+        return $this->request;
     }
 
     /**

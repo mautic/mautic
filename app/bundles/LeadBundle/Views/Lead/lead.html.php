@@ -198,14 +198,20 @@ $view['slots']->set(
                             <?php ++$step; ?>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <?php if ($devices): ?>
+                        <li>
+                            <a href="#devices" class="group" data-toggle="tab">
+                                <?php echo $view['translator']->trans('mautic.lead.devices'); ?>
+                            </a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
 
                 <!-- start: tab-content -->
                 <div class="tab-content pa-md bg-white">
                     <?php $i = 0; ?>
                     <?php foreach ($groups as $group): ?>
-                        <div class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0"
-                             id="<?php echo $group; ?>">
+                        <div class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $group; ?>">
                             <div class="pr-md pl-md pb-md">
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-bordered table-striped mb-0">
@@ -239,6 +245,11 @@ $view['slots']->set(
                         </div>
                         <?php ++$i; ?>
                     <?php endforeach; ?>
+                    <?php if ($devices): ?>
+                        <div class="tab-pane fade bdr-w-0" id="devices">
+                            <?php echo $view->render('MauticLeadBundle:Lead:devices.html.php', ['devices' => $devices]); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <!--/ lead detail collapseable -->

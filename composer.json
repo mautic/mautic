@@ -112,7 +112,8 @@
         "simshaun/recurr": "^3.0",
         "ramsey/uuid": "^3.7",
         "sendgrid/sendgrid": "~6.0",
-        "noxlogic/ratelimit-bundle": "^1.11"
+        "noxlogic/ratelimit-bundle": "^1.11",
+        "sensio/framework-extra-bundle": "~3.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",

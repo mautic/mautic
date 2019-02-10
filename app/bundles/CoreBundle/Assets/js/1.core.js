@@ -592,7 +592,7 @@ var Mautic = {
 
         if (typeof request.responseJSON !== 'undefined') {
             response = request.responseJSON;
-        } else {
+        } else if (typeof(request.responseText) !== 'undefined') {
             //Symfony may have added some excess buffer if an exception was hit during a sub rendering and because
             //it uses ob_start, PHP dumps the buffer upon hitting the exception.  So let's filter that out.
             var errorStart = request.responseText.indexOf('{"newContent');
