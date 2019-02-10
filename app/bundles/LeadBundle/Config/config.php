@@ -1081,6 +1081,12 @@ return [
                     'mautic.lead.model.lead_segment_filter_operator',
                     'mautic.lead.repository.lead_segment_filter_descriptor',
                     'mautic.helper.core_parameters',
+                    'mautic.core.date.anniversary.dictionary',
+                ],
+            ],
+            'mautic.core.date.anniversary.dictionary' => [
+                'class'     => \Mautic\LeadBundle\Services\DateAnniversaryDictionary::class,
+                'arguments' => [
                     'translator',
                 ],
             ],

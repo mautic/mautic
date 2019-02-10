@@ -12,10 +12,12 @@
 namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateRelativeParser;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use Mautic\LeadBundle\Services\DateAnniversaryDictionary;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -29,9 +31,9 @@ class DateDecorator extends CustomMappedDecorator
     private $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var DateAnniversaryDictionary
      */
-    private $translator;
+    private $anniversaryDictionary;
 
     /**
      * CustomMappedDecorator constructor.
@@ -45,11 +47,11 @@ class DateDecorator extends CustomMappedDecorator
         ContactSegmentFilterOperator $contactSegmentFilterOperator,
         ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
         CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator
+        DateAnniversaryDictionary $anniversaryDictionary
     ) {
         parent::__construct($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
+        $this->coreParametersHelper  = $coreParametersHelper;
+        $this->anniversaryDictionary = $anniversaryDictionary;
     }
 
     /**
@@ -65,56 +67,11 @@ class DateDecorator extends CustomMappedDecorator
     /**
      * @param $timeframe
      *
-     * @return bool
+     * @return DateRelativeParser
      */
-    public function hasAnniversaryDate($timeframe)
+    public function dateRelativeParser($timeframe)
     {
-        return in_array($this->getAnniversaryString($timeframe), $this->getAnniversaryTranslationsVariants());
-    }
-
-    /**
-     * Return timeframe.
-     *
-     * @param $timeframe
-     *
-     * @return string
-     */
-    private function getAnniversaryString($timeframe)
-    {
-        return trim(str_replace($this->getAnniversaryRelativeDate($timeframe), '', $timeframe));
-    }
-
-    /**
-     * Return all after anniversary/birthday string, for example -1 day.
-     *
-     * @param $filter
-     *
-     * @return string
-     */
-    public function getAnniversaryRelativeDate($filter)
-    {
-        return trim(str_replace($this->getAnniversaryTranslationsVariants(), '', $filter));
-    }
-
-    /**
-     * Return all possible variants for anniversary - translations + basic.
-     *
-     * @return array
-     */
-    private function getAnniversaryTranslationsVariants()
-    {
-        return array_merge($this->getAnniversaryTranslations(), array_keys($this->getAnniversaryTranslations()));
-    }
-
-    /**
-     * @return array
-     */
-    private function getAnniversaryTranslations()
-    {
-        return  [
-            'anniversary' => $this->translator->trans('mautic.lead.list.anniversary'),
-            'birthday'    => $this->translator->trans('mautic.lead.list.birthday'),
-        ];
+        return new DateRelativeParser($this->anniversaryDictionary->getTranslations(), $timeframe, 'date ');
     }
 
     /**
