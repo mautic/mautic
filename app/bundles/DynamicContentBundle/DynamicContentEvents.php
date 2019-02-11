@@ -126,4 +126,15 @@ final class DynamicContentEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.dwc.on_campaign_trigger_action';
+
+    /**
+     * The mautic.dwc.on_contact_filters_evaluate event is fired when dynamic content's decision's
+     * filters need to be avaluated.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\ContactFiltersEvaluateEvent
+     *
+     * @var string
+     */
+    const ON_CONTACTS_FILTER_EVALUATE = 'mautic.dwc.on_contact_filters_evaluate';
 }

@@ -16,9 +16,11 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\EmailBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -40,12 +42,17 @@ class DynamicContentHelper
      * @var DynamicContentModel
      */
     protected $dynamicContentModel;
+    /**
+     * @var LeadModel
+     */
+    private $leadModel;
 
     public function __construct(DynamicContentModel $dynamicContentModel, RealTimeExecutioner $realTimeExecutioner, EventDispatcherInterface $dispatcher)
     {
         $this->dynamicContentModel = $dynamicContentModel;
         $this->realTimeExecutioner = $realTimeExecutioner;
         $this->dispatcher          = $dispatcher;
+        $this->leadModel           = $leadModel;
     }
 
     /**
@@ -103,6 +110,25 @@ class DynamicContentHelper
         }
 
         return '';
+    }
+
+    private function filtersMatchContact(array $filters, array $contactArray): bool
+    {
+        if (empty($contactArray['id'])) {
+            return false;
+        }
+
+        if ($this->dispatcher->hasListeners(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)) {
+            $contact = $this->leadModel->getRepository()->find($contactArray['id']);
+
+            $event = new ContactFiltersEvaluateEvent($filters, $contact);
+            $this->dispatcher->dispatch(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE, $event);
+            if ($event->isMatch()) {
+                return true;
+            }
+        }
+        //  We attempt even listeners first
+        return $this->matchFilterForLead($filters, $contactArray);
     }
 
     /**
