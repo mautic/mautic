@@ -104,8 +104,7 @@ class ContactTokenReplacer extends TokenReplacer
                 if ($relativeDateParser->hasRelativeDate()) {
                     // It's anniversary (anniversary +1 day) or just relative timeframe +1 day
                     if ($relativeDateParser->hasDateFromDictionary()) {
-                        $anniversaryDate = date(date('Y').'-m-d H:i:s', strtotime($value));
-                        $this->dateTimeHelper->setDateTime($anniversaryDate);
+                        $this->dateTimeHelper->setDateTime($relativeDateParser->getAnniversaryDate($value));
                         $this->dateTimeHelper->modify($relativeDateParser->getRelativeDate());
                     } else {
                         $this->dateTimeHelper->setDateTime($value);
@@ -115,6 +114,7 @@ class ContactTokenReplacer extends TokenReplacer
                 } else {
                     $this->dateTimeHelper->setDateTime($value);
                 }
+
                     $date = $this->dateTimeHelper->getString(
                         $this->coreParametersHelper->getParameter('date_format_dateonly')
                     );
