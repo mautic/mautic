@@ -32,10 +32,12 @@ class DateRelativeParser
     {
         $this->dictionary = $dictionary;
         $this->timeframe  = trim(str_replace($prefixes, '', $timeframe));
-        $this->prefix     = trim(str_replace([$this->getRelativeString(), $this->getRelativeDate()], '', $timeframe));
+        $this->prefix     = trim(str_replace([$this->getStringPart(), $this->getTimeframePart()], '', $timeframe));
     }
 
     /**
+     * Relative date from dictionary or start with +/-.
+     *
      * @return bool
      */
     public function hasRelativeDate()
@@ -52,31 +54,31 @@ class DateRelativeParser
      */
     public function hasDateFromDictionary()
     {
-        return in_array($this->getRelativeString(), $this->getDictionaryVariants());
+        return in_array($this->getStringPart(), $this->getDictionaryVariants());
     }
 
     /**
-     * Return timeframe.
+     * Return string part of time frame, for exampele: anniversary.
      *
      * @return string
      */
-    private function getRelativeString()
+    private function getStringPart()
     {
-        return trim(str_replace($this->getRelativeDate(), '', $this->timeframe));
+        return trim(str_replace($this->getTimeframePart(), '', $this->timeframe));
     }
 
     /**
-     * Return all after /birthday string, for example -1 day.
+     * Return timeframe part, for example +1 day.
      *
      * @return string
      */
-    public function getRelativeDate()
+    public function getTimeframePart()
     {
         return trim(str_replace($this->getDictionaryVariants(), '', $this->timeframe));
     }
 
     /**
-     * Return all possible variants for dates.
+     * Return all possible variants with translations.
      *
      * @return array
      */
