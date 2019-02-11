@@ -89,7 +89,7 @@ class ActivitiesPipedriveExport extends AbstractPipedrive
                 }
                 $this->dateTimeHelper->setDateTime($event['timestamp']);
                 $data              = [];
-                $data['subject']   = $this->getEventLabel($event);
+                $data['subject']   = $this->generateEventLabel($event);
                 $data['done']      = 1;
                 $data['type']      = $event['eventType'];
                 $data['person_id'] = $integrationEntity->getIntegrationEntityId();
@@ -101,7 +101,6 @@ class ActivitiesPipedriveExport extends AbstractPipedrive
             ++$page;
         }
     }
-
 
     /**
      * @param string|array $eventLabel
@@ -122,7 +121,7 @@ class ActivitiesPipedriveExport extends AbstractPipedrive
      *
      * @return string
      */
-    private function getEventLabel($event)
+    private function generateEventLabel($event)
     {
         $eventLabel = $event['eventLabel'];
         if (is_array($eventLabel) && isset($eventLabel['label'])) {
