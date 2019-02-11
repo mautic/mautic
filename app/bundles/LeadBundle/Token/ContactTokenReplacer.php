@@ -92,7 +92,7 @@ class ContactTokenReplacer extends TokenReplacer
             $value = $fields['companies'][0][$alias];
         }
         if ($value) {
-            $relativeDateParser = new DateRelativeParser($this->anniversaryDictionary->getTranslations(), $modifier, 'date');
+            $relativeDateParser = new DateRelativeParser($this->anniversaryDictionary->getTranslations(), $modifier, ['datetime', 'date', 'time']);
             switch ($modifier) {
                 case 'true':
                     $value = urlencode($value);
@@ -102,9 +102,16 @@ class ContactTokenReplacer extends TokenReplacer
                 case 'time':
                 case $modifier && $relativeDateParser->hasRelativeDate():
                 if ($relativeDateParser->hasRelativeDate()) {
-                    $this->dateTimeHelper->setDateTime($value);
-                    $this->dateTimeHelper->modify($relativeDateParser->getRelativeDate());
-                    $modifier = 'date';
+                    // It's anniversary (anniversary +1 day) or just relative timeframe +1 day
+                    if ($relativeDateParser->hasDateFromDictionary()) {
+                        $anniversaryDate = date(date('Y').'-m-d H:i:s', strtotime($value));
+                        $this->dateTimeHelper->setDateTime($anniversaryDate);
+                        $this->dateTimeHelper->modify($relativeDateParser->getRelativeDate());
+                    } else {
+                        $this->dateTimeHelper->setDateTime($value);
+                        $this->dateTimeHelper->modify($relativeDateParser->getRelativeDate());
+                    }
+                    $modifier = $relativeDateParser->getPrefix();
                 } else {
                     $this->dateTimeHelper->setDateTime($value);
                 }

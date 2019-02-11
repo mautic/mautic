@@ -27,12 +27,12 @@ class DateRelativeParser
      *
      * @param array  $dictionary
      * @param string $timeframe
-     * @param string $prefix
      */
-    public function __construct(array $dictionary, $timeframe, $prefix = '')
+    public function __construct(array $dictionary, $timeframe, $prefixes = [])
     {
         $this->dictionary = $dictionary;
-        $this->timeframe  = trim(str_replace($prefix, '', $timeframe));
+        $this->timeframe  = trim(str_replace($prefixes, '', $timeframe));
+        $this->prefix     = trim(str_replace([$this->getRelativeString(), $this->getRelativeDate()], '', $timeframe));
     }
 
     /**
@@ -44,10 +44,14 @@ class DateRelativeParser
             return false;
         }
 
-        if ($this->getRelativeDate() == $this->timeframe) {
-            return true;
-        }
+        return true;
+    }
 
+    /**
+     * @return bool
+     */
+    public function hasDateFromDictionary()
+    {
         return in_array($this->getRelativeString(), $this->getDictionaryVariants());
     }
 
@@ -79,5 +83,13 @@ class DateRelativeParser
     private function getDictionaryVariants()
     {
         return array_merge($this->dictionary, array_keys($this->dictionary));
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
     }
 }

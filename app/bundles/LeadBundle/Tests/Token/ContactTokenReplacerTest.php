@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Tests\Token;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Services\DateAnniversaryDictionary;
 use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -49,10 +50,22 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
         return new DateTimeHelper('', 'Y-m-d H:i:s', 'UTC', $translator);
     }
 
+    private function getAnniversaryDictionary()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(function ($key) {
+                return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
+            });
+
+        return new DateAnniversaryDictionary($translator);
+    }
+
     public function setUp()
     {
         $coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
-        $this->contactTokenReplacer = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock());
+        $this->contactTokenReplacer = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock(), $this->getAnniversaryDictionary());
         $this->regex                = $this->contactTokenReplacer->getRegex();
         parent::setUp();
     }
@@ -110,10 +123,9 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
             ->with('date_format_timeonly')
             ->willReturn('g:i a');
 
-        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock());
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock(), $this->getAnniversaryDictionary());
         $token              = '{contactfield=date|datetime}';
         $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
-        $this->assertNotEmpty($tokenList[$token]);
         $this->assertNotSame($this->lead['date'], $tokenList[$token]);
     }
 
@@ -132,11 +144,10 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
             ->willReturn('g:i a');
 
         $dt                 = $this->getDateTimeMock();
-        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $dt);
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $dt, $this->getAnniversaryDictionary());
         $token              = '{contactfield=date|date}';
         $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
         $dt->setDateTime($this->lead['date']);
-        $this->assertNotEmpty($tokenList[$token]);
         $this->assertSame(strtolower($dt->getDateTime()->format('F')), current($tokenList));
     }
 
@@ -155,11 +166,10 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
             ->willReturn('g:i a');
 
         $dt                 = $this->getDateTimeMock();
-        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $dt);
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $dt, $this->getAnniversaryDictionary());
         $token              = '{contactfield=date|date}';
         $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
         $dt->setDateTime($this->lead['date']);
-        $this->assertNotEmpty($tokenList[$token]);
         $this->assertSame(strtolower($dt->getDateTime()->format('D')), strtolower(current($tokenList)));
     }
 
@@ -177,10 +187,9 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
             ->with('date_format_timeonly')
             ->willReturn('g:i a');
 
-        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock());
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock(), $this->getAnniversaryDictionary());
         $token              = '{contactfield=date|time}';
         $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
-        $this->assertNotEmpty($tokenList[$token]);
         $this->assertNotSame($this->lead['date'], $tokenList[$token]);
     }
 
@@ -198,10 +207,49 @@ class ContactTokenReplacerTest extends \PHPUnit_Framework_TestCase
             ->with('date_format_timeonly')
             ->willReturn('g:i a');
 
-        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock());
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock(), $this->getAnniversaryDictionary());
         $token              = '{contactfield=date|time}';
         $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
-        $this->assertNotEmpty($tokenList[$token]);
         $this->assertNotSame($this->lead['date'], $tokenList[$token]);
+    }
+
+    public function testReplaceRelativeDateFormatValue()
+    {
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+
+        $coreParametersHelperMock->expects($this->at(0))
+            ->method('getParameter')
+            ->with('date_format_dateonly')
+            ->willReturn('d. m. Y');
+
+        $coreParametersHelperMock->expects($this->at(1))
+            ->method('getParameter')
+            ->with('date_format_timeonly')
+            ->willReturn('g:i a');
+
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock(), $this->getAnniversaryDictionary());
+        $token              = '{contactfield=date|datetime +1 day}';
+        $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
+        self::assertContains('06. 05. 2000', $tokenList[$token]);
+    }
+
+    public function testReplaceRelativeAnniversaryDateFormatValue()
+    {
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+
+        $coreParametersHelperMock->expects($this->at(0))
+            ->method('getParameter')
+            ->with('date_format_dateonly')
+            ->willReturn('d. m. Y');
+
+        $coreParametersHelperMock->expects($this->at(1))
+            ->method('getParameter')
+            ->with('date_format_timeonly')
+            ->willReturn('g:i a');
+
+        $tokenReplacer      = new ContactTokenReplacer($coreParametersHelperMock, $this->getDateTimeMock(), $this->getAnniversaryDictionary());
+        $token              = '{contactfield=date|datetime anniversary +1 day}';
+        $tokenList          = $tokenReplacer->getTokens($token, $this->lead);
+        self::assertContains('06. 05. '.date('Y'), $tokenList[$token]);
     }
 }
