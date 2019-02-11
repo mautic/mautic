@@ -85,7 +85,7 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
         $leadExport = $this->getContainer()->get('mautic_integration.pipedrive.export.lead');
         $leadExport->setIntegration($integrationObject);
 
-        $pushed   = 1;
+        $pushed   = 0;
         $start    = 0;
         $limit    = 50;
         $progress = ProgressBarHelper::init($output, $limit);

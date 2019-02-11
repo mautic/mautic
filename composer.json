@@ -83,7 +83,7 @@
         "willdurand/oauth-server-bundle": "0.0.2",
         "jms/serializer-bundle": "~1.1",
         "oneup/uploader-bundle": "~1.3",
-        
+
         "phpoffice/phpexcel": "1.8.1",
         "joomla/http": "1.2.*",
         "joomla/filter": "1.2.*",

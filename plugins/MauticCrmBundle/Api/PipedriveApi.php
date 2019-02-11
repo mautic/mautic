@@ -241,20 +241,11 @@ class PipedriveApi extends CrmApi
      */
     public function addActivity($data)
     {
-        // "subject": "something",
-        // DONE 0/1
-        // "done": "1",
-        // "type": "Custom5",
-        // "person_id": "1"
-        //due_date - YYYY-MM-DD
-        //due_time
-        //     $engagements = $this->leadModel->getEngagements($contact, $filters, null, $page, 100, false);
         $params     = $this->getRequestParameters($data);
         $url        = sprintf('%s/%s', $this->integration->getApiUrl(), self::ACTIVITIES);
         $response   = $this->transport->post($url, $params);
 
         return $data = $this->getResponseData($response);
-        https://api.pipedrive.com/v1/activities?api_token=55823430e7a428a5c0383c4fe61c49aa97a9dbaa
     }
 
     /**
