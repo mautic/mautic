@@ -15,8 +15,8 @@ use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Token\TokenReplacerInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -55,34 +55,26 @@ class SmsSubscriber extends CommonSubscriber
     protected $smsHelper;
 
     /**
-     * @var TokenReplacerInterface
-     */
-    private $contactTokenReplacer;
-
-    /**
      * DynamicContentSubscriber constructor.
      *
-     * @param AuditLogModel          $auditLogModel
-     * @param TrackableModel         $trackableModel
-     * @param PageTokenHelper        $pageTokenHelper
-     * @param AssetTokenHelper       $assetTokenHelper
-     * @param SmsHelper              $smsHelper
-     * @param TokenReplacerInterface $contactTokenReplacer
+     * @param AuditLogModel    $auditLogModel
+     * @param TrackableModel   $trackableModel
+     * @param PageTokenHelper  $pageTokenHelper
+     * @param AssetTokenHelper $assetTokenHelper
+     * @param SmsHelper        $smsHelper
      */
     public function __construct(
         AuditLogModel $auditLogModel,
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper,
-        SmsHelper $smsHelper,
-        TokenReplacerInterface $contactTokenReplacer
+        SmsHelper $smsHelper
     ) {
-        $this->auditLogModel        = $auditLogModel;
-        $this->trackableModel       = $trackableModel;
-        $this->pageTokenHelper      = $pageTokenHelper;
-        $this->assetTokenHelper     = $assetTokenHelper;
-        $this->smsHelper            = $smsHelper;
-        $this->contactTokenReplacer = $contactTokenReplacer;
+        $this->auditLogModel    = $auditLogModel;
+        $this->trackableModel   = $trackableModel;
+        $this->pageTokenHelper  = $pageTokenHelper;
+        $this->assetTokenHelper = $assetTokenHelper;
+        $this->smsHelper        = $smsHelper;
     }
 
     /**
@@ -147,7 +139,7 @@ class SmsSubscriber extends CommonSubscriber
 
         if ($content) {
             $tokens = array_merge(
-                $this->contactTokenReplacer->getTokens($content, $lead->getProfileFields()),
+                TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
             );

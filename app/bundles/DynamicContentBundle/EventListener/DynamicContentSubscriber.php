@@ -17,7 +17,6 @@ use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Token\TokenReplacerInterface;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event as Events;
@@ -26,6 +25,7 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -87,23 +87,17 @@ class DynamicContentSubscriber extends CommonSubscriber
     private $dynamicContentModel;
 
     /**
-     * @var TokenReplacerInterface
-     */
-    private $contactTokenReplacer;
-
-    /**
      * DynamicContentSubscriber constructor.
      *
-     * @param TrackableModel         $trackableModel
-     * @param PageTokenHelper        $pageTokenHelper
-     * @param AssetTokenHelper       $assetTokenHelper
-     * @param FormTokenHelper        $formTokenHelper
-     * @param FocusTokenHelper       $focusTokenHelper
-     * @param AuditLogModel          $auditLogModel
-     * @param LeadModel              $leadModel
-     * @param DynamicContentHelper   $dynamicContentHelper
-     * @param DynamicContentModel    $dynamicContentModel
-     * @param TokenReplacerInterface $contactTokenReplacer
+     * @param TrackableModel       $trackableModel
+     * @param PageTokenHelper      $pageTokenHelper
+     * @param AssetTokenHelper     $assetTokenHelper
+     * @param FormTokenHelper      $formTokenHelper
+     * @param FocusTokenHelper     $focusTokenHelper
+     * @param AuditLogModel        $auditLogModel
+     * @param LeadModel            $leadModel
+     * @param DynamicContentHelper $dynamicContentHelper
+     * @param DynamicContentModel  $dynamicContentModel
      */
     public function __construct(
         TrackableModel $trackableModel,
@@ -114,8 +108,7 @@ class DynamicContentSubscriber extends CommonSubscriber
         AuditLogModel $auditLogModel,
         LeadModel $leadModel,
         DynamicContentHelper $dynamicContentHelper,
-        DynamicContentModel $dynamicContentModel,
-        TokenReplacerInterface $contactTokenReplacer
+        DynamicContentModel $dynamicContentModel
     ) {
         $this->trackableModel       = $trackableModel;
         $this->pageTokenHelper      = $pageTokenHelper;
@@ -126,7 +119,6 @@ class DynamicContentSubscriber extends CommonSubscriber
         $this->leadModel            = $leadModel;
         $this->dynamicContentHelper = $dynamicContentHelper;
         $this->dynamicContentModel  = $dynamicContentModel;
-        $this->contactTokenReplacer = $contactTokenReplacer;
     }
 
     /**
@@ -192,7 +184,7 @@ class DynamicContentSubscriber extends CommonSubscriber
 
         if ($content) {
             $tokens = array_merge(
-                $this->contactTokenReplacer->getTokens($content, $lead->getProfileFields()),
+                TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough),
                 $this->formTokenHelper->findFormTokens($content),

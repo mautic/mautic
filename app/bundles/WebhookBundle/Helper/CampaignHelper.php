@@ -14,8 +14,8 @@ namespace Mautic\WebhookBundle\Helper;
 use Doctrine\Common\Collections\Collection;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
-use Mautic\CoreBundle\Token\TokenReplacerInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
 
 class CampaignHelper
 {
@@ -32,17 +32,11 @@ class CampaignHelper
     private $contactsValues = [];
 
     /**
-     * @var TokenReplacerInterface
-     */
-    private $contactTokenReplacer;
-
-    /**
      * @param Http $connector
      */
-    public function __construct(Http $connector, TokenReplacerInterface $contactTokenReplacer)
+    public function __construct(Http $connector)
     {
-        $this->connector            = $connector;
-        $this->contactTokenReplacer = $contactTokenReplacer;
+        $this->connector = $connector;
     }
 
     /**
@@ -139,7 +133,7 @@ class CampaignHelper
         $contactValues = $this->getContactValues($contact);
 
         foreach ($rawTokens as $key => $value) {
-            $values[$key] = urldecode($this->contactTokenReplacer->replaceTokens($value, $contactValues));
+            $values[$key] = urldecode(TokenHelper::findLeadTokens($value, $contactValues, true));
         }
 
         return $values;

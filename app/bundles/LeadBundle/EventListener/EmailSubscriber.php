@@ -13,10 +13,10 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
-use Mautic\CoreBundle\Token\TokenReplacerInterface;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Helper\TokenHelper;
 
 /**
  * Class EmailSubscriber.
@@ -24,19 +24,16 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 class EmailSubscriber extends CommonSubscriber
 {
     /**
-     * @var TokenReplacerInterface
+     * @deprecated - to be removed in 3.0
+     *
+     * @var string
      */
-    private $contactTokenReplacer;
+    private static $leadFieldRegex = '{leadfield=(.*?)}';
 
     /**
-     * EmailSubscriber constructor.
-     *
-     * @param TokenReplacerInterface $contactTokenReplacer
+     * @var string
      */
-    public function __construct(TokenReplacerInterface $contactTokenReplacer)
-    {
-        $this->contactTokenReplacer = $contactTokenReplacer;
-    }
+    private static $contactFieldRegex = '{contactfield=(.*?)}';
 
     /**
      * @return array
@@ -59,9 +56,8 @@ class EmailSubscriber extends CommonSubscriber
         // the permissions are for viewing contact data, not for managing contact fields
         $tokenHelper->setPermissionSet(['lead:leads:viewown', 'lead:leads:viewother']);
 
-        $regex = $this->contactTokenReplacer->getRegex();
-        if ($event->tokensRequested(reset($regex))) {
-            $event->addTokensFromHelper($tokenHelper, reset($regex), 'label', 'alias', true);
+        if ($event->tokensRequested(self::$contactFieldRegex)) {
+            $event->addTokensFromHelper($tokenHelper, self::$contactFieldRegex, 'label', 'alias', true);
         }
     }
 
@@ -83,7 +79,10 @@ class EmailSubscriber extends CommonSubscriber
         $content .= $event->getContent();
         $content .= $event->getPlainText();
         $content .= implode(' ', $event->getTextHeaders());
-        $tokenList = $this->contactTokenReplacer->getTokens($content, $event->getLead());
+
+        $lead = $event->getLead();
+
+        $tokenList = TokenHelper::findLeadTokens($content, $lead);
         if (count($tokenList)) {
             $event->addTokens($tokenList);
             unset($tokenList);

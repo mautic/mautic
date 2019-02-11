@@ -45,7 +45,6 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
-                    'mautic.lead.token.replacer',
                 ],
             ],
 //            Left out until 2.9

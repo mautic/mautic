@@ -380,10 +380,7 @@ return [
                 ],
             ],
             'mautic.lead.emailbundle.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\EmailSubscriber',
-                'arguments' => [
-                    'mautic.lead.token.replacer',
-                ],
+                'class' => 'Mautic\LeadBundle\EventListener\EmailSubscriber',
             ],
             'mautic.lead.formbundle.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\FormSubscriber',
@@ -829,14 +826,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Helper\PrimaryCompanyHelper::class,
                 'arguments' => [
                     'mautic.lead.repository.company_lead',
-                ],
-            ],
-            'mautic.lead.token.replacer' => [
-                'class'     => \Mautic\LeadBundle\Token\ContactTokenReplacer::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.datetime',
-                    'mautic.core.date.anniversary.dictionary',
                 ],
             ],
         ],

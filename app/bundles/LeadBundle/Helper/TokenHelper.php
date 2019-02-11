@@ -16,9 +16,6 @@ use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
 
 /**
  * Class TokenHelper.
- *
- *  @deprecated 2.14.2 to be removed in 3.0
- *  @use Mautic\LeadBundle\Token\ContactTokenReplacer
  */
 class TokenHelper
 {

@@ -170,7 +170,6 @@ return [
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
                     'mautic.social.model.tweet',
-                    'mautic.lead.token.replacer',
                 ],
             ],
             'mautic.social.helper.twitter_command' => [

@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
@@ -474,7 +475,7 @@ class PublicController extends CommonFormController
             $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
             $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
 
-            $url = $this->get('mautic.lead.token.replacer')->replaceTokens($url, $leadArray);
+            $url = TokenHelper::findLeadTokens($url, $leadArray, true);
         }
 
         $url = UrlHelper::sanitizeAbsoluteUrl($url);

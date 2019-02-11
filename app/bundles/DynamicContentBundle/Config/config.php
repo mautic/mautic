@@ -81,7 +81,6 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.helper.dynamicContent',
                     'mautic.dynamicContent.model.dynamicContent',
-                    'mautic.lead.token.replacer',
                 ],
             ],
             'mautic.dynamicContent.subscriber.channel' => [
