@@ -119,8 +119,8 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
                         ],
                         [
                             'column' => 'e.integrationEntity',
-                            'expr'   => 'neq',
-                            'value'  => LeadExport::ORGANIZATION_ENTITY_TYPE,
+                            'expr'   => 'eq',
+                            'value'  => LeadExport::PERSON_ENTITY_TYPE,
                         ],
                         [
                             'column' => 'e.internalEntity',
