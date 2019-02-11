@@ -80,6 +80,8 @@ class ImportContactSubscriber extends CommonSubscriber
             $event->setObjectSingular('lead');
             $event->setObjectName('mautic.lead.leads');
             $event->setActiveLink('#mautic_contact_index');
+            $event->setIndexRoute('mautic_contact_index');
+            $event->stopPropagation();
         }
     }
 

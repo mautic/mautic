@@ -471,11 +471,13 @@ class ImportController extends FormController
         } else {
             $contentTemplate = 'MauticLeadBundle:Import:progress.html.php';
             $viewParameters  = [
-                'progress'   => $progress,
-                'import'     => $import,
-                'complete'   => $complete,
-                'failedRows' => $importModel->getFailedRows($import->getId()),
-                'objectName' => $initEvent->getObjectName(),
+                'progress'         => $progress,
+                'import'           => $import,
+                'complete'         => $complete,
+                'failedRows'       => $importModel->getFailedRows($import->getId()),
+                'objectName'       => $initEvent->getObjectName(),
+                'indexRoute'       => $initEvent->getIndexRoute(),
+                'indexRouteParams' => $initEvent->getIndexRouteParams(),
             ];
         }
 

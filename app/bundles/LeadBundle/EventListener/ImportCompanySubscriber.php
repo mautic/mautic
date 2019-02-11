@@ -80,6 +80,8 @@ class ImportCompanySubscriber extends CommonSubscriber
             $event->setObjectSingular('company');
             $event->setObjectName('mautic.lead.lead.companies');
             $event->setActiveLink('#mautic_company_index');
+            $event->setIndexRoute('mautic_company_index');
+            $event->stopPropagation();
         }
     }
 

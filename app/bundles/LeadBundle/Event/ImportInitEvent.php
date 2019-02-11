@@ -43,6 +43,16 @@ class ImportInitEvent extends Event
     private $activeLink;
 
     /**
+     * @var string
+     */
+    private $indexRoute;
+
+    /**
+     * @var array
+     */
+    private $indexRouteParams = [];
+
+    /**
      * @param string $routeObjectName
      */
     public function __construct($routeObjectName)
@@ -112,6 +122,32 @@ class ImportInitEvent extends Event
     public function getActiveLink()
     {
         return $this->activeLink;
+    }
+
+    /**
+     * @param string $indexRoute
+     * @param array  $routeParams
+     */
+    public function setIndexRoute($indexRoute, array $routeParams = [])
+    {
+        $this->indexRoute       = $indexRoute;
+        $this->indexRouteParams = $routeParams;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIndexRoute()
+    {
+        return $this->indexRoute;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIndexRouteParams()
+    {
+        return $this->indexRouteParams;
     }
 
     /**
