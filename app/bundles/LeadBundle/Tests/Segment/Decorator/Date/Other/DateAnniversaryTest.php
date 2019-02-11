@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
+use Mautic\CoreBundle\Helper\DateRelativeParser;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
@@ -38,11 +39,15 @@ class DateAnniversaryTest extends \PHPUnit_Framework_TestCase
     {
         $dateDecorator = $this->createMock(DateDecorator::class);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper('2018-03-02', null);
 
         $dateDecorator->method('getDefaultDate')
             ->with()
             ->willReturn($date);
+
+        $dateDecorator->method('dateRelativeParser')->willReturn(
+            (new DateRelativeParser(['anniversary'=>'anniversary'], ''))
+        );
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
 
