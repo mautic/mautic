@@ -416,8 +416,24 @@ return [
             ],
         ],
         'helpers' => [
+            'mautic.helper.datetime' => [
+                'class'     => \Mautic\CoreBundle\Helper\DateTimeHelper::class,
+                'arguments' => [
+                    '""',
+                    '"Y-m-d H:i:s"',
+                    '"UTC"',
+                    'translator',
+                ],
+            ],
             'mautic.helper.app_version' => [
-                'class' => \Mautic\CoreBundle\Helper\AppVersion::class,
+                'class'     => \Mautic\CoreBundle\Helper\AppVersion::class,
+                'arguments' => [
+                    '%mautic.date_format_full%',
+                    '%mautic.date_format_short%',
+                    '%mautic.date_format_dateonly%',
+                    '%mautic.date_format_timeonly%',
+                    'translator',
+                ],
             ],
             'mautic.helper.template.menu' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
