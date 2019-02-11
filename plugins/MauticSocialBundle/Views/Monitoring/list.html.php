@@ -76,15 +76,15 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php if ($permissions['plugin:mauticSocial:monitoring:publish']) {
-                            echo $view->render(
+                            <?php if ($permissions['plugin:mauticSocial:monitoring:publish']): ?>
+                                <?php echo $view->render(
                                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                     [
                                         'item'  => $item,
                                         'model' => 'social.monitoring',
                                     ]
-                                );
-                        } ?>
+                                ); ?>
+                            <?php endif; ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_social_action',
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]

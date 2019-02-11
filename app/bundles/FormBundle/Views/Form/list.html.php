@@ -146,18 +146,17 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php
-                            if ($security->hasEntityAccess(
+                            <?php if ($security->hasEntityAccess(
                                 $permissions['form:forms:publishown'],
                                 $permissions['form:forms:publishother'],
                                 $item->getCreatedBy()
                                 )
-                            ) {
-                                echo $view->render(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                ['item' => $item, 'model' => 'form.form']
-                                );
-                            } ?>
+                            ): ?>
+                                <?php echo $view->render(
+                                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                    ['item' => $item, 'model' => 'form.form']
+                                ); ?>
+                            <?php endif; ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_form_action',
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]

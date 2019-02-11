@@ -88,16 +88,15 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php
-                            if ($permissions['campaign:campaigns:publish']) {
-                                echo $view->render(
+                            <?php if ($permissions['campaign:campaigns:publish']): ?>
+                                <?php echo $view->render(
                                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                     [
                                         'item'  => $item,
                                         'model' => 'campaign',
                                     ]
-                                );
-                            } ?>
+                                ); ?>
+                             <?php endif; ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_campaign_action',
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]

@@ -103,18 +103,17 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                     </td>
                     <td>
                         <div>
-                            <?php
-                            if ($view['security']->hasEntityAccess(
+                            <?php if ($view['security']->hasEntityAccess(
                                 true,
                                 $permissions['lead:lists:editother'],
                                 $item->getCreatedBy()
                                 )
-                            ) {
-                                echo $view->render(
+                            ): ?>
+                                <?php echo $view->render(
                                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                     ['item' => $item, 'model' => 'lead.list']
-                                );
-                            } ?>
+                                ); ?>
+                            <?php endif; ?>
                             <?php if ($view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
                                 <a href="<?php echo $view['router']->path(
                                     'mautic_segment_action',

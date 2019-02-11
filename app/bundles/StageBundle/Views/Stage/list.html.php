@@ -85,13 +85,12 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-
-                            <?php if ($permissions['stage:stages:publish']) {
-                            echo $view->render(
+                            <?php if ($permissions['stage:stages:publish']): ?>
+                                <?php echo $view->render(
                                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                     ['item' => $item, 'model' => 'stage']
-                                );
-                        } ?>
+                                ); ?>
+                            <?php endif; ?>
                             <a href="<?php echo $view['router']->generate(
                                 'mautic_stage_action',
                                 ['objectAction' => 'edit', 'objectId' => $item->getId()]

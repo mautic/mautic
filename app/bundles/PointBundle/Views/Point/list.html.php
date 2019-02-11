@@ -97,13 +97,12 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-
-                            <?php if ($permissions['point:points:publish']) {
-                            echo $view->render(
+                            <?php if ($permissions['point:points:publish']): ?>
+                                <?php echo $view->render(
                                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                     ['item' => $item, 'model' => 'point']
-                                );
-                        } ?>
+                                ); ?>
+                            <?php endif; ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_point_action',
                                 ['objectAction' => 'edit', 'objectId' => $item->getId()]

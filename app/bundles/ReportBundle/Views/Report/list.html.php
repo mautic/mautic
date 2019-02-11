@@ -84,17 +84,16 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php
-                            if ($security->hasEntityAccess(
+                            <?php if ($security->hasEntityAccess(
                                 $permissions['report:reports:publishown'],
                                 $permissions['report:reports:publishother'],
                                 $item->getCreatedBy())
-                            ) {
-                                echo $view->render(
+                            ): ?>
+                                <?php echo $view->render(
                                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                     ['item' => $item, 'model' => 'report.report']
-                                );
-                            } ?>
+                                ); ?>
+                            <?php endif; ?>
                             <a href="<?php echo $view['router']->path('mautic_report_view', ['objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>

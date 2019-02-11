@@ -94,12 +94,12 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php if ($permissions['webhook:webhooks:publish']) {
-                            echo $view->render(
+                            <?php if ($permissions['webhook:webhooks:publish']): ?>
+                                <?php echo $view->render(
                                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                     ['item' => $item, 'model' => 'webhook']
-                                );
-                        } ?>
+                                ); ?>
+                            <?php endif; ?>
                             <a data-toggle="ajax" href="<?php echo $view['router']->path(
                                 'mautic_webhook_action',
                                 ['objectId' => $item->getId(), 'objectAction' => 'view']

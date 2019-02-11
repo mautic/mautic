@@ -105,18 +105,17 @@ if ($tmpl == 'index') {
                         ?>
                     </td>
                     <td>
-                        <?php
-                        if ($view['security']->hasEntityAccess(
+                        <?php if ($view['security']->hasEntityAccess(
                             $permissions['dynamiccontent:dynamiccontents:publishown'],
                             $permissions['dynamiccontent:dynamiccontents:publishother'],
                             $item->getCreatedBy()
                             )
-                        ) {
-                            echo $view->render(
-                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                            ['item' => $item, 'model' => 'dynamicContent']
-                            );
-                        } ?>
+                        ): ?>
+                            <?php echo $view->render(
+                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                ['item' => $item, 'model' => 'dynamicContent']
+                            ); ?>
+                        <?php endif; ?>
                         <a href="<?php echo $view['router']->generate(
                             'mautic_dynamicContent_action',
                             ['objectAction' => 'view', 'objectId' => $item->getId()]
