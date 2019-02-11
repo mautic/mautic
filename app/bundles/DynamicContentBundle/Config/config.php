@@ -164,6 +164,7 @@ return [
                     'mautic.campaign.executioner.realtime',
                     'event_dispatcher',
                     'mautic.lead.model.lead',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
