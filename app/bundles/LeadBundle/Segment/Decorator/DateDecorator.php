@@ -71,7 +71,7 @@ class DateDecorator extends CustomMappedDecorator
      */
     public function dateRelativeParser($timeframe)
     {
-        return new DateRelativeParser($this->anniversaryDictionary->getTranslations(), $timeframe, 'date ');
+        return new DateRelativeParser($this->anniversaryDictionary->getTranslations(), $timeframe);
     }
 
     /**
