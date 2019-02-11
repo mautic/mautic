@@ -105,10 +105,10 @@ class ContactTokenReplacer extends TokenReplacer
                     // It's anniversary (anniversary +1 day) or just relative timeframe +1 day
                     if ($relativeDateParser->hasDateFromDictionary()) {
                         $this->dateTimeHelper->setDateTime($relativeDateParser->getAnniversaryDate($value));
-                        $this->dateTimeHelper->modify($relativeDateParser->getRelativeDate());
+                        $this->dateTimeHelper->modify($relativeDateParser->getTimeframePart());
                     } else {
                         $this->dateTimeHelper->setDateTime($value);
-                        $this->dateTimeHelper->modify($relativeDateParser->getRelativeDate());
+                        $this->dateTimeHelper->modify($relativeDateParser->getTimeframePart());
                     }
                     $modifier = $relativeDateParser->getPrefix();
                 } else {
