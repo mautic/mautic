@@ -79,7 +79,7 @@ class DateAnniversary implements FilterDecoratorInterface
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         $filter         =  $contactSegmentFilterCrate->getFilter();
-        $relativeFilter =  $this->dateDecorator->dateRelativeParser($filter)->getRelativeDate();
+        $relativeFilter =  $this->dateDecorator->dateRelativeParser($filter)->getTimeframePart();
         $dateTimeHelper = $this->dateDecorator->getDefaultDate($relativeFilter);
 
         return $dateTimeHelper->toUtcString('%-m-d');
