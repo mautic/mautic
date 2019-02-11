@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Command;
 
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
@@ -53,12 +54,7 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
 
             return;
         }
-        /*   $leadModel = $this->getContainer()->get('mautic.lead.model.lead');
-           /** @var LeadExport $leadExport */
-        /*    $leadExport= $this->getContainer()->get('mautic_integration.pipedrive.export.lead');
-            $leadExport->setIntegration($integrationObject);
-            $leadExport->createActivities($leadModel->getEntity(22821),$integrationObject->getIntegrationEntityRepository()->getEntity(1));
-die('a');*/
+
         if ($input->getOption('restart')) {
             $this->io->note(
                 $this->getContainer()->get('templating.helper.translator')->trans(
@@ -88,9 +84,10 @@ die('a');*/
         $leadExport = $this->getContainer()->get('mautic_integration.pipedrive.export.lead');
         $leadExport->setIntegration($integrationObject);
 
-        $pushed = 1;
-        $start  = 0;
-        $limit  = 5;
+        $pushed   = 1;
+        $start    = 0;
+        $limit    = 50;
+        $progress = ProgressBarHelper::init($output, $limit);
         while (true) {
             $leads = $em->getRepository(Lead::class)->getEntities(
                 [
@@ -125,14 +122,19 @@ die('a');*/
             foreach ($leads as $lead) {
                 if ($leadExport->create($lead)) {
                     ++$pushed;
+                    if ($pushed % $limit == 0) {
+                        $progress->setProgress($pushed);
+                    }
                 }
             }
             $start = $start + $limit;
             $em->clear();
-            break;
         }
 
-        $this->io->text('Pushed '.$pushed);
+        $progress->finish();
+
+        $output->writeln('');
+        $this->io->text('Pushed total '.$pushed);
         $this->io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
     }
 }

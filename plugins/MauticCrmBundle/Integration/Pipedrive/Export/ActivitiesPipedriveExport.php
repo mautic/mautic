@@ -8,14 +8,9 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\AbstractPipedrive;
 
-class ActivitiesExport extends AbstractPipedrive
+class ActivitiesPipedriveExport extends AbstractPipedrive
 {
-    /** @var string */
-    private $timeout;
-
-    /** @var \DateTime */
-    private $endDate;
-    /**
+    /*
      * @var LeadModel
      */
     private $leadModel;
@@ -39,8 +34,74 @@ class ActivitiesExport extends AbstractPipedrive
         $this->leadModel      = $leadModel;
         $this->entityManager  = $entityManager;
         $this->dateTimeHelper = new DateTimeHelper();
-        $this->endDate        = $this->dateTimeHelper->getDateTime();
     }
+
+    /**
+     * @param IntegrationEntity $integrationEntity
+     * @param \DateTime|null    $lastActivitySync
+     */
+    public function createActivities(IntegrationEntity $integrationEntity, $lastActivitySync = null)
+    {
+        $config         = $this->getIntegration()->mergeConfigToFeatureSettings();
+        $activityEvents = isset($config['activityEvents']) ? $config['activityEvents'] : [];
+
+        // stop, if no events
+        if (empty($activityEvents)) {
+            return false;
+        }
+
+        // stop if contact not exists
+        $contact = $this->leadModel->getEntity($integrationEntity->getInternalEntityId());
+        if (!$contact) {
+            return false;
+        }
+
+        $filters = [
+            'search'        => '',
+            'includeEvents' => $activityEvents,
+            'excludeEvents' => [],
+        ];
+
+        $dateTo = $this->dateTimeHelper->getDateTime();
+        if ($lastActivitySync instanceof \DateTime) {
+            $filters['dateFrom'] = $lastActivitySync;
+            $filters['dateTo']   = $dateTo;
+        }
+
+        $page     = 1;
+        while (true) {
+            $engagements = $this->leadModel->getEngagements($contact, $filters, null, $page, 100, false);
+            $events      = $engagements[0]['events'];
+            if (empty($events)) {
+                // last event log set to integration Entity
+                $internal                       = $integrationEntity->getInternal();
+                $internal['last_activity_sync'] = $dateTo->getTimestamp();
+                $integrationEntity->setInternal($internal);
+                $this->entityManager->persist($integrationEntity);
+                $this->entityManager->flush();
+                break;
+            }
+
+            foreach ($events as $event) {
+                // Create activity before exists
+                if (!$this->getIntegration()->getApiHelper()->getActivityType($event)) {
+                    $this->getIntegration()->getApiHelper()->createActivityType($event);
+                }
+                $this->dateTimeHelper->setDateTime($event['timestamp']);
+                $data              = [];
+                $data['subject']   = $this->getEventLabel($event);
+                $data['done']      = 1;
+                $data['type']      = $event['eventType'];
+                $data['person_id'] = $integrationEntity->getIntegrationEntityId();
+                $data['due_date']  = $this->dateTimeHelper->getDateTime()->format('Y-m-d');
+                $data['due_time']  = $this->dateTimeHelper->getDateTime()->format('H:i:s');
+                $data['note']      = $this->generateDescription($event['eventLabel']);
+                $this->getIntegration()->getApiHelper()->addActivity($data);
+            }
+            ++$page;
+        }
+    }
+
 
     /**
      * @param string|array $eventLabel
@@ -57,82 +118,17 @@ class ActivitiesExport extends AbstractPipedrive
     }
 
     /**
-     * @param string|array $eventLabel
+     * @param array $eventLabel
      *
      * @return string
      */
-    private function getEventLabel($eventLabel)
+    private function getEventLabel($event)
     {
+        $eventLabel = $event['eventLabel'];
         if (is_array($eventLabel) && isset($eventLabel['label'])) {
-            return $eventLabel['label'];
+            return $event['eventType'].': '.$eventLabel['label'];
         }
 
         return $eventLabel;
-    }
-
-    /**
-     * @param IntegrationEntity $integrationEntity
-     * @param \DateTime|null    $lastActivitySync
-     */
-    public function createActivities(IntegrationEntity $integrationEntity, $lastActivitySync = null)
-    {
-        $config         = $this->getIntegration()->mergeConfigToFeatureSettings();
-        $activityEvents = isset($config['activityEvents']) ? $config['activityEvents'] : [];
-
-        // no activity events sync
-        if (empty($activityEvents)) {
-            return;
-        }
-
-        $contact = $this->leadModel->getEntity($integrationEntity->getInternalEntityId());
-        if (!$contact) {
-            return;
-        }
-
-        $filters = [
-            'search'        => '',
-            'includeEvents' => $activityEvents,
-            'excludeEvents' => [],
-        ];
-
-        if ($lastActivitySync instanceof \DateTime) {
-            $filters['dateFrom'] = $lastActivitySync;
-            $filters['dateTo']   = $this->endDate;
-        }
-
-        $page     = 1;
-        while (true) {
-            $engagements = $this->leadModel->getEngagements($contact, $filters, null, $page, 100, false);
-            $events      = $engagements[0]['events'];
-
-            if (empty($events)) {
-                // last event log set to integration Entity
-                $internal                       = $integrationEntity->getInternal();
-                $internal['last_activity_sync'] = (new DateTimeHelper())->getLocalTimestamp();
-                $integrationEntity->setInternal($internal);
-                $this->entityManager->persist($integrationEntity);
-                $this->entityManager->flush();
-                break;
-            }
-
-            foreach ($events as $event) {
-                // Create activity before exists
-                $activityType = $event['event'];
-                if (!$this->getIntegration()->getApiHelper()->getActivityType($activityType)) {
-                    $this->getIntegration()->getApiHelper()->createActivityType($activityType);
-                }
-                $this->dateTimeHelper->setDateTime($event['timestamp']);
-                $data              = [];
-                $data['subject']   = $this->getEventLabel($event['eventLabel']);
-                $data['done']      = 1;
-                $data['type']      = $activityType;
-                $data['person_id'] = $integrationEntity->getIntegrationEntityId();
-                $data['due_date']  = $this->dateTimeHelper->getDateTime()->format('Y-m-d');
-                $data['due_time']  = $this->dateTimeHelper->getDateTime()->format('H:i:s');
-                $data['note']      = $this->generateDescription($event['eventLabel']);
-                $this->getIntegration()->getApiHelper()->addActivity($data);
-            }
-            ++$page;
-        }
     }
 }

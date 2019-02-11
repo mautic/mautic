@@ -145,7 +145,7 @@ return [
                 ],
             ],
             'mautic_integration.pipedrive.export.activities' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\ActivitiesExport::class,
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\ActivitiesPipedriveExport::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',

@@ -258,13 +258,14 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param string $activityName
+     * @param array $event
      *
      * @return array|mixed
      */
-    public function getActivityType($activityName)
+    public function getActivityType($event)
     {
-        $activities = $this->getActivityTypes();
+        $activityName = $event['eventType'];
+        $activities   = $this->getActivityTypes();
         // return If already exists
         if (isset($activities[$activityName])) {
             return $activities[$activityName];
@@ -274,15 +275,37 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param $activityName
+     * @param array $event
      *
      * @return array
      */
-    public function createActivityType($activityName)
+    public function createActivityType($event)
     {
+        $icon = 'pricetag';
+
+        switch ($event['event']) {
+            case 'email.sent':
+            case 'email.read':
+            case 'email.replied':
+            case 'email.failed':
+                $icon = 'email';
+                break;
+            case 'campaign.event':
+            case 'campaign.event.scheduled':
+                $icon = 'task';
+                break;
+            case 'lead.source.identified':
+            case 'lead.source.created':
+            case 'segment_membership':
+            case 'lead.donotcontact':
+                $icon = 'addressbook';
+                break;
+        }
+
+        $activityName     = $event['eventType'];
         $data             = [];
         $data['name']     = $activityName;
-        $data['icon_key'] = 'pricetag';
+        $data['icon_key'] = $icon;
         $data['color']    = '4e5e9e';
 
         $params   = $this->getRequestParameters($data);
