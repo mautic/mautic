@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Command;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -89,36 +90,12 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
         $limit    = 50;
         $progress = ProgressBarHelper::init($output, $limit);
         while (true) {
-            $leads = $em->getRepository(Lead::class)->getEntities(
-                [
-                    'filter' => [
-                        'force' => [
-                            [
-                                'column' => 'l.email',
-                                'expr'   => 'neq',
-                                'value'  => '',
-                            ],
-                            [
-                                'column' => 'l.firstname',
-                                'expr'   => 'neq',
-                                'value'  => '',
-                            ],
-                            [
-                                'column' => 'l.lastname',
-                                'expr'   => 'neq',
-                                'value'  => '',
-                            ],
-                        ],
-                    ],
-                    'start'            => $start,
-                    'limit'            => $limit,
-                    'ignore_paginator' => true,
-                ]
-            );
+            $leads = $this->getLeads($em, $start, $limit);
 
             if (!$leads) {
                 break;
             }
+
             foreach ($leads as $lead) {
                 if ($leadExport->create($lead)) {
                     ++$pushed;
@@ -136,5 +113,42 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
         $output->writeln('');
         $this->io->text('Pushed total '.$pushed);
         $this->io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param               $start
+     * @param               $limit
+     *
+     * @return array
+     */
+    private function getLeads(EntityManager $em, $start, $limit)
+    {
+        return $em->getRepository(Lead::class)->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'l.email',
+                            'expr'   => 'neq',
+                            'value'  => '',
+                        ],
+                        [
+                            'column' => 'l.firstname',
+                            'expr'   => 'neq',
+                            'value'  => '',
+                        ],
+                        [
+                            'column' => 'l.lastname',
+                            'expr'   => 'neq',
+                            'value'  => '',
+                        ],
+                    ],
+                ],
+                'start'            => $start,
+                'limit'            => $limit,
+                'ignore_paginator' => true,
+            ]
+        );
     }
 }
