@@ -40,7 +40,7 @@ class DateRelativeParser
      */
     public function hasRelativeDate()
     {
-        if (empty($this->timeframe)) {
+        if (empty($this->timeframe) || (!$this->hasDateFromDictionary() && !in_array(substr($this->timeframe, 0, 1), ['+', '-']))) {
             return false;
         }
 
@@ -83,6 +83,27 @@ class DateRelativeParser
     private function getDictionaryVariants()
     {
         return array_merge($this->dictionary, array_keys($this->dictionary));
+    }
+
+    /**
+     * Return date with current year.
+     *
+     * @param $value
+     *
+     * @return false|string
+     */
+    public function getAnniversaryDate($value)
+    {
+        switch ($this->prefix) {
+            case 'datetime':
+                return date(date('Y').'-m-d H:i:s', strtotime($value));
+                break;
+            case 'date':
+                return date(date('Y').'-m-d', strtotime($value));
+                break;
+        }
+
+        return $value;
     }
 
     /**
