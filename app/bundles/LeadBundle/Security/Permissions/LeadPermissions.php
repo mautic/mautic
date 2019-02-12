@@ -29,12 +29,14 @@ class LeadPermissions extends AbstractPermissions
                 'editother'   => 8,
                 'deleteother' => 64,
                 'full'        => 1024,
+                'export'      => 2048,
             ],
             'fields' => [
                 'full' => 1024,
             ],
         ];
         $this->addExtendedPermissions('leads', false);
+
         $this->addStandardPermissions('imports');
     }
 
@@ -46,6 +48,65 @@ class LeadPermissions extends AbstractPermissions
     public function getName()
     {
         return 'lead';
+    }
+
+    /**
+     * Overriden to include export for leads.
+     *
+     * @param array $permissionNames
+     * @param bool  $includePublish
+     */
+    protected function addExtendedPermissions($permissionNames, $includePublish = true)
+    {
+        if (!is_array($permissionNames)) {
+            $permissionNames = [$permissionNames];
+        }
+
+        if (in_array('leads', $permissionNames)) {
+            $this->permissions['leads'] = [
+                'viewown'     => 2,
+                'viewother'   => 4,
+                'editown'     => 8,
+                'editother'   => 16,
+                'create'      => 32,
+                'deleteown'   => 64,
+                'deleteother' => 128,
+                'full'        => 1024,
+                'export'      => 2048,
+            ];
+            if ($includePublish) {
+                $this->permissions['leads']['publishown']   = 256;
+                $this->permissions['leads']['publishother'] = 512;
+            }
+
+            $permissionNames = array_diff($permissionNames, ['leads']);
+        }
+
+        parent::addExtendedPermissions($permissionNames, $includePublish);
+    }
+
+    protected function addExtendedFormFields($bundle, $level, &$builder, $data, $includePublish = true)
+    {
+        if ('lead' === $bundle && 'leads' === $level) {
+            $builder->add('lead:leads', 'permissionlist', [
+                    'choices' => [
+                        'viewown'     => 'mautic.core.permissions.viewown',
+                        'viewother'   => 'mautic.core.permissions.viewother',
+                        'export'      => 'mautic.core.permissions.export',
+                        'editown'     => 'mautic.core.permissions.editown',
+                        'editother'   => 'mautic.core.permissions.editother',
+                        'create'      => 'mautic.core.permissions.create',
+                        'deleteown'   => 'mautic.core.permissions.deleteown',
+                        'deleteother' => 'mautic.core.permissions.deleteother',
+                        'full'        => 'mautic.core.permissions.full',
+                    ],
+                    'label'  => 'mautic.lead.permissions.leads',
+                    'data'   => (!empty($data['leads']) ? $data['leads'] : []),
+                    'bundle' => 'lead',
+                    'level'  => 'leads',
+                ]
+            );
+        }
     }
 
     /**
@@ -62,6 +123,7 @@ class LeadPermissions extends AbstractPermissions
         $builder->add('lead:lists', 'permissionlist', [
             'choices' => [
                 'viewother'   => 'mautic.core.permissions.viewother',
+                'export'      => 'mautic.core.permissions.export',
                 'editother'   => 'mautic.core.permissions.editother',
                 'deleteother' => 'mautic.core.permissions.deleteother',
                 'full'        => 'mautic.core.permissions.full',
@@ -100,6 +162,8 @@ class LeadPermissions extends AbstractPermissions
         ) {
             $permissions['leads'][] = 'viewown';
         }
+
+        //add logic for export checks
 
         return false;
     }
