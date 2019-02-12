@@ -203,7 +203,7 @@ class TimelineController extends CommonController
             return $this->accessDenied();
         }
 
-        $lead = $this->checkLeadAccess($leadId, 'view');
+        $lead = $this->checkLeadAccess($leadId, 'export');
         if ($lead instanceof Response) {
             return $lead;
         }

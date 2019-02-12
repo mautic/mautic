@@ -51,6 +51,7 @@ class LeadPermissions extends AbstractPermissions
     }
 
     /**
+     * {@inheritdoc}
      * Overriden to include export for leads.
      *
      * @param array $permissionNames
@@ -85,6 +86,16 @@ class LeadPermissions extends AbstractPermissions
         parent::addExtendedPermissions($permissionNames, $includePublish);
     }
 
+    /**
+     * {@inheritdoc}
+     * Overriden to include export.
+     *
+     * @param string               $bundle
+     * @param string               $level
+     * @param FormBuilderInterface $builder
+     * @param array                $data
+     * @param bool                 $includePublish
+     */
     protected function addExtendedFormFields($bundle, $level, &$builder, $data, $includePublish = true)
     {
         if ('lead' === $bundle && 'leads' === $level) {
@@ -106,6 +117,8 @@ class LeadPermissions extends AbstractPermissions
                     'level'  => 'leads',
                 ]
             );
+        } else {
+            parent::addExtendedFormFields($bundle, $level, $builder, $data, $includePublish);
         }
     }
 
