@@ -15,11 +15,13 @@ use Doctrine\ORM\ORMException;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ImportModelTest extends StandardImportTestHelper
 {
@@ -46,7 +48,15 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testProcess()
     {
-        $model  = $this->initImportModel();
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $event      = $this->createMock(ImportProcessEvent::class);
+
+        $dispatcher->expects($this->exactly(4))
+            ->method('dispatch')
+            ->willReturn($event);
+
+        $model = $this->initImportModel();
+        $model->setDispatcher($dispatcher);
         $entity = $this->initImportEntity();
         $entity->start();
         $model->process($entity, new Progress());
