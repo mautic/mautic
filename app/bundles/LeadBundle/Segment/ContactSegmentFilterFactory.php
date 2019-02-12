@@ -58,18 +58,22 @@ class ContactSegmentFilterFactory
 
         $filters = $leadList->getFilters();
         foreach ($filters as $filter) {
-            $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-
-            $decorator = $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate);
-
-            $filterQueryBuilder = $this->getQueryBuilderForFilter($decorator, $contactSegmentFilterCrate);
-
-            $contactSegmentFilter = new ContactSegmentFilter($contactSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder);
-
+            $contactSegmentFilter = $this->factorSegmentFilter($filter);
             $contactSegmentFilters->addContactSegmentFilter($contactSegmentFilter);
         }
 
         return $contactSegmentFilters;
+    }
+
+    public function factorSegmentFilter($filter): ContactSegmentFilter
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $decorator = $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate);
+
+        $filterQueryBuilder = $this->getQueryBuilderForFilter($decorator, $contactSegmentFilterCrate);
+
+        return new ContactSegmentFilter($contactSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder);
     }
 
     /**
