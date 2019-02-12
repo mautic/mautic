@@ -193,7 +193,7 @@ class ListType extends AbstractType
 
         $builder->add('isPublished', 'yesno_button_group');
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator);
+        $filterModalTransformer = new FieldFilterTransformer($this->translator, ['object'=>'lead']);
         $builder->add(
             $builder->create(
                 'filters',
