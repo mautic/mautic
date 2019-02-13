@@ -266,6 +266,8 @@ class PipedriveApi extends CrmApi
     }
 
     /**
+     * Create activity log on Pipedrive.
+     *
      * @param array $event
      *
      * @return array
