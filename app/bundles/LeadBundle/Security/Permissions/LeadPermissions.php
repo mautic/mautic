@@ -83,7 +83,9 @@ class LeadPermissions extends AbstractPermissions
             $permissionNames = array_diff($permissionNames, ['leads']);
         }
 
-        parent::addExtendedPermissions($permissionNames, $includePublish);
+        if (count($permissionNames)) {
+            parent::addExtendedPermissions($permissionNames, $includePublish);
+        }
     }
 
     /**
