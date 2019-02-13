@@ -58,13 +58,19 @@ class ContactSegmentFilterFactory
 
         $filters = $leadList->getFilters();
         foreach ($filters as $filter) {
-            $contactSegmentFilter = $this->factorSegmentFilter($filter);
-            $contactSegmentFilters->addContactSegmentFilter($contactSegmentFilter);
+            $contactSegmentFilters->addContactSegmentFilter($this->factorSegmentFilter($filter));
         }
 
         return $contactSegmentFilters;
     }
 
+    /**
+     * @param array $filter
+     *
+     * @return ContactSegmentFilter
+     *
+     * @throws \Exception
+     */
     public function factorSegmentFilter($filter): ContactSegmentFilter
     {
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
