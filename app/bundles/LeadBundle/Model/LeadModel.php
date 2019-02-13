@@ -1441,6 +1441,31 @@ class LeadModel extends FormModel
         }
         unset($fieldData['ip']);
 
+        // Handle UTM Tags
+        $utmFields = [
+            'utm_campaign',
+            'utm_source',
+            'utm_medium',
+            'utm_content',
+            'utm_term',
+            'user_agent',
+            'url',
+            'referer',
+            'query',
+            'remote_host',
+        ];
+        $utmParams = [];
+        foreach ($utmFields as $utmField) {
+            if (!empty($fields[$utmField]) && !empty($data[$fields[$utmField]])) {
+                $utmParams[$utmField] = $data[$fields[$utmField]];
+                unset($fieldData[$utmField]);
+            }
+        }
+
+        if (!empty($utmParams)) {
+            $this->addUTMTags($lead, $utmParams);
+        }
+
         if (!empty($fields['points']) && !empty($data[$fields['points']]) && $lead->getId() === null) {
             // Add points only for new leads
             $lead->setPoints($data[$fields['points']]);
