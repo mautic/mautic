@@ -69,7 +69,7 @@ class SecurityHelper extends Helper
     }
 
     /**
-     * Helper function to check if user is an Admin
+     * Helper function to check if user is an Admin.
      *
      * @return bool
      */
