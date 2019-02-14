@@ -71,7 +71,7 @@ class ContactSegmentFilterFactory
      *
      * @throws \Exception
      */
-    public function factorSegmentFilter($filter): ContactSegmentFilter
+    public function factorSegmentFilter($filter)
     {
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
