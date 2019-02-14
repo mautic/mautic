@@ -15,7 +15,6 @@ class ContactSegmentFilterCrate
 {
     const CONTACT_OBJECT = 'lead';
     const COMPANY_OBJECT = 'company';
-    const CUSTOM_OBJECT  = 'custom';
 
     /**
      * @var string|null
