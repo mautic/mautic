@@ -32,7 +32,7 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
      *
      * @return SegmentDictionaryGenerationEvent
      */
-    public function addTranslation(string $key, $attributes)
+    public function addTranslation(string $key, array $attributes)
     {
         $this->translations[$key] = $attributes;
 
