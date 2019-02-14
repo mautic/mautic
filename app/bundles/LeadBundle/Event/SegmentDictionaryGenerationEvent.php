@@ -22,7 +22,7 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
     /**
      * @param array<string,mixed[]> $translations
      */
-    public function __construct($translations = [])
+    public function __construct(array $translations = [])
     {
         $this->translations = $translations;
     }
