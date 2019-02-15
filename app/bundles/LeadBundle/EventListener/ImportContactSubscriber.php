@@ -130,7 +130,8 @@ class ImportContactSubscriber extends CommonSubscriber
                 $event->getEventLog(),
                 (int) $import->getId()
             );
-            $event->setWasMerged($merged);
+            $event->setWasMerged((bool) $merged);
+            $event->stopPropagation();
         }
     }
 }

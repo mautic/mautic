@@ -111,11 +111,13 @@ class ImportCompanySubscriber extends CommonSubscriber
     public function onImportProcess(ImportProcessEvent $event)
     {
         if ($event->importIsForObject('company')) {
-            $event->setWasMerged($this->companyModel->import(
+            $merged = $this->companyModel->import(
                 $event->getImport()->getMatchedFields(),
                 $event->getRowData(),
                 $event->getImport()->getDefault('owner')
-            ));
+            );
+            $event->setWasMerged((bool) $merged);
+            $event->stopPropagation();
         }
     }
 }
