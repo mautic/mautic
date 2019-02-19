@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -155,14 +156,23 @@ class ReportModel extends FormModel
             $options['action'] = $action;
         }
 
-        $options = array_merge($options, [
-            'read_only'  => false,
-            'table_list' => $this->getTableData(),
-        ]);
+        $options = array_merge(
+            $options,
+            [
+                'read_only'  => false,
+                'table_list' => $this->getTableData(),
+            ]
+        );
 
         // Fire the REPORT_ON_BUILD event off to get the table/column data
 
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
+        $reportGenerator = new ReportGenerator(
+            $this->dispatcher,
+            $this->em->getConnection(),
+            $entity,
+            $this->channelListHelper,
+            $formFactory
+        );
 
         return $reportGenerator->getForm($entity, $options);
     }
@@ -243,7 +253,13 @@ class ReportModel extends FormModel
                 //build them
                 $eventContext = ('all' == $context) ? '' : $context;
 
-                $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper);
+                $event = new ReportBuilderEvent(
+                    $this->translator,
+                    $this->channelListHelper,
+                    $eventContext,
+                    $this->fieldModel->getPublishedFieldArrays(),
+                    $this->reportHelper
+                );
                 $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
 
                 $tables = $event->getTables();
@@ -365,14 +381,15 @@ class ReportModel extends FormModel
      *
      * @param string $context
      *
-     * @return \stdClass [filterList => [], definitions => [], operatorChoices =>  [], operatorHtml => [], filterListHtml => '']
+     * @return \stdClass [filterList => [], definitions => [], operatorChoices =>  [], operatorHtml => [],
+     *                   filterListHtml => '']
      */
     public function getFilterList($context = 'all')
     {
         $tableData = $this->getTableData($context);
 
-        $return  = new \stdClass();
-        $filters = (isset($tableData['filters'])) ? $tableData['filters']
+        $return                  = new \stdClass();
+        $filters                 = (isset($tableData['filters'])) ? $tableData['filters']
             : (isset($tableData['columns']) ? $tableData['columns'] : []);
         $return->choices         = [];
         $return->choiceHtml      = '';
@@ -412,7 +429,9 @@ class ReportModel extends FormModel
 
         // First sort
         foreach ($graphData as $key => $details) {
-            $return->choices[$key] = $this->translator->trans($key).' ('.$this->translator->trans('mautic.report.graph.'.$details['type']).')';
+            $return->choices[$key] = $this->translator->trans($key).' ('.$this->translator->trans(
+                    'mautic.report.graph.'.$details['type']
+                ).')';
         }
         natsort($return->choices);
 
@@ -545,22 +564,30 @@ class ReportModel extends FormModel
 
         $paginate        = !empty($options['paginate']);
         $reportPage      = isset($options['reportPage']) ? $options['reportPage'] : 1;
-        $data            = $graphs            = [];
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
+        $data            = $graphs = [];
+        $reportGenerator = new ReportGenerator(
+            $this->dispatcher,
+            $this->getConnection(),
+            $entity,
+            $this->channelListHelper,
+            $formFactory
+        );
 
         $selectedColumns = $entity->getColumns();
-        $totalResults    = $limit    = 0;
+        $totalResults    = $limit = 0;
 
         // Prepare the query builder
-        $tableDetails = $this->getTableData($entity->getSource());
-
+        $tableDetails      = $this->getTableData($entity->getSource());
+        $dataColumns       = $dataAggregatorColumns = [];
         $aggregatorColumns = ($aggregators = $entity->getAggregators()) ? $aggregators : [];
 
         foreach ($aggregatorColumns as $aggregatorColumn) {
             $selectedColumns[] = $aggregatorColumn['column'];
+            // add aggregator columns to dataColumns also
+            $dataColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']]           = $aggregatorColumn['column'];
+            $dataAggregatorColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']] = $aggregatorColumn['column'];
         }
         // Build a reference for column to data column (without table prefix)
-        $dataColumns = [];
         foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
@@ -658,7 +685,6 @@ class ReportModel extends FormModel
                         ->setMaxResults($limit);
                 }
             }
-
             $queryTime = microtime(true);
             $data      = $query->execute()->fetchAll();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
@@ -699,17 +725,18 @@ class ReportModel extends FormModel
         }
 
         return [
-            'totalResults'    => $totalResults,
-            'data'            => $data,
-            'dataColumns'     => $dataColumns,
-            'graphs'          => $graphs,
-            'contentTemplate' => $contentTemplate,
-            'columns'         => $tableDetails['columns'],
-            'limit'           => ($paginate) ? $limit : 0,
-            'page'            => ($paginate) ? $reportPage : 1,
-            'dateFrom'        => $dataOptions['dateFrom'],
-            'dateTo'          => $dataOptions['dateTo'],
-            'debug'           => $debugData,
+            'totalResults'      => $totalResults,
+            'data'              => $data,
+            'dataColumns'       => $dataColumns,
+            'graphs'            => $graphs,
+            'contentTemplate'   => $contentTemplate,
+            'columns'           => $tableDetails['columns'],
+            'limit'             => ($paginate) ? $limit : 0,
+            'page'              => ($paginate) ? $reportPage : 1,
+            'dateFrom'          => $dataOptions['dateFrom'],
+            'dateTo'            => $dataOptions['dateTo'],
+            'debug'             => $debugData,
+            'aggregatorColumns' => $dataAggregatorColumns,
         ];
     }
 
@@ -718,7 +745,8 @@ class ReportModel extends FormModel
      */
     public function getReportsWithGraphs()
     {
-        $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
+        $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId(
+        );
 
         return $this->getRepository()->findReportsWithGraphs($ownedBy);
     }
@@ -771,5 +799,17 @@ class ReportModel extends FormModel
         }
 
         return (int) $countQb->execute()->fetchColumn();
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
+    private function getConnection()
+    {
+        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
+            $this->em->getConnection()->connect('slave');
+        }
+
+        return $this->em->getConnection();
     }
 }
