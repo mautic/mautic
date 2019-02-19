@@ -113,7 +113,7 @@ class CompanyImport extends AbstractImport
 
         $mappedData = $this->getMappedCompanyData($data);
 
-        $this->companyModel->setFieldValues($company, $mappedData, true);
+        $this->companyModel->setFieldValues($company, $mappedData);
         $this->companyModel->saveEntity($company);
 
         $integrationEntity->setLastSyncDate(new \DateTime());
