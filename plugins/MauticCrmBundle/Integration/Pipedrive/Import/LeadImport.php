@@ -118,7 +118,7 @@ class LeadImport extends AbstractImport
         } //Do not push lead if contact was modified in Mautic, and we don't wanna mofify it
 
         $lead->setDateModified(new \DateTime());
-        $this->leadModel->setFieldValues($lead, $dataToUpdate);
+        $this->leadModel->setFieldValues($lead, $dataToUpdate, true);
 
         if (!isset($data['owner_id']) && $lead->getOwner()) {
             $lead->setOwner(null);
