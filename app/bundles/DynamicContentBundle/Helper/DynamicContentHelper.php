@@ -131,7 +131,7 @@ class DynamicContentHelper
         //  We attempt even listeners first
         if ($this->dispatcher->hasListeners(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)) {
             /** @var Lead $contact */
-            $contact = $this->leadModel->getRepository()->find($contactArray['id']);
+            $contact = $this->leadModel->getEntity($contactArray['id']);
 
             $event = new ContactFiltersEvaluateEvent($filters, $contact);
             $this->dispatcher->dispatch(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE, $event);
