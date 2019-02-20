@@ -15,8 +15,8 @@ use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\EmailBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
@@ -90,6 +90,8 @@ class DynamicContentHelper
      * @param Lead|array $lead
      *
      * @return string
+     *
+     * @throws \Exception
      */
     public function getDynamicContentSlotForLead($slotName, $lead)
     {
@@ -112,13 +114,23 @@ class DynamicContentHelper
         return '';
     }
 
+    /**
+     * @param array $filters
+     * @param array $contactArray
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
     private function filtersMatchContact(array $filters, array $contactArray): bool
     {
         if (empty($contactArray['id'])) {
             return false;
         }
 
+        //  We attempt even listeners first
         if ($this->dispatcher->hasListeners(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)) {
+            /** @var Lead $contact */
             $contact = $this->leadModel->getRepository()->find($contactArray['id']);
 
             $event = new ContactFiltersEvaluateEvent($filters, $contact);
@@ -127,7 +139,7 @@ class DynamicContentHelper
                 return true;
             }
         }
-        //  We attempt even listeners first
+
         return $this->matchFilterForLead($filters, $contactArray);
     }
 

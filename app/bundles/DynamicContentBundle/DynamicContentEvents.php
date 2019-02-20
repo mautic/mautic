@@ -129,10 +129,10 @@ final class DynamicContentEvents
 
     /**
      * The mautic.dwc.on_contact_filters_evaluate event is fired when dynamic content's decision's
-     * filters need to be avaluated.
+     * filters need to be evaluated.
      *
      * The event listener receives a
-     * Mautic\EmailBundle\Event\ContactFiltersEvaluateEvent
+     * Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent
      *
      * @var string
      */
