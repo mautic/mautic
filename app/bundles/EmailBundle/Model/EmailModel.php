@@ -1837,7 +1837,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         array_walk($numbers, function (&$number) use ($total) {
             $number = round(($number / $total) * 100, 1);
         });
-        $chart->setDataset($this->translator->trans('mautic.widget.emails.best.hours.reads_ratio'), $numbers);
+        $chart->setDataset($this->translator->trans('mautic.widget.emails.best.hours.reads_total', ['%reads%'=>$total]), $numbers);
 
         return $chart->render();
     }
