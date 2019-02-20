@@ -1799,6 +1799,38 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array     $filter
+     * @param bool      $canViewOthers
+     *
+     * @return array
+     */
+    public function getBestHours(\DateTime $dateFrom, \DateTime $dateTo, array $filter = [], $canViewOthers = true
+    ) {
+        $companyId  = ArrayHelper::pickValue('companyId', $filter);
+        $campaignId = ArrayHelper::pickValue('campaignId', $filter);
+        $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
+
+        $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $q          = $query->prepareTimeDataQuery('email_stats', 'date_read', $filter);
+        $q->select('CONCAT(HOUR(t.date_read),\':xx\') as hour, COUNT(t.id) AS numberOfRead');
+        if (!$canViewOthers) {
+            $this->limitQueryToCreator($q);
+        }
+        $this->addCompanyFilter($q, $companyId);
+        $this->addCampaignFilter($q, $campaignId);
+        $this->addSegmentFilter($q, $segmentId);
+        $q->groupBy('hour');
+        $q->orderBy('numberOfRead', 'DESC');
+        $result    = $q->execute()->fetchAll();
+        $chart     = new BarChart(array_column($result, 'hour'));
+        $chart->setDataset($this->translator->trans('mautic.widget.emails.best.hours.number_of_read'), array_column($result, 'numberOfRead'));
+
+        return $chart->render();
+    }
+
+    /**
      * Get line chart data of emails sent and read.
      *
      * @param          $reason
