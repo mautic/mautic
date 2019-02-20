@@ -1807,15 +1807,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @return array
      */
-    public function getBestHours($column, \DateTime $dateFrom, \DateTime $dateTo, array $filter = [], $canViewOthers = true
+    public function getBestHours($column, \DateTime $dateFrom, \DateTime $dateTo, array $filter = [], $canViewOthers = true, $timeFormat = 24
     ) {
         $companyId  = ArrayHelper::pickValue('companyId', $filter);
         $campaignId = ArrayHelper::pickValue('campaignId', $filter);
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
 
+        $format = '%H:00';
+        if ($timeFormat == 12) {
+            $format = '%h %p';
+        }
+
         $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q          = $query->prepareTimeDataQuery('email_stats', $column, $filter);
-        $q->select('CONCAT(HOUR(t.'.$column.'),\':00-\',HOUR(t.'.$column.' + INTERVAL 1 HOUR),\':00\') as hour, COUNT(t.id) AS number');
+        $q->select('CONCAT(TIME_FORMAT(t.'.$column.', \''.$format.'\'),\'-\',TIME_FORMAT(t.'.$column.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS number');
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);
         }

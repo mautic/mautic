@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\TimeFormatType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -16,6 +17,11 @@ class DashboardBestHourdsWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add(
+            'timeFormat',
+            TimeFormatType::class
+        );
+
         $builder->add(
             'companyId',
             'company_list',

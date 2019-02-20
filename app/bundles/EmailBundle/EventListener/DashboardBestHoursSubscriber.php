@@ -86,7 +86,8 @@ class DashboardBestHoursSubscriber extends MainDashboardSubscriber
                         $params['dateFrom'],
                         $params['dateTo'],
                         ArrayHelper::select($filterKeys, $params),
-                        $canViewOthers
+                        $canViewOthers,
+                        $params['timeFormat']
                     ),
                 ]);
             }
