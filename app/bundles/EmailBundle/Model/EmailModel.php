@@ -1820,23 +1820,29 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q          = $query->prepareTimeDataQuery('email_stats', $column, $filter);
-        $q->select('CONCAT(TIME_FORMAT(t.'.$column.', \''.$format.'\'),\'-\',TIME_FORMAT(t.'.$column.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS number');
+        $q->select('CONCAT(TIME_FORMAT(t.'.$column.', \''.$format.'\'),\'-\',TIME_FORMAT(t.'.$column.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS number')
+        ->groupBy('hour')
+        ->orderBy('number', 'DESC')
+        ->setMaxResults(24);
+
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);
         }
+
         $this->addCompanyFilter($q, $companyId);
         $this->addCampaignFilter($q, $campaignId);
         $this->addSegmentFilter($q, $segmentId);
-        $q->groupBy('hour');
-        $q->orderBy('number', 'DESC');
+
         $result    = $q->execute()->fetchAll();
 
         $chart     = new BarChart(array_column($result, 'hour'));
         $numbers   = array_column($result, 'number');
         $total     =  array_sum($numbers);
+
         array_walk($numbers, function (&$number) use ($total) {
             $number = round(($number / $total) * 100, 1);
         });
+
         $chart->setDataset($this->translator->trans('mautic.widget.emails.best.hours.reads_total', ['%reads%'=>$total]), $numbers);
 
         return $chart->render();
