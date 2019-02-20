@@ -122,7 +122,7 @@ class DynamicContentHelper
      *
      * @throws \Exception
      */
-    private function filtersMatchContact(array $filters, array $contactArray): bool
+    private function filtersMatchContact(array $filters, array $contactArray)
     {
         if (empty($contactArray['id'])) {
             return false;
