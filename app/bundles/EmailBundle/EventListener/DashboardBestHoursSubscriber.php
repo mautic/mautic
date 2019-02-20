@@ -82,6 +82,7 @@ class DashboardBestHoursSubscriber extends MainDashboardSubscriber
                     'chartType'   => 'bar',
                     'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $this->emailModel->getBestHours(
+                        'date_read',
                         $params['dateFrom'],
                         $params['dateTo'],
                         ArrayHelper::select($filterKeys, $params),

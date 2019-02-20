@@ -1799,6 +1799,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param string    $column
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param array     $filter
@@ -1806,15 +1807,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @return array
      */
-    public function getBestHours(\DateTime $dateFrom, \DateTime $dateTo, array $filter = [], $canViewOthers = true
+    public function getBestHours($column, \DateTime $dateFrom, \DateTime $dateTo, array $filter = [], $canViewOthers = true
     ) {
         $companyId  = ArrayHelper::pickValue('companyId', $filter);
         $campaignId = ArrayHelper::pickValue('campaignId', $filter);
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
 
         $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $q          = $query->prepareTimeDataQuery('email_stats', 'date_read', $filter);
-        $q->select('CONCAT(HOUR(t.date_read),\':xx\') as hour, COUNT(t.id) AS numberOfRead');
+        $q          = $query->prepareTimeDataQuery('email_stats', $column, $filter);
+        $q->select('CONCAT(HOUR(t.'.$column.'),\':00-\',HOUR(t.'.$column.' + INTERVAL 1 HOUR),\':00\') as hour, COUNT(t.id) AS number');
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);
         }
@@ -1822,10 +1823,16 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->addCampaignFilter($q, $campaignId);
         $this->addSegmentFilter($q, $segmentId);
         $q->groupBy('hour');
-        $q->orderBy('numberOfRead', 'DESC');
+        $q->orderBy('number', 'DESC');
         $result    = $q->execute()->fetchAll();
+
         $chart     = new BarChart(array_column($result, 'hour'));
-        $chart->setDataset($this->translator->trans('mautic.widget.emails.best.hours.number_of_read'), array_column($result, 'numberOfRead'));
+        $numbers   = array_column($result, 'number');
+        $total     =  array_sum($numbers);
+        array_walk($numbers, function (&$number) use ($total) {
+            $number = round(($number / $total) * 100, 1);
+        });
+        $chart->setDataset($this->translator->trans('mautic.widget.emails.best.hours.reads_ratio'), $numbers);
 
         return $chart->render();
     }
