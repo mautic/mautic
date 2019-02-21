@@ -11,13 +11,13 @@
 
 namespace Mautic\CoreBundle\Tests\Security\Permissions;
 
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Symfony\Component\Translation\TranslatorInterface;
 use Mautic\ApiBundle\Security\Permissions\ApiPermissions;
-use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
-use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use Mautic\AssetBundle\Security\Permissions\AssetPermissions;
+use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CorePermissionsTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,7 +53,7 @@ class CorePermissionsTest extends \PHPUnit_Framework_TestCase
         $this->corePermissions->setPermissionObject($assetPermissions);
         $permissionObjects = $this->corePermissions->getPermissionObjects();
 
-        // Even though the AssetPermissions object was set upfront there are 
+        // Even though the AssetPermissions object was set upfront there are
         // still 4 objects available.
         // The other three were instantiated to keep BC.
         $this->assertCount(4, $permissionObjects);
@@ -66,7 +66,7 @@ class CorePermissionsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $permissionClass
-     * 
+     *
      * @return array
      */
     private function mockBundleArray($permissionClass)

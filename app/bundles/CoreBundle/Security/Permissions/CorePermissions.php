@@ -115,7 +115,7 @@ class CorePermissions
     /**
      * Returns the permission class object and sets it to global array.
      *
-     * @param string $bundle can be either short bundle name or full path to the permissions class
+     * @param string $bundle         can be either short bundle name or full path to the permissions class
      * @param bool   $throwException
      *
      * @return AbstractPermissions
@@ -127,7 +127,7 @@ class CorePermissions
         if (empty($bundle)) {
             throw new \InvalidArgumentException("Bundle and permission type must be specified. {$bundle} given.");
         }
-        
+
         $bundle = ltrim($bundle, '\\');
 
         try {
