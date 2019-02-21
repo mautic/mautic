@@ -60,7 +60,6 @@ class CorePermissionsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($assetPermissions, $this->corePermissions->getPermissionObject('asset'));
         $this->assertSame($assetPermissions, $this->corePermissions->getPermissionObject(AssetPermissions::class));
-        $this->assertSame($assetPermissions, $this->corePermissions->getPermissionObject('\Mautic\AssetBundle\Security\Permissions\AssetPermissions'));
         $this->assertSame($permissionObjects['campaign'], $this->corePermissions->getPermissionObject(CampaignPermissions::class));
     }
 
