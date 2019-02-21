@@ -22,9 +22,8 @@ class AssetPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function __construct($params)
+    public function definePermissions()
     {
-        parent::__construct($params);
         $this->addExtendedPermissions('assets');
         $this->addStandardPermissions('categories');
     }
