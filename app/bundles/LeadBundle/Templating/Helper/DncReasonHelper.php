@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Templating\Helper;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -39,6 +40,8 @@ class DncReasonHelper extends Helper
      * @param int $reasonId
      *
      * @return string
+     *
+     * @throws UnknownDncReasonException
      */
     public function toText($reasonId)
     {
@@ -56,7 +59,7 @@ class DncReasonHelper extends Helper
                 $reasonKey = 'mautic.lead.event.donotcontact_manual';
                 break;
             default:
-                throw new \InvalidArgumentException(
+                throw new UnknownDncReasonException(
                     sprintf("Unknown DNC reason ID '%c'", $reasonId)
                 );
         }
