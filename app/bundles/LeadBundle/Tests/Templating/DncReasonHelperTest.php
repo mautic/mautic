@@ -18,15 +18,17 @@ use Symfony\Component\Translation\TranslatorInterface;
 class DncReasonHelperTest extends \PHPUnit_Framework_TestCase
 {
     private $reasonTo = [
-        DoNotContact::UNSUBSCRIBED => 'mautic.lead.event.donotcontact_unsubscribed',
-        DoNotContact::BOUNCED      => 'mautic.lead.event.donotcontact_bounced',
-        DoNotContact::MANUAL       => 'mautic.lead.event.donotcontact_manual',
+        DoNotContact::IS_CONTACTABLE => 'mautic.lead.event.donotcontact_contactable',
+        DoNotContact::UNSUBSCRIBED   => 'mautic.lead.event.donotcontact_unsubscribed',
+        DoNotContact::BOUNCED        => 'mautic.lead.event.donotcontact_bounced',
+        DoNotContact::MANUAL         => 'mautic.lead.event.donotcontact_manual',
     ];
 
     private $translations = [
-        'mautic.lead.event.donotcontact_unsubscribed' => 'a',
-        'mautic.lead.event.donotcontact_bounced'      => 'b',
-        'mautic.lead.event.donotcontact_manual'       => 'c',
+        'mautic.lead.event.donotcontact_contactable'  => 'a',
+        'mautic.lead.event.donotcontact_unsubscribed' => 'b',
+        'mautic.lead.event.donotcontact_bounced'      => 'c',
+        'mautic.lead.event.donotcontact_manual'       => 'd',
     ];
 
     public function testToText()
@@ -48,7 +50,7 @@ class DncReasonHelperTest extends \PHPUnit_Framework_TestCase
         $translator      = $this->createMock(TranslatorInterface::class);
         $dncReasonHelper = new DncReasonHelper($translator);
         $this->expectException(\InvalidArgumentException::class);
-        $dncReasonHelper->toText('undefined_dnc_reason_id');
+        $dncReasonHelper->toText(999);
     }
 
     public function testGetName()

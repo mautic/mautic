@@ -43,6 +43,9 @@ class DncReasonHelper extends Helper
     public function toText($reasonId)
     {
         switch ($reasonId) {
+            case DoNotContact::IS_CONTACTABLE:
+                $reasonKey = 'mautic.lead.event.donotcontact_contactable';
+                break;
             case DoNotContact::UNSUBSCRIBED:
                 $reasonKey = 'mautic.lead.event.donotcontact_unsubscribed';
                 break;
