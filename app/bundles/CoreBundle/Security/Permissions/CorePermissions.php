@@ -72,6 +72,11 @@ class CorePermissions
      */
     private $checkedPermissions = [];
 
+    /**
+     * @var bool
+     */
+    private $permissionObjectsGenerated = false;
+
     public function __construct(
         UserHelper $userHelper,
         TranslatorInterface $translator,
@@ -102,12 +107,18 @@ class CorePermissions
      */
     public function getPermissionObjects()
     {
+        if ($this->permissionObjectsGenerated) {
+            return $this->permissionObjectsByName;
+        }
+
         foreach ($this->getPermissionClasses() as $class) {
             try {
                 $this->getPermissionObject($class);
             } catch (\InvalidArgumentException $e) {
             }
         }
+
+        $this->permissionObjectsGenerated = true;
 
         return $this->permissionObjectsByName;
     }
@@ -242,6 +253,9 @@ class CorePermissions
      */
     public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
     {
+        // Initialize all permission classes if
+        $this->getPermissionObjects();
+
         if (null === $userEntity) {
             $userEntity = $this->userHelper->getUser();
         }
