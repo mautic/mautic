@@ -474,7 +474,7 @@ class ImportController extends FormController
                 'progress'         => $progress,
                 'import'           => $import,
                 'complete'         => $complete,
-                'failedRows'       => $importModel->getFailedRows($import->getId()),
+                'failedRows'       => $importModel->getFailedRows($import->getId(), $import->getObject()),
                 'objectName'       => $initEvent->getObjectName(),
                 'indexRoute'       => $initEvent->getIndexRoute(),
                 'indexRouteParams' => $initEvent->getIndexRouteParams(),
@@ -659,7 +659,7 @@ class ImportController extends FormController
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'failedRows'        => $model->getFailedRows($entity->getId()),
+                        'failedRows'        => $model->getFailedRows($entity->getId(), $entity->getObject()),
                         'importedRowsChart' => $entity->getDateStarted() ? $model->getImportedRowsLineChartData(
                             'i',
                             $entity->getDateStarted(),
