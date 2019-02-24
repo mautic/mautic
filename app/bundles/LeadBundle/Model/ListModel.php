@@ -1709,9 +1709,29 @@ class ListModel extends FormModel
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $contacts = $query->fetchTimeData('lead_lists_leads', 'date_added', $filter);
-        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts'), $contacts);
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $contacts);
+        $this->sedDatasetFromEventLog($query, $chart, $filter['leadlist_id']['value'], 'removed');
 
         return $chart->render();
+    }
+
+    /**
+     * @param ChartQuery $query
+     * @param LineChart  $chart
+     * @param int        $segmentId
+     * @param string     $action
+     */
+    private function sedDatasetFromEventLog($query, $chart, $segmentId, $action)
+    {
+        $filter              = [];
+        $filter['object']    = 'segment';
+        $filter['bundle']    = 'lead';
+        $filter['action']    = $action;
+        $filter['object_id'] = $segmentId;
+
+        $q = $query->prepareTimeDataQuery('lead_event_log', 'date_added', $filter);
+        $q->select('DATE_FORMAT(t.date_added, \'%Y-%m\') AS date, COUNT(DISTINCT t.lead_id) as count');
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.'.$action), $query->loadAndBuildTimeData($q));
     }
 
     /**
