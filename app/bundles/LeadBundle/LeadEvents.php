@@ -592,4 +592,22 @@ final class LeadEvents
      * @var string
      */
     const ADD_CHANNEL = 'mautic.bc_add_channel';
+
+    /**
+     * The mautic.dnc_get_entities event allows plugins to add to the DNC entities list.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\LeadDNCGetEntitiesEvent instance
+     *
+     * @var string
+     */
+    const GET_DNC_ENTITIES = 'mautic.dnc_get_entities';
+
+    /**
+     * The mautic.dnc_get_list event allows plugins to add to the DNC array list.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\LeadDNCGetListEvent instance
+     *
+     * @var string
+     */
+    const GET_DNC_LIST = 'mautic.dnc_get_list';
 }
