@@ -12,8 +12,10 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -749,9 +751,30 @@ class ListController extends FormController
                             'list_column_name' => 't.lead_id', ], 't.leadlist_id' => $objectId]
         );
 
+        /** @var CampaignModel $campaignModel */
+        $campaignModel = $this->getModel('campaign.campaign');
+        /** @var EmailModel $emailModel */
+        $emailModel              = $this->getModel('email.email');
+        $usageStats              = [];
+        $usageStats['campaigns'] = count($campaignModel->getRepository()->getPublishedCampaignsByLeadLists($objectId));
+        $usageStats['emails']    = count($emailModel->getRepository()->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'l.id',
+                            'expr'   => 'eq',
+                            'value'  => $objectId,
+                        ],
+                    ],
+                ],
+            ]
+        ));
+
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
+                'usageStats'  => $usageStats,
                 'list'        => $list,
                 'permissions' => $security->isGranted([
                     'lead:leads:editown',

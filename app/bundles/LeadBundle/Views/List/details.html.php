@@ -170,6 +170,7 @@ $view['slots']->set(
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- activity feed -->
+        <?php print_r($usageStats); ?>
         <?php // echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]);?>
     </div>
     <!--/ right section -->
