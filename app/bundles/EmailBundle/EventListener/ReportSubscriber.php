@@ -324,10 +324,10 @@ class ReportSubscriber implements EventSubscriberInterface
                     ->where(sprintf('%1$s BETWEEN :dateFrom AND :dateTo', 'donot.date_added'))
                     ->andWhere('donot.channel=\'email\'')
                     ->groupBy('donot.channel_id');
-                $qb->innerJoin('e', sprintf('(%s)', $subQuery->getSQL()), 'dnc', 'e.id = dnc.channel_id');
+                $qb->leftJoin('e', sprintf('(%s)', $subQuery->getSQL()), 'dnc', 'e.id = dnc.channel_id');
 
-                $event->setColumnFormula('unsubscribed', 'dnc.unsubscribed');
-                $event->setColumnFormula('bounced', 'dnc.bounced');
+                $event->setColumnFormula('unsubscribed', 'IFNULL(dnc.unsubscribed, 0)');
+                $event->setColumnFormula('bounced', 'IFNULL(dnc.bounced, 0)');
 
                 if ($event->getReport()->getSetting('hideDateRangeFilter')) {
                     if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
@@ -343,8 +343,8 @@ class ReportSubscriber implements EventSubscriberInterface
                     }
                 } else {
                     //If using date range filter, then use query with date range for results
-                    $event->setColumnFormula('unsubscribed_ratio', 'ROUND((dnc.unsubscribed/stats.sent_count)*100,2)');
-                    $event->setColumnFormula('bounced_ratio', 'ROUND((dnc.bounced/stats.sent_count)*100,2)');
+                    $event->setColumnFormula('unsubscribed_ratio', 'ROUND(IFNULL((dnc.unsubscribed/stats.sent_count)*100,0),2)');
+                    $event->setColumnFormula('bounced_ratio', 'ROUND(IFNULL((dnc.bounced/stats.sent_count)*100, 0),2)');
 
                     // email_stats with date range
                     if ($event->hasColumn($statsColumn) || $event->hasFilter($statsColumn)) {
@@ -373,11 +373,11 @@ class ReportSubscriber implements EventSubscriberInterface
                             ->where(sprintf('%1$s BETWEEN :dateFrom AND :dateTo', 'ph.date_hit'))
                             ->andWhere('ph.email_id IS NOT NULL')
                             ->groupBy('ph.email_id');
-                        $qb->innerJoin('e', sprintf('(%s)', $subQuery->getSQL()), 'hits', 'e.id = hits.email_id');
-                        $event->setColumnFormula('hits', 'hits.hits');
-                        $event->setColumnFormula('unique_hits', 'hits.unique_hits');
-                        $event->setColumnFormula('hits_ratio', 'ROUND((hits.hits/stats.sent_count)*100,1)');
-                        $event->setColumnFormula('unique_ratio', 'ROUND((hits.unique_hits/stats.sent_count)*100,1)');
+                        $qb->leftJoin('e', sprintf('(%s)', $subQuery->getSQL()), 'hits', 'e.id = hits.email_id');
+                        $event->setColumnFormula('hits', 'IFNULL(hits.hits, 0)');
+                        $event->setColumnFormula('unique_hits', 'IFNULL(hits.unique_hits, 0)');
+                        $event->setColumnFormula('hits_ratio', 'ROUND(IFNULL((hits.hits/stats.sent_count)*100, 0),1)');
+                        $event->setColumnFormula('unique_ratio', 'ROUND(IFNULL((hits.unique_hits/stats.sent_count)*100, 0),1)');
                     }
                 }
 
