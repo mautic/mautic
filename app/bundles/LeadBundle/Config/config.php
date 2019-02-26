@@ -828,6 +828,13 @@ return [
                     'mautic.lead.repository.company_lead',
                 ],
             ],
+            'mautic.lead.helper.segment.usage' => [
+                'class'     => \Mautic\LeadBundle\Helper\SegmentUsage::class,
+                'arguments' => [
+                    'mautic.email.model.email',
+                    'mautic.campaign.model.campaign',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [

@@ -78,6 +78,19 @@ $view['slots']->set(
                                 'MauticCoreBundle:Helper:details.html.php',
                                 ['entity' => $list]
                             ); ?>
+                            <?php foreach ($usageStats as $stat) : ?>
+                                <tr>
+                                    <td width="20%">
+                                        <span class="fw-b"><?php echo $view['translator']->trans($stat['label']); ?></span>
+                                    </td>
+                                    <td>
+                                        <span class="mt-xs label label-primary has-click-event clickable-stat"><a href="<?php echo $view['router']->path(
+                                                $stat['route'],
+                                                ['search' => $view['translator']->trans('mautic.core.searchcommand.ids').':'.implode(',', $stat['ids'])]
+                                            ); ?>">  <?php echo count($stat['ids']); ?></a></span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
@@ -170,7 +183,6 @@ $view['slots']->set(
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- activity feed -->
-        <?php print_r($usageStats); ?>
         <?php // echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]);?>
     </div>
     <!--/ right section -->

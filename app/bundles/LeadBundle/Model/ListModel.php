@@ -1730,7 +1730,7 @@ class ListModel extends FormModel
         $filter['object_id'] = $segmentId;
 
         $q = $query->prepareTimeDataQuery('lead_event_log', 'date_added', $filter);
-        $q->select('DATE_FORMAT(t.date_added, \'%Y-%m\') AS date, COUNT(DISTINCT t.lead_id) as count');
+        $q->select('DATE_FORMAT(t.date_added, \'%Y %m\') AS date, COUNT(DISTINCT t.lead_id) as count');
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.'.$action), $query->loadAndBuildTimeData($q));
     }
 
