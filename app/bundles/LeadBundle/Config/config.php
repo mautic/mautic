@@ -831,8 +831,12 @@ return [
             'mautic.lead.helper.segment.usage' => [
                 'class'     => \Mautic\LeadBundle\Helper\SegmentUsage::class,
                 'arguments' => [
+                    '@doctrine.orm.entity_manager',
                     'mautic.email.model.email',
                     'mautic.campaign.model.campaign',
+                    'mautic.form.model.action',
+                    'mautic.lead.model.list',
+                    'mautic.point.model.triggerevent',
                 ],
             ],
         ],
