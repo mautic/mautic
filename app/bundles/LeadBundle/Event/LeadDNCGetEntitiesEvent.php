@@ -11,13 +11,17 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\LeadBundle\Entity\LeadNote;
 
 /**
- * Class LeadDNCGetEntities.
+ * Class LeadDNCGetEntitiesEvent.
  */
 class LeadDNCGetEntitiesEvent extends CommonEvent
 {
+    /**
+     * @var array
+     */
+    protected $dncEntities;
+
     /**
      * @param array $dncEntities
      */
@@ -27,9 +31,9 @@ class LeadDNCGetEntitiesEvent extends CommonEvent
     }
 
     /**
-     * Returns the LeadNote entity.
+     * Returns the array of DoNotContact entities.
      *
-     * @return LeadNote
+     * @return array
      */
     public function getDNCEntities()
     {
@@ -37,9 +41,9 @@ class LeadDNCGetEntitiesEvent extends CommonEvent
     }
 
     /**
-     * Sets the LeadNote entity.
+     * Sets the  array of DoNotContact entities.
      *
-     * @param LeadNote $note
+     * @param array $dncEntities
      */
     public function setDNCEntities(array $dncEntities)
     {

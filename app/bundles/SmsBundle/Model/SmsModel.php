@@ -224,6 +224,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
         /** @var DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        $dncRepo->setDispatcher($this->dispatcher);
         $dnc     = $dncRepo->getChannelList('sms', $contactIds);
 
         if (!empty($dnc)) {

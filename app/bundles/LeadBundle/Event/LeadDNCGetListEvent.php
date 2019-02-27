@@ -11,25 +11,45 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\LeadBundle\Entity\LeadNote;
 
 /**
- * Class LeadDNCGetList.
+ * Class LeadDNCGetListEvent.
  */
 class LeadDNCGetListEvent extends CommonEvent
 {
     /**
-     * @param array $dncList
+     *  @var array
      */
-    public function __construct(array $dncList)
+    protected $dncList;
+
+    /**
+     * @var null | string
+     */
+    protected $channel;
+
+    /**
+     * @var null | mixed
+     */
+    protected $contacts;
+
+    /**
+     * LeadDNCGetListEvent constructor.
+     *
+     * @param array $dncList
+     * @param null  $channel
+     * @param null  $contacts
+     */
+    public function __construct(array $dncList, $channel = null, $contacts = null)
     {
-        $this->dncList = $dncList;
+        $this->dncList  = $dncList;
+        $this->channel  = $channel;
+        $this->contatcs = $contacts;
     }
 
     /**
-     * Returns the LeadNote entity.
+     * Returns the array of dnc entries.
      *
-     * @return LeadNote
+     * @return array
      */
     public function getDNCList()
     {
@@ -37,12 +57,28 @@ class LeadDNCGetListEvent extends CommonEvent
     }
 
     /**
-     * Sets the LeadNote entity.
+     * Sets the array of dncList entries.
      *
-     * @param LeadNote $note
+     * @param arraye $dncList
      */
-    public function setDNCEntities(array $dncList)
+    public function setDNCList(array $dncList)
     {
         $this->dncList = $dncList;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChannel()
+    {
+        return $this->channel;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContacts()
+    {
+        return $this->contacts;
     }
 }

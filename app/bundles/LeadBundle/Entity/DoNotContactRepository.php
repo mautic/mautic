@@ -13,6 +13,9 @@ namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Event\LeadDNCGetEntitiesEvent;
+use Mautic\LeadBundle\Event\LeadDNCGetListEvent;
+use Mautic\LeadBundle\LeadEvents;
 
 /**
  * DoNotContactRepository.
@@ -20,6 +23,8 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 class DoNotContactRepository extends CommonRepository
 {
     use TimelineTrait;
+
+    protected $dispatcher;
 
     /**
      * Get a list of DNC entries based on channel and lead_id.
@@ -31,7 +36,16 @@ class DoNotContactRepository extends CommonRepository
      */
     public function getEntriesByLeadAndChannel(Lead $lead, $channel)
     {
-        return $this->findBy(['channel' => $channel, 'lead' => $lead]);
+        $dncEntities = $this->findBy(['channel' => $channel, 'lead' => $lead]);
+
+        // Allow other bundles / plugins to add to the DNC list
+        $event = $this->dispatcher->dispatch(
+            LeadEvents::GET_DNC_ENTITIES,
+            new LeadDNCGetEntitiesEvent($dncEntities)
+        );
+        $dncEntities = $event->getDNCEntities();
+
+        return $dncEntities;
     }
 
     /**
@@ -115,10 +129,19 @@ class DoNotContactRepository extends CommonRepository
                 $byList[$result['leadlist_id']] = $result['dnc_count'];
             }
 
-            return $byList;
+            $dncCount =  $byList;
         }
 
-        return (isset($results[0])) ? $results[0]['dnc_count'] : 0;
+        $dncCount = (isset($results[0])) ? $results[0]['dnc_count'] : 0;
+
+        // Allow other bundles / plugins to add to the DNC count
+        $event = $this->dispatcher->dispatch(
+            LeadEvents::GET_DNC_COUNT,
+            new LeadDNCGetCounttEvent($dncCount, $channel, $ids, $reason, $listId, $combined)
+        );
+        $dncCount = $event->getDNCCount();
+
+        return $dncCount;
     }
 
     /**
@@ -190,6 +213,21 @@ class DoNotContactRepository extends CommonRepository
 
         unset($results);
 
+        // Allow other bundles / plugins to add to the DNC list
+        $event = $this->dispatcher->dispatch(
+            LeadEvents::GET_DNC_LIST,
+            new LeadDNCGetListEvent($dnc, $channel, $contacts)
+        );
+        $dnc = $event->getDNCList();
+
         return $dnc;
+    }
+
+    /**
+     * @param $dispatcher
+     */
+    public function setDispatcher($dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 }

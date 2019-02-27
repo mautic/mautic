@@ -11,11 +11,12 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
-class DoNotContact
+class DoNotContact extends AbstractCommonModel
 {
     /**
      * @var LeadModel
@@ -156,6 +157,7 @@ class DoNotContact
             $channel = key($channel);
         }
 
+        $this->dncRepo->setDispatcher($this->dispatcher);
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         $dncEntries = $this->dncRepo->getEntriesByLeadAndChannel($contact, $channel);
 
