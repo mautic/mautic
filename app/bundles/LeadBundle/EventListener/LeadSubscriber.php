@@ -526,6 +526,7 @@ class LeadSubscriber extends CommonSubscriber
     {
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        $dncRepo->setDispatcher($this->dispatcher);
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         $rows = $dncRepo->getTimelineStats($event->getLeadId(), $event->getQueryOptions());

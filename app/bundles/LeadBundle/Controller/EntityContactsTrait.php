@@ -23,11 +23,13 @@ trait EntityContactsTrait
      * @param        $page
      * @param        $permission
      * @param        $sessionVar
-     * @param        $entityJoinTable    Table to join to obtain list of related contacts or a DBAL QueryBuilder object defining custom joins
+     * @param        $entityJoinTable    Table to join to obtain list of related contacts or a DBAL QueryBuilder object
+     *                                   defining custom joins
      * @param null   $dncChannel         Channel for this entity to get do not contact records for
      * @param null   $entityIdColumnName If the entity ID in $joinTable is not "id", set the column name here
      * @param array  $contactFilter      Array of additional filters for the getEntityContactsWithFields() function
-     * @param array  $additionalJoins    [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
+     * @param array  $additionalJoins    [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition'
+     *                                   => ''], ... ]
      * @param string $contactColumnName  Column of the contact in the join table
      * @param string $paginationTarget   DOM seletor for injecting new content when pagination is used
      *
@@ -62,7 +64,10 @@ trait EntityContactsTrait
             $this->setListFilters($sessionVar.'.contact');
         }
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.'.$sessionVar.'.contact.filter', ''));
+        $search = $this->request->get(
+            'search',
+            $this->get('session')->get('mautic.'.$sessionVar.'.contact.filter', '')
+        );
         $this->get('session')->set('mautic.'.$sessionVar.'.contact.filter', $search);
 
         $filter     = ['string' => $search, 'force' => []];
@@ -104,7 +109,10 @@ trait EntityContactsTrait
             //the number of entities are now less then the current page so redirect to the last page
             $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->get('session')->set('mautic.'.$sessionVar.'.contact.page', $lastPage);
-            $returnUrl = $this->generateUrl($route, array_merge(['objectId' => $entityId, 'page' => $lastPage], $routeParameters));
+            $returnUrl = $this->generateUrl(
+                $route,
+                array_merge(['objectId' => $entityId, 'page' => $lastPage], $routeParameters)
+            );
 
             return $this->postActionRedirect(
                 [
@@ -121,7 +129,9 @@ trait EntityContactsTrait
         // Get DNC for the contact
         $dnc = [];
         if ($dncChannel) {
-            $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getChannelList(
+            $dncRepo = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact');
+            $dncRepo->setDispatcher($this->dispatcher);
+            $dnc = $dncRepo->getChannelList(
                 $dncChannel,
                 array_keys($contacts['results'])
             );
@@ -129,7 +139,7 @@ trait EntityContactsTrait
 
         return $this->delegateView(
             [
-                'viewParameters' => [
+                'viewParameters'  => [
                     'page'            => $page,
                     'items'           => $contacts['results'],
                     'totalItems'      => $contacts['count'],

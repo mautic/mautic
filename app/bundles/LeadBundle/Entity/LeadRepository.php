@@ -454,6 +454,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 /** @var DoNotContactRepository $dncRepository */
                 $dncRepository = $this->getEntityManager()->getRepository('MauticLeadBundle:DoNotContact');
+                $dncRepository->setDispatcher($this->dispatcher);
                 $dncRules      = $dncRepository->getChannelList(null, $contactIds);
             }
 

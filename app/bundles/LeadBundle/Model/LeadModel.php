@@ -2528,6 +2528,7 @@ class LeadModel extends FormModel
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        $dncRepo->setDispatcher($this->dispatcher);
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
