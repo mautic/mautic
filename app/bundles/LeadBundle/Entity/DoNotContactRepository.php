@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Event\LeadDNCGetCountEvent;
 use Mautic\LeadBundle\Event\LeadDNCGetEntitiesEvent;
 use Mautic\LeadBundle\Event\LeadDNCGetListEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -137,7 +138,7 @@ class DoNotContactRepository extends CommonRepository
         // Allow other bundles / plugins to add to the DNC count
         $event = $this->dispatcher->dispatch(
             LeadEvents::GET_DNC_COUNT,
-            new LeadDNCGetCounttEvent($dncCount, $channel, $ids, $reason, $listId, $combined)
+            new LeadDNCGetCountEvent($dncCount, $channel, $ids, $reason, $listId, $combined)
         );
         $dncCount = $event->getDNCCount();
 

@@ -48,5 +48,7 @@ class LeadDNCGetEntitiesEvent extends CommonEvent
     public function setDNCEntities(array $dncEntities)
     {
         $this->dncEntities = $dncEntities;
+
+        return $this;
     }
 }

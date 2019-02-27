@@ -43,7 +43,7 @@ class LeadDNCGetListEvent extends CommonEvent
     {
         $this->dncList  = $dncList;
         $this->channel  = $channel;
-        $this->contatcs = $contacts;
+        $this->contacts = $contacts;
     }
 
     /**
@@ -59,11 +59,13 @@ class LeadDNCGetListEvent extends CommonEvent
     /**
      * Sets the array of dncList entries.
      *
-     * @param arraye $dncList
+     * @param array $dncList
      */
     public function setDNCList(array $dncList)
     {
         $this->dncList = $dncList;
+
+        return $this;
     }
 
     /**
