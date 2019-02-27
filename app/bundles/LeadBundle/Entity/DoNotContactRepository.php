@@ -40,11 +40,13 @@ class DoNotContactRepository extends CommonRepository
         $dncEntities = $this->findBy(['channel' => $channel, 'lead' => $lead]);
 
         // Allow other bundles / plugins to add to the DNC list
-        $event = $this->dispatcher->dispatch(
-            LeadEvents::GET_DNC_ENTITIES,
-            new LeadDNCGetEntitiesEvent($dncEntities)
-        );
-        $dncEntities = $event->getDNCEntities();
+        if (!empty($this->dispatcher)) {
+            $event       = $this->dispatcher->dispatch(
+                LeadEvents::GET_DNC_ENTITIES,
+                new LeadDNCGetEntitiesEvent($dncEntities)
+            );
+            $dncEntities = $event->getDNCEntities();
+        }
 
         return $dncEntities;
     }
@@ -136,11 +138,13 @@ class DoNotContactRepository extends CommonRepository
         }
 
         // Allow other bundles / plugins to add to the DNC count
-        $event = $this->dispatcher->dispatch(
-            LeadEvents::GET_DNC_COUNT,
-            new LeadDNCGetCountEvent($dncCount, $channel, $ids, $reason, $listId, $combined)
-        );
-        $dncCount = $event->getDNCCount();
+        if (!empty($this->dispatcher)) {
+            $event    = $this->dispatcher->dispatch(
+                LeadEvents::GET_DNC_COUNT,
+                new LeadDNCGetCountEvent($dncCount, $channel, $ids, $reason, $listId, $combined)
+            );
+            $dncCount = $event->getDNCCount();
+        }
 
         return $dncCount;
     }
@@ -215,11 +219,13 @@ class DoNotContactRepository extends CommonRepository
         unset($results);
 
         // Allow other bundles / plugins to add to the DNC list
-        $event = $this->dispatcher->dispatch(
-            LeadEvents::GET_DNC_LIST,
-            new LeadDNCGetListEvent($dnc, $channel, $contacts)
-        );
-        $dnc = $event->getDNCList();
+        if (!empty($this->dispatcher)) {
+            $event = $this->dispatcher->dispatch(
+                LeadEvents::GET_DNC_LIST,
+                new LeadDNCGetListEvent($dnc, $channel, $contacts)
+            );
+            $dnc = $event->getDNCList();
+        }
 
         return $dnc;
     }
