@@ -130,9 +130,9 @@ class DoNotContactRepository extends CommonRepository
             }
 
             $dncCount =  $byList;
+        } else {
+            $dncCount = (isset($results[0])) ? $results[0]['dnc_count'] : 0;
         }
-
-        $dncCount = (isset($results[0])) ? $results[0]['dnc_count'] : 0;
 
         // Allow other bundles / plugins to add to the DNC count
         $event = $this->dispatcher->dispatch(
