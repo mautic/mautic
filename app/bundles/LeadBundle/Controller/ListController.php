@@ -752,9 +752,10 @@ class ListController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
-                'usageStats'  => $this->get('mautic.lead.helper.segment.usage')->getCounts($list->getId()),
-                'list'        => $list,
-                'permissions' => $security->isGranted([
+                'usageStats'     => $this->get('mautic.lead.helper.segment.usage')->getChannelsIds($list->getId()),
+                'campaignStats'  => $this->get('mautic.campaign.model.campaign')->getRepository()->getCampaignsSegmentShare($list->getId()),
+                'list'           => $list,
+                'permissions'    => $security->isGranted([
                     'lead:leads:editown',
                     'lead:lists:viewother',
                     'lead:lists:editother',

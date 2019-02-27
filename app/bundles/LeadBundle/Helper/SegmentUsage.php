@@ -82,7 +82,7 @@ class SegmentUsage
      *
      * @return array
      */
-    public function getCounts($segmentId)
+    public function getChannelsIds($segmentId)
     {
         $this->segmentId = $segmentId;
         $usage           = [];

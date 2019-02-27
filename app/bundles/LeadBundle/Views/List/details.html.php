@@ -153,6 +153,11 @@ $view['slots']->set(
                         <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
                     </a>
                 </li>
+                <li>
+                    <a href="#campaign-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.lead.campaign.share'); ?>
+                    </a>
+                </li>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -161,6 +166,37 @@ $view['slots']->set(
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0 page-list" id="contacts-container">
                 <?php echo $contacts; ?>
+            </div>
+            <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
+                <table class="table table-bordered table-striped mb-0">
+                    <thead>
+                    <tr>
+                        <th>
+                            <?php echo $view['translator']->trans('mautic.campaign.campaign'); ?>
+                        </th>
+                        <th>
+                            <?php echo $view['translator']->trans('mautic.lead.share'); ?>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($campaignStats as $stat) : ?>
+                        <tr>
+                            <td>
+                                <a href="<?php echo $view['router']->path(
+                                    'mautic_campaign_action',
+                                    ['objectAction' => 'view', 'objectId' => $stat['id']]
+                                ); ?>" data-toggle="ajax">
+                                    <?php echo $stat['name']; ?>
+                                </a>
+                            </td>
+                            <td width="20%">
+                                <?php echo $stat['share']; ?> %
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
         <!-- end: tab-content -->
@@ -172,7 +208,7 @@ $view['slots']->set(
         <table class="table table-bordered table-striped mb-0">
             <tbody>
             <tr>
-                <th colspan="2">
+                <th colspan="2" class="bg-primary">
                     <?php echo $view['translator']->trans('mautic.lead.segments.usages'); ?>
                 </th>
             </tr>
