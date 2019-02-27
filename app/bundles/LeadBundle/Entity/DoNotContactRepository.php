@@ -229,5 +229,7 @@ class DoNotContactRepository extends CommonRepository
     public function setDispatcher($dispatcher)
     {
         $this->dispatcher = $dispatcher;
+
+        return $this;
     }
 }
