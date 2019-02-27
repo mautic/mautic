@@ -239,7 +239,7 @@ class PipedriveApi extends CrmApi
      *
      * @return array
      */
-    public function addActivity($data)
+    public function addActivity(array $data)
     {
         $params     = $this->getRequestParameters($data);
         $url        = sprintf('%s/%s', $this->integration->getApiUrl(), self::ACTIVITIES);
