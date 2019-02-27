@@ -94,7 +94,7 @@ HTML;
     <head></head>
     <body>
         <h2>Hello there!</h2>
-        <a href="https://john.doe&amp;son">Link</a>
+        <a href="https://john.doe&son">Link</a>
     </body>
 </html>
 
