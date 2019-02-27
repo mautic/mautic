@@ -21,7 +21,7 @@ $loader = require_once __DIR__.'/vendor/autoload.php';
 umask(0000);
 
 if (in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1', '172.17.0.1'])) {
-    if (function_exists('apc_clear_cache') && ) {
+    if (function_exists('apc_clear_cache')) {
         @apc_clear_cache();
         @apc_clear_cache('user');
         @apc_clear_cache('opcode');
