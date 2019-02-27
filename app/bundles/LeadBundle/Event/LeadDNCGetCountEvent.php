@@ -50,7 +50,7 @@ class LeadDNCGetCountEvent extends CommonEvent
     /**
      * LeadDNCGetCountEvent constructor.
      *
-     * @param array $dncEntities
+     * @param array $dncCount
      * @param null  $channel
      * @param null  $ids
      * @param null  $reason
@@ -85,6 +85,8 @@ class LeadDNCGetCountEvent extends CommonEvent
     public function setDNCCount(int $dncCount)
     {
         $this->dncCount = $dncCount;
+
+        return $this;
     }
 
     /**

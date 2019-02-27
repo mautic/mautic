@@ -610,4 +610,13 @@ final class LeadEvents
      * @var string
      */
     const GET_DNC_LIST = 'mautic.dnc_get_list';
+
+    /**
+     * The mautic.dnc_get_count event allows plugins to add to the DNC array count.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\LeadDNCGetCountEvent instance
+     *
+     * @var string
+     */
+    const GET_DNC_COUNT = 'mautic.dnc_get_count';
 }
