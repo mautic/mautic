@@ -1843,20 +1843,21 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of emails sent and read.
      *
-     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
+     * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string|null $dateFormat
+     * @param bool        $canViewOthers
      *
      * @return array
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
     public function getEmailsLineChartData(
-        string $unit,
+        $unit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $dateFormat = null,
         array $filter = [],
-        bool $canViewOthers = true
+        $canViewOthers = true
     ) {
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setCanViewOthers($canViewOthers);
