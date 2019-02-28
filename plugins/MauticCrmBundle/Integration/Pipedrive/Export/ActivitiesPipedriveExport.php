@@ -84,7 +84,7 @@ class ActivitiesPipedriveExport extends AbstractPipedrive
 
             foreach ($events as $event) {
                 // Create activity before exists
-                if (!$this->getIntegration()->getApiHelper()->getActivityType($event)) {
+                if (!$this->getIntegration()->getApiHelper()->hasActivityType($event)) {
                     $this->getIntegration()->getApiHelper()->createActivityType($event);
                 }
                 $this->dateTimeHelper->setDateTime($event['timestamp']);

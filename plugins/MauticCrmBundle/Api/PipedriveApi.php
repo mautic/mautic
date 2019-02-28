@@ -251,15 +251,15 @@ class PipedriveApi extends CrmApi
     /**
      * @param array $event
      *
-     * @return array|mixed
+     * @return bool
      */
-    public function getActivityType(array $event)
+    public function hasActivityType(array $event)
     {
         $activityName = $event['eventType'];
         $activities   = $this->getActivityTypes();
         // return If already exists
         if (isset($activities[$activityName])) {
-            return $activities[$activityName];
+            return true;
         }
 
         return false;
