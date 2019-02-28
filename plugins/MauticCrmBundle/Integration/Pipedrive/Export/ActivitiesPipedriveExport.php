@@ -40,7 +40,7 @@ class ActivitiesPipedriveExport extends AbstractPipedrive
      * @param IntegrationEntity       $integrationEntity
      * @param \DateTimeInterface|null $lastActivitySync
      */
-    public function createActivities(IntegrationEntity $integrationEntity, $lastActivitySync = null)
+    public function createActivities(IntegrationEntity $integrationEntity, \DateTimeInterface $lastActivitySync = null)
     {
         $config         = $this->getIntegration()->mergeConfigToFeatureSettings();
         $activityEvents = isset($config['activityEvents']) ? $config['activityEvents'] : [];
