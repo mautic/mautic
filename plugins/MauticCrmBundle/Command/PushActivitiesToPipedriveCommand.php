@@ -76,7 +76,7 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
                 $internal         = $integrationEntity->getInternal();
                 $lastActivitySync = null;
                 if (isset($internal['last_activity_sync'])) {
-                    $lastActivitySync = (new \DateTime())->setTimestamp($internal['last_activity_sync']);
+                    $lastActivitySync = new \DateTimeImmutable($internal['last_activity_sync']);
                     // stop If last activity sync is over timeout
                     if ($lastActivitySync > $lastPossibleSync) {
                         continue;
