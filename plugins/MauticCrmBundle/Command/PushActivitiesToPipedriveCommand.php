@@ -43,7 +43,7 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
         $em                = $this->getContainer()->get('doctrine')->getManager();
 
         if (!$integrationObject->getIntegrationSettings()->getIsPublished()) {
-            $output->writeln('Pipedrive integration id disabled.');
+            $output->writeln('Pipedrive integration is disabled.');
 
             return;
         }

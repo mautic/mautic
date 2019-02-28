@@ -51,7 +51,7 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
         $pushed = 0;
 
         if (!$integrationObject->getIntegrationSettings()->getIsPublished()) {
-            $this->io->note('Pipedrive integration id disabled.');
+            $this->io->note('Pipedrive integration is disabled.');
 
             return;
         }
@@ -117,8 +117,8 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
 
     /**
      * @param EntityManager $em
-     * @param               $start
-     * @param               $limit
+     * @param int           $start
+     * @param int           $limit
      *
      * @return array
      */

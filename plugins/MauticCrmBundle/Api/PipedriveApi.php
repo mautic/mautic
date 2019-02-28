@@ -253,7 +253,7 @@ class PipedriveApi extends CrmApi
      *
      * @return array|mixed
      */
-    public function getActivityType($event)
+    public function getActivityType(array $event)
     {
         $activityName = $event['eventType'];
         $activities   = $this->getActivityTypes();
@@ -272,7 +272,7 @@ class PipedriveApi extends CrmApi
      *
      * @return array
      */
-    public function createActivityType($event)
+    public function createActivityType(array $event)
     {
         $icon = 'pricetag';
 

@@ -37,8 +37,8 @@ class ActivitiesPipedriveExport extends AbstractPipedrive
     }
 
     /**
-     * @param IntegrationEntity $integrationEntity
-     * @param \DateTime|null    $lastActivitySync
+     * @param IntegrationEntity       $integrationEntity
+     * @param \DateTimeInterface|null $lastActivitySync
      */
     public function createActivities(IntegrationEntity $integrationEntity, $lastActivitySync = null)
     {
@@ -63,7 +63,7 @@ class ActivitiesPipedriveExport extends AbstractPipedrive
         ];
 
         $dateTo = $this->dateTimeHelper->getDateTime();
-        if ($lastActivitySync instanceof \DateTime) {
+        if ($lastActivitySync instanceof \DateTimeInterface) {
             $filters['dateFrom'] = $lastActivitySync;
             $filters['dateTo']   = $dateTo;
         }
