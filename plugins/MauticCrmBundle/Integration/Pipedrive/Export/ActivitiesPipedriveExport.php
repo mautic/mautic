@@ -83,7 +83,7 @@ class ActivitiesPipedriveExport extends AbstractPipedrive
             }
 
             foreach ($events as $event) {
-                // Create activity before exists
+                // Create activity on Pipedrive If not exist
                 if (!$this->getIntegration()->getApiHelper()->hasActivityType($event)) {
                     $this->getIntegration()->getApiHelper()->createActivityType($event);
                 }
