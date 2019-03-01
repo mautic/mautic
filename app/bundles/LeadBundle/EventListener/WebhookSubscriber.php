@@ -118,6 +118,7 @@ class WebhookSubscriber extends CommonSubscriber
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
             ]
         );
     }
@@ -142,6 +143,7 @@ class WebhookSubscriber extends CommonSubscriber
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
             ]
         );
     }
@@ -164,6 +166,7 @@ class WebhookSubscriber extends CommonSubscriber
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
             ]
         );
     }
@@ -186,6 +189,7 @@ class WebhookSubscriber extends CommonSubscriber
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
             ]
         );
     }
