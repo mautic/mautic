@@ -89,6 +89,13 @@ Mautic.loadContent = function (route, link, method, target, showPageLoading, cal
     return false;
 };
 
+/**
+ *  Load results with  ajax in batch mode
+ *
+ * @param elementName
+ * @param route
+ * @param sortTable
+ */
 Mautic.loadAjaxStats = function(elementName, route, sortTable){
     var className = '.'+elementName;
     if (mQuery(className).length) {
@@ -125,13 +132,19 @@ Mautic.loadAjaxStats = function(elementName, route, sortTable){
     }
 }
 
-Mautic.sortableTable = function(tableId, sortColumn){
+/**
+ *  Sort table by column
+ *
+ * @param tableId
+ * @param sortElement
+ */
+Mautic.sortableTable = function(tableId, sortElement){
     if(document.getElementById(tableId)) {
         var tableData = document.getElementById(tableId).getElementsByTagName('tbody').item(0);
         var rowData = tableData.getElementsByTagName('tr');
         for (var i = 0; i < rowData.length - 1; i++) {
             for (var j = 0; j < rowData.length - (i + 1); j++) {
-                if (Number(rowData.item(j).getElementsByClassName(sortColumn).item(0).innerHTML.replace(/[^0-9\.]+/g, "")) < Number(rowData.item(j + 1).getElementsByClassName(sortColumn).item(0).innerHTML.replace(/[^0-9\.]+/g, ""))) {
+                if (Number(rowData.item(j).getElementsByClassName(sortElement).item(0).innerHTML.replace(/[^0-9\.]+/g, "")) < Number(rowData.item(j + 1).getElementsByClassName(sortElement).item(0).innerHTML.replace(/[^0-9\.]+/g, ""))) {
                     tableData.insertBefore(rowData.item(j + 1), rowData.item(j));
                 }
             }
