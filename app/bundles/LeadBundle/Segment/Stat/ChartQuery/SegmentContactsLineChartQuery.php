@@ -89,14 +89,14 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     public function getTotalStats(int $total)
     {
-        $totalCantDateTo = $this->getTotalToDateRange($total);
+        $totalCountDateTo = $this->getTotalToDateRange($total);
         // count array SUM and then reverse
         // require start from end and  substract added/removed logs
         $sums     = array_reverse(ArrayHelper::sum($this->getAddedEventLogStats(), $this->getRemovedEventLogStats()));
         $totalSum = 0;
-        $totals   = array_map(function ($sum) use ($totalCantDateTo, &$totalSum) {
+        $totals   = array_map(function ($sum) use ($totalCountDateTo, &$totalSum) {
             $totalSum += $sum;
-            $total = $totalCantDateTo - $totalSum;
+            $total = $totalCountDateTo - $totalSum;
             if ($total > -1) {
                 return $total;
             } else {
