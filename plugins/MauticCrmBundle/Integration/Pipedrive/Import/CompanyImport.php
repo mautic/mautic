@@ -101,7 +101,7 @@ class CompanyImport extends AbstractImport
         }
 
         /** @var Company $company */
-        $company = $this->em->getRepository(Company::class)->findOneById($integrationEntity->getInternalEntityId());
+        $company = $this->companyModel->getEntity($integrationEntity->getInternalEntityId());
 
         // prevent listeners from exporting
         $company->setEventData('pipedrive.webhook', 1);

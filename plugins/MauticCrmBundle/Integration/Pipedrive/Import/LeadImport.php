@@ -102,7 +102,7 @@ class LeadImport extends AbstractImport
         }
 
         /** @var Lead $lead * */
-        $lead         = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
+        $lead = $this->leadModel->getEntity($integrationEntity->getInternalEntityId());
 
         // prevent listeners from exporting
         $lead->setEventData('pipedrive.webhook', 1);
