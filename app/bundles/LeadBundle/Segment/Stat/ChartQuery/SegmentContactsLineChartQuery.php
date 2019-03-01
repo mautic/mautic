@@ -63,12 +63,13 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $this->dateTo     = $dateTo;
         $this->unit       = $unit;
         $this->filters    = $filters;
-        $this->segmentId  = $this->filters['leadlist_id']['value'];
 
         if (!isset($this->filters['leadlist_id']['value'])) {
             throw new SegmentNotFoundException('Segment ID required');
         }
         parent::__construct($connection, $dateFrom, $dateTo, $unit);
+
+        $this->segmentId  = $this->filters['leadlist_id']['value'];
         $this->init();
     }
 
@@ -118,7 +119,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
     {
         $queryForTotal = clone $this;
         // try figure out total count in dateTo
-        $queryForTotal->setDateRange($this->getDateTo(), new \DateTime());
+        $queryForTotal->setDateRange($this->dateTo, new \DateTime());
 
         return $total - array_sum(ArrayHelper::sub($queryForTotal->getAddedEventLogStats(), $queryForTotal->getRemovedEventLogStats()));
     }
@@ -192,14 +193,6 @@ class SegmentContactsLineChartQuery extends ChartQuery
             );
 
         return $subQuery->execute()->fetchColumn();
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getDateTo()
-    {
-        return $this->dateTo;
     }
 
     /**
