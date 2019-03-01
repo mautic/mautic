@@ -739,20 +739,25 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param $segmentId
+     * @param int   $segmentId
+     * @param array $campaignIds
      *
      * @return array
      */
-    public function getCampaignsSegmentShare($segmentId)
+    public function getCampaignsSegmentShare($segmentId, $campaignIds = [])
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('c.id, c.name, ROUND(COUNT(DISTINCT cl2.lead_id)/COUNT(DISTINCT cl.lead_id)*100,1) share, COUNT(DISTINCT cl.lead_id) campaignCount, COUNT(DISTINCT cl2.lead_id) segmentCount');
-        $q->from('campaigns', 'c');
-        $q->innerJoin('c', 'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = 0');
-        $q->leftJoin('c', 'lead_lists_leads', 'lll', 'lll.leadlist_id = '.$segmentId.' AND lll.manually_removed = 0');
-        $q->leftJoin('c', 'campaign_leads', 'cl2', 'cl2.campaign_id = c.id AND cl2.manually_removed = 0 AND cl2.lead_id = lll.lead_id');
+        $q->select('c.id, c.name, ROUND(IFNULL(COUNT(DISTINCT cl2.lead_id)/COUNT(DISTINCT cl.lead_id)*100, 0),1) data');
+        $q->from('campaigns', 'c')
+        ->leftJoin('c', 'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = 0')
+        ->leftJoin('c', 'lead_lists_leads', 'lll', 'lll.leadlist_id = '.$segmentId.' AND lll.manually_removed = 0')
+        ->leftJoin('c', 'campaign_leads', 'cl2', 'cl2.campaign_id = c.id AND cl2.manually_removed = 0 AND cl2.lead_id = lll.lead_id');
         $q->groupBy('c.id');
-        $q->orderBy('share', 'desc');
+        $q->orderBy('data', 'desc');
+
+        if (!empty($campaignIds)) {
+            $q->where($q->expr()->in('c.id', $campaignIds));
+        }
 
         return $q->execute()->fetchAll();
     }

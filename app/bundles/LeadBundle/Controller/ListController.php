@@ -753,7 +753,7 @@ class ListController extends FormController
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
                 'usageStats'     => $this->get('mautic.lead.helper.segment.usage')->getChannelsIds($list->getId()),
-                'campaignStats'  => $this->get('mautic.campaign.model.campaign')->getRepository()->getCampaignsSegmentShare($list->getId()),
+                'campaignStats'  => $this->get('mautic.campaign.model.campaign')->getRepository()->getPublishedCampaigns(null, null, true),
                 'list'           => $list,
                 'permissions'    => $security->isGranted([
                     'lead:leads:editown',

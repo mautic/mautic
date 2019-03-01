@@ -279,7 +279,10 @@ Mautic.leadEmailOnLoad = function(container, response) {
     });
 }
 
-Mautic.leadlistOnLoad = function(container) {
+Mautic.leadlistOnLoad = function(container, response) {
+
+    Mautic.loadAjaxStats('campaign-share-stat', 'lead:getCampaignShareStats', 'sortable-table');
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.list');
     }

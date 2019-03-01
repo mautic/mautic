@@ -168,7 +168,7 @@ $view['slots']->set(
                 <?php echo $contacts; ?>
             </div>
             <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
-                <table class="table table-bordered table-striped mb-0">
+                <table id="sortable-table" class="table table-bordered table-striped mb-0">
                     <thead>
                     <tr>
                         <th>
@@ -191,7 +191,7 @@ $view['slots']->set(
                                 </a>
                             </td>
                             <td width="20%">
-                                <?php echo $stat['share']; ?> %
+                                <span class="campaign-share-stat" data-value="<?php echo $stat['id']; ?>" id="campaign-share-stat-<?php echo $stat['id']; ?>">  </span> %
                             </td>
                         </tr>
                     <?php endforeach; ?>

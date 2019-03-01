@@ -89,6 +89,56 @@ Mautic.loadContent = function (route, link, method, target, showPageLoading, cal
     return false;
 };
 
+Mautic.loadAjaxStats = function(elementName, route, sortTable){
+    var className = '.'+elementName;
+    if (mQuery(className).length) {
+        var ids = [];
+        mQuery(className).each(function () {
+            var id = mQuery(this).attr('data-value');
+            ids.push(id);
+        });
+
+        var batchIds;
+        // Get all stats numbers in batches of 10
+        while (ids.length > 0) {
+            batchIds = ids.splice(0, 10);
+            Mautic.ajaxActionRequest(
+                route,
+                {ids: batchIds, entityId: Mautic.getEntityId()},
+                function (response) {
+                    if (response.success && response.stats) {
+                        for (var i = 0; i < response.stats.length; i++) {
+                            var stat = response.stats[i];
+                            if (mQuery('#' + elementName + '-' + stat.id).length) {
+                                mQuery('#' + elementName + '-' + stat.id).html(stat.data);
+                            }
+                        }
+                        if(sortTable && batchIds.length < 10) {
+                            Mautic.sortableTable(sortTable, elementName);
+                        }
+                    }
+                },
+                false,
+                true
+            );
+        }
+    }
+}
+
+Mautic.sortableTable = function(tableId, sortColumn){
+    if(document.getElementById(tableId)) {
+        var tableData = document.getElementById(tableId).getElementsByTagName('tbody').item(0);
+        var rowData = tableData.getElementsByTagName('tr');
+        for (var i = 0; i < rowData.length - 1; i++) {
+            for (var j = 0; j < rowData.length - (i + 1); j++) {
+                if (Number(rowData.item(j).getElementsByClassName(sortColumn).item(0).innerHTML.replace(/[^0-9\.]+/g, "")) < Number(rowData.item(j + 1).getElementsByClassName(sortColumn).item(0).innerHTML.replace(/[^0-9\.]+/g, ""))) {
+                    tableData.insertBefore(rowData.item(j + 1), rowData.item(j));
+                }
+            }
+        }
+    }
+}
+
 /**
  * Generates the title of the current page
  *
