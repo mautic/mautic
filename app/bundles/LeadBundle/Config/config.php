@@ -839,6 +839,11 @@ return [
                     'mautic.point.model.triggerevent',
                 ],
             ],
+            'mautic.lead.segment.stat.service' => [
+                'class'     => \Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class,
+                'arguments' => [
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [
@@ -1005,6 +1010,7 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.lead_segment_service',
+                    'mautic.lead.segment.stat.service',
                 ],
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [

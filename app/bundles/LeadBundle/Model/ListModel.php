@@ -33,7 +33,8 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
-use MauticPlugin\MauticRecommenderBundle\Helper\SqlQuery;
+use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
+use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -57,14 +58,22 @@ class ListModel extends FormModel
     private $leadSegmentService;
 
     /**
+     * @var SegmentChartQueryFactory
+     */
+    private $segmentStatService;
+
+    /**
      * ListModel constructor.
      *
-     * @param CoreParametersHelper $coreParametersHelper
+     * @param CoreParametersHelper     $coreParametersHelper
+     * @param ContactSegmentService    $leadSegment
+     * @param SegmentChartQueryFactory $segmentStatService
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment)
+    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentStatService)
     {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->leadSegmentService   = $leadSegment;
+        $this->segmentStatService   = $segmentStatService;
     }
 
     /**
@@ -1708,39 +1717,79 @@ class ListModel extends FormModel
     public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
     {
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $q        = $query->prepareTimeDataQuery('lead_lists_leads', 'date_added', $filter);
-        $subQuery = $this->em->getConnection()->createQueryBuilder();
-        $subQuery->select('MIN(el.date_added)')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', 'el')
-            ->where(
-                $subQuery->expr()->andX(
-                    $subQuery->expr()->eq('el.lead_id', 't.lead_id'),
-                    $subQuery->expr()->eq('el.object', $subQuery->expr()->literal('segment')),
-                    $subQuery->expr()->eq('el.bundle', $subQuery->expr()->literal('lead')),
-                    $subQuery->expr()->eq('el.object_id', $filter['leadlist_id']['value'])
-                ));
-        $q->andWhere($q->expr()->lt('t.date_added', sprintf('(%s)', $subQuery->getSQL())));
-        print_r($query->loadAndBuildTimeData($q));
-        die(print_r(SqlQuery::getQuery($q)));
-        print_r($this->loadDataFromEventLog($query, $chart, $filter['leadlist_id']['value'], 'added'));
-        die();
-        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $query->loadAndBuildTimeData($q));
-        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->loadDataFromEventLog($query, $chart, $filter['leadlist_id']['value'], 'removed'));
+        $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
+
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $this->segmentStatService->getContactsAdded($query));
+
+        if ($query->isStatsFromEventLog()) {
+            $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->segmentStatService->getContactsRemoved($query));
+            $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentStatService->getContactsTotal($query, $this));
+        }
+
+        return $chart->render();
+
+        //return $this->segmentStat->render(new SegmentChartService($chart), new SegmentChartQuery($query, ));
+
+        $q          = $query->prepareTimeDataQuery('lead_lists_leads', 'date_added', $filter);
+        $totalCount = $this->getRepository()->getLeadCount($filter['leadlist_id']['value']);
+        $query->setDateRange($dateTo, new \DateTime());
+        $addedLogs   = $this->loadDataFromEventLog($query, $filter['leadlist_id']['value'], 'added');
+        $removeLogs  = $this->loadDataFromEventLog($query, $filter['leadlist_id']['value'], 'remove');
+        $sums        = [];
+        foreach ($addedLogs as $key=>$value) {
+            $sums[$key] = $value - $removeLogs[$key];
+        }
+
+        $totalCantDateTo= $totalCount - array_sum($sums);
+
+        // TotalToDateTo
+
+        $query->setDateRange($dateFrom, $dateTo);
+
+        $dateStartFromEventLog = $this->startEventLog($query, $filter['leadlist_id']['value']);
+        $q->andWhere($q->expr()->lt('t.date_added', $q->expr()->literal($dateStartFromEventLog)));
+
+        $beforeLogs = $query->loadAndBuildTimeData($q);
+
+        $formLogs  = $this->loadDataFromEventLog($query, $filter['leadlist_id']['value'], 'added', $dateStartFromEventLog);
+
+        foreach ($beforeLogs as $key=> $value) {
+            $sums[$key] = ($value) + (isset($formLogs[$key]) ? $formLogs[$key] : 0);
+        }
+
+        //$chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $contactsAdded);
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $sums);
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->loadDataFromEventLog($query, $filter['leadlist_id']['value'], 'removed'));
+
+        $removedFromLogs = $this->loadDataFromEventLog($query, $filter['leadlist_id']['value'], 'removed');
+        $sums            = [];
+        foreach ($formLogs as $key=>$value) {
+            $sums[$key] = $value - $removedFromLogs[$key];
+        }
+
+        $sums   =array_reverse($sums);
+        $totals = [];
+        foreach ($sums as &$sum) {
+            $totals[] = $totalCantDateTo - $sum;
+        }
+
+        $totals =array_reverse($totals);
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $totals);
 
         return $chart->render();
     }
 
     /**
-     * @param $query
-     * @param $chart
+     * @param ChartQuery $query
      * @param $segmentId
      * @param $action
      *
      * @return array
      */
-    private function loadDataFromEventLog($query, $chart, $segmentId, $action)
+    private function loadDataFromEventLog(ChartQuery $query, $segmentId, $action, $startDate = '1900-01-01 00:00:00')
     {
+        $actionInverted = ($action == 'added') ? 'removed' : 'added';
+
         $filter              = [];
         $filter['object']    = 'segment';
         $filter['bundle']    = 'lead';
@@ -1748,7 +1797,21 @@ class ListModel extends FormModel
         $filter['object_id'] = $segmentId;
 
         $q = $query->prepareTimeDataQuery('lead_event_log', 'date_added', $filter);
-        $q->select('DATE_FORMAT(t.date_added, \'%Y %U\') AS date, COUNT(DISTINCT t.lead_id) as count');
+        $q->select('DATE_FORMAT(t.date_added, \''.$query->translateTimeUnit().'\') AS date, (COUNT(DISTINCT t.lead_id)) as count,IF(t.date_added < '.$q->expr()->literal($startDate).', 0, 1) AS  beforeLogs ');
+
+        $subQuery = $this->em->getConnection()->createQueryBuilder();
+        $subQuery->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', 'el')
+            ->where(
+                $subQuery->expr()->andX(
+                    $subQuery->expr()->eq('el.object', $subQuery->expr()->literal('segment')),
+                    $subQuery->expr()->eq('el.bundle', $subQuery->expr()->literal('lead')),
+                    $subQuery->expr()->eq('el.action', $subQuery->expr()->literal($actionInverted)),
+                    $subQuery->expr()->eq('el.object_id', $segmentId),
+                    $subQuery->expr()->eq('DATE_FORMAT(el.date_added, \''.$query->translateTimeUnit().'\')', 'DATE_FORMAT(t.date_added, \''.$query->translateTimeUnit().'\')'),
+                    $subQuery->expr()->gt('el.date_added', 't.date_added')
+                ));
+        $q->andWhere(sprintf('NOT EXISTS (%s)', $subQuery->getSQL()));
 
         return $query->loadAndBuildTimeData($q);
     }

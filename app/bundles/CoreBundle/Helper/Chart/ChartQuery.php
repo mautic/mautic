@@ -180,8 +180,12 @@ class ChartQuery extends AbstractChart
      *
      * @return string
      */
-    public function translateTimeUnit($unit)
+    public function translateTimeUnit($unit = null)
     {
+        if (null === $unit) {
+            $unit = $this->unit;
+        }
+
         if (!isset($this->mysqlTimeUnits[$unit])) {
             throw new \UnexpectedValueException('Date/Time unit "'.$unit.'" is not available for MySql.');
         }
@@ -352,7 +356,6 @@ class ChartQuery extends AbstractChart
                     } else {
                         $itemDate = clone $item['date'];
                     }
-
                     if (!$this->isTimeUnit) {
                         // Hours do not matter so let's reset to 00:00:00 for date comparison
                         $itemDate->setTime(0, 0, 0);
@@ -360,12 +363,10 @@ class ChartQuery extends AbstractChart
                         // Convert to the timezone used for comparison
                         $itemDate->setTimezone($this->timezone);
                     }
-
                     $item['date_comparison'] = $itemDate;
                 } else {
                     $itemDate = $item['date_comparison'];
                 }
-
                 // Place the right suma is between the time unit and time unit +1
                 if (isset($item['count']) && $itemDate >= $previousDate && $itemDate < $nextDate) {
                     $data[$i] = $item['count'];
