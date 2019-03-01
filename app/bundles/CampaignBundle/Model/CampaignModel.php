@@ -1022,4 +1022,34 @@ class CampaignModel extends CommonFormModel
 
         return new ArrayCollection($keyById);
     }
+
+    /**
+     * @param $segmentId
+     *
+     * @return array
+     */
+    public function getCampaignIdsWithDependenciesOnSegment($segmentId)
+    {
+        $entities =  $this->getRepository()->getEntities(
+            [
+                'filter'         => [
+                    'force' => [
+                        [
+                            'column' => 'l.id',
+                            'expr'   => 'eq',
+                            'value'  => $segmentId,
+                        ],
+                    ],
+                ],
+                'joinLists' => true,
+            ]
+        );
+
+        $ids = [];
+        foreach ($entities as $entity) {
+            $ids[] = $entity->getId();
+        }
+
+        return $ids;
+    }
 }

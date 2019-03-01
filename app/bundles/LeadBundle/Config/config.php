@@ -837,6 +837,7 @@ return [
                     'mautic.form.model.action',
                     'mautic.lead.model.list',
                     'mautic.point.model.triggerevent',
+                    'mautic.report.model.report',
                 ],
             ],
             'mautic.lead.segment.stat.service' => [

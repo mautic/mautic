@@ -1753,4 +1753,37 @@ class ListModel extends FormModel
 
         return $this->getEntities(['filter' => $filter])->count() !== 0;
     }
+
+    /**
+     * Get segments which are dependent on given segment.
+     *
+     * @param int $segmentId
+     *
+     * @return array
+     */
+    public function getSegmentsIdsWithDependenciesOnSegment($segmentId)
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
+                ['column' => 'l.id', 'expr' => 'neq', 'value'=>$segmentId],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['type'] === 'leadlist' && in_array($segmentId, $eachFilter['filter'])) {
+                    $dependents[] = $entity->getId();
+                }
+            }
+        }
+
+        return $dependents;
+    }
 }
