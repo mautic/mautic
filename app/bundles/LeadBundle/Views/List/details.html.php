@@ -213,20 +213,25 @@ $view['slots']->set(
                 </th>
             </tr>
             <?php foreach ($usageStats as $stat) : ?>
-                <?php if (!$countIds =  count($stat['ids'])): ?>
+                <?php if (!$countIds = count($stat['ids'])): ?>
                     <?php continue; ?>
                 <?php endif; ?>
                 <tr>
-                    <td width="5%">
-                                    <span class="mt-xs label label-primary has-click-event clickable-stat"><a href="<?php echo $view['router']->path(
-                                            $stat['route'],
-                                            ['search' => $view['translator']->trans('mautic.core.searchcommand.ids').':'.implode(',', $stat['ids'])]
-                                        ); ?>">
-                                              <?php echo $countIds; ?>
-                                            </a></span>
-                    </td>
                     <td>
                         <?php echo $view['translator']->trans($stat['label']); ?>
+                    </td>
+                    <td width="5%">
+                                    <span class="mt-xs label label-primary has-click-event clickable-stat"><a
+                                            href="<?php echo $view['router']->path(
+                                                $stat['route'],
+                                                [
+                                                    'search' => $view['translator']->trans(
+                                                            'mautic.core.searchcommand.ids'
+                                                        ).':'.implode(',', $stat['ids']),
+                                                ]
+                                            ); ?>">
+                                              <?php echo $countIds; ?>
+                                            </a></span>
                     </td>
                 </tr>
             <?php endforeach; ?>
