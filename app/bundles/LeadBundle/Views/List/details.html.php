@@ -154,7 +154,7 @@ $view['slots']->set(
                     </a>
                 </li>
                 <li>
-                    <a href="#campaign-container" role="tab" data-toggle="tab">
+                    <a id="campaign-share-tab" href="#campaign-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.lead.campaign.share'); ?>
                     </a>
                 </li>
@@ -168,35 +168,38 @@ $view['slots']->set(
                 <?php echo $contacts; ?>
             </div>
             <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
-                <table id="sortable-table" class="table table-bordered table-striped mb-0">
-                    <thead>
-                    <tr>
-                        <th>
-                            <?php echo $view['translator']->trans('mautic.campaign.campaign'); ?>
-                        </th>
-                        <th>
-                            <?php echo $view['translator']->trans('mautic.lead.share'); ?>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($campaignStats as $stat) : ?>
+                <div id="campaign-share-container" style="position: relative">
+                    <table id="campaign-share-table" class="table table-bordered table-striped mb-0">
+                        <thead>
                         <tr>
-                            <td>
-                                <a href="<?php echo $view['router']->path(
-                                    'mautic_campaign_action',
-                                    ['objectAction' => 'view', 'objectId' => $stat['id']]
-                                ); ?>" data-toggle="ajax">
-                                    <?php echo $stat['name']; ?>
-                                </a>
-                            </td>
-                            <td width="20%">
-                                <span class="campaign-share-stat" data-value="<?php echo $stat['id']; ?>" id="campaign-share-stat-<?php echo $stat['id']; ?>">  </span> %
-                            </td>
+                            <th>
+                                <?php echo $view['translator']->trans('mautic.campaign.campaign'); ?>
+                            </th>
+                            <th>
+                                <?php echo $view['translator']->trans('mautic.lead.share'); ?>
+                            </th>
                         </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($campaignStats as $stat) : ?>
+                            <tr>
+                                <td>
+                                    <a href="<?php echo $view['router']->path(
+                                        'mautic_campaign_action',
+                                        ['objectAction' => 'view', 'objectId' => $stat['id']]
+                                    ); ?>" data-toggle="ajax">
+                                        <?php echo $stat['name']; ?>
+                                    </a>
+                                </td>
+                                <td width="20%">
+                                    <span class="campaign-share-stat" data-value="<?php echo $stat['id']; ?>"
+                                          id="campaign-share-stat-<?php echo $stat['id']; ?>"><?php echo $stat['share']; ?></span> %
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <!-- end: tab-content -->

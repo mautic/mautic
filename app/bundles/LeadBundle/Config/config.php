@@ -845,6 +845,14 @@ return [
                 'arguments' => [
                 ],
             ],
+            'mautic.lead.segment.stat.campaign.share' => [
+                'class'     => \Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare::class,
+                'arguments' => [
+                    'mautic.campaign.model.campaign',
+                    'mautic.helper.cache_storage',
+                    '@doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [

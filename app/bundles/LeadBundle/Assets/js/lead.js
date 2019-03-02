@@ -281,7 +281,12 @@ Mautic.leadEmailOnLoad = function(container, response) {
 
 Mautic.leadlistOnLoad = function(container, response) {
 
-    Mautic.loadAjaxStats('campaign-share-stat', 'lead:getCampaignShareStats', 'sortable-table');
+    mQuery('#campaign-share-tab').hover(function () {
+        if (Mautic.shareTableLoaded != true) {
+            Mautic.loadAjaxStats('campaign-share-stat', 'lead:getCampaignShareStats', 'afterStatsLoad');
+            Mautic.shareTableLoaded = true;
+        }
+    })
 
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.list');

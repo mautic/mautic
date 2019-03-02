@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -21,6 +20,7 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -893,13 +893,12 @@ class AjaxController extends CommonAjaxController
      */
     protected function getCampaignShareStatsAction(Request $request)
     {
-        /** @var CampaignModel $model */
-        $model = $this->getModel('campaign');
-
         $ids      = $request->get('ids');
         $entityid = $request->get('entityId');
+        /** @var SegmentCampaignShare $segmentCampaignShareService */
+        $segmentCampaignShareService = $this->get('mautic.lead.segment.stat.campaign.share');
 
-        $data = $model->getRepository()->getCampaignsSegmentShare($entityid, $ids);
+        $data = $segmentCampaignShareService->getCampaignsSegmentShare($entityid, $ids);
 
         $data = [
             'success' => 1,

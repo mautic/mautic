@@ -94,18 +94,26 @@ Mautic.loadContent = function (route, link, method, target, showPageLoading, cal
  *
  * @param elementName
  * @param route
- * @param sortTable
+ * @param callback
  */
-Mautic.loadAjaxStats = function(elementName, route, sortTable){
+Mautic.loadAjaxStats = function(elementName, route, callback){
     var className = '.'+elementName;
     if (mQuery(className).length) {
         var ids = [];
         mQuery(className).each(function () {
-            var id = mQuery(this).attr('data-value');
-            ids.push(id);
+            if(!mQuery(this).text()) {
+                var id = mQuery(this).attr('data-value');
+                ids.push(id);
+            }
         });
 
         var batchIds;
+
+        // If not gonna load any data, then just callback
+        if(ids.length == 0) {
+            Mautic.getCallback(callback);
+        }
+
         // Get all stats numbers in batches of 10
         while (ids.length > 0) {
             batchIds = ids.splice(0, 10);
@@ -120,8 +128,8 @@ Mautic.loadAjaxStats = function(elementName, route, sortTable){
                                 mQuery('#' + elementName + '-' + stat.id).html(stat.data);
                             }
                         }
-                        if(sortTable && batchIds.length < 10) {
-                            Mautic.sortableTable(sortTable, elementName);
+                        if(batchIds.length < 10) {
+                            Mautic.getCallback(callback);
                         }
                     }
                 },
@@ -138,7 +146,7 @@ Mautic.loadAjaxStats = function(elementName, route, sortTable){
  * @param tableId
  * @param sortElement
  */
-Mautic.sortableTable = function(tableId, sortElement){
+Mautic.sortTableByColumn = function(tableId, sortElement){
     if(document.getElementById(tableId)) {
         var tableData = document.getElementById(tableId).getElementsByTagName('tbody').item(0);
         var rowData = tableData.getElementsByTagName('tr');
@@ -151,6 +159,17 @@ Mautic.sortableTable = function(tableId, sortElement){
         }
     }
 }
+
+Mautic.getCallback = function (callback) {
+    if (typeof callback !== 'undefined') {
+        if (typeof callback == 'function') {
+            callback();
+        } else {
+            window["Mautic"][callback].apply('window', []);
+        }
+    }
+}
+
 
 /**
  * Generates the title of the current page

@@ -106,7 +106,7 @@ class CampaignRepository extends CommonRepository
             ->where($this->getPublishedByDateExpression($q));
 
         if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('c.created_by', ':id'))
+            $q->andWhere($q->expr()->eq('c.createdBy', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
         }
 
@@ -748,10 +748,10 @@ class CampaignRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('c.id, c.name, ROUND(IFNULL(COUNT(DISTINCT cl2.lead_id)/COUNT(DISTINCT cl.lead_id)*100, 0),1) data');
-        $q->from('campaigns', 'c')
-        ->leftJoin('c', 'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = 0')
-        ->leftJoin('c', 'lead_lists_leads', 'lll', 'lll.leadlist_id = '.$segmentId.' AND lll.manually_removed = 0')
-        ->leftJoin('c', 'campaign_leads', 'cl2', 'cl2.campaign_id = c.id AND cl2.manually_removed = 0 AND cl2.lead_id = lll.lead_id');
+        $q->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
+        ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = 0')
+        ->leftJoin('c', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = '.$segmentId.' AND lll.manually_removed = 0')
+        ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl2', 'cl2.campaign_id = c.id AND cl2.manually_removed = 0 AND cl2.lead_id = lll.lead_id');
         $q->groupBy('c.id');
         $q->orderBy('data', 'desc');
 
