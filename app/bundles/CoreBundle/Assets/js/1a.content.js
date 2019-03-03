@@ -149,13 +149,13 @@ Mautic.loadAjaxColumn = function(elementName, route, callback){
 Mautic.sortTableByColumn = function(tableId, sortElement, removeZero){
     var tbody = mQuery(tableId).find('tbody');
     tbody.find('tr').each(function () {
-        if(mQuery(this).find(sortElement).text() == 0) {
+        if(parseInt(mQuery(this).find(sortElement).text()) == 0) {
             mQuery(this).remove();
         }
     })
     tbody.find('tr').sort(function(a, b) {
-        var tda = mQuery(a).find(sortElement).text(); // target order attribute
-        var tdb = mQuery(b).find(sortElement).text(); // target order attribute
+        var tda = parseFloat(mQuery(a).find(sortElement).text()); // target order attribute
+        var tdb = parseFloat(mQuery(b).find(sortElement).text()); // target order attribute
         // if a < b return 1
         return tda < tdb ? 1
             // else if a > b return -1
