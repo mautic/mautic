@@ -73,8 +73,8 @@ class SegmentCampaignShare
         $q->select('c.id, c.name, null as share')
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
             ->where($this->campaignModel->getRepository()->getPublishedByDateExpression($q))
-            ->orderBy('c.id', 'DESC')
-            ->setMaxResults(99);
+            ->orderBy('c.id', 'DESC');
+
         $campaigns = $q->execute()->fetchAll();
         foreach ($campaigns as &$campaign) {
             // just load from cache If exists
