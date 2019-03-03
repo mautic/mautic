@@ -840,7 +840,7 @@ return [
                     'mautic.report.model.report',
                 ],
             ],
-            'mautic.lead.segment.stat.service' => [
+            'mautic.lead.segment.stat.chart.query.factory' => [
                 'class'     => \Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class,
                 'arguments' => [
                 ],
@@ -1019,7 +1019,7 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.lead_segment_service',
-                    'mautic.lead.segment.stat.service',
+                    'mautic.lead.segment.stat.chart.query.factory',
                 ],
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [
