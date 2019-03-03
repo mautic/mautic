@@ -56,7 +56,7 @@ class SegmentCampaignShare
     {
         $campaigns = $this->campaignModel->getRepository()->getCampaignsSegmentShare($segmentId, $campaignIds);
         foreach ($campaigns as $campaign) {
-            $this->cacheStorageHelper->set($this->getCachedKey($segmentId, $campaign['id']), $campaign['data']);
+            $this->cacheStorageHelper->set($this->getCachedKey($segmentId, $campaign['id']), $campaign['segmentCampaignShare']);
         }
 
         return $campaigns;
