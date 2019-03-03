@@ -141,7 +141,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $filter['object_id'] = $this->segmentId;
 
         $q = $this->prepareTimeDataQuery('lead_event_log', 'date_added', $filter);
-        $q->select('DATE_FORMAT(t.date_added, \''.$this->translatetimeunit().'\') AS date, (COUNT(DISTINCT t.lead_id)) as count');
+        $q->select('DATE_FORMAT(t.date_added, \''.$this->translateTimeUnit().'\') AS date, (COUNT(DISTINCT t.lead_id)) as count');
 
         $subQuery = $this->connection->createQueryBuilder();
         $subQuery->select('null')

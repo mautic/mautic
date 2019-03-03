@@ -828,8 +828,8 @@ return [
                     'mautic.lead.repository.company_lead',
                 ],
             ],
-            'mautic.lead.helper.segment.usage' => [
-                'class'     => \Mautic\LeadBundle\Helper\SegmentUsage::class,
+            'mautic.lead.segment.stat.dependencies' => [
+                'class'     => \Mautic\LeadBundle\Segment\Stat\SegmentDependencies::class,
                 'arguments' => [
                     '@doctrine.orm.entity_manager',
                     'mautic.email.model.email',

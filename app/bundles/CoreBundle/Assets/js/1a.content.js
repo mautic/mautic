@@ -96,7 +96,7 @@ Mautic.loadContent = function (route, link, method, target, showPageLoading, cal
  * @param route
  * @param callback
  */
-Mautic.loadAjaxStats = function(elementName, route, callback){
+Mautic.loadAjaxColumn = function(elementName, route, callback){
     var className = '.'+elementName;
     if (mQuery(className).length) {
         var ids = [];
@@ -146,22 +146,30 @@ Mautic.loadAjaxStats = function(elementName, route, callback){
  * @param tableId
  * @param sortElement
  */
-Mautic.sortTableByColumn = function(tableId, sortElement){
-    if(document.getElementById(tableId)) {
-        var tableData = document.getElementById(tableId).getElementsByTagName('tbody').item(0);
-        var rowData = tableData.getElementsByTagName('tr');
-        for (var i = 0; i < rowData.length - 1; i++) {
-            for (var j = 0; j < rowData.length - (i + 1); j++) {
-                if (Number(rowData.item(j).getElementsByClassName(sortElement).item(0).innerHTML.replace(/[^0-9\.]+/g, "")) < Number(rowData.item(j + 1).getElementsByClassName(sortElement).item(0).innerHTML.replace(/[^0-9\.]+/g, ""))) {
-                    tableData.insertBefore(rowData.item(j + 1), rowData.item(j));
-                }
-            }
+Mautic.sortTableByColumn = function(tableId, sortElement, removeZero){
+    var tbody = mQuery(tableId).find('tbody');
+    tbody.find('tr').each(function () {
+        if(mQuery(this).find(sortElement).text() == 0) {
+            mQuery(this).remove();
         }
-    }
+    })
+    tbody.find('tr').sort(function(a, b) {
+        var tda = mQuery(a).find(sortElement).text(); // target order attribute
+        var tdb = mQuery(b).find(sortElement).text(); // target order attribute
+        // if a < b return 1
+        return tda < tdb ? 1
+            // else if a > b return -1
+            : tda > tdb ? -1
+            // else they are equal - return 0
+            : 0;
+    }).appendTo(tbody);
 }
 
+/**
+ * @param callback
+ */
 Mautic.getCallback = function (callback) {
-    if (typeof callback !== 'undefined') {
+    if (callback && typeof callback !== 'undefined') {
         if (typeof callback == 'function') {
             callback();
         } else {

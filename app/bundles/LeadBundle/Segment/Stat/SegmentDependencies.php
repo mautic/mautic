@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Helper;
+namespace Mautic\LeadBundle\Segment\Stat;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -19,7 +19,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\ReportBundle\Model\ReportModel;
 
-class SegmentUsage
+class SegmentDependencies
 {
     /** @var int */
     private $segmentId;
