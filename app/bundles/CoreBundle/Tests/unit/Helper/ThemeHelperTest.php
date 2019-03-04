@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Exception\FileNotFoundException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -38,11 +39,20 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $translator;
 
+    /**
+     * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $coreParameterHelper;
+
     protected function setUp()
     {
         $this->pathsHelper      = $this->createMock(PathsHelper::class);
         $this->templatingHelper = $this->createMock(TemplatingHelper::class);
         $this->translator       = $this->createMock(TranslatorInterface::class);
+        $this->coreParameterHelper = $this->createMock(CoreParametersHelper::class);
+        $this->coreParameterHelper->method('getParameter')
+            ->with('theme_import_allowed_extensions')
+            ->willReturn(['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif']);
     }
 
     public function testExceptionThrownWithMissingConfig()
@@ -237,6 +247,6 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
      */
     private function getThemeHelper()
     {
-        return new ThemeHelper($this->pathsHelper, $this->templatingHelper, $this->translator);
+        return new ThemeHelper($this->pathsHelper, $this->templatingHelper, $this->translator, $this->coreParameterHelper);
     }
 }
