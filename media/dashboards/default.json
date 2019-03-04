@@ -4,7 +4,7 @@
     "widgets":
     [
         {
-            "name": "Contacts created",
+            "name": "Contacts Created",
             "width": 100,
             "height": 330,
             "ordering": 0,
@@ -14,73 +14,34 @@
             }
         },
         {
-            "name": "Contact map",
-            "width": 75,
-            "height": 445,
-            "ordering": 1,
-            "type": "map.of.leads"
-        },
-        {
-            "name": "Top lists",
-            "width": 25,
-            "height": 445,
-            "ordering": 2,
-            "type": "top.lists"
-        },
-        {
-            "name": "Visits",
-            "width": 100,
-            "height": 330,
-            "ordering": 3,
-            "type": "page.hits.in.time"
-        },
-        {
-            "name": "Emails sent \/ opened",
-            "width": 100,
-            "height": 330,
-            "ordering": 4,
-            "type": "emails.in.time"
-        },
-        {
-            "name": "Unique\/returning visitors",
-            "width": 25,
-            "height": 215,
-            "ordering": 5,
-            "type": "unique.vs.returning.leads"
-        },
-        {
-            "name": "Ignored\/opened emails",
-            "width": 25,
-            "height": 215,
-            "ordering": 6,
-            "type": "ignored.vs.read.emails"
-        },
-        {
-            "name": "Identified vs anonymous leads",
-            "width": 25,
-            "height": 215,
-            "ordering": 7,
-            "type": "anonymous.vs.identified.leads"
-        },
-        {
-            "name": "Dwell times",
-            "width": 25,
-            "height": 215,
-            "ordering": 8,
-            "type": "dwell.times"
-        },
-        {
-            "name": "Recent activity",
+            "name": "Page Visits",
             "width": 50,
             "height": 330,
-            "ordering": 9,
+            "ordering": 1,
+            "type": "page.hits.in.time",
+            "params": {
+                "flag": "unique"
+            }
+        },
+        {
+            "name": "Form Submissions",
+            "width": 50,
+            "height": 330,
+            "ordering": 2,
+            "type": "submissions.in.time"
+        },
+        {
+            "name": "Recent Activity",
+            "width": 50,
+            "height": 330,
+            "ordering": 3,
             "type": "recent.activity"
         },
         {
             "name": "Upcoming Emails",
             "width": 50,
             "height": 330,
-            "ordering": 10,
+            "ordering": 4,
             "type": "upcoming.emails"
         }
     ]

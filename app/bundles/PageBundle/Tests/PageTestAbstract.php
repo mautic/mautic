@@ -15,12 +15,14 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
@@ -108,6 +110,9 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $hitRepository = $this->createMock(HitRepository::class);
+        $userHelper    = $this->createMock(UserHelper::class);
+
         $queueService = $this
             ->getMockBuilder(QueueService::class)
             ->disableOriginalConstructor()
@@ -127,6 +132,7 @@ class PageTestAbstract extends WebTestCase
                 $this->returnValueMap(
                     [
                         ['MauticPageBundle:Page', $pageRepository],
+                        ['MauticPageBundle:Hit', $hitRepository],
                     ]
                 )
             );
@@ -149,6 +155,7 @@ class PageTestAbstract extends WebTestCase
         $pageModel->setTranslator($translator);
         $pageModel->setEntityManager($entityManager);
         $pageModel->setRouter($router);
+        $pageModel->setUserHelper($userHelper);
 
         return $pageModel;
     }

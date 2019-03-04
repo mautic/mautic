@@ -455,6 +455,8 @@ class ListController extends FormController
      */
     public function deleteAction($objectId)
     {
+        /** @var ListModel $model */
+        $model     = $this->getModel('lead.list');
         $page      = $this->get('session')->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
         $flashes   = [];
@@ -468,6 +470,22 @@ class ListController extends FormController
                 'mauticContent' => 'lead',
             ],
         ];
+
+        $dependents = $model->getSegmentsWithDependenciesOnSegment($objectId);
+
+        if (!empty($dependents)) {
+            $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.lead.list.error.cannot.delete',
+                    'msgVars' => ['%segments%' => implode(', ', $dependents)],
+                ];
+
+            return $this->postActionRedirect(
+                array_merge($postActionVars, [
+                    'flashes' => $flashes,
+                ])
+            );
+        }
 
         if ($this->request->getMethod() == 'POST') {
             /** @var ListModel $model */
@@ -531,12 +549,23 @@ class ListController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var ListModel $model */
-            $model     = $this->getModel('lead.list');
-            $ids       = json_decode($this->request->query->get('ids', '{}'));
-            $deleteIds = [];
+            $model           = $this->getModel('lead.list');
+            $ids             = json_decode($this->request->query->get('ids', '{}'));
+            $canNotBeDeleted = $model->canNotBeDeleted($ids);
+
+            if (!empty($canNotBeDeleted)) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
+                    'msgVars' => ['%segments%' => implode(', ', $canNotBeDeleted)],
+                ];
+            }
+
+            $toBeDeleted = array_diff($ids, array_keys($canNotBeDeleted));
+            $deleteIds   = [];
 
             // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
+            foreach ($toBeDeleted as $objectId) {
                 $entity = $model->getEntity($objectId);
 
                 if ($entity === null) {
