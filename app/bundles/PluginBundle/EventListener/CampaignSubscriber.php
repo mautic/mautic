@@ -58,6 +58,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $config                  = $event->getConfig();
         $config['campaignEvent'] = $event->getEvent();
+        $config['leadEventLog']  = $event->getLogEntry();
         $lead                    = $event->getLead();
         $errors                  = [];
         $success                 = $this->pushToIntegration($config, $lead, $errors);

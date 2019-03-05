@@ -196,8 +196,8 @@ class ContactChannelsType extends AbstractType
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(
             [
-                'public_view' => false,
-                'save_button' => false,
+                'public_view'               => false,
+                'save_button'               => false,
             ]
         );
     }
