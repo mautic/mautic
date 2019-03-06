@@ -651,12 +651,19 @@ class LeadApiController extends CommonApiController
             unset($this->entityRequestParameters['lastActive']);
         }
 
+        // Batch DNC settings
         if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {
             foreach ($parameters['doNotContact'] as $dnc) {
                 $channel  = !empty($dnc['channel']) ? $dnc['channel'] : 'email';
                 $comments = !empty($dnc['comments']) ? $dnc['comments'] : '';
-                $reason   = !empty($dnc['reason']) ? $dnc['reason'] : DoNotContact::MANUAL;
-                $this->model->addDncForLead($entity, $channel, $comments, $reason, false);
+                $reason   = !empty($dnc['reason']) || $dnc['reason'] === 0 ? $dnc['reason'] : DoNotContact::MANUAL;
+                if ($reason === DoNotContact::IS_CONTACTABLE) {
+                    // Remove DNC record
+                    $this->model->removeDncForLead($entity, $channel, false);
+                } else {
+                    // Add DNC record
+                    $this->model->addDncForLead($entity, $channel, $comments, $reason, false);
+                }
             }
             unset($parameters['doNotContact']);
         }
