@@ -390,7 +390,7 @@ Mautic.reorderSegmentFilters = function() {
             }
 
             var newName = prefix+'[filters]['+counter+']['+suffix+']';
-            if (name !== undefined && name.slice(-2) === '[]') {
+            if (typeof name !== 'undefined' && name.slice(-2) === '[]') {
                 newName += '[]';
             }
 
