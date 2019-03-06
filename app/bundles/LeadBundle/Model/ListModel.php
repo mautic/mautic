@@ -1756,36 +1756,12 @@ class ListModel extends FormModel
     }
 
     /**
-     * Get segments which are dependent on given segment.
-     *
-     * @param int $segmentId
-     *
-     * @return array
-     */
-    public function getSegmentsIdsWithDependenciesOnSegment($segmentId)
-    {
-        return $this->getSegmentPropertyWithDependenciesOnSegment($segmentId, 'id');
-    }
-
-    /**
-     * Get segments which are dependent on given segment.
-     *
-     * @param int $segmentId
-     *
-     * @return array
-     */
-    public function getSegmentsWithDependenciesOnSegment($segmentId)
-    {
-        return $this->getSegmentPropertyWithDependenciesOnSegment($segmentId, 'name');
-    }
-
-    /**
      * @param      $segmentId      *
      * @param null $returnProperty property of entity in returned array, null return all entity
      *
      * @return array
      */
-    private function getSegmentPropertyWithDependenciesOnSegment($segmentId, $returnProperty = null)
+    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name')
     {
         $filter = [
             'force'  => [

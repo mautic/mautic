@@ -105,7 +105,7 @@ class SegmentDependencies
         $usage[] = [
             'label' => 'mautic.lead.lead.lists',
             'route' => 'mautic_segment_index',
-            'ids'   => $this->listModel->getSegmentsIdsWithDependenciesOnSegment($segmentId),
+            'ids'   => $this->listModel->getSegmentsWithDependenciesOnSegment($segmentId, 'id'),
         ];
 
         $usage[] = [
