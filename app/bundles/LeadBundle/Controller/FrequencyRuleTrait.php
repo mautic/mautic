@@ -184,7 +184,7 @@ trait FrequencyRuleTrait
         if (isset($this->request->request->get('lead_contact_frequency_rules')['lead_channels']['subscribed_channels'])) {
             foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {
                 if (!isset($leadChannels[$contactChannel])) {
-                    $dncModel->addDncForContact($lead->getId(), $contactChannel, DoNotContact::IS_CONTACTABLE);
+                    $dncModel->removeDncForContact($lead->getId(), $contactChannel);
                 }
             }
             $dncChannels = array_diff($allChannels, $formData['lead_channels']['subscribed_channels']);
