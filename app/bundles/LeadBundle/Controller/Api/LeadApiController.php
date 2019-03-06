@@ -656,7 +656,10 @@ class LeadApiController extends CommonApiController
             foreach ($parameters['doNotContact'] as $dnc) {
                 $channel  = !empty($dnc['channel']) ? $dnc['channel'] : 'email';
                 $comments = !empty($dnc['comments']) ? $dnc['comments'] : '';
-                $reason   = !empty($dnc['reason']) || $dnc['reason'] === 0 ? $dnc['reason'] : DoNotContact::MANUAL;
+
+                $reason = isset($dnc['reason']) ? (int) $dnc['reason'] : null;
+                $reason = (null !== $reason) ? $reason : DoNotContact::MANUAL;
+
                 if ($reason === DoNotContact::IS_CONTACTABLE) {
                     // Remove DNC record
                     $this->model->removeDncForLead($entity, $channel, false);
