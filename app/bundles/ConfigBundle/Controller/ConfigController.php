@@ -35,10 +35,10 @@ class ConfigController extends FormController
      *
      * @return array
      */
-    protected function filterNormDataForLogging(array $data): array
+    protected function filterNormDataForLogging(array $data)
     {
         foreach ($data as $key => $value) {
-            if (is_array( $value )) {
+            if (is_array($value)) {
                 $value = $this->filterNormDataForLogging($value);
             }
 
