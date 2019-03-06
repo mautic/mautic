@@ -168,7 +168,9 @@ class SegmentContactsLineChartQuery extends ChartQuery
     public function getDataFromLeadListLeads()
     {
         $q        = $this->prepareTimeDataQuery('lead_lists_leads', 'date_added', $this->filters);
-        $q->andWhere($q->expr()->lt('t.date_added', $q->expr()->literal($this->firstEventLog)));
+        if ($this->firstEventLog) {
+            $q->andWhere($q->expr()->lt('t.date_added', $q->expr()->literal($this->firstEventLog)));
+        }
 
         return  $this->loadAndBuildTimeData($q);
     }
