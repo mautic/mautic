@@ -181,7 +181,7 @@ trait FrequencyRuleTrait
         $dncModel = $this->getModel('lead.dnc');
 
         // iF subscribed_channels are enabled in form, then touch DNC
-        if (isset($this->request->request->get('lead_contact_frequency_rules')['lead_channels']['subscribed_channels'])) {
+        if (isset($this->request->request->get('lead_contact_frequency_rules')['lead_channels'])) {
             foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {
                 if (!isset($leadChannels[$contactChannel])) {
                     $dncModel->removeDncForContact($lead->getId(), $contactChannel);
