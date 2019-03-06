@@ -52,7 +52,7 @@ class ConfigController extends FormController
 
         return $data;
     }
-    
+
     /**
      * Controller action for editing the application configuration.
      *
