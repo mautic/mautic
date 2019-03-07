@@ -39,7 +39,7 @@ class DateAnniversaryTest extends \PHPUnit_Framework_TestCase
     {
         $dateDecorator = $this->createMock(DateDecorator::class);
 
-        $date = new DateTimeHelper('2018-03-02', null);
+        $date = new DateTimeHelper('2018-03-02', null, 'local');
 
         $dateDecorator->method('getDefaultDate')
             ->with()
