@@ -90,7 +90,7 @@ class DateRelativeParser
     /**
      * Return date with current year.
      *
-     * @param $value
+     * @param string $value
      *
      * @return false|string
      */
