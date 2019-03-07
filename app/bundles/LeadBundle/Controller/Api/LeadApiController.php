@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
@@ -657,8 +658,7 @@ class LeadApiController extends CommonApiController
                 $channel  = !empty($dnc['channel']) ? $dnc['channel'] : 'email';
                 $comments = !empty($dnc['comments']) ? $dnc['comments'] : '';
 
-                $reason = isset($dnc['reason']) ? (int) $dnc['reason'] : null;
-                $reason = (null !== $reason) ? $reason : DoNotContact::MANUAL;
+                $reason = (int) ArrayHelper::getValue('reason', $dnc, DoNotContact::MANUAL);
 
                 if ($reason === DoNotContact::IS_CONTACTABLE) {
                     // Remove DNC record
