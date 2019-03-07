@@ -65,7 +65,7 @@ class DateDecorator extends CustomMappedDecorator
     }
 
     /**
-     * @param $timeframe
+     * @param string $timeframe
      *
      * @return DateRelativeParser
      */
