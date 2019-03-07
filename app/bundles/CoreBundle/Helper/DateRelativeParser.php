@@ -13,13 +13,19 @@ namespace Mautic\CoreBundle\Helper;
 
 class DateRelativeParser
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     private $dictionary;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $timeframe;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $prefix;
 
     /**
@@ -27,6 +33,7 @@ class DateRelativeParser
      *
      * @param array  $dictionary
      * @param string $timeframe
+     * @param array  $prefixes
      */
     public function __construct(array $dictionary, $timeframe, $prefixes = [])
     {
