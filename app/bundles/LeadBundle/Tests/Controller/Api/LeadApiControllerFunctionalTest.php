@@ -155,7 +155,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $emailAddress = uniqid('', false).'@mautic.com';
 
         $payload = [
-            'id' => 80,
+            'id'   => 80,
             'email'=> $emailAddress,
         ];
 
@@ -166,14 +166,14 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Batch update contact with new DNC record
         $payload = [[
-            'id' => $contactId,
-            'email'=> $emailAddress,
+            'id'           => $contactId,
+            'email'        => $emailAddress,
             'doNotContact' => [[
-                'reason' => DoNotContact::MANUAL,
-                'comments' => 'manually',
-                'channel' => 'email',
-                'channelId' => null
-            ]]
+                'reason'    => DoNotContact::MANUAL,
+                'comments'  => 'manually',
+                'channel'   => 'email',
+                'channelId' => null,
+            ]],
         ]];
 
         $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
@@ -184,14 +184,14 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Batch update contact and remove DNC record
         $payload = [[
-            'id' => $contactId,
-            'email'=> $emailAddress,
+            'id'           => $contactId,
+            'email'        => $emailAddress,
             'doNotContact' => [[
-                'reason' => DoNotContact::IS_CONTACTABLE,
-                'comments' => 'manually',
-                'channel' => 'email',
-                'channelId' => null
-            ]]
+                'reason'    => DoNotContact::IS_CONTACTABLE,
+                'comments'  => 'manually',
+                'channel'   => 'email',
+                'channelId' => null,
+            ]],
         ]];
 
         $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
