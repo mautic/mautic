@@ -75,16 +75,9 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
-            if (empty($params['limit'])) {
-                // Count the pages limit from the widget height
-                $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
-            } else {
-                $limit = $params['limit'];
-            }
-
             if (!$event->isCached()) {
                 $items = [];
-                $pages = $this->pageModel->getPopularTrackedPages($limit, $params['dateFrom'], $params['dateTo'], $params, $canViewOthers);
+                $pages = $this->pageModel->getPopularTrackedPages($widget->getLimitCalcByWeight(), $params['dateFrom'], $params['dateTo'], $params, $canViewOthers);
                 // Build table rows with links
                 if ($pages) {
                     foreach ($pages as $page) {
