@@ -258,12 +258,12 @@ class CommonController extends Controller implements MauticController
      */
     public function removeTrailingSlashAction(Request $request)
     {
-        $pathInfo   = $request->getPathInfo();
-        $requestUri = $request->getRequestUri();
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->get('mautic.helper.core_parameters');
+        $siteUrl              = $coreParametersHelper->getParameter('site_url');
+        $pathInfo             = substr($request->getPathInfo(), 0, -1);
 
-        $url = str_replace($pathInfo, rtrim($pathInfo, ' /'), $requestUri);
-
-        return $this->redirect($url, 301);
+        return $this->redirect($siteUrl.$pathInfo, 301);
     }
 
     /**
