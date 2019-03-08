@@ -43,7 +43,7 @@ class DoNotContactRepository extends CommonRepository
         if (!empty($this->dispatcher)) {
             $event       = $this->dispatcher->dispatch(
                 LeadEvents::GET_DNC_ENTITIES,
-                new LeadDNCGetEntitiesEvent($dncEntities)
+                new LeadDNCGetEntitiesEvent($lead, $channel, $dncEntities)
             );
             $dncEntities = $event->getDNCEntities();
         }

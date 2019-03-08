@@ -11,6 +11,7 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class LeadDNCGetEntitiesEvent.
@@ -18,16 +19,54 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class LeadDNCGetEntitiesEvent extends CommonEvent
 {
     /**
-     * @var array
+     * @var Lead
      */
-    protected $dncEntities;
+    protected $lead;
 
     /**
-     * @param array $dncEntities
+     * @var string
      */
-    public function __construct(array $dncEntities)
+    protected $channel;
+
+    /**
+     * @var array
+     */
+    protected $coreEntities;
+
+    /**
+     * @var array
+     */
+    protected $pluginEntities;
+
+    /**
+     * LeadDNCGetEntitiesEvent constructor.
+     *
+     * @param Lead   $lead
+     * @param string $channel
+     * @param array  $dncEntities
+     */
+    public function __construct(Lead $lead, $channel, array $dncEntities = [])
     {
-        $this->dncEntities = $dncEntities;
+        $this->lead           = $lead;
+        $this->channel        = $channel;
+        $this->coreEntities   = $dncEntities;
+        $this->pluginEntities = [];
+    }
+
+    /**
+     * @return Lead
+     */
+    public function getLead()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChannel()
+    {
+        return $this->channel;
     }
 
     /**
@@ -37,17 +76,17 @@ class LeadDNCGetEntitiesEvent extends CommonEvent
      */
     public function getDNCEntities()
     {
-        return $this->dncEntities;
+        return array_merge($this->coreEntities, $this->pluginEntities);
     }
 
     /**
-     * Sets the  array of DoNotContact entities.
-     *
      * @param array $dncEntities
+     *
+     * @return $this
      */
-    public function setDNCEntities(array $dncEntities)
+    public function addDNCEntities(array $dncEntities)
     {
-        $this->dncEntities = $dncEntities;
+        $this->pluginEntities = array_merge($this->pluginEntities, $dncEntities);
 
         return $this;
     }
