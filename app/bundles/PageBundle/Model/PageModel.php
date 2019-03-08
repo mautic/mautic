@@ -12,6 +12,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -1006,6 +1007,53 @@ class PageModel extends FormModel
         $chartQuery->applyDateFilters($q, 'date_hit');
 
         return $q->execute()->fetchAll();
+    }
+
+    /**
+     * Get a list of popular (by hits) tracking pages.
+     *
+     * @param int            $limit
+     * @param \DateTime|null $dateFrom
+     * @param \DateTime|null $dateTo
+     * @param array          $filters
+     * @param bool           $canViewOthers
+     *
+     * @return array
+     */
+    public function getPopularTrackedPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true)
+    {
+        $companyId  = ArrayHelper::pickValue('companyId', $filters);
+        $campaignId = ArrayHelper::pickValue('campaignId', $filters);
+        $segmentId  = ArrayHelper::pickValue('segmentId', $filters);
+        $q          = $this->em->getConnection()->createQueryBuilder();
+        $q->select('t.url_title, t.url, COUNT(DISTINCT t.id) AS hits')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 't')
+            ->where(
+                $q->expr()->isNull('t.email_id'),
+                $q->expr()->isNull('t.page_id'),
+                $q->expr()->isNull('t.redirect_id'),
+                $q->expr()->isNotNull('t.url_title'),
+                $q->expr()->eq('t.code', 200)
+            )
+            ->orderBy('hits', 'DESC')
+            ->groupBy('t.url_title')
+            ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->andWhere('p.created_by = :userId')
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        $chartQuery->applyDateFilters($q, 'date_hit');
+        $chartQuery->addCompanyFilter($q, $companyId);
+        $chartQuery->addCampaignFilter($q, $campaignId);
+        $chartQuery->addSegmentFilter($q, $segmentId);
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 
     /**
