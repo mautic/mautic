@@ -11,19 +11,19 @@
 
 namespace Mautic\DynamicContentBundle\Tests\EventListener;
 
-use Mautic\PageBundle\Event\PageDisplayEvent;
-use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
-use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
-use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
-use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
+use Mautic\PageBundle\Model\TrackableModel;
+use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 
 class DynamicContentSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -68,13 +68,11 @@ class DynamicContentSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * This test is ensuring this error won't happen again:
-     * 
-     * DOMDocumentFragment::appendXML(): Entity: line 1: parser error : xmlParseEntityRef: no name
-     * 
-     * It happens when there is an ampersand in the DWC content.
+     * This test is ensuring this error won't happen again:.
      *
-     * @return void
+     * DOMDocumentFragment::appendXML(): Entity: line 1: parser error : xmlParseEntityRef: no name
+     *
+     * It happens when there is an ampersand in the DWC content.
      */
     public function testDecodeTokensWithAmpersand()
     {
@@ -103,7 +101,7 @@ HTML;
 HTML;
         $dwcContent = '<a href="https://john.doe&son">Link</a>';
         $event      = $this->createMock(PageDisplayEvent::class);
-        $contact    = new Lead;
+        $contact    = new Lead();
 
         $event->expects($this->once())
             ->method('getContent')
@@ -134,7 +132,7 @@ HTML;
                             'operator' => '!empty',
                             'filter'   => '',
                             'type'     => 'email',
-                        ]
+                        ],
                     ],
                 ],
             ]);
@@ -146,7 +144,7 @@ HTML;
         $event->expects($this->once())
             ->method('setContent')
             ->with($expected);
-            
+
         $this->subscriber->decodeTokens($event);
     }
 }
