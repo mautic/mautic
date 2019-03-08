@@ -575,6 +575,12 @@ return [
             'mautic.helper.file_properties' => [
                 'class' => \Mautic\CoreBundle\Helper\FileProperties::class,
             ],
+            'mautic.helper.trailing_slash' => [
+                'class'     => \Mautic\CoreBundle\Helper\TrailingSlashHelper::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
