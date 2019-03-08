@@ -82,7 +82,7 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
                 $limit = $params['limit'];
             }
 
-            if (!$event->isCached() || 1 == 1) {
+            if (!$event->isCached()) {
                 $items = [];
                 $pages = $this->pageModel->getPopularTrackedPages($limit, $params['dateFrom'], $params['dateTo'], $params, $canViewOthers);
                 // Build table rows with links
