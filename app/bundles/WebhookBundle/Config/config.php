@@ -106,6 +106,7 @@ return [
                 'class'     => \Mautic\WebhookBundle\Helper\CampaignHelper::class,
                 'arguments' => [
                     'mautic.http.connector',
+                    'mautic.lead.token.replacer',
                 ],
             ],
         ],

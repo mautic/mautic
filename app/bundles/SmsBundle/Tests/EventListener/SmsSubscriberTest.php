@@ -14,6 +14,7 @@ namespace Mautic\SmsBundle\Tests\EventListener;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Token\ContactTokenReplacer;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -47,6 +48,9 @@ class SmsSubscriberTest extends WebTestCase
         $mockSmsHelper = $this->createMock(SmsHelper::class);
         $mockSmsHelper->expects($this->any())->method('getDisableTrackableUrls')->willReturn(false);
 
+        $contactTokenReplacerMock = $this->createMock(ContactTokenReplacer::class);
+        $contactTokenReplacerMock->expects($this->any())->method('getTokens')->willReturn([]);
+
         $lead                  = new Lead();
         $tokenReplacementEvent = new TokenReplacementEvent($this->messsageText, $lead, ['channel' => ['sms', 1]]);
         $subscriber            = new SmsSubscriber(
@@ -54,7 +58,8 @@ class SmsSubscriberTest extends WebTestCase
             $mockTrackableModel,
             $mockPageTokenHelper,
             $mockAssetTokenHelper,
-            $mockSmsHelper
+            $mockSmsHelper,
+            $contactTokenReplacerMock
         );
         $subscriber->onTokenReplacement($tokenReplacementEvent);
         $this->assertNotSame($this->messsageText, $tokenReplacementEvent->getContent());
@@ -80,6 +85,9 @@ class SmsSubscriberTest extends WebTestCase
         $mockSmsHelper = $this->createMock(SmsHelper::class);
         $mockSmsHelper->expects($this->any())->method('getDisableTrackableUrls')->willReturn(true);
 
+        $contactTokenReplacerMock = $this->createMock(ContactTokenReplacer::class);
+        $contactTokenReplacerMock->expects($this->any())->method('getTokens')->willReturn([]);
+
         $lead                  = new Lead();
         $tokenReplacementEvent = new TokenReplacementEvent($this->messsageText, $lead, ['channel' => ['sms', 1]]);
         $subscriber            = new SmsSubscriber(
@@ -87,7 +95,8 @@ class SmsSubscriberTest extends WebTestCase
             $mockTrackableModel,
             $mockPageTokenHelper,
             $mockAssetTokenHelper,
-            $mockSmsHelper
+            $mockSmsHelper,
+            $contactTokenReplacerMock
         );
         $subscriber->onTokenReplacement($tokenReplacementEvent);
         $this->assertSame($this->messsageText, $tokenReplacementEvent->getContent());
