@@ -429,6 +429,36 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
+     * @param string      $integration
+     * @param null|string $integrationEntity
+     * @param null|string $internalEntity
+     *
+     * @return bool|int
+     */
+    public function getTotalIntegrationCount(string $integration, $integrationEntity = null, $internalEntity = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
+        $q->select('count(i.id) as total');
+        $q->where('i.internal not like \'%error%\' and i.integration_entity_id is not null');
+
+        $q->andWhere($q->expr()->eq('i.integration', ':integration'));
+        $q->setParameter('integration', $integration);
+
+        if (!empty($integrationEntity)) {
+            $q->andWhere($q->expr()->eq('i.integration_entity', ':intEntity'));
+            $q->setParameter('intEntity', $integrationEntity);
+        }
+
+        if (!empty($internalEntity)) {
+            $q->andWhere($q->expr()->eq('i.internal_entity', ':internalEntity'));
+            $q->setParameter('internalEntity', $internalEntity);
+        }
+
+        return $q->execute()->fetchColumn();
+    }
+
+    /**
      * @param $leadId
      * @param $integration
      * @param $integrationEntity

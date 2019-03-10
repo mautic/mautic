@@ -49,7 +49,7 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
         $integrationObject = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
         $em                = $this->getContainer()->get('doctrine')->getManager();
 
-        if (!$integrationObject->getIntegrationSettings()->getIsPublished()) {
+        if ($integrationObject->getIntegrationSettings()->getIsPublished()) {
             $output->writeln('Pipedrive integration is disabled.');
 
             return;
@@ -69,7 +69,9 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
         $timeInterval     = str_replace('--', '-', '-'.$input->getOption('time-interval'));
         $lastPossibleSync = (new \DateTime())->setTimestamp(strtotime($timeInterval));
 
-        $progress = ProgressBarHelper::init($output, $limit);
+        $integrationCount =  $integrationObject->getIntegrationEntityRepository()->getTotalIntegrationCount(PipedriveIntegration::INTEGRATION_NAME, PipedriveIntegration::PERSON_ENTITY_TYPE, PipedriveIntegration::LEAD_ENTITY_TYPE);
+
+        $progress = ProgressBarHelper::init($output, $integrationCount);
 
         while (true) {
             $integrationEntities = $this->getIntegrationEntities($integrationObject, $start, $limit);
@@ -91,16 +93,19 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
                 }
                 if ($activitiesExport->createActivities($integrationEntity, $lastActivitySync) !== false) {
                     ++$pushed;
-                    if ($pushed % $limit == 0) {
-                        $progress->setProgress($pushed);
-                    }
                 }
             }
             $start = $start + $limit;
+
+            if ($start % $limit == 0) {
+                $progress->setProgress($start);
+            }
+
             $em->clear();
         }
 
         $progress->finish();
+
         $output->writeln('');
         $output->writeln('Pushed activities to '.$pushed.' contacts');
         $output->writeln('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
