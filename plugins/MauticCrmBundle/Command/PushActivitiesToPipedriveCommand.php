@@ -96,10 +96,7 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
                 }
             }
             $start = $start + $limit;
-
-            if ($start % $limit == 0) {
-                $progress->setProgress($start);
-            }
+            $progress->setProgress($start);
 
             $em->clear();
         }

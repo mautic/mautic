@@ -455,7 +455,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setParameter('internalEntity', $internalEntity);
         }
 
-        return $q->execute()->fetchColumn();
+        return (int) $q->execute()->fetchColumn();
     }
 
     /**

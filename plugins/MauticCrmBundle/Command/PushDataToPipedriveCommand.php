@@ -95,7 +95,10 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
         $pushed   = 0;
         $start    = 0;
         $limit    = $input->getOption('batch-limit');
-        $progress = ProgressBarHelper::init($output, $limit);
+
+        $totalContactToProcess = $this->getContactWithRequiredDataCount($em);
+
+        $progress = ProgressBarHelper::init($output, $totalContactToProcess);
         while (true) {
             $leads = $this->getLeads($em, $start, $limit);
 
@@ -106,12 +109,11 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
             foreach ($leads as $lead) {
                 if ($leadExport->create($lead)) {
                     ++$pushed;
-                    if ($pushed % $limit == 0) {
-                        $progress->setProgress($pushed);
-                    }
                 }
             }
             $start = $start + $limit;
+            $progress->setProgress($start);
+
             $em->clear();
         }
 
@@ -154,5 +156,27 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
                 'ignore_paginator' => true,
             ]
         );
+    }
+
+    /**
+     * Get the count of identified contacts with email, firstname and lastname.
+     *
+     * @param EntityManager $em
+     *
+     * @return int
+     */
+    public function getContactWithRequiredDataCount(EntityManager $em)
+    {
+        $qb = $em->getConnection()->createQueryBuilder()
+            ->select('count(l.id)')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        $qb->andWhere(
+            $qb->expr()->isNotNull('l.email'),
+            $qb->expr()->isNotNull('l.firstname'),
+            $qb->expr()->isNotNull('l.lastname')
+        );
+
+        return (int) $qb->execute()->fetchColumn();
     }
 }
