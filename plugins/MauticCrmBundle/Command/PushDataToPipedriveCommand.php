@@ -130,18 +130,15 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
                     'force' => [
                         [
                             'column' => 'l.email',
-                            'expr'   => 'neq',
-                            'value'  => '',
+                            'expr'   => 'isNotNull',
                         ],
                         [
                             'column' => 'l.firstname',
-                            'expr'   => 'neq',
-                            'value'  => '',
+                            'expr'   => 'isNotNull',
                         ],
                         [
                             'column' => 'l.lastname',
-                            'expr'   => 'neq',
-                            'value'  => '',
+                            'expr'   => 'isNotNull',
                         ],
                     ],
                 ],

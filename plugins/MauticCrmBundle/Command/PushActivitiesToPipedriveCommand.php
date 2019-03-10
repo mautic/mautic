@@ -106,7 +106,7 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
      *
      * @return array|null
      */
-    private function getIntegrationEntities($integrationObject, $start, $limit)
+    private function getIntegrationEntities(PipedriveIntegration $integrationObject, $start, $limit)
     {
         return $integrationObject->getIntegrationEntityRepository()->getEntities(
             [
