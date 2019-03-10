@@ -27,6 +27,13 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL,
                 'Send time interval to check updates, it should be a correct php formatted time interval in the past eg:(15 minutes)',
                 '15 minutes'
+            )
+            ->addOption(
+                '--batch-limit',
+                '-b',
+                InputOption::VALUE_OPTIONAL,
+                'Set batch size of contacts to process per round. Defaults to 50.',
+                50
             );
 
         parent::configure();
@@ -56,7 +63,7 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
 
         $pushed = 0;
         $start  = 0;
-        $limit  = 50;
+        $limit  = $input->getOption('batch-limit');
 
         // now() - time-interval
         $timeInterval     = str_replace('--', '-', '-'.$input->getOption('time-interval'));

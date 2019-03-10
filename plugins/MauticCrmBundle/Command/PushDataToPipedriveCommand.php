@@ -32,6 +32,13 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Restart intgeration'
+            )
+            ->addOption(
+                '--batch-limit',
+                '-b',
+                InputOption::VALUE_OPTIONAL,
+                'Set batch size of contacts to process per round. Defaults to 50.',
+                50
             );
 
         parent::configure();
@@ -87,7 +94,7 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
 
         $pushed   = 0;
         $start    = 0;
-        $limit    = 50;
+        $limit    = $input->getOption('batch-limit');
         $progress = ProgressBarHelper::init($output, $limit);
         while (true) {
             $leads = $this->getLeads($em, $start, $limit);
