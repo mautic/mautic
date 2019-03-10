@@ -435,7 +435,7 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return bool|int
      */
-    public function getTotalIntegrationCount(string $integration, $integrationEntity = null, $internalEntity = null)
+    public function getTotalIntegrationCount($integration, $integrationEntity = null, $internalEntity = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
