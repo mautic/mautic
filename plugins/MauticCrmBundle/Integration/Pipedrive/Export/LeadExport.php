@@ -87,6 +87,7 @@ class LeadExport extends AbstractPipedrive
     {
         $leadId            = $lead->getId();
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
+
         if (!$integrationEntity) {
             // create new contact
             return $this->create($lead);
@@ -95,6 +96,7 @@ class LeadExport extends AbstractPipedrive
         try {
             $mappedData = $this->getMappedLeadData($lead);
             $this->getIntegration()->getApiHelper()->updateLead($mappedData, $integrationEntity->getIntegrationEntityId());
+
             $integrationEntity->setLastSyncDate(new \DateTime());
 
             $this->em->persist($integrationEntity);
