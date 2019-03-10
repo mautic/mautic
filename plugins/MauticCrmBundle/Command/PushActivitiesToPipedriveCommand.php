@@ -49,7 +49,7 @@ class PushActivitiesToPipedriveCommand extends ContainerAwareCommand
         $integrationObject = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
         $em                = $this->getContainer()->get('doctrine')->getManager();
 
-        if ($integrationObject->getIntegrationSettings()->getIsPublished()) {
+        if (!$integrationObject->getIntegrationSettings()->getIsPublished()) {
             $output->writeln('Pipedrive integration is disabled.');
 
             return;
