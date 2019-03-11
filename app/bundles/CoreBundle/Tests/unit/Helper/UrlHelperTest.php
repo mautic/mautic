@@ -124,6 +124,7 @@ class UrlHelperTest extends \PHPUnit_Framework_TestCase
                 'https://example.org/with/query?utm_campaign=hello',
                 'https://example.org/with/tokenized-query?foo={contactfield=bar}&bar=foo',
                 'https://example.org/with/just-tokenized-query?foo={contactfield=bar}',
+                'https://example.org/with/query?utm_campaign=_hello#_underscore-test',
             ],
             UrlHelper::getUrlsFromPlaintext(
                 <<<STRING
@@ -143,6 +144,7 @@ Someone said “https://example.org/with/quotation”
 Checkout my UTM tags https://example.org/with/query?utm_campaign=hello.
 Hey what about https://example.org/with/tokenized-query?foo={contactfield=bar}&bar=foo.
 What happens with this https://example.org/with/just-tokenized-query?foo={contactfield=bar}?
+Underscore test https://example.org/with/query?utm_campaign=_hello#_underscore-test
 STRING
             )
         );
