@@ -46,9 +46,9 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->pathsHelper      = $this->createMock(PathsHelper::class);
-        $this->templatingHelper = $this->createMock(TemplatingHelper::class);
-        $this->translator       = $this->createMock(TranslatorInterface::class);
+        $this->pathsHelper         = $this->createMock(PathsHelper::class);
+        $this->templatingHelper    = $this->createMock(TemplatingHelper::class);
+        $this->translator          = $this->createMock(TranslatorInterface::class);
         $this->coreParameterHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParameterHelper->method('getParameter')
             ->with('theme_import_allowed_extensions')
