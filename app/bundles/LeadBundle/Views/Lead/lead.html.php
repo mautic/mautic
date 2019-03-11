@@ -470,12 +470,12 @@ $view['slots']->set(
                     <div class="panel-heading text-center">
                         <h4 class="fw-sb">
                             <?php if (\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED == $doNotContact->getReason()): ?>
-                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact->getId(); ?>">
+                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $view['lead_dnc_reason']->toText($doNotContact->getReason()); ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
                             </span>
 
                             <?php elseif (\Mautic\LeadBundle\Entity\DoNotContact::MANUAL == $doNotContact->getReason()): ?>
-                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact->getId(); ?>">
+                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $view['lead_dnc_reason']->toText($doNotContact->getReason()); ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
                                     <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans(
                                         'mautic.lead.remove_dnc_status'
