@@ -183,7 +183,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $contact1->method('getId')
             ->willReturn(1);
         $contact1->method('getTimezone')
-            ->willReturn('America/New_York');
+            ->willReturn('Etc/GMT+5');
         $contacts = new ArrayCollection([$contact1]);
 
         $interval               = $this->getInterval();
@@ -436,7 +436,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $contact1->method('getId')
             ->willReturn(1);
         $contact1->method('getTimezone')
-            ->willReturn('America/New_York');
+            ->willReturn('Etc/GMT+5');
         $contacts = new ArrayCollection([$contact1]);
 
         $interval = $this->getInterval();
@@ -473,7 +473,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $contact1->method('getId')
             ->willReturn(1);
         $contact1->method('getTimezone')
-            ->willReturn('America/New_York');
+            ->willReturn('Etc/GMT+5');
         $contacts = new ArrayCollection([$contact1]);
 
         $interval = $this->getInterval();
