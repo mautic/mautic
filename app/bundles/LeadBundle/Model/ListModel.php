@@ -1723,6 +1723,13 @@ class ListModel extends FormModel
      */
     public function isFieldUsed(LeadField $field)
     {
+        $segments = $this->getFieldSegments($field);
+
+        return 0 < $segments->count();
+    }
+
+    public function getFieldSegments(LeadField $field)
+    {
         $alias       = $field->getAlias();
         $aliasLength = mb_strlen($alias);
         $likeContent = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
@@ -1733,7 +1740,7 @@ class ListModel extends FormModel
             ],
         ];
 
-        return $this->getEntities(['filter' => $filter])->count() !== 0;
+        return $this->getEntities(['filter' => $filter]);
     }
 
     /**
