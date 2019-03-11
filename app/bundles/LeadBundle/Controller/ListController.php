@@ -80,7 +80,7 @@ class ListController extends FormController
             $translator      = $this->get('translator');
             $mine            = $translator->trans('mautic.core.searchcommand.ismine');
             $global          = $translator->trans('mautic.lead.list.searchcommand.isglobal');
-            $filter['force'] = " ($mine or $global)";
+            $filter['force'] = "($mine or $global)";
         }
 
         $items = $model->getEntities(
@@ -757,9 +757,8 @@ class ListController extends FormController
                 ],
             ]);
         } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'lead:leads:viewown',
             'lead:lists:viewother',
-            'lead:lists:editother',
-            'lead:lists:deleteother',
             $list->getCreatedBy()
         )
         ) {
