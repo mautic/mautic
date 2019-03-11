@@ -93,16 +93,28 @@ class MaintenanceSubscriber extends CommonSubscriber
                   ));
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
-            $rows = $qb->delete(MAUTIC_TABLE_PREFIX.$table)
-                ->where(
-                    $qb->expr()->in(
-                        'lead_id',
-                        $subQb->getSQL()
-                    )
-                )
-                ->execute();
-        }
+            $rows = 0;
+            $loop = 0;
+            $subQb->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));
+            while (true) {
+                $subQb->setMaxResults(10000)->setFirstResult($loop * 10000);
 
+                $leadsIds = array_column($subQb->execute()->fetchAll(), 'id');
+
+                if (sizeof($leadsIds) === 0) {
+                    break;
+                }
+
+                $rows += $qb->delete(MAUTIC_TABLE_PREFIX.$table)
+                  ->where(
+                    $qb->expr()->in(
+                      'lead_id', $leadsIds
+                    )
+                  )
+                  ->execute();
+                ++$loop;
+            }
+        }
         $event->setStat($this->translator->trans('mautic.maintenance.'.$table), $rows, $qb->getSQL(), $qb->getParameters());
     }
 }
