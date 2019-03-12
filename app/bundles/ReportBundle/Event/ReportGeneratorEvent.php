@@ -485,15 +485,4 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
         return substr(str_shuffle($alpha_numeric), 0, 8);
     }
-
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     *
-     * @return bool
-     */
-    private function joinExists(QueryBuilder $queryBuilder, $alias)
-    {
-        isset($queryBuilder->getQueryParts()['join'][$alias]);
-    }
 }
