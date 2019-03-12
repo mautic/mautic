@@ -11,9 +11,9 @@
 
 namespace Mautic\ReportBundle\Tests\Entity;
 
-use Mautic\ReportBundle\Entity\Report;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 
 class ReportGeneratorEventTest extends \PHPUnit_Framework_TestCase
@@ -63,9 +63,9 @@ class ReportGeneratorEventTest extends \PHPUnit_Framework_TestCase
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with(
-                'e', 
-                MAUTIC_TABLE_PREFIX.'categories', 
-                ReportGeneratorEvent::CATEGORY_PREFIX, 
+                'e',
+                MAUTIC_TABLE_PREFIX.'categories',
+                ReportGeneratorEvent::CATEGORY_PREFIX,
                 ReportGeneratorEvent::CATEGORY_PREFIX.'.id = e.category_id'
             );
 
@@ -95,9 +95,9 @@ class ReportGeneratorEventTest extends \PHPUnit_Framework_TestCase
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with(
-                'e', 
-                MAUTIC_TABLE_PREFIX.'leads', 
-                ReportGeneratorEvent::CONTACT_PREFIX, 
+                'e',
+                MAUTIC_TABLE_PREFIX.'leads',
+                ReportGeneratorEvent::CONTACT_PREFIX,
                 ReportGeneratorEvent::CONTACT_PREFIX.'.id = e.lead_id'
             );
 
@@ -115,9 +115,9 @@ class ReportGeneratorEventTest extends \PHPUnit_Framework_TestCase
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with(
-                'e', 
-                MAUTIC_TABLE_PREFIX.'leads', 
-                ReportGeneratorEvent::CONTACT_PREFIX, 
+                'e',
+                MAUTIC_TABLE_PREFIX.'leads',
+                ReportGeneratorEvent::CONTACT_PREFIX,
                 ReportGeneratorEvent::CONTACT_PREFIX.'.id = e.lead_id'
             );
 
@@ -147,9 +147,9 @@ class ReportGeneratorEventTest extends \PHPUnit_Framework_TestCase
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with(
-                'e', 
-                MAUTIC_TABLE_PREFIX.'ip_addresses', 
-                ReportGeneratorEvent::IP_ADDRESS_PREFIX, 
+                'e',
+                MAUTIC_TABLE_PREFIX.'ip_addresses',
+                ReportGeneratorEvent::IP_ADDRESS_PREFIX,
                 ReportGeneratorEvent::IP_ADDRESS_PREFIX.'.id = e.ip_id'
             );
 
