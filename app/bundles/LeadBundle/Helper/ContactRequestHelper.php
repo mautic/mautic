@@ -122,7 +122,8 @@ class ContactRequestHelper
      */
     public function getContactFromQuery(array $queryFields = [])
     {
-        $this->trackedContact = $this->contactTracker->getContact();
+        $ignoreTrackedDevices = isset($queryFields['ignore_tracked_devices']) ? $queryFields['ignore_tracked_devices'] : false;
+        $this->trackedContact = $this->contactTracker->getContact($ignoreTrackedDevices);
         $this->queryFields    = $queryFields;
         try {
             $foundContact         = $this->getContactFromUrl();

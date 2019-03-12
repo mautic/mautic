@@ -132,7 +132,7 @@ class ContactTracker
     /**
      * @return Lead|null
      */
-    public function getContact()
+    public function getContact($ignoreTrackedDevices = false)
     {
         if ($systemContact = $this->getSystemContact()) {
             return $systemContact;
@@ -141,7 +141,7 @@ class ContactTracker
         }
 
         if (empty($this->trackedContact)) {
-            $this->trackedContact = $this->getCurrentContact();
+            $this->trackedContact = $this->getCurrentContact($ignoreTrackedDevices);
             $this->generateTrackingCookies();
         }
 
@@ -260,9 +260,9 @@ class ContactTracker
     /**
      * @return Lead|null
      */
-    private function getCurrentContact()
+    private function getCurrentContact($ignoreTrackedDevices = false)
     {
-        if ($lead = $this->getContactByTrackedDevice()) {
+        if (!$ignoreTrackedDevices && $lead = $this->getContactByTrackedDevice()) {
             return $lead;
         }
 
