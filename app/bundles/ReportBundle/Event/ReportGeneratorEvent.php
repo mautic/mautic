@@ -325,7 +325,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         if ($this->hasColumnWithPrefix($companyPrefix) && $this->hasColumnWithPrefix($contactPrefix)) {
             $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', $contactPrefix.'.id = companies_lead.lead_id');
-            $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', $companyPrefix , 'companies_lead.company_id = '.$companyPrefix.'.id');
+            $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', $companyPrefix, 'companies_lead.company_id = '.$companyPrefix.'.id');
         }
     }
 
@@ -367,7 +367,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     /**
      * @param string $prefix
-     * 
+     *
      * @return bool
      */
     public function hasColumnWithPrefix($prefix)
@@ -488,8 +488,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param string $alias
-     * 
+     * @param string       $alias
+     *
      * @return bool
      */
     private function joinExists(QueryBuilder $queryBuilder, $alias)
