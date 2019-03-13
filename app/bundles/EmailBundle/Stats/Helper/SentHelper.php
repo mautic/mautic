@@ -34,6 +34,8 @@ class SentHelper extends AbstractHelper
         $query = $this->getQuery($fromDateTime, $toDateTime);
         $q     = $query->prepareTimeDataQuery('email_stats', 'date_sent', $options->getFilters());
 
+        $this->limitQueryToEmailIds($q, $options->getEmailIds(), 'email_id', 't');
+
         if (!$options->canViewOthers()) {
             $this->limitQueryToCreator($q);
         }
