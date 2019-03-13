@@ -415,13 +415,19 @@ class FieldController extends FormController
                 return $this->accessDenied();
             }
 
-            if ($model->isUsedField($field)) {
+            $segments = [];
+            foreach ($model->getFieldSegments($field) as $segment) {
+                $segments[] = sprintf('"%s" (%d)', $segment->getName(), $segment->getId());
+            }
+
+            if (count($segments)) {
                 $flashMessage = [
                     'type'    => 'error',
                     'msg'     => 'mautic.core.notice.used.field',
                     'msgVars' => [
-                        '%name%' => $field->getLabel(),
-                        '%id%'   => $objectId,
+                        '%name%'     => $field->getLabel(),
+                        '%id%'       => $objectId,
+                        '%segments%' => implode(', ', $segments),
                     ],
                 ];
             } else {
@@ -497,16 +503,34 @@ class FieldController extends FormController
             // Delete everything we are able to
             if (!empty($deleteIds)) {
                 $filteredDeleteIds = $model->filterUsedFieldIds($deleteIds);
+                $usedFieldIds      = array_diff($deleteIds, $filteredDeleteIds);
+                $segments          = [];
+                $usedFieldsNames   = [];
+
+                if ($usedFieldIds) {
+                    // Iterating through all used fileds to get segments they are used in
+                    foreach ($usedFieldIds as $usedFieldId) {
+                        $fieldEntity = $model->getEntity($usedFieldId);
+                        foreach ($model->getFieldSegments($fieldEntity) as $segment) {
+                            $segments[$segment->getId()] = sprintf('"%s" (%d)', $segment->getName(), $segment->getId());
+                            $usedFieldsNames[]           = sprintf('"%s"', $fieldEntity->getName());
+                        }
+                    }
+                }
 
                 if ($filteredDeleteIds !== $deleteIds) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.core.notice.used.fields',
+                        'msgVars' => [
+                            '%segments%' => implode(', ', $segments),
+                            '%fields%'   => implode(', ', array_unique($usedFieldsNames)),
+                        ],
                     ];
                 }
 
                 if (count($filteredDeleteIds)) {
-                    $entities = $model->deleteEntities($deleteIds);
+                    $entities = $model->deleteEntities($filteredDeleteIds);
 
                     $flashes[] = [
                         'type'    => 'notice',

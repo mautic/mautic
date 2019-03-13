@@ -101,6 +101,8 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('last_shown_tab', 'hidden');
+
         $builder->add(
             'site_url',
             'text',

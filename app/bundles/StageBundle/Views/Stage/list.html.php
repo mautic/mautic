@@ -90,12 +90,16 @@ if ($tmpl == 'index') {
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 ['item' => $item, 'model' => 'stage']
                             ); ?>
+                            <?php if ($permissions['stage:stages:edit']): ?>
                             <a href="<?php echo $view['router']->generate(
                                 'mautic_stage_action',
                                 ['objectAction' => 'edit', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
+                            <?php else: ?>
+                                <?php echo $item->getName(); ?>
+                            <?php endif; ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
                             <div class="text-muted mt-4">

@@ -152,6 +152,6 @@ class StagesChangeLogRepository extends CommonRepository
 
         $result = $query->execute()->fetch();
 
-        return (isset($result['stage'])) ? $result['stage'] : null;
+        return (isset($result['stage'])) ? (int) $result['stage'] : null;
     }
 }
