@@ -28,7 +28,6 @@ use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Class PointModel.
@@ -57,9 +56,6 @@ class PointModel extends CommonFormModel
      */
     protected $leadModel;
 
-    /** @var PropertyAccessor */
-    private $propertyAccessor;
-
     /**
      * PointModel constructor.
      *
@@ -72,7 +68,6 @@ class PointModel extends CommonFormModel
         $this->session          = $session;
         $this->ipLookupHelper   = $ipLookupHelper;
         $this->leadModel        = $leadModel;
-        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
