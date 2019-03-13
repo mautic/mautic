@@ -74,7 +74,7 @@ class ReportGeneratorEventTest extends \PHPUnit_Framework_TestCase
 
     public function testAddLeadLeftJoinWhenColumnIsNotUsed()
     {
-        $this->report->expects($this->exactly(3))
+        $this->report->expects($this->exactly(4))
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['e.id', 'comp.name']);
 
@@ -106,7 +106,7 @@ class ReportGeneratorEventTest extends \PHPUnit_Framework_TestCase
 
     public function testAddLeadLeftJoinWhenCampaignIdColumnIsUsed()
     {
-        $this->report->expects($this->exactly(3))
+        $this->report->expects($this->exactly(4))
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(
                 ['e.id', 'clel.campaign_id', 'comp.name']

@@ -217,7 +217,11 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addLeadLeftJoin(QueryBuilder $queryBuilder, $prefix, $leadPrefix = self::CONTACT_PREFIX)
     {
-        if ($this->hasColumnWithPrefix($leadPrefix) || $this->hasColumn('cmp.name') || $this->hasColumn('clel.campaign_id')) {
+        if ($this->hasColumnWithPrefix($leadPrefix) 
+            || $this->hasColumnWithPrefix(self::IP_ADDRESS_PREFIX) 
+            || $this->hasColumn('cmp.name') 
+            || $this->hasColumn('clel.campaign_id')
+        ) {
             $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'leads', $leadPrefix, $leadPrefix.'.id = '.$prefix.'.lead_id');
         }
 
@@ -253,7 +257,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addLeadIpAddressLeftJoin(QueryBuilder $queryBuilder, $ipXrefPrefix = 'lip', $ipPrefix = self::IP_ADDRESS_PREFIX, $leadPrefix = self::CONTACT_PREFIX)
     {
-        if ($this->hasColumnWithPrefix($ipPrefix) && $this->hasColumnWithPrefix($leadPrefix)) {
+        if ($this->hasColumnWithPrefix($ipPrefix)) {
             $this->addIpAddressLeftJoin($queryBuilder, $ipXrefPrefix, $ipPrefix);
             $queryBuilder->leftJoin($leadPrefix, MAUTIC_TABLE_PREFIX.'lead_ips_xref', $ipXrefPrefix, $ipXrefPrefix.'.lead_id = '.$leadPrefix.'.id');
         }
