@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -39,6 +40,11 @@ class PointEventHelper
 
         if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
             //no points change
+            return false;
+        }
+
+        /* Email $evenDetails */
+        if ($eventDetails instanceof Email && empty($action['repeatable']) && empty($action['properties']['separately']) && $eventDetails->getReadCount()) {
             return false;
         }
 

@@ -113,7 +113,7 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onEmailOpen(EmailOpenEvent $event)
     {
-        $this->pointModel->triggerAction('email.open', $event->getEmail());
+        $this->pointModel->triggerAction('email.open', $event->getEmail(), null, null);
     }
 
     /**

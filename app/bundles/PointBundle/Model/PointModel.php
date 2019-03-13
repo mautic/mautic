@@ -27,6 +27,7 @@ use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Class PointModel.
@@ -55,6 +56,9 @@ class PointModel extends CommonFormModel
      */
     protected $leadModel;
 
+    /** @var PropertyAccessor */
+    private $propertyAccessor;
+
     /**
      * PointModel constructor.
      *
@@ -64,9 +68,10 @@ class PointModel extends CommonFormModel
      */
     public function __construct(Session $session, IpLookupHelper $ipLookupHelper, LeadModel $leadModel)
     {
-        $this->session        = $session;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel      = $leadModel;
+        $this->session          = $session;
+        $this->ipLookupHelper   = $ipLookupHelper;
+        $this->leadModel        = $leadModel;
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -190,12 +195,13 @@ class PointModel extends CommonFormModel
     /**
      * Triggers a specific point change.
      *
-     * @param       $type
-     * @param mixed $eventDetails passthrough from function triggering action to the callback function
-     * @param mixed $typeId       Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param Lead  $lead
+     * @param        $type
+     * @param mixed  $eventDetails       passthrough from function triggering action to the callback function
+     * @param mixed  $typeId             Something unique to the triggering event to prevent  unnecessary duplicate calls
+     * @param Lead   $lead
+     * @param string $internalIdProperty
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
+    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $internalIdProperty = 'id')
     {
         //only trigger actions for anonymous users
         if (!$this->security->isAnonymous()) {
@@ -250,6 +256,7 @@ class PointModel extends CommonFormModel
                     'id'         => $action->getId(),
                     'type'       => $action->getType(),
                     'name'       => $action->getName(),
+                    'repeatable' => $action->getRepeatable(),
                     'properties' => $action->getProperties(),
                     'points'     => $action->getDelta(),
                 ],
@@ -301,6 +308,7 @@ class PointModel extends CommonFormModel
                         $log->setIpAddress($ipAddress);
                         $log->setPoint($action);
                         $log->setLead($lead);
+                        $log->setInternalId($this->propertyAccessor->getValue($eventDetails, $internalIdProperty));
                         $log->setDateFired(new \DateTime());
                         $persist[] = $log;
                     }

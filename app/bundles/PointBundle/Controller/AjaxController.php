@@ -70,6 +70,22 @@ class AjaxController extends CommonAjaxController
                 $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : 'genericpoint_settings';
                 $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : [];
                 $form            = $this->get('form.factory')->create('pointaction', [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
+                /* $form->add(
+                     'separately',
+                     'yesno_button_group',
+                     [
+                         'label'      => 'mautic.email.open.each',
+                         'label_attr' => ['class' => 'control-label'],
+                         'attr'       => [
+                             'class'   => 'form-control',
+                             'tooltip' => 'mautic.email.open.each.tooltip',
+                             'data-show-on' => '{"point_repeatable_0":"checked"}',
+
+                         ],
+                         'required'   => false,
+
+                     ]
+                 );*/
                 $html            = $this->renderView('MauticPointBundle:Point:actionform.html.php', [
                     'form' => $this->setFormTheme($form, 'MauticPointBundle:Point:actionform.html.php', $themes),
                 ]);
