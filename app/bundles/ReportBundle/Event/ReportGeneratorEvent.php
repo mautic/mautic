@@ -217,9 +217,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addLeadLeftJoin(QueryBuilder $queryBuilder, $prefix, $leadPrefix = self::CONTACT_PREFIX)
     {
-        if ($this->hasColumnWithPrefix($leadPrefix) 
-            || $this->hasColumnWithPrefix(self::IP_ADDRESS_PREFIX) 
-            || $this->hasColumn('cmp.name') 
+        if ($this->hasColumnWithPrefix($leadPrefix)
+            || $this->hasColumnWithPrefix(self::IP_ADDRESS_PREFIX)
+            || $this->hasColumn('cmp.name')
             || $this->hasColumn('clel.campaign_id')
         ) {
             $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'leads', $leadPrefix, $leadPrefix.'.id = '.$prefix.'.lead_id');
