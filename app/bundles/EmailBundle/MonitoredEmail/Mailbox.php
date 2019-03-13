@@ -284,14 +284,12 @@ class Mailbox
      */
     public function getImapPath($settings)
     {
-        /**
-         * @var $host
-         * @var $port
-         * @var $encryption
-         * @var $folder
-         * @var $user
-         * @var $password
-         */
+        /** @var string $host */
+        /** @var int $port */
+        /** @var string $encryption */
+        /** @var string $folder */
+        /** @var string $user */
+        /** @var string $password */
         extract($settings);
         if (!isset($encryption)) {
             $encryption = (!empty($ssl)) ? '/ssl' : '';
@@ -406,6 +404,10 @@ class Mailbox
     protected function initImapStream()
     {
         imap_timeout(IMAP_OPENTIMEOUT, 15);
+        imap_timeout(IMAP_CLOSETIMEOUT, 15);
+        imap_timeout(IMAP_READTIMEOUT, 15);
+        imap_timeout(IMAP_WRITETIMEOUT, 15);
+
         $imapStream = @imap_open(
             $this->imapFullPath,
             $this->settings['user'],
