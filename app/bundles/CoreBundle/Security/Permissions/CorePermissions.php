@@ -328,6 +328,9 @@ class CorePermissions
      */
     public function checkPermissionExists($permission)
     {
+        // Generate all permission objects in case they haven't been already.
+        $this->getPermissionObjects();
+
         $checkPermissions = (!is_array($permission)) ? [$permission] : $permission;
 
         $result = [];
