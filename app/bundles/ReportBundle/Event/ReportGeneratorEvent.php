@@ -219,6 +219,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         if ($this->hasColumnWithPrefix($leadPrefix)
             || $this->hasColumnWithPrefix(self::IP_ADDRESS_PREFIX)
+            || $this->hasColumnWithPrefix(self::COMPANY_PREFIX)
             || $this->hasColumn('cmp.name')
             || $this->hasColumn('clel.campaign_id')
         ) {
@@ -327,7 +328,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addCompanyLeftJoin(QueryBuilder $queryBuilder, $companyPrefix = self::COMPANY_PREFIX, $contactPrefix = self::CONTACT_PREFIX)
     {
-        if ($this->hasColumnWithPrefix($companyPrefix) && $this->hasColumnWithPrefix($contactPrefix)) {
+        if ($this->hasColumnWithPrefix($companyPrefix)) {
             $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', $contactPrefix.'.id = companies_lead.lead_id');
             $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', $companyPrefix, 'companies_lead.company_id = '.$companyPrefix.'.id');
         }
