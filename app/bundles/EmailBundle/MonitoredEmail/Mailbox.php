@@ -284,12 +284,12 @@ class Mailbox
      */
     public function getImapPath($settings)
     {
-        /** @var string $host */
-        /** @var int $port */
-        /** @var string $encryption */
-        /** @var string $folder */
-        /** @var string $user */
-        /** @var string $password */
+        /* @var string $host */
+        /* @var int $port */
+        /* @var string $encryption */
+        /* @var string $folder */
+        /* @var string $user */
+        /* @var string $password */
         extract($settings);
         if (!isset($encryption)) {
             $encryption = (!empty($ssl)) ? '/ssl' : '';
