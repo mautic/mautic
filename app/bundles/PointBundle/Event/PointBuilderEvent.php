@@ -81,6 +81,10 @@ class PointBuilderEvent extends Event
         $action['label'] = $this->translator->trans($action['label']);
         $action['group'] = $this->translator->trans($action['group']);
 
+        if (!isset($action['internalIdProperty'])) {
+            $action['internalIdProperty'] = 'id';
+        }
+
         $this->actions[$key] = $action;
     }
 

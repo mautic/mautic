@@ -43,11 +43,6 @@ class PointEventHelper
             return false;
         }
 
-        /* Email $evenDetails */
-        if ($eventDetails instanceof Email && empty($action['repeatable']) && empty($action['properties']['separately']) && $eventDetails->getReadCount()) {
-            return false;
-        }
-
         return true;
     }
 
