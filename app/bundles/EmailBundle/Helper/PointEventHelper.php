@@ -64,13 +64,15 @@ class PointEventHelper
         }
 
         if (!$eventDetails instanceof Stat) {
-            return false;
+            return true;
         }
 
+        // true If I it'đ repeatble or execute_each is disabled
         if (empty($action['properties']['execute_each']) || !empty($action['repeatable'])) {
-            return false;
+            return true;
         }
 
+        // already opened
         if ($eventDetails->getOpenCount() > 1) {
             return false;
         }

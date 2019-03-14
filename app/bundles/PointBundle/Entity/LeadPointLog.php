@@ -34,8 +34,6 @@ class LeadPointLog
      */
     private $ipAddress;
 
-    /** @var int|string */
-    private $internalId;
     /**
      * @var \DateTime
      **/
@@ -49,8 +47,7 @@ class LeadPointLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_lead_action_log')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeadPointLogRepository')
-            ->addIndex(['internal_id'], 'internal_id');
+            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeadPointLogRepository');
 
         $builder->createManyToOne('point', 'Point')
             ->isPrimaryKey()
@@ -64,12 +61,6 @@ class LeadPointLog
 
         $builder->createField('dateFired', 'datetime')
             ->columnName('date_fired')
-            ->build();
-
-        $builder->createField('internalId', 'string')
-            ->columnName('internal_id')
-            ->length(255)
-            ->nullable()
             ->build();
     }
 
@@ -135,21 +126,5 @@ class LeadPointLog
     public function setPoint($point)
     {
         $this->point = $point;
-    }
-
-    /**
-     * @return int|string
-     */
-    public function getInternalId()
-    {
-        return $this->internalId;
-    }
-
-    /**
-     * @param int|string $internalId
-     */
-    public function setInternalId($internalId)
-    {
-        $this->internalId = $internalId;
     }
 }

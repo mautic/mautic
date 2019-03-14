@@ -23,7 +23,7 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
-use Mautic\PointBundle\Executioner\PointActionExecutionValidator;
+use Mautic\PointBundle\Executioner\Validator\PointActionTriggerValidator;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -227,7 +227,7 @@ class PointModel extends CommonFormModel
             }
         }
 
-        $pointActionExecutionValidator = new PointActionExecutionValidator($this, $eventDetails, $type, $lead);
+        $pointActionExecutionValidator = new PointActionTriggerValidator($this, $eventDetails, $type, $lead);
 
         //get available actions
         $availableActions = $this->getPointActions();
@@ -235,26 +235,22 @@ class PointModel extends CommonFormModel
         $persist = [];
         /** @var Point $action */
         foreach ($availableActions as $action) {
+            $args = [
+                'action' => [
+                    'id'         => $action->getId(),
+                    'type'       => $action->getType(),
+                    'name'       => $action->getName(),
+                    'repeatable' => $action->getRepeatable(),
+                    'properties' => $action->getProperties(),
+                    'points'     => $action->getDelta(),
+                ],
+                'lead'         => $lead,
+                'factory'      => $this->factory, // WHAT?
+                'eventDetails' => $eventDetails,
+            ];
+
             try {
-                if (!$pointActionExecutionValidator->isValid($action)) {
-                    continue;
-                }
-
-                $args = [
-                    'action' => [
-                        'id'         => $action->getId(),
-                        'type'       => $action->getType(),
-                        'name'       => $action->getName(),
-                        'repeatable' => $action->getRepeatable(),
-                        'properties' => $action->getProperties(),
-                        'points'     => $action->getDelta(),
-                    ],
-                    'lead'         => $lead,
-                    'factory'      => $this->factory, // WHAT?
-                    'eventDetails' => $eventDetails,
-                ];
-
-                if (!$pointActionExecutionValidator->isValidByCallback($args)) {
+                if (!$pointActionExecutionValidator->canTrigger($action, $args)) {
                     continue;
                 }
             } catch (\Exception $exception) {

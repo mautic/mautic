@@ -9,22 +9,18 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PointBundle\Executioner;
+namespace Mautic\PointBundle\Executioner\Validator;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\Point;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class PointActionExecutionValidator
+class PointActionTriggerValidator
 {
     /**
      * @var PointModel
      */
     private $pointModel;
-
-    /** @var object */
-    private $eventDetails;
 
     /** @var array */
     private $settings;
@@ -36,50 +32,42 @@ class PointActionExecutionValidator
     /** @var array */
     private $completedActionsForContact;
 
-    /** @var int/string */
-    private $internalId;
-
     /**
      * PointActionValidator constructor.
      *
      * @param PointModel $pointModel
      */
-    public function __construct(PointModel $pointModel, $eventDetails, $type, Lead $lead)
+    public function __construct(PointModel $pointModel, $type, Lead $lead)
     {
         $this->pointModel                 = $pointModel;
-        $this->eventDetails               = $eventDetails;
         $this->completedActionsForContact = $this->pointModel->getRepository()->getCompletedLeadActions($type, $lead->getId());
-        $this->propertyAccessor           = new PropertyAccessor();
     }
 
     /**
      * @param Point $action
      *
-     * @return bool
+     * @param array $args
      *
+     * @return bool
      * @throws \Exception
      */
-    public function isValid(Point $action)
+    public function canTrigger(Point $action, array $args)
     {
         $this->action = $action;
-
-        $availableActions = $this->pointModel->getPointActions();
-
-        if (!isset($availableActions['actions'][$this->action->getType()])) {
-            throw new \Exception(sprintf('Action "%s" doesn\'t exist', $this->action->getType()));
-        }
-
-        $this->settings = $availableActions['actions'][$action->getType()];
+        $this->settings = $this->getActionSettings();
 
         // repeatable - valid always
         if ($this->action->getRepeatable()) {
             return true;
-        } elseif ($this->validationByInternalId()) {
-            if ($this->hasContactCompletedActionByInternalId()) {
-                return false;
-            }
-        } elseif ($this->hasContactCompletedAction()) {
-            return false;
+        }
+        // validation by callback
+        if ($this->canTriggerByCallback($args)) {
+            return true;
+        }
+
+        // point log already exits
+        if ($this->canTriggerByLog()) {
+            return true;
         }
 
         return true;
@@ -92,7 +80,7 @@ class PointActionExecutionValidator
      *
      * @return bool
      */
-    public function isValidByCallback(array $args)
+    private function canTriggerByCallback(array $args)
     {
         $callback = (isset($this->settings['callback'])) ? $this->settings['callback'] :
             ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
@@ -124,53 +112,27 @@ class PointActionExecutionValidator
     }
 
     /**
+     * @return mixed
+     * @throws \Exception
+     */
+    private function getActionSettings()
+    {
+        $availableActions = $this->pointModel->getPointActions();
+
+        if (!isset($availableActions['actions'][$this->action->getType()])) {
+            throw new \Exception(sprintf('Action "%s" doesn\'t exist', $this->action->getType()));
+        }
+
+        return $availableActions['actions'][$this->action->getType()];
+    }
+
+    /**
      * Check If contact already has log of point action.
      *
      * @return bool
      */
-    private function hasContactCompletedAction()
+    private function canTriggerByLog()
     {
-        return !empty($this->completedActionsForContact[$this->action->getId()]);
-    }
-
-    /**
-     * Check If contact already has log of point action and internal id.
-     *
-     * @return bool
-     */
-    private function hasContactCompletedActionByInternalId()
-    {
-        if (!$this->internalId = $this->propertyAccessor->getValue($this->eventDetails, $this->settings['internalIdProperty'])) {
-            return false;
-        }
-        if (!array_search($this->internalId, array_column($this->completedActionsForContact, 'internal_id'))) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @return bool
-     */
-    private function validationByInternalId()
-    {
-        return  !empty($this->action->getProperties()['separately']) && $this->hasInternalIdProperty();
-    }
-
-    /**
-     * @return bool
-     */
-    private function hasInternalIdProperty()
-    {
-        return $this->settings['internalIdProperty'] ? true : false;
-    }
-
-    /**
-     * @return int
-     */
-    public function getInternalId()
-    {
-        return $this->internalId;
+        return (empty($this->action->getProperties()['execute_each']) && empty($this->completedActionsForContact[$this->action->getId()]));
     }
 }
