@@ -105,16 +105,60 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getLeadsByFieldValue($field, $value, $ignoreId = null, $indexByColumn = false)
     {
+        $results = $this->getEntities([
+            'qb'               => $this->buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId, $indexByColumn),
+            'ignore_paginator' => true,
+        ]);
+
+        if (!$indexByColumn) {
+            return $results;
+        }
+
+        return array_map(function ($key, $value) {
+            return [$key => $value];
+        }, array_map(function (Lead $lead) use ($field) {
+            return $lead->getFieldValue($field);
+        }, $results), $results);
+    }
+
+    /**
+     * Builds the query for the getLeadsByFieldValue method.
+     *
+     * @internal
+     *
+     * @param $field
+     * @param $value
+     * @param $ignoreId
+     * @param $indexByColumn
+     *
+     * @return QueryBuilder
+     */
+    private function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null, $indexByColumn = false)
+    {
         $col = 'l.'.$field;
 
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $q = $this->createQueryBuilderFromConnection()
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         if (is_array($value)) {
+            /**
+             * Bind each value to specific named parameters.
+             *
+             * @see https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/query-builder.html#line-number-0a267d5a2c69797a7656aae33fcc140d16b0a566-72
+             */
+            $valueParams = [];
+            for ($i = 0; $i < count($value); ++$i) {
+                $valueParams[':'.$this->generateRandomParameterName()] = $value[$i];
+            }
+
             $q->where(
-                $q->expr()->in($col, $value)
+                $q->expr()->in($col, array_keys($valueParams))
             );
+
+            foreach ($valueParams as $param => $value) {
+                $q->setParameter(ltrim($param, ':'), $value);
+            }
         } else {
             $q->where("$col = :search")
                 ->setParameter('search', $value);
@@ -125,21 +169,17 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 ->setParameter('ignoreId', $ignoreId);
         }
 
-        $results = $this->getEntities(['qb' => $q, 'ignore_paginator' => true]);
+        return $q;
+    }
 
-        if (count($results) && $indexByColumn) {
-            /* @var Lead $lead */
-            $leads = [];
-            foreach ($results as $lead) {
-                $fieldKey = $lead->getFieldValue($field);
-
-                $leads[$fieldKey] = $lead;
-            }
-
-            return $leads;
-        }
-
-        return $results;
+    /**
+     * Method for creating a query builder from the entity manager connection.
+     *
+     * @return QueryBuilder
+     */
+    protected function createQueryBuilderFromConnection()
+    {
+        return $this->getEntityManager()->getConnection()->createQueryBuilder();
     }
 
     /**
