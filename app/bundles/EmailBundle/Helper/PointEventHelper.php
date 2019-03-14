@@ -12,6 +12,8 @@
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -31,6 +33,10 @@ class PointEventHelper
             return false;
         }
 
+        if ($eventDetails instanceof Stat) {
+            $eventDetails = $eventDetails->getEmail();
+        }
+
         $emailId = $eventDetails->getId();
 
         if (isset($action['properties']['emails'])) {
@@ -39,6 +45,33 @@ class PointEventHelper
 
         if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
             //no points change
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $eventDetails
+     * @param $action
+     *
+     * @return bool
+     */
+    public function validateEmailByOpen($eventDetails, $action)
+    {
+        if (!self::validateEmail($eventDetails, $action)) {
+            return false;
+        }
+
+        if (!$eventDetails instanceof Stat) {
+            return false;
+        }
+
+        if (empty($action['properties']['execute_each']) || !empty($action['repeatable'])) {
+            return false;
+        }
+
+        if ($eventDetails->getOpenCount() > 1) {
             return false;
         }
 
