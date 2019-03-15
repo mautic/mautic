@@ -603,6 +603,18 @@ class FieldModel extends FormModel
     }
 
     /**
+     * Returns list of all segments that use $field.
+     *
+     * @param LeadField $field
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
+    public function getFieldSegments(LeadField $field)
+    {
+        return $this->leadListModel->getFieldSegments($field);
+    }
+
+    /**
      * Filter used field ids.
      *
      * @param array $ids

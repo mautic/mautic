@@ -136,7 +136,7 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'unsubscribed',
                 'label'   => 'mautic.email.report.unsubscribed',
                 'type'    => 'string',
-                'formula' => 'SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' , 1, 0))',
+                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'unsubscribed_ratio' => [
                 'alias'   => 'unsubscribed_ratio',
@@ -149,7 +149,7 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'bounced',
                 'label'   => 'mautic.email.report.bounced',
                 'type'    => 'string',
-                'formula' => 'SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0))',
+                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'bounced_ratio' => [
                 'alias'   => 'bounced_ratio',
@@ -373,6 +373,13 @@ class ReportSubscriber extends CommonSubscriber
                         )
                         ->where('cut2.channel = \'email\' AND ph.source = \'email\'')
                         ->groupBy('cut2.channel_id, ph.lead_id');
+
+                    if ($event->hasFilter('e.id')) {
+                        $filterParam = $event->createParameterName();
+                        $qbcut->andWhere("cut2.channel_id = :{$filterParam}");
+                        $qb->setParameter($filterParam, $event->getFilterValue('e.id'), \PDO::PARAM_INT);
+                    }
+
                     $qb->leftJoin(
                         'e',
                         sprintf('(%s)', $qbcut->getSQL()),

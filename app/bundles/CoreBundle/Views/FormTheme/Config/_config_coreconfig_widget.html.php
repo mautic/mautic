@@ -27,6 +27,7 @@ $template  = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'log_path', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'theme', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'image_path', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'last_shown_tab'); ?>
         </div>
     </div>
 </div>

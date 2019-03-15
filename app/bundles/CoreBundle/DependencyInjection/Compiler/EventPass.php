@@ -15,8 +15,8 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\WebhookBundle\EventListener\WebhookSubscriberBase;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * Class EventPass.
@@ -40,7 +40,7 @@ class EventPass implements CompilerPassInterface
             $definition->addMethodCall('setRequest', [new Reference('request_stack')]);
             $definition->addMethodCall('setSecurity', [new Reference('mautic.security')]);
             $definition->addMethodCall('setSerializer', [new Reference('jms_serializer')]);
-            $definition->addMethodCall('setSystemParameters', [new Parameter('mautic.parameters')]);
+            $definition->addMethodCall('setSystemParameters', [new Expression("parameter('mautic.parameters')")]);
             $definition->addMethodCall('setDispatcher', [new Reference('event_dispatcher')]);
             $definition->addMethodCall('setTranslator', [new Reference('translator')]);
             $definition->addMethodCall('setEntityManager', [new Reference('doctrine.orm.entity_manager')]);

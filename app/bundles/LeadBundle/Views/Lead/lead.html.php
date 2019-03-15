@@ -198,14 +198,20 @@ $view['slots']->set(
                             <?php ++$step; ?>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <?php if ($devices): ?>
+                        <li>
+                            <a href="#devices" class="group" data-toggle="tab">
+                                <?php echo $view['translator']->trans('mautic.lead.devices'); ?>
+                            </a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
 
                 <!-- start: tab-content -->
                 <div class="tab-content pa-md bg-white">
                     <?php $i = 0; ?>
                     <?php foreach ($groups as $group): ?>
-                        <div class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0"
-                             id="<?php echo $group; ?>">
+                        <div class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $group; ?>">
                             <div class="pr-md pl-md pb-md">
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-bordered table-striped mb-0">
@@ -239,6 +245,11 @@ $view['slots']->set(
                         </div>
                         <?php ++$i; ?>
                     <?php endforeach; ?>
+                    <?php if ($devices): ?>
+                        <div class="tab-pane fade bdr-w-0" id="devices">
+                            <?php echo $view->render('MauticLeadBundle:Lead:devices.html.php', ['devices' => $devices]); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <!--/ lead detail collapseable -->
@@ -459,12 +470,12 @@ $view['slots']->set(
                     <div class="panel-heading text-center">
                         <h4 class="fw-sb">
                             <?php if (\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED == $doNotContact->getReason()): ?>
-                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact->getId(); ?>">
+                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $view['lead_dnc_reason']->toText($doNotContact->getReason()); ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
                             </span>
 
                             <?php elseif (\Mautic\LeadBundle\Entity\DoNotContact::MANUAL == $doNotContact->getReason()): ?>
-                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact->getId(); ?>">
+                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $view['lead_dnc_reason']->toText($doNotContact->getReason()); ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
                                     <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans(
                                         'mautic.lead.remove_dnc_status'

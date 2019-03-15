@@ -83,11 +83,31 @@ class MaintenanceSubscriber extends CommonSubscriber
                 ->execute()
                 ->fetchColumn();
         } else {
-            $rows = (int) $qb->delete(MAUTIC_TABLE_PREFIX.$table)
-                ->where(
-                    $qb->expr()->lte('date_added', ':date')
-                )
-                ->execute();
+            $qb->select('log.id')
+              ->from(MAUTIC_TABLE_PREFIX.$table, 'log')
+              ->where(
+                $qb->expr()->lte('log.date_added', ':date')
+              );
+
+            $rows = 0;
+            $qb->setMaxResults(10000)->setFirstResult(0);
+
+            $qb2 = $this->db->createQueryBuilder();
+            while (true) {
+                $ids = array_column($qb->execute()->fetchAll(), 'id');
+
+                if (sizeof($ids) === 0) {
+                    break;
+                }
+
+                $rows += $qb2->delete(MAUTIC_TABLE_PREFIX.$table)
+                  ->where(
+                    $qb2->expr()->in(
+                      'id', $ids
+                    )
+                  )
+                  ->execute();
+            }
         }
 
         $event->setStat($this->translator->trans('mautic.maintenance.'.$table), $rows, $qb->getSQL(), $qb->getParameters());
