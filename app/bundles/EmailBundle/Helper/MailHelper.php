@@ -802,7 +802,8 @@ class MailHelper
             // Stash attachment to be processed by the transport
             $this->message->addAttachment($filePath, $fileName, $contentType, $inline);
         } else {
-            if (file_exists($filePath) && is_readable($filePath)) {
+            // filePath can contain the value of a local file path or the value of an URL where the file can be found
+            if (filter_var($filePath, FILTER_VALIDATE_URL) || (file_exists($filePath) && is_readable($filePath))) {
                 try {
                     $attachment = \Swift_Attachment::fromPath($filePath);
 
