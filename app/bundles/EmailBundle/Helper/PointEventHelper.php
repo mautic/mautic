@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PointBundle\Exception\PointTriggerCustomHandledException;
 
 /**
  * Class PointEventHelper.
@@ -56,9 +57,12 @@ class PointEventHelper
      * @param $action
      *
      * @return bool
+     *
+     * @throws PointTriggerCustomHandledException
      */
     public function validateEmailByOpen($eventDetails, $action)
     {
+        // standard validation not passed, then not need continue
         if (!self::validateEmail($eventDetails, $action)) {
             return false;
         }
@@ -67,17 +71,12 @@ class PointEventHelper
             return true;
         }
 
-        // true If I it's repeatble or execute_each is disabled
-        if (empty($action['properties']['open_condition']) || !empty($action['repeatable'])) {
+        // custom handler not used, then continue
+        if (empty($action['properties']['open_condition'])) {
             return true;
         }
 
-        // already opened
-        if ($eventDetails->getOpenCount() > 1) {
-            return false;
-        }
-
-        return true;
+        throw new PointTriggerCustomHandledException(($eventDetails->getOpenCount() < 2));
     }
 
     /**

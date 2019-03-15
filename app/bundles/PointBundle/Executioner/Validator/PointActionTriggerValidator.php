@@ -14,6 +14,7 @@ namespace Mautic\PointBundle\Executioner\Validator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Exception\PointTriggerCustomHandledException;
 
 class PointActionTriggerValidator
 {
@@ -33,14 +34,26 @@ class PointActionTriggerValidator
     private $completedActionsForContact;
 
     /**
+     * @var Lead
+     */
+    private $lead;
+
+    private $eventDetails;
+
+    /**
      * PointActionValidator constructor.
      *
      * @param PointModel $pointModel
+     * @param            $eventDetails
+     * @param            $type
+     * @param Lead       $lead
      */
-    public function __construct(PointModel $pointModel, $type, Lead $lead)
+    public function __construct(PointModel $pointModel, $eventDetails, $type, Lead $lead)
     {
         $this->pointModel                 = $pointModel;
+        $this->lead                       = $lead;
         $this->completedActionsForContact = $this->pointModel->getRepository()->getCompletedLeadActions($type, $lead->getId());
+        $this->eventDetails               = $eventDetails;
     }
 
     /**
@@ -51,23 +64,29 @@ class PointActionTriggerValidator
      *
      * @throws \Exception
      */
-    public function canTrigger(Point $action, array $args)
+    public function canChangePoints(Point $action)
     {
         $this->action   = $action;
         $this->settings = $this->getActionSettings();
 
-        // repeatable - trigger always
+        // repeatable - always change points
         if ($this->action->getRepeatable()) {
             return true;
         }
-        // validation by callback
-        if ($this->canTriggerByCallback($args)) {
-            return true;
+
+        try {
+            // validation by callback not passed, stop
+            if (!$this->canChangePointsByCallback($this->getCallbackArgs())) {
+                return false;
+            }
+        } catch (PointTriggerCustomHandledException $handledException) {
+            // if we want use our custom validation for change points, then stop here and not continue
+            return $handledException->canChangePoints();
         }
 
-        // point log already exits
-        if ($this->canTriggerByLog()) {
-            return true;
+        // standard validation from logs If we are able to change points for action for contact
+        if (!$this->canChangePointsByLog()) {
+            return false;
         }
 
         return true;
@@ -80,7 +99,7 @@ class PointActionTriggerValidator
      *
      * @return bool
      */
-    private function canTriggerByCallback(array $args)
+    private function canChangePointsByCallback(array $args)
     {
         $callback = (isset($this->settings['callback'])) ? $this->settings['callback'] :
             ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
@@ -128,12 +147,32 @@ class PointActionTriggerValidator
     }
 
     /**
+     * @return array
+     */
+    private function getCallbackArgs()
+    {
+        return [
+            'action' => [
+                'id'         => $this->action->getId(),
+                'type'       => $this->action->getType(),
+                'name'       => $this->action->getName(),
+                'repeatable' => $this->action->getRepeatable(),
+                'properties' => $this->action->getProperties(),
+                'points'     => $this->action->getDelta(),
+            ],
+            'lead'         => $this->lead,
+            'factory'      => $this->factory, // WHAT?
+            'eventDetails' => $this->eventDetails,
+        ];
+    }
+
+    /**
      * Check If contact already has log of point action.
      *
      * @return bool
      */
-    private function canTriggerByLog()
+    private function canChangePointsByLog()
     {
-        return empty($this->settings['only_callback']) && empty($this->completedActionsForContact[$this->action->getId()]);
+        return empty($this->completedActionsForContact[$this->action->getId()]);
     }
 }

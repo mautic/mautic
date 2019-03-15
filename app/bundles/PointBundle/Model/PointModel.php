@@ -235,28 +235,18 @@ class PointModel extends CommonFormModel
         $persist = [];
         /** @var Point $action */
         foreach ($availableActions as $action) {
-            $args = [
-                'action' => [
-                    'id'         => $action->getId(),
-                    'type'       => $action->getType(),
-                    'name'       => $action->getName(),
-                    'repeatable' => $action->getRepeatable(),
-                    'properties' => $action->getProperties(),
-                    'points'     => $action->getDelta(),
-                ],
-                'lead'         => $lead,
-                'factory'      => $this->factory, // WHAT?
-                'eventDetails' => $eventDetails,
-            ];
+            if (!$pointActionExecutionValidator->canChangePoints($action)) {
+                continue;
+            }
 
-            try {
-                if (!$pointActionExecutionValidator->canTrigger($action, $args)) {
+            /*try {
+                if (!$pointActionExecutionValidator->canChangePoints($action, $args)) {
                     continue;
                 }
             } catch (\Exception $exception) {
                 $this->logger->addDebug($exception->getMessage());
                 continue;
-            }
+            }*/
 
             $delta = $action->getDelta();
             $lead->adjustPoints($delta);
