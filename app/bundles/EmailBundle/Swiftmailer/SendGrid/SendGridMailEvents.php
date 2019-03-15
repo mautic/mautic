@@ -25,4 +25,17 @@ final class SendGridMailEvents
      * @var string
      */
     const GET_MAIL_MESSAGE = 'mautic.email.swiftmailer.sendgrid_api.get_mail_message';
+
+    /**
+     * The mautic.email.swiftmailer.sendgrid_api.mail_send_response event is
+     * dispatched by the mautic.transport.sendgrid_api.facade service
+     * after verifying the response from sending a SendGrid\Mail object via
+     * the mautic.transport.sendgrid_api.sendgrid_wrapper service.
+     *
+     * The event listener receives an instance of
+     * \Mautic\EmailBundle\Swiftmailer\SendGrid\Event\MailSendResponseEvent.
+     *
+     * @var string
+     */
+    const MAIL_SEND_RESPONSE = 'mautic.email.swiftmailer.sendgrid_api.mail_send_response';
 }

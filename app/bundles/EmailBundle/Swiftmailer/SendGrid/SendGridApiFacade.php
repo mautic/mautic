@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadRequestException;
 use Mautic\EmailBundle\Swiftmailer\SwiftmailerFacadeInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use SendGrid\Mail;
+use SendGrid\Response;
 
 class SendGridApiFacade implements SwiftmailerFacadeInterface
 {
@@ -69,6 +70,8 @@ class SendGridApiFacade implements SwiftmailerFacadeInterface
         } catch (SendGridBadRequestException $e) {
             throw new \Swift_TransportException($e->getMessage());
         }
+
+        $this->dispatchMailSendResponseEvent($response, $mail, $message);
     }
 
     /**
@@ -83,4 +86,19 @@ class SendGridApiFacade implements SwiftmailerFacadeInterface
 
         $this->dispatcher->dispatch(SendGridMailEvents::GET_MAIL_MESSAGE, $event);
     }
+
+    /**
+     * Dispatch MAIL_SEND_RESPONSE event.
+     *
+     * @param Response            $response
+     * @param Mail                $mail
+     * @param \Swift_Mime_Message $message
+     */
+    private function dispatchMailSendResponseEvent(Response $response, Mail $mail, \Swift_Mime_Message $message)
+    {
+        $event = new Event\MailSendResponseEvent($response, $mail, $message);
+
+        $this->dispatcher->dispatch(SendGridMailEvents::MAIL_SEND_RESPONSE, $event);
+    }
+
 }
