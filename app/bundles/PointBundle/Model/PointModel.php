@@ -230,10 +230,12 @@ class PointModel extends CommonFormModel
                 }
             }
 
-            return  $reflection->invokeArgs($this, $pass);
+            if (!$reflection->invokeArgs($this, $pass)) {
+                return false;
+            }
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -289,22 +291,30 @@ class PointModel extends CommonFormModel
                 continue;
             }
 
-            $settings = $availableActions['actions'][$action->getType()];
-            $callback = (isset($settings['callback'])) ? $settings['callback'] :
-                ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
+            $pointsChange = true;
 
-            try {
-                // validation by callback not passed, stop
-                $pointsChange = $this->canChangePointsFromCallback($action, $lead, $eventDetails, $callback);
+            // If not repeatable, then need check change points
+            if (!$action->getRepeatable()) {
+                $settings = $availableActions['actions'][$action->getType()];
+                $callback = (isset($settings['callback'])) ? $settings['callback'] :
+                    ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
+                try {
+                    // 1. step - can change points from callback
+                    if (!$pointsChange = $this->canChangePointsFromCallback($action, $lead, $eventDetails, $callback)) {
+                        continue;
+                    }
 
-                if (isset($completedActions[$action->getId()])) {
-                    $pointsChange = false;
+                    // 2. step - can change points from log
+                    if (isset($completedActions[$action->getId()])) {
+                        $pointsChange = false;
+                    }
+                } catch (PointTriggerCustomHandlerException $handledException) {
+                    // If we want to use our custom validation for points change
+                    $pointsChange = $handledException->canChangePoints();
                 }
-            } catch (PointTriggerCustomHandlerException $handledException) {
-                // if we want use our custom validation for change points, then stop here and not continue
-                $pointsChange =  $handledException->canChangePoints();
             }
 
+            // Change points
             if ($pointsChange) {
                 $delta = $action->getDelta();
                 $lead->adjustPoints($delta);
@@ -320,7 +330,7 @@ class PointModel extends CommonFormModel
                 $event = new PointActionEvent($action, $lead);
                 $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
 
-                // add log If not repeatable
+                // Add to log, repeatable is not logged, just executed
                 if (!$action->getRepeatable()) {
                     $log = new LeadPointLog();
                     $log->setIpAddress($ipAddress);
