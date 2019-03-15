@@ -114,9 +114,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return $results;
         }
 
-        return array_map(function ($key, $value) {
-            return [$key => $value];
-        }, array_map(function (Lead $lead) use ($field) {
+        return array_combine(array_map(function (Lead $lead) use ($field) {
             return $lead->getFieldValue($field);
         }, $results), $results);
     }
@@ -133,11 +131,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return QueryBuilder
      */
-    private function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null, $indexByColumn = false)
+    protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null, $indexByColumn = false)
     {
         $col = 'l.'.$field;
 
-        $q = $this->createQueryBuilderFromConnection()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
@@ -170,16 +168,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return $q;
-    }
-
-    /**
-     * Method for creating a query builder from the entity manager connection.
-     *
-     * @return QueryBuilder
-     */
-    protected function createQueryBuilderFromConnection()
-    {
-        return $this->getEntityManager()->getConnection()->createQueryBuilder();
     }
 
     /**

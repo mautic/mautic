@@ -11,9 +11,10 @@
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\LeadBundle\Entity\CustomFieldRepositoryTrait;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Tests\Stubs\QueryBuilder as QueryBuilderStub;
 
 class LeadRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,30 +38,77 @@ class LeadRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Ensure that the emails are bound separately
-     * as parameters according to https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/query-builder.html#line-number-0a267d5a2c69797a7656aae33fcc140d16b0a566-72.
+     * Ensure that the emails are bound separately as parameters according to
+     * https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/query-builder.html#line-number-0a267d5a2c69797a7656aae33fcc140d16b0a566-72.
      */
     public function testBuildQueryForGetLeadsByFieldValue()
     {
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', 'mtc_');
 
+        $dbalMock = new DBALMocker($this);
+
         $mock = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
-            ->setMethods(['createQueryBuilderFromConnection', 'generateRandomParameterName'])
+            ->setMethods(['getEntityManager'])
             ->getMock();
 
-        $mock->method('createQueryBuilderFromConnection')
-            ->will($this->returnValue($queryBuilder = new QueryBuilderStub()));
-
-        $mock->method('generateRandomParameterName')
-            ->will($this->onConsecutiveCalls('a', 'b'));
+        $mock->method('getEntityManager')
+            ->will($this->returnValue($dbalMock->getMockEm()));
 
         $reflection = new \ReflectionClass(LeadRepository::class);
         $refMethod  = $reflection->getMethod('buildQueryForGetLeadsByFieldValue');
         $refMethod->setAccessible(true);
 
-        $query = $refMethod->invoke($mock, 'email', ['test@example.com', 'test2@example.com']);
+        $refMethod->invoke($mock, 'email', ['test@example.com', 'test2@example.com']);
 
-        $this->assertCount(2, $query->getParameters(), 'There should be two parameters bound because that\'s the number of emails we passed into the method.');
+        $parameters = $dbalMock->getQueryPart('parameters');
+
+        $this->assertCount(2, $parameters, 'There should be two parameters bound because that\'s the number of emails we passed into the method.');
+    }
+
+    /**
+     * Ensure that the array_combine return value matches the old style.
+     */
+    public function testGetLeadsByFieldValueArrayMapReturn()
+    {
+        $mock = $this->getMockBuilder(LeadRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getEntities', 'buildQueryForGetLeadsByFieldValue'])
+            ->getMock();
+
+        // Mock the
+        $mockEntity = $this->getMockBuilder(Lead::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['loadMetadata'])
+            ->getMock();
+
+        $mockEntity->setEmail('test@example.com');
+
+        $mockEntity2 = clone $mockEntity;
+        $mockEntity2->setEmail('test2@example.com');
+
+        $entities = [
+            $mockEntity,
+            $mockEntity2,
+        ];
+
+        $mock->method('getEntities')
+            ->will($this->returnValue($entities));
+
+        $mock->method('buildQueryForGetLeadsByFieldValue')
+            ->will($this->returnValue(null));
+
+        $contacts = $mock->getLeadsByFieldValue('email', ['test@example.com', 'test2@example.com']);
+
+        $this->assertSame($entities, $contacts, 'When getting leads without indexing by column, it should match the expected result.');
+
+        $contacts = $mock->getLeadsByFieldValue('email', ['test@example.com', 'test2@example.com'], null, true);
+
+        $expected = [
+            'test@example.com',
+            'test2@example.com',
+        ];
+
+        $this->assertSame($expected, array_keys($contacts), 'When getting leads with indexing by column, it should match the expected result.');
     }
 }
