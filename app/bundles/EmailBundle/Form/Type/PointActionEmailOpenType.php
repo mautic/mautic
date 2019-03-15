@@ -19,21 +19,18 @@ class PointActionEmailOpenType extends EmailOpenType
     {
         parent::buildForm($builder, $options);
 
-        $builder->add(
-            'execute_each',
-            'yesno_button_group',
-            [
-                'label'      => 'mautic.email.open.each',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.email.open.each.tooltip',
-                    'data-show-on' => '{"point_repeatable_0":"checked"}',
-                ],
-                'data'       => isset($options['execute_each']) ? $options['execute_each'] : false,
-                'required'   => false,
-            ]
-        );
+        $builder->add('open_condition', 'choice', [
+            'choices' => [
+                'first' => 'First email',
+                'each'  => 'Each email',
+            ],
+            'label'       => 'mautic.email.open.options',
+            'empty_value' => false,
+            'attr'        => [
+                'class'   => 'form-control',
+            ],
+            'required' => false,
+        ]);
     }
 
     public function getName()

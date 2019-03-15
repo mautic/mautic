@@ -45,18 +45,18 @@ class PointActionTriggerValidator
 
     /**
      * @param Point $action
-     *
      * @param array $args
      *
      * @return bool
+     *
      * @throws \Exception
      */
     public function canTrigger(Point $action, array $args)
     {
-        $this->action = $action;
+        $this->action   = $action;
         $this->settings = $this->getActionSettings();
 
-        // repeatable - valid always
+        // repeatable - trigger always
         if ($this->action->getRepeatable()) {
             return true;
         }
@@ -113,6 +113,7 @@ class PointActionTriggerValidator
 
     /**
      * @return mixed
+     *
      * @throws \Exception
      */
     private function getActionSettings()
@@ -133,6 +134,6 @@ class PointActionTriggerValidator
      */
     private function canTriggerByLog()
     {
-        return (empty($this->action->getProperties()['execute_each']) && empty($this->completedActionsForContact[$this->action->getId()]));
+        return empty($this->settings['only_callback']) && empty($this->completedActionsForContact[$this->action->getId()]);
     }
 }

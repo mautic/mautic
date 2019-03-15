@@ -67,8 +67,8 @@ class PointEventHelper
             return true;
         }
 
-        // true If I it'đ repeatble or execute_each is disabled
-        if (empty($action['properties']['execute_each']) || !empty($action['repeatable'])) {
+        // true If I it's repeatble or execute_each is disabled
+        if (empty($action['properties']['open_condition']) || !empty($action['repeatable'])) {
             return true;
         }
 
