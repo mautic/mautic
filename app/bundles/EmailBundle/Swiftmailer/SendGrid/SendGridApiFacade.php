@@ -14,6 +14,8 @@ namespace Mautic\EmailBundle\Swiftmailer\SendGrid;
 use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadLoginException;
 use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadRequestException;
 use Mautic\EmailBundle\Swiftmailer\SwiftmailerFacadeInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use SendGrid\Mail;
 
 class SendGridApiFacade implements SwiftmailerFacadeInterface
 {
@@ -32,14 +34,21 @@ class SendGridApiFacade implements SwiftmailerFacadeInterface
      */
     private $sendGridApiResponse;
 
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
     public function __construct(
         SendGridWrapper $sendGridWrapper,
         SendGridApiMessage $sendGridApiMessage,
-        SendGridApiResponse $sendGridApiResponse
+        SendGridApiResponse $sendGridApiResponse,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->sendGridWrapper     = $sendGridWrapper;
         $this->sendGridApiMessage  = $sendGridApiMessage;
         $this->sendGridApiResponse = $sendGridApiResponse;
+        $this->dispatcher          = $dispatcher;
     }
 
     /**
@@ -48,6 +57,8 @@ class SendGridApiFacade implements SwiftmailerFacadeInterface
     public function send(\Swift_Mime_SimpleMessage $message)
     {
         $mail = $this->sendGridApiMessage->getMessage($message);
+
+        $this->dispatchGetMailMessageEvent($mail, $message);
 
         $response = $this->sendGridWrapper->send($mail);
 
@@ -58,5 +69,18 @@ class SendGridApiFacade implements SwiftmailerFacadeInterface
         } catch (SendGridBadRequestException $e) {
             throw new \Swift_TransportException($e->getMessage());
         }
+    }
+
+    /**
+     * Dispatch GET_MAIL_MESSAGE event.
+     *
+     * @param Mail                $mail
+     * @param \Swift_Mime_Message $message
+     */
+    private function dispatchGetMailMessageEvent(Mail $mail, \Swift_Mime_Message $message)
+    {
+        $event = new Event\GetMailMessageEvent($mail, $message);
+
+        $this->dispatcher->dispatch(SendGridMailEvents::GET_MAIL_MESSAGE, $event);
     }
 }
