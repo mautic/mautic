@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\PointBundle\Exception\PointTriggerCustomHandledException;
+use Mautic\PointBundle\Exception\PointTriggerCustomHandlerException;
 
 /**
  * Class PointEventHelper.
@@ -58,7 +58,7 @@ class PointEventHelper
      *
      * @return bool
      *
-     * @throws PointTriggerCustomHandledException
+     * @throws PointTriggerCustomHandlerException
      */
     public function validateEmailByOpen($eventDetails, $action)
     {
@@ -76,7 +76,7 @@ class PointEventHelper
             return true;
         }
 
-        throw new PointTriggerCustomHandledException(($eventDetails->getOpenCount() < 2));
+        throw new PointTriggerCustomHandlerException(($eventDetails->getOpenCount() < 2));
     }
 
     /**

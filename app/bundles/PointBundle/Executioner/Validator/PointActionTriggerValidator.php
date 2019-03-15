@@ -14,7 +14,7 @@ namespace Mautic\PointBundle\Executioner\Validator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\Point;
-use Mautic\PointBundle\Exception\PointTriggerCustomHandledException;
+use Mautic\PointBundle\Exception\PointTriggerCustomHandlerException;
 
 class PointActionTriggerValidator
 {
@@ -79,7 +79,7 @@ class PointActionTriggerValidator
             if (!$this->canChangePointsByCallback($this->getCallbackArgs())) {
                 return false;
             }
-        } catch (PointTriggerCustomHandledException $handledException) {
+        } catch (PointTriggerCustomHandlerException $handledException) {
             // if we want use our custom validation for change points, then stop here and not continue
             return $handledException->canChangePoints();
         }

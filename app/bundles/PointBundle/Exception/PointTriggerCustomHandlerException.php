@@ -11,17 +11,23 @@
 
 namespace Mautic\PointBundle\Exception;
 
-class PointTriggerCustomHandledException extends \Exception
+class PointTriggerCustomHandlerException extends \Exception
 {
     /**
      * @var bool
      */
     private $canChagePoints;
 
-    public function __construct(bool $canChagePoints, $message = 'Trigger handled')
+    /**
+     * PointTriggerCustomHandlerException constructor.
+     *
+     * @param bool   $canChagePoints
+     * @param string $message
+     */
+    public function __construct(bool $canChagePoints, $message = 'Custom trigger handled')
     {
-        parent::__construct($message);
         $this->canChagePoints = $canChagePoints;
+        parent::__construct($message);
     }
 
     /**
