@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Form\Type\LeadImportFieldType;
@@ -391,12 +392,59 @@ class ImportController extends FormController
                             }
                         }
 
+                        // @todo validate required fields are present
+                        $missingRequiredFields = [];
+                        $leadFieldModel        = $this->getModel('lead.field');
+                        $requiredFields        = $leadFieldModel->getEntities([
+                            'ignore_paginator' => true,
+                            'filter'           => [
+                                'force' => [
+                                    [
+                                        'column' => 'f.object',
+                                        'expr'   => 'eq',
+                                        'value'  => 'company',
+                                    ],
+                                    [
+                                        'column' => 'f.isRequired',
+                                        'expr'   => 'eq',
+                                        'value'  => 1,
+                                    ],
+                                ],
+                            ],
+                        ]);
+
+                        $requiredFieldsArray = array_combine(array_map(function (LeadField $field) {
+                            return $field->getName();
+                        }, $requiredFields), array_map(function (LeadField $field) {
+                            return $field->getAlias();
+                        }, $requiredFields));
+
+                        $missingRequiredFields = array_diff($requiredFieldsArray, $matchedFields);
+
+                        if (count($missingRequiredFields)) {
+                            $form->addError(
+                                new FormError(
+                                    $this->get('translator')->trans(
+                                        'mautic.import.missing.required.fields',
+                                        [
+                                            '%requiredFields%' => implode(', ', array_keys($missingRequiredFields)),
+                                            '%fieldOrFields%'  => count($missingRequiredFields) === 1 ? 'field' : 'fields',
+                                        ],
+                                        'validators'
+                                    )
+                                )
+                            );
+                            break;
+                        }
+
                         if (empty($matchedFields)) {
                             $form->addError(
                                 new FormError(
                                     $this->get('translator')->trans('mautic.lead.import.matchfields', [], 'validators')
                                 )
                             );
+
+                            break;
                         } else {
                             $defaultOwner = ($owner) ? $owner->getId() : null;
 
@@ -422,23 +470,45 @@ class ImportController extends FormController
 
                                 $session->set('mautic.'.$object.'.import.step', self::STEP_PROGRESS_BAR);
                             }
-
-                            $importModel->saveEntity($import);
-
-                            $session->set('mautic.'.$object.'.import.id', $import->getId());
-
-                            // In case the user decided to queue the import
-                            if ($this->importInCli($form, $object)) {
-                                $this->addFlash('mautic.'.$object.'.batch.import.created');
-                                $this->resetImport($object, $fullPath, false);
-
-                                return $this->indexAction();
-                            }
-
-                            return $this->newAction(0, true);
                         }
-                        break;
 
+                        $defaultOwner = ($owner) ? $owner->getId() : null;
+
+                        /** @var \Mautic\LeadBundle\Entity\Import $import */
+                        $import = $importModel->getEntity();
+
+                        $import->setMatchedFields($matchedFields)
+                            ->setObject($object)
+                            ->setDir($importDir)
+                            ->setLineCount($this->getLineCount($object))
+                            ->setFile($fileName)
+                            ->setOriginalFile($session->get('mautic.'.$object.'.import.original.file'))
+                            ->setDefault('owner', $defaultOwner)
+                            ->setDefault('list', $list)
+                            ->setDefault('tags', $tags)
+                            ->setHeaders($session->get('mautic.'.$object.'.import.headers'))
+                            ->setParserConfig($session->get('mautic.'.$object.'.import.config'));
+
+                        // In case the user chose to import in browser
+                        if ($this->importInBrowser($form, $object)) {
+                            $import->setStatus($import::MANUAL);
+
+                            $session->set('mautic.'.$object.'.import.step', self::STEP_PROGRESS_BAR);
+                        }
+
+                        $importModel->saveEntity($import);
+
+                        $session->set('mautic.'.$object.'.import.id', $import->getId());
+
+                        // In case the user decided to queue the import
+                        if ($this->importInCli($form, $object)) {
+                            $this->addFlash('mautic.'.$object.'.batch.import.created');
+                            $this->resetImport($object, $fullPath, false);
+
+                            return $this->indexAction();
+                        }
+
+                        return $this->newAction(0, true);
                     default:
                         // Done or something wrong
 
