@@ -63,7 +63,7 @@ class PointSubscriber extends CommonSubscriber
         $action = [
             'group'    => 'mautic.email.actions',
             'label'    => 'mautic.email.point.action.open',
-            'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'],
+            'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmailByOpen'],
             'formType' => PointActionEmailOpenType::class,
         ];
 
