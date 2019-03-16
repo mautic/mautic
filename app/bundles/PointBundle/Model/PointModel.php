@@ -292,9 +292,9 @@ class PointModel extends CommonFormModel
 
             if (!$action->getRepeatable()) {
                 if (isset($settings['eventName'])) {
-                    $triggerExecutedEvent = new PointChangeActionExecutedEvent();
-                    $event                = $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
-                    if (!$event->getResult()) {
+                    $pointChangeActionExecutedEvent = new PointChangeActionExecutedEvent($action, $lead, $eventDetails);
+                    $event                          = $this->dispatcher->dispatch($settings['eventName'], $pointChangeActionExecutedEvent);
+                    if (!$event->canChangePoints()) {
                         continue;
                     }
                 } else {

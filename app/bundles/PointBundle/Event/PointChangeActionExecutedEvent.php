@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -12,46 +12,49 @@
 namespace Mautic\PointBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\PointBundle\Entity\TriggerEvent as TriggerEventEntity;
+use Mautic\PointBundle\Entity\Point;
 use Symfony\Component\EventDispatcher\Event;
 
 class PointChangeActionExecutedEvent extends Event
 {
-    /** @var TriggerEventEntity */
-    private $triggerEvent;
+    /**
+     * @var Point
+     */
+    private $pointAction;
 
-    /** @var Lead */
+    /**
+     * @var Lead
+     */
     private $lead;
 
-    /** @var bool */
+    /**
+     * @var
+     */
+    private $eventDetails;
+
+    /**
+     * @var bool
+     */
     private $result;
 
-    public function __construct(TriggerEventEntity $triggerEvent, Lead $lead)
+    /**
+     * PointChangeActionExecutedEvent constructor.
+     *
+     * @param Point $pointAction
+     * @param Lead  $lead
+     * @param       $eventDetails
+     */
+    public function __construct(Point $pointAction, Lead $lead, $eventDetails)
     {
-        $this->triggerEvent = $triggerEvent;
+        $this->pointAction  = $pointAction;
         $this->lead         = $lead;
-    }
-
-    /**
-     * @return TriggerEventEntity
-     */
-    public function getTriggerEvent()
-    {
-        return $this->triggerEvent;
-    }
-
-    /**
-     * @return Lead
-     */
-    public function getLead()
-    {
-        return $this->lead;
+        $this->eventDetails = $eventDetails;
     }
 
     /**
      * @return bool
      */
-    public function getResult()
+    public function canChangePoints()
     {
         return $this->result;
     }
@@ -64,5 +67,29 @@ class PointChangeActionExecutedEvent extends Event
     public function setFailed()
     {
         $this->result = false;
+    }
+
+    /**
+     * @return Point
+     */
+    public function getPointAction()
+    {
+        return $this->pointAction;
+    }
+
+    /**
+     * @return Lead
+     */
+    public function getLead()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEventDetails()
+    {
+        return $this->eventDetails;
     }
 }

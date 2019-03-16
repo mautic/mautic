@@ -13,11 +13,13 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\EmailBundle\Form\Type\PointActionEmailOpenType;
 use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Event\PointChangeActionExecutedEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
@@ -48,10 +50,11 @@ class PointSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            PointEvents::POINT_ON_BUILD   => ['onPointBuild', 0],
-            PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
-            EmailEvents::EMAIL_ON_OPEN    => ['onEmailOpen', 0],
-            EmailEvents::EMAIL_ON_SEND    => ['onEmailSend', 0],
+            PointEvents::POINT_ON_BUILD                     => ['onPointBuild', 0],
+            PointEvents::TRIGGER_ON_BUILD                   => ['onTriggerBuild', 0],
+            EmailEvents::EMAIL_ON_OPEN                      => ['onEmailOpen', 0],
+            EmailEvents::EMAIL_ON_SEND                      => ['onEmailSend', 0],
+            EmailEvents::ON_POINT_CHANGE_ACTION_EXECUTED    => ['onPointChangeActionExecuted', 0],
         ];
     }
 
@@ -61,10 +64,10 @@ class PointSubscriber extends CommonSubscriber
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = [
-            'group'    => 'mautic.email.actions',
-            'label'    => 'mautic.email.point.action.open',
-            'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmailByOpen'],
-            'formType' => PointActionEmailOpenType::class,
+            'group'     => 'mautic.email.actions',
+            'label'     => 'mautic.email.point.action.open',
+            'eventName' => EmailEvents::ON_POINT_CHANGE_ACTION_EXECUTED,
+            'formType'  => PointActionEmailOpenType::class,
         ];
 
         $event->addAction('email.open', $action);
@@ -131,5 +134,27 @@ class PointSubscriber extends CommonSubscriber
         }
 
         $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead);
+    }
+
+    /**
+     * @param PointChangeActionExecutedEvent $changeActionExecutedEvent
+     */
+    public function onPointChangeActionExecuted(PointChangeActionExecutedEvent $changeActionExecutedEvent)
+    {
+        $action = $changeActionExecutedEvent->getPointAction();
+        $stat   = $changeActionExecutedEvent->getEventDetails();
+        if (!$stat instanceof Stat) {
+            return $changeActionExecutedEvent->setFailed();
+        }
+
+        if (!empty($action->getProperties()['emails'])) {
+            $limitToEmails = $action['properties']['emails'];
+            if (!empty($limitToEmails) && !in_array($stat->getEmail()->getId(), $limitToEmails)) {
+                //no points change
+                return $changeActionExecutedEvent->setFailed();
+            }
+        }
+
+        // check logs
     }
 }
