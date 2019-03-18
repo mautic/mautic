@@ -70,6 +70,7 @@ class LeadPointLog
             ->columnName('internal_id')
             ->length(255)
             ->nullable()
+            ->makePrimaryKey()
             ->build();
     }
 
