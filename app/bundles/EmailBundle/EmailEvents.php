@@ -236,7 +236,7 @@ final class EmailEvents
     const ON_TRANSPORT_WEBHOOK = 'mautic.email.on_transport_webhook';
 
     /**
-     * The mautic..email.on_point_change_action_action_executed event is dispatched when change point action is executed.
+     * The mautic.email.on_point_change_action_action_executed event is dispatched when change point action is executed.
      *
      * The event listener receives a
      * Mautic\PointBundle\Events\PointChangeActionExecutedEvent

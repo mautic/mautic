@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -20,7 +21,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class PointEventHelper
 {
     /**
-     * @param $eventDetails
+     * @param Email $eventDetails
      * @param $action
      *
      * @return int
@@ -35,11 +36,20 @@ class PointEventHelper
 
         if (isset($action['properties']['emails'])) {
             $limitToEmails = $action['properties']['emails'];
+            if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
+                //no points change
+                return false;
+            }
         }
 
-        if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
-            //no points change
-            return false;
+        $categoryId = $eventDetails->getCategory()->getId();
+
+        if (isset($action['properties']['categories'])) {
+            $limitToCategories = $action['properties']['categories'];
+            if (!empty($limitToCategories) && !in_array($categoryId, $limitToCategories)) {
+                //no points change
+                return false;
+            }
         }
 
         return true;

@@ -19,22 +19,46 @@ class PointActionEmailOpenType extends EmailOpenType
     {
         parent::buildForm($builder, $options);
 
-        $builder->add('condition', 'choice', [
-            'choices' => [
-                'first' => 'First email',
-                'each'  => 'Each email',
-            ],
-            'label'       => 'mautic.email.open.options',
-            'empty_value' => false,
-            'attr'        => [
-                'class'   => 'form-control',
-            ],
-            'required' => false,
-        ]);
+        //add category
+        $builder->add(
+            'categories',
+            'category',
+            [
+                'label'           => 'mautic.email.open.limittocategories',
+                'bundle'          => 'email',
+                'multiple'        => true,
+                'empty_value'     => true,
+                'with_create_new' => false,
+                'return_entity'   => false,
+                'attr'            => [
+                    'tooltip'=> 'mautic.email.open.limittocategories_descr',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'triggerMode',
+            'button_group',
+            [
+                'choices'     => [
+                        ''           => 'mautic.email.open.execute.first',
+                        'internalId' => 'mautic.email.open.execute.each',
+                    ],
+                'expanded'    => true,
+                'multiple'    => false,
+                'label_attr'  => ['class' => 'control-label'],
+                'label'       => 'mautic.email.open.execute',
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => [
+                    'data-show-on' => '{"point_repeatable_0":"checked"}',
+                ],
+            ]
+        );
     }
 
     public function getName()
     {
-        return 'point_action_emailopen_list';
+        return 'point_action_emailopen';
     }
 }

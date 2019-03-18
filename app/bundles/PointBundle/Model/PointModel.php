@@ -196,53 +196,6 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * @param Point $action
-     * @param Lead  $lead
-     * @param       $eventDetails
-     * @param array $settings
-     *
-     * @return bool
-     */
-    private function invokeCallback(Point $action, Lead $lead, $eventDetails, array $settings)
-    {
-        $callback = (isset($settings['callback'])) ? $settings['callback'] :
-            ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
-
-        $args = [
-            'action' => [
-                'id'         => $action->getId(),
-                'type'       => $action->getType(),
-                'name'       => $action->getName(),
-                'properties' => $action->getProperties(),
-                'points'     => $action->getDelta(),
-            ],
-            'lead'         => $lead,
-            'factory'      => $this->factory, // WHAT?
-            'eventDetails' => $eventDetails,
-        ];
-
-        if (is_array($callback)) {
-            $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-        } elseif (strpos($callback, '::') !== false) {
-            $parts      = explode('::', $callback);
-            $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-        } else {
-            $reflection = new \ReflectionMethod(null, $callback);
-        }
-
-        $pass = [];
-        foreach ($reflection->getParameters() as $param) {
-            if (isset($args[$param->getName()])) {
-                $pass[] = $args[$param->getName()];
-            } else {
-                $pass[] = null;
-            }
-        }
-
-        return $reflection->invokeArgs($this, $pass);
-    }
-
-    /**
      * Triggers a specific point change.
      *
      * @param       $type
@@ -315,16 +268,7 @@ class PointModel extends CommonFormModel
                 }
             }
 
-            $delta = $action->getDelta();
-            $lead->adjustPoints($delta);
-            $parsed = explode('.', $action->getType());
-            $lead->addPointsChangeLogEntry(
-                $parsed[0],
-                $action->getId().': '.$action->getName(),
-                $parsed[1],
-                $delta,
-                $ipAddress
-            );
+            $this->adjustLeadPoints($action, $lead);
 
             $event = new PointActionEvent($action, $lead);
             $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
@@ -335,7 +279,7 @@ class PointModel extends CommonFormModel
                 $log->setIpAddress($ipAddress);
                 $log->setPoint($action);
                 $log->setLead($lead);
-                $log->setInternalId($this->propertyAccessor($eventDetails, 'id'));
+                $log->setInternalId($this->propertyAccessor->getValue($eventDetails, 'id'));
                 $log->setDateFired(new \DateTime());
                 $persist[] = $log;
             }
@@ -350,6 +294,71 @@ class PointModel extends CommonFormModel
         if (!empty($lead->getpointchanges())) {
             $this->leadModel->saveEntity($lead);
         }
+    }
+
+    /**
+     * @param Point $action
+     * @param Lead  $lead
+     */
+    private function adjustLeadPoints(Point $action, Lead $lead)
+    {
+        $delta = $action->getDelta();
+        $lead->adjustPoints($delta);
+        $parsed = explode('.', $action->getType());
+        $lead->addPointsChangeLogEntry(
+            $parsed[0],
+            $action->getId().': '.$action->getName(),
+            $parsed[1],
+            $delta,
+            $this->ipLookupHelper->getIpAddress()
+        );
+    }
+
+    /**
+     * @param Point $action
+     * @param Lead  $lead
+     * @param       $eventDetails
+     * @param array $settings
+     *
+     * @return bool
+     */
+    private function invokeCallback(Point $action, Lead $lead, $eventDetails, array $settings)
+    {
+        $callback = (isset($settings['callback'])) ? $settings['callback'] :
+            ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
+
+        $args = [
+            'action' => [
+                'id'         => $action->getId(),
+                'type'       => $action->getType(),
+                'name'       => $action->getName(),
+                'properties' => $action->getProperties(),
+                'points'     => $action->getDelta(),
+            ],
+            'lead'         => $lead,
+            'factory'      => $this->factory, // WHAT?
+            'eventDetails' => $eventDetails,
+        ];
+
+        if (is_array($callback)) {
+            $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+        } elseif (strpos($callback, '::') !== false) {
+            $parts      = explode('::', $callback);
+            $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+        } else {
+            $reflection = new \ReflectionMethod(null, $callback);
+        }
+
+        $pass = [];
+        foreach ($reflection->getParameters() as $param) {
+            if (isset($args[$param->getName()])) {
+                $pass[] = $args[$param->getName()];
+            } else {
+                $pass[] = null;
+            }
+        }
+
+        return $reflection->invokeArgs($this, $pass);
     }
 
     /**

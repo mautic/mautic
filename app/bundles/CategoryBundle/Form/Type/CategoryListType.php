@@ -88,7 +88,9 @@ class CategoryListType extends AbstractType
                 foreach ($categories as $l) {
                     $choices[$l['id']] = $l['title'];
                 }
-                $choices['new'] = $createNew;
+                if ($options['with_create_new']) {
+                    $choices['new'] = $createNew;
+                }
 
                 return $choices;
             },
@@ -97,23 +99,29 @@ class CategoryListType extends AbstractType
             'multiple'    => false,
             'empty_value' => 'mautic.core.form.uncategorized',
             'attr'        => function (Options $options) {
+                if (!$options['with_create_new']) {
+                    return [];
+                }
                 $modalHeader = $this->translator->trans('mautic.category.header.new');
                 $newUrl = $this->router->generate('mautic_category_action', [
-                    'objectAction' => 'new',
-                    'bundle'       => $options['bundle'],
-                    'inForm'       => 1,
-                ]);
+                        'objectAction' => 'new',
+                        'bundle'       => $options['bundle'],
+                        'inForm'       => 1,
+                    ]);
 
                 return [
-                    'class'    => 'form-control category-select',
-                    'onchange' => "Mautic.loadAjaxModalBySelectValue(this, 'new', '{$newUrl}', '{$modalHeader}');",
-                ];
+                        'class'    => 'form-control category-select',
+                        'onchange' => "Mautic.loadAjaxModalBySelectValue(this, 'new', '{$newUrl}', '{$modalHeader}');",
+                    ];
             },
             'required'      => false,
             'return_entity' => true,
         ]);
 
         $resolver->setRequired(['bundle']);
+        $resolver->setDefaults([
+            'with_create_new' => true,
+        ]);
     }
 
     /**

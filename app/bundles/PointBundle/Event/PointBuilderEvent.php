@@ -77,6 +77,12 @@ class PointBuilderEvent extends Event
             $action
         );
 
+        //Support for old way with callback and new event based system
+        //Could be removed after all events will be refactored to events. The key 'eventName' will be mandatory and 'callback' will be removed.
+        if (!array_key_exists('callback', $action) && !array_key_exists('eventName', $action)) {
+            throw new InvalidArgumentException("One of the 'callback' or 'eventName' has to be provided. Use 'eventName' for new code");
+        }
+
         //translate the label and group
         $action['label'] = $this->translator->trans($action['label']);
         $action['group'] = $this->translator->trans($action['group']);

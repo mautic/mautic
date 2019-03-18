@@ -73,7 +73,7 @@ class PointRepository extends CommonRepository
     public function getCompletedLeadActions($type, $leadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('p.*')
+            ->select('p.*, x.internal_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_action_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX.'points', 'p', 'x.point_id = p.id');
 
