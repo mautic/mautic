@@ -28,6 +28,7 @@ use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Class PointModel.
@@ -57,6 +58,11 @@ class PointModel extends CommonFormModel
     protected $leadModel;
 
     /**
+     * @var PropertyAccessor
+     */
+    private $propertyAccessor;
+
+    /**
      * PointModel constructor.
      *
      * @param Session        $session
@@ -65,9 +71,10 @@ class PointModel extends CommonFormModel
      */
     public function __construct(Session $session, IpLookupHelper $ipLookupHelper, LeadModel $leadModel)
     {
-        $this->session        = $session;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel      = $leadModel;
+        $this->session          = $session;
+        $this->ipLookupHelper   = $ipLookupHelper;
+        $this->leadModel        = $leadModel;
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -279,8 +286,7 @@ class PointModel extends CommonFormModel
 
         //get a list of actions that has already been performed on this lead
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
-
-        $persist = [];
+        $persist          = [];
         /** @var Point $action */
         foreach ($availablePoints as $action) {
             //make sure the action still exists
@@ -292,7 +298,7 @@ class PointModel extends CommonFormModel
 
             if (!$action->getRepeatable()) {
                 if (isset($settings['eventName'])) {
-                    $pointChangeActionExecutedEvent = new PointChangeActionExecutedEvent($action, $lead, $eventDetails);
+                    $pointChangeActionExecutedEvent = new PointChangeActionExecutedEvent($action, $lead, $eventDetails, $completedActions);
                     $event                          = $this->dispatcher->dispatch($settings['eventName'], $pointChangeActionExecutedEvent);
                     if (!$event->canChangePoints()) {
                         continue;
@@ -329,6 +335,7 @@ class PointModel extends CommonFormModel
                 $log->setIpAddress($ipAddress);
                 $log->setPoint($action);
                 $log->setLead($lead);
+                $log->setInternalId($this->propertyAccessor($eventDetails, 'id'));
                 $log->setDateFired(new \DateTime());
                 $persist[] = $log;
             }

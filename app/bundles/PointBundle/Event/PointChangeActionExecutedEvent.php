@@ -38,17 +38,24 @@ class PointChangeActionExecutedEvent extends Event
     private $result;
 
     /**
+     * @var array
+     */
+    private $completedActions;
+
+    /**
      * PointChangeActionExecutedEvent constructor.
      *
      * @param Point $pointAction
      * @param Lead  $lead
      * @param       $eventDetails
+     * @param array $completedActions
      */
-    public function __construct(Point $pointAction, Lead $lead, $eventDetails)
+    public function __construct(Point $pointAction, Lead $lead, $eventDetails, $completedActions = [])
     {
-        $this->pointAction  = $pointAction;
-        $this->lead         = $lead;
-        $this->eventDetails = $eventDetails;
+        $this->pointAction      = $pointAction;
+        $this->lead             = $lead;
+        $this->eventDetails     = $eventDetails;
+        $this->completedActions = $completedActions;
     }
 
     /**
@@ -67,6 +74,24 @@ class PointChangeActionExecutedEvent extends Event
     public function setFailed()
     {
         $this->result = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function setStatusFromLogs()
+    {
+        $this->result = (!isset($this->completedActions[$this->pointAction->getId()]));
+    }
+
+    /**
+     * @param $internalId
+     *
+     * @return bool
+     */
+    public function setStatusFromLogsForInternalId($internalId)
+    {
+        $this->result = (!array_search($internalId, array_column($this->completedActions, 'internal_id')));
     }
 
     /**
@@ -91,5 +116,13 @@ class PointChangeActionExecutedEvent extends Event
     public function getEventDetails()
     {
         return $this->eventDetails;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCompletedActions()
+    {
+        return $this->completedActions;
     }
 }

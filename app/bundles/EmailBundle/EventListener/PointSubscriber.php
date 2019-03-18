@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\EmailBundle\Form\Type\PointActionEmailOpenType;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointChangeActionExecutedEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
@@ -35,13 +36,20 @@ class PointSubscriber extends CommonSubscriber
     protected $pointModel;
 
     /**
+     * @var EmailModel
+     */
+    private $emailModel;
+
+    /**
      * PointSubscriber constructor.
      *
      * @param PointModel $pointModel
+     * @param EmailModel $emailModel
      */
-    public function __construct(PointModel $pointModel)
+    public function __construct(PointModel $pointModel, EmailModel $emailModel)
     {
         $this->pointModel = $pointModel;
+        $this->emailModel = $emailModel;
     }
 
     /**
@@ -139,9 +147,14 @@ class PointSubscriber extends CommonSubscriber
     /**
      * @param PointChangeActionExecutedEvent $changeActionExecutedEvent
      */
-    public function onPointChangeActionExecuted(PointChangeActionExecutedEvent $changeActionExecutedEvent)
+    public function onPointChangeActionExecutedOnOpenEmail(PointChangeActionExecutedEvent $changeActionExecutedEvent)
     {
         $action = $changeActionExecutedEvent->getPointAction();
+
+        if ($action->getType() != 'email.open') {
+            return $changeActionExecutedEvent->setFailed();
+        }
+
         $stat   = $changeActionExecutedEvent->getEventDetails();
         if (!$stat instanceof Stat) {
             return $changeActionExecutedEvent->setFailed();
@@ -155,6 +168,17 @@ class PointSubscriber extends CommonSubscriber
             }
         }
 
-        // check logs
+        $condition = isset($action->getProperties()['condition']) ? $action->getProperties()['condition'] : 'first';
+
+        switch ($condition) {
+            case 'each':
+
+                break;
+            default:
+                return $changeActionExecutedEvent->setStatusFromLogs();
+                break;
+        }
+
+        return $changeActionExecutedEvent->setSucceded();
     }
 }

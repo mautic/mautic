@@ -202,6 +202,7 @@ return [
                 'class'     => 'Mautic\EmailBundle\EventListener\PointSubscriber',
                 'arguments' => [
                     'mautic.point.model.point',
+                    'mautic.email.model.email',
                 ],
             ],
             'mautic.email.touser.subscriber' => [

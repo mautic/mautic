@@ -19,7 +19,7 @@ class PointActionEmailOpenType extends EmailOpenType
     {
         parent::buildForm($builder, $options);
 
-        $builder->add('open_condition', 'choice', [
+        $builder->add('condition', 'choice', [
             'choices' => [
                 'first' => 'First email',
                 'each'  => 'Each email',
