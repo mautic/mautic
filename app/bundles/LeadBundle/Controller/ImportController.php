@@ -5,9 +5,9 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Import;
-use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
+use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Form\Type\LeadImportFieldType;
 use Mautic\LeadBundle\Form\Type\LeadImportType;
 use Mautic\LeadBundle\Helper\Progress;
@@ -353,8 +353,10 @@ class ImportController extends FormController
                         }
                         break;
                     case self::STEP_MATCH_FIELDS:
-                        // Save matched fields
-                        $matchedFields = $form->getData();
+                        $validateEvent = $dispatcher->dispatch(
+                            LeadEvents::IMPORT_ON_VALIDATE,
+                            new ImportValidateEvent($this->request->get('object'), $form)
+                        );
 
                         if (empty($matchedFields)) {
                             $this->resetImport($object, $fullPath);
@@ -434,8 +436,11 @@ class ImportController extends FormController
                                     )
                                 )
                             );
+                        if ($validateEvent->hasErrors()) {
                             break;
                         }
+
+                        $matchedFields = $validateEvent->getMatchedFields();
 
                         if (empty($matchedFields)) {
                             $form->addError(
@@ -443,6 +448,8 @@ class ImportController extends FormController
                                     $this->get('translator')->trans('mautic.lead.import.matchfields', [], 'validators')
                                 )
                             );
+
+                            $this->resetImport($object, $fullPath);
 
                             break;
                         } else {
@@ -472,7 +479,8 @@ class ImportController extends FormController
                             }
                         }
 
-                        $defaultOwner = ($owner) ? $owner->getId() : null;
+                            return $this->newAction(0, true);
+                        }
 
                         /** @var \Mautic\LeadBundle\Entity\Import $import */
                         $import = $importModel->getEntity();
@@ -483,9 +491,9 @@ class ImportController extends FormController
                             ->setLineCount($this->getLineCount($object))
                             ->setFile($fileName)
                             ->setOriginalFile($session->get('mautic.'.$object.'.import.original.file'))
-                            ->setDefault('owner', $defaultOwner)
-                            ->setDefault('list', $list)
-                            ->setDefault('tags', $tags)
+                            ->setDefault('owner', $validateEvent->getOwnerId())
+                            ->setDefault('list', $validateEvent->getList())
+                            ->setDefault('tags', $validateEvent->getTags())
                             ->setHeaders($session->get('mautic.'.$object.'.import.headers'))
                             ->setParserConfig($session->get('mautic.'.$object.'.import.config'));
 

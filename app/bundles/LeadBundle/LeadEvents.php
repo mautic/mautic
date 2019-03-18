@@ -390,6 +390,14 @@ final class LeadEvents
     const IMPORT_ON_PROCESS = 'mautic.lead_import_on_process';
 
     /**
+     * The mautic.lead_import_on_validate event is dispatched when the import form is being validated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance
+     */
+    const IMPORT_ON_VALIDATE = 'mautic.lead_import_on_validate';
+
+    /**
      * The mautic.lead_import_batch_processed event is dispatched after an import batch is processed.
      *
      * The event listener receives a
