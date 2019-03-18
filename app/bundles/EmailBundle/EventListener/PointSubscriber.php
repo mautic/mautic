@@ -13,11 +13,12 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\EmailBundle\Form\Type\PointActionEmailOpenType;
+use Mautic\EmailBundle\Helper\PointEventHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointChangeActionExecutedEvent;
@@ -125,7 +126,7 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onEmailOpen(EmailOpenEvent $event)
     {
-        $this->pointModel->triggerAction('email.open', $event->getStat());
+        $this->pointModel->triggerAction('email.open', $event->getEmail());
     }
 
     /**
@@ -151,34 +152,22 @@ class PointSubscriber extends CommonSubscriber
     {
         $action = $changeActionExecutedEvent->getPointAction();
 
-        if ($action->getType() != 'email.open') {
-            return $changeActionExecutedEvent->setFailed();
+        /** @var Email $eventDetails */
+        $eventDetails = $changeActionExecutedEvent->getEventDetails();
+
+        if (!PointEventHelper::validateEmail($eventDetails, $action)) {
+            $changeActionExecutedEvent->setFailed();
+
+            return;
         }
 
-        $stat   = $changeActionExecutedEvent->getEventDetails();
-        if (!$stat instanceof Stat) {
-            return $changeActionExecutedEvent->setFailed();
+        $condition = isset($action->getProperties()['condition']) ? $action->getProperties()['condition'] : null;
+        if ($condition == 'each') {
+            $changeActionExecutedEvent->setStatusFromLogsForInternalId($eventDetails->getId());
+
+            return;
         }
 
-        if (!empty($action->getProperties()['emails'])) {
-            $limitToEmails = $action['properties']['emails'];
-            if (!empty($limitToEmails) && !in_array($stat->getEmail()->getId(), $limitToEmails)) {
-                //no points change
-                return $changeActionExecutedEvent->setFailed();
-            }
-        }
-
-        $condition = isset($action->getProperties()['condition']) ? $action->getProperties()['condition'] : 'first';
-
-        switch ($condition) {
-            case 'each':
-
-                break;
-            default:
-                return $changeActionExecutedEvent->setStatusFromLogs();
-                break;
-        }
-
-        return $changeActionExecutedEvent->setSucceded();
+        $changeActionExecutedEvent->setStatusFromLogs();
     }
 }

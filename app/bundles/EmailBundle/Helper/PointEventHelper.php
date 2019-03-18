@@ -12,10 +12,7 @@
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\PointBundle\Exception\PointTriggerCustomHandlerException;
 
 /**
  * Class PointEventHelper.
@@ -34,51 +31,18 @@ class PointEventHelper
             return false;
         }
 
-        if ($eventDetails instanceof Stat) {
-            $email = $eventDetails->getEmail();
-        }
+        $emailId = $eventDetails->getId();
 
-        // If limited to selected emails
-        if (!empty($action['properties']['emails'])) {
-            // If we send custom content
-            if ($email) {
-                return false;
-            }
-
+        if (isset($action['properties']['emails'])) {
             $limitToEmails = $action['properties']['emails'];
-            if (!empty($limitToEmails) && !in_array($email->getId(), $limitToEmails)) {
-                //no points change
-                return false;
-            }
         }
 
-        return true;
-    }
-
-    /**
-     * @param $eventDetails
-     * @param $action
-     *
-     * @return bool
-     *
-     * @throws PointTriggerCustomHandlerException
-     */
-    public static function validateEmailByOpen($eventDetails, $action)
-    {
-        // standard validation not passed, then not need continue
-        if (!self::validateEmail($eventDetails, $action)) {
+        if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
+            //no points change
             return false;
         }
 
-        if (!$eventDetails instanceof Stat) {
-            return true;
-        }
-
-        // custom handler not used, then continue to basic log validation in PointModel
-        if (isset($action['properties']['open_condition']) && $action['properties']['open_condition'] == 'first') {
-            return true;
-        }
-        throw new PointTriggerCustomHandlerException(($eventDetails->getOpenCount() < 2));
+        return true;
     }
 
     /**
