@@ -81,7 +81,7 @@ class PointChangeActionExecutedEvent extends Event
      */
     public function setStatusFromLogs()
     {
-        $this->result = (!isset($this->completedActions[$this->pointAction->getId()]));
+        $this->result = !(isset($this->completedActions[$this->pointAction->getId()]));
     }
 
     /**
@@ -91,7 +91,7 @@ class PointChangeActionExecutedEvent extends Event
      */
     public function setStatusFromLogsForInternalId($internalId)
     {
-        $this->result = (!array_search($internalId, array_column($this->completedActions, 'internal_id')));
+        $this->result = !(in_array($internalId, array_column($this->completedActions, 'internal_id')));
     }
 
     /**
