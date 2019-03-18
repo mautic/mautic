@@ -19,7 +19,6 @@ class PointActionEmailOpenType extends EmailOpenType
     {
         parent::buildForm($builder, $options);
 
-        //add category
         $builder->add(
             'categories',
             'category',
@@ -55,10 +54,5 @@ class PointActionEmailOpenType extends EmailOpenType
                 ],
             ]
         );
-    }
-
-    public function getName()
-    {
-        return 'point_action_emailopen';
     }
 }

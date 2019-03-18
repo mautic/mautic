@@ -36,7 +36,7 @@ class PointEventHelper
 
         if (isset($action['properties']['emails'])) {
             $limitToEmails = $action['properties']['emails'];
-            if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
+            if (!in_array($emailId, $limitToEmails)) {
                 //no points change
                 return false;
             }
@@ -46,7 +46,7 @@ class PointEventHelper
 
         if (isset($action['properties']['categories'])) {
             $limitToCategories = $action['properties']['categories'];
-            if (!empty($limitToCategories) && !in_array($categoryId, $limitToCategories)) {
+            if (!in_array($categoryId, $limitToCategories)) {
                 //no points change
                 return false;
             }
