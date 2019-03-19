@@ -466,7 +466,7 @@ class PublicController extends CommonFormController
             if ($lead = $submissionEvent->getLead()) {
                 $this->tokens = array_merge(
                     $submissionEvent->getTokens(),
-                    $this->get('mautic.lead.token.replacer')->findTokens($string, $lead->getProfileFields())
+                    $this->get('mautic.lead.token.replacer')->searchTokens($string, $lead->getProfileFields())
                 );
             }
         }
