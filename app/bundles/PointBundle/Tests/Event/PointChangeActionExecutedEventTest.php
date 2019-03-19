@@ -77,7 +77,7 @@ class PointChangeActionExecutedEventTest extends \PHPUnit_Framework_TestCase
             ->willReturn(1);
 
         $event = new PointChangeActionExecutedEvent($this->pointMock, $this->leadMock, $this->eventDetailsMock, $this->completedActions);
-        $event->setStatusFromLogsForInte | rnalId(98);
+        $event->setStatusFromLogsForInternalId(98);
         $this->assertTrue($event->canChangePoints());
     }
 }
