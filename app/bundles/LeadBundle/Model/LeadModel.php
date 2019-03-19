@@ -1512,8 +1512,7 @@ class LeadModel extends FormModel
                 $lead->addUpdatedField('email', $data[$fields['email']]);
                 if ($doNotEmail) {
                     $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
-                }
-                else {
+                } else {
                     $this->removeDncForLead($lead, 'email', true);
                 }
             }
