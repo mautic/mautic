@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
@@ -140,34 +142,24 @@ final class ImportContactSubscriber implements EventSubscriberInterface
 
     /**
      * @param array $matchedFields
+     *
+     * @return ?int
      */
     private function handleValidateOwner(array &$matchedFields)
     {
-        if (array_key_exists('owner', $matchedFields)) {
-            $owner = $matchedFields['owner'];
-            unset($matchedFields['owner']);
+        $owner = ArrayHelper::pickValue('owner', $matchedFields);
 
-            return $owner ? $owner->getId() : null;
-        }
-
-        return null;
+        return $owner ? $owner->getId() : null;
     }
 
     /**
      * @param array $matchedFields
      *
-     * @return string
+     * @return ?int
      */
     private function handleValidateList(array &$matchedFields)
     {
-        if (array_key_exists('list', $matchedFields)) {
-            $list = $matchedFields['list'];
-            unset($matchedFields['list']);
-
-            return $list;
-        }
-
-        return null;
+        return ArrayHelper::pickValue('list', $matchedFields);
     }
 
     /**
@@ -177,18 +169,9 @@ final class ImportContactSubscriber implements EventSubscriberInterface
      */
     private function handleValidateTags(array &$matchedFields)
     {
-        if (array_key_exists('tags', $matchedFields)) {
-            $tagCollection = $matchedFields['tags'];
-            $tags          = [];
-            foreach ($tagCollection as $tag) {
-                $tags[] = $tag->getTag();
-            }
-            unset($matchedFields['tags']);
-
-            return $tags;
-        }
-
-        return [];
+        return array_map(function (Tag $tag) {
+            return $tag->getTag();
+        }, ArrayHelper::pickValue('tags', $matchedFields, []));
     }
 
     /**
