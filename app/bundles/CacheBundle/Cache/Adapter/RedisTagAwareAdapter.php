@@ -25,7 +25,7 @@ class RedisTagAwareAdapter extends TagAwareAdapter
 
         $options = array_key_exists('options', $servers) ? $servers['options'] : [];
 
-        $client = RedisAdapter::createConnection($servers['dsn'], $options);
+        $client = \Predis\Client([$servers['dsn']], $options);
 
         parent::__construct(
             new RedisAdapter($client, $namespace, $lifetime),
