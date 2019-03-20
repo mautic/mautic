@@ -175,6 +175,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->message = $message;
         $metadata      = $this->getMetadata();
         $mauticTokens  = $mergeVars = $mergeVarPlaceholders = [];
+        $campaignId    = '';
 
         // Sparkpost uses {{ name }} for tokens so Mautic's need to be converted; although using their {{{ }}} syntax to prevent HTML escaping
         if (!empty($metadata)) {
@@ -187,6 +188,8 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $mergeVars[$token]            = strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
                 $mergeVarPlaceholders[$token] = '{{{ '.$mergeVars[$token].' }}}';
             }
+
+            $campaignId = $this->extractCampaignId($metadataSet);
         }
 
         $message = $this->messageToArray($mauticTokens, $mergeVarPlaceholders, true);
@@ -291,10 +294,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         $sparkPostMessage = [
-            'content'    => $content,
-            'recipients' => $recipients,
-            'inline_css' => $inlineCss,
-            'tags'       => $tags,
+            'content'     => $content,
+            'recipients'  => $recipients,
+            'inline_css'  => $inlineCss,
+            'tags'        => $tags,
+            'campaign_id' => $campaignId,
         ];
 
         if (!empty($message['attachments'])) {
@@ -501,5 +505,26 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     public function ping()
     {
         return true;
+    }
+
+    /**
+     * @return string
+     */
+    private function extractCampaignId(array $metadataSet)
+    {
+        // Extract and build a campaign ID from the metadata sample
+        if (!empty($metadataSet['utmTags']['utmCampaign'])) {
+            return $metadataSet['utmTags']['utmCampaign'];
+        }
+
+        if (!empty($metadataSet['emailId']) && !empty($metadataSet['emailName'])) {
+            return $metadataSet['emailId'].':'.$metadataSet['emailName'];
+        }
+
+        if (!empty($metadataSet['emailId'])) {
+            return $metadataSet['emailId'];
+        }
+
+        return '';
     }
 }
