@@ -114,7 +114,7 @@ class LeadSubscriber extends CommonSubscriber
                 $dncChanges['mautic_internal_dnc_'.$channel] = [$oldValue, $newValue];
             }
 
-            $this->recordFieldChanges($dncChanges, (int)$lead->getId(), Lead::class);
+            $this->recordFieldChanges($dncChanges, $lead->getId(), Lead::class);
         }
     }
 
@@ -169,10 +169,11 @@ class LeadSubscriber extends CommonSubscriber
      *
      * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
      */
-    private function recordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
+    private function recordFieldChanges(array $fieldChanges, $objectId, string $objectType): void
     {
         $toPersist     = [];
         $changedFields = [];
+        $objectId = (int)$objectId;
         foreach ($fieldChanges as $key => list($oldValue, $newValue)) {
             $valueDAO          = $this->variableExpressor->encodeVariable($newValue);
             $changedFields[]   = $key;
