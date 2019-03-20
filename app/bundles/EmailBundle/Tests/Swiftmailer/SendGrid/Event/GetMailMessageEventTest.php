@@ -13,13 +13,14 @@ namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Event;
 
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Event\GetMailMessageEvent;
-use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment;
-use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase;
-use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
-use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization;
+use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage;
+use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse;
+use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridWrapper;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridMailEvents;
 use SendGrid\Mail;
+use SendGrid\Response;
+use Swift_Mime_Message;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -50,9 +51,9 @@ class GetMailMessageEventTest extends \PHPUnit_Framework_TestCase
         $mail->expects($this->never())
             ->method('addCustomArg');
 
-        $apiMessage = $this->createSendgridApiMessage($dispatcher, $mail, $message);
+        $apiFacade = $this->createSendGridApiFacade($mail, $message, $dispatcher);
 
-        $apiMail = $apiMessage->getMessage($message);
+        $apiFacade->send($message);
     }
 
     /**
@@ -75,11 +76,17 @@ class GetMailMessageEventTest extends \PHPUnit_Framework_TestCase
             ->setMethodsExcept(['addCategory', 'getCategories', 'addCustomArg', 'getCustomArgs'])
             ->getMock();
 
-        $apiMessage = $this->createSendgridApiMessage($dispatcher, $mail, $message);
-        $apiMail    = $apiMessage->getMessage($message);
+        $apiFacade = $this->createSendGridApiFacade($mail, $message, $dispatcher);
 
-        $categories = $apiMail->getCategories();
-        $customArgs = $apiMail->getCustomArgs();
+        // This is where the action happens
+        $apiFacade->send($message);
+
+        // Though the send doesn't return anything, and the $mail instance
+        // will only be available to event listeners in real operation, we can
+        // access $mail here because it is the same object returned by our
+        // mocked ApiMessage instance.
+        $categories = $mail->getCategories();
+        $customArgs = $mail->getCustomArgs();
 
         // Test that all categories were added.
         $this->assertContains('foo', $categories);
@@ -93,45 +100,47 @@ class GetMailMessageEventTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Create sendgrid api message.
+     * Create sendgrid api facade.
      *
-     * @param EventDispatcherInterface $dispatcher
+     * @param Mail                      $mail
+     * @param Swift_Mime_Message        $message
+     * @param EventDispatcherInterface  $dispatcher
      *
-     * @return SendGridApiMessage
+     * @return SendGridApiFacade
      */
-    protected function createSendgridApiMessage(EventDispatcherInterface $dispatcher, Mail $mail, \Swift_Mime_Message $message)
-    {
-        $sendGridMailBase = $this->getMockBuilder(SendGridMailBase::class)
+    protected function createSendGridApiFacade(
+        Mail $mail,
+        Swift_Mime_Message $message,
+        EventDispatcherInterface $dispatcher
+    ) {
+        $response = $this->getMockBuilder(Response::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridMailPersonalization = $this->getMockBuilder(SendGridMailPersonalization::class)
+        $wrapper = $this->getMockBuilder(SendGridWrapper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridMailMetadata = $this->getMockBuilder(SendGridMailMetadata::class)
+        $wrapper
+            ->method('send')
+            ->willReturn($response);
+
+        $apiMessage = $this->getMockBuilder(SendGridApiMessage::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridMailAttachment = $this->getMockBuilder(SendGridMailAttachment::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $sendGridApiMessage = new SendGridApiMessage(
-            $sendGridMailBase,
-            $sendGridMailPersonalization,
-            $sendGridMailMetadata,
-            $sendGridMailAttachment,
-            $dispatcher
-        );
-
-        $sendGridMailBase->expects($this->once())
-            ->method('getSendGridMail')
+        $apiMessage
+            ->method('getMessage')
             ->with($message)
             ->willReturn($mail);
 
-        return $sendGridApiMessage;
+        $apiResponse = $this->getMockBuilder(SendGridApiResponse::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        return new SendGridApiFacade($wrapper, $apiMessage, $apiResponse, $dispatcher);
     }
+
 }
 
 /**
