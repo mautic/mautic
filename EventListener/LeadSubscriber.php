@@ -114,7 +114,7 @@ class LeadSubscriber extends CommonSubscriber
                 $dncChanges['mautic_internal_dnc_'.$channel] = [$oldValue, $newValue];
             }
 
-            $this->recordFieldChanges($dncChanges, $lead->getId(), Lead::class);
+            $this->recordFieldChanges($dncChanges, (int)$lead->getId(), Lead::class);
         }
     }
 
