@@ -169,9 +169,14 @@ final class ImportContactSubscriber implements EventSubscriberInterface
      */
     private function handleValidateTags(array &$matchedFields)
     {
+        // In case $matchedFields['tags'] === null ...
+        $tags = ArrayHelper::pickValue('tags', $matchedFields, []);
+        // ...we must ensure we pass an [] to array_map
+        $tags = is_array($tags) ? $tags : [];
+
         return array_map(function (Tag $tag) {
             return $tag->getTag();
-        }, ArrayHelper::pickValue('tags', $matchedFields, []));
+        }, $tags);
     }
 
     /**
