@@ -199,6 +199,26 @@ final class ImportContactSubscriber implements EventSubscriberInterface
 
         $missingRequiredFields = array_diff_key($requiredFields, array_flip($matchedFields));
 
+        // Check for the presense of company mapped fields
+        $companyFields = array_filter($matchedFields, function ($fieldname) {
+            return strpos($fieldname, 'company') === 0;
+        });
+
+        // If we have any, ensure all required company fields are mapped.
+        if (count($companyFields)) {
+            $companyRequiredFields = $this->fieldList->getFieldList(false, false, [
+                'isPublished' => true,
+                'object'      => 'company',
+                'isRequired'  => true,
+            ]);
+
+            $companyMissingRequiredFields = array_diff_key($companyRequiredFields, array_flip($matchedFields));
+
+            if (count($companyMissingRequiredFields)) {
+                $missingRequiredFields = array_merge($missingRequiredFields, $companyMissingRequiredFields);
+            }
+        }
+
         if (count($missingRequiredFields)) {
             $event->getForm()->addError(
                 new FormError(
