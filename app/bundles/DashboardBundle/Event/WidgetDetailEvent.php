@@ -51,8 +51,9 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * WidgetDetailEvent constructor.
+     *
      * @param TranslatorInterface $translator
-     * @param CacheProvider|null $cacheProvider
+     * @param CacheProvider|null  $cacheProvider
      */
     public function __construct(TranslatorInterface $translator, CacheProvider $cacheProvider = null)
     {
@@ -70,14 +71,54 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
+     * @param \DateTime|string $value
+     *
+     * @return null|string
+     */
+    private function castDateTimeToString($value)
+    {
+        if ($value instanceof \DateTime) {
+            $value = $value->format('r');
+            if (false !== $value) {
+                return $value;
+            }
+
+            return null;
+        }
+
+        try {
+            $value = (string) $value;
+        } catch (Exception $e) {
+            return null;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Return unique key, uses legacy methods for BC.
+     *
      * @return string
      */
     public function getCacheKey()
     {
-        $cacheKey = sprintf('%s%s',
+        $cacheKey = [
             $this->cacheKeyPath,
-            $this->getUniqueWidgetId()
-        );
+            $this->getUniqueWidgetId(),
+        ];
+
+        $params = $this->getWidget()->getParams();
+
+        foreach (['dateTo', 'dateFrom'] as $index => $key) {
+            if (isset($params[$key])) {
+                $date = $this->castDateTimeToString($params[$key]);
+                if (null !== $date) {
+                    $cacheKey[] = $date;
+                }
+            }
+        }
+
+        $cacheKey = implode('', $cacheKey);
 
         return $cacheKey;
     }
@@ -220,7 +261,9 @@ class WidgetDetailEvent extends CommonEvent
         }
 
         $cItem = $this->cacheProvider->getItem($this->getCacheKey());
-        $cItem->expiresAfter($this->widget->getCacheTimeout());
+        if ($this->widget->getCacheTimeout()) {
+            $cItem->expiresAfter((int) $this->widget->getCacheTimeout() * 60);  // This is in minutes
+        }
         $cItem->set($templateData);
 
         return $this->cacheProvider->save($cItem);
