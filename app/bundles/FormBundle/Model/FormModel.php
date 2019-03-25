@@ -864,8 +864,8 @@ class FormModel extends CommonFormModel
 
         foreach ($autoFillFields as $field) {
             $value = $lead->getFieldValue($field->getLeadField());
-
-            if (!empty($value)) {
+            // just skip string empty field
+            if ($value !== '') {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }
