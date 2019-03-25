@@ -44,8 +44,10 @@ class Point extends FormEntity
      */
     private $type;
 
-    /** @var bool */
-    private $repeatable;
+    /**
+     * @var bool
+     */
+    private $repeatable = false;
 
     /**
      * @var \DateTime

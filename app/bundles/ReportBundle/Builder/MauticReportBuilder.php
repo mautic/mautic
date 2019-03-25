@@ -244,7 +244,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         } elseif ($order = $this->entity->getTableOrder()) {
             foreach ($order as $o) {
-                if (!empty($o['column'])) {
+                if (!empty($options['columns'][$o['column']]['formula'])) {
+                    $queryBuilder->orderBy($options['columns'][$o['column']]['formula'], $o['direction']);
+                } elseif (!empty($o['column'])) {
                     $queryBuilder->orderBy($o['column'], $o['direction']);
                 }
             }
@@ -311,6 +313,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         } else {
                             $selectText = $field;
                         }
+                    }
+
+                    // support for prefix and suffix to value in query
+                    $prefix     = isset($fieldOptions['prefix']) ? $fieldOptions['prefix'] : '';
+                    $suffix     = isset($fieldOptions['suffix']) ? $fieldOptions['suffix'] : '';
+                    if ($prefix || $suffix) {
+                        $selectText = 'CONCAT(\''.$prefix.'\', '.$selectText.',\''.$suffix.'\')';
                     }
 
                     if (isset($fieldOptions['alias'])) {

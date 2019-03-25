@@ -385,8 +385,14 @@ class BuilderSubscriber extends CommonSubscriber
                 $divContent = $xpath->query('//*[@data-slot="saveprefsbutton"]');
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
+                    $saveButton      = $xpath->query('//*[@data-slot="saveprefsbutton"]//a')->item(0);
                     $slot->nodeValue = self::saveprefsRegex;
                     $content         = $dom->saveHTML();
+
+                    $params['saveprefsbutton'] = [
+                        'style'      => $saveButton->getAttribute('style'),
+                        'background' => $saveButton->getAttribute('background'),
+                    ];
                 }
 
                 unset($slot, $xpath, $dom);

@@ -526,6 +526,10 @@ class LeadModel extends FormModel
                     $entity->addUpdatedField('zipcode', $details['zipcode']);
                 }
             }
+
+            if (!$entity->getCompany() && !empty($details['organization'])) {
+                $entity->addUpdatedField('company', $details['organization']);
+            }
         }
 
         $updatedFields = $entity->getUpdatedFields();
@@ -613,7 +617,8 @@ class LeadModel extends FormModel
             $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
             $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
 
-            if ($data['stage'] !== $currentLeadStage) {
+            $previousId = is_object($data['stage']) ? $data['stage']->getId() : (int) $data['stage'];
+            if ($previousId !== $currentLeadStage) {
                 $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
                 $lead->stageChangeLogEntry(
                     $stage,
