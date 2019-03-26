@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Exception\CouldNotFormatDateTimeException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -77,14 +78,14 @@ class WidgetDetailEvent extends CommonEvent
 
         foreach (['dateTo', 'dateFrom'] as $key => $dateParameter) {
             if (isset($params[$dateParameter])) {
-                $date = $this->castDateTimeToString($params[$dateParameter]);
-                if (null !== $date) {
+                try {
+                    $date = $this->castDateTimeToString($params[$dateParameter]);
                     $cacheKey[] = $date;
-                }
+                } catch (CouldNotFormatDateTimeException $e) {}
             }
         }
 
-        // If there is no additional parameters we return uniqueWidgetId as a cache key
+        // If there are no additional parameters we return uniqueWidgetId as a cache key
         // Otherwise we return hashed $cacheKey value
         $cacheKey = (1 == count($cacheKey)) ? $this->getUniqueWidgetId() : substr(md5(implode('', $cacheKey)), 0, 16);
 
@@ -383,26 +384,27 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * We need to cast DateTime objects to strings to use them in the cache key.
      *
-     * @param \DateTime|string $value
+     * @param \DateTimeInterface|mixed $value
+     * @throws CouldNotFormatDateTimeException
      *
-     * @return null|string
+     * @return string
      */
     private function castDateTimeToString($value)
     {
         if ($value instanceof \DateTimeInterface) {
             // We use RFC 2822 format because it includes timezone
             $value = $value->format('r');
-            if (false !== $value) {
-                return $value;
+            if (false === $value) {
+                throw new CouldNotFormatDateTimeException;
             }
 
-            return null;
+            return $value;
         }
 
         try {
-            $value = (string) $value;
+            $value = (string)$value;
         } catch (Exception $e) {
-            return null;
+            throw new CouldNotFormatDateTimeException;
         }
 
         return $value;
