@@ -97,16 +97,17 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get a list of leads based on field value.
      *
-     * @param $field
-     * @param $value
-     * @param $ignoreId
+     * @param string $field
+     * @param string $value
+     * @param ?int   $ignoreId
+     * @param bool   $indexByColumn
      *
      * @return array
      */
     public function getLeadsByFieldValue($field, $value, $ignoreId = null, $indexByColumn = false)
     {
         $results = $this->getEntities([
-            'qb'               => $this->buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId, $indexByColumn),
+            'qb'               => $this->buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId),
             'ignore_paginator' => true,
         ]);
 
@@ -124,20 +125,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @internal
      *
-     * @param $field
-     * @param $value
-     * @param $ignoreId
-     * @param $indexByColumn
+     * @param string $field
+     * @param string $value
+     * @param ?int   $ignoreId
      *
      * @return QueryBuilder
      */
-    protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null, $indexByColumn = false)
+    protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null)
     {
         $col = 'l.'.$field;
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        if ($ignoreId) {
+            $q->where('l.id != :ignoreId')
+                ->setParameter('ignoreId', $ignoreId);
+        }
 
         if (is_array($value)) {
             /**
@@ -150,22 +155,18 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $valueParams[':'.$this->generateRandomParameterName()] = $value[$i];
             }
 
-            $q->where(
+            $q->andWhere(
                 $q->expr()->in($col, array_keys($valueParams))
             );
 
             foreach ($valueParams as $param => $value) {
                 $q->setParameter(ltrim($param, ':'), $value);
             }
-        } else {
-            $q->where("$col = :search")
-                ->setParameter('search', $value);
+
+            return $q;
         }
 
-        if ($ignoreId) {
-            $q->andWhere('l.id != :ignoreId')
-                ->setParameter('ignoreId', $ignoreId);
-        }
+        $q->andWhere("$col = :search")->setParameter('search', $value);
 
         return $q;
     }
