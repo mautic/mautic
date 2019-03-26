@@ -146,6 +146,24 @@ class DashboardModel extends FormModel
      * @param array $widgets
      * @param array $filter
      */
+    public function populateWidgetPreviews(&$widgets, $filter = [])
+    {
+        if (count($widgets)) {
+            foreach ($widgets as &$widget) {
+                if (!($widget instanceof Widget)) {
+                    $widget = $this->populateWidgetEntity($widget);
+                }
+                $this->populateWidgetContent($widget, $filter);
+            }
+        }
+    }
+
+    /**
+     * Fill widgets with their content.
+     *
+     * @param array $widgets
+     * @param array $filter
+     */
     public function populateWidgetsContent(&$widgets, $filter = []): void
     {
         if (count($widgets)) {
@@ -206,7 +224,7 @@ class DashboardModel extends FormModel
         $widget->setParams($resultParams);
 
         $this->dispatcher->dispatch(
-            $this->eventFactory->create($widget),
+            $this->widgetEventFactory->create($widget),
             DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
         );
     }

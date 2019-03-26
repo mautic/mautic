@@ -34,10 +34,44 @@ class WidgetDetailEvent extends CommonEvent
 
     private string $cacheKeyPath = 'dashboard.widget.';
 
+    protected $security = null;
+
+    private bool $isPreview = false;
+
     public function __construct(private TranslatorInterface $translator, private CorePermissions $security, protected Widget $widget, private ?CacheProvider $cacheProvider = null)
     {
         $this->startTime = microtime(true);
         $this->setWidget($widget);
+    }
+
+    /**
+     * Act as widget preview without data.
+     *
+     * @param $isPreview
+     */
+    public function setPreview($isPreview)
+    {
+        $this->isPreview = $isPreview;
+    }
+
+    /**
+     * Is preview without data?
+     *
+     * @return bool
+     */
+    public function isPreview()
+    {
+        return $this->isPreview;
+    }
+
+    /**
+     * Checks for cache type. This event should be created by factory thus not legacy approach.
+     *
+     * @return bool
+     */
+    private function usesLegacyCache()
+    {
+        return is_null($this->cacheProvider);
     }
 
     /**

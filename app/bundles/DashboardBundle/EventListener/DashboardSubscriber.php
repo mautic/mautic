@@ -36,8 +36,34 @@ class DashboardSubscriber implements EventSubscriberInterface
         return [
             DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE   => ['onWidgetListGenerate', 0],
             DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE   => ['onWidgetFormGenerate', 0],
+            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD => ['onWidgetDetailPreLoad', 0],
             DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE => ['onWidgetDetailGenerate', 0],
         ];
+    }
+
+    /**
+     * Generates widget preview without data.
+     *
+     * @param WidgetDetailEvent $event
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function onWidgetDetailPreLoad(WidgetDetailEvent $event)
+    {
+        $widget = $event->getWidget();
+        $params = $widget->getParams(); // $params['dateFrom'], $params['dateTo']
+
+        $event->setTemplateData([
+            'chartType'   => 'line',
+            'chartHeight' => $widget->getHeight() - 80,
+            'chartData'   => [
+                'datasets'=> [],
+                'labels'  => [],
+            ],
+        ]);
+
+        $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+        $event->stopPropagation();
     }
 
     /**
