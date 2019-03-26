@@ -25,9 +25,9 @@ class CouldNotFormatDateTimeException extends Exception
      * @param Throwable|null $previous
      */
     public function __construct(
-        string $message = 'Can\'t format date object to string',
-        int $code = 0,
-        ?Throwable $throwable = null
+        $message = 'Can\'t format date object to string',
+        $code = 0,
+        Throwable $throwable = null
     )
     {
         parent::__construct($message, $code, $throwable);
