@@ -11,11 +11,11 @@
 
 namespace Mautic\LeadBundle\Tests\Services;
 
-use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\Exception\FilterNotFoundException;
+use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactSegmentFilterDictionaryTest extends \PHPUnit_Framework_TestCase
 {
