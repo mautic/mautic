@@ -42,9 +42,8 @@ class PointEventHelper
             }
         }
 
-        $categoryId = $eventDetails->getCategory()->getId();
-
         if (isset($action['properties']['categories'])) {
+            $categoryId        = $eventDetails->getCategory() ? $eventDetails->getCategory()->getId() : null;
             $limitToCategories = $action['properties']['categories'];
             if (!in_array($categoryId, $limitToCategories)) {
                 //no points change
