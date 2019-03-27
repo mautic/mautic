@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Mautic\LeadBundle\Exception\FilterNotFoundException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
@@ -79,14 +80,16 @@ class DecoratorFactory
 
         $originalField = $contactSegmentFilterCrate->getField();
 
-        if (empty($this->contactSegmentFilterDictionary[$originalField])) {
+        try {
+            $this->contactSegmentFilterDictionary->getFilter($originalField);
+
+            return $this->customMappedDecorator;
+        } catch (FilterNotFoundException $e) {
             if ($contactSegmentFilterCrate->isCompanyType()) {
                 return $this->companyDecorator;
             }
 
             return $this->baseDecorator;
         }
-
-        return $this->customMappedDecorator;
     }
 }
