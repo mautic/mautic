@@ -42,7 +42,7 @@ class PointEventHelper
             }
         }
 
-        if (isset($action['properties']['categories'])) {
+        if (!empty($action['properties']['categories'])) {
             $categoryId        = $eventDetails->getCategory() ? $eventDetails->getCategory()->getId() : null;
             $limitToCategories = $action['properties']['categories'];
             if (!in_array($categoryId, $limitToCategories)) {
