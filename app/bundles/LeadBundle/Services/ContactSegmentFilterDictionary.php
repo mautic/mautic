@@ -48,7 +48,7 @@ class ContactSegmentFilterDictionary
     {
         if (empty($this->filters)) {
             $this->setDefaultFilters();
-            $this->fetchTranslationsFromSubscribers();
+            $this->fetchFiltersFromSubscribers();
         }
 
         return $this->filters;
@@ -292,7 +292,7 @@ class ContactSegmentFilterDictionary
     /**
      * Other bundles can add more filters by subscribing to this event.
      */
-    private function fetchTranslationsFromSubscribers()
+    private function fetchFiltersFromSubscribers()
     {
         if ($this->dispatcher->hasListeners(LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE)) {
             $event = new SegmentDictionaryGenerationEvent($this->filters);
