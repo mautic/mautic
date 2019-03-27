@@ -1229,6 +1229,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if(type == 'date') {
@@ -1238,6 +1239,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false,
             closeOnDateSelect: true
         });
@@ -1248,6 +1250,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     }

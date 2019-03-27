@@ -306,6 +306,7 @@ Mautic.leadlistOnLoad = function(container) {
                     'fast',
                     function () {
                         mQuery(this).remove();
+                        Mautic.reorderSegmentFilters();
                     }
                 );
 
@@ -389,7 +390,7 @@ Mautic.reorderSegmentFilters = function() {
             }
 
             var newName = prefix+'[filters]['+counter+']['+suffix+']';
-            if (name.slice(-2) === '[]') {
+            if (typeof name !== 'undefined' && name.slice(-2) === '[]') {
                 newName += '[]';
             }
 
@@ -408,7 +409,6 @@ Mautic.reorderSegmentFilters = function() {
 
     mQuery('#' + prefix + '_filters .panel-heading').removeClass('hide');
     mQuery('#' + prefix + '_filters .panel-heading').first().addClass('hide');
-    mQuery('#' + prefix + '_filters .panel').first().removeClass('in-group');
 };
 
 Mautic.convertLeadFilterInput = function(el) {
@@ -568,6 +568,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
             'fast',
             function () {
                 mQuery(this).remove();
+                Mautic.reorderSegmentFilters();
             }
         );
     });
@@ -614,6 +615,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if (fieldType == 'date') {
@@ -623,6 +625,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false,
             closeOnDateSelect: true
         });
@@ -633,6 +636,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if (fieldType == 'lookup_id') {
@@ -1438,10 +1442,11 @@ Mautic.initUniqueIdentifierFields = function() {
 };
 
 Mautic.updateFilterPositioning = function (el) {
-    var $el = mQuery(el);
+    var $el       = mQuery(el);
     var $parentEl = $el.closest('.panel');
+    var list      = $parentEl.parent().children('.panel');
 
-    if ($el.val() == 'and') {
+    if ($el.val() == 'and' && list.index($parentEl) !== 0) {
         $parentEl.addClass('in-group');
     } else {
         $parentEl.removeClass('in-group');
