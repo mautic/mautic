@@ -558,13 +558,13 @@ class ReportModel extends FormModel
 
         foreach ($aggregatorColumns as $aggregatorColumn) {
             $selectedColumns[] = $aggregatorColumn['column'];
+            // add aggregator columns to dataColumns also
+            $dataColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']]           = $aggregatorColumn['column'];
+            $dataAggregatorColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']] = $aggregatorColumn['column'];
         }
         // Build a reference for column to data column (without table prefix)
         foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
             $dataColumns[$columnData['alias']] = $dbColumn;
-            // add aggregator columns to dataColumns also
-            $dataColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']]           = $aggregatorColumn['column'];
-            $dataAggregatorColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']] = $aggregatorColumn['column'];
         }
 
         $orderBy    = $this->session->get('mautic.report.'.$entity->getId().'.orderby', '');
