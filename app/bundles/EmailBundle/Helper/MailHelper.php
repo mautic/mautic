@@ -1025,7 +1025,7 @@ class MailHelper
                 $address[$item] = $name;
 
                 return $address;
-            }, array());
+            }, []);
         }
 
         $this->checkBatchMaxRecipients(count($addresses));
