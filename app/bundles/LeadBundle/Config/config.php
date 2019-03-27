@@ -1076,7 +1076,6 @@ return [
             'mautic.lead.repository.lead_segment_filter_descriptor' => [
                 'class'     => \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary::class,
                 'arguments' => [
-                    'translator',
                     'event_dispatcher',
                 ],
             ],
