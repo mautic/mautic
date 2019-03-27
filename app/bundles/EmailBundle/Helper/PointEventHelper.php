@@ -34,7 +34,7 @@ class PointEventHelper
 
         $emailId = $eventDetails->getId();
 
-        if (isset($action['properties']['emails'])) {
+        if (!empty($action['properties']['emails'])) {
             $limitToEmails = $action['properties']['emails'];
             if (!in_array($emailId, $limitToEmails)) {
                 //no points change
