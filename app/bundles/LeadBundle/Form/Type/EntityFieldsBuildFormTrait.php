@@ -169,7 +169,8 @@ trait EntityFieldsBuildFormTrait
                 case 'select':
                 case 'multiselect':
                 case 'boolean':
-                    if ($type == 'multiselect') {
+                $typeProperties['data']        = $type === 'multiselect' ? FormFieldHelper::parseList($value) : $value;
+                    if ($type == 'multiselect' && !is_array($typeProperties['data'])) {
                         $constraints[] = new Length(['max' => 255]);
                     }
 
@@ -203,7 +204,6 @@ trait EntityFieldsBuildFormTrait
                         }
                     }
 
-                    $typeProperties['data']        = $type === 'multiselect' ? FormFieldHelper::parseList($value) : $value;
                     $typeProperties['empty_value'] = $emptyValue;
                     $builder->add(
                         $alias,
