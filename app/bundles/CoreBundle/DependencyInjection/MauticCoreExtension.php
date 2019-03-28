@@ -31,6 +31,8 @@ class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $canOverrideServices = $this->canOverrideServices($container);
+
         $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
 
         // Store menu renderer options to create unique renderering classes per menu
@@ -72,7 +74,7 @@ class MauticCoreExtension extends Extension
                     }
 
                     foreach ($services as $name => $details) {
-                        if (isset($serviceNames[$name])) {
+                        if (isset($serviceNames[$name]) && !$canOverrideServices) {
                             throw new \InvalidArgumentException("$name is already registered");
                         }
                         $serviceNames[$name] = true;
@@ -344,5 +346,20 @@ class MauticCoreExtension extends Extension
             // Reference
             $definitionArguments[] = new Reference($argument);
         }
+    }
+
+    /**
+     * Returns true if the parameter 'plugin_allow_overrides' is set to true
+     *
+     * @param ContainerBuilder $container
+     * @return bool
+     */
+    private function canOverrideServices(ContainerBuilder $container)
+    {
+        try {
+            return (bool)$container->getParameter('mautic.plugin_allow_overrides');
+        } catch (\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException $e) {}
+
+        return false;
     }
 }
