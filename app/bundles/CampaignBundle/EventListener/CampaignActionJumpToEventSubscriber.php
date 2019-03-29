@@ -95,6 +95,11 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      * Process campaign.jump_to_event actions.
      *
      * @param PendingEvent $campaignEvent
+     *
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
+     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
     public function onJumpToEvent(PendingEvent $campaignEvent)
     {
@@ -102,10 +107,10 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
         $jumpTarget = $this->getJumpTargetForEvent($event, 'e.id');
 
         if ($jumpTarget === null) {
-            $campaignEvent->passWithError($jumpTarget, $this->translator->trans('mautic.campaign.campaign.jump_to_event.target_not_exist'));
+            $campaignEvent->passWithError($event, $this->translator->trans('mautic.campaign.campaign.jump_to_event.target_not_exist'));
+        } else {
+            $this->eventExecutioner->executeForContacts($jumpTarget, $campaignEvent->getContacts());
         }
-
-        $this->eventExecutioner->executeForContacts($jumpTarget, $campaignEvent->getContacts());
 
         $campaignEvent->passRemaining();
     }
