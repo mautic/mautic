@@ -353,7 +353,11 @@ MauticJS.processGatedVideos = function (videoElements) {
     
     MauticJS.iterateCollection(videoElements)(function(node, i){
         var playerFeatures = [];
-        var source   = node.getElementsByTagName('source')[0];
+        var sourceNodes = node.getElementsByTagName('source');
+        if (sourceNodes.length === 0) {
+            return;
+        }
+        var source   = sourceNodes[0];
         
         if (source.type === 'video/mp4') {
             node.dataset.mp4 = true;
