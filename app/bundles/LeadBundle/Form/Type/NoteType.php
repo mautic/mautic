@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\File;
 
 /**
  * Class NoteType.
@@ -61,7 +62,7 @@ class NoteType extends AbstractType
         $data = ($dt == null) ? $this->dateHelper->getDateTime() : $dt;
 
         $builder->add('dateTime', 'datetime', [
-            'label'      => 'mautic.core.date.added',
+            'label'      => 'mautic.core.attachment',
             'label_attr' => ['class' => 'control-label'],
             'widget'     => 'single_text',
             'attr'       => [
@@ -72,6 +73,20 @@ class NoteType extends AbstractType
             'format' => 'yyyy-MM-dd HH:mm',
             'data'   => $data,
         ]);
+
+        $builder->add(
+            'attachment',
+            'file',
+            [
+                'label'      => 'mautic.core.attachment',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'   => 'form-control',
+                ],
+                'mapped'      => false,
+            ]
+        );
 
         $builder->add('buttons', 'form_buttons', [
             'apply_text' => false,

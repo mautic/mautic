@@ -48,6 +48,9 @@ class LeadNote extends FormEntity
      */
     private $dateTime;
 
+    /** @var string */
+    private $attachment;
+
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -71,6 +74,10 @@ class LeadNote extends FormEntity
 
         $builder->createField('dateTime', 'datetime')
             ->columnName('date_time')
+            ->nullable()
+            ->build();
+
+        $builder->createField('attachment', 'string')
             ->nullable()
             ->build();
     }
