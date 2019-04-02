@@ -200,6 +200,14 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot_separator',
                 400
             );
+            $event->addSlotType(
+                'video',
+                $this->translator->trans('mautic.core.slot.label.video'),
+                'video',
+                'MauticCoreBundle:Slots:video.html.php',
+                'slot_video',
+                350
+            );
 
             $event->addSlotType(
                 'dynamicContent',

@@ -5503,3 +5503,25 @@ div:empty[data-slot]:before,div.empty[data-slot]:before,.codemodeHtmlContainer:e
   color:gray;
   font-size:small;
 }
+.slot-video::before {
+    content: '';
+    width: 80px;
+    height: 80px;
+    display: block;
+    position: absolute;
+    top: calc(50% - 40px);
+    left: calc(50% - 40px);
+}
+.slot-video-light::before {
+  background: url(https://img.icons8.com/ios/200/FFFFFF/play-button-circled-filled.png);
+  background-size: cover;
+}
+.slot-video-dark::before {
+  background: url(https://img.icons8.com/ios/200/000000/play-button-circled-filled.png);
+  background-size: cover;
+}
+
+.slot-video img {
+  width: 600px;
+  height: 335px;
+}

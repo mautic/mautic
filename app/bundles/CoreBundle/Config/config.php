@@ -321,6 +321,10 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotSeparatorType',
                 'alias' => 'slot_separator',
             ],
+            'mautic.form.type.slot.video' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotVideoType',
+                'alias' => 'slot_video',
+            ],
             'mautic.form.type.slot.imagecard' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCardType',
                 'alias' => 'slot_imagecard',
