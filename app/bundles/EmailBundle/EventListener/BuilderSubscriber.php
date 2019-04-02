@@ -203,7 +203,7 @@ class BuilderSubscriber extends CommonSubscriber
             $event->addSlotType(
                 'video',
                 $this->translator->trans('mautic.core.slot.label.video'),
-                'video',
+                'youtube',
                 'MauticCoreBundle:Slots:video.html.php',
                 'slot_video',
                 350
