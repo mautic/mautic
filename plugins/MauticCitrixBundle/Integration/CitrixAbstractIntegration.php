@@ -63,7 +63,8 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     {
         return [
             'app_name'  => 'mautic.citrix.form.appname',
-            'client_id' => 'mautic.citrix.form.consumerkey',
+            'client_id' => 'mautic.citrix.form.clientid',
+            'client_secret' => 'mautic.citrix.form.clientsecret'
         ];
     }
 
@@ -117,7 +118,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
      */
     public function getAccessTokenUrl()
     {
-        return $this->getApiUrl().'/oauth/access_token';
+        return $this->getApiUrl().'/oauth/v2/token';
     }
 
     /**
@@ -127,7 +128,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
      */
     public function getAuthenticationUrl()
     {
-        return $this->getApiUrl().'/oauth/authorize';
+        return $this->getApiUrl().'/oauth/v2/authorize';
     }
 
     /**
