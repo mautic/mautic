@@ -158,7 +158,7 @@ class TestMailSendResponseSubscriber implements EventSubscriberInterface
      *
      * @return bool
      */
-    public function wasCalled(): bool
+    public function wasCalled()
     {
         return $this->called;
     }
