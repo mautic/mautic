@@ -16,8 +16,8 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\Event\GetMailMessageEvent;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse;
-use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridWrapper;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridMailEvents;
+use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridWrapper;
 use SendGrid\Mail;
 use SendGrid\Response;
 use Swift_Mime_Message;
@@ -102,9 +102,9 @@ class GetMailMessageEventTest extends \PHPUnit_Framework_TestCase
     /**
      * Create sendgrid api facade.
      *
-     * @param Mail                      $mail
-     * @param Swift_Mime_Message        $message
-     * @param EventDispatcherInterface  $dispatcher
+     * @param Mail                     $mail
+     * @param Swift_Mime_Message       $message
+     * @param EventDispatcherInterface $dispatcher
      *
      * @return SendGridApiFacade
      */
@@ -140,7 +140,6 @@ class GetMailMessageEventTest extends \PHPUnit_Framework_TestCase
 
         return new SendGridApiFacade($wrapper, $apiMessage, $apiResponse, $dispatcher);
     }
-
 }
 
 /**

@@ -71,8 +71,8 @@ class MailSendResponseEventTest extends \PHPUnit_Framework_TestCase
     /**
      * Create SendGridApiFacade and send message with specified success.
      *
-     * @param EventDispatcherInterface  $dispatcher
-     * @param bool                      $success    Whether response is successful
+     * @param EventDispatcherInterface $dispatcher
+     * @param bool                     $success    Whether response is successful
      */
     protected function createFacadeAndSendMessage(
         EventDispatcherInterface $dispatcher,
@@ -118,7 +118,6 @@ class MailSendResponseEventTest extends \PHPUnit_Framework_TestCase
 
         $apiFacade->send($message);
     }
-
 }
 
 /**
@@ -172,5 +171,4 @@ class TestMailSendResponseSubscriber implements EventSubscriberInterface
     {
         return $this->response;
     }
-
 }

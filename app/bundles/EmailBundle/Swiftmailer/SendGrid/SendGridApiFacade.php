@@ -14,9 +14,9 @@ namespace Mautic\EmailBundle\Swiftmailer\SendGrid;
 use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadLoginException;
 use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadRequestException;
 use Mautic\EmailBundle\Swiftmailer\SwiftmailerFacadeInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use SendGrid\Mail;
 use SendGrid\Response;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendGridApiFacade implements SwiftmailerFacadeInterface
 {
@@ -100,5 +100,4 @@ class SendGridApiFacade implements SwiftmailerFacadeInterface
 
         $this->dispatcher->dispatch(SendGridMailEvents::MAIL_SEND_RESPONSE, $event);
     }
-
 }
