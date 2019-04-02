@@ -333,14 +333,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.activateMultiSelect(this);
     });
 
-    mQuery(container + " *[data-toggle='field-lookup']").each(function (index) {
-        var target = mQuery(this).attr('data-target');
-        var options = mQuery(this).attr('data-options');
-        var field = mQuery(this).attr('id');
-        var action = mQuery(this).attr('data-action');
-
-        Mautic.activateFieldTypeahead(field, target, options, action);
-    });
+    Mautic.activateLookupTypeahead(mQuery(container));
 
     // Fix dropdowns in responsive tables - https://github.com/twbs/bootstrap/issues/11037#issuecomment-163746965
     mQuery(container + " .table-responsive").on('shown.bs.dropdown', function (e) {
@@ -546,7 +539,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
                     // Set custom buttons with separator between them.
                     toolbarButtons: maxButtons,
                     toolbarButtonsMD: maxButtons,
-                    heightMin: 300
+                    heightMin: 300,
+                    useClasses: false
                 };
 
                 if (textarea.hasClass('editor-basic-fullpage')) {
@@ -569,7 +563,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
                     toolbarButtonsMD: minButtons,
                     toolbarButtonsSM: minButtons,
                     toolbarButtonsXS: minButtons,
-                    heightMin: 100
+                    heightMin: 100,
+                    useClasses: false
                 }));
             }
         });
@@ -716,7 +711,22 @@ Mautic.onPageLoad = function (container, response, inModal) {
 };
 
 /**
- *
+ * @param jQueryObject
+ */
+Mautic.activateLookupTypeahead = function(containerEl) {
+    containerEl.find("*[data-toggle='field-lookup']").each(function () {
+        var lookup = mQuery(this);
+
+        Mautic.activateFieldTypeahead(
+            lookup.attr('id'),
+            lookup.attr('data-target'),
+            lookup.attr('data-options'),
+            lookup.attr('data-action')
+        );
+    });
+};
+
+/**
  * @param jQueryObject
  */
 Mautic.makeConfirmationsAlive = function(jQueryObject) {
@@ -968,6 +978,21 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
 };
 
 /**
+ * Check and destroy chosen select
+ *
+ * @param el
+ */
+Mautic.destroyChosen = function(el) {
+    var eventObject = mQuery._data(el.get(0), 'events');
+
+    // Check if object has chosen event
+    if (eventObject !== undefined && eventObject['chosen:activate'] !== undefined) {
+        el.chosen('destroy');
+        el.off('chosen:activate chosen:close chosen:open chosen:updated'); //Clear chosen events because chosen('destroy') doesn't
+    }
+};
+
+/**
  * Activate a typeahead lookup
  *
  * @param field
@@ -1200,10 +1225,11 @@ Mautic.activateDateTimeInputs = function(el, type) {
     var format = mQuery(el).data('format');
     if (type == 'datetime') {
         mQuery(el).datetimepicker({
-            format: (format) ? format : 'Y-m-d H:i:s',
+            format: (format) ? format : 'Y-m-d H:i',
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if(type == 'date') {
@@ -1213,16 +1239,18 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false,
             closeOnDateSelect: true
         });
     } else if (type == 'time') {
         mQuery(el).datetimepicker({
             datepicker: false,
-            format: (format) ? format : 'H:i:s',
+            format: (format) ? format : 'H:i',
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     }

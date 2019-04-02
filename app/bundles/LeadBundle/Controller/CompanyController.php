@@ -35,6 +35,7 @@ class CompanyController extends FormController
                 'lead:leads:viewother',
                 'lead:leads:create',
                 'lead:leads:editother',
+                'lead:leads:editown',
                 'lead:leads:deleteother',
             ],
             'RETURN_ARRAY'
@@ -44,9 +45,7 @@ class CompanyController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         //set limits
         $limit = $this->get('session')->get(

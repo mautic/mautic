@@ -30,9 +30,7 @@ class MonitoringController extends FormController
     {
         $session = $this->get('session');
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         /** @var \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $model */
         $model = $this->getModel('social.monitoring');

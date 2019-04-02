@@ -174,9 +174,12 @@ class UrlHelper
         $urls = array_merge($urls, $matches[0]);
 
         foreach ($urls as $key => $url) {
+            // Remove dangling punctuation
+            $urls[$key] = $url = self::removeTrailingNonAlphaNumeric($url);
+
             // We don't want to match URLs in token default values
             // like {contactfield=website|http://ignore.this.url}
-            if (preg_match_all("#{(.*?)\|$url}#", $text, $matches)) {
+            if (preg_match_all("/{(.*?)\|".preg_quote($url, '/').'}/', $text, $matches)) {
                 unset($urls[$key]);
 
                 // We know this is a URL due to the default so let's include it as a trackable
@@ -258,5 +261,29 @@ class UrlHelper
         }
 
         return $url;
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    private static function removeTrailingNonAlphaNumeric($string)
+    {
+        // Special handling of closing bracket
+        if (substr($string, -1) === '}' && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
+            $string = substr($string, 0, -1);
+
+            return self::removeTrailingNonAlphaNumeric($string);
+        }
+
+        // Ensure only alphanumeric allowed
+        if (!preg_match("/^.*?[a-zA-Z0-9}\/]$/i", $string)) {
+            $string = substr($string, 0, -1);
+
+            return self::removeTrailingNonAlphaNumeric($string);
+        }
+
+        return $string;
     }
 }

@@ -26,8 +26,8 @@ class SortableValueLabelListType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('label', 'text', ['label' => 'mautic.core.label', 'attr' => ['class' => 'form-control']]);
-        $builder->add('value', 'text', ['label' => 'mautic.core.value', 'attr' => ['class' => 'form-control']]);
+        $builder->add('label', 'text', ['label' => 'mautic.core.label', 'error_bubbling' => true, 'attr' => ['class' => 'form-control']]);
+        $builder->add('value', 'text', ['label' => 'mautic.core.value', 'error_bubbling' => true, 'attr' => ['class' => 'form-control']]);
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options)

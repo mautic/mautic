@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Validator\Constraints\FileEncoding as EncodingValidation;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\File;
@@ -40,6 +41,12 @@ class LeadImportType extends AbstractType
                         [
                             'mimeTypes'        => ['text/csv', 'text/plain'],
                             'mimeTypesMessage' => 'mautic.core.invalid_file_type',
+                        ]
+                    ),
+                    new EncodingValidation(
+                        [
+                            'encodingFormat'        => ['UTF-8'],
+                            'encodingFormatMessage' => 'mautic.core.invalid_file_encoding',
                         ]
                     ),
                 ],

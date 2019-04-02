@@ -389,7 +389,8 @@ Mautic.updateEntitySelect = function (response) {
 
         var sortOptions = function (options) {
             return options.sort(function (a, b) {
-                var alc = a.text.toLowerCase(), blc = b.text.toLowerCase();
+                var alc = a.text ? a.text.toLowerCase() : mQuery(a).attr("label").toLowerCase();
+                var blc = b.text ? b.text.toLowerCase() : mQuery(b).attr("label").toLowerCase();
                 return alc > blc ? 1 : alc < blc ? -1 : 0;
             });
         }
@@ -582,7 +583,7 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
 
             if (mQuery('#'+fieldPrefix+'value_chosen').length) {
                 valueFieldAttrs['value'] = '';
-                valueField.chosen('destroy');
+                Mautic.destroyChosen(valueField);
             }
 
             if (!mQuery.isEmptyObject(response.options) && response.fieldType !== 'number') {
@@ -658,9 +659,7 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
             if (!mQuery.isEmptyObject(response.operators)) {
                 var operatorField = mQuery('#'+fieldPrefix+'operator');
 
-                if (mQuery('#'+fieldPrefix+'operator_chosen').length) {
-                    operatorField.chosen('destroy');
-                }
+                Mautic.destroyChosen(operatorField);
 
                 var operatorFieldAttrs = {
                     'class': operatorField.attr('class'),

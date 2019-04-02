@@ -11,8 +11,12 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\ListModel;
 
 class FieldModelTest extends MauticMysqlTestCase
 {
@@ -91,13 +95,27 @@ class FieldModelTest extends MauticMysqlTestCase
         $this->assertCount(0, $this->getColumns('companies', $companyField2->getAlias()));
     }
 
+    public function testIsUsedField()
+    {
+        $leadField = new LeadField();
+
+        $indexSchemaHelpe  = $this->createMock(IndexSchemaHelper::class);
+        $columnSchemaHelpe = $this->createMock(ColumnSchemaHelper::class);
+        $leadListModel     = $this->createMock(ListModel::class);
+        $leadListModel->expects($this->once())
+            ->method('isFieldUsed')
+            ->with($leadField)
+            ->willReturn(true);
+
+        $model = new FieldModel($indexSchemaHelpe, $columnSchemaHelpe, $leadListModel);
+        $this->assertTrue($model->isUsedField($leadField));
+    }
+
     /**
      * @param $table
      * @param $column
      *
      * @return array
-     *
-     * @throws \Doctrine\DBAL\DBALException
      */
     private function getColumns($table, $column)
     {

@@ -144,7 +144,7 @@ class MembershipBuilder
         $contactsProcessed = 0;
 
         if ($this->output) {
-            $countResult = $this->campaignMemberRepository->getCountsForCampaignContactsBySegment($this->campaign->getId(), $this->contactLimiter);
+            $countResult = $this->campaignMemberRepository->getCountsForCampaignContactsBySegment($this->campaign->getId(), $this->contactLimiter, $this->campaign->allowRestart());
 
             $this->output->writeln(
                 $this->translator->trans(
@@ -161,9 +161,15 @@ class MembershipBuilder
             $this->startProgressBar($countResult->getCount());
         }
 
-        $contacts = $this->campaignMemberRepository->getCampaignContactsBySegments($this->campaign->getId(), $this->contactLimiter);
+        $contacts = $this->campaignMemberRepository->getCampaignContactsBySegments($this->campaign->getId(), $this->contactLimiter, $this->campaign->allowRestart());
+
         while (count($contacts)) {
             $contactCollection = $this->leadRepository->getContactCollection($contacts);
+            if (!$contactCollection->count()) {
+                // Prevent endless loop just in case
+                break;
+            }
+
             $contactsProcessed += $contactCollection->count();
 
             // Add the contacts to this segment
@@ -220,6 +226,11 @@ class MembershipBuilder
         $contacts = $this->campaignMemberRepository->getOrphanedContacts($this->campaign->getId(), $this->contactLimiter);
         while (count($contacts)) {
             $contactCollection = $this->leadRepository->getContactCollection($contacts);
+            if (!$contactCollection->count()) {
+                // Prevent endless loop just in case
+                break;
+            }
+
             $contactsProcessed += $contactCollection->count();
 
             // Add the contacts to this segment

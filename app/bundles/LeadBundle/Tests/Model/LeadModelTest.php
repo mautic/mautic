@@ -2,25 +2,167 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\IpAddressModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\LegacyLeadModel;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\LeadBundle\Tracker\DeviceTracker;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Security\Provider\UserProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class LeadModelTest extends \PHPUnit_Framework_TestCase
 {
+    private $requestStackMock;
+    private $cookieHelperMock;
+    private $ipLookupHelperMock;
+    private $pathsHelperMock;
+    private $integrationHelperkMock;
     private $fieldModelMock;
+    private $listModelMock;
+    private $formFactoryMock;
+    private $companyModelMock;
+    private $categoryModelMock;
+    private $channelListHelperMock;
+    private $coreParametersHelperMock;
+    private $emailValidatorMock;
+    private $userProviderMock;
+    private $contactTrackerMock;
+    private $deviceTrackerMock;
+    private $legacyLeadModelMock;
+    private $ipAddressModelMock;
     private $leadRepositoryMock;
+    private $companyLeadRepositoryMock;
+    private $userHelperMock;
+    private $dispatcherMock;
+    private $entityManagerMock;
+    private $leadModel;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->fieldModelMock     = $this->createMock(FieldModel::class);
-        $this->leadRepositoryMock = $this->createMock(LeadRepository::class);
+
+        $this->requestStackMock          = $this->createMock(RequestStack::class);
+        $this->cookieHelperMock          = $this->createMock(CookieHelper::class);
+        $this->ipLookupHelperMock        = $this->createMock(IpLookupHelper::class);
+        $this->pathsHelperMock           = $this->createMock(PathsHelper::class);
+        $this->integrationHelperkMock    = $this->createMock(IntegrationHelper::class);
+        $this->fieldModelMock            = $this->createMock(FieldModel::class);
+        $this->listModelMock             = $this->createMock(ListModel::class);
+        $this->formFactoryMock           = $this->createMock(FormFactory::class);
+        $this->companyModelMock          = $this->createMock(CompanyModel::class);
+        $this->categoryModelMock         = $this->createMock(CategoryModel::class);
+        $this->channelListHelperMock     = $this->createMock(ChannelListHelper::class);
+        $this->coreParametersHelperMock  = $this->createMock(CoreParametersHelper::class);
+        $this->emailValidatorMock        = $this->createMock(EmailValidator::class);
+        $this->userProviderMock          = $this->createMock(UserProvider::class);
+        $this->contactTrackerMock        = $this->createMock(ContactTracker::class);
+        $this->deviceTrackerMock         = $this->createMock(DeviceTracker::class);
+        $this->legacyLeadModelMock       = $this->createMock(LegacyLeadModel::class);
+        $this->ipAddressModelMock        = $this->createMock(IpAddressModel::class);
+        $this->leadRepositoryMock        = $this->createMock(LeadRepository::class);
+        $this->companyLeadRepositoryMock = $this->createMock(CompanyLeadRepository::class);
+        $this->userHelperMock            = $this->createMock(UserHelper::class);
+        $this->dispatcherMock            = $this->createMock(EventDispatcherInterface::class);
+        $this->entityManagerMock         = $this->createMock(EntityManager::class);
+        $this->leadModel                 = new LeadModel(
+            $this->requestStackMock,
+            $this->cookieHelperMock,
+            $this->ipLookupHelperMock,
+            $this->pathsHelperMock,
+            $this->integrationHelperkMock,
+            $this->fieldModelMock,
+            $this->listModelMock,
+            $this->formFactoryMock,
+            $this->companyModelMock,
+            $this->categoryModelMock,
+            $this->channelListHelperMock,
+            $this->coreParametersHelperMock,
+            $this->emailValidatorMock,
+            $this->userProviderMock,
+            $this->contactTrackerMock,
+            $this->deviceTrackerMock,
+            $this->legacyLeadModelMock,
+            $this->ipAddressModelMock
+        );
+
+        $this->leadModel->setUserHelper($this->userHelperMock);
+        $this->leadModel->setDispatcher($this->dispatcherMock);
+        $this->leadModel->setEntityManager($this->entityManagerMock);
+
+        $this->entityManagerMock->expects($this->any())
+            ->method('getRepository')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['MauticLeadBundle:Lead', $this->leadRepositoryMock],
+                    ]
+                )
+            );
+
+        $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
+    }
+
+    public function testIpLookupAddsCompanyIfDoesNotExistInEntity()
+    {
+        $companyFromIpLookup = 'Doctors Without Borders';
+        $entity              = new Lead();
+        $ipAddress           = new IpAddress();
+
+        $ipAddress->setIpDetails(['organization' => $companyFromIpLookup]);
+
+        $entity->addIpAddress($ipAddress);
+
+        $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
+        $this->fieldModelMock->method('getFieldList')->willReturn([]);
+        $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);
+
+        $this->leadModel->saveEntity($entity);
+
+        $this->assertSame($companyFromIpLookup, $entity->getCompany());
+        $this->assertSame($companyFromIpLookup, $entity->getUpdatedFields()['company']);
+    }
+
+    public function testIpLookupAddsCompanyIfExistsInEntity()
+    {
+        $companyFromIpLookup = 'Doctors Without Borders';
+        $companyFromEntity   = 'Red Cross';
+        $entity              = new Lead();
+        $ipAddress           = new IpAddress();
+
+        $entity->setCompany($companyFromEntity);
+        $ipAddress->setIpDetails(['organization' => $companyFromIpLookup]);
+
+        $entity->addIpAddress($ipAddress);
+
+        $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
+        $this->fieldModelMock->method('getFieldList')->willReturn([]);
+        $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);
+
+        $this->leadModel->saveEntity($entity);
+
+        $this->assertSame($companyFromEntity, $entity->getCompany());
+        $this->assertFalse(isset($entity->getUpdatedFields()['company']));
     }
 
     public function testCheckForDuplicateContact()

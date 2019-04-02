@@ -35,6 +35,8 @@ class ReportDataAdapter
         $options['limit']           = $reportExportOptions->getBatchSize();
         $options['ignoreGraphData'] = true;
         $options['page']            = $reportExportOptions->getPage();
+        $options['dateTo']          = $reportExportOptions->getDateTo();
+        $options['dateFrom']        = $reportExportOptions->getDateFrom();
 
         $data = $this->reportModel->getReportData($report, null, $options);
 

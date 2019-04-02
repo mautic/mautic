@@ -75,7 +75,7 @@ class EmailApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if (null !== $entity || !$entity->isPublished()) {
+        if (null === $entity || !$entity->isPublished()) {
             return $this->notFound();
         }
 

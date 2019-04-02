@@ -136,6 +136,11 @@ class TrackingHelper
         return $this->leadModel->getCurrentLead();
     }
 
+    public function getAnonymizeIp()
+    {
+        return $this->coreParametersHelper->getParameter('google_analytics_anonymize_ip');
+    }
+
     /**
      * @return bool
      */

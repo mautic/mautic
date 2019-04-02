@@ -26,8 +26,9 @@ use Mautic\ReportBundle\ReportEvents;
  */
 class ReportSubscriber extends CommonSubscriber
 {
-    const CONTEXT_PAGES     = 'pages';
-    const CONTEXT_PAGE_HITS = 'page.hits';
+    const CONTEXT_PAGES      = 'pages';
+    const CONTEXT_PAGE_HITS  = 'page.hits';
+    const CONTEXT_VIDEO_HITS = 'video.hits';
 
     /**
      * @var CompanyReportData
@@ -58,7 +59,7 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if (!$event->checkContext([self::CONTEXT_PAGES, self::CONTEXT_PAGE_HITS])) {
+        if (!$event->checkContext([self::CONTEXT_PAGES, self::CONTEXT_PAGE_HITS, self::CONTEXT_VIDEO_HITS])) {
             return;
         }
 
@@ -269,6 +270,88 @@ class ReportSubscriber extends CommonSubscriber
             $event->addGraph($context, 'table', 'mautic.page.table.most.visited');
             $event->addGraph($context, 'table', 'mautic.page.table.most.visited.unique');
         }
+        if ($event->checkContext(self::CONTEXT_VIDEO_HITS)) {
+            $hitPrefix  = 'vh.';
+            $hitColumns = [
+                $hitPrefix.'id' => [
+                    'label' => 'mautic.core.id',
+                    'type'  => 'int',
+                ],
+                $hitPrefix.'date_hit' => [
+                    'label'          => 'mautic.page.report.hits.date_hit',
+                    'type'           => 'datetime',
+                    'groupByFormula' => 'DATE('.$hitPrefix.'date_hit)',
+                ],
+                $hitPrefix.'country' => [
+                    'label' => 'mautic.page.report.hits.country',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'region' => [
+                    'label' => 'mautic.page.report.hits.region',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'city' => [
+                    'label' => 'mautic.page.report.hits.city',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'isp' => [
+                    'label' => 'mautic.page.report.hits.isp',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'organization' => [
+                    'label' => 'mautic.page.report.hits.organization',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'code' => [
+                    'label' => 'mautic.page.report.hits.code',
+                    'type'  => 'int',
+                ],
+                $hitPrefix.'referer' => [
+                    'label' => 'mautic.page.report.hits.referer',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'url' => [
+                    'label' => 'mautic.page.report.hits.url',
+                    'type'  => 'url',
+                ],
+                $hitPrefix.'user_agent' => [
+                    'label' => 'mautic.page.report.hits.user_agent',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'remote_host' => [
+                    'label' => 'mautic.page.report.hits.remote_host',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'browser_languages' => [
+                    'label' => 'mautic.page.report.hits.browser_languages',
+                    'type'  => 'array',
+                ],
+                $hitPrefix.'channel' => [
+                    'label' => 'mautic.report.field.source',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'channel_id' => [
+                    'label' => 'mautic.report.field.source_id',
+                    'type'  => 'int',
+                ],
+                'time_watched' => [
+                    'label'   => 'mautic.page.report.hits.time_watched',
+                    'type'    => 'string',
+                    'formula' => 'if('.$hitPrefix.'duration = 0,\'-\',SEC_TO_TIME('.$hitPrefix.'time_watched))',
+                ],
+                'duration' => [
+                    'label'   => 'mautic.page.report.hits.duration',
+                    'type'    => 'string',
+                    'formula' => 'if('.$hitPrefix.'duration = 0,\'-\',SEC_TO_TIME('.$hitPrefix.'duration))',
+                ],
+            ];
+
+            $data = [
+                'display_name' => 'mautic.'.self::CONTEXT_VIDEO_HITS,
+                'columns'      => array_merge($hitColumns, $event->getLeadColumns(), $event->getIpColumn()),
+            ];
+            $event->addTable(self::CONTEXT_VIDEO_HITS, $data, 'videos');
+        }
     }
 
     /**
@@ -278,8 +361,9 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        $context = $event->getContext();
-        $qb      = $event->getQueryBuilder();
+        $context    = $event->getContext();
+        $qb         = $event->getQueryBuilder();
+        $hasGroupBy = $event->hasGroupBy();
 
         switch ($context) {
             case self::CONTEXT_PAGES:
@@ -308,8 +392,18 @@ class ReportSubscriber extends CommonSubscriber
                 }
 
                 break;
-        }
+            case 'video.hits':
+                if (!$hasGroupBy) {
+                    $qb->groupBy('vh.id');
+                }
+                $event->applyDateFilters($qb, 'date_hit', 'vh');
 
+                $qb->from(MAUTIC_TABLE_PREFIX.'video_hits', 'vh');
+
+                $event->addIpAddressLeftJoin($qb, 'vh');
+                $event->addLeadLeftJoin($qb, 'vh');
+                break;
+        }
         $event->setQueryBuilder($qb);
     }
 

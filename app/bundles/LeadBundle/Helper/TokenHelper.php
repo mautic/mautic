@@ -11,11 +11,19 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
+
 /**
  * Class TokenHelper.
  */
 class TokenHelper
 {
+    /**
+     * @var array
+     */
+    private static $parameters;
+
     /**
      * @param string $content
      * @param array  $lead
@@ -95,11 +103,40 @@ class TokenHelper
             $value = $lead['companies'][0][$alias];
         }
 
-        if ('true' === $defaultValue) {
-            $value = urlencode($value);
+        if ($value) {
+            switch ($defaultValue) {
+                case 'true':
+                    $value = urlencode($value);
+                    break;
+                case 'datetime':
+                case 'date':
+                case 'time':
+                    $dt   = new DateTimeHelper($value);
+                    $date = $dt->getDateTime()->format(
+                        self::getParameter('date_format_dateonly')
+                    );
+                    $time = $dt->getDateTime()->format(
+                        self::getParameter('date_format_timeonly')
+                    );
+                    switch ($defaultValue) {
+                        case 'datetime':
+                            $value = $date.' '.$time;
+                            break;
+                        case 'date':
+                            $value = $date;
+                            break;
+                        case 'time':
+                            $value = $time;
+                            break;
+                    }
+                    break;
+            }
         }
-
-        return $value ?: $defaultValue;
+        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime'])) {
+            return $value;
+        } else {
+            return $value ?: $defaultValue;
+        }
     }
 
     /**
@@ -128,5 +165,19 @@ class TokenHelper
         $fallbackCheck = explode('|', $match);
 
         return $fallbackCheck[0];
+    }
+
+    /**
+     * @param string $parameter
+     *
+     * @return mixed
+     */
+    private static function getParameter($parameter)
+    {
+        if (null === self::$parameters) {
+            self::$parameters = (new ParamsLoaderHelper())->getParameters();
+        }
+
+        return self::$parameters[$parameter];
     }
 }

@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Email;
@@ -145,9 +146,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @param      $type
-     * @param      $value
-     * @param null $f
+     * @param       $type
+     * @param       $value
+     * @param Field $f
      *
      * @return array
      */

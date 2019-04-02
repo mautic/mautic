@@ -196,4 +196,22 @@ class LeadDeviceRepository extends CommonRepository
 
         return !empty($devices);
     }
+
+    /**
+     * @param Lead $lead
+     *
+     * @return array
+     */
+    public function getLeadDevices(Lead $lead)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        return $qb->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es')
+            ->where('lead_id = :leadId')
+            ->setParameter('leadId', (int) $lead->getId())
+            ->orderBy('date_added', 'desc')
+            ->execute()
+            ->fetchAll();
+    }
 }

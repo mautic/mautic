@@ -247,11 +247,10 @@ trait CustomFieldEntityTrait
             $fieldValues = [
                 'id' => $this->id,
             ];
-            if (isset($this->fields['core'])) {
-                foreach ($this->fields as $group => $fields) {
-                    foreach ($fields as $alias => $field) {
-                        $fieldValues[$alias] = $field['value'];
-                    }
+
+            foreach ($this->fields as $group => $fields) {
+                foreach ($fields as $alias => $field) {
+                    $fieldValues[$alias] = $field['value'];
                 }
             }
 

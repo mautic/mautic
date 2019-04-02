@@ -33,9 +33,7 @@ class RoleController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         //set limits
         $limit = $this->get('session')->get('mautic.role.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));

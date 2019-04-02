@@ -77,6 +77,10 @@ class IdentifyCompanyHelper
             $companyName = filter_var($parameters['companyname']);
         }
 
+        if (isset($parameters['email']) || isset($parameters['companyemail'])) {
+            $companyDomain = isset($parameters['email']) ? self::domainExists($parameters['email']) : self::domainExists($parameters['companyemail']);
+        }
+
         if (empty($parameters['companywebsite']) && !empty($parameters['companyemail'])) {
             $companyDomain = self::domainExists($parameters['companyemail']);
         }

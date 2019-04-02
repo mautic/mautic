@@ -29,6 +29,9 @@ $loader = require_once __DIR__.'/app/autoload.php';
 \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
 
 $kernel = new AppKernel('prod', false);
-$kernel->loadClassCache();
+
+if (version_compare(PHP_VERSION, '7.0.0', '<')) {
+    $kernel->loadClassCache();
+}
 
 Stack\run((new MiddlewareBuilder('prod'))->resolve($kernel));

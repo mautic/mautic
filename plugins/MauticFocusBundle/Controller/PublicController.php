@@ -14,6 +14,8 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\Event\FocusViewEvent;
+use MauticPlugin\MauticFocusBundle\FocusEvents;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -62,7 +64,12 @@ class PublicController extends CommonController
             $lead  = $this->getModel('lead')->getCurrentLead();
 
             if ($focus && $focus->isPublished() && $lead) {
-                $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $lead);
+                $stat = $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $lead);
+                if ($stat && $this->dispatcher->hasListeners(FocusEvents::FOCUS_ON_VIEW)) {
+                    $event = new FocusViewEvent($stat);
+                    $this->dispatcher->dispatch(FocusEvents::FOCUS_ON_VIEW, $event);
+                    unset($event);
+                }
             }
         }
 

@@ -73,6 +73,7 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
 
         $expected = [
             'comp.id' => [
+                'alias' => 'comp_id',
                 'label' => 'mautic.lead.report.company.company_id',
                 'type'  => 'int',
                 'link'  => 'mautic_company_action',

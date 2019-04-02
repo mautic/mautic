@@ -90,7 +90,7 @@ class EventLogger
         $this->persistQueue->add($log);
 
         if ($this->persistQueue->count() >= 20) {
-            $this->persistQueuedLogs();
+            $this->persistPendingAndInsertIntoLogStack();
         }
     }
 
@@ -104,7 +104,7 @@ class EventLogger
 
     /**
      * @param Event     $event
-     * @param Lead|null $lead
+     * @param Lead|null $contact
      * @param bool      $isInactiveEvent
      *
      * @return LeadEventLog
@@ -143,20 +143,12 @@ class EventLogger
 
     /**
      * Persist the queue, clear the entities from memory, and reset the queue.
+     *
+     * @return ArrayCollection
      */
     public function persistQueuedLogs()
     {
-        if ($this->persistQueue->count()) {
-            $this->leadEventLogRepository->saveEntities($this->persistQueue->getValues());
-        }
-
-        // Push them into the logs ArrayCollection to be used later.
-        /** @var LeadEventLog $log */
-        foreach ($this->persistQueue as $log) {
-            $this->logs->set($log->getId(), $log);
-        }
-
-        $this->persistQueue->clear();
+        $this->persistPendingAndInsertIntoLogStack();
 
         $logs = clone $this->logs;
         $this->logs->clear();
@@ -211,10 +203,10 @@ class EventLogger
     }
 
     /**
-     * @param Event                  $event
-     * @param AbstractEventAccessor  $config
-     * @param ArrayCollection|Lead[] $contacts
-     * @param bool                   $isInactiveEvent
+     * @param Event                 $event
+     * @param AbstractEventAccessor $config
+     * @param ArrayCollection       $contacts
+     * @param bool                  $isInactiveEntry
      *
      * @return ArrayCollection
      */
@@ -262,5 +254,22 @@ class EventLogger
     public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
     {
         $this->contactRotations = $this->leadRepository->getContactRotations($contactIds, $campaignId);
+    }
+
+    private function persistPendingAndInsertIntoLogStack()
+    {
+        if (!$this->persistQueue->count()) {
+            return;
+        }
+
+        $this->leadEventLogRepository->saveEntities($this->persistQueue->getValues());
+
+        // Push them into the logs ArrayCollection to be used later.
+        /** @var LeadEventLog $log */
+        foreach ($this->persistQueue as $log) {
+            $this->logs->set($log->getId(), $log);
+        }
+
+        $this->persistQueue->clear();
     }
 }

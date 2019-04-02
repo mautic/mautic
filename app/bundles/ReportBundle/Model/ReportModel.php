@@ -11,6 +11,8 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -281,7 +283,41 @@ class ReportModel extends FormModel
     {
         $data = $this->buildAvailableReports($context);
 
-        return (!isset($data['tables'])) ? [] : $data['tables'];
+        $data = (!isset($data['tables'])) ? [] : $data['tables'];
+
+        if (array_key_exists('columns', $data)) {
+            $data['columns'] = $this->preventSameAliases($data['columns']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Prevent same aliases using numeric suffixes for each alias.
+     *
+     * @param array $columns
+     *
+     * @return array
+     */
+    private function preventSameAliases(array $columns)
+    {
+        $existingAliases = [];
+
+        foreach ($columns as $key => $column) {
+            $alias = $column['alias'];
+
+            // Count suffixes
+            if (!array_key_exists($alias, $existingAliases)) {
+                $existingAliases[$alias] = 1;
+            } else {
+                ++$existingAliases[$alias];
+            }
+
+            // Add numeric suffix
+            $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+        }
+
+        return $columns;
     }
 
     /**
@@ -511,7 +547,7 @@ class ReportModel extends FormModel
         $paginate        = !empty($options['paginate']);
         $reportPage      = isset($options['reportPage']) ? $options['reportPage'] : 1;
         $data            = $graphs            = [];
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
         $selectedColumns = $entity->getColumns();
         $totalResults    = $limit    = 0;
@@ -542,7 +578,7 @@ class ReportModel extends FormModel
             'dynamicFilters' => (isset($options['dynamicFilters'])) ? $options['dynamicFilters'] : [],
         ];
 
-        /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
+        /** @var QueryBuilder $query */
         $query                 = $reportGenerator->getQuery($dataOptions);
         $options['translator'] = $this->translator;
 
@@ -592,6 +628,13 @@ class ReportModel extends FormModel
             }
         }
 
+        $query->add('orderBy', $order);
+
+        // Allow plugin to manipulate the query
+        $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
+        $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
+        $query = $event->getQuery();
+
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
@@ -605,19 +648,17 @@ class ReportModel extends FormModel
                     $start = 0;
                 }
 
-                $totalResults = $query->execute()->rowCount();
+                if (empty($options['totalResults'])) {
+                    $options['totalResults'] = $totalResults = $this->getTotalCount($query, $debugData);
+                } else {
+                    $totalResults = $options['totalResults'];
+                }
+
                 if ($limit > 0) {
                     $query->setFirstResult($start)
                         ->setMaxResults($limit);
                 }
             }
-
-            $query->add('orderBy', $order);
-
-            // Allow plugin to manipulate the query
-            $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
-            $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
-            $query = $event->getQuery();
 
             $queryTime = microtime(true);
             $data      = $query->execute()->fetchAll();
@@ -666,6 +707,7 @@ class ReportModel extends FormModel
             'contentTemplate' => $contentTemplate,
             'columns'         => $tableDetails['columns'],
             'limit'           => ($paginate) ? $limit : 0,
+            'page'            => ($paginate) ? $reportPage : 1,
             'dateFrom'        => $dataOptions['dateFrom'],
             'dateTo'          => $dataOptions['dateTo'],
             'debug'           => $debugData,
@@ -709,5 +751,38 @@ class ReportModel extends FormModel
         }
 
         return $options;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param array        $debugData
+     *
+     * @return int
+     */
+    private function getTotalCount(QueryBuilder $qb, array &$debugData)
+    {
+        $countQb = clone $qb;
+        $countQb->resetQueryParts();
+
+        $countQb->select('count(*)')
+            ->from('('.$qb->getSQL().')', 'c');
+
+        if (MAUTIC_ENV == 'dev') {
+            $debugData['count_query'] = $countQb->getSQL();
+        }
+
+        return (int) $countQb->execute()->fetchColumn();
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
+    private function getConnection()
+    {
+        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
+            $this->em->getConnection()->connect('slave');
+        }
+
+        return $this->em->getConnection();
     }
 }

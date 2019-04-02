@@ -33,6 +33,7 @@ $startCount           = 1;
         [
             'graphOrder' => $graphOrder,
             'graphs'     => $graphs,
+            'report'     => $report,
         ]);
     ?>
 <?php endif; ?>
@@ -77,6 +78,7 @@ $startCount           = 1;
         [
             'graphOrder' => $graphOrder,
             'graphs'     => $graphs,
+            'report'     => $report,
         ]);
     ?>
 <?php endif; ?>

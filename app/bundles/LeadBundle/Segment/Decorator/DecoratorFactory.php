@@ -76,7 +76,13 @@ class DecoratorFactory
     public function getDecoratorForFilter(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         if ($contactSegmentFilterCrate->isDateType()) {
-            return $this->dateOptionFactory->getDateOption($contactSegmentFilterCrate);
+            $dateDecorator = $this->dateOptionFactory->getDateOption($contactSegmentFilterCrate);
+
+            if ($contactSegmentFilterCrate->isCompanyType()) {
+                return new DateCompanyDecorator($dateDecorator);
+            }
+
+            return $dateDecorator;
         }
 
         $originalField = $contactSegmentFilterCrate->getField();

@@ -65,7 +65,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateFormFieldsAction(Request $request)
     {
-        $formId     = InputHelper::int($request->request->get('formId'));
+        $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
         $model      = $this->getModel('form');
         $entity     = $model->getEntity($formId);

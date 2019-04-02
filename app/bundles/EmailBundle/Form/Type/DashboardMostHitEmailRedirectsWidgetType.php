@@ -34,12 +34,13 @@ class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
             'campaignId',
             'campaign_list',
             [
-                'label'      => 'mautic.email.campaignId.filter',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'empty_data' => '',
-                'required'   => false,
-                'multiple'   => false,
+                'label'       => 'mautic.email.campaignId.filter',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'empty_data'  => '',
+                'empty_value' => '',
+                'required'    => false,
+                'multiple'    => false,
             ]
         );
 

@@ -172,9 +172,10 @@ trait FieldsTypeTrait
                         );
                     }
                     if (!$fieldObject) {
+                        $contactId['mauticContactId'] = $this->translator->trans('mautic.lead.report.contact_id');
                         $contactLink['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
                         $isContactable['mauticContactIsContactableByEmail'] = $this->translator->trans('mautic.plugin.integration.contact.donotcontact.email');
-                        $mauticFields = array_merge($mauticFields, $contactLink, $isContactable);
+                        $mauticFields = array_merge($mauticFields, $contactLink, $isContactable, $contactId);
                     }
 
                     $form->add(

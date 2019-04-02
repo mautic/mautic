@@ -16,7 +16,6 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -112,17 +111,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        if ($field == 'email') {
-            // Prevent emails from being case sensitive
-            $col   = "LOWER($col)";
-            $value = (is_array($value)) ? array_map(
-                function ($v) use ($q) {
-                    return $q->expr()->literal(strtolower(InputHelper::email($v)));
-                },
-                $value
-            ) : strtolower($value);
-        }
-
         if (is_array($value)) {
             $q->where(
                 $q->expr()->in($col, $value)
@@ -144,9 +132,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $leads = [];
             foreach ($results as $lead) {
                 $fieldKey = $lead->getFieldValue($field);
-                if ('email' === $field) {
-                    $fieldKey = strtolower($fieldKey);
-                }
 
                 $leads[$fieldKey] = $lead;
             }
@@ -286,8 +271,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->where('LOWER(email) = :search')
-            ->setParameter('search', strtolower($email));
+            ->where('email = :search')
+            ->setParameter('search', $email);
 
         $result = $q->execute()->fetchAll();
 

@@ -215,9 +215,10 @@ class ChartQuery extends AbstractChart
      * Modify database query for fetching the line time chart data.
      *
      * @param QueryBuilder $query
-     * @param string       $column      name
+     * @param string       $column       name
      * @param string       $tablePrefix
      * @param string       $countColumn
+     * @param bool|string  $isEnumerable true = COUNT, string sum = SUM
      */
     public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
     {
@@ -234,6 +235,8 @@ class ChartQuery extends AbstractChart
 
         if ($isEnumerable === true) {
             $count = 'COUNT('.$countColumn.') AS count';
+        } elseif ($isEnumerable == 'sum') {
+            $count = 'SUM('.$countColumn.') AS count';
         } else {
             $count = $countColumn.' AS count';
         }
@@ -255,6 +258,23 @@ class ChartQuery extends AbstractChart
     public function fetchTimeData($table, $column, $filters = [])
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters);
+
+        return $this->loadAndBuildTimeData($query);
+    }
+
+    /**
+     * Fetch data and sum it for a time related dataset.
+     *
+     * @param string $table     without prefix
+     * @param string $column    name. The column must be type of datetime
+     * @param array  $filters   will be added to where claues
+     * @param string $sumColumn name that will be summed
+     *
+     * @return array
+     */
+    public function fetchSumTimeData($table, $column, $filters = [], $sumColumn)
+    {
+        $query = $this->prepareTimeDataQuery($table, $column, $filters, $sumColumn, 'sum');
 
         return $this->loadAndBuildTimeData($query);
     }

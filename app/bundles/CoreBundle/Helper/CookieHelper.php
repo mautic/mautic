@@ -79,7 +79,7 @@ class CookieHelper
         setcookie(
             $name,
             $value,
-            ($expire) ? time() + $expire : null,
+            ($expire) ? (int) (time() + $expire) : null,
             ($path == null) ? $this->path : $path,
             ($domain == null) ? $this->domain : $domain,
             ($secure == null) ? $this->secure : $secure,

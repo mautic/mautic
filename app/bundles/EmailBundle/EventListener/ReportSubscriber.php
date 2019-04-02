@@ -44,11 +44,6 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * @var bool Property is used to avoid Joining DNC table more times
-     */
-    private $dncWasAddedToQb = false;
-
-    /**
      * ReportSubscriber constructor.
      *
      * @param Connection        $db
@@ -104,7 +99,8 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'read_ratio',
                 'label'   => 'mautic.email.report.read_ratio',
                 'type'    => 'string',
-                'formula' => 'CONCAT(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100, 1),\'%\')',
+                'formula' => 'IFNULL(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100, 1), \'0.0\')',
+                'suffix'  => '%',
             ],
             $prefix.'sent_count' => [
                 'label' => 'mautic.email.report.sent_count',
@@ -114,49 +110,53 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'hits',
                 'label'   => 'mautic.email.report.hits_count',
                 'type'    => 'string',
-                'formula' => $channelUrlTrackables.'hits',
+                'formula' => 'IFNULL('.$channelUrlTrackables.'hits, 0)',
             ],
             'unique_hits' => [
                 'alias'   => 'unique_hits',
                 'label'   => 'mautic.email.report.unique_hits_count',
                 'type'    => 'string',
-                'formula' => $channelUrlTrackables.'unique_hits',
+                'formula' => 'IFNULL('.$channelUrlTrackables.'unique_hits, 0)',
             ],
             'hits_ratio' => [
                 'alias'   => 'hits_ratio',
                 'label'   => 'mautic.email.report.hits_ratio',
                 'type'    => 'string',
-                'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count)*100, 1),\'%\')',
+                'formula' => 'IFNULL(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count)*100, 1), \'0.0\')',
+                'suffix'  => '%',
             ],
             'unique_ratio' => [
                 'alias'   => 'unique_ratio',
                 'label'   => 'mautic.email.report.unique_ratio',
                 'type'    => 'string',
-                'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count)*100, 1),\'%\')',
+                'formula' => 'IFNULL(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count)*100, 1), \'0.0\')',
+                'suffix'  => '%',
             ],
             'unsubscribed' => [
                 'alias'   => 'unsubscribed',
                 'label'   => 'mautic.email.report.unsubscribed',
                 'type'    => 'string',
-                'formula' => 'SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' , 1, 0))',
+                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'unsubscribed_ratio' => [
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => 'mautic.email.report.unsubscribed_ratio',
                 'type'    => 'string',
-                'formula' => 'CONCAT(ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' , 1, 0))/'.$prefix.'sent_count)*100, 1),\'%\')',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'suffix'  => '%',
             ],
             'bounced' => [
                 'alias'   => 'bounced',
                 'label'   => 'mautic.email.report.bounced',
                 'type'    => 'string',
-                'formula' => 'SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0))',
+                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'bounced_ratio' => [
                 'alias'   => 'bounced_ratio',
                 'label'   => 'mautic.email.report.bounced_ratio',
                 'type'    => 'string',
-                'formula' => 'CONCAT(ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0))/'.$prefix.'sent_count)*100, 1),\'%\')',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'suffix'  => '%',
             ],
             $prefix.'revision' => [
                 'label' => 'mautic.email.report.revision',
@@ -373,6 +373,13 @@ class ReportSubscriber extends CommonSubscriber
                         )
                         ->where('cut2.channel = \'email\' AND ph.source = \'email\'')
                         ->groupBy('cut2.channel_id, ph.lead_id');
+
+                    if ($event->hasFilter('e.id')) {
+                        $filterParam = $event->createParameterName();
+                        $qbcut->andWhere("cut2.channel_id = :{$filterParam}");
+                        $qb->setParameter($filterParam, $event->getFilterValue('e.id'), \PDO::PARAM_INT);
+                    }
+
                     $qb->leftJoin(
                         'e',
                         sprintf('(%s)', $qbcut->getSQL()),
@@ -616,17 +623,33 @@ class ReportSubscriber extends CommonSubscriber
      */
     private function addDNCTable(QueryBuilder $qb)
     {
-        if ($this->dncWasAddedToQb) {
-            return;
+        $fromAlias = 'e';
+        $table     = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
+        $alias     = 'dnc';
+
+        if (!$this->isJoined($qb, $table, $fromAlias, $alias)) {
+            $qb->leftJoin(
+                $fromAlias,
+                $table,
+                $alias,
+                'e.id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
+            );
+        }
+    }
+
+    private function isJoined($query, $table, $fromAlias, $alias)
+    {
+        $joins = $query->getQueryParts()['join'];
+        if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) {
+            return false;
         }
 
-        $qb->leftJoin(
-            'e',
-            MAUTIC_TABLE_PREFIX.'lead_donotcontact',
-            'dnc',
-            'e.id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
-        );
+        foreach ($joins[$fromAlias] as $join) {
+            if ($join['joinTable'] == $table && $join['joinAlias'] == $alias) {
+                return true;
+            }
+        }
 
-        $this->dncWasAddedToQb = true;
+        return false;
     }
 }
