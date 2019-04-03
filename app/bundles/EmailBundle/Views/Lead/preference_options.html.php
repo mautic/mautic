@@ -127,7 +127,7 @@ JS;
                     <div id="preferred_channel" class="text-left"><?php echo $view['form']->row($leadChannelsForm['preferred_channel']); ?></div>
                 <?php
                 else:
-                    unset($form['preferred_channel']);
+                    unset($form['lead_channels']['preferred_channel']);
                 endif; ?>
 
                 <?php if ($showContactSegments && count($form['lead_lists'])):?>
