@@ -15,11 +15,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 use Mautic\StatsBundle\Aggregate\Collector;
-use Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait;
 
 abstract class AbstractHelper implements StatHelperInterface
 {
@@ -30,7 +30,7 @@ abstract class AbstractHelper implements StatHelperInterface
      * @var Collector
      */
     private $collector;
-    
+
     /**
      * @var UserHelper
      */
