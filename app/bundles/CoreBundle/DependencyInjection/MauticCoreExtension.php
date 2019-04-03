@@ -349,16 +349,18 @@ class MauticCoreExtension extends Extension
     }
 
     /**
-     * Returns true if the parameter 'plugin_allow_overrides' is set to true
+     * Returns true if the parameter 'plugin_allow_overrides' is set to true.
      *
      * @param ContainerBuilder $container
+     *
      * @return bool
      */
     private function canOverrideServices(ContainerBuilder $container)
     {
         try {
-            return (bool)$container->getParameter('mautic.plugin_allow_overrides');
-        } catch (\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException $e) {}
+            return (bool) $container->getParameter('mautic.plugin_allow_overrides');
+        } catch (\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException $e) {
+        }
 
         return false;
     }
