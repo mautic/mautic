@@ -31,7 +31,7 @@ trait DateRangeUnitTrait
         if ($dayDiff <= 1) {
             $unit = 'H';
 
-            $sameDay    = $dateTo->format('d') == $dateFrom->format('d') ? 1 : 0;
+            $sameDay    = $dateTo->format('d') === $dateFrom->format('d');
             $hourDiff   = $dateTo->diff($dateFrom)->format('%h');
             $minuteDiff = $dateTo->diff($dateFrom)->format('%i');
             if ($sameDay && !intval($hourDiff) && intval($minuteDiff)) {
