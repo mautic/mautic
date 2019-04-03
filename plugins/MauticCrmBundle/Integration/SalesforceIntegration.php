@@ -2476,7 +2476,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $leadIds[$record['internal_entity_id']]    = $record['integration_entity_id'];
             $leadEmails[$record['internal_entity_id']] = $record['email'];
 
-            if (isset($record['opted_out']) && $record['opted_out'] && isset($record['is_new']) && $record['is_new']) {
+            if (!empty($record['opted_out']) && !empty($record['is_new'])) {
                 $DNCCreatedContacts[] = $record['internal_entity_id'];
             }
         }
