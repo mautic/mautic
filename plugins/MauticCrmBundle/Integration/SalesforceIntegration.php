@@ -336,6 +336,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mauticObjectReference = null;
         $integrationMapping    = [];
 
+        $DNCUpdates = [];
+
         if (isset($data['records']) and 'Activity' !== $object) {
             foreach ($data['records'] as $record) {
                 $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate record '.var_export($record, true));
@@ -402,7 +404,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
                             $mauticObjectReference = 'lead';
                             $detachClass           = Lead::class;
-
                             break;
                         case 'Account':
                             $entity                = $this->getMauticCompany($dataObject, 'Account');
@@ -430,6 +431,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (method_exists($entity, 'isNewlyCreated') && $entity->isNewlyCreated()) {
                         ++$created;
+                        if (isset($record['HasOptedOutOfEmail'])) {
+                            $DNCUpdates[$object][$entity->getEmail()] = [
+                                'integration_entity_id' => $record['Id'],
+                                'internal_entity_id'    => $entity->getId(),
+                                'email'                 => $entity->getEmail(),
+                                'is_new'                => true,
+                                'opted_out'             => $record['HasOptedOutOfEmail'],
+                            ];
+                        }
                     } else {
                         ++$updated;
                     }
@@ -451,6 +461,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $this->buildIntegrationEntities($integrationMapping, $object, $mauticObjectReference, $params);
                 $this->em->detach($entity);
             }
+
+            foreach ($DNCUpdates as $objectName=>$sfEntity) {
+                $this->pushLeadDoNotContactByDate('email', $sfEntity,$objectName,$params );
+            }
+
 
             unset($data['records']);
             $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate response '.var_export($data, true));
@@ -2408,6 +2423,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $fields[] = str_replace('-'.$object, '', $sfField);
                     }
                 }
+                if (!in_array('HasOptedOutOfEmail', $fields)) {
+                    $fields[] = 'HasOptedOutOfEmail';
+                }
         }
 
         return $fields;
@@ -2439,6 +2457,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $filters = [];
         $leadIds = [];
+        $DNCCreatedContacts = [];
 
         if (empty($sfRecords) || !isset($sfRecords['mauticContactIsContactableByEmail']) && !$this->updateDncByDate()) {
             return;
@@ -2451,11 +2470,20 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $leadIds[$record['internal_entity_id']]    = $record['integration_entity_id'];
             $leadEmails[$record['internal_entity_id']] = $record['email'];
+
+            if (isset($record['opted_out']) && $record['opted_out'] && isset($record['is_new']) && $record['is_new']) {
+                $DNCCreatedContacts[] = $record['internal_entity_id'];
+            }
         }
 
         $sfFieldString = "'".implode("','", $leadIds)."'";
 
         $historySF = $this->getDncHistory($sfObject, $sfFieldString);
+
+        if (count($DNCCreatedContacts)) {
+            $this->updateMauticDNC($DNCCreatedContacts, true);
+        }
+
         // if there is no records of when it was modified in SF then just exit
         if (empty($historySF['records'])) {
             return;
@@ -2497,12 +2525,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     private function updateMauticDNC($leadId, $newDncValue): void
     {
-        $lead = $this->leadModel->getEntity($leadId);
+        $leadIds = is_array($leadId) ? $leadId : [$leadId];
 
-        if (true == $newDncValue) {
-            $this->doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, 'Set by Salesforce', true, true, true);
-        } elseif (false == $newDncValue) {
-            $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
+        foreach ($leadIds as $leadId) {
+            $lead = $this->leadModel->getEntity($leadId);
+
+            if (true == $newDncValue) {
+                $this->doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, 'Set by Salesforce', true, true, true);
+            } elseif (false == $newDncValue) {
+                $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
+            }
         }
     }
 
