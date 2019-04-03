@@ -198,7 +198,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return mixed[]
      *
-     * @throws \Exception
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getAvailableLeadFields($settings = []): array
     {
@@ -324,7 +324,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
+     * @param array<mixed> $params
+     *
+     * @return array<mixed>
+     * @throws ApiErrorException
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object, $params = []): array
     {
@@ -463,9 +466,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             foreach ($DNCUpdates as $objectName=>$sfEntity) {
-                $this->pushLeadDoNotContactByDate('email', $sfEntity,$objectName,$params );
+                $this->pushLeadDoNotContactByDate('email', $sfEntity, $objectName, $params);
             }
-
 
             unset($data['records']);
             $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate response '.var_export($data, true));
@@ -2450,13 +2452,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @param string $channel
      * @param string $sfObject
+     * @param array  $sfIds
+     *
+     * @return int|void
      *
      * @throws ApiErrorException
      */
     public function pushLeadDoNotContactByDate($channel, &$sfRecords, $sfObject, $params = []): void
     {
-        $filters = [];
-        $leadIds = [];
+        $filters            = [];
+        $leadIds            = [];
         $DNCCreatedContacts = [];
 
         if (empty($sfRecords) || !isset($sfRecords['mauticContactIsContactableByEmail']) && !$this->updateDncByDate()) {
@@ -2523,6 +2528,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param int|int[] $leadId
+     * @param bool      $newDncValue
+     */
     private function updateMauticDNC($leadId, $newDncValue): void
     {
         $leadIds = is_array($leadId) ? $leadId : [$leadId];
