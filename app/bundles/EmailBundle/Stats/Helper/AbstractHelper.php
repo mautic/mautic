@@ -19,34 +19,29 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 use Mautic\StatsBundle\Aggregate\Collector;
+use Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait;
 
 abstract class AbstractHelper implements StatHelperInterface
 {
     use FilterTrait;
+    use DateRangeUnitTrait;
 
     /**
      * @var Collector
      */
     private $collector;
-
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
-
+    
     /**
      * @var UserHelper
      */
     private $userHelper;
 
     /**
-     * @var string
+     * @var GeneratedColumnsProviderInterface
      */
-    private $unit;
+    protected $generatedColumnsProvider;
 
     /**
-     * AbstractHelper constructor.
-     *
      * @param Collector                         $collector
      * @param Connection                        $connection
      * @param GeneratedColumnsProviderInterface $generatedColumnsProvider
@@ -79,7 +74,7 @@ abstract class AbstractHelper implements StatHelperInterface
         $calculator     = $statCollection->getCalculator($fromDateTime, $toDateTime);
 
         // Format into what is required for the graphs
-        switch ($this->getUnit($fromDateTime, $toDateTime)) {
+        switch ($this->getTimeUnitFromDateRange($fromDateTime, $toDateTime)) {
             case 'Y': // year
                 $stats = $calculator->getSumsByYear();
                 break;
@@ -107,7 +102,7 @@ abstract class AbstractHelper implements StatHelperInterface
      */
     protected function getQuery(\DateTime $fromDateTime, \DateTime $toDateTime)
     {
-        $unit  = $this->getUnit($fromDateTime, $toDateTime);
+        $unit  = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
         $query = new ChartQuery($this->connection, $fromDateTime, $toDateTime, $unit);
 
         $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
@@ -163,30 +158,5 @@ abstract class AbstractHelper implements StatHelperInterface
         foreach ($results as $result) {
             $statCollection->addStatByDateTimeStringInUTC($result['date'], $result['count']);
         }
-    }
-
-    /**
-     * @param \DateTime $fromDateTime
-     * @param \DateTime $toDateTime
-     *
-     * @return string
-     */
-    private function getUnit(\DateTime $fromDateTime, \DateTime $toDateTime)
-    {
-        $dayDiff = $toDateTime->diff($fromDateTime)->format('%a');
-
-        if ($dayDiff <= 1) {
-            return 'H';
-        }
-
-        if ($dayDiff < 31) {
-            return 'd';
-        }
-
-        if ($dayDiff < 365) {
-            return 'm';
-        }
-
-        return 'Y';
     }
 }
