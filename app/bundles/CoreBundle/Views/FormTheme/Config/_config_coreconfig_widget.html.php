@@ -13,7 +13,7 @@ $fieldKeys = array_keys($fields);
 $template  = '<div class="col-md-6">{content}</div>';
 ?>
 
-<?php if (count(array_intersect($fieldKeys, ['site_url', 'update_stability', 'cache_path', 'log_path', 'theme', 'image_path']))): ?>
+<?php if (count(array_intersect($fieldKeys, ['site_url', 'webroot', 'update_stability', 'cache_path', 'log_path', 'theme', 'image_path']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.general'); ?></h3>
