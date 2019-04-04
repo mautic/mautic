@@ -225,6 +225,5 @@ class ReportGeneratorEventTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->reportGeneratorEvent->usesColumn('comp.name'));
         $this->assertTrue($this->reportGeneratorEvent->usesColumn('foo.is_published'));
         $this->assertFalse($this->reportGeneratorEvent->usesColumn('foo.bar'));
-
     }
 }
