@@ -13,10 +13,10 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\DataFixtures\Traits;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundException;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Trait FixtureObjectsTrait implements Liip fixtures with Alice and offers helper methods for handling them.
@@ -121,8 +121,8 @@ trait FixtureObjectsTrait
     private function getFixturesDirectory(): string
     {
         /** @var KernelInterface $kernel */
-        $kernel          = $this->getContainer()->get('kernel');
-        echo $pluginDirectory = $kernel->getRootDir() . '/bundles/LeadBundle/Tests/DataFixtures/ORM/Data';
+        $kernel               = $this->getContainer()->get('kernel');
+        echo $pluginDirectory = $kernel->getRootDir().'/bundles/LeadBundle/Tests/DataFixtures/ORM/Data';
 
         if (!is_dir($pluginDirectory)) {
             throw new NotFoundException('Resource not found.');

@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -145,7 +144,7 @@ class RelativeDateFunctionalTest extends WebTestCase
         $this->setFixtureObjects($objects);
 
         /** @var Registr $connection */
-        $connection            = $entityManager->getConnection();
+        $connection            = $this->em->getConnection();
 
         /** @var ContactSegmentFilterFactory $filterFactory */
         $filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');
@@ -172,7 +171,7 @@ class RelativeDateFunctionalTest extends WebTestCase
 
         foreach ($filterValues as $filterValue) {
             $queryBuilder = new QueryBuilder($connection);
-            $queryBuilder->select('l.id, l.date_added')->from(MAUTIC_TABLE_PREFIX.'leads','l');
+            $queryBuilder->select('l.id, l.date_added')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
             $crateArguments['operator'] = $filterValue[1];
             $crateArguments['filter']   = $filterValue[2];
@@ -185,7 +184,6 @@ class RelativeDateFunctionalTest extends WebTestCase
         }
         $this->unloadFixtures();
     }
-
 
     /**
      * @param string $name
