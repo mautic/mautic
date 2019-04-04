@@ -452,9 +452,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $dataObject['owner_email'] = $dataObject['Owner__Contact']['Email'];
                             }
 
-                            if (isset($dataObject['Email__Lead']) && ($dataObject['Email__Lead'] == 'blast.market@gmail.com')) {
-                                $dataObject['Email__Lead'] = 'https://sjdhkjsdnmwnewe.comksjdfds.com';
-                            }
                             $entity                = $this->getMauticLead($dataObject, true, null, null, $object, ['email']);
                             $mauticObjectReference = 'lead';
                             $detachClass           = Lead::class;
