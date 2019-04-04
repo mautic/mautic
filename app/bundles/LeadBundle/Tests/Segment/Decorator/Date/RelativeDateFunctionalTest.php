@@ -130,7 +130,7 @@ class RelativeDateFunctionalTest extends WebTestCase
     public function testRelativeOperators()
     {
         /** @var EntityManager $entityManager */
-        $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $entityManager       = $this->getContainer()->get('doctrine.orm.default_entity_manager');
         $this->entityManager = $entityManager;
         $this->postFixtureSetup();
 
@@ -144,7 +144,7 @@ class RelativeDateFunctionalTest extends WebTestCase
         $this->setFixtureObjects($objects);
 
         /** @var Registr $connection */
-        $connection            = $this->em->getConnection();
+        $connection            = $this->entityManager->getConnection();
 
         /** @var ContactSegmentFilterFactory $filterFactory */
         $filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');

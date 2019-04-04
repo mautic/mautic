@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2019 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -38,7 +36,7 @@ trait FixtureObjectsTrait
      *
      * @param mixed[] $objects
      */
-    public function setFixtureObjects(array $objects): void
+    public function setFixtureObjects(array $objects)
     {
         foreach ($objects as $key => $object) {
             $this->objects[get_class($object)][$key] = $object;
@@ -53,7 +51,7 @@ trait FixtureObjectsTrait
      *
      * @throws FixtureNotFoundException
      */
-    public function getFixturesByEntityClassName(string $type): array
+    public function getFixturesByEntityClassName($type)
     {
         if (!isset($this->objects[$type])) {
             throw new FixtureNotFoundException('No fixtures of type '.$type.' defined');
@@ -70,7 +68,7 @@ trait FixtureObjectsTrait
      *
      * @throws FixtureNotFoundException
      */
-    public function getFixtureByEntityClassNameAndIndex(string $type, int $index): CommonEntity
+    public function getFixtureByEntityClassNameAndIndex($type, $index)
     {
         $fixtures = $this->getFixturesByEntityClassName($type);
 
@@ -90,7 +88,7 @@ trait FixtureObjectsTrait
      *
      * @throws FixtureNotFoundException
      */
-    public function getFixtureById(string $id): UniqueEntityInterface
+    public function getFixtureById($id)
     {
         if (!isset($this->entityMap[$id])) {
             throw new FixtureNotFoundException('No fixture with id "'.$id.'"" defined');
@@ -102,7 +100,7 @@ trait FixtureObjectsTrait
     /**
      * @return mixed[]
      */
-    public function getFixturesInUnloadableOrder(): array
+    public function getFixturesInUnloadableOrder()
     {
         $entities = [];
 
@@ -118,11 +116,11 @@ trait FixtureObjectsTrait
     /**
      * @return string
      */
-    private function getFixturesDirectory(): string
+    private function getFixturesDirectory()
     {
         /** @var KernelInterface $kernel */
         $kernel               = $this->getContainer()->get('kernel');
-        echo $pluginDirectory = $kernel->getRootDir().'/bundles/LeadBundle/Tests/DataFixtures/ORM/Data';
+        $pluginDirectory = $kernel->getRootDir().'/bundles/LeadBundle/Tests/DataFixtures/ORM/Data';
 
         if (!is_dir($pluginDirectory)) {
             throw new NotFoundException('Resource not found.');
