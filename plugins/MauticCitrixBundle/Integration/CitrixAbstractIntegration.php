@@ -36,7 +36,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     {
         //make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
-        if (array_key_exists('url', $keys) && substr($keys['url'], -1) === '/') {
+        if (array_key_exists('url', $keys) && '/' === substr($keys['url'], -1)) {
             $keys['url'] = substr($keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }
@@ -62,9 +62,9 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'app_name'  => 'mautic.citrix.form.appname',
-            'client_id' => 'mautic.citrix.form.clientid',
-            'client_secret' => 'mautic.citrix.form.clientsecret'
+            'app_name'      => 'mautic.citrix.form.appname',
+            'client_id'     => 'mautic.citrix.form.clientid',
+            'client_secret' => 'mautic.citrix.form.clientsecret',
         ];
     }
 

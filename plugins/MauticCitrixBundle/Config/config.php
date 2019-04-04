@@ -67,7 +67,7 @@ return [
                 ],
             ],
             'mautic.citrix.integration.request' => [
-                'class' => \MauticPlugin\MauticCitrixBundle\EventListener\IntegrationRequestSubscriber::class,
+                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\IntegrationRequestSubscriber::class,
                 'arguments' => [],
             ],
         ],

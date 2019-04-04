@@ -11,8 +11,6 @@
 
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,14 +20,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class IntegrationRequestSubscriber implements EventSubscriberInterface
 {
-
     public static function getSubscribedEvents()
     {
         return [
             PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST => [
                 'getParameters',
-                0
-            ]
+                0,
+            ],
         ];
     }
 
@@ -40,11 +37,11 @@ class IntegrationRequestSubscriber implements EventSubscriberInterface
      */
     public function getParameters(PluginIntegrationRequestEvent $requestEvent)
     {
-        if (strpos($requestEvent->getUrl(), 'oauth/v2/token') !== false) {
+        if (false !== strpos($requestEvent->getUrl(), 'oauth/v2/token')) {
             $authorization = $this->getAuthorization($requestEvent->getParameters());
             $requestEvent->setHeaders([
                 'Authorization' => sprintf('Basic %s', base64_encode($authorization)),
-                'Content-Type' => 'application/x-www-form-urlencoded',
+                'Content-Type'  => 'application/x-www-form-urlencoded',
             ]);
         }
     }
@@ -53,6 +50,7 @@ class IntegrationRequestSubscriber implements EventSubscriberInterface
      * @param array $parameters
      *
      * @return string
+     *
      * @throws \Exception
      */
     protected function getAuthorization(array $parameters)
