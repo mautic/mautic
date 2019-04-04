@@ -370,7 +370,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null)
+    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null, $skipValidation = array())
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -440,6 +440,16 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
+
+
+        foreach ($skipValidation as $field) {
+            // We need to set them again
+            // to prevent modification by LeadModel::setFieldValues method
+            if (isset($matchedFields[$field])) {
+                $lead->$field = $matchedFields[$field];
+            }
+        }
+
         if (!empty($socialCache)) {
             // Update the social cache
             $leadSocialCache = $lead->getSocialCache();
