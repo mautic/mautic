@@ -168,4 +168,63 @@ class ReportGeneratorEventTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->reportGeneratorEvent->hasColumnWithPrefix('lump'));
         $this->assertFalse($this->reportGeneratorEvent->hasColumnWithPrefix('c.'));
     }
+
+    public function testUsesColumnWithPrefix()
+    {
+        $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+            ->willReturn(['e.id', 'c.first_name', 'comp.name']);
+
+        $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+            ->willReturn(['e.id', 'c.first_name', 'comp.name']);
+
+        $this->report->method('getFilters')
+            ->willReturn(
+                [
+                    [
+                        'column'    => 'foo.is_published',
+                        'condition' => 'eq',
+                        'value'     => '1',
+                        'glue'      => 'and',
+                        'dynamic'   => null,
+                    ],
+                ]
+            );
+
+        $this->assertTrue($this->reportGeneratorEvent->usesColumnWithPrefix('e'));
+        $this->assertTrue($this->reportGeneratorEvent->usesColumnWithPrefix('c'));
+        $this->assertTrue($this->reportGeneratorEvent->usesColumnWithPrefix('comp'));
+        $this->assertTrue($this->reportGeneratorEvent->usesColumnWithPrefix('foo'));
+        $this->assertFalse($this->reportGeneratorEvent->usesColumnWithPrefix('a'));
+        $this->assertFalse($this->reportGeneratorEvent->usesColumnWithPrefix('lump'));
+        $this->assertFalse($this->reportGeneratorEvent->usesColumnWithPrefix('c.'));
+    }
+
+    public function testUsesColumn()
+    {
+        $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+            ->willReturn(['e.id', 'c.first_name', 'comp.name']);
+
+        $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+            ->willReturn(['e.id', 'c.first_name', 'comp.name']);
+
+        $this->report->method('getFilters')
+            ->willReturn(
+                [
+                    [
+                        'column'    => 'foo.is_published',
+                        'condition' => 'eq',
+                        'value'     => '1',
+                        'glue'      => 'and',
+                        'dynamic'   => null,
+                    ],
+                ]
+            );
+
+        $this->assertTrue($this->reportGeneratorEvent->usesColumn('e.id'));
+        $this->assertTrue($this->reportGeneratorEvent->usesColumn('c.first_name'));
+        $this->assertTrue($this->reportGeneratorEvent->usesColumn('comp.name'));
+        $this->assertTrue($this->reportGeneratorEvent->usesColumn('foo.is_published'));
+        $this->assertFalse($this->reportGeneratorEvent->usesColumn('foo.bar'));
+
+    }
 }
