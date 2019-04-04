@@ -120,7 +120,7 @@ trait FixtureObjectsTrait
     {
         /** @var KernelInterface $kernel */
         $kernel               = $this->getContainer()->get('kernel');
-        $pluginDirectory = $kernel->getRootDir().'/bundles/LeadBundle/Tests/DataFixtures/ORM/Data';
+        $pluginDirectory      = $kernel->getRootDir().'/bundles/LeadBundle/Tests/DataFixtures/ORM/Data';
 
         if (!is_dir($pluginDirectory)) {
             throw new NotFoundException('Resource not found.');

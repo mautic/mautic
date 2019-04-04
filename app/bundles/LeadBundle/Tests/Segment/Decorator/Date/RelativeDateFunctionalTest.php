@@ -127,13 +127,17 @@ class RelativeDateFunctionalTest extends WebTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testRelativeOperators()
+    protected function setUp(): void
     {
-        /** @var EntityManager $entityManager */
-        $entityManager       = $this->getContainer()->get('doctrine.orm.default_entity_manager');
-        $this->entityManager = $entityManager;
-        $this->postFixtureSetup();
+        parent::setUp();
 
+        /** @var EntityManager $entityManager */
+        $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->entityManager = $entityManager;
+    }
+
+        public function testRelativeOperators()
+    {
         $fixturesDirectory = $this->getFixturesDirectory();
         $objects           = $this->loadFixtureFiles([
             $fixturesDirectory.'/roles.yml',
