@@ -2425,7 +2425,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $fields[] = str_replace('-'.$object, '', $sfField);
                     }
                 }
-                if (!in_array('HasOptedOutOfEmail', $fields) && $object === 'Lead') {
+                if (!in_array('HasOptedOutOfEmail', $fields) && $object === 'Contact') {
                     $fields[] = 'HasOptedOutOfEmail';
                 }
         }
