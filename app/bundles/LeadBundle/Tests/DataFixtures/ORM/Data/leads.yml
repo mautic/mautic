@@ -1,0 +1,38 @@
+Mautic\LeadBundle\Entity\Lead:
+  contact1:
+    firstname: '<firstName()>'
+    lastname: '<lastName()>'
+    is_published: 1
+    date_added: '<dateTimeBetween("-1 days 00:00:00","-1 days 23:59:59")>'
+    email: '<email()>'
+  contact2:
+    firstname: '<firstName()>'
+    lastname: '<lastName()>'
+    is_published: 1
+    date_added: '<dateTimeBetween("-2 days 00:00:00","-2 days 23:59:59")>'
+    email: '<email()>'
+  contact3:
+    firstname: '<firstName()>'
+    lastname: '<lastName()>'
+    is_published: 1
+    date_added: '<dateTimeBetween("-3 days 00:00:00","-3 days 23:59:59")>'
+    email: '<email()>'
+  contact4:
+    firstname: '<firstName()>'
+    lastname: '<lastName()>'
+    is_published: 1
+    date_added: '<dateTimeBetween("-4 days 00:00:00","-4 days 23:59:59")>'
+    email: '<email()>'
+  contact5:
+    firstname: '<firstName()>'
+    lastname: '<lastName()>'
+    is_published: 1
+    date_added: '<dateTimeBetween("-5 days 00:00:00","-5 days 23:59:59")>'
+    email: '<email()>'
+  contact6:
+    firstname: '<firstName()>'
+    lastname: '<lastName()>'
+    is_published: 1
+    date_added: '<dateTimeBetween("-6 days 00:00:00","-6 days 23:59:59")>'
+    email: '<email()>'
+

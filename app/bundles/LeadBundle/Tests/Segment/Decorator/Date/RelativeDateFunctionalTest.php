@@ -2,17 +2,28 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
+use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Tests\DataFixtures\Traits\FixtureObjectsTrait;
 
 /**
  * Class RelativeDateFunctionalTest.
  */
-class RelativeDateFunctionalTest extends MauticWebTestCase
+class RelativeDateFunctionalTest extends WebTestCase
 {
+    use FixtureObjectsTrait;
+
+    /** @var EntityManager */
+    private $entityManager;
+
     public function testSegmentCountIsCorrectForToday()
     {
         $name = 'Today';
@@ -117,6 +128,65 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
+    public function testRelativeOperators()
+    {
+        /** @var EntityManager $entityManager */
+        $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->entityManager = $entityManager;
+        $this->postFixtureSetup();
+
+        $fixturesDirectory = $this->getFixturesDirectory();
+        $objects           = $this->loadFixtureFiles([
+            $fixturesDirectory.'/roles.yml',
+            $fixturesDirectory.'/users.yml',
+            $fixturesDirectory.'/leads.yml',
+        ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
+
+        $this->setFixtureObjects($objects);
+
+        /** @var Registr $connection */
+        $connection            = $entityManager->getConnection();
+
+        /** @var ContactSegmentFilterFactory $filterFactory */
+        $filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');
+
+        $crateArguments = [
+            'glue'     => 'and',
+            'field'    => 'date_added',
+            'object'   => ContactSegmentFilterCrate::CONTACT_OBJECT,
+            'type'     => 'date',
+            'filter'   => null,
+            'operator' => 'gte',
+        ];
+
+        $filterValues = [
+            [3, 'gte', '-3 day'],
+            [0, 'gt', '-3 day ago'],
+            [3, 'gte', '3 day ago'],
+            [2, 'gt', '3 day ago'],
+            [4, 'gt', '5 day ago'],
+            [5, 'gte', '5 day ago'],
+            [5, 'gt', '6 day ago'],
+            [6, 'gte', '6 day ago'],
+        ];
+
+        foreach ($filterValues as $filterValue) {
+            $queryBuilder = new QueryBuilder($connection);
+            $queryBuilder->select('l.id, l.date_added')->from(MAUTIC_TABLE_PREFIX.'leads','l');
+
+            $crateArguments['operator'] = $filterValue[1];
+            $crateArguments['filter']   = $filterValue[2];
+            $filter                     = $filterFactory->factorSegmentFilter($crateArguments);
+
+            $filter->applyQuery($queryBuilder);
+            $result = $queryBuilder->execute();
+
+            $this->assertEquals($filterValue[0], $result->rowCount());
+        }
+        $this->unloadFixtures();
+    }
+
+
     /**
      * @param string $name
      * @param Lead   $lead
@@ -177,5 +247,16 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
     {
         // Remove all date related leads to not affect other test
         $this->em->getConnection()->query(sprintf("DELETE FROM %sleads WHERE lastname = 'Date';", MAUTIC_TABLE_PREFIX));
+    }
+
+    protected function unloadFixtures(): void
+    {
+        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
+            $this->entityManager->remove($entity);
+        }
+
+        $this->entityManager->flush();
+
+        parent::tearDown();
     }
 }

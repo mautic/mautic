@@ -111,6 +111,9 @@ class DateRelativeInterval implements FilterDecoratorInterface
         if ($operator === 'like' || $operator === 'notLike') {
             $format .= '%';
         }
+        if ($operator === 'gt') { //    This assures that gt does work correctly
+            $format .= ' 23:59:59';
+        }
 
         return $date->toLocalString($format);
     }
