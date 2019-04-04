@@ -3,8 +3,8 @@
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
 use Doctrine\ORM\EntityManager;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Tests\DataFixtures\Traits\FixtureObjectsTrait;
 /**
  * Class RelativeDateFunctionalTest.
  */
-class RelativeDateFunctionalTest extends WebTestCase
+class RelativeDateFunctionalTest extends MauticWebTestCase
 {
     use FixtureObjectsTrait;
 
@@ -127,28 +127,17 @@ class RelativeDateFunctionalTest extends WebTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        /** @var EntityManager $entityManager */
-        $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $this->entityManager = $entityManager;
-    }
-
-        public function testRelativeOperators()
+    public function testRelativeOperators()
     {
         $fixturesDirectory = $this->getFixturesDirectory();
         $objects           = $this->loadFixtureFiles([
-            $fixturesDirectory.'/roles.yml',
-            $fixturesDirectory.'/users.yml',
             $fixturesDirectory.'/leads.yml',
         ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
 
-        /** @var Registr $connection */
-        $connection            = $this->entityManager->getConnection();
+        /** @var Register $connection */
+        $connection            = $this->em->getConnection();
 
         /** @var ContactSegmentFilterFactory $filterFactory */
         $filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');
@@ -251,14 +240,13 @@ class RelativeDateFunctionalTest extends WebTestCase
         $this->em->getConnection()->query(sprintf("DELETE FROM %sleads WHERE lastname = 'Date';", MAUTIC_TABLE_PREFIX));
     }
 
-    protected function unloadFixtures(): void
+    protected function unloadFixtures()
     {
         foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-            $this->entityManager->remove($entity);
+            $entity = $this->em->merge($entity);
+            $this->em->remove($entity);
         }
 
-        $this->entityManager->flush();
-
-        parent::tearDown();
+        $this->em->flush();
     }
 }

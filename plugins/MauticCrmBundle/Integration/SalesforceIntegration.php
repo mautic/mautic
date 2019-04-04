@@ -261,7 +261,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array|mixed
      *
-     * @throws \Exception
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getAvailableLeadFields($settings = [])
     {
@@ -402,6 +402,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param array $params
      *
      * @return array
+     *
+     * @throws ApiErrorException
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object, $params = [])
     {
@@ -412,6 +414,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $detachClass           = null;
         $mauticObjectReference = null;
         $integrationMapping    = [];
+
+        $DNCUpdates = [];
 
         if (isset($data['records']) and $object !== 'Activity') {
             foreach ($data['records'] as $record) {
@@ -468,7 +472,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
                             $mauticObjectReference = 'lead';
                             $detachClass           = Lead::class;
-
                             break;
                         case 'Account':
                             $entity                = $this->getMauticCompany($dataObject, 'Account');
@@ -496,6 +499,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (method_exists($entity, 'isNewlyCreated') && $entity->isNewlyCreated()) {
                         ++$created;
+                        if (isset($record['HasOptedOutOfEmail'])) {
+                            $DNCUpdates[$object][$entity->getEmail()] = [
+                                'integration_entity_id' => $record['Id'],
+                                'internal_entity_id'    => $entity->getId(),
+                                'email'                 => $entity->getEmail(),
+                                'is_new'                => true,
+                                'opted_out'             => $record['HasOptedOutOfEmail'],
+                            ];
+                        }
                     } else {
                         ++$updated;
                     }
@@ -516,6 +528,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 // Persist integration entities
                 $this->buildIntegrationEntities($integrationMapping, $object, $mauticObjectReference, $params);
                 $this->em->clear($detachClass);
+            }
+
+            foreach ($DNCUpdates as $objectName=>$sfEntity) {
+                $this->pushLeadDoNotContactByDate('email', $sfEntity, $objectName, $params);
             }
 
             unset($data['records']);
@@ -1093,6 +1109,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param array $params
      *
      * @return mixed
+     *
+     * @throws ApiErrorException
      */
     public function pushLeads($params = [])
     {
@@ -1349,7 +1367,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param $campaignId
      *
-     * @throws \Exception
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getCampaignMembers($campaignId)
     {
@@ -1485,11 +1503,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead $lead
-     * @param      $campaignId
-     * @param      $status
+     * @param Lead   $lead
+     * @param int    $campaignId
+     * @param string $status
+     * @param null   $personIds
      *
-     * @return array
+     * @return bool
+     *
+     * @throws ApiErrorException
      */
     public function pushLeadToCampaign(Lead $lead, $campaignId, $status = '', $personIds = null)
     {
@@ -2585,8 +2606,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $fields
      *
-     * @return array
-     *
      * @deprecated 2.6.0 to be removed in 3.0
      */
     public function amendToSfFields($fields)
@@ -2616,6 +2635,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     if (strpos($sfField, '-'.$object) !== false) {
                         $fields[] = str_replace('-'.$object, '', $sfField);
                     }
+                }
+                if (!in_array('HasOptedOutOfEmail', $fields)) {
+                    $fields[] = 'HasOptedOutOfEmail';
                 }
         }
 
@@ -2648,14 +2670,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param string $sfObject
      * @param array  $sfIds
      *
-     * @return int
+     * @return int|void
      *
      * @throws ApiErrorException
      */
     public function pushLeadDoNotContactByDate($channel, &$sfRecords, $sfObject, $params = [])
     {
-        $filters = [];
-        $leadIds = [];
+        $filters            = [];
+        $leadIds            = [];
+        $DNCCreatedContacts = [];
 
         if (empty($sfRecords) || !isset($sfRecords['mauticContactIsContactableByEmail']) && !$this->updateDncByDate()) {
             return;
@@ -2668,11 +2691,20 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $leadIds[$record['internal_entity_id']]    = $record['integration_entity_id'];
             $leadEmails[$record['internal_entity_id']] = $record['email'];
+
+            if (isset($record['opted_out']) && $record['opted_out'] && isset($record['is_new']) && $record['is_new']) {
+                $DNCCreatedContacts[] = $record['internal_entity_id'];
+            }
         }
 
         $sfFieldString = "'".implode("','", $leadIds)."'";
 
         $historySF = $this->getDncHistory($sfObject, $sfFieldString);
+
+        if (count($DNCCreatedContacts)) {
+            $this->updateMauticDNC($DNCCreatedContacts, true);
+        }
+
         //if there is no records of when it was modified in SF then just exit
         if (empty($historySF['records'])) {
             return;
@@ -2713,17 +2745,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $leadId
-     * @param $newDncValue
+     * @param int|int[] $leadId
+     * @param bool      $newDncValue
      */
     private function updateMauticDNC($leadId, $newDncValue)
     {
-        $lead = $this->leadModel->getEntity($leadId);
+        $leadIds = is_array($leadId) ? $leadId : [$leadId];
 
-        if ($newDncValue == true) {
-            $this->leadModel->addDncForLead($lead, 'email', 'Set by Salesforce', DoNotContact::MANUAL, true, false, true);
-        } elseif ($newDncValue == false) {
-            $this->leadModel->removeDncForLead($lead, 'email', true);
+        foreach ($leadIds as $leadId) {
+            $lead = $this->leadModel->getEntity($leadId);
+
+            if ($newDncValue == true) {
+                $this->leadModel->addDncForLead($lead, 'email', 'Set by Salesforce', DoNotContact::MANUAL, true, false, true);
+            } elseif ($newDncValue == false) {
+                $this->leadModel->removeDncForLead($lead, 'email', true);
+            }
         }
     }
 
