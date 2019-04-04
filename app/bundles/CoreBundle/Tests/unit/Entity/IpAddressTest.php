@@ -9,9 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
 namespace Mautic\CoreBundle\Tests\Entity;
-
 
 use Mautic\CoreBundle\Entity\IpAddress;
 
@@ -22,7 +20,7 @@ class IpAddressTest extends \PHPUnit_Framework_TestCase
         $ipAddress = new IpAddress();
         $ipAddress->setDoNotTrackList(
             [
-                '192.168.0.1'
+                '192.168.0.1',
             ]
         );
         $ipAddress->setIpAddress('192.168.0.1');
