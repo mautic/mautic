@@ -233,11 +233,11 @@ class ReportSubscriber implements EventSubscriberInterface
             case self::CONTEXT_LEADS:
                 $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
                 }
 
-                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                if ($event->usesColumn('i.ip_address')) {
                     $event->addLeadIpAddressLeftJoin($qb);
                 }
 
@@ -254,11 +254,11 @@ class ReportSubscriber implements EventSubscriberInterface
                 $qb->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
                     ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
 
-                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
                 }
 
-                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                if ($event->usesColumn('i.ip_address')) {
                     $event->addLeadIpAddressLeftJoin($qb);
                 }
 
@@ -268,11 +268,11 @@ class ReportSubscriber implements EventSubscriberInterface
                 $qb->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'lf')
                     ->leftJoin('lf', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lf.lead_id');
 
-                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
                 }
 
-                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                if ($event->usesColumn('i.ip_address')) {
                     $event->addLeadIpAddressLeftJoin($qb);
                 }
 
@@ -298,15 +298,15 @@ class ReportSubscriber implements EventSubscriberInterface
                         )
                     );
 
-                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
                 }
 
-                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                if ($event->usesColumn('i.ip_address')) {
                     $event->addIpAddressLeftJoin($qb, 'log');
                 }
 
-                if ($event->hasColumn(['cat.id', 'cat.title']) || $event->hasColumn(['cat.id', 'cat.title'])) {
+                if ($event->usesColumn(['cat.id', 'cat.title'])) {
                     $event->addCategoryLeftJoin($qb, 'c', 'cat');
                 }
 
@@ -366,7 +366,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 $event->applyDateFilters($qb, 'date_added', 'comp');
                 $qb->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
 
-                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('comp', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = comp.owner_id');
                 }
 
