@@ -132,7 +132,7 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
         $fixturesDirectory = $this->getFixturesDirectory();
         $objects           = $this->loadFixtureFiles([
             $fixturesDirectory.'/leads.yml',
-        ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
+        ], false, null, 'doctrine');
 
         $this->setFixtureObjects($objects);
 
