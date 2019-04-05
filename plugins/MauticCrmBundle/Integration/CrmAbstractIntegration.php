@@ -367,11 +367,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param array|null  $socialCache
      * @param mixed||null $identifiers
      * @param string|null $object
-     * @param array       $preserve List of fields we don't want to be sanitized
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null, $preserve = [])
+    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null, $skipValidation = [])
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -442,10 +441,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
-        foreach ($preserve as $field) {
-            // We need to set values for those fields again
-            // to prevent modification by RequestTrait::cleanField method
-            // called from LeadModel::setFieldValues
+        foreach ($skipValidation as $field) {
+            // We need to set them again
+            // to prevent modification by LeadModel::setFieldValues method
             if (isset($matchedFields[$field])) {
                 $lead->$field = $matchedFields[$field];
             }

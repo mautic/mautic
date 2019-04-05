@@ -451,6 +451,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             } elseif (!empty($dataObject['Owner__Contact']['Email'])) {
                                 $dataObject['owner_email'] = $dataObject['Owner__Contact']['Email'];
                             }
+
                             $entity                = $this->getMauticLead($dataObject, true, null, null, $object, ['email']);
                             $mauticObjectReference = 'lead';
                             $detachClass           = Lead::class;
