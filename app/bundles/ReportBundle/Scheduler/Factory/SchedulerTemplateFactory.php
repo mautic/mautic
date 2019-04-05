@@ -13,6 +13,7 @@ namespace Mautic\ReportBundle\Scheduler\Factory;
 
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerDailyBuilder;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerMonthBuilder;
+use Mautic\ReportBundle\Scheduler\Builder\SchedulerNowBuilder;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerWeeklyBuilder;
 use Mautic\ReportBundle\Scheduler\BuilderInterface;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
@@ -29,6 +30,9 @@ class SchedulerTemplateFactory
      */
     public function getBuilder(SchedulerInterface $scheduler)
     {
+        if ($scheduler->isScheduledNow()) {
+            return new SchedulerNowBuilder();
+        }
         if ($scheduler->isScheduledDaily()) {
             return new SchedulerDailyBuilder();
         }

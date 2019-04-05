@@ -76,6 +76,11 @@ class SchedulerEntity implements SchedulerInterface
         return $this->scheduleMonthFrequency;
     }
 
+    public function isScheduledNow()
+    {
+        return $this->getScheduleUnit() === SchedulerEnum::UNIT_NOW;
+    }
+
     public function isScheduledDaily()
     {
         return $this->getScheduleUnit() === SchedulerEnum::UNIT_DAILY;
