@@ -2525,6 +2525,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param array $fields
+     *
+     * @return array
+     *
+     * @deprecated 2.6.0 to be removed in 3.0
+     */
+    public function amendToSfFields($fields)
+    {
+    }
+
+    /**
      * @param string $object
      *
      * @return array
