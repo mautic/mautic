@@ -15,6 +15,8 @@ interface SchedulerInterface
 {
     public function isScheduled();
 
+    public function isScheduledNow();
+
     public function isScheduledDaily();
 
     public function isScheduledWeekly();

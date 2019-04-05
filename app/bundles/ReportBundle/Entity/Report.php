@@ -232,7 +232,7 @@ class Report extends FormEntity implements SchedulerInterface
 
     /**
      * @param ?int
-     * 
+     *
      * @return Report
      */
     public function setId($id)
@@ -670,6 +670,14 @@ class Report extends FormEntity implements SchedulerInterface
         $this->setIsScheduled(true);
         $this->setScheduleUnit(SchedulerEnum::UNIT_WEEKLY);
         $this->setScheduleMonthFrequency(null);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isScheduledNow()
+    {
+        return $this->getScheduleUnit() === SchedulerEnum::UNIT_NOW;
     }
 
     /**
