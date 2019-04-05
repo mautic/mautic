@@ -435,6 +435,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $entity = false;
                     switch ($object) {
                         case 'Contact':
+                            if (isset($dataObject['Email__Contact'])) {
+                                // Sanitize email to make sure we match it
+                                // correctly against mautic emails
+                                $dataObject['Email__Contact'] = InputHelper::email($dataObject['Email__Contact']);
+                            }
+
                             //get company from account id and assign company name
                             if (isset($dataObject['AccountId__'.$object])) {
                                 $companyName = $this->getCompanyName($dataObject['AccountId__'.$object], 'Name');
