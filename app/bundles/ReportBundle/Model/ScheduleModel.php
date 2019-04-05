@@ -42,7 +42,7 @@ class ScheduleModel
 
     /**
      * @param ExportOption $exportOption
-     * 
+     *
      * @return Scheduler[]
      */
     public function getScheduledReportsForExport(ExportOption $exportOption)
