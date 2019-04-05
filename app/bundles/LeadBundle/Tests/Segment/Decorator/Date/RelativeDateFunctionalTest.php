@@ -137,7 +137,7 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
         $this->setFixtureObjects($objects);
 
         /** @var Register $connection */
-        $connection            = $this->em->getConnection();
+        $connection = $this->em->getConnection();
 
         /** @var ContactSegmentFilterFactory $filterFactory */
         $filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');
