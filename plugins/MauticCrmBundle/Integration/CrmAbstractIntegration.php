@@ -367,7 +367,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param array|null  $socialCache
      * @param mixed||null $identifiers
      * @param string|null $object
-     * @param array       $preserve    List of fields we don't want to be sanitized
+     * @param array       $preserve List of fields we don't want to be sanitized
      *
      * @return Lead
      */
@@ -445,7 +445,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         foreach ($preserve as $field) {
             // We need to set values for those fields again
             // to prevent modification by RequestTrait::cleanField method
-            // called from LeadModel::setFieldValues. This creates duplicated leads.
+            // called from LeadModel::setFieldValues
             if (isset($matchedFields[$field])) {
                 $lead->$field = $matchedFields[$field];
             }
