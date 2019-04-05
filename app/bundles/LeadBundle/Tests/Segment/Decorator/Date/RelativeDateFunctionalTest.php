@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Entity\Lead;
