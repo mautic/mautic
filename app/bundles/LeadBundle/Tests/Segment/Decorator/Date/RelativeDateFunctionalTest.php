@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
@@ -19,9 +20,6 @@ use Mautic\LeadBundle\Tests\DataFixtures\Traits\FixtureObjectsTrait;
 class RelativeDateFunctionalTest extends MauticWebTestCase
 {
     use FixtureObjectsTrait;
-
-    /** @var EntityManager */
-    private $entityManager;
 
     public function testSegmentCountIsCorrectForToday()
     {
@@ -136,7 +134,7 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
 
         $this->setFixtureObjects($objects);
 
-        /** @var Register $connection */
+        /** @var Connection $connection */
         $connection = $this->em->getConnection();
 
         /** @var ContactSegmentFilterFactory $filterFactory */
