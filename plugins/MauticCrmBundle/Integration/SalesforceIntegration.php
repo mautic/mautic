@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -451,7 +452,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             } elseif (!empty($dataObject['Owner__Contact']['Email'])) {
                                 $dataObject['owner_email'] = $dataObject['Owner__Contact']['Email'];
                             }
-                            $entity                = $this->getMauticLead($dataObject, true, null, null, $object, $params);
+
+                            if (isset($dataObject['Email__Lead'])) {
+                                // Sanitize email to make sure we match it
+                                // correctly against mautic_leads emails
+                                $dataObject['Email__Lead'] = InputHelper::email($dataObject['Email__Lead']);
+                            }
+
+                            $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
                             $mauticObjectReference = 'lead';
                             $detachClass           = Lead::class;
 
