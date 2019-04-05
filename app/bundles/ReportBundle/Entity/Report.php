@@ -231,6 +231,18 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
+     * @param ?int
+     * 
+     * @return Report
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * Set name.
      *
      * @param string $name
