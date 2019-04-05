@@ -114,13 +114,6 @@ class Report extends FormEntity implements SchedulerInterface
      */
     private $scheduleMonthFrequency;
 
-    public function __clone()
-    {
-        $this->id = null;
-
-        parent::__clone();
-    }
-
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -237,6 +230,18 @@ class Report extends FormEntity implements SchedulerInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param ?int
+     * 
+     * @return Report
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     /**

@@ -157,6 +157,7 @@ class ReportController extends FormController
             }
 
             $entity = clone $entity;
+            $entity->setId(null);
             $entity->setIsPublished(false);
         }
 
