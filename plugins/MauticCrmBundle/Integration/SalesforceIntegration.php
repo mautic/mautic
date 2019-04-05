@@ -465,9 +465,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $this->em->detach($entity);
             }
 
-            foreach ($DNCUpdates as $objectName=>$sfEntity) {
+            foreach ($DNCUpdates as $objectName => $sfEntity) {
                 $this->pushLeadDoNotContactByDate('email', $sfEntity, $objectName, $params);
             }
+
 
             unset($data['records']);
             $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate response '.var_export($data, true));
@@ -2425,7 +2426,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $fields[] = str_replace('-'.$object, '', $sfField);
                     }
                 }
-                if (!in_array('HasOptedOutOfEmail', $fields) && $object === 'Contact') {
+                if (!in_array('HasOptedOutOfEmail', $fields) && $object==='Contact') {
                     $fields[] = 'HasOptedOutOfEmail';
                 }
         }
@@ -2454,7 +2455,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param string $sfObject
      * @param array  $sfIds
      *
-     * @return int|void
+     * @return void
      *
      * @throws ApiErrorException
      */
@@ -2476,7 +2477,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $leadIds[$record['internal_entity_id']]    = $record['integration_entity_id'];
             $leadEmails[$record['internal_entity_id']] = $record['email'];
 
-            if (!empty($record['opted_out']) && !empty($record['is_new'])) {
+            if (isset($record['opted_out']) && $record['opted_out'] && isset($record['is_new']) && $record['is_new']) {
                 $DNCCreatedContacts[] = $record['internal_entity_id'];
             }
         }
