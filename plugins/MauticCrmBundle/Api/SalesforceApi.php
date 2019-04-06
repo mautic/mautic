@@ -2,6 +2,9 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api;
 
+use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper\RequestUrl;
@@ -20,6 +23,13 @@ class SalesforceApi extends CrmApi
     protected $apiRequestCounter   = 0;
     protected $requestCounter      = 1;
     protected $maxLockRetries      = 3;
+
+    /**
+     * We will attempt to fetch the opt-out field, if this fails; we will flag it.
+     *
+     * @var bool
+     */
+    private $optOutFieldAccessible = true;
 
     public function __construct(CrmAbstractIntegration $integration)
     {
@@ -327,25 +337,73 @@ class SalesforceApi extends CrmApi
             }
 
             $fields[] = 'Id';
-            $fields   = implode(', ', array_unique($fields));
 
-            $config = $this->integration->mergeConfigToFeatureSettings([]);
-            if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {
-                $fields = 'Owner.Name, Owner.Email, '.$fields;
-            }
-
-            $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
-
-            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
-                .$ignoreConvertedLeads;
-
-            return $this->request('queryAll', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
+            return $this->requestQueryAllAndHandle($queryUrl, $fields, $object, $query);
         }
 
         return [
             'totalSize' => 0,
             'records'   => [],
         ];
+    }
+
+    private function requestQueryAllAndHandle($queryUrl, $fields, $object, $query)
+    {
+        $fields = array_unique($fields);
+
+        $config = $this->integration->mergeConfigToFeatureSettings([]);
+        if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
+            $fields = $fields = ['Owner.Name', 'Owner.Email'];
+        }
+
+            $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
+
+        if (!$this->isOptOutFieldAccessible()) { // If not opt-out is supported; unset it
+            unset($fields['HasOptedOutOfEmail']);
+        }
+
+        $leadsQuery = 'SELECT '.join(', ', $fields).' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
+            .$ignoreConvertedLeads;
+
+        try {
+            $response = $this->request('queryAll', ['q' => $leadsQuery], 'GET', false, null, $queryUrl);
+        } catch (ApiErrorException $e) {
+            if (preg_match("/No such column 'HasOptedOutOfEmail' on entity '([^']+)'/", $e->getMessage(), $matches)) {
+                unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
+                $this->setOptOutFieldAccessible(false);
+                $this->upsertUnreadNotification('Opt-out set up incorrectly.', 'It seems you have not set up your Sales Force permission correctly. 
+                <a href="https://help.salesforce.com/articleView?id=000214338&language=en_US&type=1" target="_blank">Check this link</a> ');
+            }
+            $leadsQuery = 'SELECT '.join(', ', $fields).' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
+                .$ignoreConvertedLeads;
+
+            $response = $this->request('queryAll', ['q' => $leadsQuery], 'GET', false, null, $queryUrl);
+        }
+
+        return $response;
+    }
+
+    private function upsertUnreadNotification($header, $message, $type='error', $preventUnreadDuplicates = true)
+    {
+        $notificationArray = [
+            'type'    => $type,
+            'is_read' => false,
+            'header'  => EmojiHelper::toHtml(InputHelper::strict_html($header)),
+            'message' => EmojiHelper::toHtml(InputHelper::strict_html($message)),
+        ];
+
+        $exists = $this->integration->getNotificationModel()->getRepository()->findOneBy($notificationArray);
+
+        if (!$exists) {
+            $notification = new Notification();
+            $notification->setType($notificationArray['type']);
+            $notification->setIsRead(false);
+            $notification->setHeader($notificationArray['header']);
+            $notification->setMessage($notificationArray['message']);
+            $notification->setIconClass(null);
+
+            $this->integration->getNotificationModel()->saveEntity($notification);
+        }
     }
 
     /**
@@ -598,5 +656,25 @@ class SalesforceApi extends CrmApi
         $value = str_replace("'", "\'", $value);
 
         return $value;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOptOutFieldAccessible()
+    {
+        return $this->optOutFieldAccessible;
+    }
+
+    /**
+     * @param bool $optOutFieldAccessible
+     *
+     * @return SalesforceApi
+     */
+    public function setOptOutFieldAccessible($optOutFieldAccessible)
+    {
+        $this->optOutFieldAccessible = $optOutFieldAccessible;
+
+        return $this;
     }
 }

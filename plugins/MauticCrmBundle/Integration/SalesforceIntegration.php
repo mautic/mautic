@@ -535,7 +535,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $this->pushLeadDoNotContactByDate('email', $sfEntity,$objectName,$params );
             }
 
-
             unset($data['records']);
             $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate response '.var_export($data, true));
 
