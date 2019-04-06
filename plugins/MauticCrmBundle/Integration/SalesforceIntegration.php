@@ -469,7 +469,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $this->pushLeadDoNotContactByDate('email', $sfEntity, $objectName, $params);
             }
 
-
             unset($data['records']);
             $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate response '.var_export($data, true));
 
@@ -2426,7 +2425,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $fields[] = str_replace('-'.$object, '', $sfField);
                     }
                 }
-                if (!in_array('HasOptedOutOfEmail', $fields) && $object==='Contact') {
+                if (!in_array('HasOptedOutOfEmail', $fields)) {
                     $fields[] = 'HasOptedOutOfEmail';
                 }
         }
@@ -2454,8 +2453,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param string $channel
      * @param string $sfObject
      * @param array  $sfIds
-     *
-     * @return void
      *
      * @throws ApiErrorException
      */
