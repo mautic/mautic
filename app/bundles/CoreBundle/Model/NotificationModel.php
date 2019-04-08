@@ -220,4 +220,11 @@ class NotificationModel extends FormModel
     {
         return $this->getRepository()->isDuplicate($userId, $deduplicate, $from ?? new \DateTime('-1 day'));
     }
+
+    public function upsertAdminsNotification(Notification $notification, $uniqueUnread = true, $updateTimeStamp = false, $messageLimit = 1)
+    {
+//        $this->getRepository()->findOneBy(
+//            $notification
+//        )
+    }
 }

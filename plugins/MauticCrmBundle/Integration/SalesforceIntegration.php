@@ -3007,4 +3007,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $matchedFields;
     }
+
+    /**
+     * @return \Doctrine\ORM\EntityManager
+     */
+    public function getEntityManager()
+    {
+        return $this->em;
+    }
 }
