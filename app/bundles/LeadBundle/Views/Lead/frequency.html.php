@@ -10,7 +10,7 @@
  */
 ?>
 
-    <?php echo $view['form']->start($form); ?>
+<?php echo $view['form']->start($form); ?>
 <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#channels"><?php echo $view['translator']->trans('mautic.lead.contact.channels'); ?></a></li>
     <li><a data-toggle="tab" href="#categories"><?php echo $view['translator']->trans('mautic.lead.preferred.categories'); ?></a></li>
