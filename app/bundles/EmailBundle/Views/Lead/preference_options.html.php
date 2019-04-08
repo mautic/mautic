@@ -179,6 +179,5 @@ JS;
     <?php
     unset($form['lead_channels']['preferred_channel']);
     unset($form['lead_channels']['subscribed_channels']);
-    var_dump($form['lead_channels']);
     echo $view['form']->end($form); ?>
 </div>
