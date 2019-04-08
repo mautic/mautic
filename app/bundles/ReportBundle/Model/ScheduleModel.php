@@ -31,11 +31,17 @@ class ScheduleModel
     private $schedulerPlanner;
 
     /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
      * @param EntityManager    $entityManager
      * @param SchedulerPlanner $schedulerPlanner
      */
     public function __construct(EntityManager $entityManager, SchedulerPlanner $schedulerPlanner)
     {
+        $this->entityManager       = $entityManager;
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
         $this->schedulerPlanner    = $schedulerPlanner;
     }
@@ -56,5 +62,15 @@ class ScheduleModel
     public function reportWasScheduled(Report $report)
     {
         $this->schedulerPlanner->computeScheduler($report);
+    }
+
+    /**
+     * @param Report $report
+     */
+    public function turnOffScheduler(Report $report)
+    {
+        $report->setIsScheduled(false);
+        $this->entityManager->persist($report);
+        $this->entityManager->flush();
     }
 }

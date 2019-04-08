@@ -85,6 +85,10 @@ class ReportExporter
 
             $dateFrom = clone $dateTo;
             switch ($report->getScheduleUnit()) {
+                case SchedulerEnum::UNIT_NOW:
+                    $dateFrom->sub(new \DateInterval('P10Y'));
+                    $this->schedulerModel->turnOffScheduler($report);
+                    break;
                 case SchedulerEnum::UNIT_DAILY:
                     $dateFrom->sub(new \DateInterval('P1D'));
                     break;
@@ -118,8 +122,7 @@ class ReportExporter
                 $this->reportExportOptions->nextBatch();
             }
 
-            $file = $this->reportFileWriter->getFilePath($scheduler);
-
+            $file  = $this->reportFileWriter->getFilePath($scheduler);
             $event = new ReportScheduleSendEvent($scheduler, $file);
             $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
         }
