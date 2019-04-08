@@ -500,31 +500,36 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
+     * Extract and build a campaign ID from the metadata sample
+     *
+     * @param array $metadataSet
+     *
+     * @return string
+     */
+    private function extractCampaignId(array $metadataSet)
+    {
+        $id = '';
+
+        if (!empty($metadataSet['utmTags']['utmCampaign'])) {
+            $id = $metadataSet['utmTags']['utmCampaign'];
+        }
+
+        elseif (!empty($metadataSet['emailId']) && !empty($metadataSet['emailName'])) {
+            $id = $metadataSet['emailId'].':'.$metadataSet['emailName'];
+        }
+
+        elseif (!empty($metadataSet['emailId'])) {
+            $id = $metadataSet['emailId'];
+        }
+
+        return substr($id, 0, 64);
+    }
+
+    /**
      * @return bool
      */
     public function ping()
     {
         return true;
-    }
-
-    /**
-     * @return string
-     */
-    private function extractCampaignId(array $metadataSet)
-    {
-        // Extract and build a campaign ID from the metadata sample
-        if (!empty($metadataSet['utmTags']['utmCampaign'])) {
-            return $metadataSet['utmTags']['utmCampaign'];
-        }
-
-        if (!empty($metadataSet['emailId']) && !empty($metadataSet['emailName'])) {
-            return $metadataSet['emailId'].':'.$metadataSet['emailName'];
-        }
-
-        if (!empty($metadataSet['emailId'])) {
-            return $metadataSet['emailId'];
-        }
-
-        return '';
     }
 }
