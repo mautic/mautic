@@ -8,6 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+/** @var \Symfony\Component\Form\Form $form */
+
 $leadId           = $lead->getId();
 $leadName         = $lead->getPrimaryIdentifier();
 $channelNumber    = 0;
@@ -177,7 +179,6 @@ JS;
     </div>
 
     <?php
-    unset($form['lead_channels']['preferred_channel']);
-    unset($form['lead_channels']['subscribed_channels']);
+    unset($form['lead_channels']);  // We do not want to render anything else but the CSRF token
     echo $view['form']->end($form); ?>
 </div>
