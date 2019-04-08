@@ -11,14 +11,11 @@
 
 namespace Mautic\ReportBundle\Scheduler\Model;
 
+use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\CoreBundle\Helper\FilePathResolver;
-use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class FileHandler
@@ -68,17 +65,17 @@ class FileHandler
 
     /**
      * Zips the file and returns the path where the zip file was created.
-     * 
+     *
      * @param string $csvFilePath
-     * 
+     *
      * @return string
-     * 
+     *
      * @throws FilePathException
      */
     public function zipIt($csvFilePath)
     {
         $zipFilePath = str_replace('.csv', '.zip', $csvFilePath);
-        $zipArchive = new \ZipArchive();
+        $zipArchive  = new \ZipArchive();
 
         if ($zipArchive->open($zipFilePath) === true) {
             $zipArchive->addFile($csvFilePath, 'report.csv');
