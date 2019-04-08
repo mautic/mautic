@@ -127,6 +127,7 @@ JS;
                     <hr />
                     <div id="preferred_channel" class="text-left"><?php echo $view['form']->row($leadChannelsForm['preferred_channel']); ?></div>
                 <?php
+                    unset($form['lead_channels']['preferred_channel']);
                 else:
                     unset($form['lead_channels']['preferred_channel']);
                 endif; ?>
@@ -176,6 +177,6 @@ JS;
     </div>
 
     <?php
-    unset($form['lead_channels']);
+    unset($form['lead_channels']['subscribed_channels']);
     echo $view['form']->end($form); ?>
 </div>
