@@ -9,7 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 /** @var \Symfony\Component\Form\Form $form */
-
 $leadId           = $lead->getId();
 $leadName         = $lead->getPrimaryIdentifier();
 $channelNumber    = 0;
