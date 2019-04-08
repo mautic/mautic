@@ -213,6 +213,15 @@ return [
                 'arguments' => [
                     'mautic.helper.mailer',
                     'mautic.report.model.message_schedule',
+                    'mautic.report.model.file_hanlder',
+                ],
+            ],
+            'mautic.report.model.file_hanlder' => [
+                'class'     => \Mautic\ReportBundle\Scheduler\Model\FileHandler::class,
+                'arguments' => [
+                    'mautic.helper.file_path_resolver',
+                    'mautic.helper.file_properties',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.report.model.message_schedule' => [

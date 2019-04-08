@@ -36,7 +36,7 @@ class SchedulerPlanner
     private $entityManager;
 
     /**
-     * @param DateBuilder $dateBuilder
+     * @param DateBuilder   $dateBuilder
      * @param EntityManager $entityManager
      */
     public function __construct(DateBuilder $dateBuilder, EntityManager $entityManager)

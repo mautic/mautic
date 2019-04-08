@@ -108,4 +108,13 @@ class FilePathResolver
         } catch (IOException $e) {
         }
     }
+
+    /**
+     * @param string $originPath
+     * @param string $targetPath
+     */
+    public function move($originPath, $targetPath)
+    {
+        $this->filesystem->rename($originPath, $targetPath);
+    }
 }
