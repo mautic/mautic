@@ -54,7 +54,7 @@ class MessageSchedule
 
     /**
      * @deprecated 2.15.2 to be removed in 3.0. Use getMessageForAttachedFile or getMessageForLinkedFile
-     * 
+     *
      * @param Report $report
      * @param string $filePath
      *
@@ -127,7 +127,7 @@ class MessageSchedule
 
     /**
      * @deprecated 2.15.2 use \Mautic\ReportBundle\Scheduler\Model\FileHandler::fileCanBeAttached instead. To be removed in 3.0.0.
-     * 
+     *
      * @param string $filePath
      *
      * @return bool

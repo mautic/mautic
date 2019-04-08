@@ -14,7 +14,6 @@ namespace Mautic\ReportBundle\Scheduler\Model;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\ReportBundle\Entity\Scheduler;
-use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 
 class SendSchedule
 {
@@ -34,16 +33,15 @@ class SendSchedule
     private $fileHandler;
 
     /**
-     * @param MailHelper $mailer
+     * @param MailHelper      $mailer
      * @param MessageSchedule $messageSchedule
-     * @param FileHandler $fileHandler
+     * @param FileHandler     $fileHandler
      */
     public function __construct(
-        MailHelper $mailer, 
+        MailHelper $mailer,
         MessageSchedule $messageSchedule,
         FileHandler $fileHandler
-    )
-    {
+    ) {
         $this->mailer          = $mailer->getMailer();
         $this->messageSchedule = $messageSchedule;
         $this->fileHandler     = $fileHandler;
