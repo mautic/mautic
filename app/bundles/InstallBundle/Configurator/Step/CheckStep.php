@@ -22,50 +22,35 @@ class CheckStep implements StepInterface
 {
     /**
      * Flag if the configuration file is writable.
-     *
-     * @var bool
      */
     private $configIsWritable;
 
     /**
      * Path to the kernel root.
-     *
-     * @var string
      */
     private $kernelRoot;
 
-    /**
-     * @var OpenSSLCipher
-     */
     private $openSSLCipher;
 
     /**
      * Absolute path to cache directory.
      * Required in step.
-     *
-     * @var string
      */
     public $cache_path = '%kernel.root_dir%/../var/cache';
 
     /**
      * Absolute path to log directory.
      * Required in step.
-     *
-     * @var string
      */
     public $log_path = '%kernel.root_dir%/../var/logs';
 
     /**
      * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.
-     *
-     * @var string
      */
     public $site_url;
 
     /**
      * Recommended minimum memory limit for Mautic.
-     *
-     * @var string
      */
     public static $memory_limit = '512M';
 
@@ -84,7 +69,9 @@ class CheckStep implements StepInterface
 
         $this->configIsWritable = $configurator->isFileWritable();
         $this->kernelRoot       = $kernelRoot;
-        $this->site_url         = $request->getSchemeAndHttpHost().$request->getBasePath();
+        if (!empty($request)) {
+            $this->site_url         = $request->getSchemeAndHttpHost().$request->getBasePath();
+        }
         $this->openSSLCipher    = $openSSLCipher;
     }
 
