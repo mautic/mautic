@@ -3,9 +3,11 @@
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper\RequestUrl;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
@@ -371,39 +373,64 @@ class SalesforceApi extends CrmApi
             if (preg_match("/No such column 'HasOptedOutOfEmail' on entity '([^']+)'/", $e->getMessage(), $matches)) {
                 unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
                 $this->setOptOutFieldAccessible(false);
-                $this->upsertUnreadNotification('Opt-out set up incorrectly.', 'It seems you have not set up your Sales Force permission correctly. 
+                $this->upsertUnreadAdminsNotification('Opt-out set up incorrectly.', 'It seems you have not set up your Sales Force permission correctly. 
                 <a href="https://help.salesforce.com/articleView?id=000214338&language=en_US&type=1" target="_blank">Check this link</a> ');
             }
             $leadsQuery = 'SELECT '.join(', ', $fields).' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
                 .$ignoreConvertedLeads;
 
-            $response = $this->request('queryAll', ['q' => $leadsQuery], 'GET', false, null, $queryUrl);
+            $response = $this->request('queryAll', ['q' => $leadsQuery], 'GET', true, null, $queryUrl);
         }
 
         return $response;
     }
 
-    private function upsertUnreadNotification($header, $message, $type='error', $preventUnreadDuplicates = true)
+    private function upsertUnreadAdminsNotification($header, $message, $type='error', $preventUnreadDuplicates = true)
     {
-        $notificationArray = [
-            'type'    => $type,
-            'is_read' => false,
-            'header'  => EmojiHelper::toHtml(InputHelper::strict_html($header)),
-            'message' => EmojiHelper::toHtml(InputHelper::strict_html($message)),
-        ];
+        $notificationTemplate = new Notification();
+        $notificationTemplate->setType($type);
+        $notificationTemplate->setIsRead(false);
+        $notificationTemplate->setHeader(EmojiHelper::toHtml(InputHelper::strict_html($header)));
+        $notificationTemplate->setMessage(EmojiHelper::toHtml(InputHelper::strict_html($message)));
+        $notificationTemplate->setIconClass(null);
 
-        $exists = $this->integration->getNotificationModel()->getRepository()->findOneBy($notificationArray);
+        $persistEntities = [];
+        $transformer = new NotificationArrayTransformer();
 
-        if (!$exists) {
-            $notification = new Notification();
-            $notification->setType($notificationArray['type']);
-            $notification->setIsRead(false);
-            $notification->setHeader($notificationArray['header']);
-            $notification->setMessage($notificationArray['message']);
-            $notification->setIconClass(null);
+        foreach ($this->getAdminUsers() as $adminUser) {
+            if ($preventUnreadDuplicates) {
+                /** @var Notification|null $exists */
+                $notificationTemplate->setUser($adminUser);
+                $exists = $this->integration->getNotificationModel()->getRepository()->findOneBy(
+                    transformer->transform($notificationTemplate));
 
-            $this->integration->getNotificationModel()->saveEntity($notification);
+                if ($exists) {
+                    continue;
+                }
+
+                $notification = clone $notificationTemplate;
+                $notification->setDateAdded(new \DateTime());   // not sure what date to use
+            }
+
+            $persistEntities[] = $notification;
         }
+
+        $this->integration->getNotificationModel()->getRepository()->saveEntities($persistEntities);
+        $this->integration->getNotificationModel()->getRepository()->detachEntities($persistEntities);
+    }
+
+    private function getAdminUsers() {
+        $userRepository = $this->integration->getEntityManager()->getRepository(User::class);
+        $adminRole = $this->integration->getEntityManager()->getRepository('MauticUserBundle:Role')->findOneBy(['isAdmin' => true]);
+
+        $admins = $userRepository->findBy(
+            [
+                'role'        => $adminRole,
+                'isPublished' => true,
+            ]
+        );
+
+        return $admins;
     }
 
     /**
