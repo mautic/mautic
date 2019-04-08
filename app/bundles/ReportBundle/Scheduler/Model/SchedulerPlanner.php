@@ -35,6 +35,10 @@ class SchedulerPlanner
      */
     private $entityManager;
 
+    /**
+     * @param DateBuilder $dateBuilder
+     * @param EntityManager $entityManager
+     */
     public function __construct(DateBuilder $dateBuilder, EntityManager $entityManager)
     {
         $this->dateBuilder         = $dateBuilder;
@@ -42,12 +46,18 @@ class SchedulerPlanner
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }
 
+    /**
+     * @param Report $report
+     */
     public function computeScheduler(Report $report)
     {
         $this->removeSchedulerOfReport($report);
         $this->planScheduler($report);
     }
 
+    /**
+     * @param Report $report
+     */
     private function planScheduler(Report $report)
     {
         try {
@@ -61,6 +71,9 @@ class SchedulerPlanner
         $this->entityManager->flush();
     }
 
+    /**
+     * @param Report $report
+     */
     private function removeSchedulerOfReport(Report $report)
     {
         $scheduler = $this->schedulerRepository->getSchedulerByReport($report);
