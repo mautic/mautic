@@ -70,7 +70,7 @@ class CheckStep implements StepInterface
         $this->configIsWritable = $configurator->isFileWritable();
         $this->kernelRoot       = $kernelRoot;
         if (!empty($request)) {
-            $this->site_url         = $request->getSchemeAndHttpHost().$request->getBasePath();
+            $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
         $this->openSSLCipher    = $openSSLCipher;
     }
