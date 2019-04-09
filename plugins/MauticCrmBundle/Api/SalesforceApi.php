@@ -2,12 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api;
 
-use Mautic\CoreBundle\Entity\Notification;
-use Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer;
-use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Exception\ApiErrorException;
-use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper\RequestUrl;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
@@ -295,9 +290,9 @@ class SalesforceApi extends CrmApi
 
                 return $results;
             }
-
-            return [];
         }
+
+        return [];
     }
 
     /**
@@ -345,6 +340,18 @@ class SalesforceApi extends CrmApi
         ];
     }
 
+    /**
+     * Perform queryAll request and retry if HasOptedOutOfEmail is not accessible.
+     *
+     * @param string $queryUrl
+     * @param array  $fields
+     * @param        $object
+     * @param array  $query
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
     private function requestQueryAllAndHandle($queryUrl, $fields, $object, $query)
     {
         $fields = array_unique($fields);
@@ -367,11 +374,19 @@ class SalesforceApi extends CrmApi
             $response = $this->request('queryAll', ['q' => $leadsQuery], 'GET', false, null, $queryUrl);
         } catch (ApiErrorException $e) {
             if (preg_match("/No such column 'HasOptedOutOfEmail' on entity '([^']+)'/", $e->getMessage(), $matches)) {
+                // Unset field as it is not accessible
                 unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
+
+                // Disable the use of the HasOptedOutOfEmail field for future requests
                 $this->setOptOutFieldAccessible(false);
-                $this->upsertUnreadAdminsNotification('Opt-out set up incorrectly.', 'It seems you have not set up your Sales Force permission correctly. 
-                <a href="https://help.salesforce.com/articleView?id=000214338&language=en_US&type=1" target="_blank">Check this link</a> ');
+
+                // Notify all admins of this error
+                $this->integration->upsertUnreadAdminsNotification(
+                    $this->integration->getTranslator()->trans('mautic.salesforce.error.opt-out_permission.header'),
+                    $this->integration->getTranslator()->trans('mautic.salesforce.error.opt-out_permission.message')
+                );
             }
+
             $leadsQuery = 'SELECT '.join(', ', $fields).' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
                 .$ignoreConvertedLeads;
 
@@ -379,54 +394,6 @@ class SalesforceApi extends CrmApi
         }
 
         return $response;
-    }
-
-    private function upsertUnreadAdminsNotification($header, $message, $type='error', $preventUnreadDuplicates = true)
-    {
-        $notificationTemplate = new Notification();
-        $notificationTemplate->setType($type);
-        $notificationTemplate->setIsRead(false);
-        $notificationTemplate->setHeader(EmojiHelper::toHtml(InputHelper::strict_html($header)));
-        $notificationTemplate->setMessage(EmojiHelper::toHtml(InputHelper::strict_html($message)));
-        $notificationTemplate->setIconClass(null);
-
-        $persistEntities = [];
-        $transformer = new NotificationArrayTransformer();
-
-        foreach ($this->getAdminUsers() as $adminUser) {
-            if ($preventUnreadDuplicates) {
-                /** @var Notification|null $exists */
-                $notificationTemplate->setUser($adminUser);
-                $exists = $this->integration->getNotificationModel()->getRepository()->findOneBy(
-                    transformer->transform($notificationTemplate));
-
-                if ($exists) {
-                    continue;
-                }
-
-                $notification = clone $notificationTemplate;
-                $notification->setDateAdded(new \DateTime());   // not sure what date to use
-            }
-
-            $persistEntities[] = $notification;
-        }
-
-        $this->integration->getNotificationModel()->getRepository()->saveEntities($persistEntities);
-        $this->integration->getNotificationModel()->getRepository()->detachEntities($persistEntities);
-    }
-
-    private function getAdminUsers() {
-        $userRepository = $this->integration->getEntityManager()->getRepository(User::class);
-        $adminRole = $this->integration->getEntityManager()->getRepository('MauticUserBundle:Role')->findOneBy(['isAdmin' => true]);
-
-        $admins = $userRepository->findBy(
-            [
-                'role'        => $adminRole,
-                'isPublished' => true,
-            ]
-        );
-
-        return $admins;
     }
 
     /**
