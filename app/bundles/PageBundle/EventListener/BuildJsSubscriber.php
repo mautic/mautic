@@ -107,6 +107,17 @@ class BuildJsSubscriber extends CommonSubscriber
                 }
             }
         }
+
+        if (window.Intl && window.Intl.DateTimeFormat) {
+            // Newer browsers know their timezone name, not just offset
+            var dtf = new window.Intl.DateTimeFormat(),
+                resolvedOptions =  dtf.resolvedOptions && dtf.resolvedOptions(),
+                timeZone = resolvedOptions && resolvedOptions.timeZone;
+            if (timeZone) {
+                params.timezone = timeZone
+            }
+        }
+
         params.fingerprint = m.fingerprint;
         
         return params;

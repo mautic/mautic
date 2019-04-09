@@ -596,6 +596,11 @@ class PageModel extends FormModel
 
         $query = $hit->getQuery() ? $hit->getQuery() : [];
 
+        if (isset($query['timezone']) && !$lead->getTimezone()) {
+            // timezone holds timezone name
+            $lead->setTimezone($query['timezone']);
+        }
+
         if (isset($query['timezone_offset']) && !$lead->getTimezone()) {
             // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
             // Multiply by -1 because Firgerprint2 seems to have it the other way around.
