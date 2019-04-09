@@ -427,3 +427,12 @@ $container->setDefinition(
     'mautic.kernel.listener.command_terminate',
     $definitionConsoleExceptionListener
 );
+
+$container->loadFromExtension('enqueue', [
+    'transport' => [
+        'default' => [
+            'dsn' => 'null://',
+        ],
+    ],
+    'client' => true,
+]);

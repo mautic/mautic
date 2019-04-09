@@ -18,4 +18,5 @@ class QueueProtocol
 {
     const BEANSTALKD = 'beanstalkd';
     const RABBITMQ   = 'rabbitmq';
+    const ENQUEUE    = 'enqueue';
 }

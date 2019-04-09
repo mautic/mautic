@@ -11,6 +11,7 @@
 
 namespace Mautic\QueueBundle\DependencyInjection;
 
+use Enqueue\Bundle\DependencyInjection\EnqueueExtension;
 use Leezy\PheanstalkBundle\DependencyInjection\LeezyPheanstalkExtension;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use OldSound\RabbitMqBundle\DependencyInjection\Compiler\RegisterPartsPass;
@@ -42,6 +43,10 @@ class MauticQueueExtension extends Extension
 
         if ($queueProtocol == QueueProtocol::BEANSTALKD) {
             $container->registerExtension(new LeezyPheanstalkExtension());
+        }
+
+        if ($queueProtocol == QueueProtocol::ENQUEUE) {
+            $container->registerExtension(new EnqueueExtension());
         }
 
         if (file_exists(__DIR__.'/../Config/'.$queueProtocol.'.php')) {
