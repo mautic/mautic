@@ -64,7 +64,7 @@ trait CustomFieldRepositoryTrait
         if (!$total && !empty($args['withTotalCount'])) {
             $results = [];
         } else {
-            if ($groupBy) {
+            if (isset($groupBy) && $groupBy) {
                 $dq->groupBy($groupBy);
             }
             //now get the actual paginated results
