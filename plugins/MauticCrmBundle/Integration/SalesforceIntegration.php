@@ -294,9 +294,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
 
                     $sfObject = trim($sfObject);
-
                     // Check the cache first
-                    $settings['cache_suffix'] = $cacheSuffix = '.'.$sfObject;
+                    $settings['cache_suffix'] = $cacheSuffix = '3.'.$sfObject;
                     if ($fields = parent::getAvailableLeadFields($settings)) {
                         if (('company' === $sfObject && isset($fields['Id'])) || isset($fields['Id__'.$sfObject])) {
                             $salesFields[$sfObject] = $fields;
@@ -310,7 +309,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $fields = $this->getApiHelper()->getLeadFields($sfObject);
                             if (!empty($fields['fields'])) {
                                 foreach ($fields['fields'] as $fieldInfo) {
-                                    if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id') && $fieldInfo['name'] != 'IsDeleted')
+                                    if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && !in_array($fieldInfo['name'], ['Id', 'IsDeleted', 'CreatedDate'])))
                                         || !isset($fieldInfo['name'])
                                         || (in_array(
                                                 $fieldInfo['type'],
@@ -339,6 +338,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                             'group'       => $sfObject,
                                             'optionLabel' => $fieldInfo['label'],
                                         ];
+
+                                        // CreateDate can be updatable just in Mautic
+                                        if (in_array($fieldInfo['name'], ['CreatedDate'])) {
+                                            $salesFields[$sfObject][$fieldInfo['name'].'__'.$sfObject]['update_mautic'] = 1;
+                                        }
                                     } else {
                                         $salesFields[$sfObject][$fieldInfo['name']] = [
                                             'type'     => $type,
