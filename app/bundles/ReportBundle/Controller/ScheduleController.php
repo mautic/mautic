@@ -12,10 +12,10 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Mautic\CoreBundle\Service\FlashBag;
 
 /**
  * Class ScheduleController.
@@ -44,9 +44,9 @@ class ScheduleController extends CommonAjaxController
 
     /**
      * Sets report to schedule NOW if possible.
-     * 
+     *
      * @param int $reportId
-     * 
+     *
      * @return JsonResponse
      */
     public function nowAction($reportId)
@@ -65,7 +65,7 @@ class ScheduleController extends CommonAjaxController
 
             return $this->flushFlash(Response::HTTP_NOT_FOUND);
         }
-        
+
         if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
             $this->addFlash('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
 
@@ -91,7 +91,7 @@ class ScheduleController extends CommonAjaxController
 
     /**
      * @param string $status
-     * 
+     *
      * @return JsonResponse
      */
     private function flushFlash($status)

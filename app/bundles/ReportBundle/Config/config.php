@@ -23,6 +23,13 @@ return [
                     'format' => 'csv',
                 ],
             ],
+            'mautic_report_download' => [
+                'path'       => '/reports/download/{reportId}/{format}',
+                'controller' => 'MauticReportBundle:Report:download',
+                'defaults'   => [
+                    'format' => 'csv',
+                ],
+            ],
             'mautic_report_view' => [
                 'path'       => '/reports/view/{objectId}/{reportPage}',
                 'controller' => 'MauticReportBundle:Report:view',

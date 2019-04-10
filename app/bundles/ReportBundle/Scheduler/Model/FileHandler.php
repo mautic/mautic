@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Exception\FileTooBigException;
+use Symfony\Component\Debug\Exception\ContextErrorException;
 
 class FileHandler
 {
@@ -66,25 +67,41 @@ class FileHandler
     /**
      * Zips the file and returns the path where the zip file was created.
      *
-     * @param string $csvFilePath
+     * @param string $originalFilePath
      *
      * @return string
      *
      * @throws FilePathException
      */
-    public function zipIt($csvFilePath)
+    public function zipIt($originalFilePath)
     {
-        $zipFilePath = str_replace('.csv', '.zip', $csvFilePath);
+        $zipFilePath = str_replace('.csv', '.zip', $originalFilePath);
         $zipArchive  = new \ZipArchive();
 
-        if ($zipArchive->open($zipFilePath) === true) {
-            $zipArchive->addFile($csvFilePath, 'report.csv');
+        if ($zipArchive->open($zipFilePath, \ZipArchive::OVERWRITE | \ZipArchive::CREATE) === true) {
+            $zipArchive->addFile($originalFilePath, 'report.csv');
             $zipArchive->close();
 
             return $zipFilePath;
         }
 
-        throw new FilePathException("Could not create zip archive at {$zipFilePath}");
+        throw new FilePathException("Could not create zip archive at {$zipFilePath}. {$zipArchive->getStatusString()}");
+    }
+
+    /**
+     * @param Report $report
+     */
+    public function getPathToCompressedCsvFileForReport(Report $report)
+    {
+        return "{$this->getReportDir()}/csv_reports/report_{$report->getId()}.zip";
+    }
+
+    /**
+     * @param Report $report
+     */
+    public function compressedCsvFileForReportExists(Report $report)
+    {
+        return file_exists($this->getPathToCompressedCsvFileForReport($report));
     }
 
     /**
@@ -93,8 +110,11 @@ class FileHandler
      */
     public function moveZipToPermanentLocation(Report $report, $originalPath)
     {
-        $targetPath = "{$this->getReportDir()}/{csv_reports/{$report->getId()}/{$report->setScheduleUnit()}.zip";
-        $this->filePathResolver->move($originalPath, $zipPath);
+        $compressedCsvPath = $this->getPathToCompressedCsvFileForReport($report);
+
+        $this->filePathResolver->delete($compressedCsvPath);
+        $this->filePathResolver->createDirectory(dirname($compressedCsvPath));
+        $this->filePathResolver->move($originalPath, $compressedCsvPath);
     }
 
     /**

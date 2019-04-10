@@ -53,7 +53,7 @@ class MessageSchedule
     }
 
     /**
-     * @deprecated 2.15.2 to be removed in 3.0. Use getMessageForAttachedFile or getMessageForLinkedFile
+     * @deprecated 2.16.0 to be removed in 3.0. Use getMessageForAttachedFile or getMessageForLinkedFile
      *
      * @param Report $report
      * @param string $filePath
@@ -102,10 +102,10 @@ class MessageSchedule
      */
     public function getMessageForLinkedFile(Report $report)
     {
-        $link = $this->router->generate('mautic_report_download', ['objectId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $link = $this->router->generate('mautic_report_download', ['reportId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return $this->translator->trans(
-            'mautic.report.schedule.email.message_file_not_attached',
+            'mautic.report.schedule.email.message_file_linked',
             ['%report_name%' => $report->getName(), '%link%' => $link]
         );
     }
@@ -126,7 +126,7 @@ class MessageSchedule
     }
 
     /**
-     * @deprecated 2.15.2 use \Mautic\ReportBundle\Scheduler\Model\FileHandler::fileCanBeAttached instead. To be removed in 3.0.0.
+     * @deprecated 2.16.0 use \Mautic\ReportBundle\Scheduler\Model\FileHandler::fileCanBeAttached instead. To be removed in 3.0.0.
      *
      * @param string $filePath
      *
