@@ -8,7 +8,7 @@ Mautic.matchedFields = function (index, object, integration) {
     var integrationField = mQuery('#integration_details_featureSettings_'+object+'Fields_i_' + index).attr('data-value');
     var mauticField = mQuery('#integration_details_featureSettings_'+object+'Fields_m_' + index + ' option:selected').val();
 
-    if(mQuery('.btn-arrow' + index).parent().attr('data-force-setuped') != 1) {
+    if(mQuery('.btn-arrow' + index).parent().attr('data-force-direction') != 1) {
         if (mQuery.inArray(mauticField, compoundMauticFields) >= 0) {
             mQuery('.btn-arrow' + index).removeClass('active');
             mQuery('#integration_details_featureSettings_' + object + 'Fields_update_mautic' + index + '_0').attr('checked', 'checked');

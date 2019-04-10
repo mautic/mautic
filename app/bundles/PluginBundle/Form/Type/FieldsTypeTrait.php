@@ -153,15 +153,15 @@ trait FieldsTypeTrait
                             $updateName .= '_'.$fieldObject;
                         }
 
+                        $forceDirection = false;
                         $disabled = (isset($fieldData[$fieldsName][$field])) ? $options['integration_object']->isCompoundMauticField($fieldData[$fieldsName][$field]) : false;
                         $data = isset($fieldData[$updateName][$field]) ? (int) $fieldData[$updateName][$field] : 1;
 
-                        $forceSetuped = false;
                         // Force to use just one way for certainly fields
                         if (isset($fields[$field]['update_mautic'])) {
                             $data = (bool) $fields[$field]['update_mautic'];
                             $disabled = true;
-                            $forceSetuped = true;
+                            $forceDirection = true;
                         }
 
                         $form->add(
@@ -176,10 +176,10 @@ trait FieldsTypeTrait
                                 'data'        => $data,
                                 'empty_value' => false,
                                 'attr'        => [
-                                    'data-toggle' => 'tooltip',
-                                    'title'       => 'mautic.plugin.direction.data.update',
-                                    'disabled'    => $disabled,
-                                    'forceSetuped'=> $forceSetuped,
+                                    'data-toggle'   => 'tooltip',
+                                    'title'         => 'mautic.plugin.direction.data.update',
+                                    'disabled'      => $disabled,
+                                    'forceDirection'=> $forceDirection,
                                 ],
                             ]
                         );

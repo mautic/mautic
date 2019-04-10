@@ -295,7 +295,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     $sfObject = trim($sfObject);
                     // Check the cache first
-                    $settings['cache_suffix'] = $cacheSuffix = '3.'.$sfObject;
+                    $settings['cache_suffix'] = $cacheSuffix = '.'.$sfObject;
                     if ($fields = parent::getAvailableLeadFields($settings)) {
                         if (('company' === $sfObject && isset($fields['Id'])) || isset($fields['Id__'.$sfObject])) {
                             $salesFields[$sfObject] = $fields;
