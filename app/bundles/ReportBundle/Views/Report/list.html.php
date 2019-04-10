@@ -76,8 +76,8 @@ if ('index' == $tmpl) {
                                         $item->getCreatedBy()
                                     ),
                                 ],
-                                'routeBase' => 'report',
-                                'langVar'   => 'report.report',
+                                'routeBase'     => 'report',
+                                'langVar'       => 'report.report',
                                 'customButtons' => $item->isScheduled() ? [] : [
                                     [
                                         'attr' => [
