@@ -65,16 +65,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Checks for cache type. This event should be created by factory thus not legacy approach.
-     *
-     * @return bool
-     */
-    private function usesLegacyCache()
-    {
-        return is_null($this->cacheProvider);
-    }
-
-    /**
      * Return unique key, uses legacy methods for BC.
      */
     public function getCacheKey(): string
