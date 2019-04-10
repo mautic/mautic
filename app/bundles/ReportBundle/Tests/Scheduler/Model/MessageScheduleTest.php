@@ -17,6 +17,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 {
@@ -169,5 +170,67 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->willReturn($limit);
 
         $this->assertFalse($this->messageSchedule->fileCouldBeSend('path-to-a-file'));
+    }
+
+    public function testGetMessageForAttachedFile()
+    {
+        $report = $this->createMock(Report::class);
+
+        $report->expects($this->once())
+            ->method('getId')
+            ->willReturn(33);
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with('mautic_report_view', ['objectId' => 33], UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('absolute/link');
+
+        $this->translatorMock->expects($this->once())
+            ->method('trans')
+            ->with('mautic.report.schedule.email.message')
+            ->willReturn('The message');
+
+        $this->assertSame('The message', $this->messageSchedule->getMessageForAttachedFile($report));
+    }
+
+    public function testGetMessageForLinkedFile()
+    {
+        $report = $this->createMock(Report::class);
+
+        $report->expects($this->once())
+            ->method('getId')
+            ->willReturn(33);
+
+        $report->expects($this->once())
+            ->method('getName')
+            ->willReturn('Report ABC');
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with('mautic_report_download', ['reportId' => 33], UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('absolute/link');
+
+        $this->translatorMock->expects($this->once())
+            ->method('trans')
+            ->with('mautic.report.schedule.email.message_file_linked')
+            ->willReturn('The message', ['%report_name%' => 'Report ABC', '%link%' => 'absolute/link']);
+
+        $this->assertSame('The message', $this->messageSchedule->getMessageForLinkedFile($report));
+    }
+
+    public function testGetSubject()
+    {
+        $report = $this->createMock(Report::class);
+
+        $report->expects($this->once())
+            ->method('getName')
+            ->willReturn('Report ABC');
+
+        $this->translatorMock->expects($this->once())
+            ->method('trans')
+            ->with('mautic.report.schedule.email.subject')
+            ->willReturn('The subject');
+
+        $this->assertSame('The subject', $this->messageSchedule->getSubject($report));
     }
 }
