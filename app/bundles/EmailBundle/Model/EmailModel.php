@@ -1563,7 +1563,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             return false;
         }
 
-        $mailer = $this->mailHelper->getMailer();
+        $mailer            = $this->mailHelper->getMailer();
+        $lead['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($lead['id']);
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));
