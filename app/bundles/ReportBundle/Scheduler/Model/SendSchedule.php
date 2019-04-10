@@ -14,6 +14,7 @@ namespace Mautic\ReportBundle\Scheduler\Model;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\ReportBundle\Entity\Scheduler;
+use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class SendSchedule
 {
@@ -72,7 +73,7 @@ class SendSchedule
                 $this->mailer->attachFile($zipFilePath);
             } catch (FileTooBigException $e) {
                 // Send the ZIP file as link in the email message.
-                $this->fileHandler->moveZipToPermanentLocation($zipFilePath);
+                $this->fileHandler->moveZipToPermanentLocation($report, $zipFilePath);
                 $message = $this->messageSchedule->getMessageForLinkedFile($report);
             }
         }

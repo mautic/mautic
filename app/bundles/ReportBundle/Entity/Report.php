@@ -638,7 +638,6 @@ class Report extends FormEntity implements SchedulerInterface
 
     /**
      * @param string $email
-     * @return void
      */
     public function setAsScheduledNow($email)
     {
