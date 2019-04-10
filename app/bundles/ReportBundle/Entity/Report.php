@@ -636,6 +636,17 @@ class Report extends FormEntity implements SchedulerInterface
         $this->setScheduleMonthFrequency(null);
     }
 
+    /**
+     * @param string $email
+     * @return void
+     */
+    public function setAsScheduledNow($email)
+    {
+        $this->setIsScheduled(true);
+        $this->setToAddress($email);
+        $this->setScheduleUnit(SchedulerEnum::UNIT_NOW);
+    }
+
     public function ensureIsDailyScheduled()
     {
         $this->setIsScheduled(true);

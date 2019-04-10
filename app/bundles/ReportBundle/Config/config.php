@@ -43,6 +43,10 @@ return [
                     'scheduleMonthFrequency' => '',
                 ],
             ],
+            'mautic_report_schedule' => [
+                'path'       => '/reports/schedule/{reportId}/now',
+                'controller' => 'MauticReportBundle:Schedule:now',
+            ],
             'mautic_report_action' => [
                 'path'       => '/reports/{objectAction}/{objectId}',
                 'controller' => 'MauticReportBundle:Report:execute',
