@@ -14,10 +14,10 @@ namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
+use Mautic\ReportBundle\Exception\FileTooBigException;
+use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
-use Mautic\ReportBundle\Scheduler\Model\FileHandler;
-use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {
@@ -60,6 +60,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
             $this->fileHandler
         );
     }
+
     public function testSendScheduleWithFile()
     {
         $this->report->setToAddress('john@doe.com, doe@john.com');

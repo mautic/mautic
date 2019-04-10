@@ -78,8 +78,6 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->with('mautic_report_view')
             ->willReturn('some/route');
 
-
-
         $this->messageSchedule->getMessage($this->report, 'path-to-a-file');
     }
 
