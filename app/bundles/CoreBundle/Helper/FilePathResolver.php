@@ -29,7 +29,7 @@ class FilePathResolver
     private $inputHelper;
 
     /**
-     * @param Filesystem $filesystem
+     * @param Filesystem  $filesystem
      * @param InputHelper $inputHelper
      */
     public function __construct(Filesystem $filesystem, InputHelper $inputHelper)
@@ -114,7 +114,7 @@ class FilePathResolver
      * @param string $uploadDir
      * @param string $fileName
      * @param string $ext
-     * 
+     *
      * @return string
      */
     private function getFilePath($uploadDir, $fileName, $ext)

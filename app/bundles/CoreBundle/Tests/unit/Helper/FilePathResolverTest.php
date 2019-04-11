@@ -230,4 +230,16 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
 
         $this->filePathResolver->delete($file);
     }
+
+    public function testMove()
+    {
+        $originalPath = 'my/file';
+        $targetPath = 'my/new/file';
+
+        $this->filesystemMock->expects($this->once())
+            ->method('rename')
+            ->with($originalPath, $targetPath);
+
+        $this->filePathResolver->move($originalPath, $targetPath);
+    }
 }
