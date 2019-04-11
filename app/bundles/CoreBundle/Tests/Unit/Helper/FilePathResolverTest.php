@@ -234,7 +234,7 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
     public function testMove()
     {
         $originalPath = 'my/file';
-        $targetPath = 'my/new/file';
+        $targetPath   = 'my/new/file';
 
         $this->filesystemMock->expects($this->once())
             ->method('rename')
