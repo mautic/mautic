@@ -121,7 +121,7 @@ class Calculator
 
             $statDAO->addStat(
                 CalculatorHelper::getDayLabel($today, $labelFormat),
-                $stats->getCount()
+                $stats->getSum()
             );
 
             $yesterday = $today;
