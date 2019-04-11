@@ -10,9 +10,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Helper;
 
-use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\DependencyInjection\Container;
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -21,7 +20,8 @@ trait DatabaseSchemaTrait
     /** @var EntityManager */
     private $entityManager;
 
-    protected function getEntityManager() {
+    protected function getEntityManager()
+    {
         if (is_null($this->entityManager)) {
             static::$kernel = static::createKernel();
             static::$kernel->boot();

@@ -346,9 +346,8 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-
-    public function testRequestQueryAllAndHandle() {
-
+    public function testRequestQueryAllAndHandle()
+    {
     }
 
     /**

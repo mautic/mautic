@@ -12,7 +12,6 @@
 namespace MauticPlugin\MauticCrmBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -73,7 +72,7 @@ class SalesforceIntegrationFunctionalTest extends WebTestCase
         $objects             = $this->loadFixtureFiles([
             $fixturesDirectory.'/roles.yml',
             $fixturesDirectory.'/users.yml',
-            $fixturesDirectory.'/leads.yml'
+            $fixturesDirectory.'/leads.yml',
         ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
@@ -81,17 +80,19 @@ class SalesforceIntegrationFunctionalTest extends WebTestCase
         parent::setUp();
     }
 
-    public function testGetLeads() {
-        $executed = null;
+    public function testGetLeads()
+    {
+        $executed    = null;
         $integration = $this->getSalesforceIntegration();
-        $result = $integration->getLeads(['start' => '2019-01-01','end'=>date('Y-m-d 23:59:59')],null,$executed,null,'Lead');
+        $result      = $integration->getLeads(['start' => '2019-01-01', 'end'=>date('Y-m-d 23:59:59')], null, $executed, null, 'Lead');
 
-        $this->assertEquals([0,0],$result);
+        $this->assertEquals([0, 0], $result);
 
-        $result = $integration->getLeads(['start' => '2019-01-01','end'=>date('Y-m-d 23:59:59')],null,$executed,null,'Contact');
+        $result = $integration->getLeads(['start' => '2019-01-01', 'end'=>date('Y-m-d 23:59:59')], null, $executed, null, 'Contact');
     }
 
-    private function getAPIMock($integration) {
+    private function getAPIMock($integration)
+    {
         $APIMock = $this->getMockBuilder(SalesforceApi::class)
             ->setMethods(['makeRequest'])
             ->setConstructorArgs([$integration])
@@ -168,7 +169,7 @@ class SalesforceIntegrationFunctionalTest extends WebTestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|SalesforceIntegration $sf */
         $sf = $this->getMockBuilder(SalesforceIntegration::class)
             ->setConstructorArgs([$mockFactory])
-            ->setMethods(['request', 'isAuthorized','getApiHelper','makeRequest'])
+            ->setMethods(['request', 'isAuthorized', 'getApiHelper', 'makeRequest'])
             ->getMock();
 
         $integrationEntityModelMock = $this->getMockBuilder(IntegrationEntityModel::class)
@@ -184,7 +185,6 @@ class SalesforceIntegrationFunctionalTest extends WebTestCase
             ->will(
                 $this->returnCallback(
                     function () use ($maxSfContacts, $maxSfLeads, $updateObject) {
-
                     }
                 )
             );
@@ -208,8 +208,8 @@ class SalesforceIntegrationFunctionalTest extends WebTestCase
 
         $sf->setIntegrationSettings($integration);
         $sf->method('getApiHelper')->willReturn($this->getAPIMock($sf));
-        $sf->method('makeRequest')->willReturnCallback(function($requestUrl, $elementData, $method, $settings){
-           $this->assertStringStartsWith('https://sftest.com', $requestUrl);
+        $sf->method('makeRequest')->willReturnCallback(function ($requestUrl, $elementData, $method, $settings) {
+            $this->assertStringStartsWith('https://sftest.com', $requestUrl);
             $args = func_get_args();
             // Determine what to return by analyzing the URL and query parameters
             switch (true) {
@@ -243,20 +243,21 @@ No such column 'HasOptedOutOfEmail' on entity 'Lead'. If you are attempting to u
                                 'totalSize' => 0,
                                 'records'   => [],
                             ];
+
                             return $response;
                         }
                     } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Contact') !== false) {
                         $response = [
                             'totalSize' => 1,
-                            'done' => true,
-                            'records' => [
+                            'done'      => true,
+                            'records'   => [
                                 [
-                                    "Email"=>"sample@contact.net",
-                                    "LastName"=>"Contact",
-                                    "HasOptedOutOfEmail"=>true,
-                                    "Id"=>"0034H00001tsgLEQAY"
-                                ]
-                            ]
+                                    'Email'             => 'sample@contact.net',
+                                    'LastName'          => 'Contact',
+                                    'HasOptedOutOfEmail'=> true,
+                                    'Id'                => '0034H00001tsgLEQAY',
+                                ],
+                            ],
                         ];
 
                         return $response;
@@ -266,12 +267,11 @@ No such column 'HasOptedOutOfEmail' on entity 'Lead'. If you are attempting to u
             }
         });
 
-
         return $sf;
     }
 
-    private function getLeadFormattedForAPI() {
-
+    private function getLeadFormattedForAPI()
+    {
     }
 
     /**
@@ -536,5 +536,4 @@ No such column 'HasOptedOutOfEmail' on entity 'Lead'. If you are attempting to u
 
         return $mockFactory;
     }
-
 }

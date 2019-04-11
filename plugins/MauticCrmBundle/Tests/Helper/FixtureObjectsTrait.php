@@ -14,10 +14,10 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Helper;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\CommonEntity;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundException;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Trait FixtureObjectsTrait implements Liip fixtures with Alice and offers helper methods for handling them.
@@ -123,7 +123,7 @@ trait FixtureObjectsTrait
     {
         /** @var KernelInterface $kernel */
         $kernel          = $this->getContainer()->get('kernel');
-        $pluginDirectory = $kernel->locateResource('@' . $bundleName);
+        $pluginDirectory = $kernel->locateResource('@'.$bundleName);
 
         if (!is_string($pluginDirectory)) {
             throw new NotFoundException("Resource $bundleName not found.");
