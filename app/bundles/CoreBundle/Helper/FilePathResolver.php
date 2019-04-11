@@ -22,6 +22,10 @@ class FilePathResolver
 
     private $inputHelper;
 
+    /**
+     * @param Filesystem $filesystem
+     * @param InputHelper $inputHelper
+     */
     public function __construct(Filesystem $filesystem, InputHelper $inputHelper)
     {
         $this->filesystem  = $filesystem;
@@ -40,16 +44,12 @@ class FilePathResolver
         $inputHelper       = $this->inputHelper;
         $fullName          = $file->getClientOriginalName();
         $fullNameSanitized = $inputHelper::filename($fullName);
+        $ext               = $this->getFileExtension($file);
+        $baseFileName      = pathinfo($fullNameSanitized, PATHINFO_FILENAME);
+        $name              = $baseFileName;
+        $filePath          = $this->getFilePath($uploadDir, $baseFileName, $ext);
+        $i                 = 1;
 
-        $ext = $this->getFileExtension($file);
-
-        $baseFileName = pathinfo($fullNameSanitized, PATHINFO_FILENAME);
-
-        $name = $baseFileName;
-
-        $filePath = $this->getFilePath($uploadDir, $baseFileName, $ext);
-
-        $i = 1;
         while ($this->filesystem->exists($filePath)) {
             $name     = $baseFileName.'-'.$i;
             $filePath = $this->getFilePath($uploadDir, $name, $ext);
@@ -80,21 +80,6 @@ class FilePathResolver
         }
     }
 
-    private function getFilePath($uploadDir, $fileName, $ext)
-    {
-        return $uploadDir.DIRECTORY_SEPARATOR.$fileName.$ext;
-    }
-
-    /**
-     * @return string
-     */
-    private function getFileExtension(UploadedFile $file)
-    {
-        $ext = $file->getClientOriginalExtension();
-
-        return ('' === $ext ? '' : '.').$ext;
-    }
-
     /**
      * @param string $path
      */
@@ -116,5 +101,30 @@ class FilePathResolver
     public function move($originPath, $targetPath)
     {
         $this->filesystem->rename($originPath, $targetPath);
+    }
+
+    /**
+     * @param string $uploadDir
+     * @param string $fileName
+     * @param string $ext
+     * 
+     * @return string
+     */
+    private function getFilePath($uploadDir, $fileName, $ext)
+    {
+        return $uploadDir.DIRECTORY_SEPARATOR.$fileName.$ext;
+    }
+
+    /**
+     * @param UploadedFile $file
+     *
+     * @return string
+     */
+    private function getFileExtension(UploadedFile $file)
+    {
+        $ext = $file->getClientOriginalExtension();
+        $ext = ($ext === '' ? '' : '.').$ext;
+
+        return $ext;
     }
 }
