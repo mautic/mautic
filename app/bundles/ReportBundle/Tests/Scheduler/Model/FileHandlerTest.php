@@ -11,13 +11,12 @@
 
 namespace Mautic\ReportBundle\Tests\Model;
 
-use Mautic\ReportBundle\Scheduler\Model\FileHandler;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\FileProperties;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\ReportBundle\Exception\FileTooBigException;
 use Mautic\ReportBundle\Entity\Report;
-
+use Mautic\ReportBundle\Exception\FileTooBigException;
+use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 
 class FileHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -136,7 +135,7 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
         $this->filePathResolver->expects($this->once())
             ->method('move')
             ->with($filePath, '/some/path/csv_reports/report_33.zip');
-        
+
         $this->fileHandler->moveZipToPermanentLocation($report, $filePath);
     }
 

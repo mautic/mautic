@@ -89,7 +89,7 @@ class FileHandler
 
     /**
      * @param Report $report
-     * 
+     *
      * @return string;
      */
     public function getPathToCompressedCsvFileForReport(Report $report)
@@ -101,9 +101,9 @@ class FileHandler
 
     /**
      * @param Report $report
-     * 
+     *
      * @return bool
-     * 
+     *
      * @codeCoverageIgnore as it calls PHP function only.
      */
     public function compressedCsvFileForReportExists(Report $report)

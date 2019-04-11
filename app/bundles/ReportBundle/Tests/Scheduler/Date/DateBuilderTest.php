@@ -13,78 +13,92 @@ use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 
 class DateBuilderTest extends \PHPUnit\Framework\TestCase
 {
+    private $schedulerBuilder;
+
+    /**
+     * @var DateBuilder
+     */
+    private $dateBuilder;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->schedulerBuilder = $this->createMock(SchedulerBuilder::class);
+        $this->dateBuilder      = new DateBuilder($this->schedulerBuilder);
+    }
+
     public function testGetNextEvent()
     {
         $schedulerTemplateFactory = new SchedulerTemplateFactory();
         $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory);
+        $dateBuilder              = new DateBuilder($schedulerBuilder);
+        $schedulerEntity          = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
+        $date                     = $dateBuilder->getNextEvent($schedulerEntity);
+        $expectedDate             = (new \DateTime())->setTime(0, 0)->modify('+1 day');
 
-        $dateBuilder = new DateBuilder($schedulerBuilder);
-
-        $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
-
-        $date = $dateBuilder->getNextEvent($schedulerEntity);
-
-        $expectedDate = (new \DateTime())->setTime(0, 0)->modify('+1 day');
         $this->assertEquals($expectedDate, $date);
     }
 
     public function testInvalidScheduler()
     {
-        $schedulerBuilder = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
-        $schedulerBuilder->expects($this->once())
+        $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvent')
             ->with($schedulerEntity)
             ->willThrowException(new InvalidSchedulerException());
 
-        $dateBuilder = new DateBuilder($schedulerBuilder);
-
         $this->expectException(NoScheduleException::class);
 
-        $dateBuilder->getNextEvent($schedulerEntity);
+        $this->dateBuilder->getNextEvent($schedulerEntity);
     }
 
     public function testSchedulerNotSupported()
     {
-        $schedulerBuilder = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
-        $schedulerBuilder->expects($this->once())
+        $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvent')
             ->with($schedulerEntity)
             ->willThrowException(new NotSupportedScheduleTypeException());
 
-        $dateBuilder = new DateBuilder($schedulerBuilder);
-
         $this->expectException(NoScheduleException::class);
 
-        $dateBuilder->getNextEvent($schedulerEntity);
+        $this->dateBuilder->getNextEvent($schedulerEntity);
     }
 
     public function testNoResult()
     {
-        $schedulerBuilder = $this->getMockBuilder(SchedulerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
-        $schedulerBuilder->expects($this->once())
+        $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvent')
             ->with($schedulerEntity)
             ->willReturn([]);
 
-        $dateBuilder = new DateBuilder($schedulerBuilder);
-
         $this->expectException(NoScheduleException::class);
 
-        $dateBuilder->getNextEvent($schedulerEntity);
+        $this->dateBuilder->getNextEvent($schedulerEntity);
+    }
+
+    public function testGetPreviewDaysForNow()
+    {
+        $this->schedulerBuilder->expects($this->once())
+            ->method('getNextEvents')
+            ->with($this->isInstanceOf(SchedulerEntity::class), 1)
+            ->willReturn([]);
+
+        $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_NOW, '', '');
+    }
+
+    public function testGetPreviewDaysForMonths()
+    {
+        $this->schedulerBuilder->expects($this->once())
+            ->method('getNextEvents')
+            ->with($this->isInstanceOf(SchedulerEntity::class), 10)
+            ->willReturn([]);
+
+        $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_MONTHLY, 'MON', '1');
     }
 }
