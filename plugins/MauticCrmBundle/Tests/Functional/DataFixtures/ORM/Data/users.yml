@@ -1,0 +1,10 @@
+Mautic\UserBundle\Entity\User:
+  user1:
+    role: '@role1'
+    is_published: 1
+    username: 'test2'
+    password: 'dxul9wuermx9l'
+    first_name: '<firstName("female")>'
+    last_name: '<lastName()>'
+    email: '<email()>'
+

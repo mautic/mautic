@@ -1,0 +1,6 @@
+Mautic\UserBundle\Entity\Role:
+  role1:
+    is_published: 1
+    name: 'Test Role'
+    description: '<sentence(20)>'
+    is_admin: 1
