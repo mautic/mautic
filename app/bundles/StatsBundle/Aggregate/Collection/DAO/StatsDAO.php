@@ -11,10 +11,13 @@
 
 namespace Mautic\StatsBundle\Aggregate\Collection\DAO;
 
+use Exception;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\HourStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
+use Mautic\StatsBundle\Aggregate\Collection\Stats\WeekStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat;
+use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
 class StatsDAO
 {
@@ -50,7 +53,7 @@ class StatsDAO
     /**
      * @return MonthStat[]
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getMonths()
     {
@@ -68,9 +71,38 @@ class StatsDAO
     }
 
     /**
+     * @return WeekStat[]
+     *
+     * @throws Exception
+     */
+    public function getWeeks()
+    {
+        $flattenedWeeks = [];
+
+        $months = $this->getMonths();
+        foreach ($months as $monthStats) {
+            $stats = $monthStats->getStats();
+
+            foreach ($stats as $day => $stats) {
+                $week = CalculatorHelper::getWeekFromDayString($day);
+                if (!isset($flattenedWeeks[$week])) {
+                    $flattenedWeeks[$week] = new WeekStat($week);
+                    $flattenedWeeks[$week]->setCount($stats->getCount());
+                } else {
+                    $flattenedWeeks[$week]->addToCount($stats->getCount());
+                }
+            }
+        }
+
+        ksort($flattenedWeeks);
+
+        return $flattenedWeeks;
+    }
+
+    /**
      * @return DayStat[]
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getDays()
     {
@@ -93,7 +125,7 @@ class StatsDAO
     /**
      * @return HourStat[]
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getHours()
     {

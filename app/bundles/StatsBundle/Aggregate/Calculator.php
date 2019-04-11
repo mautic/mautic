@@ -11,6 +11,8 @@
 
 namespace Mautic\StatsBundle\Aggregate;
 
+use DateTime;
+use Exception;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatDAO;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
@@ -23,23 +25,19 @@ class Calculator
     private $statsDAO;
 
     /**
-     * @var \DateTime|null
+     * @var DateTime|null
      */
     private $fromDateTime;
 
     /**
-     * @var \DateTime|null
+     * @var DateTime|null
      */
     private $toDateTime;
 
     /**
      * Calculator constructor.
-     *
-     * @param StatsDAO       $statsDAO
-     * @param \DateTime|null $fromDateTime
-     * @param \DateTime|null $toDateTime
      */
-    public function __construct(StatsDAO $statsDAO, \DateTime $fromDateTime = null, \DateTime $toDateTime = null)
+    public function __construct(StatsDAO $statsDAO, DateTime $fromDateTime = null, DateTime $toDateTime = null)
     {
         $this->statsDAO     = $statsDAO;
         $this->fromDateTime = $fromDateTime;
@@ -51,7 +49,7 @@ class Calculator
      *
      * @return StatDAO
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getSumsByYear($labelFormat = 'Y')
     {
@@ -81,7 +79,7 @@ class Calculator
      *
      * @return StatDAO
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getSumsByMonth($labelFormat = 'Y-m')
     {
@@ -111,7 +109,7 @@ class Calculator
      *
      * @return StatDAO
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getSumsByDay($labelFormat = 'Y-m-d')
     {
@@ -123,7 +121,7 @@ class Calculator
 
             $statDAO->addStat(
                 CalculatorHelper::getDayLabel($today, $labelFormat),
-                $stats->getSum()
+                $stats->getCount()
             );
 
             $yesterday = $today;
@@ -141,7 +139,40 @@ class Calculator
      *
      * @return StatDAO
      *
-     * @throws \Exception
+     * @throws Exception
+     */
+    public function getSumsByWeek($labelFormat = 'Y-W')
+    {
+        $statDAO   = new StatDAO();
+        $yesterday = $this->fromDateTime ? $this->fromDateTime->format('Y-W') : null;
+
+        foreach ($this->statsDAO->getWeeks() as $today => $stats) {
+            CalculatorHelper::fillInMissingWeeks($statDAO, $yesterday, $today, $labelFormat);
+
+            $statDAO->addStat(
+                $today,
+                $stats->getCount()
+            );
+
+            $yesterday = $today;
+        }
+
+        $yesterday = (new DateTime(CalculatorHelper::getWeekDateString($yesterday)))->modify('+1 week')->format('Y-W');
+
+        if ($this->toDateTime) {
+            $tomorrow = $this->toDateTime;
+            CalculatorHelper::fillInMissingWeeks($statDAO, $yesterday, $tomorrow->modify('+1 week')->format('Y-W'), $labelFormat);
+        }
+
+        return $statDAO;
+    }
+
+    /**
+     * @param string $labelFormat
+     *
+     * @return StatDAO
+     *
+     * @throws Exception
      */
     public function getCountsByHour($labelFormat = 'Y-m-d H')
     {
@@ -168,8 +199,8 @@ class Calculator
 
     public function getSum()
     {
-        $statDAO  = new StatDAO();
-        $sum      = 0;
+        $statDAO = new StatDAO();
+        $sum     = 0;
 
         foreach ($this->statsDAO->getYears() as $thisYear => $stats) {
             $sum += $stats->getSum();

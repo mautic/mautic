@@ -11,6 +11,9 @@
 
 namespace Mautic\StatsBundle\Aggregate\Collection;
 
+use DateTime;
+use DateTimeZone;
+use Exception;
 use Mautic\StatsBundle\Aggregate\Calculator;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 
@@ -58,7 +61,7 @@ class StatCollection
      *
      * @return $this
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function addStat($year, $month, $day, $hour, $count)
     {
@@ -77,17 +80,17 @@ class StatCollection
      *
      * @return $this
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function addStatByDateTime(\DateTime $dateTime, $count)
+    public function addStatByDateTime(DateTime $dateTime, $count)
     {
-        $dateTime->setTimezone(new \DateTimeZone('UTC'));
+        $dateTime->setTimezone(new DateTimeZone('UTC'));
 
         $this->addStat(
             $dateTime->format('Y'),
             $dateTime->format('n'),
             $dateTime->format('j'),
-            $dateTime->format('h'),
+            $dateTime->format('H'),
             $count
         );
 
@@ -100,16 +103,16 @@ class StatCollection
      *
      * @return $this
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count)
     {
         if (4 == strlen($dateTimeInUTC) and is_numeric($dateTimeInUTC)) {
-            $dateTime = (new \DateTime('now', new \DateTimeZone('UTC')))
+            $dateTime = (new DateTime('now', new DateTimeZone('UTC')))
                 ->setDate($dateTimeInUTC, 1, 1)
                 ->setTime(0, 0);
         } else {
-            $dateTime = new \DateTime($dateTimeInUTC, new \DateTimeZone('UTC'));
+            $dateTime = new DateTime($dateTimeInUTC, new DateTimeZone('UTC'));
         }
         $this->addStatByDateTime($dateTime, $count);
 
@@ -127,7 +130,7 @@ class StatCollection
     /**
      * @return Calculator
      */
-    public function getCalculator(\DateTime $fromDateTime, \DateTime $toDateTime)
+    public function getCalculator(DateTime $fromDateTime, DateTime $toDateTime)
     {
         if (is_null($this->calculator)) {
             $this->calculator = new Calculator($this->stats, $fromDateTime, $toDateTime);

@@ -11,8 +11,10 @@
 
 namespace Mautic\EmailBundle\Stats\Helper;
 
+use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Exception;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait;
@@ -41,12 +43,6 @@ abstract class AbstractHelper implements StatHelperInterface
      */
     protected $generatedColumnsProvider;
 
-    /**
-     * @param Collector                         $collector
-     * @param Connection                        $connection
-     * @param GeneratedColumnsProviderInterface $generatedColumnsProvider
-     * @param UserHelper                        $userHelper
-     */
     public function __construct(
         Collector $collector,
         Connection $connection,
@@ -60,15 +56,11 @@ abstract class AbstractHelper implements StatHelperInterface
     }
 
     /**
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
-     *
      * @return array
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function fetchStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
+    public function fetchStats(DateTime $fromDateTime, DateTime $toDateTime, EmailStatOptions $options)
     {
         $statCollection = $this->collector->fetchStats($this->getName(), $fromDateTime, $toDateTime, $options);
         $calculator     = $statCollection->getCalculator($fromDateTime, $toDateTime);
@@ -80,6 +72,9 @@ abstract class AbstractHelper implements StatHelperInterface
                 break;
             case 'm': // month
                 $stats = $calculator->getSumsByMonth();
+                break;
+            case 'W':
+                $stats = $calculator->getSumsByWeek();
                 break;
             case 'd': // day
                 $stats = $calculator->getSumsByDay();
@@ -95,14 +90,15 @@ abstract class AbstractHelper implements StatHelperInterface
     }
 
     /**
-     * @param \DateTime $fromDateTime
-     * @param \DateTime $toDateTime
-     *
      * @return ChartQuery
      */
-    protected function getQuery(\DateTime $fromDateTime, \DateTime $toDateTime)
+    protected function getQuery(DateTime $fromDateTime, DateTime $toDateTime)
     {
-        $unit  = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
+        $unit = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
+
+        if ('W' == $unit) {   // We won't support week storage, we will store it by date
+            $unit = 'd';
+        }
         $query = new ChartQuery($this->connection, $fromDateTime, $toDateTime, $unit);
 
         $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
@@ -113,8 +109,7 @@ abstract class AbstractHelper implements StatHelperInterface
     /**
      * Joins the email table and limits created_by to currently logged in user.
      *
-     * @param QueryBuilder $q
-     * @param string       $emailIdColumn
+     * @param string $emailIdColumn
      */
     protected function limitQueryToCreator(QueryBuilder $q, $emailIdColumn = 't.email_id')
     {
@@ -124,18 +119,16 @@ abstract class AbstractHelper implements StatHelperInterface
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param array        $ids
-     * @param string       $column
-     * @param string       $prefix
+     * @param string $column
+     * @param string $prefix
      */
     protected function limitQueryToEmailIds(QueryBuilder $q, array $ids, $column, $prefix)
     {
-        if (count($ids) === 0) {
+        if (0 === count($ids)) {
             return;
         }
 
-        if (count($ids) === 1) {
+        if (1 === count($ids)) {
             $q->andWhere("$prefix.$column = :email_id");
             $q->setParameter('email_id', $ids[0]);
 
@@ -147,10 +140,7 @@ abstract class AbstractHelper implements StatHelperInterface
     }
 
     /**
-     * @param QueryBuilder   $q
-     * @param StatCollection $statCollection
-     *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function fetchAndBindToCollection(QueryBuilder $q, StatCollection $statCollection)
     {
