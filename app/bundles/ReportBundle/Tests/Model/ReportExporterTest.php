@@ -23,55 +23,50 @@ use Mautic\ReportBundle\Model\ScheduleModel;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
+use Mautic\ReportBundle\ReportEvents;
 
 class ReportExporterTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcessExport()
     {
-        $exportOption = new ExportOption(null);
-
-        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
-
-        $report1    = new Report();
-        $report2    = new Report();
-        $scheduler1 = new Scheduler($report1, new \DateTime());
-        $scheduler2 = new Scheduler($report2, new \DateTime());
-        $schedulers = [
+        $batchSize            = 3;
+        $exportOption         = new ExportOption(null);
+        $reportDataResult     = new ReportDataResult(Fixtures::getValidReportResult());
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $report1              = new Report();
+        $report2              = new Report();
+        $reportNow            = new Report();
+        $scheduler1           = new Scheduler($report1, new \DateTime());
+        $scheduler2           = new Scheduler($report2, new \DateTime());
+        $schedulerNow         = new Scheduler($reportNow, new \DateTime());
+        $schedulers           = [
             $scheduler1,
             $scheduler2,
+            $schedulerNow,
         ];
-
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        
+        $reportNow->setScheduleUnit(SchedulerEnum::UNIT_NOW);
 
         $coreParametersHelper->expects($this->once())
             ->method('getParameter')
             ->with('report_export_batch_size')
-            ->willReturn(2); //Batch size
+            ->willReturn($batchSize);
 
-        $schedulerModel = $this->getMockBuilder(ScheduleModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $reportDataAdapter = $this->getMockBuilder(ReportDataAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $schedulerModel      = $this->createMock(ScheduleModel::class);
+        $reportDataAdapter   = $this->createMock(ReportDataAdapter::class);
         $reportExportOptions = new ReportExportOptions($coreParametersHelper);
-
-        $reportFileWriter = $this->getMockBuilder(ReportFileWriter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $reportFileWriter    = $this->createMock(ReportFileWriter::class);
+        $eventDispatcher     = $this->createMock(EventDispatcherInterface::class);
 
         $schedulerModel->expects($this->once())
             ->method('getScheduledReportsForExport')
             ->with($exportOption)
             ->willReturn($schedulers);
+
+        $schedulerModel->expects($this->once())
+            ->method('turnOffScheduler')
+            ->with($reportNow);
 
         /*
          * $reportDataResult->getData() has 11 results
@@ -86,17 +81,27 @@ class ReportExporterTest extends \PHPUnit_Framework_TestCase
         $reportFileWriter->expects($this->exactly(12))
             ->method('writeReportData');
 
-        $reportFileWriter->expects($this->exactly(2))
+        $reportFileWriter->expects($this->exactly($batchSize))
             ->method('getFilePath')
             ->willReturn('my-path');
 
-        $eventDispatcher->expects($this->exactly(2))
-            ->method('dispatch');
+        $eventDispatcher->expects($this->exactly($batchSize))
+            ->method('dispatch')
+            ->with(ReportEvents::REPORT_SCHEDULE_SEND);
 
-        $schedulerModel->expects($this->exactly(2))
+        $reportFileWriter->expects($this->exactly($batchSize))
+            ->method('clear');
+
+        $schedulerModel->expects($this->exactly($batchSize))
             ->method('reportWasScheduled');
 
-        $reportExporter = new ReportExporter($schedulerModel, $reportDataAdapter, $reportExportOptions, $reportFileWriter, $eventDispatcher);
+        $reportExporter = new ReportExporter(
+            $schedulerModel,
+            $reportDataAdapter,
+            $reportExportOptions,
+            $reportFileWriter,
+            $eventDispatcher
+        );
 
         $reportExporter->processExport($exportOption);
     }
