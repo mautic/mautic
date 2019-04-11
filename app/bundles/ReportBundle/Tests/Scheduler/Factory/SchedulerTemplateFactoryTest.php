@@ -4,12 +4,12 @@ namespace Mautic\ReportBundle\Tests\Scheduler\Factory;
 
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerDailyBuilder;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerMonthBuilder;
+use Mautic\ReportBundle\Scheduler\Builder\SchedulerNowBuilder;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerWeeklyBuilder;
 use Mautic\ReportBundle\Scheduler\Entity\SchedulerEntity;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
-use Mautic\ReportBundle\Scheduler\Builder\SchedulerNowBuilder;
 
 class SchedulerTemplateFactoryTest extends \PHPUnit\Framework\TestCase
 {
