@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -89,14 +89,22 @@ class FileHandler
 
     /**
      * @param Report $report
+     * 
+     * @return string;
      */
     public function getPathToCompressedCsvFileForReport(Report $report)
     {
-        return "{$this->getReportDir()}/csv_reports/report_{$report->getId()}.zip";
+        $reportDir = $this->coreParametersHelper->getParameter('report_temp_dir');
+
+        return "{$reportDir}/csv_reports/report_{$report->getId()}.zip";
     }
 
     /**
      * @param Report $report
+     * 
+     * @return bool
+     * 
+     * @codeCoverageIgnore as it calls PHP function only.
      */
     public function compressedCsvFileForReportExists(Report $report)
     {
@@ -114,13 +122,5 @@ class FileHandler
         $this->filePathResolver->delete($compressedCsvPath);
         $this->filePathResolver->createDirectory(dirname($compressedCsvPath));
         $this->filePathResolver->move($originalPath, $compressedCsvPath);
-    }
-
-    /**
-     * @return string
-     */
-    private function getReportDir()
-    {
-        return $this->coreParametersHelper->getParameter('report_temp_dir');
     }
 }
