@@ -10,9 +10,9 @@
 
 namespace Mautic\Migrations;
 
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
+use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 class Version20190410143658 extends AbstractMauticMigration
 {
@@ -25,11 +25,11 @@ class Version20190410143658 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         $newIndexName = $this->getNewIndexName();
-        $tableName = $this->getTableName();
-        $table = $schema->getTable($tableName);
+        $tableName    = $this->getTableName();
+        $table        = $schema->getTable($tableName);
 
-        if ($table->hasIndex($newIndexName) === true) {
-
+        if ($table->hasIndex($newIndexName) === true)
+        {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -39,11 +39,12 @@ class Version20190410143658 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $tableName = $this->getTableName();
-        $oldIndexName = $this->getOldIndexName($tableName);
         $newIndexName = $this->getNewIndexName();
+        $tableName    = $this->getTableName();
+        $oldIndexName = $this->getOldIndexName($tableName);
 
-        $this->addSql("ALTER TABLE {$tableName} ADD INDEX {$newIndexName} (lead_id,channel,reason);");
+
+        $this->addSql("ALTER TABLE {$tableName} ADD INDEX {$newIndexName} (lead_id, channel, reason);");
         $this->addSql("ALTER TABLE {$tableName} DROP INDEX {$oldIndexName};");
     }
 
@@ -54,8 +55,7 @@ class Version20190410143658 extends AbstractMauticMigration
      */
     private function getOldIndexName($tableName)
     {
-        $indexName = $this->generatePropertyName($tableName, 'idx', ['lead_id']);
-        return $indexName;
+        return $this->generatePropertyName($tableName, 'idx', ['lead_id']);
     }
 
     /**
@@ -63,8 +63,7 @@ class Version20190410143658 extends AbstractMauticMigration
      */
     private function getNewIndexName()
     {
-        $indexName = "{$this->prefix}leadid_reason_channel";
-        return $indexName;
+        return "{$this->prefix}leadid_reason_channel";
     }
 
     /**
@@ -72,8 +71,6 @@ class Version20190410143658 extends AbstractMauticMigration
      */
     private function getTableName()
     {
-        $tableName = "{$this->prefix}lead_donotcontact";
-        return $tableName;
+        return "{$this->prefix}lead_donotcontact";
     }
-
 }
