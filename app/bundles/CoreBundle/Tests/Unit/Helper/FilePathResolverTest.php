@@ -20,6 +20,19 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 {
+    private $filesystemMock;
+    private $fileMock;
+    private $inputHelper;
+    private $filePathResolver;
+
+    protected function setUp()
+    {
+        $this->filesystemMock   = $this->createMock(Filesystem::class);
+        $this->fileMock         = $this->createMock(UploadedFile::class);
+        $this->inputHelper      = new InputHelper();
+        $this->filePathResolver = new FilePathResolver($this->filesystemMock, $this->inputHelper);
+    }
+
     /**
      * @testdox Get correct name if few previous names are taken
      *
@@ -31,44 +44,32 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $extension     = 'jpg';
         $dirtyFileName = 'fileName_x./-u'.$extension;
 
-        $inputHelper = new InputHelper();
-
-        $filesystemMock = $this->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMock->expects($this->at(0))
+        $this->filesystemMock->expects($this->at(0))
             ->method('exists')
             ->with('my/upload/dir/filename_x.jpg')
             ->willReturn(true);
 
-        $filesystemMock->expects($this->at(1))
+        $this->filesystemMock->expects($this->at(1))
             ->method('exists')
             ->with('my/upload/dir/filename_x-1.jpg')
             ->willReturn(true);
 
-        $filesystemMock->expects($this->at(2))
+        $this->filesystemMock->expects($this->at(2))
             ->method('exists')
             ->with('my/upload/dir/filename_x-2.jpg')
             ->willReturn(false);
 
-        $fileMock = $this->getMockBuilder(UploadedFile::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fileMock->expects($this->once())
+        $this->fileMock->expects($this->once())
             ->method('getClientOriginalName')
             ->with()
             ->willReturn($dirtyFileName);
 
-        $fileMock->expects($this->once())
+        $this->fileMock->expects($this->once())
             ->method('getClientOriginalExtension')
             ->with()
             ->willReturn($extension);
 
-        $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
-
-        $name = $filePathResolver->getUniqueFileName($uploadDir, $fileMock);
+        $name = $this->filePathResolver->getUniqueFileName($uploadDir, $this->fileMock);
 
         $this->assertSame('filename_x-2.jpg', $name);
     }
@@ -84,36 +85,24 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $extension     = 'jpg';
         $dirtyFileName = 'fileName_x./-u'.$extension;
 
-        $inputHelper = new InputHelper();
-
-        $filesystemMock = $this->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMock->expects($this->exactly(1000))
+        $this->filesystemMock->expects($this->exactly(100))
             ->method('exists')
             ->willReturn(true);
 
-        $fileMock = $this->getMockBuilder(UploadedFile::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fileMock->expects($this->once())
+        $this->fileMock->expects($this->once())
             ->method('getClientOriginalName')
             ->with()
             ->willReturn($dirtyFileName);
 
-        $fileMock->expects($this->once())
+        $this->fileMock->expects($this->once())
             ->method('getClientOriginalExtension')
             ->with()
             ->willReturn($extension);
 
-        $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
-
         $this->expectException(FilePathException::class);
         $this->expectExceptionMessage('Could not generate path');
 
-        $filePathResolver->getUniqueFileName($uploadDir, $fileMock);
+        $this->filePathResolver->getUniqueFileName($uploadDir, $this->fileMock);
     }
 
     /**
@@ -125,20 +114,12 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
     {
         $directory = 'my/directory';
 
-        $inputHelper = new InputHelper();
-
-        $filesystemMock = $this->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMock->expects($this->once())
+        $this->filesystemMock->expects($this->once())
             ->method('exists')
             ->with($directory)
             ->willReturn(true);
 
-        $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
-
-        $filePathResolver->createDirectory($directory);
+        $this->filePathResolver->createDirectory($directory);
     }
 
     /**
@@ -150,24 +131,16 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
     {
         $directory = 'my/directory';
 
-        $inputHelper = new InputHelper();
-
-        $filesystemMock = $this->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMock->expects($this->once())
+        $this->filesystemMock->expects($this->once())
             ->method('exists')
             ->with($directory)
             ->willReturn(false);
 
-        $filesystemMock->expects($this->once())
+        $this->filesystemMock->expects($this->once())
             ->method('mkdir')
             ->with($directory);
 
-        $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
-
-        $filePathResolver->createDirectory($directory);
+        $this->filePathResolver->createDirectory($directory);
     }
 
     /**
@@ -179,18 +152,12 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
     {
         $directory = 'my/directory';
 
-        $inputHelper = new InputHelper();
-
-        $filesystemMock = $this->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMock->expects($this->once())
+        $this->filesystemMock->expects($this->once())
             ->method('exists')
             ->with($directory)
             ->willReturn(false);
 
-        $filesystemMock->expects($this->once())
+        $this->filesystemMock->expects($this->once())
             ->method('mkdir')
             ->with($directory)
             ->willThrowException(new IOException(''));
@@ -198,9 +165,7 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $this->expectException(FilePathException::class);
         $this->expectExceptionMessage('Could not create directory');
 
-        $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
-
-        $filePathResolver->createDirectory($directory);
+        $this->filePathResolver->createDirectory($directory);
     }
 
     /**
@@ -212,24 +177,16 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
     {
         $file = 'my/file';
 
-        $inputHelper = new InputHelper();
-
-        $filesystemMock = $this->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMock->expects($this->once())
+        $this->filesystemMock->expects($this->once())
             ->method('exists')
             ->with($file)
             ->willReturn(true);
 
-        $filesystemMock->expects($this->once())
+        $this->filesystemMock->expects($this->once())
             ->method('remove')
             ->with($file);
 
-        $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
-
-        $filePathResolver->delete($file);
+        $this->filePathResolver->delete($file);
     }
 
     /**
@@ -241,25 +198,17 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
     {
         $file = 'my/file';
 
-        $inputHelper = new InputHelper();
-
-        $filesystemMock = $this->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMock->expects($this->once())
+        $this->filesystemMock->expects($this->once())
             ->method('exists')
             ->with($file)
             ->willReturn(true);
 
-        $filesystemMock->expects($this->once())
+        $this->filesystemMock->expects($this->once())
             ->method('remove')
             ->with($file)
             ->willThrowException(new IOException(''));
 
-        $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
-
-        $filePathResolver->delete($file);
+        $this->filePathResolver->delete($file);
     }
 
     /**
@@ -271,22 +220,14 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
     {
         $file = 'my/file';
 
-        $inputHelper = new InputHelper();
-
-        $filesystemMock = $this->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMock->expects($this->once())
+        $this->filesystemMock->expects($this->once())
             ->method('exists')
             ->with($file)
             ->willReturn(false);
 
-        $filesystemMock->expects($this->never())
+        $this->filesystemMock->expects($this->never())
             ->method('remove');
 
-        $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
-
-        $filePathResolver->delete($file);
+        $this->filePathResolver->delete($file);
     }
 }
