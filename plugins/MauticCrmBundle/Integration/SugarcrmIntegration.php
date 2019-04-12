@@ -239,7 +239,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return [
             'sugarcrm_url'  => 'mautic.sugarcrm.form.url',
             'client_id'     => 'mautic.sugarcrm.form.clientkey',
-            'client_secret' => 'mautic.sugarcrm.form.clientsecret',
+            //'client_secret' => 'mautic.sugarcrm.form.clientsecret',
             'username'      => 'mautic.sugarcrm.form.username',
             'password'      => 'mautic.sugarcrm.form.password',
         ];
@@ -940,7 +940,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $mauticObjectReference = 'lead';
                         $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
                         if ($object == 'Leads') {
-                            $this->setTags($dataObject, $entity);
+                            $this->setTagsToContact($dataObject, $entity);
                         }
                         $detachClass           = Lead::class;
                         $company               = null;
@@ -1024,7 +1024,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * @param $dataObject
      * @param Lead $entity
      */
-    private function setTags($dataObject, &$entity)
+    private function setTagsToContact($dataObject, &$entity)
     {
         $config = $this->mergeConfigToFeatureSettings();
         if (!empty($config['toTags'])) {
