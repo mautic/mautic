@@ -152,7 +152,7 @@ class CalculatorHelper
     }
 
     /**
-     * @param        $date
+     * @param string $date
      * @param string $labelFormat
      *
      * @return string
