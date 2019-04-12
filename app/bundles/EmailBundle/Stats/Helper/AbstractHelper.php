@@ -94,7 +94,7 @@ abstract class AbstractHelper implements StatHelperInterface
      */
     protected function getQuery(DateTime $fromDateTime, DateTime $toDateTime)
     {
-        $unit = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime); // == 'W' ? 'd' : null;
+        $unit = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
 
         if ('W' == $unit) {   // We won't support week storage, we will store it by date
             $unit = 'd';
