@@ -165,7 +165,7 @@ class CalculatorHelper
     }
 
     /**
-     * @param $day
+     * @param string $day
      *
      * @return string
      */
