@@ -28,8 +28,7 @@ class Version20190410143658 extends AbstractMauticMigration
         $tableName    = $this->getTableName();
         $table        = $schema->getTable($tableName);
 
-        if ($table->hasIndex($newIndexName) === true)
-        {
+        if ($table->hasIndex($newIndexName) === true) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -42,7 +41,6 @@ class Version20190410143658 extends AbstractMauticMigration
         $newIndexName = $this->getNewIndexName();
         $tableName    = $this->getTableName();
         $oldIndexName = $this->getOldIndexName($tableName);
-
 
         $this->addSql("ALTER TABLE {$tableName} ADD INDEX {$newIndexName} (lead_id, channel, reason);");
         $this->addSql("ALTER TABLE {$tableName} DROP INDEX {$oldIndexName};");
