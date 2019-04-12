@@ -829,6 +829,10 @@ return [
                     'mautic.lead.repository.company_lead',
                 ],
             ],
+            'mautic.lead.validator.length' => [
+                'class'     => Mautic\LeadBundle\Validator\Constraints\LengthValidator::class,
+                'tag'       => 'validator.constraint_validator',
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [
