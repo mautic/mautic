@@ -16,16 +16,16 @@ use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\ReportBundle\Entity\Report;
-use Mautic\ChannelBundle\Helper\ChannelListHelper;
-use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -117,7 +117,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onReportGenerate($event);
 
         $this->assertSame(
-            "SELECT  FROM email_stats es LEFT JOIN emails e ON e.id = es.email_id LEFT JOIN emails vp ON vp.id = e.variant_parent_id WHERE es.date_sent IS NULL OR (es.date_sent BETWEEN :dateFrom AND :dateTo)",
+            'SELECT  FROM email_stats es LEFT JOIN emails e ON e.id = es.email_id LEFT JOIN emails vp ON vp.id = e.variant_parent_id WHERE es.date_sent IS NULL OR (es.date_sent BETWEEN :dateFrom AND :dateTo)',
             $this->queryBuilder->getSQL()
         );
     }
