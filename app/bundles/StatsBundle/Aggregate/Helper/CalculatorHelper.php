@@ -140,7 +140,7 @@ class CalculatorHelper
     }
 
     /**
-     * @param $date
+     * @param string $date
      *
      * @return string
      *
