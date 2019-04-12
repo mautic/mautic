@@ -43,7 +43,9 @@ class Version20190410143658 extends AbstractMauticMigration
         $oldIndexName = $this->getOldIndexName($tableName);
 
         $this->addSql("ALTER TABLE {$tableName} ADD INDEX {$newIndexName} (lead_id, channel, reason);");
-        $this->addSql("ALTER TABLE {$tableName} DROP INDEX {$oldIndexName};");
+        if ($schema->getTable($tableName)->hasIndex($oldIndexName)) {
+            $this->addSql("ALTER TABLE {$tableName} DROP INDEX {$oldIndexName};");
+        }
     }
 
     /**
