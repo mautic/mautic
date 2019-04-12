@@ -42,6 +42,14 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     protected $doNotContactModel;
 
     /**
+     * Holds a list of IntegrationEntities which are saved later in 
+     * fetchLeads process
+     *
+     * @var array
+     */
+    protected $IntegrationEntitiesToSave = [];
+
+    /**
      * SugarcrmIntegration constructor.
      *
      * @param DoNotContact $doNotContactModel
@@ -957,8 +965,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     ++$count;
                 }
 
-                $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-                $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+                $this->delaySaveIntegrationEntities($integrationEntities);
             }
             unset($data);
             unset($integrationEntities);
@@ -1354,6 +1361,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
             }
         }
+
+        $this->saveIntegrationEntities();
+
         /** @var SugarcrmApi $apiHelper */
         $apiHelper = $this->getApiHelper();
         if (!empty($mauticData)) {
@@ -1910,5 +1920,37 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $convertedString        = substr($convertedString, 0, -1);
 
         return $convertedString;
+    }
+
+    
+    /**
+     * Hold a list of Integration Entitity records to be saved later
+     * If a NEW Integration Entity record is provided, it is saved/flushed immediately.
+     * 
+     * This is needed because the `getLeads` and `getContacts` functions create 
+     * IntegrationEntity records (in the `amendLeadDataBeforeMauticPopulate` function). The
+     * `pushLeads` function calls the repo's `findLeadsToUpdate` function which filters based on 
+     * the IE's last_sync_date. We need to not flush the IE record until after that function has
+     * been called. 
+     * So this function helps to hold on to them until a reasonable time
+     *
+     * @param array $entities
+     * @return void
+     */
+    protected function delaySaveIntegrationEntities(array $entities)
+    {
+        foreach($entities as $entity){
+            if($entity->getId()){
+                $this->IntegrationEntitiesToSave[$entity->getId()] = $entity;
+            }else{
+                $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntity($entity);
+            }
+        }
+    }
+
+    protected function saveIntegrationEntities()
+    {
+        $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($this->IntegrationEntitiesToSave);
+        $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
     }
 }
