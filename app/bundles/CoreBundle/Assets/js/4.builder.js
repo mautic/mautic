@@ -1533,6 +1533,44 @@ Mautic.initSlotListeners = function() {
             params.slot.find('a').eq(0).attr('href', params.field.val());
         } else if (fieldParam === 'link-text') {
             params.slot.find('a').eq(0).text(params.field.val());
+        } else if (fieldParam === 'signature-contrast') {
+            params.slot.find('.signature-image').css('border-right-color', '#' + params.field.val());
+            params.slot.find('.signature-color-contrast').css('color', '#' + params.field.val());
+        } else if (fieldParam === 'signature-neutral') {
+            params.slot.find('.signature-color-neutral').css('color', '#' + params.field.val());
+        } else if (fieldParam === 'signature-link') {
+            params.slot.find('.signature-color-link').css('color', '#' + params.field.val());
+        } else if (fieldParam === 'signature-image') {
+            params.slot.find('.signature-image img').attr('src', params.field.val());
+        } else if (fieldParam === 'signature-image-border-radius') {
+            params.slot.find('.signature-image img').css('border-radius', params.field.val() + 'px');
+        } else if (fieldParam === 'signature-name') {
+            params.slot.find('.signature-name').text(params.field.val());
+        } else if (fieldParam === 'signature-bio') {
+            params.slot.find('.signature-bio').html(params.field.val());
+        } else if (fieldParam === 'signature-mobile') {
+            if (params.field.val() !== '') {
+                params.slot.find('.signature-mobile').css('display', 'table-row');
+                params.slot.find('.signature-mobile span').text(params.field.val());
+            } else {
+                params.slot.find('.signature-mobile').css('display', 'none');
+            }
+        } else if (fieldParam === 'signature-site') {
+            if (params.field.val() !== '') {
+                params.slot.find('.signature-site').css('display', 'table-row');
+                params.slot.find('.signature-site a').text(params.field.val());
+                params.slot.find('.signature-site a').attr('href', params.field.val());
+            } else {
+                params.slot.find('.signature-site').css('display', 'none');
+            }
+        } else if (fieldParam === 'signature-email') {
+            if (params.field.val() !== '') {
+                params.slot.find('.signature-email').css('display', 'table-row');
+                params.slot.find('.signature-email a').text(params.field.val());
+                params.slot.find('.signature-email a').attr('href', 'mailto:' + params.field.val());
+            } else {
+                params.slot.find('.signature-email').css('display', 'none');
+            }
         } else if (fieldParam === 'float') {
             var values = ['left', 'center', 'right'];
             params.slot.find('a').parent().attr('align', values[params.field.val()]);

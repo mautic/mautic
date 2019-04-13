@@ -332,6 +332,10 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotSeparatorType',
                 'alias' => 'slot_separator',
             ],
+            'mautic.form.type.slot.signature' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSignatureType',
+                'alias' => 'slot_signature',
+            ],
             'mautic.form.type.slot.imagecard' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCardType',
                 'alias' => 'slot_imagecard',
