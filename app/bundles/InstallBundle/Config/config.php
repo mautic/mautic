@@ -121,6 +121,20 @@ return [
                     'priority' => 2,
                 ],
             ],
+            'mautic.install.service' => [
+                'class'     => 'Mautic\InstallBundle\Install\InstallService',
+                'arguments' => [
+                    'mautic.configurator',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.cache',
+                    'mautic.helper.paths',
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'kernel',
+                    'security.encoder_factory',
+                    'monolog.logger.mautic',
+                ],
+            ],
         ],
     ],
 ];
