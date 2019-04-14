@@ -386,7 +386,12 @@ class MailHelper
                 $this->queueAssetDownloadEntry();
             }
 
-            $this->message->setSubject($this->subject);
+            if(!empty($this->lead['anexo']) && is_readable($this->lead['anexo'])){
+                $attachment = \Swift_Attachment::fromPath($this->lead['anexo']);
+                $this->message->attach($attachment);
+            }
+
+            $this->message->setSubject($this->subject.rand(1,999));
             // Only set body if not empty or if plain text is empty - this ensures an empty HTML body does not show for
             // messages only with plain text
             if (!empty($this->body['content']) || empty($this->plainText)) {
@@ -438,6 +443,9 @@ class MailHelper
                 }
 
                 $this->mailer->send($this->message, $failures);
+                if(!empty($attachment)){
+                    $this->message->detach($attachment);
+                }
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
@@ -553,6 +561,7 @@ class MailHelper
                     break;
                 case self::QUEUE_RETURN_ERRORS:
                     $this->message->setTo([]);
+                    $this->attachedAssets = [];
                     $errors = $this->getErrors();
 
                     $this->clearErrors();
