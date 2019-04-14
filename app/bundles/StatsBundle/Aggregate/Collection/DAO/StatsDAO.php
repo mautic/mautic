@@ -79,18 +79,13 @@ class StatsDAO
     {
         $flattenedWeeks = [];
 
-        $months = $this->getMonths();
-        foreach ($months as $monthStats) {
-            $stats = $monthStats->getStats();
-
-            foreach ($stats as $day => $stats) {
-                $week = CalculatorHelper::getWeekFromDayString($day);
-                if (!isset($flattenedWeeks[$week])) {
-                    $flattenedWeeks[$week] = new WeekStat($week);
-                    $flattenedWeeks[$week]->setCount($stats->getCount());
-                } else {
-                    $flattenedWeeks[$week]->addToCount($stats->getCount());
-                }
+        foreach ($this->getDays() as $day => $stats) {
+            $week = CalculatorHelper::getWeekFromDayString($day);
+            if (!isset($flattenedWeeks[$week])) {
+                $flattenedWeeks[$week] = new WeekStat($week);
+                $flattenedWeeks[$week]->setCount($stats->getCount());
+            } else {
+                $flattenedWeeks[$week]->addToCount($stats->getCount());
             }
         }
 
