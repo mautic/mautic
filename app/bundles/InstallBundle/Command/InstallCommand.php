@@ -165,7 +165,7 @@ class InstallCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container    = $this->getContainer();
+        $container = $this->getContainer();
         /** @var \Mautic\InstallBundle\Install\InstallService $installer */
         $installer = $container->get('mautic.install.service');
 

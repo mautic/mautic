@@ -150,7 +150,7 @@ class InstallController extends CommonController
         } elseif (!empty($subIndex)) {
             switch ($index) {
                 case self::DOCTRINE_STEP:
-                    $dbParams     = (array) $step;
+                    $dbParams = (array) $step;
 
                     switch ((int) $subIndex) {
                         case 1:
