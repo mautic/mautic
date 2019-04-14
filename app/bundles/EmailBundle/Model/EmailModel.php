@@ -401,11 +401,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $queued  = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
             $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
 
-            if ($queued) {
+            if ($queued !== false) {
                 $entity->setQueuedCount($queued);
             }
 
-            if ($pending) {
+            if ($pending !== false) {
                 $entity->setPendingCount($pending);
             }
         }
@@ -977,7 +977,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $countWithMaxMin
         );
 
-        if ($storeToCache && !empty($total)) {
+        if ($storeToCache) {
             if ($countOnly && $countWithMaxMin) {
                 $toStore = $total['count'];
             } elseif ($countOnly) {
@@ -1006,10 +1006,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         $queued = (int) $this->messageQueueModel->getQueuedChannelCount('email', $ids);
-
-        if ($queued) {
-            $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
-        }
+        $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
 
         return $queued;
     }
