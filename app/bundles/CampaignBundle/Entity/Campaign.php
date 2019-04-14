@@ -642,6 +642,8 @@ class Campaign extends FormEntity
      */
     public function setAllowRestart($allowRestart)
     {
+        $this->isChanged('allowRestart', $allowRestart);
+
         $this->allowRestart = $allowRestart;
 
         return $this;

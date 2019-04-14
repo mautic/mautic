@@ -42,7 +42,7 @@ class LeadListEvent extends CommonEvent
     /**
      * Sets the List entity.
      *
-     * @param List $list
+     * @param LeadList $list
      */
     public function setList(LeadList $list)
     {

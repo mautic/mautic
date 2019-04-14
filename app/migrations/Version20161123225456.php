@@ -157,10 +157,10 @@ class Version20161123225456 extends AbstractMauticMigration
     {
         if ($checkMe['field'] && array_key_exists($checkMe['field'], $fields)) {
             // Boolean field found so check to see if the label was used
-            if ($checkMe['filter'] === $fields[$checkMe['field']]['no']) {
+            if ($fields[$checkMe['field']]['no'] === $checkMe['filter']) {
                 $update            = true;
                 $checkMe['filter'] = 0;
-            } elseif ($checkMe['filter'] === $fields[$checkMe['field']]['yes']) {
+            } elseif ($fields[$checkMe['field']]['yes'] === $checkMe['filter']) {
                 $update            = true;
                 $checkMe['filter'] = 1;
             }

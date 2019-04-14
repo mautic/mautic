@@ -58,9 +58,12 @@ class ConfigController extends FormController
             ]
         );
 
+        $originalNormData = $form->getNormData();
+
         /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $configurator = $this->get('mautic.configurator');
         $isWritabale  = $configurator->isFileWritable();
+        $openTab      = null;
 
         // Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -73,6 +76,9 @@ class ConfigController extends FormController
 
                     // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save
                     $configEvent = new ConfigEvent($formData, $post);
+                    $configEvent
+                        ->setOriginalNormData($originalNormData)
+                        ->setNormData($form->getNormData());
                     $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
                     $formValues = $configEvent->getConfig();
 
@@ -119,6 +125,7 @@ class ConfigController extends FormController
                             }
 
                             $configurator->write();
+                            $dispatcher->dispatch(ConfigEvents::CONFIG_POST_SAVE, $configEvent);
 
                             $this->addFlash('mautic.config.config.notice.updated');
 
@@ -126,6 +133,10 @@ class ConfigController extends FormController
                             /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
                             $cacheHelper = $this->get('mautic.helper.cache');
                             $cacheHelper->clearContainerFile();
+
+                            if ($isValid && !empty($formData['coreconfig']['last_shown_tab'])) {
+                                $openTab = $formData['coreconfig']['last_shown_tab'];
+                            }
                         } catch (\RuntimeException $exception) {
                             $this->addFlash('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
@@ -142,7 +153,12 @@ class ConfigController extends FormController
             // If the form is saved or cancelled, redirect back to the dashboard
             if ($cancelled || $isValid) {
                 if (!$cancelled && $this->isFormApplied($form)) {
-                    return $this->delegateRedirect($this->generateUrl('mautic_config_action', ['objectAction' => 'edit']));
+                    $redirectParameters = ['objectAction' => 'edit'];
+                    if ($openTab) {
+                        $redirectParameters['tab'] = $openTab;
+                    }
+
+                    return $this->delegateRedirect($this->generateUrl('mautic_config_action', $redirectParameters));
                 } else {
                     return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
                 }

@@ -26,7 +26,7 @@ class Version20180117141613 extends AbstractMauticMigration
     {
         $table = $schema->getTable(MAUTIC_TABLE_PREFIX.'tweets');
         if ($table->hasColumn('text')
-            && $table->getColumn('text')->getLength() === 280
+            && 280 === $table->getColumn('text')->getLength()
         ) {
             throw new SkipMigrationException('Schema includes this migration');
         }

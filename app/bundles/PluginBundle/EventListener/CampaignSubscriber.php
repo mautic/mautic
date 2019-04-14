@@ -56,10 +56,12 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $config  = $event->getConfig();
-        $lead    = $event->getLead();
-        $errors  = [];
-        $success = $this->pushToIntegration($config, $lead, $errors);
+        $config                  = $event->getConfig();
+        $config['campaignEvent'] = $event->getEvent();
+        $config['leadEventLog']  = $event->getLogEntry();
+        $lead                    = $event->getLead();
+        $errors                  = [];
+        $success                 = $this->pushToIntegration($config, $lead, $errors);
 
         if (count($errors)) {
             $log = $event->getLogEntry();

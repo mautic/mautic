@@ -101,6 +101,8 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('last_shown_tab', 'hidden');
+
         $builder->add(
             'site_url',
             'text',
@@ -194,18 +196,6 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
-                ],
-            ]
-        );
-
-        $builder->add(
-            'theme',
-            'theme_list',
-            [
-                'label' => 'mautic.core.config.form.theme',
-                'attr'  => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.form.template.help',
                 ],
             ]
         );
@@ -448,6 +438,35 @@ class ConfigType extends AbstractType
                         ]
                     ),
                 ],
+            ]
+        );
+
+        $builder->add(
+            'default_daterange_filter',
+            'choice',
+            [
+                'choices' => [
+                    'midnight'  => 'mautic.core.daterange.0days',
+                    '-24 hours' => 'mautic.core.daterange.1days',
+                    '-1 week'   => $this->translator->transChoice('mautic.core.daterange.week', 1, ['%count%' => 1]),
+                    '-2 weeks'  => $this->translator->transChoice('mautic.core.daterange.week', 2, ['%count%' => 2]),
+                    '-3 weeks'  => $this->translator->transChoice('mautic.core.daterange.week', 3, ['%count%' => 3]),
+                    '-1 month'  => $this->translator->transChoice('mautic.core.daterange.month', 1, ['%count%' => 1]),
+                    '-2 months' => $this->translator->transChoice('mautic.core.daterange.month', 2, ['%count%' => 2]),
+                    '-3 months' => $this->translator->transChoice('mautic.core.daterange.month', 3, ['%count%' => 3]),
+                    '-1 year'   => $this->translator->transChoice('mautic.core.daterange.year', 1, ['%count%' => 1]),
+                    '-2 years'  => $this->translator->transChoice('mautic.core.daterange.year', 2, ['%count%' => 2]),
+                ],
+                'expanded'   => false,
+                'multiple'   => false,
+                'label'      => 'mautic.core.config.form.default.daterange_default',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.default.daterange_default.tooltip',
+                ],
+                'required'    => false,
+                'empty_value' => false,
             ]
         );
 

@@ -13,7 +13,6 @@ namespace Mautic\FormBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -97,15 +96,7 @@ class FormApiController extends CommonApiController
             return $this->badRequest('The actions attribute must be array.');
         }
 
-        $currentActions = $entity->getActions();
-
-        foreach ($currentActions as $currentAction) {
-            if (in_array($currentAction->getId(), $actionsToDelete)) {
-                $entity->removeAction($currentAction);
-            }
-        }
-
-        $this->model->saveEntity($entity);
+        $this->model->deleteActions($entity, $actionsToDelete);
 
         $view = $this->view([$this->entityNameOne => $entity]);
 
@@ -121,10 +112,13 @@ class FormApiController extends CommonApiController
         $fieldModel  = $this->getModel('form.field');
         $actionModel = $this->getModel('form.action');
         $isNew       = false;
+        $alias       = $entity->getAlias();
 
-        // Set clean alias to prevent SQL errors
-        $alias = $this->model->cleanAlias($entity->getName(), '', 10);
-        $entity->setAlias($alias);
+        if (empty($alias)) {
+            // Set clean alias to prevent SQL errors
+            $alias = $this->model->cleanAlias($entity->getName(), '', 10);
+            $entity->setAlias($alias);
+        }
 
         // Set timestamps
         $this->model->setTimestamps($entity, true, false);
@@ -174,7 +168,7 @@ class FormApiController extends CommonApiController
                 $fieldEntityArray['formId'] = $formId;
 
                 if (!empty($fieldParams['alias'])) {
-                    $fieldParams['alias'] = InputHelper::filename($fieldParams['alias']);
+                    $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], '', 25);
 
                     if (!in_array($fieldParams['alias'], $aliases)) {
                         $fieldEntityArray['alias'] = $fieldParams['alias'];
@@ -246,10 +240,16 @@ class FormApiController extends CommonApiController
 
         // Remove actions which weren't in the PUT request
         if (!$isNew && $method === 'PUT') {
+            $actionsToDelete = [];
+
             foreach ($currentActions as $currentAction) {
                 if (!in_array($currentAction->getId(), $requestActionIds)) {
-                    $entity->removeAction($currentAction);
+                    $actionsToDelete[] = $currentAction->getId();
                 }
+            }
+
+            if ($actionsToDelete) {
+                $this->model->deleteActions($entity, $actionsToDelete);
             }
         }
     }

@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
@@ -63,8 +65,15 @@ class ContactSegmentQueryBuilder
      */
     public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters)
     {
+        /** @var Connection $connection */
+        $connection = $this->entityManager->getConnection();
+        if ($connection instanceof MasterSlaveConnection) {
+            // Prefer a slave connection if available.
+            $connection->connect('slave');
+        }
+
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
+        $queryBuilder = new QueryBuilder($connection);
 
         $queryBuilder->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
@@ -100,8 +109,15 @@ class ContactSegmentQueryBuilder
      */
     public function wrapInCount(QueryBuilder $qb)
     {
+        /** @var Connection $connection */
+        $connection = $this->entityManager->getConnection();
+        if ($connection instanceof MasterSlaveConnection) {
+            // Prefer a slave connection if available.
+            $connection->connect('slave');
+        }
+
         // Add count functions to the query
-        $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
+        $queryBuilder = new QueryBuilder($connection);
 
         //  If there is any right join in the query we need to select its it
         $primary = $qb->guessPrimaryLeadContactIdColumn();
@@ -145,16 +161,7 @@ class ContactSegmentQueryBuilder
         $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias, $tableAlias.'.lead_id = l.id');
         $queryBuilder->addSelect($tableAlias.'.lead_id AS '.$tableAlias.'_lead_id');
 
-        // @todo evaluate if this was supposed to be here; it's causing contacts already in the segment to be added because the join is based on
-        // when the contact is created
-        if (false && isset($batchRestrictions['dateTime'])) {
-            $expression = $queryBuilder->expr()->andX(
-                $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId),
-                $queryBuilder->expr()->lte('l.date_added', "'".$batchRestrictions['dateTime']."'")
-            );
-        } else {
-            $expression = $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId);
-        }
+        $expression = $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId);
 
         $queryBuilder->addJoinCondition($tableAlias, $expression);
 

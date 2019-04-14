@@ -520,7 +520,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $leadIds
                         );
 
-                        $saugarLeadData = [];
+                        $sugarLeadData = [];
                         foreach ($sugarIds as $ids) {
                             $leadId = $ids['internal_entity_id'];
                             if (isset($leadActivity[$leadId])) {
@@ -1254,7 +1254,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $config                  = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo   = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mauticData              = $leadsToUpdate              = $fields              = [];
-        $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields              = $config['leadFields'];
         if (!empty($leadFields)) {
             if ($keys = array_keys($leadFields, 'mauticContactTimelineLink')) {

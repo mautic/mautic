@@ -45,6 +45,11 @@ class Point extends FormEntity
     private $type;
 
     /**
+     * @var bool
+     */
+    private $repeatable = false;
+
+    /**
      * @var \DateTime
      */
     private $publishUp;
@@ -108,6 +113,9 @@ class Point extends FormEntity
 
         $builder->addPublishDates();
 
+        $builder->createField('repeatable', 'boolean')
+            ->build();
+
         $builder->addField('delta', 'integer');
 
         $builder->addField('properties', 'array');
@@ -163,6 +171,7 @@ class Point extends FormEntity
                     'publishDown',
                     'delta',
                     'properties',
+                    'repeatable',
                 ]
             )
             ->build();
@@ -401,5 +410,26 @@ class Point extends FormEntity
     public function setDelta($delta)
     {
         $this->delta = (int) $delta;
+    }
+
+    /**
+     * @param bool $repeatable
+     *
+     * @return Point
+     */
+    public function setRepeatable($repeatable)
+    {
+        $this->isChanged('repeatable', $repeatable);
+        $this->repeatable = $repeatable;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRepeatable()
+    {
+        return $this->repeatable;
     }
 }

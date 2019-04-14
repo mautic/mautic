@@ -239,7 +239,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             if ($event->checkContext('email.click')) {
                 /** @var Hit $hit */
                 $hit = $eventDetails;
-                if ($eventDetails->getEmail()->getId() == (int) $eventParent['properties']['email']) {
+                if (in_array((int) $eventParent['properties']['email'], $eventDetails->getEmail()->getRelatedEntityIds())) {
                     if (!empty($eventConfig['urls']['list'])) {
                         $limitToUrls = (array) $eventConfig['urls']['list'];
                         if (UrlMatcher::hasMatch($limitToUrls, $hit->getUrl())) {
@@ -253,10 +253,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                 return $event->setResult(false);
             } elseif ($event->checkContext('email.open')) {
                 // open decision
-                return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
+                return $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
             } elseif ($event->checkContext('email.reply')) {
                 // reply decision
-                return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
+                return $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
             }
         }
 
@@ -309,8 +309,8 @@ class CampaignSubscriber implements EventSubscriberInterface
          * @var Lead $contact
          */
         foreach ($contacts as $logId => $contact) {
-            $leadCredentials = $contact->getProfileFields();
-
+            $leadCredentials                      = $contact->getProfileFields();
+            $leadCredentials['primaryIdentifier'] = $contact->getPrimaryIdentifier();
             // Set owner_id to support the "Owner is mailer" feature
             if ($contact->getOwner()) {
                 $leadCredentials['owner_id'] = $contact->getOwner()->getId();
@@ -341,7 +341,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $log = $event->findLogByContactId($contactId);
                 $event->fail(
                     $log,
-                    $this->translator->trans('mautic.email.contact_already_received_marketing_email', ['%contact%' => $contact->getPrimaryIdentifier()])
+                    $this->translator->trans('mautic.email.contact_already_received_marketing_email', ['%contact%' => $credentialArray[$log->getId()]['primaryIdentifier']])
                 );
                 unset($credentialArray[$log->getId()]);
             }

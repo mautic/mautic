@@ -86,7 +86,7 @@ class CompanySubscriber extends CommonSubscriber
         $company = $event->getCompany();
         $log     = [
             'bundle'    => 'lead',
-            'object'    => 'field',
+            'object'    => 'company',
             'objectId'  => $company->deletedId,
             'action'    => 'delete',
             'details'   => ['name', $company->getPrimaryIdentifier()],

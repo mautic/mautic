@@ -147,7 +147,6 @@ class InactiveExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 
@@ -185,7 +184,6 @@ class InactiveExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 

@@ -16,13 +16,70 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ListModel
+     */
+    private $mockListModel;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContext
+     */
+    private $context;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|Request
+     */
+    private $request;
+
+    /**
+     * @var CircularDependencyValidator
+     */
+    private $validator;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->mockListModel = $this->createMock(ListModel::class);
+        $this->context       = $this->createMock(ExecutionContext::class);
+        $this->requestStack  = $this->createMock(RequestStack::class);
+        $this->request       = $this->createMock(Request::class);
+
+        $this->requestStack->expects($this->once())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
+
+        $this->validator = new CircularDependencyValidator($this->mockListModel, $this->requestStack);
+        $this->validator->initialize($this->context);
+    }
+
+    /**
+     * Checks that the validator won't break if the segment ID is not present in the request.
+     */
+    public function testIfSegmentIdIsNotInTheRequest()
+    {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->mockListModel->expects($this->never())
+            ->method('getEntity');
+
+        $this->validator->validate([], new CircularDependency([]));
+    }
+
+    /**
      * Configure a CircularDependencyValidator.
      *
-     * @param string $expectedMessage the expected message on a validation violation, if any
+     * @param string $expectedMessage  the expected message on a validation violation, if any
+     * @param int    $currentSegmentId
      *
      * @return Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator
      */
-    public function configureValidator($expectedMessage, $currentSegmentId)
+    private function configureValidator($expectedMessage, $currentSegmentId)
     {
         $filters = [
             [
@@ -60,17 +117,9 @@ class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $mockListModel = $this->getMockBuilder(ListModel::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getEntity'])
-            ->getMock();
+        $mockEntity = $this->createMock(LeadList::class);
 
-        $mockEntity = $this->getMockBuilder(LeadList::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getId', 'getFilters'])
-            ->getMock();
-
-        $mockEntity1 = clone $mockEntity;
+        $mockEntity1 = $this->createMock(LeadList::class);
         $mockEntity1->expects($this->any())
             ->method('getId')
             ->willReturn(1);
@@ -78,7 +127,7 @@ class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getFilters')
             ->willReturn($filters);
 
-        $mockEntity2 = clone $mockEntity;
+        $mockEntity2 = $this->createMock(LeadList::class);
         $mockEntity2->expects($this->any())
             ->method('getId')
             ->willReturn(2);
@@ -86,7 +135,7 @@ class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getFilters')
             ->willReturn($filters2);
 
-        $mockEntity3 = clone $mockEntity;
+        $mockEntity3 = $this->createMock(LeadList::class);
         $mockEntity3->expects($this->any())
             ->method('getId')
             ->willReturn(3);
@@ -100,56 +149,29 @@ class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
             3 => $mockEntity3,
         ];
 
-        $mockListModel->expects($this->any())
+        $this->mockListModel->expects($this->any())
             ->method('getEntity')
             ->willReturnCallback(function ($id) use ($entities) {
                 return $entities[$id];
             });
 
-        // mock the validator context
-        $context = $this->getMockBuilder(ExecutionContext::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['addViolation'])
-            ->getMock();
-
         if (!empty($expectedMessage)) {
-            $context->expects($this->once())
+            $this->context->expects($this->once())
                 ->method('addViolation')
                 ->with($this->equalTo($expectedMessage));
         } else {
-            $context->expects($this->never())
+            $this->context->expects($this->never())
                 ->method('addViolation');
         }
 
-        $request = $this
-            ->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $request
-            ->expects($this->once())
+        $this->request->expects($this->once())
             ->method('get')
             ->with('_route_params')
             ->willReturn([
                 'objectId' => $currentSegmentId,
             ]);
 
-        $requestStack = $this->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getCurrentRequest', 'get'])
-            ->getMock();
-
-        $requestStack
-            ->expects($this->once())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-
-        // initialize the validator with the mocked context
-        $validator = new CircularDependencyValidator($mockListModel, $requestStack);
-        $validator->initialize($context);
-
-        // return the CircularDependencyValidator
-        return $validator;
+        return $this->validator;
     }
 
     /**

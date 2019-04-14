@@ -605,9 +605,6 @@ class PageModel extends FormModel
 
         $query = $this->cleanQuery($query);
 
-        $hit->setQuery($query);
-        $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
-
         if (isset($query['page_referrer'])) {
             $hit->setReferer($query['page_referrer']);
         }
@@ -615,8 +612,13 @@ class PageModel extends FormModel
             $hit->setPageLanguage($query['page_language']);
         }
         if (isset($query['page_title'])) {
-            $hit->setUrlTitle($query['page_title']);
+            $safeTitle = InputHelper::transliterate($query['page_title']);
+            $hit->setUrlTitle($safeTitle);
+            $query['page_title'] = $safeTitle;
         }
+
+        $hit->setQuery($query);
+        $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
 
         // Add entry to contact log table
         $this->setLeadManipulator($page, $hit, $lead);
@@ -640,8 +642,6 @@ class PageModel extends FormModel
         // Check if this is a unique page hit
         $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
 
-        $clickthrough = $this->generateClickThrough($hit);
-
         if (!empty($page)) {
             if ($page instanceof Page) {
                 $hit->setPageLanguage($page->getLanguage());
@@ -661,16 +661,14 @@ class PageModel extends FormModel
                     $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
 
                     // If this is a trackable, up the trackable counts as well
-                    if (!empty($clickthrough['channel'])) {
-                        if (count($clickthrough['channel']) === 1) {
-                            $channelId = reset($clickthrough['channel']);
-                            $channel   = key($clickthrough['channel']);
-                        } else {
-                            $channel   = $clickthrough['channel'][0];
-                            $channelId = (int) $clickthrough['channel'][1];
-                        }
-
-                        $this->pageTrackableModel->getRepository()->upHitCount($page->getId(), $channel, $channelId, 1, $isUnique);
+                    if ($hit->getSource() && $hit->getSourceId()) {
+                        $this->pageTrackableModel->getRepository()->upHitCount(
+                            $page->getId(),
+                            $hit->getSource(),
+                            $hit->getSourceId(),
+                            1,
+                            $isUnique
+                        );
                     }
                 } catch (\Exception $exception) {
                     if (MAUTIC_ENV === 'dev') {
@@ -790,9 +788,10 @@ class PageModel extends FormModel
      */
     public function getHitQuery(Request $request, $page = null)
     {
-        if (!isset($query)) {
-            $query = $request->query->all();
-        }
+        $get  = $request->query->all();
+        $post = $request->request->all();
+
+        $query = \array_merge($get, $post);
 
         // Set generated page url
         $query['page_url'] = $this->getPageUrl($request, $page);

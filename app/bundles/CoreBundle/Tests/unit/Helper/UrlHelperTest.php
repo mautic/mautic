@@ -107,7 +107,8 @@ class UrlHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetUrlsFromPlaintextWithSymbols()
     {
         $this->assertEquals(
-            ['https://example.org/with/square/brackets',
+            [
+                'https://example.org/with/square/brackets',
                 'https://example.org/square/brackets/with/slash/and/comma/',
                 'https://example.org/with/parentheses',
                 'https://example.org/with/braces',
@@ -120,20 +121,32 @@ class UrlHelperTest extends \PHPUnit_Framework_TestCase
                 'https://example.org/with/double-quotes',
                 'https://example.org/with/exclamation',
                 'https://example.org/with/quotation',
-                ],
-            UrlHelper::getUrlsFromPlaintext('This text contains URL with the square brackets [https://example.org/with/square/brackets]
-                also the square brackets with a slash and a comma [https://example.org/square/brackets/with/slash/and/comma/],
-                or parentheses (https://example.org/with/parentheses),
-                or braces {https://example.org/with/braces}
-                or greater than symbol <https://example.org/with/greater-than-symbol>
-                even with just a comma: https://example.org/with/comma,
-                or with a dot: https://example.org/with/dot.
-                https://example.org/with/colon: It is cool!
-                This website https://example.org/with/semi-colon; Very awesome!
-                A single example \'https://example.org/with/simple-quotes\'
-                A double example "https://example.org/with/double-quotes"
-                Thanks for this https://example.org/with/exclamation!
-                Someone said “https://example.org/with/quotation”')
+                'https://example.org/with/query?utm_campaign=hello',
+                'https://example.org/with/tokenized-query?foo={contactfield=bar}&bar=foo',
+                'https://example.org/with/just-tokenized-query?foo={contactfield=bar}',
+                'https://example.org/with/query?utm_campaign=_hello#_underscore-test',
+            ],
+            UrlHelper::getUrlsFromPlaintext(
+                <<<STRING
+This text contains URL with the square brackets [https://example.org/with/square/brackets]
+also the square brackets with a slash and a comma [https://example.org/square/brackets/with/slash/and/comma/],
+or parentheses (https://example.org/with/parentheses),
+or braces {https://example.org/with/braces}
+or greater than symbol <https://example.org/with/greater-than-symbol>
+even with just a comma: https://example.org/with/comma,
+or with a dot: https://example.org/with/dot.
+https://example.org/with/colon: It is cool!
+This website https://example.org/with/semi-colon; Very awesome!
+A single example 'https://example.org/with/simple-quotes'
+A double example "https://example.org/with/double-quotes"
+Thanks for this https://example.org/with/exclamation!
+Someone said “https://example.org/with/quotation”
+Checkout my UTM tags https://example.org/with/query?utm_campaign=hello.
+Hey what about https://example.org/with/tokenized-query?foo={contactfield=bar}&bar=foo.
+What happens with this https://example.org/with/just-tokenized-query?foo={contactfield=bar}?
+Underscore test https://example.org/with/query?utm_campaign=_hello#_underscore-test
+STRING
+            )
         );
     }
 }

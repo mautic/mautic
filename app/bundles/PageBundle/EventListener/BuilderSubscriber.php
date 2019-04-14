@@ -59,6 +59,7 @@ class BuilderSubscriber extends CommonSubscriber
     const channelfrequency  = '{channelfrequency}';
     const preferredchannel  = '{preferredchannel}';
     const saveprefsRegex    = '{saveprefsbutton}';
+    const successmessage    = '{successmessage}';
     const identifierToken   = '{leadidentifier}';
 
     /**
@@ -142,6 +143,7 @@ class BuilderSubscriber extends CommonSubscriber
                         self::preferredchannel   => $this->translator->trans('mautic.page.form.preferredchannel'),
                         self::channelfrequency   => $this->translator->trans('mautic.page.form.channelfrequency'),
                         self::saveprefsRegex     => $this->translator->trans('mautic.page.form.saveprefs'),
+                        self::successmessage     => $this->translator->trans('mautic.page.form.successmessage'),
                         self::identifierToken    => $this->translator->trans('mautic.page.form.leadidentifier'),
                     ]
                 )
@@ -244,6 +246,15 @@ class BuilderSubscriber extends CommonSubscriber
                     'floppy-o',
                     'MauticCoreBundle:Slots:saveprefsbutton.html.php',
                     'slot_saveprefsbutton',
+                    540
+                );
+
+                $event->addSlotType(
+                    'successmessage',
+                    $this->translator->trans('mautic.core.slot.label.successmessage'),
+                    'check',
+                    'MauticCoreBundle:Slots:successmessage.html.php',
+                    'slot_successmessage',
                     540
                 );
             }
@@ -374,8 +385,14 @@ class BuilderSubscriber extends CommonSubscriber
                 $divContent = $xpath->query('//*[@data-slot="saveprefsbutton"]');
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
+                    $saveButton      = $xpath->query('//*[@data-slot="saveprefsbutton"]//a')->item(0);
                     $slot->nodeValue = self::saveprefsRegex;
                     $content         = $dom->saveHTML();
+
+                    $params['saveprefsbutton'] = [
+                        'style'      => $saveButton->getAttribute('style'),
+                        'background' => $saveButton->getAttribute('background'),
+                    ];
                 }
 
                 unset($slot, $xpath, $dom);
@@ -404,6 +421,11 @@ class BuilderSubscriber extends CommonSubscriber
             if (false !== strpos($content, self::saveprefsRegex)) {
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
+            }
+
+            if (false !== strpos($content, self::successmessage)) {
+                $successMessage = $this->renderSuccessMessage($params);
+                $content        = str_ireplace(self::successmessage, $successMessage, $content);
             }
         }
 
@@ -528,6 +550,24 @@ class BuilderSubscriber extends CommonSubscriber
         if (empty($content)) {
             $content = "<div class='pref-saveprefs'>\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
+            $content .= "</div>\n";
+        }
+
+        return $content;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return string
+     */
+    protected function renderSuccessMessage(array $params = [])
+    {
+        static $content = '';
+
+        if (empty($content)) {
+            $content = "<div class=\"pref-successmessage\">\n";
+            $content .= $this->templating->render('MauticCoreBundle:Slots:successmessage.html.php', $params);
             $content .= "</div>\n";
         }
 

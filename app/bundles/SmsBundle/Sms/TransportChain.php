@@ -80,6 +80,11 @@ class TransportChain
     {
         $enabled = $this->getEnabledTransports();
 
+        // If there no primary transport selected and there is just one available we will use it as primary
+        if (count($enabled) === 1) {
+            return array_shift($enabled);
+        }
+
         if (!array_key_exists($this->primaryTransport, $enabled)) {
             throw new \Exception('Primary SMS transport is not enabled. '.$this->primaryTransport);
         }

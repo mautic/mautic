@@ -301,6 +301,20 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
+            'campaign' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.campaign'),
+                'properties' => [
+                    'type' => 'campaign',
+                ],
+                'operators' => $this->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
+            ],
+            'lead_asset_download' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_asset_download'),
+                'properties' => ['type' => 'assets'],
+                'operators'  => $this->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+            ],
             'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
                 'properties' => [
@@ -326,6 +340,23 @@ class ListModel extends FormModel
                         'include' => [
                             'in',
                             '!in',
+                        ],
+                    ]
+                ),
+                'object' => 'lead',
+            ],
+            'lead_email_sent_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            '!=',
+                            'gt',
+                            'lt',
+                            'gte',
+                            'lte',
                         ],
                     ]
                 ),
@@ -751,7 +782,7 @@ class ListModel extends FormModel
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
-            if (in_array($type, ['lookup', 'multiselect', 'boolean'])) {
+            if (in_array($type, ['select', 'multiselect', 'boolean'])) {
                 if ('boolean' == $type) {
                     //create a lookup list with ID
                     $properties['list'] = [
@@ -808,6 +839,18 @@ class ListModel extends FormModel
     public function getGlobalLists()
     {
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getGlobalLists();
+
+        return $lists;
+    }
+
+    /**
+     * Get a list of preference center lead lists.
+     *
+     * @return mixed
+     */
+    public function getPreferenceCenterLists()
+    {
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getPreferenceCenterList();
 
         return $lists;
     }
@@ -1014,7 +1057,7 @@ class ListModel extends FormModel
                 // Keep CPU down for large lists; sleep per $limit batch
                 $this->batchSleep();
 
-                $removeLeadList = $this->leadSegmentService->getOrphanedLeadListLeads($leadList);
+                $removeLeadList = $this->leadSegmentService->getOrphanedLeadListLeads($leadList, [], $limit);
 
                 if (empty($removeLeadList[$leadList->getId()])) {
                     // Somehow ran out of leads so break out
@@ -1686,6 +1729,13 @@ class ListModel extends FormModel
      */
     public function isFieldUsed(LeadField $field)
     {
+        $segments = $this->getFieldSegments($field);
+
+        return 0 < $segments->count();
+    }
+
+    public function getFieldSegments(LeadField $field)
+    {
         $alias       = $field->getAlias();
         $aliasLength = mb_strlen($alias);
         $likeContent = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
@@ -1696,6 +1746,105 @@ class ListModel extends FormModel
             ],
         ];
 
-        return $this->getEntities(['filter' => $filter])->count() !== 0;
+        return $this->getEntities(['filter' => $filter]);
+    }
+
+    /**
+     * Get segments which are dependent on given segment.
+     *
+     * @param int $segmentId
+     *
+     * @return array
+     */
+    public function getSegmentsWithDependenciesOnSegment($segmentId)
+    {
+        $page  = 1;
+        $limit = 1000;
+        $start = 0;
+
+        $filter = [
+            'force'  => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
+                ['column' => 'l.id', 'expr' => 'neq', 'value'=>$segmentId],
+            ],
+        ];
+
+        $entities = $this->getEntities(
+            [
+                'start'      => $start,
+                'limit'      => $limit,
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['type'] === 'leadlist' && in_array($segmentId, $eachFilter['filter'])) {
+                    $dependents[] = $entity->getName();
+                }
+            }
+        }
+
+        return $dependents;
+    }
+
+    /**
+     * Get segments which are used as a dependent by other segments to prevent batch deletion of them.
+     *
+     * @param array $segmentIds
+     *
+     * @return array
+     */
+    public function canNotBeDeleted($segmentIds)
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
+            ],
+        ];
+
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+
+        $idsNotToBeDeleted   = [];
+        $namesNotToBeDeleted = [];
+        $dependency          = [];
+
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['type'] !== 'leadlist') {
+                    continue;
+                }
+
+                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $eachFilter['filter']));
+                foreach ($eachFilter['filter'] as $val) {
+                    if (!empty($dependency[$val])) {
+                        $dependency[$val] = array_merge($dependency[$val], [$entity->getId()]);
+                        $dependency[$val] = array_unique($dependency[$val]);
+                    } else {
+                        $dependency[$val] = [$entity->getId()];
+                    }
+                }
+            }
+        }
+        foreach ($dependency as $key => $value) {
+            if (array_intersect($value, $segmentIds) === $value) {
+                $idsNotToBeDeleted = array_unique(array_diff($idsNotToBeDeleted, [$key]));
+            }
+        }
+
+        $idsNotToBeDeleted = array_intersect($segmentIds, $idsNotToBeDeleted);
+
+        foreach ($idsNotToBeDeleted as $val) {
+            $namesNotToBeDeleted[$val] = $this->getEntity($val)->getName();
+        }
+
+        return $namesNotToBeDeleted;
     }
 }

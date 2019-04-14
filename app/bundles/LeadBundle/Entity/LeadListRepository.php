@@ -152,7 +152,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false)
+    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
         if (is_array($lead)) {
             $q = $this->getEntityManager()->createQueryBuilder()
@@ -175,12 +175,16 @@ class LeadListRepository extends CommonRepository
             )
                 ->setParameter('leads', $lead)
                 ->setParameter('false', false, 'boolean');
+
             if ($isPublic) {
                 $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
                     ->setParameter('isPublic', true, 'boolean');
             }
+            if ($isPreferenceCenter) {
+                $q->andWhere($q->expr()->eq('l.isPreferenceCenter', ':isPreferenceCenter'))
+                    ->setParameter('isPreferenceCenter', true, 'boolean');
+            }
             $result = $q->getQuery()->getArrayResult();
-
             $return = [];
             foreach ($result as $r) {
                 foreach ($r['leads'] as $l) {
@@ -212,6 +216,11 @@ class LeadListRepository extends CommonRepository
             if ($isPublic) {
                 $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
                     ->setParameter('isPublic', true, 'boolean');
+            }
+
+            if ($isPreferenceCenter) {
+                $q->andWhere($q->expr()->eq('l.isPreferenceCenter', ':isPreferenceCenter'))
+                    ->setParameter('isPreferenceCenter', true, 'boolean');
             }
 
             return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
@@ -261,6 +270,27 @@ class LeadListRepository extends CommonRepository
             ->where($q->expr()->eq('l.isPublished', 'true'))
             ->setParameter(':true', true, 'boolean')
             ->andWhere($q->expr()->eq('l.isGlobal', ':true'))
+            ->orderBy('l.name');
+
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
+    }
+
+    /**
+     * Return a list of global lists.
+     *
+     * @return array
+     */
+    public function getPreferenceCenterList()
+    {
+        $q = $this->getEntityManager()->createQueryBuilder()
+            ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+
+        $q->select('partial l.{id, name, alias}')
+            ->where($q->expr()->eq('l.isPublished', 'true'))
+            ->setParameter(':true', true, 'boolean')
+            ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':true'))
             ->orderBy('l.name');
 
         $results = $q->getQuery()->getArrayResult();
@@ -1118,12 +1148,16 @@ class LeadListRepository extends CommonRepository
                     break;
                 case 'hit_url_date':
                 case 'lead_email_read_date':
+                case 'lead_email_sent_date':
                     $operand = (in_array($func, ['eq', 'gt', 'lt', 'gte', 'lte', 'between'])) ? 'EXISTS' : 'NOT EXISTS';
                     $table   = 'page_hits';
                     $column  = 'date_hit';
 
                     if ($details['field'] == 'lead_email_read_date') {
                         $column = 'date_read';
+                        $table  = 'email_stats';
+                    } elseif ($details['field'] == 'lead_email_sent_date') {
+                        $column = 'date_sent';
                         $table  = 'email_stats';
                     }
 
@@ -1504,6 +1538,8 @@ class LeadListRepository extends CommonRepository
                     break;
                 case 'tags':
                 case 'globalcategory':
+                case 'campaign':
+                case 'lead_asset_download':
                 case 'lead_email_received':
                 case 'lead_email_sent':
                 case 'device_type':
@@ -1525,6 +1561,14 @@ class LeadListRepository extends CommonRepository
                             $table  = 'lead_categories';
                             $column = 'category_id';
                             break;
+                        case 'campaign':
+                            $table  = 'campaign_leads';
+                            $column = 'campaign_id';
+
+                            $notRemovedParameter                         = $this->generateRandomParameterName();
+                            $subQueryFilters[$alias.'.manually_removed'] = $notRemovedParameter;
+                            $parameters[$notRemovedParameter]            = 0;
+                            break;
                         case 'lead_email_received':
                             $table  = 'email_stats';
                             $column = 'email_id';
@@ -1545,6 +1589,10 @@ class LeadListRepository extends CommonRepository
                             $table  = 'lead_devices';
                             $column = 'device_brand';
                             break;
+                        case 'lead_asset_download':
+                            $table  = 'asset_downloads';
+                            $column = 'asset_id';
+                            break;
                         case 'device_os':
                             $table  = 'lead_devices';
                             $column = 'device_os_name';
@@ -1560,7 +1608,6 @@ class LeadListRepository extends CommonRepository
                         $leadId,
                         $subQueryFilters
                     );
-
                     $groupExpr->add(
                         sprintf('%s (%s)', $func, $subQb->getSQL())
                     );
@@ -1990,10 +2037,6 @@ class LeadListRepository extends CommonRepository
         $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.ismine'):
-            case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
-                $expr = $q->expr()->eq('l.createdBy', $this->currentUser->getId());
-                break;
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isGlobal', ":$unique");
@@ -2036,9 +2079,8 @@ class LeadListRepository extends CommonRepository
     {
         $commands = [
             'mautic.lead.list.searchcommand.isglobal',
-            'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.ispublished',
-            'mautic.core.searchcommand.isinactive',
+            'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.name',
         ];
 

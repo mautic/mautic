@@ -401,12 +401,25 @@ class InputHelper
         } else {
             // Special handling for doctype
             $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', $value, $doctype);
-
             // Special handling for CDATA tags
             $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], $value, $cdataCount);
-
             // Special handling for conditional blocks
-            $value = preg_replace("/<!--\[if(.*?)\]>(.*?)<!\[endif\]-->/is", '<mcondition><mif>$1</mif>$2</mcondition>', $value, -1, $conditionsFound);
+            preg_match_all("/<!--\[if(.*?)\]>(.*?)(?:\<\!\-\-)?<!\[endif\]-->/is", $value, $matches);
+            if (!empty($matches[0])) {
+                $from = [];
+                $to   = [];
+                foreach ($matches[0] as $key=>$match) {
+                    $from[]   = $match;
+                    $startTag = '<mcondition>';
+                    $endTag   = '</mcondition>';
+                    if (false !== strpos($match, '<!--<![endif]-->')) {
+                        $startTag = '<mconditionnonoutlook>';
+                        $endTag   = '</mconditionnonoutlook>';
+                    }
+                    $to[] = $startTag.'<mif>'.$matches[1][$key].'</mif>'.$matches[2][$key].$endTag;
+                }
+                $value = str_replace($from, $to, $value);
+            }
 
             // Slecial handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
             $value = preg_replace_callback(
@@ -425,7 +438,7 @@ class InputHelper
                 $value, -1, $needsScriptDecoding);
 
             // Special handling for HTML comments
-            $value = str_replace(['<!--', '-->'], ['<mcomment>', '</mcomment>'], $value, $commentCount);
+            $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
 
             $value = self::getFilter(true)->clean($value, 'html');
 
@@ -438,8 +451,9 @@ class InputHelper
                 $value = str_replace(['<mcdata>', '</mcdata>'], ['<![CDATA[', ']]>'], $value);
             }
 
-            if ($conditionsFound) {
+            if (!empty($matches[0])) {
                 // Special handling for conditional blocks
+                $value = preg_replace("/<mconditionnonoutlook><mif>(.*?)<\/mif>(.*?)<\/mconditionnonoutlook>/is", '<!--[if$1]>$2<!--<![endif]-->', $value);
                 $value = preg_replace("/<mcondition><mif>(.*?)<\/mif>(.*?)<\/mcondition>/is", '<!--[if$1]>$2<![endif]-->', $value);
             }
 

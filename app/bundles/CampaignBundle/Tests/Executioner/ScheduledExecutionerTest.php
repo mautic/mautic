@@ -148,7 +148,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('executeLogs');
 
         $this->scheduler->expects($this->exactly(4))
-            ->method('getExecutionDateTime')
+            ->method('validateExecutionDateTime')
             ->willReturn(new \DateTime());
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
@@ -212,7 +212,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('executeLogs');
 
         $this->scheduler->expects($this->exactly(4))
-            ->method('getExecutionDateTime')
+            ->method('validateExecutionDateTime')
             ->willReturn(new \DateTime());
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
@@ -226,6 +226,8 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
+        $campaign->method('isPublished')
+            ->willReturn(true);
 
         $event = $this->getMockBuilder(Event::class)
             ->getMock();
@@ -261,7 +263,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->with([1, 2])
             ->willReturn($logs);
 
-        $this->scheduler->method('getExecutionDateTime')
+        $this->scheduler->method('validateExecutionDateTime')
             ->willReturn(new \DateTime());
 
         // Should only be executed once because the two logs were grouped by event ID
@@ -318,7 +320,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('executeLogs');
 
         $this->scheduler->expects($this->exactly(2))
-            ->method('getExecutionDateTime')
+            ->method('validateExecutionDateTime')
             ->willReturnOnConsecutiveCalls(
                 $oneMinuteDateTime,
                 $twoMinuteDateTime
@@ -346,6 +348,8 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
+        $campaign->method('isPublished')
+            ->willReturn(true);
 
         $event = $this->getMockBuilder(Event::class)
             ->getMock();
@@ -385,7 +389,7 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
         $threeMinuteDateTime = new \DateTime('+3 minutes');
 
         $this->scheduler->expects($this->exactly(2))
-            ->method('getExecutionDateTime')
+            ->method('validateExecutionDateTime')
             ->willReturnOnConsecutiveCalls(
                 $twoMinuteDateTime,
                 $threeMinuteDateTime
@@ -410,6 +414,67 @@ class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
 
         // Two events were evaluated
         $this->assertEquals(2, $counter->getTotalScheduled());
+    }
+
+    public function testSpecificEventsWithUnpublishedCamapign()
+    {
+        $campaign = $this->getMockBuilder(Campaign::class)
+            ->getMock();
+        $campaign->expects($this->once())
+            ->method('isPublished')
+            ->willReturn(false);
+
+        $event = $this->getMockBuilder(Event::class)
+            ->getMock();
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getCampaign')
+            ->willReturn($campaign);
+
+        $log1 = $this->createMock(LeadEventLog::class);
+        $log1->method('getId')
+            ->willReturn(1);
+        $log1->method('getEvent')
+            ->willReturn($event);
+        $log1->method('getCampaign')
+            ->willReturn($campaign);
+        $log1->method('getDateTriggered')
+            ->willReturn(new \DateTime());
+
+        $log2 = $this->createMock(LeadEventLog::class);
+        $log2->method('getId')
+            ->willReturn(2);
+        $log2->method('getEvent')
+            ->willReturn($event);
+        $log2->method('getCampaign')
+            ->willReturn($campaign);
+        $log2->method('getDateTriggered')
+            ->willReturn(new \DateTime());
+
+        $logs = new ArrayCollection([1 => $log1, 2 => $log2]);
+
+        $this->repository->expects($this->once())
+            ->method('getScheduledByIds')
+            ->with([1, 2])
+            ->willReturn($logs);
+
+        $this->executioner->expects($this->never())
+            ->method('executeLogs');
+
+        $this->executioner->expects($this->once())
+            ->method('recordLogsWithError');
+
+        $this->contactFinder->expects($this->never())
+            ->method('hydrateContacts');
+
+        $this->scheduler->method('validateExecutionDateTime')
+            ->willReturn(new \DateTime());
+
+        $counter = $this->getExecutioner()->executeByIds([1, 2]);
+
+        // Two events were evaluated
+        $this->assertEquals(2, $counter->getTotalEvaluated());
+        $this->assertEquals(0, $counter->getTotalExecuted());
     }
 
     /**
