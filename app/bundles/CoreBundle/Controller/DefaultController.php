@@ -66,10 +66,14 @@ class DefaultController extends CommonController
             $results = [];
         }
 
+        // Allow disable of ajax search until user hits enter key
+        $disableSearchUntilEnter = $this->container->getParameter('mautic.disable_search_until_enter');
+
         return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.php',
             [
-                'results'      => $results,
-                'searchString' => $searchStr,
+                'results'                 => $results,
+                'searchString'            => $searchStr,
+                'disableSearchUntilEnter' => $disableSearchUntilEnter,
             ]
         );
     }
