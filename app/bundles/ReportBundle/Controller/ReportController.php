@@ -864,7 +864,7 @@ class ReportController extends FormController
         $security = $this->container->get('mautic.security');
 
         /** @var \Mautic\ReportBundle\Scheduler\Model\FileHandler $fileHandler */
-        $fileHandler = $this->container->get('mautic.report.model.file_hanlder');
+        $fileHandler = $this->container->get('mautic.report.model.file_handler');
 
         if (empty($report)) {
             return $this->notFound($this->translator->trans('mautic.report.notfound', ['%id%' => $reportId]));
