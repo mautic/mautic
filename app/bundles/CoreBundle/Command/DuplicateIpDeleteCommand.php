@@ -11,10 +11,10 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use Doctrine\DBAL\DBALException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Doctrine\DBAL\DBALException;
 
 /**
  * CLI Command to delete duplicate IP addresses.
@@ -27,10 +27,10 @@ class DuplicateIpDeleteCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('mautic:duplicateip:delete')
-            ->setDescription('Deletes duplicate IP addresses that are not used in any other table')
+            ->setDescription('Deletes duplicate IP addresses that are not used in any other database table')
             ->setHelp(
                 <<<'EOT'
-                The <info>%command.name%</info> command is used to delete duplicate IP addresses that are not used in any other table.
+                The <info>%command.name%</info> command is used to delete duplicate IP addresses that are not used in any other database table.
 
 <info>php %command.full_name%</info>
 EOT
@@ -47,10 +47,9 @@ EOT
 
         try {
             $deletedRows = $ipAddressRepo->deleteDuplicateIpAddresses();
-            $output->writeln(sprintf("<info>%s duplicate IP addresses has been deleted</info>", $deletedRows));
-
+            $output->writeln(sprintf('<info>%s duplicate IP addresses has been deleted</info>', $deletedRows));
         } catch (DBALException $e) {
-            $output->writeln(sprintf("<error>Deletion of duplicate IP addresses failed because of database error: %s</error>", $e->getMessage()));
+            $output->writeln(sprintf('<error>Deletion of duplicate IP addresses failed because of database error: %s</error>', $e->getMessage()));
 
             return 1;
         }
