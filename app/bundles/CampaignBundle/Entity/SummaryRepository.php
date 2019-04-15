@@ -118,6 +118,8 @@ class SummaryRepository extends CommonRepository
      * Get the oldest triggered time for back-filling historical data.
      *
      * @return \DateTime|null
+     *
+     * @throws \Exception
      */
     public function getOldestTriggeredDate()
     {
@@ -167,8 +169,10 @@ class SummaryRepository extends CommonRepository
             ->getConnection()
             ->prepare($sql);
 
-        $q->bindParam('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT);
-        $q->bindParam('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+        $dateFromTs = $dateFrom->getTimestamp();
+        $dateToTs   = $dateTo->getTimestamp();
+        $q->bindParam('dateFrom', $dateFromTs, \PDO::PARAM_INT);
+        $q->bindParam('dateTo', $dateToTs, \PDO::PARAM_INT);
 
         $q->execute();
     }
