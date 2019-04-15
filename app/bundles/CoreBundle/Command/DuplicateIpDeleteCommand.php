@@ -41,12 +41,12 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em = $this->getContainer()->get('doctrine')->getEntityManager();
-        $ipAddressRepository = $em->getRepository('MauticCoreBundle:IpAddress');
+        $em             = $this->getContainer()->get('doctrine')->getEntityManager();
+        $ipAddressRepo  = $em->getRepository('MauticCoreBundle:IpAddress');
 
-        $deletedRows = $ipAddressRepository->deleteDuplicateIpAddresses();
+        $deletedRows = $ipAddressRepo->deleteDuplicateIpAddresses();
 
-        $output->writeln(sprintf('<info>%s duplicate IP adreeses has been deleted</info>', $deletedRows)); //TODO add translation?
+        $output->writeln(sprintf("\n\n<info>%s duplicate IP addresses has been deleted</info>", $deletedRows));
 
         return 0;
     }

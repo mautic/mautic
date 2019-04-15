@@ -35,14 +35,14 @@ class IpAddressRepository extends CommonRepository
     }
 
     /**
-     * Deletes duplicate IP addresses that are not being used in any other table
+     * Deletes duplicate IP addresses that are not being used in any other table.
      *
-     * @return int
+     * @return int  Number of deleted rows
+     *
      * @throws \Doctrine\DBAL\DBALException
      */
     public function deleteDuplicateIpAddresses()
     {
-
         $prefix = MAUTIC_TABLE_PREFIX;
 
         $sql = <<<SQL
@@ -65,12 +65,18 @@ class IpAddressRepository extends CommonRepository
 	            AND {$prefix}campaign_lead_event_log.id IS NULL 
 	            AND {$prefix}email_stats.id IS NULL 
 	            AND {$prefix}email_stats_devices.id IS NULL 
-	            AND {$prefix}form_submissions.id IS NULL AND {$prefix}lead_ips_xref.lead_id IS NULL AND {$prefix}lead_points_change_log.id IS NULL 
-	            AND {$prefix}page_hits.id IS NULL AND {$prefix}point_lead_action_log.point_id IS NULL AND {$prefix}point_lead_event_log.event_id IS NULL AND {$prefix}push_notification_stats.id IS NULL 
-	            AND {$prefix}sms_message_stats.id IS NULL AND {$prefix}stage_lead_action_log.stage_id IS NULL AND {$prefix}video_hits.id IS NULL AND {$prefix}ip_addresses.id < 10000000;
+	            AND {$prefix}form_submissions.id IS NULL 
+	            AND {$prefix}lead_ips_xref.lead_id IS NULL 
+	            AND {$prefix}lead_points_change_log.id IS NULL 
+	            AND {$prefix}page_hits.id IS NULL 
+	            AND {$prefix}point_lead_action_log.point_id IS NULL 
+	            AND {$prefix}point_lead_event_log.event_id IS NULL 
+	            AND {$prefix}push_notification_stats.id IS NULL 
+	            AND {$prefix}sms_message_stats.id IS NULL 
+	            AND {$prefix}stage_lead_action_log.stage_id IS NULL 
+	            AND {$prefix}video_hits.id IS NULL;
 SQL;
-        $stmt = $this->_em->getConnection()->prepare($sql);
-        $stmt->execute();
+        $stmt = $this->_em->getConnection()->executeQuery($sql);
 
         $deletedCount = $stmt->rowCount();
 
