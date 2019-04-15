@@ -11,10 +11,13 @@
 
 namespace Mautic\WebhookBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\WebhookBundle\Event\WebhookEvent;
-use Mautic\WebhookBundle\WebhookEvents as WebhookEvents;
+use Mautic\WebhookBundle\WebhookEvents;
+use Recurr\Transformer\TranslatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
@@ -29,10 +32,33 @@ class WebhookSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    /**
+     * @var NotificationModel
+     */
+    private $notificationModel;
+
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        NotificationModel $notificationModel,
+        EntityManager $entityManager,
+        TranslatorInterface $translator
+    ) {
+        $this->ipLookupHelper    = $ipLookupHelper;
+        $this->auditLogModel     = $auditLogModel;
+        $this->notificationModel = $notificationModel;
+        $this->entityManager     = $entityManager;
+        $this->translator        = $translator;
     }
 
     /**
@@ -43,6 +69,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         return [
             WebhookEvents::WEBHOOK_POST_SAVE   => ['onWebhookSave', 0],
             WebhookEvents::WEBHOOK_POST_DELETE => ['onWebhookDelete', 0],
+            WebhookEvents::WEBHOOK_KILL        => ['onWebhookKill', 0],
         ];
     }
 
@@ -81,5 +108,33 @@ class WebhookSubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * Send notification about killed webhook.
+     */
+    public function onWebhookKill(WebhookEvent $event)
+    {
+        $webhook = $event->getWebhook();
+        $reason  = $event->getReason();
+
+        $this->notificationModel->addNotification(
+            $this->translator->trans(
+                'mautic.webhook.stopped.details',
+                [
+                    '%reason%'  => $this->translator->trans($reason),
+                    '%webhook%' => '<a href="'.$this->router->generate(
+                            'mautic_webhook_action',
+                            ['objectAction' => 'view', 'objectId' => $webhook->getId()]
+                        ).'" data-toggle="ajax">'.$webhook->getName().'</a>',
+                ]
+            ),
+            'error',
+            false,
+            $this->translator->trans('mautic.webhook.stopped'),
+            null,
+            null,
+            $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy())
+        );
     }
 }
