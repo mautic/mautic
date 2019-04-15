@@ -14,6 +14,7 @@ namespace Mautic\CoreBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Doctrine\DBAL\DBALException;
 
 /**
  * CLI Command to delete duplicate IP addresses.
@@ -44,9 +45,15 @@ EOT
         $em             = $this->getContainer()->get('doctrine')->getEntityManager();
         $ipAddressRepo  = $em->getRepository('MauticCoreBundle:IpAddress');
 
-        $deletedRows = $ipAddressRepo->deleteDuplicateIpAddresses();
+        try {
+            $deletedRows = $ipAddressRepo->deleteDuplicateIpAddresses();
+            $output->writeln(sprintf("<info>%s duplicate IP addresses has been deleted</info>", $deletedRows));
 
-        $output->writeln(sprintf("\n\n<info>%s duplicate IP addresses has been deleted</info>", $deletedRows));
+        } catch (DBALException $e) {
+            $output->writeln(sprintf("<error>Deletion of duplicate IP addresses failed because of database error: %s</error>", $e->getMessage()));
+
+            return 1;
+        }
 
         return 0;
     }
